@@ -59,8 +59,8 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
             <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="order_transaction.repository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieSupportFacade">

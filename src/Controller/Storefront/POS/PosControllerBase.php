@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Controller\Storefront\POS;
 
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;

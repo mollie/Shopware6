@@ -11,7 +11,6 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;

@@ -5,9 +5,9 @@ namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
-use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -32,7 +32,7 @@ class WebhookControllerBase extends AbstractStoreFrontController
     private $logger;
 
     /**
-     * @var OrderRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrders;
 
@@ -45,11 +45,11 @@ class WebhookControllerBase extends AbstractStoreFrontController
     /**
      * @param NotificationFacade $notificationFacade
      * @param SubscriptionManager $subscriptionManager
-     * @param OrderRepositoryInterface $repoOrders
+     * @param EntityRepository $repoOrders
      * @param OrderTransactionRepositoryInterface $repoOrderTransactions
      * @param LoggerInterface $logger
      */
-    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, OrderRepositoryInterface $repoOrders, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
+    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, EntityRepository $repoOrders, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->subscriptions = $subscriptionManager;

@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRen
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepositoryInterface;
+
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Resources\Payment;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -12,6 +12,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionColl
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityNotFoundException;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 
@@ -23,7 +24,7 @@ class SubscriptionRenewing
     private $numberRanges;
 
     /**
-     * @var OrderAddressRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrderAddress;
 
@@ -40,11 +41,11 @@ class SubscriptionRenewing
 
     /**
      * @param NumberRangeValueGeneratorInterface $numberRanges
-     * @param OrderAddressRepositoryInterface $repoOrderAddress
+     * @param EntityRepository $repoOrderAddress
      * @param OrderService $orderService
      * @param OrderCloneService $orderCloneService
      */
-    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, OrderAddressRepositoryInterface $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
+    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, EntityRepository $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
     {
         $this->numberRanges = $numberRanges;
         $this->repoOrderAddress = $repoOrderAddress;

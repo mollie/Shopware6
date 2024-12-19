@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionS
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -26,7 +27,7 @@ class LiveDataEnricher implements EventSubscriberInterface
     private $gwMollie;
 
     /**
-     * @var SubscriptionRepository
+     * @var EntityRepository
      */
     private $repoSubscriptions;
 
@@ -38,10 +39,10 @@ class LiveDataEnricher implements EventSubscriberInterface
     /**
      * @param SettingsService $pluginSettings
      * @param MollieGatewayInterface $gwMollie
-     * @param SubscriptionRepository $repoSubscriptions
+     * @param EntityRepository $repoSubscriptions
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie, SubscriptionRepository $repoSubscriptions, LoggerInterface $logger)
+    public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie, EntityRepository $repoSubscriptions, LoggerInterface $logger)
     {
         $this->pluginSettings = $pluginSettings;
         $this->gwMollie = $gwMollie;

@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
-use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Psr\Log\LoggerInterface;

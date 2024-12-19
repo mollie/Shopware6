@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
@@ -33,7 +34,7 @@ class SubscriptionPageLoader
     private $genericLoader;
 
     /**
-     * @var SubscriptionRepository
+     * @var EntityRepository
      */
     private $repoSubscriptions;
 
@@ -65,14 +66,14 @@ class SubscriptionPageLoader
 
     /**
      * @param GenericPageLoaderInterface $genericLoader
-     * @param SubscriptionRepository $repoSubscriptions
+     * @param EntityRepository $repoSubscriptions
      * @param CustomerService $customerService
      * @param AbstractCountryRoute $countryRoute
      * @param AbstractSalutationRoute $salutationRoute
      * @param SettingsService $settingsService
      * @param ContainerInterface $container
      */
-    public function __construct(GenericPageLoaderInterface $genericLoader, SubscriptionRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
+    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;

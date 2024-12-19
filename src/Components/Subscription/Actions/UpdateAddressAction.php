@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class UpdateAddressAction extends BaseAction
@@ -33,7 +34,7 @@ class UpdateAddressAction extends BaseAction
 
     /**
      * @param SettingsService $pluginSettings
-     * @param SubscriptionRepository $repoSubscriptions
+     * @param EntityRepository $repoSubscriptions
      * @param SubscriptionBuilder $subscriptionBuilder
      * @param MollieDataBuilder $mollieRequestBuilder
      * @param CustomerService $customers
@@ -46,7 +47,7 @@ class UpdateAddressAction extends BaseAction
      * @param OrderService $orderService
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, OrderService $orderService)
+    public function __construct(SettingsService $pluginSettings, EntityRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, OrderService $orderService)
     {
         parent::__construct(
             $pluginSettings,

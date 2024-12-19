@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing;
 
-use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
+
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\Order\OrderConversionContext;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class OrderCloneService
@@ -34,11 +35,11 @@ class OrderCloneService
 
 
     /**
-     * @param OrderRepositoryInterface $repoOrders
+     * @param EntityRepository $repoOrders
      * @param OrderConverter $orderConverter
      * @param Processor $processor
      */
-    public function __construct(OrderRepositoryInterface $repoOrders, OrderConverter $orderConverter, Processor $processor)
+    public function __construct(EntityRepository $repoOrders, OrderConverter $orderConverter, Processor $processor)
     {
         $this->repoOrders = $repoOrders;
         $this->orderConverter = $orderConverter;

@@ -6,7 +6,6 @@ use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
-use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Migration\MigrationCollection;

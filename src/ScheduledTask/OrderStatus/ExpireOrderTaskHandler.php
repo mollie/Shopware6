@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\ScheduledTask\OrderStatus;
 
 use Kiener\MolliePayments\Components\OrderExpiration\ExpireAction;
-use Kiener\MolliePayments\Repository\ScheduledTask\ScheduledTaskRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;

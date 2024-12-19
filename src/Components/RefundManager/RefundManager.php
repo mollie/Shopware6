@@ -33,6 +33,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
@@ -74,7 +75,7 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
-     * @var RefundRepositoryInterface
+     * @var EntityRepository
      */
     protected $refundRepository;
 
@@ -93,7 +94,7 @@ class RefundManager implements RefundManagerInterface
      * @param FlowBuilderFactoryInterface $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param StockManagerInterface $stockUpdater
-     * @param RefundRepositoryInterface $refundRepository
+     * @param EntityRepository $refundRepository
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -104,7 +105,7 @@ class RefundManager implements RefundManagerInterface
         FlowBuilderFactoryInterface $flowBuilderFactory,
         FlowBuilderEventFactory $flowBuilderEventFactory,
         StockManagerInterface $stockUpdater,
-        RefundRepositoryInterface $refundRepository,
+        EntityRepository $refundRepository,
         RefundCreditNoteService $creditNoteService,
         LoggerInterface $logger
     ) {

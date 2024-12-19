@@ -3,7 +3,6 @@
 namespace Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder;
 
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Repository\ScheduledTask\ScheduledTaskRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
