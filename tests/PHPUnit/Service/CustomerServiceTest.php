@@ -2,30 +2,20 @@
 
 namespace Kiener\MolliePayments\Tests\Service;
 
-use Kiener\MolliePayments\Repository\Country\CountryRepository;
-use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
-use Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepositoryInterface;
-use Kiener\MolliePayments\Repository\Salutation\SalutationRepository;
 use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
-use Kiener\MolliePayments\Service\MollieApi\Mandate;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Struct\CustomerStruct;
 use MolliePayments\Tests\Fakes\FakeContainer;
-use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use MolliePayments\Tests\Fakes\Repositories\FakeCustomerRepository;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -47,14 +37,14 @@ class CustomerServiceTest extends TestCase
         $this->settingsService = $this->createMock(SettingsService::class);
 
         $this->customerService = new CustomerService(
-            $this->createMock(CountryRepository::class),
+            $this->createMock(EntityRepository::class),
             $this->customerRepository,
-            $this->createMock(CustomerAddressRepositoryInterface::class),
+            $this->createMock(EntityRepository::class),
             $this->createMock(Customer::class),
             $this->createMock(EventDispatcherInterface::class),
             new NullLogger(),
             $this->createMock(SalesChannelContextPersister::class),
-            $this->createMock(SalutationRepository::class),
+            $this->createMock(EntityRepository::class),
             $this->settingsService,
             'does.not.matter.here',
             $this->createMock(ConfigService::class),

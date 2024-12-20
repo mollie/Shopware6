@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\ApplePayDirect\Models\Collections;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayDirectDomainAllowListItem;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections\ApplePayDirectDomainAllowList;
 use PHPUnit\Framework\TestCase;

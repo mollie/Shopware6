@@ -10,7 +10,6 @@ use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor;
 use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
-use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
@@ -26,7 +25,6 @@ use Shopware\Core\Framework\Context;
 
 class ShipmentManagerTest extends TestCase
 {
-
     use OrderTrait;
 
     /**
@@ -78,8 +76,8 @@ class ShipmentManagerTest extends TestCase
      * We also do not provide any tracking information. In this case, the tracking data will be
      * read from the order, which is also empty in this test.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderRestWithoutTracking(): void
     {
@@ -104,8 +102,8 @@ class ShipmentManagerTest extends TestCase
      * We also do not provide any tracking information. But our order as tracking information,
      * so it should be passed on correctly to Mollie.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderRestWithTrackingFromDelivery(): void
     {
@@ -133,8 +131,8 @@ class ShipmentManagerTest extends TestCase
      * This is defined by passing an empty line item array to our shipment service.
      * We also provide custom tracking data that needs to be used.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderRestWithCustomTracking(): void
     {
@@ -165,8 +163,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies that we get a successful exception
      * if our order in Shopware somehow has no deliveries.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderRestFailsWithoutDeliveries()
     {
@@ -194,8 +192,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies that our shipOrder throws a valid exception
      * if no line items have been provided.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderWithoutTrackingNoLineItems()
     {
@@ -216,8 +214,8 @@ class ShipmentManagerTest extends TestCase
      * In this test case we do not have any tracking information, neither in the
      * custom request, nor in the order delivery itself, so nothing should be tracked.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderWithoutTracking()
     {
@@ -250,8 +248,8 @@ class ShipmentManagerTest extends TestCase
      * In this test case we do provide any tracking information,
      * but the order already has one, so it should be used.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderWithTrackingFromDelivery()
     {
@@ -288,8 +286,8 @@ class ShipmentManagerTest extends TestCase
      * In this test case we provide custom tracking information,
      * which should be used.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderWithCustomTracking()
     {
@@ -328,8 +326,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies that we get a successful exception
      * if our order in Shopware somehow has no deliveries.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipOrderFailsWithoutDeliveries()
     {
@@ -360,8 +358,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies if a specific item shipment is correctly being passed on.
      * We do not provide any tracking information, neither in the custom request, nor in the order delivery itself.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipItemWithoutTracking()
     {
@@ -391,8 +389,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies if a specific item shipment is correctly being passed on.
      * We do not provide custom tracking data, but our order delivery has data which should be used.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipItemWithTrackingFromDelivery()
     {
@@ -423,8 +421,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies if a specific item shipment is correctly being passed on.
      * We do provide custom tracking data that should be used
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipItemWithCustomTracking()
     {
@@ -440,7 +438,8 @@ class ShipmentManagerTest extends TestCase
             new TrackingData(
                 'DHL Standard',
                 'code-abc',
-                'https://www.mollie.com?code=%s'),
+                'https://www.mollie.com?code=%s'
+            ),
             $this->context
         );
 
@@ -454,8 +453,8 @@ class ShipmentManagerTest extends TestCase
      * This test verifies that we get a successful exception
      * if our order in Shopware somehow has no deliveries.
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testShipItemFailsWithoutDeliveries()
     {
@@ -480,5 +479,4 @@ class ShipmentManagerTest extends TestCase
         # make sure we don't call the Mollie API
         $this->assertFalse($this->fakeShipmentService->isShipOrderCalled());
     }
-
 }

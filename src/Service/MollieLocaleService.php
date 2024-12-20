@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieLocaleService
@@ -32,11 +33,11 @@ class MollieLocaleService
     ];
 
     /**
-     * @var LanguageRepositoryInterface
+     * @var EntityRepository
      */
     private $repoLanguages;
 
-    public function __construct(LanguageRepositoryInterface $repoLanguages)
+    public function __construct(EntityRepository $repoLanguages)
     {
         $this->repoLanguages = $repoLanguages;
     }
@@ -53,7 +54,15 @@ class MollieLocaleService
         $salesChannel = $salesChannelContext->getSalesChannel();
         $languageId = $salesChannel->getLanguageId();
 
-        $language = $this->repoLanguages->findById($languageId, $salesChannelContext->getContext());
+        $languageCriteria = new Criteria([$languageId]);
+        $languageCriteria->addAssociation('locale');
+
+
+        $languagesResult = $this->repoLanguages->search($languageCriteria, $salesChannelContext->getContext());
+
+        $language = $languagesResult->first();
+
+
 
         if ($language !== null && $language->getLocale() !== null) {
             $locale = $language->getLocale()->getCode();

@@ -4,9 +4,7 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use DateTime;
 use DateTimeZone;
-use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
 use MolliePayments\Tests\Fakes\FakeContainer;

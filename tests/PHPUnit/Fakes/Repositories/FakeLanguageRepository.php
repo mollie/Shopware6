@@ -2,13 +2,14 @@
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
-use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\Language\LanguageEntity;
 
-class FakeLanguageRepository implements LanguageRepositoryInterface
+class FakeLanguageRepository extends EntityRepository
 {
 
     /**
@@ -18,7 +19,7 @@ class FakeLanguageRepository implements LanguageRepositoryInterface
 
 
     /**
-     * @param LanguageEntity|null $foundLanguage
+     * @param null|LanguageEntity $foundLanguage
      */
     public function __construct(?LanguageEntity $foundLanguage)
     {
@@ -33,17 +34,20 @@ class FakeLanguageRepository implements LanguageRepositoryInterface
      */
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
-        // TODO: Implement search() method.
+        $entities = new EntityCollection();
+        if ($this->foundLanguage instanceof LanguageEntity) {
+            $entities->add($this->foundLanguage);
+        }
+        return new EntitySearchResult(LanguageEntity::class, $entities->count(), $entities, null, $criteria, $context);
     }
 
     /**
      * @param string $languageId
      * @param Context $context
-     * @return LanguageEntity|null
+     * @return null|LanguageEntity
      */
     public function findById(string $languageId, Context $context): ?LanguageEntity
     {
         return $this->foundLanguage;
     }
-
 }

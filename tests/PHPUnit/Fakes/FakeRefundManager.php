@@ -112,5 +112,4 @@ class FakeRefundManager implements RefundManagerInterface
     {
         // TODO: Implement cancelAllOrderRefunds() method.
     }
-
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\OrderExpiration;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Service\Order\OrderExpireService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -13,6 +11,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStat
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
@@ -22,15 +21,15 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ExpireAction
 {
-    private OrderRepositoryInterface $orderRepository;
-    private SalesChannelRepositoryInterface $salesChannelRepository;
+    private EntityRepository $orderRepository;
+    private EntityRepository $salesChannelRepository;
     private OrderExpireService $orderExpireService;
     private SettingsService $settingsService;
     private LoggerInterface $logger;
 
     public function __construct(
-        OrderRepositoryInterface        $orderRepository,
-        SalesChannelRepositoryInterface $salesChannelRepository,
+        EntityRepository        $orderRepository,
+        EntityRepository $salesChannelRepository,
         OrderExpireService              $orderExpireService,
         SettingsService                 $settingsService,
         LoggerInterface                 $logger

@@ -5,7 +5,6 @@ namespace MolliePayments\Tests\Service\Cart\Voucher;
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use MolliePayments\Tests\Fakes\Repositories\FakeProductRepository;
-use MolliePayments\Tests\Traits\FakeTrait;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -105,7 +104,7 @@ class VoucherServiceTest extends TestCase
         $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
 
         $fakeRepoProducts = new FakeProductRepository(null, $foundProduct);
-
+        $fakeRepoProducts->throwExceptions = true;
         $item = $this->buildProductLineItem('10001');
 
         $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
@@ -133,7 +132,7 @@ class VoucherServiceTest extends TestCase
         $foundParentProduct->setTranslated(['customFields'=>$foundParentProduct->getCustomFields()]);
 
 
-        $fakeRepoProducts = new FakeProductRepository($foundParentProduct, $foundProduct);
+        $fakeRepoProducts = new FakeProductRepository($foundParentProduct, null);
 
         $item = $this->buildProductLineItem('10001');
 

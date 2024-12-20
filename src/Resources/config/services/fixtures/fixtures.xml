@@ -8,7 +8,7 @@
 
         <service id="MolliePayments\Fixtures\SalesChannel\SalesChannelFixture">
             <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <tag name="basecom.fixture"/>
         </service>
 

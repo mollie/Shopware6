@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Fakes;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
-use Kiener\MolliePayments\Components\CancelManager\CancelManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Api\Endpoints\OrderEndpoint;
@@ -14,7 +13,6 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use MolliePayments\Tests\Fakes\Repositories\FakeOrderLineItemRepository;
-use MolliePayments\Tests\Fakes\Repositories\FakeOrderRepository;
 use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -49,7 +47,6 @@ class CancelItemFacadeBuilder
 
     public function withInvalidOrder(): self
     {
-
         $mockOrderEndpoint = $this->testCase->getMockBuilder(OrderEndpoint::class)->disableOriginalConstructor()->getMock();
         $mockOrderEndpoint->method('get')->willThrowException(new ApiException('Invalid order'));
 
@@ -107,5 +104,4 @@ class CancelItemFacadeBuilder
 
         return new CancelItemFacade($mollieFactory, $orderLineRepository, $this->stockManager, $dispatcher, new NullLogger());
     }
-
 }

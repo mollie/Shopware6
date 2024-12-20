@@ -2,9 +2,7 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;

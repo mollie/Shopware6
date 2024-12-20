@@ -2,18 +2,11 @@
 
 namespace PHPUnit\Components\Subscription\Services\Builder;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
-use Kiener\MolliePayments\Service\Router\RoutingBuilder;
-use Kiener\MolliePayments\Service\Router\RoutingDetector;
-use MolliePayments\Tests\Fakes\FakePluginSettings;
-use MolliePayments\Tests\Fakes\FakeRouter;
 use MolliePayments\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\Currency\CurrencyEntity;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class MollieDataBuilderTest extends TestCase
 {

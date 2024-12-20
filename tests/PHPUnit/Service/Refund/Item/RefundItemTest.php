@@ -3,7 +3,6 @@
 namespace MolliePayments\Tests\Service\Refund\Item;
 
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
-use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
 use PHPUnit\Framework\TestCase;
 
 class RefundItemTest extends TestCase

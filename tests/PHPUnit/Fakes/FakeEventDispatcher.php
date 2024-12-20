@@ -82,6 +82,4 @@ class FakeEventDispatcher implements EventDispatcherInterface
     {
         // TODO: Implement hasListeners() method.
     }
-
-
 }

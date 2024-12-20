@@ -2,8 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
-use Kiener\MolliePayments\Repository\StateMachineState\StateMachineStateRepositoryInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -12,6 +10,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 class OrderStatusUpdater
@@ -23,7 +23,7 @@ class OrderStatusUpdater
     private $orderHandler;
 
     /**
-     * @var OrderRepositoryInterface
+     * @var EntityRepository
      */
     private $repoOrders;
 
@@ -39,18 +39,18 @@ class OrderStatusUpdater
     private $logger;
 
     /**
-     * @var StateMachineStateRepositoryInterface
+     * @var EntityRepository
      */
     private $stateMachineStateRepository;
 
 
     /**
      * @param OrderStateService $orderHandler
-     * @param OrderRepositoryInterface $repoOrders
+     * @param EntityRepository $repoOrders
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderStateService $orderHandler, OrderRepositoryInterface $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, StateMachineStateRepositoryInterface $stateMachineStateRepository, LoggerInterface $logger)
+    public function __construct(OrderStateService $orderHandler, EntityRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, EntityRepository $stateMachineStateRepository, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;
@@ -74,7 +74,12 @@ class OrderStatusUpdater
 
 
         if (! $currentShopwareState instanceof StateMachineStateEntity) {
-            $currentShopwareState = $this->stateMachineStateRepository->findByStateId($transaction->getStateId(), $context);
+            $criteria = new Criteria([$transaction->getStateId()]);
+            $searchResult = $this->stateMachineStateRepository->search($criteria, $context);
+
+            /** @var ?StateMachineStateEntity OrderStatusUpdater.php */
+            $currentShopwareState = $searchResult->first();
+
             if (! $currentShopwareState instanceof StateMachineStateEntity) {
                 return;
             }
@@ -172,7 +177,13 @@ class OrderStatusUpdater
         # last but not least,
         # also update the lastUpdated of the order itself
         # this is required for ERP systems and more (so they know something has changed).
-        $this->repoOrders->updateOrderLastUpdated($order->getId(), $context);
+
+        $this->repoOrders->update([
+            [
+                'id' => $order->getId(),
+                'updatedAt' => new \DateTime(),
+            ]
+        ], $context);
     }
 
     /**

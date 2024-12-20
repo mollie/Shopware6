@@ -3,11 +3,11 @@
 namespace Kiener\MolliePayments\Command\DAL;
 
 use Doctrine\DBAL\Connection;
-use Kiener\MolliePayments\Repository\Product\ProductRepositoryInterface;
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,7 +20,7 @@ class DALCleanupCommand extends Command
 
 
     /**
-     * @var ProductRepositoryInterface
+     * @var EntityRepository
      */
     private $repoProducts;
 
@@ -36,11 +36,11 @@ class DALCleanupCommand extends Command
 
 
     /**
-     * @param ProductRepositoryInterface $repoProducts
+     * @param EntityRepository $repoProducts
      * @param Connection $connection
      * @param LoggerInterface $logger
      */
-    public function __construct(ProductRepositoryInterface $repoProducts, Connection $connection, LoggerInterface $logger)
+    public function __construct(EntityRepository $repoProducts, Connection $connection, LoggerInterface $logger)
     {
         $this->repoProducts = $repoProducts;
         $this->connection = $connection;

@@ -5,7 +5,6 @@ namespace MolliePayments\Tests\Service\Mail;
 use Kiener\MolliePayments\Service\Mail\MailService;
 use League\Flysystem\FilesystemInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Shopware\Core\Content\Mail\Service\MailFactory;
 use Shopware\Core\Content\Mail\Service\MailSender;
 use Shopware\Core\Framework\Validation\DataValidator;

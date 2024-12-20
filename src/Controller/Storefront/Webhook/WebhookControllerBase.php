@@ -5,8 +5,8 @@ namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
-use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\OrderRepository;
+use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -32,12 +32,12 @@ class WebhookControllerBase extends AbstractStoreFrontController
     private $logger;
 
     /**
-     * @var OrderRepositoryInterface
+     * @var OrderRepository
      */
     private $repoOrders;
 
     /**
-     * @var OrderTransactionRepositoryInterface
+     * @var OrderTransactionRepository
      */
     private $repoOrderTransactions;
 
@@ -45,11 +45,11 @@ class WebhookControllerBase extends AbstractStoreFrontController
     /**
      * @param NotificationFacade $notificationFacade
      * @param SubscriptionManager $subscriptionManager
-     * @param OrderRepositoryInterface $repoOrders
-     * @param OrderTransactionRepositoryInterface $repoOrderTransactions
+     * @param OrderRepository $repoOrders
+     * @param OrderTransactionRepository $repoOrderTransactions
      * @param LoggerInterface $logger
      */
-    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, OrderRepositoryInterface $repoOrders, OrderTransactionRepositoryInterface $repoOrderTransactions, LoggerInterface $logger)
+    public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptionManager, OrderRepository $repoOrders, OrderTransactionRepository $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->subscriptions = $subscriptionManager;

@@ -2,17 +2,16 @@
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
-use Kiener\MolliePayments\Repository\Order\OrderRepositoryInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
-use Shopware\Core\Framework\Uuid\Uuid;
 
-class FakeOrderRepository implements OrderRepositoryInterface
+class FakeOrderRepository extends EntityRepository
 {
     /**
      * @var OrderEntity

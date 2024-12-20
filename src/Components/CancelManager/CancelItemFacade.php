@@ -6,11 +6,11 @@ namespace Kiener\MolliePayments\Components\CancelManager;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Event\OrderLinesUpdatedEvent;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepositoryInterface;
 use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -23,11 +23,11 @@ class CancelItemFacade
 
 
     private LoggerInterface $logger;
-    private OrderLineItemRepositoryInterface $orderLineItemRepository;
+    private EntityRepository $orderLineItemRepository;
     private StockManagerInterface $stockManager;
     private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(MollieApiFactory $clientFactory, OrderLineItemRepositoryInterface $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
+    public function __construct(MollieApiFactory $clientFactory, EntityRepository $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->client = $clientFactory->getClient();
         $this->logger = $logger;

@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Kiener\MolliePayments\Components\ShipmentManager\Models\ShipmentLineItem;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\TrackingData;
 use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManagerInterface;
 use Mollie\Api\MollieApiClient;
@@ -51,7 +50,7 @@ class FakeShipmentManager implements ShipmentManagerInterface
 
     /**
      * @param OrderEntity $order
-     * @param TrackingData|null $tracking
+     * @param null|TrackingData $tracking
      * @param array $shippingItems
      * @param Context $context
      * @return Shipment
@@ -68,7 +67,7 @@ class FakeShipmentManager implements ShipmentManagerInterface
      * @param OrderEntity $order
      * @param string $itemIdentifier
      * @param int $quantity
-     * @param TrackingData|null $tracking
+     * @param null|TrackingData $tracking
      * @param Context $context
      * @return Shipment
      */
@@ -79,7 +78,7 @@ class FakeShipmentManager implements ShipmentManagerInterface
 
     /**
      * @param OrderEntity $order
-     * @param TrackingData|null $tracking
+     * @param null|TrackingData $tracking
      * @param Context $context
      * @return Shipment
      */
@@ -100,6 +99,4 @@ class FakeShipmentManager implements ShipmentManagerInterface
     {
         // TODO: Implement getTotals() method.
     }
-
-
 }

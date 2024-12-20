@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use http\Env\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 

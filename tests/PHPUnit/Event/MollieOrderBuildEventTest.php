@@ -3,7 +3,6 @@
 namespace MolliePayments\Tests\Event;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
-use MolliePayments\Tests\Fakes\FakeSalesChannelContext;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;

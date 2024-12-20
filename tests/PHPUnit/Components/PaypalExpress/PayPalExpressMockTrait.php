@@ -71,7 +71,7 @@ trait PayPalExpressMockTrait
 
     private function getPaypalExpress(bool $withSessionId = false, bool $withStartSession = false, bool $withLoadSession = false, bool $withRedirectUrl = false, bool $withAuthenticateId = false, ?\stdClass $methodDetails = null): PayPalExpress
     {
-        if($methodDetails === null){
+        if ($methodDetails === null) {
             $methodDetails = new \stdClass();
         }
         /** @var PayPalExpress $paypalExpress */
@@ -83,7 +83,7 @@ trait PayPalExpressMockTrait
             if ($withRedirectUrl) {
                 $fakeSession->redirectUrl = 'fakeRedirectUrl';
             }
-            if($withAuthenticateId){
+            if ($withAuthenticateId) {
                 $fakeSession->authenticationId = 'fakeAuthenticationId';
             }
             $fakeSession->methodDetails = $methodDetails;

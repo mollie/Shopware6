@@ -2,22 +2,24 @@
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
-use Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepositoryInterface;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Event\NestedEventCollection;
 
-class FakeRefundRepository implements RefundRepositoryInterface
+class FakeRefundRepository extends EntityRepository
 {
 
     /**
      * @var array<mixed>
      */
     private $receivedCreateData;
-
+    public function __construct()
+    {
+    }
 
     /**
      * @param array<mixed> $data
@@ -65,5 +67,4 @@ class FakeRefundRepository implements RefundRepositoryInterface
     {
         return $this->receivedCreateData;
     }
-
 }

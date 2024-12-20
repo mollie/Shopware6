@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\PaypalExpress;
 
-
 use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
 use Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
@@ -30,7 +29,6 @@ class StartCheckoutRouteTest extends TestCase
 
         $this->expectException(DecorationPatternException::class);
         $route->getDecorated();
-
     }
 
     public function testPaymentIsNotEnabledExceptionIsThrown(): void
@@ -53,7 +51,6 @@ class StartCheckoutRouteTest extends TestCase
 
     public function testCartIsEmptyExceptionIsThrown(): void
     {
-
         $settingsService = $this->getSettings(true);
         $cartService = $this->getCartService(true);
 
@@ -68,7 +65,6 @@ class StartCheckoutRouteTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame($e->getErrorCode(), PaypalExpressException::EMPTY_CART);
         }
-
     }
 
     public function testStartSessionReturnsEmptyId(): void
@@ -87,7 +83,6 @@ class StartCheckoutRouteTest extends TestCase
         } catch (HttpException $e) {
             $this->assertSame($e->getErrorCode(), PaypalExpressException::MISSING_SESSION_ID);
         }
-
     }
 
     public function testLoadSessionReturnsEmptyId(): void
@@ -160,7 +155,6 @@ class StartCheckoutRouteTest extends TestCase
         $this->assertInstanceOf(ArrayStruct::class, $cartExtension);
         $this->assertNotNull($response->getSessionId());
         $this->assertSame('fakeSessionId', $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY]);
-        $this->assertSame(1,$cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION]);
+        $this->assertSame(1, $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION]);
     }
-
 }

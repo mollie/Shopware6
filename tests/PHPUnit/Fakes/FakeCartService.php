@@ -78,5 +78,4 @@ class FakeCartService implements CartServiceInterface
     {
         // TODO: Implement persistCart() method.
     }
-
 }

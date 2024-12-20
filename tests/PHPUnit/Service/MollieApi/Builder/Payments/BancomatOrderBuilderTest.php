@@ -4,13 +4,9 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use DateTime;
 use DateTimeZone;
-use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\BancomatPayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
-use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
-use Mollie\Api\Types\PaymentMethod;
 use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;

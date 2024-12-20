@@ -2,24 +2,24 @@
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Repository\Product\ProductRepositoryInterface;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class ProductService
 {
     /**
-     * @var ProductRepositoryInterface
+     * @var EntityRepository
      */
     private $productRepository;
 
 
     /**
-     * @param ProductRepositoryInterface $productRepository
+     * @param EntityRepository $productRepository
      */
-    public function __construct(ProductRepositoryInterface $productRepository)
+    public function __construct(EntityRepository $productRepository)
     {
         $this->productRepository = $productRepository;
     }

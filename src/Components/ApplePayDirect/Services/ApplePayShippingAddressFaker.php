@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
-use Kiener\MolliePayments\Repository\Customer\CustomerRepositoryInterface;
-use Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepositoryInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
@@ -17,12 +16,12 @@ use Shopware\Core\Framework\Uuid\Uuid;
 class ApplePayShippingAddressFaker
 {
     private const ID_SUFFIX = 'applePayAddressId';
-    private CustomerRepositoryInterface $customerRepository;
-    private CustomerAddressRepositoryInterface $customerAddressRepository;
+    private EntityRepository $customerRepository;
+    private EntityRepository $customerAddressRepository;
 
     public function __construct(
-        CustomerRepositoryInterface        $customerRepository,
-        CustomerAddressRepositoryInterface $customerAddressRepository
+        EntityRepository        $customerRepository,
+        EntityRepository $customerAddressRepository
     ) {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;

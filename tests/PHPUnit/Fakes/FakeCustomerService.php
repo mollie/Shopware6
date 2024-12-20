@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
-use Exception;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -84,7 +82,8 @@ final class FakeCustomerService implements CustomerServiceInterface
         return [];
     }
 
-    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId,  SalesChannelContext $context,?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): ?CustomerEntity{
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): ?CustomerEntity
+    {
         return null;
     }
 

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\ApplePayDirect\Services;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use PHPUnit\Framework\TestCase;
 
