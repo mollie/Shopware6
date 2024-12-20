@@ -13,6 +13,7 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBui
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -82,7 +83,7 @@ class ApplePayDirect
     private $customerService;
 
     /**
-     * @var EntityRepository
+     * @var PaymentMethodRepository
      */
     private $repoPaymentMethods;
 
@@ -131,7 +132,7 @@ class ApplePayDirect
      * @param ApplePayShippingBuilder $shippingBuilder
      * @param SettingsService $pluginSettings
      * @param CustomerService $customerService
-     * @param EntityRepository $repoPaymentMethods
+     * @param PaymentMethodRepository $repoPaymentMethods
      * @param CartBackupService $cartBackupService
      * @param MollieApiFactory $mollieApiFactory
      * @param ShopService $shopService
@@ -140,7 +141,7 @@ class ApplePayDirect
      * @param ApplePayDirectDomainAllowListGateway $domainAllowListGateway
      * @param ApplePayDirectDomainSanitizer $domainSanitizer
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, EntityRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, EntityRepository $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
+    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, EntityRepository $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;
@@ -181,7 +182,7 @@ class ApplePayDirect
         $criteria->addFilter(new EqualsFilter('active', true));
 
         /** @var array<string> $paymentMethods */
-        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context->getContext())->getIds();
+        $paymentMethods = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context->getContext())->getIds();
 
         if (count($paymentMethods) <= 0) {
             throw new \Exception('Payment Method Apple Pay Direct not found in system');

@@ -15,6 +15,15 @@
         <service id="Kiener\MolliePayments\Repository\OrderRepository">
             <argument type="service" id="order.repository"/>
         </service>
+        <service id="Kiener\MolliePayments\Repository\PaymentMethodRepository">
+            <argument type="service" id="payment_method.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Repository\MediaRepository">
+            <argument type="service" id="media.repository"/>
+        </service>
+
+
 
     </services>
 </container>

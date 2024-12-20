@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\PaypalExpress;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
@@ -12,7 +13,6 @@ use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Resources\Session;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -30,7 +30,7 @@ class PayPalExpress
      */
     private const SESSION_BASE_TIMEOUT = 2000;
     /**
-     * @var EntityRepository
+     * @var PaymentMethodRepository
      */
     private $repoPaymentMethods;
 
@@ -60,14 +60,14 @@ class PayPalExpress
     private $cartService;
 
     /**
-     * @param EntityRepository $repoPaymentMethods
+     * @param PaymentMethodRepository $repoPaymentMethods
      * @param MollieApiFactory $mollieApiFactory
      * @param MollieOrderPriceBuilder $priceBuilder
      * @param RoutingBuilder $urlBuilder
      * @param CustomerService $customerService
      * @param CartServiceInterface $cartService
      */
-    public function __construct(EntityRepository $repoPaymentMethods, MollieApiFactory $mollieApiFactory, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $urlBuilder, CustomerService $customerService, CartServiceInterface $cartService)
+    public function __construct(PaymentMethodRepository $repoPaymentMethods, MollieApiFactory $mollieApiFactory, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $urlBuilder, CustomerService $customerService, CartServiceInterface $cartService)
     {
         $this->repoPaymentMethods = $repoPaymentMethods;
         $this->mollieApiFactory = $mollieApiFactory;
@@ -107,7 +107,7 @@ class PayPalExpress
         $criteria->addFilter(new EqualsFilter('salesChannels.id', $context->getSalesChannelId()));
 
         /** @var array<string> $paymentMethods */
-        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context->getContext())->getIds();
+        $paymentMethods = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context->getContext())->getIds();
 
         if (count($paymentMethods) <= 0) {
             throw new \Exception('Payment Method PayPal Express not found in system');

@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -31,7 +32,7 @@ class MollieOrderPaymentFlow
     /** @var PaymentMethodService */
     private $paymentMethodService;
 
-    /** @var EntityRepository */
+    /** @var PaymentMethodRepository */
     private $paymentMethodRepository;
 
     /** @var EntityRepository */
@@ -43,10 +44,10 @@ class MollieOrderPaymentFlow
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param SettingsService $settingsService
      * @param PaymentMethodService $paymentMethodService
-     * @param EntityRepository $paymentMethodRepository
+     * @param PaymentMethodRepository $paymentMethodRepository
      * @param EntityRepository $orderTransactionRepository
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, EntityRepository $paymentMethodRepository, EntityRepository $orderTransactionRepository)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, EntityRepository $orderTransactionRepository)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
@@ -80,7 +81,7 @@ class MollieOrderPaymentFlow
 
             // check if it is mollie payment method
             // ensure that we may only fetch mollie payment methods
-            $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
+            $molliePaymentMethodId = $this->paymentMethodRepository->getRepository()->searchIds(
                 (new Criteria())
                     ->addFilter(
                         new MultiFilter(

@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
 use Kiener\MolliePayments\Exception\SalesChannelPaymentMethodsException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -24,7 +25,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     protected $apiFactory;
 
     /**
-     * @var EntityRepository
+     * @var PaymentMethodRepository
      */
     protected $paymentMethodRepository;
 
@@ -36,10 +37,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     /**
      * @param EntityRepository $salesChannelRepository
      * @param MollieApiFactory $apiFactory
-     * @param EntityRepository $paymentMethodRepository
+     * @param PaymentMethodRepository $paymentMethodRepository
      * @param SalesChannelDataExtractor $salesChannelDataExtractor
      */
-    public function __construct(EntityRepository $salesChannelRepository, MollieApiFactory $apiFactory, EntityRepository $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
+    public function __construct(EntityRepository $salesChannelRepository, MollieApiFactory $apiFactory, PaymentMethodRepository $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
     {
         parent::__construct($salesChannelRepository);
 
@@ -82,7 +83,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         $criteria->addFilter(new ContainsFilter('handlerIdentifier', 'MolliePayments'));
 
         /** @var PaymentMethodCollection $paymentMethods */
-        $paymentMethods = $this->paymentMethodRepository->search($criteria, $context)->getEntities();
+        $paymentMethods = $this->paymentMethodRepository->getRepository()->search($criteria, $context)->getEntities();
 
         /** @var PaymentMethodEntity $paymentMethod */
         foreach ($paymentMethods as $paymentMethod) {

@@ -15,6 +15,7 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBui
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\OrderService;
@@ -87,7 +88,7 @@ class ApplePayDirectTest extends TestCase
         $customerService = $this->createDummyMock(CustomerService::class, $this);
 
         /** @var PaymentMethodRepository $repoPaymentMethods */
-        $repoPaymentMethods = $this->createDummyMock(EntityRepository::class, $this);
+        $repoPaymentMethods = new PaymentMethodRepository($this->createDummyMock(EntityRepository::class, $this));
 
         /** @var CartBackupService $cartBackupService */
         $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);

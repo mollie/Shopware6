@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Kiener\MolliePayments\Repository\MediaRepository;
 
-class FakeMediaRepository extends EntityRepository
+class FakeMediaRepository extends MediaRepository
 {
     public function __construct()
     {

@@ -161,7 +161,7 @@
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">
             <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <!-- // inject after product collector(5000) -->
             <tag name="shopware.cart.collector" priority="2000"/>
         </service>
@@ -216,7 +216,7 @@
         <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\PaymentMethodGenerator">
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor"/>
 
             <tag name="mollie_payments.mail.attachment_generator"/>
