@@ -12,6 +12,7 @@ use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -51,7 +52,7 @@ class NotificationFacade
     private $statusUpdater;
 
     /**
-     * @var EntityRepository
+     * @var PaymentMethodRepository
      */
     private $repoPaymentMethods;
 
@@ -100,7 +101,7 @@ class NotificationFacade
      * @param MollieGatewayInterface $gatewayMollie
      * @param OrderStatusConverter $statusConverter
      * @param OrderStatusUpdater $statusUpdater
-     * @param EntityRepository $repoPaymentMethods
+     * @param PaymentMethodRepository $repoPaymentMethods
      * @param OrderTransactionRepository $repoOrderTransactions
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
@@ -110,7 +111,7 @@ class NotificationFacade
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, EntityRepository $repoPaymentMethods, OrderTransactionRepository $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepository $repoPaymentMethods, OrderTransactionRepository $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -334,7 +335,7 @@ class NotificationFacade
             )
         );
 
-        $shopwarePaymentId = $this->repoPaymentMethods->searchIds($criteria, $context)->firstId();
+        $shopwarePaymentId = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context)->firstId();
 
         if (is_null($shopwarePaymentId)) {
             # if the payment method is not available locally in shopware
