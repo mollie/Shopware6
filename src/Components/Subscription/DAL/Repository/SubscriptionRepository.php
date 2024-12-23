@@ -21,10 +21,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 class SubscriptionRepository
 {
     private EntityRepository $repository;
+    private EntityRepository $addressRepository;
 
-    public function __construct(EntityRepository $repository)
+    public function __construct(EntityRepository $repository, EntityRepository $addressRepository)
     {
         $this->repository = $repository;
+        $this->addressRepository = $addressRepository;
     }
 
     public function getRepository(): EntityRepository
@@ -434,30 +436,28 @@ class SubscriptionRepository
      */
     private function upsertAddress(string $subscriptionId, SubscriptionAddressEntity $address, Context $context): void
     {
-        $this->repository->upsert(
+        $this->addressRepository->upsert(
             [
                 [
-                    'id' => $subscriptionId,
-                    'addresses' => [
-                        [
-                            'id' => $address->getId(),
-                            'salutationId' => ($address->getSalutationId() === '') ? null : $address->getSalutationId(),
-                            'title' => $address->getTitle(),
-                            'firstName' => $address->getFirstName(),
-                            'lastName' => $address->getLastName(),
-                            'company' => $address->getCompany(),
-                            'department' => $address->getDepartment(),
-                            'vatId' => $address->getVatId(),
-                            'street' => $address->getStreet(),
-                            'zipcode' => $address->getZipcode(),
-                            'city' => $address->getCity(),
-                            'countryId' => ($address->getCountryId() === '') ? null : $address->getCountryId(),
-                            'countryStateId' => ($address->getCountryStateId() === '') ? null : $address->getCountryStateId(),
-                            'phoneNumber' => $address->getPhoneNumber(),
-                            'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
-                            'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
-                        ]
-                    ],
+                    'id' => $address->getId(),
+                    'salutationId' => ($address->getSalutationId() === '') ? null : $address->getSalutationId(),
+                    'subscriptionId' => $subscriptionId,
+                    'title' => $address->getTitle(),
+                    'firstName' => $address->getFirstName(),
+                    'lastName' => $address->getLastName(),
+                    'company' => $address->getCompany(),
+                    'department' => $address->getDepartment(),
+                    'vatId' => $address->getVatId(),
+                    'street' => $address->getStreet(),
+                    'zipcode' => $address->getZipcode(),
+                    'city' => $address->getCity(),
+                    'countryId' => ($address->getCountryId() === '') ? null : $address->getCountryId(),
+                    'countryStateId' => ($address->getCountryStateId() === '') ? null : $address->getCountryStateId(),
+                    'phoneNumber' => $address->getPhoneNumber(),
+                    'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
+                    'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
+
+
                 ]
             ],
             $context
