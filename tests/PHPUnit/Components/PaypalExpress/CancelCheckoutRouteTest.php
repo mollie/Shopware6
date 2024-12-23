@@ -25,7 +25,6 @@ class CancelCheckoutRouteTest extends TestCase
 
         $this->expectException(DecorationPatternException::class);
         $route->getDecorated();
-
     }
 
     public function testPaymentIsNotEnabledExceptionIsThrown(): void
@@ -64,14 +63,14 @@ class CancelCheckoutRouteTest extends TestCase
     public function testCancelCheckoutSuccess(): void
     {
         $settingsService = $this->getSettings(true);
-        $cartService = $this->getCartService(true,true,true);
+        $cartService = $this->getCartService(true, true, true);
         $paypalExpress = $this->getPaypalExpress();
         $cartBackupService = $this->createMock(CartBackupService::class);
 
         $route = new CancelCheckoutRoute($settingsService, $cartBackupService, $cartService, $paypalExpress);
 
 
-       $response = $route->cancelCheckout($this->getContext());
-       $this->assertNotNull($response->getSessionId());
+        $response = $route->cancelCheckout($this->getContext());
+        $this->assertNotNull($response->getSessionId());
     }
 }

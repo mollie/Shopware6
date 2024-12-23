@@ -2,27 +2,27 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class UpdateOrderLineItems
 {
     /**
-     * @var OrderLineItemRepositoryInterface
+     * @var EntityRepository
      */
     private $orderLineRepository;
 
 
     /**
-     * @param OrderLineItemRepositoryInterface $orderLineRepository
+     * @param EntityRepository $orderLineRepository
      */
-    public function __construct(OrderLineItemRepositoryInterface $orderLineRepository)
+    public function __construct(EntityRepository $orderLineRepository)
     {
         $this->orderLineRepository = $orderLineRepository;
     }

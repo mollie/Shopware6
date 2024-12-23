@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Components\RefundManager\RefundData;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Refund;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;

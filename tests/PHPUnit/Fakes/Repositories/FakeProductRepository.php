@@ -2,14 +2,16 @@
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
-use Kiener\MolliePayments\Repository\Product\ProductRepositoryInterface;
+use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class FakeProductRepository implements ProductRepositoryInterface
+class FakeProductRepository extends EntityRepository
 {
     /**
      * @var ?ProductEntity
@@ -21,7 +23,7 @@ class FakeProductRepository implements ProductRepositoryInterface
      */
     private $searchResultNumber;
 
-
+    public bool $throwExceptions = false;
     /**
      * @param null|ProductEntity $resultID
      * @param null|ProductEntity $resultNumber
@@ -67,6 +69,23 @@ class FakeProductRepository implements ProductRepositoryInterface
      */
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
-        // TODO: Implement search() method.
+        if ($this->throwExceptions) {
+            throw new ProductNotFoundException('test');
+        }
+
+        $entities = new EntityCollection();
+
+        if ($this->searchResultNumber !== null) {
+            $entities->add($this->searchResultNumber);
+        }
+
+        if ($this->searchResultID !== null) {
+            $entities->add($this->searchResultID);
+        }
+
+
+
+
+        return new EntitySearchResult(ProductEntity::class, $entities->count(), $entities, null, $criteria, $context);
     }
 }

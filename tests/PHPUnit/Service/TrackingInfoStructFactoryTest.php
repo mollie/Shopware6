@@ -30,8 +30,8 @@ class TrackingInfoStructFactoryTest extends TestCase
 
 
     /**
-     * @return void
      * @throws \Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundException
+     * @return void
      */
     public function testTrackingFromOrder(): void
     {
@@ -62,8 +62,8 @@ class TrackingInfoStructFactoryTest extends TestCase
     }
 
     /**
-     * @return void
      * @throws NoDeliveriesFoundExceptions
+     * @return void
      */
     public function testOnlyOneCodeAccepted(): void
     {
@@ -184,5 +184,4 @@ class TrackingInfoStructFactoryTest extends TestCase
 
         $this->assertSame('', $trackingInfoStruct->getUrl());
     }
-
 }

@@ -37,8 +37,8 @@ use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
-use Kiener\MolliePayments\Repository\Media\MediaRepositoryInterface;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
+use Kiener\MolliePayments\Repository\MediaRepository;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -68,7 +68,7 @@ class PaymentMethodService
     private $mediaService;
 
     /**
-     * @var PaymentMethodRepositoryInterface
+     * @var PaymentMethodRepository
      */
     private $paymentRepository;
 
@@ -78,7 +78,7 @@ class PaymentMethodService
     private $pluginIdProvider;
 
     /**
-     * @var MediaRepositoryInterface
+     * @var MediaRepository
      */
     private $mediaRepository;
 
@@ -97,12 +97,12 @@ class PaymentMethodService
     /**
      * @param string $shopwareVersion
      * @param MediaService $mediaService
-     * @param MediaRepositoryInterface $mediaRepository
-     * @param PaymentMethodRepositoryInterface $paymentRepository
+     * @param MediaRepository$mediaRepository
+     * @param PaymentMethodRepository $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepositoryInterface $mediaRepository, PaymentMethodRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
+    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
@@ -248,7 +248,7 @@ class PaymentMethodService
         }
 
         if (count($upsertData) > 0) {
-            $this->paymentRepository->upsert($upsertData, $context);
+            $this->paymentRepository->getRepository()->upsert($upsertData, $context);
         }
     }
 
@@ -263,7 +263,7 @@ class PaymentMethodService
         $paymentCriteria = new Criteria();
         $paymentCriteria->addFilter(new ContainsFilter('handlerIdentifier', 'MolliePayments'));
 
-        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, $context);
 
         if (! $paymentMethods->count()) {
             return $installableHandlers;
@@ -337,7 +337,7 @@ class PaymentMethodService
      */
     public function setPaymentMethodActivated(string $paymentMethodId, bool $active, Context $context): EntityWrittenContainerEvent
     {
-        return $this->paymentRepository->upsert(
+        return $this->paymentRepository->getRepository()->upsert(
             [
                 [
                     'id' => $paymentMethodId,
@@ -362,7 +362,7 @@ class PaymentMethodService
         $paymentCriteria->addFilter(new EqualsFilter('id', $id));
 
         // Get payment methods
-        $paymentMethods = $this->paymentRepository->search($paymentCriteria, Context::createDefaultContext());
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, Context::createDefaultContext());
 
         if ($paymentMethods->getTotal() === 0) {
             return null;
@@ -413,7 +413,7 @@ class PaymentMethodService
         $paymentCriteria->addAssociation('translations');
 
         // Get payment IDs
-        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, $context);
 
         if ($paymentMethods->getTotal() === 0) {
             return null;
@@ -495,7 +495,7 @@ class PaymentMethodService
         $criteria->addFilter(new EqualsFilter('fileName', $fileName));
 
         /** @var MediaCollection $icons */
-        $icons = $this->mediaRepository->search($criteria, $context);
+        $icons = $this->mediaRepository->getRepository()->search($criteria, $context);
 
         if ($icons->count() && $icons->first() !== null) {
             return $icons->first()->getId();
@@ -540,7 +540,7 @@ class PaymentMethodService
 
         if (! $paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
-            $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
+            $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
         }
 
         return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;

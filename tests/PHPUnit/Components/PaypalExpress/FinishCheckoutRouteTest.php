@@ -11,7 +11,6 @@ use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 
-
 class FinishCheckoutRouteTest extends TestCase
 {
     use PayPalExpressMockTrait;
@@ -189,8 +188,5 @@ class FinishCheckoutRouteTest extends TestCase
 
         $this->assertInstanceOf(ArrayStruct::class, $cartExtension);
         $this->assertSame('fakeAuthenticationId', $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID]);
-
     }
-
-
 }

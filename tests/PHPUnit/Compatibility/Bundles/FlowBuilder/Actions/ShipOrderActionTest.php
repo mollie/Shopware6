@@ -2,21 +2,13 @@
 
 namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction;
-use Mollie\Api\Resources\Refund;
-use Mollie\Api\Types\RefundStatus;
-use MolliePayments\Tests\Fakes\FakeShipmentManager;
 use MolliePayments\Tests\Fakes\FakeOrderService;
+use MolliePayments\Tests\Fakes\FakeShipmentManager;
 use MolliePayments\Tests\Traits\FlowBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Content\Flow\Dispatching\FlowState;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\FlowEvent;
-use Shopware\Core\Framework\Util\Random;
 
 class ShipOrderActionTest extends TestCase
 {

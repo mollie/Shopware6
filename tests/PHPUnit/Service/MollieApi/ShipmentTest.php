@@ -39,7 +39,7 @@ class ShipmentTest extends TestCase
         $this->orderApiService = $this->createMock(Order::class);
         $this->orderApiService->method('getMollieOrder')->willReturn($this->mollieOrder);
 
-        $this->shipmentApiService = new Shipment($this->orderApiService,$dispatcher);
+        $this->shipmentApiService = new Shipment($this->orderApiService, $dispatcher);
     }
 
     protected function setUpOrderLines()
@@ -130,7 +130,6 @@ class ShipmentTest extends TestCase
      */
     public function testShipItem()
     {
-
         $this->mollieOrder
             ->expects($this->once())
             ->method('createShipment')

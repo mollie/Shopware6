@@ -16,19 +16,19 @@ use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellat
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class RemindAction extends BaseAction
 {
     /**
-     * @var SalesChannelRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSalesChannel;
 
@@ -55,11 +55,11 @@ class RemindAction extends BaseAction
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SubscriptionHistoryHandler $subscriptionHistory
      * @param LoggerInterface $logger
-     * @param SalesChannelRepositoryInterface $repoSalesChannel
+     * @param EntityRepository $repoSalesChannel
      * @param ReminderValidator $reminderValidator
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, SalesChannelRepositoryInterface $repoSalesChannel, ReminderValidator $reminderValidator)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, EntityRepository $repoSalesChannel, ReminderValidator $reminderValidator)
     {
         parent::__construct(
             $pluginSettings,

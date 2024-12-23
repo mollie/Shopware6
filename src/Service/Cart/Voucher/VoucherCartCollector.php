@@ -3,7 +3,7 @@
 namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepositoryInterface;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
@@ -21,7 +21,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
 
     /**
-     * @var PaymentMethodRepositoryInterface
+     * @var PaymentMethodRepository
      */
     private $repoPaymentMethods;
 
@@ -33,9 +33,9 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
     /**
      * @param VoucherService $voucherService
-     * @param PaymentMethodRepositoryInterface $paymentMethodRepository
+     * @param PaymentMethodRepository $paymentMethodRepository
      */
-    public function __construct(VoucherService $voucherService, PaymentMethodRepositoryInterface $paymentMethodRepository)
+    public function __construct(VoucherService $voucherService, PaymentMethodRepository $paymentMethodRepository)
     {
         $this->voucherService = $voucherService;
         $this->repoPaymentMethods = $paymentMethodRepository;
@@ -111,7 +111,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
         // Get payment methods
         /** @var array<string> $paymentMethods */
-        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
+        $paymentMethods = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context)->getIds();
 
         return (string)$paymentMethods[0];
     }

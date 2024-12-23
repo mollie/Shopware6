@@ -59,8 +59,8 @@ class RefundManagerTest extends TestCase
     private $fakeContext;
 
     /**
-     * @return void
      * @throws \Exception
+     * @return void
      */
     protected function setUp(): void
     {
@@ -105,8 +105,8 @@ class RefundManagerTest extends TestCase
      * This test verifies that our correct flow builder
      * event is fired with all required data.
      *
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testFlowBuilderDispatching()
     {
@@ -143,8 +143,8 @@ class RefundManagerTest extends TestCase
      * order line item entities for that ID and extract the product ID.
      * This will be passed on with the quantity for the stock reset.
      *
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testStockReset()
     {
@@ -194,8 +194,8 @@ class RefundManagerTest extends TestCase
      *
      * @param int $qty
      * @param float $itemPrice
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
      */
     public function testValidItemsAreAdded(int $qty, float $itemPrice): void
     {
@@ -212,7 +212,7 @@ class RefundManagerTest extends TestCase
             [
                 "mollieLineId" => "odl_123",
                 "label" => "product-id-1",
-                "quantity" => max($qty,1),
+                "quantity" => max($qty, 1),
                 "amount" => $itemPrice,
                 "orderLineItemId" => "line-1",
                 'orderLineItemVersionId' => null,
@@ -232,11 +232,11 @@ class RefundManagerTest extends TestCase
      *
      * @param int $qty
      * @param float $itemPrice
-     * @return void
-     * @return void
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return void
+     * @return void
      * /
-     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function testInvalidItemsAreNotAdded(int $qty, float $itemPrice): void
     {
@@ -280,5 +280,4 @@ class RefundManagerTest extends TestCase
 
         return $order;
     }
-
 }

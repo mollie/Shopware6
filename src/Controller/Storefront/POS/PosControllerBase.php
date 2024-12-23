@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Controller\Storefront\POS;
 
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
-use Kiener\MolliePayments\Repository\OrderTransaction\OrderTransactionRepositoryInterface;
+use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -47,7 +47,7 @@ class PosControllerBase extends AbstractStoreFrontController
     private $statusConverter;
 
     /**
-     * @var OrderTransactionRepositoryInterface
+     * @var OrderTransactionRepository
      */
     private $repoTransactions;
 
@@ -57,9 +57,9 @@ class PosControllerBase extends AbstractStoreFrontController
      * @param RouterInterface $router
      * @param OrderStatusUpdater $orderStatusUpdater
      * @param OrderStatusConverter $statusConverter
-     * @param OrderTransactionRepositoryInterface $repoTransactions
+     * @param OrderTransactionRepository $repoTransactions
      */
-    public function __construct(CustomerService $customerService, MollieGatewayInterface $mollieGateway, RouterInterface $router, OrderStatusUpdater $orderStatusUpdater, OrderStatusConverter $statusConverter, OrderTransactionRepositoryInterface $repoTransactions)
+    public function __construct(CustomerService $customerService, MollieGatewayInterface $mollieGateway, RouterInterface $router, OrderStatusUpdater $orderStatusUpdater, OrderStatusConverter $statusConverter, OrderTransactionRepository $repoTransactions)
     {
         $this->customerService = $customerService;
         $this->mollieGateway = $mollieGateway;

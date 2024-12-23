@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Exception\OrderCurrencyNotFoundException;
 use Kiener\MolliePayments\Exception\OrderCustomerNotFoundException;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

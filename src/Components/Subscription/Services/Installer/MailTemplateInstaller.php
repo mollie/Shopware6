@@ -5,12 +5,10 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Repository\MailTemplate\MailTemplateRepositoryInterface;
-use Kiener\MolliePayments\Repository\MailTemplateType\MailTemplateTypeRepositoryInterface;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -25,27 +23,27 @@ class MailTemplateInstaller
     private $connection;
 
     /**
-     * @var MailTemplateTypeRepositoryInterface
+     * @var EntityRepository
      */
     private $repoMailTypes;
 
     /**
-     * @var MailTemplateRepositoryInterface
+     * @var EntityRepository
      */
     private $repoMailTemplates;
 
     /**
-     * @var SalesChannelRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSalesChannels;
 
     /**
      * @param Connection $connection
-     * @param MailTemplateTypeRepositoryInterface $repoMailTypes
-     * @param MailTemplateRepositoryInterface $repoMailTemplates
-     * @param SalesChannelRepositoryInterface $repoSalesChannels
+     * @param EntityRepository $repoMailTypes
+     * @param EntityRepository $repoMailTemplates
+     * @param EntityRepository $repoSalesChannels
      */
-    public function __construct(Connection $connection, MailTemplateTypeRepositoryInterface $repoMailTypes, MailTemplateRepositoryInterface $repoMailTemplates, SalesChannelRepositoryInterface $repoSalesChannels)
+    public function __construct(Connection $connection, EntityRepository $repoMailTypes, EntityRepository $repoMailTemplates, EntityRepository $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;

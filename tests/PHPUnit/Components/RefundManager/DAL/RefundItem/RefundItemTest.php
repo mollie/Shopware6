@@ -86,6 +86,6 @@ class RefundItemTest extends TestCase
         $refundItem = new RefundItemEntity();
         $refundItem->label = null;
 
-        $this->assertSame('',$refundItem->getLabel());
+        $this->assertSame('', $refundItem->getLabel());
     }
 }

@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
-use Kiener\MolliePayments\Repository\Language\LanguageRepositoryInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
@@ -29,7 +28,6 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Fakes\FakeEventDispatcher;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
-use MolliePayments\Tests\Fakes\Repositories\FakeLanguageRepository;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -38,6 +36,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -60,7 +59,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $loggerService;
     /**
-     * @var OrderDataExtractor|MockObject
+     * @var MockObject|OrderDataExtractor
      */
     protected $orderDataExtractor;
     /**
@@ -100,11 +99,11 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $localeCode;
     /**
-     * @var MolliePaymentDoPay|MockObject
+     * @var MockObject|MolliePaymentDoPay
      */
     protected $mollieDoPaymentFacade;
     /**
-     * @var MolliePaymentFinalize|MockObject
+     * @var MockObject|MolliePaymentFinalize
      */
     protected $molliePaymentFinalize;
     /**
@@ -117,7 +116,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
     protected $settingStruct;
 
     /**
-     * @var MollieLocaleService|MockObject
+     * @var MockObject|MollieLocaleService
      */
     private $mollieLocaleService;
 
@@ -170,9 +169,10 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $routingDetector,
             new FakePluginSettings(''),
             ''
-        );;
+        );
+        ;
 
-        $this->mollieLocaleService = new MollieLocaleService($this->createMock(LanguageRepositoryInterface::class));
+        $this->mollieLocaleService = new MollieLocaleService($this->createMock(EntityRepository::class));
 
         $this->builder = new MollieOrderBuilder(
             $this->settingsService,

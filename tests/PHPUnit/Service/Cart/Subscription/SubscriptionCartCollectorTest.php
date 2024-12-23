@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\Cart\Subscription;
 
-
 use Kiener\MolliePayments\Event\MollieSubscriptionCartItemAddedEvent;
 use Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionCartCollector;
-use Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionProductIdentifier;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem as CheckoutCartLineItem;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem as CheckoutCartLineItem;
 
 class SubscriptionCartCollectorTest extends TestCase
 {

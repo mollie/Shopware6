@@ -14,7 +14,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\DAL\Repository\RefundRepository"/>
+            <argument type="service" id="mollie_refund.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundCreditNoteService"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
@@ -42,18 +42,18 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository"/>
+            <argument type="service" id="order_address.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress" public="true">
-           <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository"/>
+           <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
@@ -87,15 +87,15 @@
 
         <service id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\OrderLineItem\OrderLineItemRepository"/>
+            <argument type="service" id="order_line_item.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="mollie_payments.logger"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker">
-            <argument type="service" id="Kiener\MolliePayments\Repository\Customer\CustomerRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\CustomerAddress\CustomerAddressRepository"/>
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="customer_address.repository"/>
         </service>
 
 
