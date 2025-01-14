@@ -96,8 +96,8 @@ stan: ##2 Starts the PHPStan Analyser
 phpunit: ##2 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
-phpintergration: ##2 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --testsuite integration --configuration=custom/plugins/MolliePayments/phpunit.xml --coverage-html ./.reports/phpunit/coverage
+phpintegration: ##2 Starts all PHPUnit Tests
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --testsuite integration --configuration=custom/plugins/MolliePayments/phpunit.xml
 
 infection: ##2 Starts all Infection/Mutation tests
 	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug --test-framework-options="--testsuite=unit --no-coverage"
