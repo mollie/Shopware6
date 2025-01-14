@@ -140,7 +140,7 @@ runs:
     - name: Integration Tests
       shell: bash
       run: |
-        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliPayments && make phpintegration'
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make phpintegration'
     # --------------------------------------------------------------------------------------------------------------------------------------
 
 
