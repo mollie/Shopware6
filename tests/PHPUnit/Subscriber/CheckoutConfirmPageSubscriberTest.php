@@ -27,6 +27,7 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
     /** @var CheckoutConfirmPage */
     private $checkoutConfirmPage;
 
+    private PaymentMethodCollection $paymentMethodCollection;
     /**
      * Sets up the test.
      *

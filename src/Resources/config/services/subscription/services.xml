@@ -47,7 +47,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -113,7 +113,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Tags\OrderTagService"/>
         </service>
 
@@ -128,7 +128,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\UpdateAddressAction">
@@ -142,7 +142,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
         </service>
 
@@ -157,7 +157,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
@@ -174,7 +174,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
         </service>
@@ -190,7 +190,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction">
@@ -204,7 +204,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\SkipAction">
@@ -218,7 +218,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\CancelAction">
@@ -232,7 +232,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\RemindAction">
@@ -246,7 +246,7 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator"/>
         </service>

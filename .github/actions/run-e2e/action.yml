@@ -137,6 +137,13 @@ runs:
         docker exec shop bash -c 'php bin/console dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
+    - name: Integration Tests
+      shell: bash
+      run: |
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliPayments && make phpintegration'
+    # --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}

@@ -42,12 +42,15 @@
     },
     "autoload": {
         "psr-4": {
+            "Mollie\\Shopware\\": "shopware/",
             "Kiener\\MolliePayments\\": "src/",
             "Mollie\\Api\\": "vendor_manual/mollie/mollie-api-php/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "Mollie\\Unit\\": "tests/Unit/",
+            "Mollie\\Integration\\": "tests/Integration/",
             "MolliePayments\\Tests\\": "tests/PHPUnit/",
             "MolliePayments\\PHPStan\\": "tests/PHPStan/",
             "MolliePayments\\Fixtures\\": "tests/Fixtures/"
@@ -70,7 +73,7 @@
         "shopware/elasticsearch": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9",
         "phpstan/phpstan": "1.10.0",
         "friendsofphp/php-cs-fixer": "^2.18",
         "phpcompatibility/php-compatibility": "^9.3",

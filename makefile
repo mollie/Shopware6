@@ -94,10 +94,13 @@ stan: ##2 Starts the PHPStan Analyser
 	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
 
 phpunit: ##2 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.xml --coverage-html ./.reports/phpunit/coverage
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=phpunit.xml
+
+phpintergration: ##2 Starts all PHPUnit Tests
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --testsuite integration --configuration=custom/plugins/MolliePayments/phpunit.xml
 
 infection: ##2 Starts all Infection/Mutation tests
-	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug
+	@XDEBUG_MODE=coverage php vendor/bin/infection --configuration=./.infection.json --log-verbosity=all --debug --test-framework-options="--testsuite=unit --no-coverage"
 
 insights: ##2 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
@@ -151,6 +154,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
+	@make phpintergration -B
 	@make jest -B
 	@make eslint mode=no-dry-run -B
 	@make stylelint -B
