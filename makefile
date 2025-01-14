@@ -154,7 +154,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
-	@make phpintergration -B
+	@make phpintegration -B
 	@make jest -B
 	@make eslint mode=no-dry-run -B
 	@make stylelint -B
