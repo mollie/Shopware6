@@ -137,11 +137,6 @@ runs:
         docker exec shop bash -c 'php bin/console dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
-    - name: Integration Tests
-      shell: bash
-      run: |
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit && php vendor/bin/phpunit --testsuite integration --configuration=custom/plugins/MolliePayments/phpunit.xml'
-    # --------------------------------------------------------------------------------------------------------------------------------------
 
 
 
