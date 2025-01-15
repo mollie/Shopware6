@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Settings;
 
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
@@ -13,15 +14,15 @@ final class SettingsService extends AbstractSettingsService
     private const CACHE_KEY_LOGGER = 'logger';
     private const CACHE_KEY_SHOPWARE = 'shopware';
 
-    private SystemConfigService $systemConfigService;
+    private ?SystemConfigService $systemConfigService  = null;
 
     private array $settingsCache = [];
+    private ContainerInterface $container;
 
 
-
-    public function __construct(SystemConfigService $systemConfigService)
+    public function __construct(ContainerInterface $container)
     {
-        $this->systemConfigService = $systemConfigService;
+        $this->container = $container;
     }
 
     public function getDecorated(): AbstractSettingsService
@@ -52,7 +53,12 @@ final class SettingsService extends AbstractSettingsService
         if (isset($this->settingsCache[$cacheKey])) {
             return $this->settingsCache[$cacheKey];
         }
-
+        /**
+         * Attention, we have to use service locator here, because in Shopware 6.4 there is an issue with system config service.
+         */
+        if($this->systemConfigService === null){
+            $this->systemConfigService =  $this->container->get(SystemConfigService::class);
+        }
         $shopwareSettingsArray = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
         $this->settingsCache[$cacheKey] = $shopwareSettingsArray;
         return $shopwareSettingsArray;
