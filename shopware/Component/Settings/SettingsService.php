@@ -56,7 +56,7 @@ final class SettingsService extends AbstractSettingsService
         /**
          * Attention, we have to use service locator here, because in Shopware 6.4 there is an issue with system config service.
          */
-        if($this->systemConfigService === null){
+        if ($this->systemConfigService === null) {
             $this->systemConfigService =  $this->container->get(SystemConfigService::class);
         }
         $shopwareSettingsArray = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
