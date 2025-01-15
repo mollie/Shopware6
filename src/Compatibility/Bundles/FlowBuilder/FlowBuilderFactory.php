@@ -56,7 +56,7 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
             return new ShopwareFlowBuilderDispatcher65($this->flowDispatcher);
         }
 
-        if ($this->versionCompare->lt(self::FLOW_BUILDER_MIN_VERSION)) {
+        if ($this->versionCompare->gt(self::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyFlowBuilderDispatcher();
         }
 

@@ -12,7 +12,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <tag name="mollie_payments.payment_method.remover.sw64"/>
         </service>
@@ -25,7 +25,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <tag name="mollie_payments.payment_method.remover.sw64"/>
         </service>
@@ -37,7 +37,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <tag name="mollie_payments.payment_method.remover.sw64"/>
             <tag name="mollie_payments.payment_method.remover.sw63"/>
@@ -50,7 +50,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <tag name="mollie_payments.payment_method.remover.sw64"/>
             <tag name="mollie_payments.payment_method.remover.sw63"/>
@@ -62,7 +62,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <tag name="mollie_payments.payment_method.remover.sw64"/>
         </service>

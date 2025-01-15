@@ -44,6 +44,15 @@
             <helpText lang="nl-NL">Staat de test modus toe met de Mollie Sandbox betalingspagina. De Storefront zal ook "(Test Mode)" tonen naast de naam van de betaalmethode.</helpText>
             <helpText lang="it-IT">Abilita la modalità test con la pagina di pagamento di Mollie Sandbox. Lo Storefront mostrerà anche (Modalità test) accanto ai nomi dei metodi di pagamento.</helpText>
         </input-field>
+        <component name="mollie-pluginconfig-section-api">
+            <name>molliePluginConfigSectionApi</name>
+        </component>
+    </card>
+    <card>
+        <title>Logger</title>
+        <title lang="de-DE">Logger</title>
+        <title lang="nl-NL">Logger</title>
+        <title lang="it-IT">Logger</title>
         <input-field type="bool">
             <name>debugMode</name>
             <label>Debug Mode</label>
@@ -68,9 +77,6 @@
             <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden worden bewaard totdat ze automatisch worden verwijderd.</helpText>
             <helpText lang="it-IT">Imposta il numero di giorni per quanto tempo i file di log devono essere conservati prima di essere automaticamente eliminati.</helpText>
         </input-field>
-        <component name="mollie-pluginconfig-section-api">
-            <name>molliePluginConfigSectionApi</name>
-        </component>
     </card>
     <card>
         <title>Payments</title>

@@ -22,6 +22,11 @@ class SubscriptionCartCollectorTest extends TestCase
     private $collector;
     private $data;
 
+    private $context;
+    private $original;
+    private $behavior;
+
+
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
