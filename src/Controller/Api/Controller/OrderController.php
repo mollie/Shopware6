@@ -7,6 +7,8 @@ use Kiener\MolliePayments\Controller\Api\Order\CancelLineController;
 use Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase;
 use Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -123,11 +125,11 @@ class OrderController extends AbstractController
         if ($orders->count() === 0) {
             throw new \RuntimeException('Order not found');
         }
-
+        /**
+         * @var OrderEntity $order
+         */
         $order = $orders->first();
-
-        $customFields =  $order->getCustomFieldsValue('mollie_payments');
-
-        return $customFields['order_id'];
+        $customFields =  $order->getCustomFields();
+        return $customFields[CustomFieldsInterface::MOLLIE_KEY]['order_id']??'';
     }
 }
