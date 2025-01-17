@@ -150,10 +150,18 @@ class MollieLineItemBuilder
             if ($productChildren === null) {
                 continue;
             }
-            $productChildren = $productChildren->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS);
-            foreach ($productChildren as $productChild) {
-                if ($productChild->getPrice() !== null && $productChild->getPrice()->getTotalPrice() > 0) {
-                    $lineItems->add($productChild);
+            $options = $productChildren->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS);
+            foreach ($options as $option) {
+                $optionValues = $option->getChildren();
+                if ($optionValues !== null) {
+                    foreach ($optionValues as $optionValue) {
+                        if ($optionValue->getPrice() !== null && $optionValue->getPrice()->getTotalPrice() > 0) {
+                            $lineItems->add($optionValue);
+                        }
+                    }
+                }
+                if ($option->getPrice() !== null && $option->getPrice()->getTotalPrice() > 0) {
+                    $lineItems->add($option);
                 }
             }
         }
