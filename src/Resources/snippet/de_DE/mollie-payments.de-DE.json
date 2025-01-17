@@ -1,55 +1,15 @@
 {
-  "checkout": {
-    "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar.",
-    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
-    "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden."
-  },
-  "error": {
-    "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar.",
-    "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
-    "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden."
-  },
-  "molliePayments": {
-    "components": {
-      "creditCard": {
-        "cardExpiryDateLabel": "MM/JJ",
-        "cardHolderLabel": "Name des Karteninhabers",
-        "cardNumberLabel": "Kreditkartennummer",
-        "cardVerificationCodeLabel": "CVV",
-        "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von",
-        "headLine": "Kreditkarteninformationen",
-        "saveCardDetailLabel": "Kartendaten für zukünftige Zahlungen speichern"
-      },
-      "ideal": {
-        "selectBank": "Bank auswählen"
-      },
-      "mandate": {
-        "sectionTitle": "Gespeicherte Karten",
-        "cardTitleLabel": "%name% •••• %number%",
-        "deleteSuccessMessage": "Ihre Karte wurde erfolgreich gelöscht",
-        "deleteErrorMessage": "Beim Entfernen Ihrer Karte ist ein Problem aufgetreten",
-        "newCard": "Neue Karte",
-        "remove": "Entfernen",
-        "subscriptionBadge": "Abonnement"
-      },
-      "mandateRemoveModal": {
-        "cancelButton": "Stornieren",
-        "cardSubscription": "Diese Karte wird für ein Abonnement verwendet. Bitte beenden Sie zuerst das Abonnement bevor Sie diese Karte löschen.",
-        "deleteButton": "Löschen",
-        "deleteConfirmation": "Sind Sie sicher, dass Sie die Zahlart löschen möchten?",
-        "title": "Bestätigung zum Löschen"
-      }
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar.",
+        "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
+        "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden."
     },
-    "messages": {
-      "payment": {
-        "buttonPayThroughMollie": "Bezahlen Sie mit einer anderen Zahlungsart",
-        "buttonReturnToShop": "Kehre zum Webshop zurück",
-        "error": "Zahlung fehlgeschlagen",
-        "failed": "Die Zahlung ist fehlgeschlagen oder wurde storniert. Sie werden zu Mollie weitergeleitet, wo Sie Ihre Zahlung mit der Methode Ihrer Wahl abschließen können. "
-      },
-      "redirecting": "Leiten Sie weiter zu: "
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Die aktuell gewählte Zahlungsmethode ist nicht für Abonnementprodukte verfügbar.",
+        "mollie-payments-cart-error-mixedcart": "Ihr Warenkorb enthält mehrere Artikel in Kombination mit Abonnementartikeln. Bitte beachten Sie, dass Sie jeweils nur 1 Abonnementartikel kaufen können.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Bei der Bestellung von Abonnementprodukten sind nicht alle Zahlungsmethoden verfügbar.",
+        "mollie-payments-cart-guest-account": "Gäste Konten können nicht für Bestellungen von Abonnements benutzt werden."
     },
     "molliePayments": {
         "components": {
@@ -159,13 +119,12 @@
                 "information": "Abonnementprodukt"
             }
         },
-       "order": {
-            "refundedLabel": "Rückerstattet:",
-            "refundPendingLabel": "Rückerstattung ausstehend:"
+        "order": {
+          "refundedLabel": "Rückerstattet:",
+          "refundPendingLabel": "Rückerstattung ausstehend:"
         },
         "testMode": {
             "label": "Testmodus"
         }
     }
-  }
 }
