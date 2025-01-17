@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ### Features
-- Returns over Shopware Commercial plugins is now transferred to Mollie when the Return status is set to "Done" and can be cancelled with the "Cancelled" status. Please note that the refund cannot be cancelled after two hours.
+- Returns for Shopware Commercial plugins are now transferred to Mollie when the return status is set to "Done" and can be canceled with the "Cancelled" status. Please note that refunds cannot be canceled after two hours.
 ### Changes
-- Minimum Supported Shopware version is now 6.4.5.0
-- Add new monolog channel "mollie". You can now add custom handler and assign them to the mollie channel
+- The minimum supported Shopware version is now 6.4.5.0.
+- Added a new Monolog channel "mollie." You can now add custom handlers and assign them to the Mollie channel.
 ### Fixes
-- Fixed order details in refund manager in shopware 6.4.x
-- Fixed the issue for SwagCustomizedProducts, the prices for option values are now added to the order
+- Fixed order details in the refund manager for Shopware 6.4.x.
+- Resolved an issue with SwagCustomizedProducts where prices for option values are now correctly added to the order.

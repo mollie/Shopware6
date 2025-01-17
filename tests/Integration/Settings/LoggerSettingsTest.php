@@ -36,7 +36,7 @@ final class LoggerSettingsTest extends TestCase
 
     public function testSettingsAreCachedPerSalesChannel():void
     {
-        
+
         $settingsService = new SettingsService($this->getContainer());
 
         $expectedSettings = $settingsService->getLoggerSettings();
