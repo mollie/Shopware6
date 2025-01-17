@@ -1,55 +1,15 @@
 {
-  "checkout": {
-    "mollie-payments-cart-error-method-invalid": "De actueel geselecteerde betaalmethode is niet beschikbaar voor abonnementsproducten.",
-    "mollie-payments-cart-error-mixedcart": "Uw winkelwagen bevat meerdere artikelen in combinatie met abonnementsartikelen. Houd er rekening mee dat u slechts 1 abonnementsartikel tegelijk kunt kopen.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten.",
-    "mollie-payments-cart-guest-account": "Gastaccounts kunnen niet worden gebruikt voor abonnementsbestellingen."
-  },
-  "error": {
-    "mollie-payments-cart-error-method-invalid": "De actueel geselecteerde betaalmethode is niet beschikbaar voor abonnementsproducten.",
-    "mollie-payments-cart-error-mixedcart": "Uw winkelwagen bevat meerdere artikelen in combinatie met abonnementsartikelen. Houd er rekening mee dat u slechts 1 abonnementsartikel tegelijk kunt kopen.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten.",
-    "mollie-payments-cart-guest-account": "Gastaccounts kunnen niet worden gebruikt voor abonnementsbestellingen."
-  },
-  "molliePayments": {
-    "components": {
-      "creditCard": {
-        "cardExpiryDateLabel": "MM/JJ",
-        "cardHolderLabel": "Naam kaarthouder",
-        "cardNumberLabel": "Creditcardnummer",
-        "cardVerificationCodeLabel": "CVV",
-        "creditCardTagLine": "Betaling verzekerd en verzorgd door",
-        "headLine": "Credit card gegevens",
-        "saveCardDetailLabel": "Bewaar kaartgegevens voor toekomstige betalingen"
-      },
-      "ideal": {
-        "selectBank": "Selecteer bank"
-      },
-      "mandate": {
-        "sectionTitle": "Opgeslagen kaarten",
-        "cardTitleLabel": "%name% •••• %number%",
-        "deleteSuccessMessage": "Uw kaart is succesvol verwijderd",
-        "deleteErrorMessage": "Er is een probleem opgetreden bij het verwijderen van uw kaart",
-        "newCard": "Nieuwe kaart",
-        "remove": "Verwijderen",
-        "subscriptionBadge": "Abonnement"
-      },
-      "mandateRemoveModal": {
-        "cancelButton": "Annuleren",
-        "cardSubscription": "Deze kaart wordt gebruikt voor een abonnement. Annuleer eerst uw abonnement voordat u deze kaart verwijdert.",
-        "deleteButton": "Verwijderen",
-        "deleteConfirmation": "Weet je zeker dat je dat wilt verwijderen?",
-        "title": "Bevestiging verwijderen"
-      }
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "De actueel geselecteerde betaalmethode is niet beschikbaar voor abonnementsproducten.",
+        "mollie-payments-cart-error-mixedcart": "Uw winkelwagen bevat meerdere artikelen in combinatie met abonnementsartikelen. Houd er rekening mee dat u slechts 1 abonnementsartikel tegelijk kunt kopen.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten.",
+        "mollie-payments-cart-guest-account": "Gastaccounts kunnen niet worden gebruikt voor abonnementsbestellingen."
     },
-    "messages": {
-      "payment": {
-        "buttonPayThroughMollie": "Betaal met een andere betaalmethode",
-        "buttonReturnToShop": "Terug naar de webshop",
-        "error": "Betaling mislukt",
-        "failed": "De betaling is mislukt of geannuleerd. U wordt doorgestuurd naar Mollie waar u uw betaling kunt afronden met de methode naar keuze. "
-      },
-      "redirecting": "Doorsturen naar: "
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "De actueel geselecteerde betaalmethode is niet beschikbaar voor abonnementsproducten.",
+        "mollie-payments-cart-error-mixedcart": "Uw winkelwagen bevat meerdere artikelen in combinatie met abonnementsartikelen. Houd er rekening mee dat u slechts 1 abonnementsartikel tegelijk kunt kopen.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten.",
+        "mollie-payments-cart-guest-account": "Gastaccounts kunnen niet worden gebruikt voor abonnementsbestellingen."
     },
     "molliePayments": {
         "components": {
@@ -160,12 +120,11 @@
             }
         },
         "order": {
-             "refundedLabel": "Terugbetaling:",
-             "refundPendingLabel": "Terugbetaling in afwachting:"
+          "refundedLabel": "Terugbetaling:",
+          "refundPendingLabel": "Terugbetaling in afwachting:"
         },
         "testMode": {
             "label": "testmodus"
         }
     }
-  }
 }
