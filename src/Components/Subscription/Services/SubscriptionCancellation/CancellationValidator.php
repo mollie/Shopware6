@@ -7,7 +7,6 @@ use DateTimeInterface;
 
 class CancellationValidator
 {
-
     /**
      * @param null|DateTimeInterface $nextRenewal
      * @param int $maxCancellationDays

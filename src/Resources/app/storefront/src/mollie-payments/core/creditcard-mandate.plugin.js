@@ -1,6 +1,5 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import DomAccess from 'src/helper/dom-access.helper';
 import HttpClient from '../services/HttpClient';
+import Plugin from '../Plugin';
 
 /**
  * This plugin manage the credit card mandate of the customer
@@ -25,16 +24,14 @@ export default class MollieCreditCardMandate extends Plugin {
     registerMandateEvents() {
         const {
             newCardMandateOption,
-            mollieCreditCardFormClass,
-            mollieCreditCardMandateInput,
         } = this.options;
 
         if (!newCardMandateOption) {
             return;
         }
 
-        this.mollieCreditCarfFormEl = DomAccess.querySelector(document, mollieCreditCardFormClass, false);
-        this.mollieCreditCardMandateEls = DomAccess.querySelectorAll(document, mollieCreditCardMandateInput, false);
+        this.mollieCreditCarfFormEl = document.querySelector('.mollie-components-credit-card');
+        this.mollieCreditCardMandateEls = document.querySelectorAll('input[name="mollieCreditCardMandate"]');
 
         if (!this.mollieCreditCarfFormEl || !this.mollieCreditCardMandateEls) {
             return
@@ -68,9 +65,9 @@ export default class MollieCreditCardMandate extends Plugin {
      * Get value of `mollieCreditCardMandate` checked radio input
      */
     getMandateCheckedValue() {
-        const { mollieCreditCardMandateInput } = this.options;
+        const {mollieCreditCardMandateInput} = this.options;
 
-        const mandateInput = DomAccess.querySelector(document, `${ mollieCreditCardMandateInput }:checked`, false);
+        const mandateInput = document.querySelector(`${mollieCreditCardMandateInput}:checked`);
         if (!mandateInput || !mandateInput.value) {
             return null;
         }
@@ -86,9 +83,7 @@ export default class MollieCreditCardMandate extends Plugin {
      * Get value of `mollieShouldSaveCardDetail` checkbox input
      */
     shouldSaveCardDetail() {
-        const { mollieShouldSaveCardDetailInput } = this.options;
-
-        const shouldSaveCardDetail = DomAccess.querySelector(document, mollieShouldSaveCardDetailInput, false);
+        const shouldSaveCardDetail = document.querySelector('input[name="mollieShouldSaveCardDetail"]');
         if (!shouldSaveCardDetail) {
             return false;
         }
@@ -97,12 +92,15 @@ export default class MollieCreditCardMandate extends Plugin {
     }
 
     onMandateInputChange(mandateValue) {
-        const { newCardMandateOption } = this.options
+        const {newCardMandateOption} = this.options
         if (mandateValue === newCardMandateOption) {
             this.mollieCreditCarfFormEl.classList.remove('d-none');
             return;
         }
 
-        this.mollieCreditCarfFormEl.classList.add('d-none');
+        // i dont know...makes no sense but works
+        if (mandateValue !== null) {
+            this.mollieCreditCarfFormEl.classList.add('d-none');
+        }
     }
 }

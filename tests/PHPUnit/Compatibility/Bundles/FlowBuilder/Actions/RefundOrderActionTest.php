@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
-
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction;
 use MolliePayments\Tests\Fakes\FakeOrderService;
 use MolliePayments\Tests\Fakes\FakeRefundManager;
@@ -13,7 +12,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class RefundOrderActionTest extends TestCase
 {
-
     use FlowBuilderTestTrait;
 
 
@@ -34,8 +32,8 @@ class RefundOrderActionTest extends TestCase
      * If everything works out correctly, our refund service is called with a full-refund
      * as well as the correct order. So we also verify that a full refund request is built
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testRefundAction()
     {
@@ -64,5 +62,4 @@ class RefundOrderActionTest extends TestCase
         # verify that the correct order has been fetched
         $this->assertEquals('ord-123', $fakeRefundManager->getRefundedOrder()->getOrderNumber());
     }
-
 }

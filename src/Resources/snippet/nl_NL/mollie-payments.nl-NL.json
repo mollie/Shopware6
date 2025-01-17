@@ -51,70 +51,121 @@
       },
       "redirecting": "Doorsturen naar: "
     },
-    "payments": {
-      "applePayDirect": {
-        "captionSubtotal": "Subtotaal",
-        "captionTaxes": "BTW",
-        "paymentError": "De betaling met Apple Pay is mislukt."
-      }
-    },
-    "subscriptions": {
-      "account": {
-        "btnEditBillingAddress": "factuuradres bewerken",
-        "btnEditShippingAddress": "verzendadres bewerken",
-        "cancelSubscription": "Abonnement is geannuleerd",
-        "errorCancelSubscription": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
-        "errorPause": "There was an error when pausing your subscription",
-        "errorResume": "There was an error when resuming your subscription",
-        "errorSkip": "There was an error when skipping your subscription",
-        "errorUpdateAddress": "Er is een fout opgetreden bij het bijwerken van uw adres",
-        "errorUpdatePayment": "Er is een fout opgetreden bij het updaten van uw betaalmethode",
-        "headlineBillingAddress": "Facturatie adres",
-        "headlineShippingAddress": "Afleveradres",
-        "mollieSubscriptionAmount": "Hoeveelheid",
-        "mollieSubscriptionCancel": "Abonnement annuleren",
-        "mollieSubscriptionCancelUntil": "Annulering mogelijk tot",
-        "mollieSubscriptionContextMenuReorder": "Herhaal abonnement",
-        "mollieSubscriptionId": "Id",
-        "mollieSubscriptionNextPayment": "Volgende betaling bij",
-        "mollieSubscriptionPause": "Abonnement pauzeren",
-        "mollieSubscriptionResume": "Abonnement hervatten",
-        "mollieSubscriptionSkip": "Overslaan abonnement",
-        "mollieSubscriptionUpdatePayment": "Betaalmethode bijwerken",
-        "mollieSubscriptionsHeadline": "Abonnement:",
-        "mollieSubscriptionsInfoEmpty": "U heeft nog geen abonnementen.",
-        "mollieSubscriptionsLink": "Abonnementen",
-        "mollieSubscriptionsTitle": "Abonnementen",
-        "mollieSubscriptionsWelcome": "Uw recente abonnementen:",
-        "orderActionHide": "Verbergen",
-        "orderActionView": "Kijkje",
-        "shippingEqualToBilling": "Gelijk aan factuuradres",
-        "successPause": "Your subscription has been paused",
-        "successResume": "Your subscription will now be resumed",
-        "successSkip": "Your subscription has been skipped",
-        "successUpdateAddress": "Uw adres is succesvol bijgewerkt",
-        "successUpdatePayment": "De betaalmethode is succesvol geüpdatet"
-      },
-      "options": {
-        "everyDay": "Elke dag",
-        "everyDays": "Elke %value% dagen",
-        "everyMonth": "Elke maand",
-        "everyMonths": "Elke %value% maanden",
-        "everyWeek": "Elke week",
-        "everyWeeks": "Elke %value% weken",
-        "repetitionCount": "%value% keer"
-      },
-      "product": {
-        "addToCartText": "Abonneren",
-        "information": "Abonnement product"
-      }
-    },
-    "order": {
-      "refundedLabel": "Terugbetaling:",
-      "refundPendingLabel": "Terugbetaling in afwachting:"
-    },
-    "testMode": {
-      "label": "testmodus"
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "MM/JJ",
+                "cardHolderLabel": "Naam kaarthouder",
+                "cardNumberLabel": "Creditcardnummer",
+                "cardVerificationCodeLabel": "CVV",
+                "creditCardTagLine": "Betaling verzekerd en verzorgd door",
+                "headLine": "Credit card gegevens",
+                "saveCardDetailLabel": "Bewaar kaartgegevens voor toekomstige betalingen"
+            },
+            "ideal": {
+                "selectBank": "Selecteer bank"
+            },
+          "pos": {
+            "selectTerminal": "Selecteer terminal"
+          },
+            "mandate": {
+                "sectionTitle": "Opgeslagen kaarten",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Uw kaart is succesvol verwijderd",
+                "deleteErrorMessage": "Er is een probleem opgetreden bij het verwijderen van uw kaart",
+                "newCard": "Nieuwe kaart",
+                "remove": "Verwijderen",
+                "subscriptionBadge" : "Abonnement"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Annuleren",
+                "cardSubscription": "Deze kaart wordt gebruikt voor een abonnement. Annuleer eerst uw abonnement voordat u deze kaart verwijdert.",
+                "deleteButton": "Verwijderen",
+                "deleteConfirmation": "Weet je zeker dat je dat wilt verwijderen?",
+                "title": "Bevestiging verwijderen"
+            },
+            "bancomatPay": {
+              "headLine": "Telefoonnummer",
+              "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Betaal met een andere betaalmethode",
+                "buttonReturnToShop": "Terug naar de webshop",
+                "error": "Betaling mislukt",
+                "failed": "De betaling is mislukt of geannuleerd. U wordt doorgestuurd naar Mollie waar u uw betaling kunt afronden met de methode naar keuze. "
+            },
+            "redirecting": "Doorsturen naar: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Subtotaal",
+                "captionTaxes": "BTW",
+                "paymentError": "De betaling met Apple Pay is mislukt."
+            },
+          "paypalExpress": {
+            "paymentError": "De betaling met Paypal Express is mislukt."
+          }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "factuuradres bewerken",
+                "btnEditShippingAddress": "verzendadres bewerken",
+                "cancelSubscription": "Abonnement is geannuleerd",
+                "errorCancelSubscription": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
+                "errorPause": "There was an error when pausing your subscription",
+                "errorResume": "There was an error when resuming your subscription",
+                "errorSkip": "There was an error when skipping your subscription",
+                "errorUpdateAddress": "Er is een fout opgetreden bij het bijwerken van uw adres",
+                "errorUpdatePayment": "Er is een fout opgetreden bij het updaten van uw betaalmethode",
+                "headlineBillingAddress": "Facturatie adres",
+                "headlineShippingAddress": "Afleveradres",
+                "mollieSubscriptionAmount": "Hoeveelheid",
+                "mollieSubscriptionCancel": "Abonnement annuleren",
+                "mollieSubscriptionCancelUntil": "Annulering mogelijk tot",
+                "mollieSubscriptionContextMenuReorder": "Herhaal abonnement",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Volgende betaling bij",
+                "mollieSubscriptionPause": "Abonnement pauzeren",
+                "mollieSubscriptionResume": "Abonnement hervatten",
+                "mollieSubscriptionSkip": "Overslaan abonnement",
+                "mollieSubscriptionUpdatePayment": "Betaalmethode bijwerken",
+                "mollieSubscriptionsHeadline": "Abonnement:",
+                "mollieSubscriptionsInfoEmpty": "U heeft nog geen abonnementen.",
+                "mollieSubscriptionsLink": "Abonnementen",
+                "mollieSubscriptionsTitle": "Abonnementen",
+                "mollieSubscriptionsWelcome": "Uw recente abonnementen:",
+                "orderActionHide": "Verbergen",
+                "orderActionView": "Kijkje",
+                "shippingEqualToBilling": "Gelijk aan factuuradres",
+                "successPause": "Your subscription has been paused",
+                "successResume": "Your subscription will now be resumed",
+                "successSkip": "Your subscription has been skipped",
+                "successUpdateAddress": "Uw adres is succesvol bijgewerkt",
+                "successUpdatePayment": "De betaalmethode is succesvol geüpdatet"
+            },
+            "options": {
+                "everyDay": "Elke dag",
+                "everyDays": "Elke %value% dagen",
+                "everyMonth": "Elke maand",
+                "everyMonths": "Elke %value% maanden",
+                "everyWeek": "Elke week",
+                "everyWeeks": "Elke %value% weken",
+                "repetitionCount": "%value% keer"
+            },
+            "product": {
+                "addToCartText": "Abonneren",
+                "information": "Abonnement product"
+            }
+        },
+        "order": {
+             "refundedLabel": "Terugbetaling:",
+             "refundPendingLabel": "Terugbetaling in afwachting:"
+        },
+        "testMode": {
+            "label": "testmodus"
+        }
     }
   }
 }

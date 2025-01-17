@@ -1,11 +1,24 @@
+<!--
+**********************************************************************************
+**********************************************************************************
+
+SHOPWARE 6.4
+- integration of mollie payment data in order form
+
+**********************************************************************************
+**********************************************************************************
+-->
 {% block sw_order_detail_base_secondary_info_payment %}
     {% parent %}
 
-    <template v-if="mollieOrderId">
+    <template v-if="isMollieOrder">
+
         <div v-if="hasCreditCardData">
             <dt>Credit Card Data</dt>
             <dd>
-                <mollie-credit-card-logo :creditCardCompany="creditCardLabel">{{ creditCardLabel }}</mollie-credit-card-logo>
+                <mollie-credit-card-logo :creditCardCompany="creditCardLabel">
+                    {{ creditCardLabel }}
+                </mollie-credit-card-logo>
             </dd>
             <dd>
                 {{ creditCardNumber }}
@@ -14,7 +27,9 @@
                 {{ creditCardHolder }}
             </dd>
         </div>
-        <dt>{{ $tc('sw-order.detailExtended.labelMollieOrderId') }}</dt>
+        <dt>
+            {{ $tc('sw-order.detailExtended.labelMollieOrderId') }}
+        </dt>
         <dd>
             {{ mollieOrderId }}
             <div v-if="isSubscription">

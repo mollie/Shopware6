@@ -1,7 +1,5 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import DomAccess from 'src/helper/dom-access.helper';
-import PageLoadingIndicatorUtil from 'src/utility/loading-indicator/page-loading-indicator.util';
 import HttpClient from '../services/HttpClient';
+import Plugin from '../Plugin';
 
 /**
  * This plugin manage the credit card mandate of customer
@@ -22,8 +20,6 @@ export default class MollieCreditCardMandateManage extends Plugin {
         const {
             shopUrl,
             customerId,
-            mollieMandateDeleteAlertSuccessId,
-            mollieMandateDeleteAlertErrorId,
         } = this.options;
         if (!shopUrl) {
             throw new Error(`The "shopUrl" option for the plugin "${this._pluginName}" is not defined.`);
@@ -33,12 +29,12 @@ export default class MollieCreditCardMandateManage extends Plugin {
             throw new Error(`The "customerId" option for the plugin "${this._pluginName}" is not defined.`);
         }
 
-        this.mollieMandateDeleteAlertEl = DomAccess.querySelector(document, mollieMandateDeleteAlertSuccessId, false);
+        this.mollieMandateDeleteAlertEl = document.querySelector('#mollieCreditCardMandateDeleteSuccess');
         if (!this.mollieMandateDeleteAlertEl) {
             return;
         }
 
-        this.mollieMandateDeleteAlertErrorEl = DomAccess.querySelector(document, mollieMandateDeleteAlertErrorId, false);
+        this.mollieMandateDeleteAlertErrorEl = document.querySelector('#mollieCreditCardMandateDeleteError');
         if (!this.mollieMandateDeleteAlertErrorEl) {
             return;
         }
@@ -48,16 +44,13 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     registerEvents() {
-        const {
-            mollieMandateRemoveButtonClass,
-            mollieMandateRemoveModalButtonClass,
-        } = this.options;
-        const removeButtons = DomAccess.querySelectorAll(document, mollieMandateRemoveButtonClass, false);
+
+        const removeButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove');
         if (!removeButtons || removeButtons.length === 0) {
             return;
         }
 
-        const modalRemoveButtons = DomAccess.querySelectorAll(document, mollieMandateRemoveModalButtonClass, false);
+        const modalRemoveButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove-modal-button');
         if (!modalRemoveButtons || modalRemoveButtons.length === 0) {
             return;
         }
@@ -103,10 +96,7 @@ export default class MollieCreditCardMandateManage extends Plugin {
             return
         }
 
-        PageLoadingIndicatorUtil.create();
         this.deleteMandate(currentMandateId).then(({success}) => {
-
-            PageLoadingIndicatorUtil.remove();
 
             if (success) {
                 this.mollieMandateDeleteAlertErrorEl.classList.add('d-none')

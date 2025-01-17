@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing
+        https://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="frontend.mollie.payment-failed"
+           path="/mollie/payment/failed/{transactionId}"
+           methods="GET|POST">
+        <requirement key="transactionId">.*</requirement>
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase::paymentFailedAction</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
+        <default key="csrf_protected"><bool>false</bool></default>
+        <option key="seo">false</option>
+    </route>
+
+    <route id="frontend.mollie.payment.retry"
+           path="/mollie/payment/retry/{transactionId}"
+           methods="GET|POST">
+        <requirement key="transactionId">.*</requirement>
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase::retry</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
+        <default key="csrf_protected"><bool>false</bool></default>
+        <option key="seo">false</option>
+    </route>
+</routes>

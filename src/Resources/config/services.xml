@@ -6,32 +6,35 @@
 
     <imports>
         <import resource="services/api.xml"/>
-        <import resource="services/controller.xml"/>
         <import resource="services/components.xml"/>
         <import resource="services/commands.xml"/>
         <import resource="services/facades.xml"/>
         <import resource="services/gateways.xml"/>
         <import resource="services/hydrators.xml"/>
-        <import resource="services/repositories.xml"/>
         <import resource="services/payment.xml"/>
         <import resource="services/services.xml"/>
-        <import resource="services/snippets.xml"/>
         <import resource="services/subscriber.xml"/>
         <import resource="services/validators.xml"/>
         <import resource="services/builder.xml"/>
-        <import resource="services/controller.xml"/>
         <import resource="services/handlers.xml"/>
         <import resource="services/scheduled_tasks.xml"/>
-
         <import resource="services/subscription/services.xml"/>
         <import resource="services/refundmanager/services.xml"/>
+        <import resource="services/controller.xml"/>
+        <import resource="services/snippets.xml"/>
+        <import resource="services/repositories.xml"/>
+        <import resource="packages/**/*.xml"/>
+        <import resource="../../../shopware/Resources/config/services.xml"/>
     </imports>
+
 
     <services>
 
         <!-- Configuration -->
         <service id="Kiener\MolliePayments\Service\ConfigService" class="Kiener\MolliePayments\Service\ConfigService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
         </service>
 
 
@@ -44,14 +47,16 @@
 
 
         <!-- Helpers -->
-        <service id="Kiener\MolliePayments\Helper\DeliveryStateHelper" class="Kiener\MolliePayments\Helper\DeliveryStateHelper">
-            <argument type="service" id="Kiener\MolliePayments\Service\DeliveryService"/>
-            <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
+        <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
+            <argument type="service" id="monolog.logger.mollie"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
-            <argument type="service" id="mollie_payments.logger"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
+        <service id="Kiener\MolliePayments\Service\Order\OrderExpireService">
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderTimeService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
 
@@ -66,14 +71,16 @@
         <service id="Kiener\MolliePayments\Service\CustomerService" class="Kiener\MolliePayments\Service\CustomerService">
             <argument type="service" id="country.repository"/>
             <argument type="service" id="customer.repository"/>
+            <argument type="service" id="customer_address.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Customer"/>
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>
             <argument type="service" id="salutation.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument>%kernel.shopware_version%</argument>
-            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="service_container"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MandateService" class="Kiener\MolliePayments\Service\MandateService">
@@ -82,39 +89,48 @@
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\CustomFieldService" class="Kiener\MolliePayments\Service\CustomFieldService">
-            <argument type="service" id="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\DeliveryService" class="Kiener\MolliePayments\Service\DeliveryService">
-            <argument type="service" id="order_delivery.repository"/>
+            <argument type="service" id="order_deliveries.repository"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" public="true">
             <argument type="service" id="custom_field_set.repository"/>
         </service>
 
-
         <service id="Kiener\MolliePayments\Service\PaymentMethodService" class="Kiener\MolliePayments\Service\PaymentMethodService" public="true">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
-            <argument type="service" id="media.repository"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\MediaRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
             <argument type="service" id="kiener.mollie_payments.http.client"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PayPalExpressConfig"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService" class="Kiener\MolliePayments\Service\ProductService">
             <argument type="service" id="product.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\SettingsService" class="Kiener\MolliePayments\Service\SettingsService">
+        <service id="Kiener\MolliePayments\Service\PayPalExpressConfig">
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BETA)%</argument>
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE)%</argument>
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE)%</argument>
+            <argument type="string">%env(default::MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS)%</argument>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\PayPalExpressConfig"/>
+            <argument key="$envShopDomain">%env(default::MOLLIE_SHOP_DOMAIN)%</argument>
+            <argument key="$envDevMode">%env(default::MOLLIE_DEV_MODE)%</argument>
+            <argument key="$envCypressMode">%env(default::MOLLIE_CYPRESS_MODE)%</argument>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ShippingMethodService" class="Kiener\MolliePayments\Service\ShippingMethodService">
             <argument type="service" id="shipping_method.repository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ShopService" class="Kiener\MolliePayments\Service\ShopService">
@@ -125,10 +141,10 @@
             <argument type="service" id="order_transaction.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService">
+        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService" class="Kiener\MolliePayments\Service\Cart\CartBackupService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
         </service>
-
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
@@ -137,40 +153,24 @@
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
-            <argument type="service" id="payment_method.repository"/>
-            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\Webhook\WebhookController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
 
         <!-- Subscribers -->
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="language.repository"/>
-            <argument type="service" id="locale.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Subscriber\OrderStateSubscriber" class="Kiener\MolliePayments\Subscriber\OrderStateSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -194,7 +194,72 @@
             <argument type="service" id="router"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
+
+        <service id="Kiener\MolliePayments\Service\UrlParsingService"/>
+
+        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory">
+            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Subscriber\KernelSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\VersionCompare"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\CompatibilityFactory" class="Kiener\MolliePayments\Compatibility\CompatibilityFactory">
+            <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway" class="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway">
+            <factory service="Kiener\MolliePayments\Compatibility\CompatibilityFactory" method="createGateway"/>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\RemovePaymentMethodRoute64"
+                 decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\RemovePaymentMethodRoute64.inner"/>
+
+            <argument type="tagged" tag="mollie_payments.payment_method.remover.sw64"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Compatibility\VersionCompare">
+            <argument>%kernel.shopware_version%</argument>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\CartConvertedSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+
+        <!-- Mail -->
+        <service id="mollie_payments.mail_service" class="Kiener\MolliePayments\Service\Mail\MailService">
+            <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailFactory"/>
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailSender"/>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Service\Tags\OrderTagService">
+            <argument id="order.repository" type="service"/>
+            <argument id="tag.repository" type="service"/>
+        </service>
+        <service id="Kiener\MolliePayments\Checkout\Cart\ExpressCartItemAddRoute" decorates="Shopware\Core\Checkout\Cart\SalesChannel\CartItemAddRoute" public="true">
+            <argument type="service" id=".inner"/>
+            <argument type="service" id="service_container"/>
+        </service>
+
 
     </services>
 

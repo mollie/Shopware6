@@ -1,0 +1,9 @@
+{% block mollie_express_privacy_notice %}
+
+    {% if mollie_express_required_data_protection and visible %}
+        <div class="mollie-privacy-note d-none">
+            {% sw_include '@Storefront/storefront/component/privacy-notice.html.twig' %}
+        </div>
+    {% endif %}
+
+{% endblock %}

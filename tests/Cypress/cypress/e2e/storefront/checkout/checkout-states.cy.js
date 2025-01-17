@@ -47,7 +47,7 @@ context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C4028: Test Status Open stays In-Progress', () => {
+        it('C4028: Test Status Open stays Unconfirmed/In progress', () => {
 
             // we create a SEPA bank transfer payment
             // the payment status will be IN PROGRESS then in Shopware.
@@ -66,7 +66,13 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             adminOrders.assertLatestOrderStatus('Open');
-            adminOrders.assertLatestPaymentStatus('In Progress');
+            if (shopware.isVersionLower('6.4.4.0')) {
+                adminOrders.assertLatestPaymentStatus('In Progress');
+            }else{
+                adminOrders.assertLatestPaymentStatus('Unconfirmed');
+            }
+
+
         })
 
         it('C4023: Test Status Paid', () => {
@@ -88,7 +94,7 @@ context("Order Status Mapping Tests", () => {
         it('C4024: Test Status Authorized', () => {
 
             scenarioDummyBasket.execute();
-            paymentAction.switchPaymentMethod('Pay later');
+            paymentAction.switchPaymentMethod('Klarna');
 
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();

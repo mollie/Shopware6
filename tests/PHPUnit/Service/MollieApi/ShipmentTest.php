@@ -13,6 +13,7 @@ use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Types\OrderLineType;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ShipmentTest extends TestCase
 {
@@ -34,16 +35,16 @@ class ShipmentTest extends TestCase
     protected function setUp(): void
     {
         $this->mollieOrder = $this->createMock(MollieOrder::class);
-
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->orderApiService = $this->createMock(Order::class);
         $this->orderApiService->method('getMollieOrder')->willReturn($this->mollieOrder);
 
-        $this->shipmentApiService = new Shipment($this->orderApiService);
+        $this->shipmentApiService = new Shipment($this->orderApiService, $dispatcher);
     }
 
     protected function setUpOrderLines()
     {
-        $this->mollieOrder->method('lines')->willReturnCallback(function() {
+        $this->mollieOrder->method('lines')->willReturnCallback(function () {
             $collection = new OrderLineCollection(4, \Safe\json_decode('{}'));
 
             // Total shipped: 5 items, amount € 175.00
@@ -106,7 +107,7 @@ class ShipmentTest extends TestCase
             ->method('shipAll')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId');
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
     }
 
     /**
@@ -121,7 +122,7 @@ class ShipmentTest extends TestCase
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId');
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
     }
 
     /**
@@ -134,7 +135,11 @@ class ShipmentTest extends TestCase
             ->method('createShipment')
             ->willReturn($this->createMock(MollieShipment::class));
 
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1);
+        $this->mollieOrder->method('lines')->willReturn([]);
+
+
+
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
     }
 
     /**
@@ -146,10 +151,11 @@ class ShipmentTest extends TestCase
             ->expects($this->once())
             ->method('createShipment')
             ->willThrowException(new ApiException());
+        $this->mollieOrder->method('lines')->willReturn([]);
 
         $this->expectException(MollieOrderCouldNotBeShippedException::class);
 
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1);
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
     }
 
     /**
@@ -195,7 +201,8 @@ class ShipmentTest extends TestCase
 
         $expectedTotals = [
             'amount' => 175.0,
-            'quantity' => 5
+            'quantity' => 5,
+            'shippableQuantity' => 4
         ];
 
         $actualTotals = $this->shipmentApiService->getTotals('mollieOrderId', 'salesChannelId');

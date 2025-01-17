@@ -5,28 +5,26 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-
-        <service id="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository"
-                 class="Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository">
-            <argument type="service" id="custom_field_set.repository"/>
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository">
+            <argument type="service" id="mollie_subscription.repository"/>
+            <argument type="service" id="mollie_subscription_address.repository"/>
+        </service>
+        <service id="Kiener\MolliePayments\Repository\OrderTransactionRepository">
+            <argument type="service" id="order_transaction.repository"/>
         </service>
 
-
-        <service id="Kiener\MolliePayments\Repository\Order\OrderAddressRepository" class="Kiener\MolliePayments\Repository\Order\OrderAddressRepository">
-            <argument type="service" id="order_address.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Repository\Order\OrderRepository" class="Kiener\MolliePayments\Repository\Order\OrderRepository">
+        <service id="Kiener\MolliePayments\Repository\OrderRepository">
             <argument type="service" id="order.repository"/>
         </service>
-
-        <service id="Kiener\MolliePayments\Repository\Product\ProductRepository" class="Kiener\MolliePayments\Repository\Product\ProductRepository">
-            <argument type="service" id="product.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository">
+        <service id="Kiener\MolliePayments\Repository\PaymentMethodRepository">
             <argument type="service" id="payment_method.repository"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Repository\MediaRepository">
+            <argument type="service" id="media.repository"/>
+        </service>
+
+
 
     </services>
 </container>

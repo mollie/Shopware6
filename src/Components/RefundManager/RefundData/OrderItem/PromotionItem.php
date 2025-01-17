@@ -8,7 +8,6 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 
 class PromotionItem extends AbstractItem
 {
-
     /**
      * @var OrderLineItemEntity
      */
@@ -28,8 +27,11 @@ class PromotionItem extends AbstractItem
     /**
      * @param OrderDeliveryEntity|OrderLineItemEntity $lineItem
      * @param int $alreadyRefundedQuantity
+     * @param float $taxTotal
+     * @param float $taxPerItem
+     * @param float $taxDiff
      */
-    private function __construct($lineItem, int $alreadyRefundedQuantity)
+    private function __construct($lineItem, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
         if ($lineItem instanceof OrderDeliveryEntity) {
             $this->orderDeliveryItem = $lineItem;
@@ -40,26 +42,34 @@ class PromotionItem extends AbstractItem
         }
 
         $this->alreadyRefundedQty = $alreadyRefundedQuantity;
+
+        parent::__construct($taxTotal, $taxPerItem, $taxDiff);
     }
 
     /**
      * @param OrderLineItemEntity $lineItem
      * @param int $alreadyRefundedQuantity
+     * @param float $taxTotal
+     * @param float $taxPerItem
+     * @param float $taxDiff
      * @return PromotionItem
      */
-    public static function fromOrderLineItem(OrderLineItemEntity $lineItem, int $alreadyRefundedQuantity)
+    public static function fromOrderLineItem(OrderLineItemEntity $lineItem, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
-        return new PromotionItem($lineItem, $alreadyRefundedQuantity);
+        return new PromotionItem($lineItem, $alreadyRefundedQuantity, $taxTotal, $taxPerItem, $taxDiff);
     }
 
     /**
      * @param OrderDeliveryEntity $lineItem
      * @param int $alreadyRefundedQuantity
+     * @param float $taxTotal
+     * @param float $taxPerItem
+     * @param float $taxDiff
      * @return PromotionItem
      */
-    public static function fromOrderDeliveryItem(OrderDeliveryEntity $lineItem, int $alreadyRefundedQuantity)
+    public static function fromOrderDeliveryItem(OrderDeliveryEntity $lineItem, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
-        return new PromotionItem($lineItem, $alreadyRefundedQuantity);
+        return new PromotionItem($lineItem, $alreadyRefundedQuantity, $taxTotal, $taxPerItem, $taxDiff);
     }
 
     /**
@@ -77,6 +87,7 @@ class PromotionItem extends AbstractItem
                 $this->orderLineItem->getUnitPrice(),
                 $this->orderLineItem->getQuantity(),
                 $this->orderLineItem->getTotalPrice(),
+                0,
                 0,
                 0,
                 $this->alreadyRefundedQty
@@ -102,6 +113,7 @@ class PromotionItem extends AbstractItem
                 $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
                 $this->orderDeliveryItem->getShippingCosts()->getQuantity(),
                 $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
+                0,
                 0,
                 0,
                 $this->alreadyRefundedQty

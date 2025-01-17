@@ -6,7 +6,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FakeTranslator implements TranslatorInterface
 {
-
     /**
      * @var array
      */
@@ -28,9 +27,13 @@ class FakeTranslator implements TranslatorInterface
      * @param null $locale
      * @return mixed|string
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null): string
     {
         return $this->snippets[$id];
     }
 
+    public function getLocale(): string
+    {
+        // TODO: Implement getLocale() method.
+    }
 }

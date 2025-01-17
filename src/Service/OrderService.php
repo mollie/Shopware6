@@ -14,11 +14,12 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
@@ -27,7 +28,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class OrderService implements OrderServiceInterface
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     protected $orderRepository;
 
@@ -52,49 +53,52 @@ class OrderService implements OrderServiceInterface
     private $updateOrderTransactionCustomFields;
 
     /**
+     * @var OrderDeliveryService
+     */
+    private $orderDeliveryService;
+
+    /**
      * @var LoggerInterface
      */
     protected $logger;
 
-
     /**
-     * @param EntityRepositoryInterface $orderRepository
+     * @param EntityRepository $orderRepository
      * @param ShopwareOrderService $swOrderService
      * @param Order $mollieOrderService
-     * @param UpdateOrderCustomFields $customFieldsUpdater
-     * @param UpdateOrderTransactionCustomFields $orderTransactionCustomFields
+     * @param UpdateOrderCustomFields $updateOrderCustomFields
+     * @param UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields
+     * @param OrderDeliveryService $orderDeliveryService
      * @param LoggerInterface $logger
      */
-    public function __construct(EntityRepositoryInterface $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $customFieldsUpdater, UpdateOrderTransactionCustomFields $orderTransactionCustomFields, LoggerInterface $logger)
+    public function __construct(EntityRepository $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
         $this->swOrderService = $swOrderService;
         $this->mollieOrderService = $mollieOrderService;
-        $this->updateOrderCustomFields = $customFieldsUpdater;
-        $this->updateOrderTransactionCustomFields = $orderTransactionCustomFields;
+        $this->updateOrderCustomFields = $updateOrderCustomFields;
+        $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
+        $this->orderDeliveryService = $orderDeliveryService;
         $this->logger = $logger;
     }
 
 
     /**
-     * Return an order entity, enriched with associations.
-     *
      * @param string $orderId
      * @param Context $context
-     * @throws OrderNotFoundException
      * @return OrderEntity
      */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
         $criteria = new Criteria([$orderId]);
+
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
         $criteria->addAssociation('addresses.country');     # required for FlowBuilder -> send confirm email option
-        $criteria->addAssociation('shippingMethod');        # required for FlowBuilder -> send confirm email option
-        $criteria->addAssociation('shippingAddress');   # important for subscription creation
         $criteria->addAssociation('billingAddress');    # important for subscription creation
         $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('orderCustomer');
+        $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('orderCustomer.customer');
         $criteria->addAssociation('orderCustomer.salutation');
         $criteria->addAssociation('language');
@@ -105,10 +109,11 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('deliveries.shippingMethod');
         $criteria->addAssociation('deliveries.positions.orderLineItem');
+        $criteria->addAssociation('deliveries.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME); # for refund manager
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME . '.refundItems'); # for refund manager
 
 
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -133,6 +138,7 @@ class OrderService implements OrderServiceInterface
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+
         $orderId = $this->orderRepository->searchIds($criteria, $context)->firstId();
 
         if (is_string($orderId)) {
@@ -144,6 +150,29 @@ class OrderService implements OrderServiceInterface
         );
 
         throw new OrderNumberNotFoundException($orderNumber);
+    }
+
+    /**
+     * @param string $deliveryId
+     * @param Context $context
+     * @throws \Exception
+     * @return OrderEntity
+     */
+    public function getOrderByDeliveryId(string $deliveryId, Context $context): OrderEntity
+    {
+        $delivery = $this->orderDeliveryService->getDelivery($deliveryId, $context);
+
+        if (!$delivery instanceof OrderDeliveryEntity) {
+            throw new \Exception('Delivery with id ' . $deliveryId . ' not found');
+        }
+
+        $order = $delivery->getOrder();
+
+        if (!$order instanceof OrderEntity) {
+            throw new \Exception('Order with id ' . $delivery->getOrderId() . ' not found');
+        }
+
+        return $order;
     }
 
     /**
@@ -225,9 +254,8 @@ class OrderService implements OrderServiceInterface
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
         $creditCardDetails = null;
-
+        $bankTransferDetails = null;
         try {
-
             // Add the transaction ID to the order's custom fields
             // We might need this later on for reconciliation
             $molliePayment = $this->mollieOrderService->getCompletedPayment($mollieOrderID, $molliePaymentId, $order->getSalesChannelId());
@@ -242,6 +270,7 @@ class OrderService implements OrderServiceInterface
             # check if we have a Bank Transfer reference
             if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
                 $thirdPartyPaymentId = $molliePayment->details->transferReference;
+                $bankTransferDetails = $molliePayment->details;
             }
 
             # check for creditcard
@@ -261,6 +290,7 @@ class OrderService implements OrderServiceInterface
         $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
         $customFieldsStruct->setCreditCardDetails($creditCardDetails);
+        $customFieldsStruct->setBankTransferDetails($bankTransferDetails);
 
         $this->updateOrderCustomFields->updateOrder(
             $order->getId(),
@@ -335,5 +365,32 @@ class OrderService implements OrderServiceInterface
             $orderTransactionCustomFields,
             $context
         );
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @return array<string,array<string,mixed>>
+     */
+    public function getStatus(OrderEntity $order): array
+    {
+        $lineItems = [];
+
+        $orderLineItems = $order->getLineItems();
+
+        if ($orderLineItems === null) {
+            return $lineItems;
+        }
+
+        foreach ($orderLineItems as $lineItem) {
+            $lineItems[$lineItem->getId()] = [
+                'id' => $lineItem->getId(),
+                'mollieOrderLineId' => null,
+                'quantity' => $lineItem->getQuantity(),
+                'quantityShippable' => 0,
+                'quantityShipped' => 0,
+            ];
+        }
+
+        return $lineItems;
     }
 }

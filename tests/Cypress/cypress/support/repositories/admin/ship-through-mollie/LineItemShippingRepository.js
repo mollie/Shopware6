@@ -21,7 +21,7 @@ export default class LineItemShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getInputQuantity() {
-        return cy.get('#sw-field--shipQuantity');
+        return cy.get('.cy-ship-quantity input');
     }
 
     /**

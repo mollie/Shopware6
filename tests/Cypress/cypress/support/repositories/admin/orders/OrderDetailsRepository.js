@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 export default class OrderDetailsRepository {
 
 
@@ -6,6 +10,9 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getDeliveryStatusTop() {
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return cy.get('.sw-order-general-info__order-state-delivery .sw-block-field__block .sw-single-select__selection-text');
+        }
         return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
     }
 
@@ -23,6 +30,17 @@ export default class OrderDetailsRepository {
      */
     getMollieActionButtonShipThroughMollie() {
         return cy.get('.sw-order-line-items-grid__actions-ship-button');
+    }
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLineItemActionsButtonCancelThroughMollie() {
+        return cy.get('.sw-context-button__menu-popover', {timeout: 15000}).contains('Cancel through Mollie');
+    }
+
+    getLineItemCancelled(){
+        return cy.get('.sw-data-grid__cell--canceledQuantity');
     }
 
     /**
@@ -54,6 +72,9 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getPaymentReferenceTitle() {
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return cy.get(':nth-child(2) > .mollie-property-title');
+        }
         return cy.get('.mollie-order-user-card-payment-reference-title');
     }
 
@@ -62,6 +83,9 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getPaymentReferenceValue() {
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return cy.get(':nth-child(2) > .mollie-property-content');
+        }
         return cy.get('.mollie-order-user-card-payment-reference-value');
     }
 
@@ -78,7 +102,7 @@ export default class OrderDetailsRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getLineItemActionsButtonShipThroughMollie() {
-        return cy.contains('Ship through Mollie');
+        return cy.get('.sw-context-button__menu-popover', {timeout: 15000}).contains('Ship through Mollie');
     }
 
     /**
@@ -94,7 +118,14 @@ export default class OrderDetailsRepository {
      * @param trackingCode
      */
     getTrackingCode(trackingCode) {
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return cy.get('.sw-order-user-card__tracking-code-select input.sw-select-selection-list__input');
+        }
         return cy.get(':nth-child(6) > .sw-field > .sw-block-field__block > .sw-select__selection > .sw-select-selection-list > li > .sw-select-selection-list__input');
+    }
+
+    getTrackingCodeAddButton() {
+        return cy.get('.sw-popover__wrapper .sw-multi-tag-select-valid')
     }
 
     /**
@@ -113,4 +144,15 @@ export default class OrderDetailsRepository {
         return cy.get('.sw-order-detail__summary-data');
     }
 
+    getOrderDetailsTab() {
+        return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-details')
+    }
+
+    getOrderDetailsGeneralTab() {
+        return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-general')
+    }
+
+    getMollieRefundManagerDialog(){
+        return cy.get('#modalTitleEl');
+    }
 }

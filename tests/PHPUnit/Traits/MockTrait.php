@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 trait MockTrait
 {
-
     /**
      * @param string $originalClassName
      * @param TestCase $testCase
@@ -22,5 +21,4 @@ trait MockTrait
             ->disallowMockingUnknownTypes()
             ->getMock();
     }
-
 }

@@ -22,7 +22,6 @@ class SubscriptionStatus
     public static function fromMollieStatus(string $status)
     {
         switch ($status) {
-
             case 'pending':
                 return self::PENDING;
 

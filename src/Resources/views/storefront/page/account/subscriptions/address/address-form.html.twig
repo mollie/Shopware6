@@ -5,7 +5,7 @@
     {% endblock %}
 
     {% block mollie_subscription_component_address_form_salutation %}
-        <div class="form-row">
+        <div class="form-row row g-2">
 
             {% block mollie_subscription_component_address_form_salutation_col %}
                 <div class="form-group col-sm-6">
@@ -16,7 +16,7 @@
                     {% endblock %}
                     {% block mollie_subscription_component_address_form_salutation_select %}
                         <select id="personalSalutation"
-                                class="custom-select"
+                                class="custom-select form-select"
                                 name="address[salutationId]"
                                 required="required">
                             {% if not data.get('salutationId') %}
@@ -60,7 +60,7 @@
     {% endblock %}
 
     {% block mollie_subscription_component_address_form_name %}
-        <div class="form-row">
+        <div class="form-row row g-2">
 
             {% block mollie_subscription_component_address_form_first_name_col %}
                 <div class="form-group col-sm-6">
@@ -105,7 +105,7 @@
     {% endblock %}
 
     {% block mollie_subscription_component_address_form_company %}
-        <div class="form-row">
+        <div class="form-row row g-2">
 
             {% block mollie_subscription_component_address_form_company_col %}
                 <div class="form-group col-md-6">
@@ -147,7 +147,7 @@
     {% endblock %}
 
     {% block mollie_subscription_component_address_form_additional_field %}
-        <div class="form-row">
+        <div class="form-row row g-2">
 
             {% block mollie_subscription_component_address_form_additional_field_first_config %}
                 {% block mollie_subscription_component_address_form_additional_field_first_col %}
@@ -194,7 +194,7 @@
     {% endblock %}
 
     {% block mollie_subscription_component_address_form_phone_number %}
-        <div class="form-row">
+        <div class="form-row row g-2">
             {% block mollie_subscription_component_address_form_phone_number_config %}
                 {% block mollie_subscription_component_address_form_phone_number_col %}
                     <div class="form-group col-6">
@@ -218,7 +218,7 @@
     {% endblock %}
 
     {% block mollie_subscription_component_address_form_street %}
-        <div class="form-row">
+        <div class="form-row row g-2">
 
             {% block mollie_subscription_component_address_form_street_col %}
                 <div class="form-group col-md-6">

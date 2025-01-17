@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 class PluginInstaller
 {
-
     /**
      * @var CustomFieldsInstaller
      */

@@ -9,10 +9,8 @@ use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Mollie\Api\Types\OrderLineType;
 use PHPUnit\Framework\TestCase;
 
-
 class RoundingDifferenceFixerTest extends TestCase
 {
-
     /**
      * @var RoundingDifferenceFixer
      */
@@ -190,5 +188,4 @@ class RoundingDifferenceFixerTest extends TestCase
 
         $this->assertEquals('', $diffItem->getSku());
     }
-
 }

@@ -2,12 +2,11 @@
 
 namespace Kiener\MolliePayments\Struct\LineItem;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Content\Product\ProductEntity;
 
 class LineItemAttributes
 {
-
     /**
      * @var string
      */
@@ -43,6 +42,10 @@ class LineItemAttributes
      */
     private $subscriptionRepetitionType;
 
+    /**
+     * @var bool
+     */
+    private $isPromotionProduct;
 
     /**
      * @param LineItem $lineItem
@@ -58,6 +61,8 @@ class LineItemAttributes
             $this->productNumber = (string)$payload['productNumber'];
         }
 
+        $this->isPromotionProduct = array_key_exists('promotionId', $payload);
+
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
@@ -68,11 +73,34 @@ class LineItemAttributes
     }
 
     /**
+     * @return string[]
+     */
+    public static function getKeyList(): array
+    {
+        return [
+            'mollie_payments_product_voucher_type',
+            'mollie_payments_product_subscription_enabled',
+            'mollie_payments_product_subscription_interval',
+            'mollie_payments_product_subscription_interval_unit',
+            'mollie_payments_product_subscription_repetition',
+            'mollie_payments_product_subscription_repetition_type',
+        ];
+    }
+
+    /**
      * @return string
      */
     public function getProductNumber(): string
     {
         return $this->productNumber;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPromotionProduct(): bool
+    {
+        return $this->isPromotionProduct;
     }
 
     /**
@@ -106,7 +134,6 @@ class LineItemAttributes
     {
         $this->subscriptionProduct = $subscriptionProduct;
     }
-
 
     /**
      * @return int
@@ -189,10 +216,8 @@ class LineItemAttributes
         $foundValue = '';
 
         if ($lineItem->getPayload() !== null) {
-
             # check if we have customFields in our payload
             if (array_key_exists('customFields', $lineItem->getPayload())) {
-
                 # load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
 
@@ -208,9 +233,9 @@ class LineItemAttributes
                 # and load, but we migrate to the new one
                 # check if we have customFields
                 if ($foundValue === '') {
-                    if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+                    if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
                         # load the mollie entry
-                        $mollieData = $customFields['mollie_payments'];
+                        $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
                         # assign our value if we have it
                         $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
                     }

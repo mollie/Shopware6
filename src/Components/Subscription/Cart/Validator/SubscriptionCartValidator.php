@@ -6,6 +6,7 @@ use Kiener\MolliePayments\Components\Subscription\Cart\Error\InvalidGuestAccount
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\InvalidPaymentMethodError;
 use Kiener\MolliePayments\Components\Subscription\Cart\Error\MixedCartBlockError;
 use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
+use Kiener\MolliePayments\Components\Subscription\Services\Validator\MixedCartValidator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -16,12 +17,15 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionCartValidator implements CartValidatorInterface
 {
-
     /**
      * @var SettingsService
      */
     private $pluginSettings;
 
+    /**
+     * @var MixedCartValidator
+     */
+    private $mixedCartValidator;
 
     /**
      * @param SettingsService $pluginSettings
@@ -29,6 +33,8 @@ class SubscriptionCartValidator implements CartValidatorInterface
     public function __construct(SettingsService $pluginSettings)
     {
         $this->pluginSettings = $pluginSettings;
+
+        $this->mixedCartValidator = new MixedCartValidator();
     }
 
 
@@ -68,7 +74,7 @@ class SubscriptionCartValidator implements CartValidatorInterface
         # --------------------------------------------------------------------------------------------
         # now check if we have a mixed cart.
         # this is not allowed!
-        $isMixedCart = $this->isMixedCart($cart);
+        $isMixedCart = $this->mixedCartValidator->isMixedCart($cart);
 
         if ($isMixedCart) {
             $errorCollection->add(new MixedCartBlockError());
@@ -125,43 +131,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
             if ($attribute->isSubscriptionProduct()) {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param Cart $cart
-     * @return bool
-     */
-    private function isMixedCart(Cart $cart): bool
-    {
-        $subscriptionItemsCount = 0;
-        $otherItemsCount = 0;
-        $isMixedCart = false;
-
-        foreach ($cart->getLineItems()->getFlat() as $lineItem) {
-            $attributes = new LineItemAttributes($lineItem);
-
-            if ($attributes->isSubscriptionProduct()) {
-                $subscriptionItemsCount++;
-            } else {
-                $otherItemsCount++;
-            }
-
-            if ($otherItemsCount > 0) {
-                # mixed cart with other items
-                $isMixedCart = true;
-            }
-
-            if ($subscriptionItemsCount > 1) {
-                # mixed cart with multiple subscription items
-                $isMixedCart = true;
-            }
-        }
-
-        if ($subscriptionItemsCount >= 1 && $isMixedCart) {
-            return true;
         }
 
         return false;

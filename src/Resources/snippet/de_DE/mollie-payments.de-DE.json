@@ -51,70 +51,121 @@
       },
       "redirecting": "Leiten Sie weiter zu: "
     },
-    "payments": {
-      "applePayDirect": {
-        "captionSubtotal": "Zwischensumme",
-        "captionTaxes": "Steuern",
-        "paymentError": "Die Zahlung mit Apple Pay ist fehlgeschlagen."
-      }
-    },
-    "subscriptions": {
-      "account": {
-        "btnEditBillingAddress": "Rechnungsadresse bearbeiten",
-        "btnEditShippingAddress": "Lieferadresse bearbeiten",
-        "cancelSubscription": "Das Abonnement wurde gekündigt",
-        "errorCancelSubscription": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
-        "errorPause": "Dein Abonnement konnte nicht pausiert werden",
-        "errorResume": "Dein Abonnement konnte nicht fortgesetzt werden",
-        "errorSkip": "Dein Abonnement konnte nicht ausgesetzt werden",
-        "errorUpdateAddress": "Die Adresse konnte nicht aktualisiert werden",
-        "errorUpdatePayment": "Die Zahlungsart konnte nicht aktualisiert werden",
-        "headlineBillingAddress": "Rechnungsadresse",
-        "headlineShippingAddress": "Lieferadresse",
-        "mollieSubscriptionAmount": "Betragen",
-        "mollieSubscriptionCancel": "Abonnement kündigen",
-        "mollieSubscriptionCancelUntil": "Kündbar bis",
-        "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
-        "mollieSubscriptionId": "Id",
-        "mollieSubscriptionNextPayment": "Nächste Zahlung um",
-        "mollieSubscriptionPause": "Abonnement pausieren",
-        "mollieSubscriptionResume": "Abonnement fortsetzen",
-        "mollieSubscriptionSkip": "Abonnement aussetzen",
-        "mollieSubscriptionUpdatePayment": "Zahlungsmethode aktualisieren",
-        "mollieSubscriptionsHeadline": "Abonnement:",
-        "mollieSubscriptionsInfoEmpty": "Sie haben noch keine Abonnements.",
-        "mollieSubscriptionsLink": "Abonnements",
-        "mollieSubscriptionsTitle": "Abonnements",
-        "mollieSubscriptionsWelcome": "Ihre letzten Abonnements:",
-        "orderActionHide": "Ausblenden",
-        "orderActionView": "Anzeigen",
-        "shippingEqualToBilling": "gleich wie Rechnungsadresse",
-        "successPause": "Dein Abonnement wurde pausiert",
-        "successResume": "Dein Abonnement wird nun wieder fortgesetzt",
-        "successSkip": "Dein Abonnement wird ausgesetzt",
-        "successUpdateAddress": "Deine Adresse wurde erfolgreich aktualisiert",
-        "successUpdatePayment": "Die Zahlungsart konnte erfolgreich aktualisiert werden"
-      },
-      "options": {
-        "everyDay": "Jeden Tag",
-        "everyDays": "Alle %value% Tage",
-        "everyMonth": "Jeden Monat",
-        "everyMonths": "Alle %value% Monate",
-        "everyWeek": "Jede Woche",
-        "everyWeeks": "Alle %value% Wochen",
-        "repetitionCount": "%value% mal"
-      },
-      "product": {
-        "addToCartText": "Abonnieren",
-        "information": "Abonnementprodukt"
-      }
-    },
-    "order": {
-      "refundedLabel": "Rückerstattet:",
-      "refundPendingLabel": "Rückerstattung ausstehend:"
-    },
-    "testMode": {
-      "label": "Testmodus"
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "MM/JJ",
+                "cardHolderLabel": "Name des Karteninhabers",
+                "cardNumberLabel": "Kreditkartennummer",
+                "cardVerificationCodeLabel": "CVV",
+                "creditCardTagLine": "Zahlung gesichert und zur Verfügung gestellt von",
+                "headLine": "Kreditkarteninformationen",
+                "saveCardDetailLabel": "Kartendaten für zukünftige Zahlungen speichern"
+            },
+            "ideal": {
+                "selectBank": "Bank auswählen"
+            },
+            "pos": {
+                "selectTerminal": "Terminal auswählen"
+            },
+            "mandate": {
+                "sectionTitle": "Gespeicherte Karten",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Ihre Karte wurde erfolgreich gelöscht",
+                "deleteErrorMessage": "Beim Entfernen Ihrer Karte ist ein Problem aufgetreten",
+                "newCard": "Neue Karte",
+                "remove": "Entfernen",
+                "subscriptionBadge" : "Abonnement"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Stornieren",
+                "cardSubscription": "Diese Karte wird für ein Abonnement verwendet. Bitte beenden Sie zuerst das Abonnement bevor Sie diese Karte löschen.",
+                "deleteButton": "Löschen",
+                "deleteConfirmation": "Sind Sie sicher, dass Sie die Zahlart löschen möchten?",
+                "title": "Bestätigung zum Löschen"
+            },
+            "bancomatPay": {
+              "headLine": "Telefonnummer",
+              "phoneErrorMessage": "Die Telefonnummer ist erforderlich. Zum Beispiel +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Bezahlen Sie mit einer anderen Zahlungsart",
+                "buttonReturnToShop": "Kehre zum Webshop zurück",
+                "error": "Zahlung fehlgeschlagen",
+                "failed": "Die Zahlung ist fehlgeschlagen oder wurde storniert. Sie werden zu Mollie weitergeleitet, wo Sie Ihre Zahlung mit der Methode Ihrer Wahl abschließen können. "
+            },
+            "redirecting": "Leiten Sie weiter zu: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Zwischensumme",
+                "captionTaxes": "Steuern",
+                "paymentError": "Die Zahlung mit Apple Pay ist fehlgeschlagen."
+            },
+            "paypalExpress": {
+                "paymentError": "Die Zahlung mit Paypal Express ist fehlgeschlagen."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "Rechnungsadresse bearbeiten",
+                "btnEditShippingAddress": "Lieferadresse bearbeiten",
+                "cancelSubscription": "Das Abonnement wurde gekündigt",
+                "errorCancelSubscription": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
+                "errorPause": "Dein Abonnement konnte nicht pausiert werden",
+                "errorResume": "Dein Abonnement konnte nicht fortgesetzt werden",
+                "errorSkip": "Dein Abonnement konnte nicht ausgesetzt werden",
+                "errorUpdateAddress": "Die Adresse konnte nicht aktualisiert werden",
+                "errorUpdatePayment": "Die Zahlungsart konnte nicht aktualisiert werden",
+                "headlineBillingAddress": "Rechnungsadresse",
+                "headlineShippingAddress": "Lieferadresse",
+                "mollieSubscriptionAmount": "Betragen",
+                "mollieSubscriptionCancel": "Abonnement kündigen",
+                "mollieSubscriptionCancelUntil": "Kündbar bis",
+                "mollieSubscriptionContextMenuReorder": "Abo wiederholen",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Nächste Zahlung um",
+                "mollieSubscriptionPause": "Abonnement pausieren",
+                "mollieSubscriptionResume": "Abonnement fortsetzen",
+                "mollieSubscriptionSkip": "Abonnement aussetzen",
+                "mollieSubscriptionUpdatePayment": "Zahlungsmethode aktualisieren",
+                "mollieSubscriptionsHeadline": "Abonnement:",
+                "mollieSubscriptionsInfoEmpty": "Sie haben noch keine Abonnements.",
+                "mollieSubscriptionsLink": "Abonnements",
+                "mollieSubscriptionsTitle": "Abonnements",
+                "mollieSubscriptionsWelcome": "Ihre letzten Abonnements:",
+                "orderActionHide": "Ausblenden",
+                "orderActionView": "Anzeigen",
+                "shippingEqualToBilling": "gleich wie Rechnungsadresse",
+                "successPause": "Dein Abonnement wurde pausiert",
+                "successResume": "Dein Abonnement wird nun wieder fortgesetzt",
+                "successSkip": "Dein Abonnement wird ausgesetzt",
+                "successUpdateAddress": "Deine Adresse wurde erfolgreich aktualisiert",
+                "successUpdatePayment": "Die Zahlungsart konnte erfolgreich aktualisiert werden"
+            },
+            "options": {
+                "everyDay": "Jeden Tag",
+                "everyDays": "Alle %value% Tage",
+                "everyMonth": "Jeden Monat",
+                "everyMonths": "Alle %value% Monate",
+                "everyWeek": "Jede Woche",
+                "everyWeeks": "Alle %value% Wochen",
+                "repetitionCount": "%value% mal"
+            },
+            "product": {
+                "addToCartText": "Abonnieren",
+                "information": "Abonnementprodukt"
+            }
+        },
+       "order": {
+            "refundedLabel": "Rückerstattet:",
+            "refundPendingLabel": "Rückerstattung ausstehend:"
+        },
+        "testMode": {
+            "label": "Testmodus"
+        }
     }
   }
 }

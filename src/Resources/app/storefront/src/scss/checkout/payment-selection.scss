@@ -9,6 +9,14 @@
         margin-top: 15px;
     }
 
+    .mollie-bancomat-pay{
+        margin-top:15px;
+    }
+
+    .mollie-pos-terminals {
+        margin-top: 15px;
+    }
+
     .payment-method-description {
         order: -1;
     }
@@ -16,6 +24,18 @@
 
 .confirm-payment {
     .mollie-ideal-issuer {
+        margin-top: 15px;
+
+        .custom-select:invalid {
+            border: 1px solid red;
+        }
+    }
+
+    .mollie-bancomat-pay{
+        margin-top:15px;
+    }
+
+    .mollie-pos-terminals {
         margin-top: 15px;
 
         .custom-select:invalid {

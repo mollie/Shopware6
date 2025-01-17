@@ -1,0 +1,63 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apple Pay Select Shipping Method Endpoint",
+    "description": "Endpoint to select a shipping method for Apple Pay integration.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/applepay/shipping-method": {
+      "post": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
+        "summary": "Select Apple Pay Shipping Method",
+        "operationId": "selectApplePayShippingMethod",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "identifier": {
+                    "type": "string",
+                    "description": "The identifier of the selected shipping method."
+                  }
+                },
+                "required": ["identifier"],
+                "example": {
+                  "identifier": "shipping_method_1"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response indicating the shipping method was selected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if the operation was successful."
+                    }
+                  },
+                  "required": ["success"]
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

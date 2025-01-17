@@ -3,9 +3,23 @@
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
 use Exception;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
+use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler;
+use Kiener\MolliePayments\Components\Subscription\Services\Validator\MixedOrderValidator;
+use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
+use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\Tags\Exceptions\CouldNotTagOrderException;
+use Kiener\MolliePayments\Service\Tags\OrderTagService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -14,6 +28,40 @@ class CreateAction extends BaseAction
 {
     private const INITIAL_STATUS = SubscriptionStatus::PENDING;
 
+    /**
+     * @var OrderTagService
+     */
+    private $orderTagService;
+
+    public function __construct(
+        SettingsService $pluginSettings,
+        SubscriptionRepository $repoSubscriptions,
+        SubscriptionBuilder $subscriptionBuilder,
+        MollieDataBuilder $mollieRequestBuilder,
+        CustomerService $customers,
+        MollieGatewayInterface $gwMollie,
+        CancellationValidator $cancellationValidator,
+        FlowBuilderFactory $flowBuilderFactory,
+        FlowBuilderEventFactory $flowBuilderEventFactory,
+        SubscriptionHistoryHandler $subscriptionHistory,
+        LoggerInterface $logger,
+        OrderTagService $orderTagService
+    ) {
+        parent::__construct(
+            $pluginSettings,
+            $repoSubscriptions,
+            $subscriptionBuilder,
+            $mollieRequestBuilder,
+            $customers,
+            $gwMollie,
+            $cancellationValidator,
+            $flowBuilderFactory,
+            $flowBuilderEventFactory,
+            $subscriptionHistory,
+            $logger
+        );
+        $this->orderTagService = $orderTagService;
+    }
 
     /**
      * @param OrderEntity $order
@@ -29,10 +77,18 @@ class CreateAction extends BaseAction
 
         # -------------------------------------------------------------------------------------
 
-        if ($order->getLineItems() === null || $order->getLineItems()->count() > 1) {
-            # Mixed carts are not allowed for subscriptions
+        if ($order->getLineItems() === null) {
+            # empty carts are not allowed for subscriptions
             return '';
         }
+
+        $mixedOrderValidator = new MixedOrderValidator();
+
+        if ($mixedOrderValidator->isMixedCart($order)) {
+            # Mixed orders are not allowed for subscriptions
+            return '';
+        }
+
 
         $item = $order->getLineItems()->first();
 
@@ -45,7 +101,7 @@ class CreateAction extends BaseAction
         $attributes = new OrderLineItemEntityAttributes($item);
 
         if (!$attributes->isSubscriptionProduct()) {
-            $this->getLogger()->warning("Order {$order->getOrderNumber()} did not create a subscription. Line item does not seem to be a subscription product (anymore)!");
+            # this is no subscription product (regular checkout), so return an empty string.
             # return an empty string that will be saved as "reference".
             # so our order will not be a subscription
             return '';
@@ -73,6 +129,12 @@ class CreateAction extends BaseAction
 
 
         $this->getStatusHistory()->markCreated($subscription, self::INITIAL_STATUS, $context->getContext());
+
+        try {
+            $this->orderTagService->addTagToSubscriptionOrder($subscription, $context->getContext());
+        } catch (CouldNotTagOrderException $exception) {
+            $this->getLogger()->error('Could not tag order with subscription: ' . $exception->getMessage());
+        }
 
         return $subscription->getId();
     }

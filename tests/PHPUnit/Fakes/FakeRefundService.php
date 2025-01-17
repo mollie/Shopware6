@@ -2,9 +2,7 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\RefundServiceInterface;
-use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -12,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 class FakeRefundService implements RefundServiceInterface
 {
-
     /**
      * @var bool
      */
@@ -70,7 +67,7 @@ class FakeRefundService implements RefundServiceInterface
      * @param Context $context
      * @return Refund
      */
-    public function refundFull(OrderEntity $order, string $description,string $internalDescription, array $refundItems, Context $context): Refund
+    public function refundFull(OrderEntity $order, string $description, string $internalDescription, array $refundItems, Context $context): Refund
     {
         $this->fullyRefunded = true;
         $this->refundedOrder = $order;
@@ -87,7 +84,7 @@ class FakeRefundService implements RefundServiceInterface
      * @param Context $context
      * @return Refund
      */
-    public function refundPartial(OrderEntity $order, string $description,string $internalDescription, float $amount, array $lineItems, Context $context): Refund
+    public function refundPartial(OrderEntity $order, string $description, string $internalDescription, float $amount, array $lineItems, Context $context): Refund
     {
         $this->fullyRefunded = false;
         $this->refundedOrder = $order;
@@ -109,7 +106,7 @@ class FakeRefundService implements RefundServiceInterface
      * @param OrderEntity $order
      * @return array
      */
-    public function getRefunds(OrderEntity $order): array
+    public function getRefunds(OrderEntity $order, Context $context): array
     {
         // TODO: Implement getRefunds() method.
     }
@@ -155,5 +152,4 @@ class FakeRefundService implements RefundServiceInterface
 
         return $refund;
     }
-
 }

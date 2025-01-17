@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class MolliePaymentDetailsTest extends TestCase
 {
-
     /**
      * This test verifies that an existing mandate id
      * is correctly found and returned
@@ -53,5 +52,4 @@ class MolliePaymentDetailsTest extends TestCase
 
         $this->assertEquals('', $mandateId);
     }
-
 }

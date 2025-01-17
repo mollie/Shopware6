@@ -21,7 +21,8 @@ class CompatibilityGatewayOrderTransactionStateTest extends TestCase
      * @param $expectedState
      * @dataProvider getChargebackStateTestData
      */
-    public function testGetChargebackState($swVersion, $expectedState) {
+    public function testGetChargebackState($swVersion, $expectedState)
+    {
         $compatibilityGateway = new CompatibilityGateway($swVersion, $this->salesChannelContextService);
 
         $actualState = $compatibilityGateway->getChargebackOrderTransactionState();

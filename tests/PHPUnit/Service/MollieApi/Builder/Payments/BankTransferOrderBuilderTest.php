@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use DateTime;
 use DateTimeZone;
-use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
@@ -16,10 +15,17 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 {
+
+    /**
+     * @throws \Exception
+     * @return void
+     */
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
+
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
+
         $paymentMethod = PaymentMethod::BANKTRANSFER;
 
 
@@ -30,9 +36,11 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
         );
 
 
-        $bankDueDays = $this->expiresAt + 5;
+        $bankDueDays = 2;
+        $expiresDays = 10;
+
         $this->settingStruct->assign([
-            'orderLifetimeDays' => $this->expiresAt,
+            'orderLifetimeDays' => $expiresDays,
             'paymentMethodBankTransferDueDateDays' => $bankDueDays
         ]);
 
@@ -50,24 +58,28 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $order = $this->getOrderEntity($amountTotal, $taxStatus, $currencyISO, $lineItems, $orderNumber);
 
-        $actual = $this->builder->build($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
+        $actual = $this->builder->buildOrderPayload($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 
-        $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
+        $bankDueDatetime = (new DateTime())
+            ->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $bankDueDays))
             ->format('Y-m-d');
+
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
             'locale' => $this->localeCode,
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
-            'payment' => ['webhookUrl' => $redirectWebhookUrl],
+            'payment' => [
+                'webhookUrl' => $redirectWebhookUrl,
+            ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $bankDueDatetime
         ];
 
         self::assertSame($expected, $actual);

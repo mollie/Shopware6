@@ -4,7 +4,7 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SystemConfig\Service\ConfigurationService;
 
 abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannelGenerator
@@ -21,13 +21,13 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
 
     /**
      * @param ConfigurationService $configurationService
-     * @param EntityRepositoryInterface $salesChannelRepository
+     * @param EntityRepository $salesChannelRepository
      * @param SettingsService $settingsService
      */
     public function __construct(
-        ConfigurationService      $configurationService,
-        EntityRepositoryInterface $salesChannelRepository,
-        SettingsService           $settingsService
+        ConfigurationService            $configurationService,
+        EntityRepository $salesChannelRepository,
+        SettingsService                 $settingsService
     ) {
         parent::__construct($salesChannelRepository);
 

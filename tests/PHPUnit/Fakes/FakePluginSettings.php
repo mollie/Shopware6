@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Service\PluginSettingsServiceInterface;
 
 class FakePluginSettings implements PluginSettingsServiceInterface
 {
-
     /**
      * @var string
      */
@@ -37,5 +36,4 @@ class FakePluginSettings implements PluginSettingsServiceInterface
     {
         return false;
     }
-
 }

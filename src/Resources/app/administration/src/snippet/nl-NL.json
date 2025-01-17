@@ -1,5 +1,8 @@
 {
   "global": {
+    "entities": {
+      "mollie_subscription": "Mollie Abonnement | Mollie Abonnementen"
+    },
     "businessEvents": {
       "mollie_checkout_order_success": " Bestelling succesvol",
       "mollie_checkout_order_failed": " Bestelling mislukt",
@@ -20,7 +23,7 @@
       "mollie_subscription_cancelled": " Mollie abonnement opgezegd",
       "mollie_subscription_paused": " Mollie abonnement gepauzeerd",
       "mollie_subscription_resumed": " Mollie abonnement hervat",
-      "mollie_subscription_skipped": " Mollie subscription overgeslagen",
+      "mollie_subscription_skipped": " Mollie abonnement overgeslagen",
       "mollie_subscription_renewed": " Mollie abonnement verlengd",
       "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
     }
@@ -28,12 +31,14 @@
   "mollie-payments": {
     "pluginTitle": "Mollie",
     "pluginDescription": "Mollie Module",
+    "searchPlaceholder": "Zoek in abonnementen...",
     "general": {
       "mainMenuItemGeneral": "Mollie betalingen",
       "descriptionTextModule": "Mollie betalingen",
       "btnMollieActions": "Mollie acties",
       "refundThroughMollie": "Terugbetaling via Mollie",
-      "shipThroughMollie": "Verzending door Mollie"
+      "shipThroughMollie": "Verzending door Mollie",
+      "cancelMollieItem": "Opzeggen via Mollie"
     },
     "config": {
       "info": {
@@ -72,13 +77,17 @@
           "failed": "De betaalmethoden konden niet worden geupdated."
         },
         "mollieLimits": {
-          "link": "Open betalingslimieten van Mollie"
+          "link": "Toon Mollie-beschikbaarheidsregels voor betaalmethoden"
         }
       },
       "rounding": {
         "info1": "Shopware kan valuta-instellingen gebruiken om te berekenen hoe het totaal van een bestelling wordt afgerond. Dit omvat het aantal decimalen in jouw productprijzen en het dichtstbijzijnde afrondingsinterval, zoals 0,50 of 1,00.",
         "info2": "Deze instellingen kunnen leiden tot een andere totale som dan de totale som van lineitems. Wanneer Mollie deze bedragen kruiselings controleert en vaststelt dat ze niet overeenkomen, ontstaat er een fout bij het afrekenen.",
         "info3": "Je kunt deze functie gebruiken om afrondingsproblemen bij het afrekenen te voorkomen. Indien ingeschakeld, voegt het een apart lineitem toe aan je Mollie Dashboard met het afrondingsverschil, en betalen je klanten de totale som zoals berekend door Shopware."
+      },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "Het is niet mogelijk om Klarna Pay now, Klarna Slice it of Klarna Pay later als methode te gebruiken wanneer de vervaldatum meer dan 28 dagen in de toekomst ligt, tenzij een ander maximum is overeengekomen tussen de merchant en Klarna.",
+        "bankTransferDueDateLimitReached": "Het is niet mogelijk om de orderlevensduur langer dan 100 dagen in te stellen."
       },
       "support": {
         "modalTitle": "Verzoek support van Mollie",
@@ -152,7 +161,8 @@
             "resetStock": "Voorraad resetten"
           },
           "btnResetLine": "Rij resetten",
-          "checkDeductPromotion": "Promotie aftrekken"
+          "checkDeductPromotion": "Promotie aftrekken",
+          "checkRefundTax": "Refund VAT"
         },
         "roundDiffItemAdded": "Automatisch afrondingsitem toegevoegd"
       },
@@ -253,7 +263,8 @@
         "order": {
           "description": "De volgende product aantallen zullen worden verzonden.",
           "itemHeader": "Product",
-          "quantityHeader": "Aantal"
+          "quantityHeader": "Aantal",
+          "originalQuantityHeader": "Aantal (verzendbaar)"
         },
         "availableTracking": {
           "label": "Beschikbare tracking codes",
@@ -266,10 +277,27 @@
           "url": "Url",
           "invalid": "Voer zowel Carrier als Code in"
         },
-        "confirmButton": "Verzenden",
-        "cancelButton": "Niet verzenden"
+        "confirmButton": "Bestelling verzenden",
+        "cancelButton": "Annuleren",
+        "selectAllButton": "Selecteer alles",
+        "resetButton": "Resetten"
+      },
+      "cancel": {
+        "title": "Product in Mollie afkorting",
+        "confirmButton": "Product in Mollie afkorting",
+        "cancelButton": "Annuleren",
+        "resetStock": "Voorraad resetten",
+        "item": {
+          "success": "Product geannuleerd",
+          "failed": {
+            "quantityZero": "Aantal is 0",
+            "invalidLine": "Product bestaat niet in de bestelling",
+            "quantityTooHigh": "Het aantal is te hoog"
+          }
+        }
       }
     },
+
     "sw-flow": {
       "actions": {
         "shipOrder": {
@@ -348,7 +376,8 @@
         },
         "action": {
           "edit": "Abonnement bewerken"
-        }
+        },
+        "deletedCustomer": "Klant verwijderd"
       },
       "detail": {
         "title": "Mollie Abonnement",
@@ -403,9 +432,11 @@
   },
   "sw-order": {
     "detailExtended": {
+      "titleCreditCardData" : "Credit Card data",
       "buttonMolliePaymentLink": "Kopieer naar Klembord",
       "columnRefunded": "Terugbetaald",
       "columnShipped": "Verzonden",
+      "columnCanceled": "Geannuleerd",
       "labelMollieOrderId": "Mollie Order ID",
       "labelMollieThirdPartyPaymentId": "Betalingskenmerk",
       "labelMolliePaymentLink": "Mollie Checkout URL",
@@ -437,6 +468,15 @@
       },
       "mollie_subscription": {
         "label": "Abonnementen"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Beschrijving"
+        }
       }
     }
   },

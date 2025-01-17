@@ -8,10 +8,8 @@ use PHPStan\Node\FileNode;
 use PHPStan\Rules\Rule;
 use PHPStan\ShouldNotHappenException;
 
-
 final class StrictTypeRule implements Rule
 {
-
     /**
      * @return string
      */
@@ -67,5 +65,4 @@ final class StrictTypeRule implements Rule
             'File has no "declare(strict_types=1)" declaration. This is required for this project!',
         ];
     }
-
 }

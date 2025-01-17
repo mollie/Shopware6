@@ -2,7 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
-use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
@@ -15,16 +15,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RegularPaymentRemover extends PaymentMethodRemover
 {
-
     /**
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @param OrderService $orderService
      * @param SettingsService $settingsService
-     * @param OrderDataExtractor $orderDataExtractor
+     * @param OrderItemsExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
     }
@@ -34,7 +33,7 @@ class RegularPaymentRemover extends PaymentMethodRemover
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        if (!$this->isAllowedRoute()) {
+        if (! $this->isAllowedRoute()) {
             return $originalData;
         }
 
@@ -51,8 +50,29 @@ class RegularPaymentRemover extends PaymentMethodRemover
             if ($attributes->getMollieIdentifier() === PaymentMethod::INGHOMEPAY) {
                 $originalData->getPaymentMethods()->remove($key);
             }
+
+            # hiding billie for none business customers
+            if ($attributes->getMollieIdentifier() === PaymentMethod::BILLIE && $this->companyNameExists($context) === false) {
+                $originalData->getPaymentMethods()->remove($key);
+            }
         }
 
         return $originalData;
+    }
+
+    private function companyNameExists(SalesChannelContext $context): bool
+    {
+        $customer = $context->getCustomer();
+
+        if ($customer === null) {
+            return false;
+        }
+        
+        $billingAddress = $customer->getActiveBillingAddress();
+
+        if ($billingAddress === null) {
+            $billingAddress = $customer->getDefaultBillingAddress();
+        }
+        return $billingAddress && ! empty($billingAddress->getCompany());
     }
 }

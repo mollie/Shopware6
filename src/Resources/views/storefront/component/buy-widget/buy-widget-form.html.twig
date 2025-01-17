@@ -1,39 +1,68 @@
 {% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
 
-{% block buy_widget_buy_container %}
+{% block buy_widget_buy_button %}
 
-    {% if mollie_subscriptions_enabled and product.customFields.mollie_payments_product_subscription_enabled %}
-        <button class="btn btn-primary btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}" aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-        </button>
+    {% if mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
+        <div class="d-grid">
+            <button class="btn btn-primary btn-block btn-buy"
+                    title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}"
+                    aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+                {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+            </button>
+        </div>
     {% else %}
         {{ parent() }}
     {% endif %}
 
-    {% block page_product_detail_buy_container_apple_direct %}
-        {# this is for Shopware < 6.4 #}
-        {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
-        {# this is for Shopware >= 6.4 #}
-        {% set buyable = product.available and product.childCount <= 0 and product.calculatedMaxPurchase > 0 %}
+{% endblock %}
 
-        {% set productPrice = 0 %}
+{% block buy_widget_buy_form_inner %}
+    {{ parent() }}
 
-        {% if product.calculatedPrices|length == 1 %}
-            {% set productPrice = product.calculatedPrices.first.unitPrice %}
-        {% else %}
-            {% set productPrice = product.calculatedPrice.unitPrice %}
-            {% if listPrice.percentage > 0 %}
-                {% set productPrice = listPrice.price %}
-            {% endif %}
+
+    {# this is for Shopware < 6.4 #}
+    {% set buyableLegacy = (not page.product.isCloseout or (page.product.availableStock >= page.product.minPurchase)) and page.product.childCount <= 0 %}
+    {# this is for Shopware >= 6.4 #}
+    {% set buyable = product.available and product.childCount <= 0 and product.calculatedMaxPurchase > 0 %}
+
+    {% set productPrice = 0 %}
+
+    {% if product.calculatedPrices|length == 1 %}
+        {% set productPrice = product.calculatedPrices.first.unitPrice %}
+    {% else %}
+        {% set productPrice = product.calculatedPrice.unitPrice %}
+        {% if listPrice.percentage > 0 %}
+            {% set productPrice = listPrice.price %}
         {% endif %}
+    {% endif %}
 
-        {% if mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and ((buyableLegacy) or (buyable and productPrice) > 0) %}
+
+    {% set applePayVisible = mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and ((buyableLegacy) or (buyable and productPrice) > 0) %}
+    {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) and ((buyableLegacy) or (buyable and productPrice) > 0) %}
+    {% set noticeVisible = applePayVisible or paypalExpressVisible %}
+
+    {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
+
+
+
+    {% block page_product_detail_buy_container_apple_direct %}
+
+        {% if applePayVisible %}
             {% block page_product_detail_buy_container_apple_direct_component %}
-                <div class="form-row mt-3 justify-content-end js-apple-pay-container mollie-apple-pay-direct-pdp">
+                <div class="row g-2 form-row mt-2 justify-content-end js-apple-pay-container mollie-apple-pay-direct-pdp d-none">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' with {cols: 'col-8'} %}
                 </div>
             {% endblock %}
         {% endif %}
     {% endblock %}
 
+    {% block page_product_detail_buy_container_paypal_express %}
+        {% if paypalExpressVisible %}
+            {% block page_product_detail_buy_container_mollie_paypal_express_component %}
+                <div class="row g-2 form-row mt-2 justify-content-end mollie-paypal-express-pdp">
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' with {cols: 'col-8'} %}
+                </div>
+            {% endblock %}
+        {% endif %}
+    {% endblock %}
 {% endblock %}

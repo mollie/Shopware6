@@ -3,17 +3,15 @@
 
 namespace MolliePayments\Fixtures\Customer;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
+use Basecom\FixturePlugin\Utils\SalutationUtils;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class CustomerFixture extends Fixture
 {
-
     private const CUSTOMER_ID_NL = '0d8eefdd6d32456385580e2ff42431b9';
     private const ADDRESS_ID_NL = 'e27dc2b4e85f4a0f9a912a09f07701b0';
 
@@ -21,22 +19,18 @@ class CustomerFixture extends Fixture
     private const ADDRESS_ID_DE = 'e27ddeb4e85f4a0f9a912a09f07701b0';
 
 
-    /**
-     * @var FixtureHelper
-     */
-    private $helper;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $customerRepository;
 
 
     /**
      * @param FixtureHelper $helper
-     * @param EntityRepositoryInterface $customerRepository
+     * @param EntityRepository $customerRepository
      */
-    public function __construct(FixtureHelper $helper, EntityRepositoryInterface $customerRepository)
+    public function __construct(FixtureHelper $helper,EntityRepository $customerRepository)
     {
         $this->helper = $helper;
         $this->customerRepository = $customerRepository;
@@ -57,7 +51,7 @@ class CustomerFixture extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
         $salesChannel = $this->helper->SalesChannel()->getStorefrontSalesChannel();
 
@@ -68,16 +62,16 @@ class CustomerFixture extends Fixture
             'defaultPaymentMethodId' => $this->helper->PaymentMethod()->getInvoicePaymentMethod()->getId(),
             'defaultBillingAddress' => [
                 'id' => self::ADDRESS_ID_NL,
-                'salutationId' => $this->helper->Customer()->getNotSpecifiedSalutation()->getId(),
+                'salutationId' => $this->helper->Salutation()->getNotSpecifiedSalutation()->getId(),
                 'firstName' => 'Mollie NL',
                 'lastName' => 'Test',
                 'zipcode' => '1015 CW',
                 'street' => 'Keizersgracht 126',
                 'city' => 'Amsterdam',
-                'countryId' => $this->helper->SalesChannel()->getCountry('NL')->getId(),
+                'countryId' => $this->helper->LanguageAndLocale()->getCountry('NL')->getId(),
             ],
             'defaultShippingAddressId' => self::ADDRESS_ID_NL,
-            'salutationId' => $this->helper->Customer()->getNotSpecifiedSalutation()->getId(),
+            'salutationId' => $this->helper->Salutation()->getNotSpecifiedSalutation()->getId(),
             'customerNumber' => '1122',
             'firstName' => 'Mollie NL',
             'lastName' => 'Test',
@@ -86,7 +80,5 @@ class CustomerFixture extends Fixture
         ]];
 
         $this->customerRepository->upsert($dataNL, Context::createDefaultContext());
-
     }
-
 }

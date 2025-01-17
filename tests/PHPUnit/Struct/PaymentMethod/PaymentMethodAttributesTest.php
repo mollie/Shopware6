@@ -8,10 +8,8 @@ use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
-
 class PaymentMethodAttributesTest extends TestCase
 {
-
     /**
      * This test verifies that our VoucherPayment class is
      * recognized as "voucher" payment type.
@@ -39,5 +37,4 @@ class PaymentMethodAttributesTest extends TestCase
 
         $this->assertEquals(false, $attributes->isVoucherMethod());
     }
-
 }

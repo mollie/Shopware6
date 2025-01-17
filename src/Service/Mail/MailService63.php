@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Mail;
 
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\MailTemplate\Service\MailSender;
 use Shopware\Core\Content\MailTemplate\Service\MessageFactory;
 use Shopware\Core\Framework\Validation\DataValidator;
@@ -53,7 +52,7 @@ class MailService63 extends AbstractMailService
             $this->getNoReplyAddress($data),
             $this->getRecipients($data['recipientLocale'] ?? null),
             $this->buildContents($data),
-            $this->filterFileAttachments($attachments),
+            [],
             $this->filterBinaryAttachments($attachments)
         );
 

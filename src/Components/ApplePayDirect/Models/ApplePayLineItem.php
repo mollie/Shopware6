@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\ApplePayDirect\Models;
 
 class ApplePayLineItem
 {
-
     /**
      * @var string
      */

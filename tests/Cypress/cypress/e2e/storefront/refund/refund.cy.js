@@ -53,7 +53,7 @@ context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C4046: Create full refund and cancel it', () => {
+        it('C4046: Create full refund and cancel it @sanity', () => {
 
             createOrderAndOpenAdmin();
 
@@ -73,7 +73,9 @@ context("Order Refunds", () => {
             // now start the partial refund
             refundManager.fullRefund(REFUND_DESCRIPTION, REFUND_INTERNAL_DESCRIPTION);
 
-            // verify that our refund now exists
+
+
+            // // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
 
             repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
@@ -107,6 +109,7 @@ context("Order Refunds", () => {
 
             // now start the partial refund
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -143,6 +146,8 @@ context("Order Refunds", () => {
 
             // now start the partial refund with a custom amount
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+
+
 
             // -------------------------------------------------------------------------------
 
@@ -182,8 +187,13 @@ context("Order Refunds", () => {
             // the checkbox for the verification is not enabled
             repoRefundManager.getFullRefundButton().should('be.disabled');
 
+            // check if refund quantity input field is visible
+            repoRefundManager.getFirstLineItemQuantityInput().should('be.visible');
+
             // now start the full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
+
+
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -195,8 +205,12 @@ context("Order Refunds", () => {
             // and make sure that its gone afterwards
             refundManager.cancelPendingRefund();
 
-            // now start the partial refund
-            refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
+            // after cancel, the refund input field should be visible again
+            repoRefundManager.getFirstLineItemQuantityInput().should('be.visible');
+
+            // now start another full refund
+            refundManager.fullRefund(REFUND_DESCRIPTION, '');
+
 
             cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
 

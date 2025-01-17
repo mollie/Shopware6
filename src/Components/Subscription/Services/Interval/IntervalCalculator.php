@@ -4,7 +4,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Interval;
 
 class IntervalCalculator
 {
-
     /**
      * @param \DateTimeInterface $baseDateTime
      * @param int $interval

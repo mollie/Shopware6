@@ -1,0 +1,86 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Subscription Skip API",
+    "description": "API for skipping Mollie subscriptions.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/_action/mollie/subscriptions/skip": {
+      "post": {
+        "summary": "Skip Mollie Subscription",
+        "description": "Skips the next scheduled payment for a subscription in Mollie.",
+        "operationId": "skipMollieSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The ID of the subscription to skip."
+                  }
+                },
+                "required": ["id"],
+                "example": {
+                  "id": "sub_123456789"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription skipped successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  },
+                  "required": ["success"]
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": ["success", "errors"]
+                },
+                "example": {
+                  "success": false,
+                  "errors": ["Internal server error occurred."]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

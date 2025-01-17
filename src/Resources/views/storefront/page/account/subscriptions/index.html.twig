@@ -3,6 +3,7 @@
 {% block page_account_main_content %}
     {% block page_account_mollie_subscriptions %}
         <div class="account-mollie-subscriptions">
+
             {% block page_account_mollie_subscriptions_welcome %}
                 <div class="account-welcome">
                     {% block page_account_mollie_subscriptions_welcome_headline %}
@@ -11,8 +12,10 @@
                     {% endblock %}
                 </div>
             {% endblock %}
+
             {% block page_account_mollie_subscriptions_main %}
                 <div class="account-order-main account-mollie-main">
+
                     {% if page.subscriptions.total == 0 %}
                         {% block page_account_mollie_subscriptions_info_empty %}
                             {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
@@ -21,6 +24,7 @@
                             } %}
                         {% endblock %}
                     {% else %}
+
                         {% block page_account_mollie_subscriptions_overview %}
                             <div class="account-order-overview">
                                 {% block page_account_mollie_subscriptions_table %}
@@ -53,9 +57,11 @@
                                               data-form-ajax-submit="true"
                                               data-form-ajax-submit-options='{{ formAjaxSubmitOptions|json_encode }}'>
 
-                                            {% block page_account_mollie_subscriptions_page_csrf %}
-                                                {{ sw_csrf('frontend.account.mollie.subscriptions.page') }}
-                                            {% endblock %}
+                                            {% if mollie_csrf_available %}
+                                                {% block page_account_mollie_subscriptions_page_csrf %}
+                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-page-form.twig' %}
+                                                {% endblock %}
+                                            {% endif %}
 
                                             {% sw_include '@Storefront/storefront/component/pagination.html.twig' with {
                                                 entities: page,
@@ -66,9 +72,12 @@
                                 {% endblock %}
                             {% endif %}
                         {% endblock %}
+
                     {% endif %}
+
                 </div>
             {% endblock %}
+
         </div>
     {% endblock %}
 {% endblock %}

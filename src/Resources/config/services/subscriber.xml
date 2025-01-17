@@ -8,28 +8,30 @@
 
         <service id="Kiener\MolliePayments\Subscriber\OrderDeliverySubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\CancelMollieOrderSubscriber">
+        <service id="Kiener\MolliePayments\Subscriber\CancelOrderSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\ShippingSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Subscriber\SystemConfigSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\CsrfSubscriber">
+            <argument>%kernel.shopware_version%</argument>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -38,9 +40,22 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\StorefrontBuildSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Shopware\Storefront\Theme\StorefrontPluginRegistry"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\VersionCompare"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\ApplePayDirectSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\PaypalExpressSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -53,7 +68,7 @@
         <service id="Kiener\MolliePayments\Subscriber\WebhookTimezoneSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -61,5 +76,30 @@
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\OrderEditSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\ExpressCartRestoreSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\SalesChannelContextTokenChangedSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="Kiener\MolliePayments\Subscriber\OrderReturnSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\Service\OrderReturnHandler"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Subscriber\OrderLinesUpdatedSubscriber">
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 </container>

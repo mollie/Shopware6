@@ -7,16 +7,17 @@ use Shopware\Core\Framework\Event\BusinessEventDispatcher;
 
 class ShopwareFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
 {
-
     /**
      * @var BusinessEventDispatcher
      */
+    /** @phpstan-ignore-next-line */
     private $dispatcher;
 
 
     /**
      * @param BusinessEventDispatcher $dispatcher
      */
+    /** @phpstan-ignore-next-line */
     public function __construct($dispatcher)
     {
         $this->dispatcher = $dispatcher;

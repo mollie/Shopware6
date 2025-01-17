@@ -6,23 +6,29 @@ use Composer\Autoload\ClassLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class DependencyLoader
 {
-
     /**
      * @var Container
      */
     private $container;
 
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+
 
     /**
      * @param Container $container
      */
-    public function __construct(Container $container)
+    public function __construct(ContainerInterface $container, VersionCompare $versionCompare)
     {
         $this->container = $container;
+        $this->versionCompare = $versionCompare;
     }
 
     /**
@@ -30,10 +36,6 @@ class DependencyLoader
      */
     public function loadServices(): void
     {
-        /** @var string $version */
-        $version = $this->container->getParameter('kernel.shopware_version');
-
-        $versionCompare = new VersionCompare($version);
 
 
         /** @var ContainerBuilder $containerBuilder */
@@ -41,45 +43,82 @@ class DependencyLoader
 
         $loader = new XmlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../Resources/config'));
 
-        # load all our base services that
-        # we need all the time
-        $loader->load('services.xml');
-
-        # now load our base compatibility services
-        # that already wrap our functions for different shopware versions
-        $loader->load('compatibility/base.xml');
-
 
         # load Flow Builder
         $loader->load('compatibility/flowbuilder/all_versions.xml');
 
-        if ($versionCompare->gte('6.4.6.0')) {
+        if ($this->versionCompare->gte('6.4.6.0')) {
             $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
         }
 
+        if ($this->shouldLoadFixtures()) {
+            $loader->load('services/fixtures/fixtures.xml');
+        }
+    }
 
-        # load other data
-        if ($versionCompare->gte('6.4')) {
-            $loader->load('compatibility/services_6.4.xml');
-        } elseif ($versionCompare->gte('6.3.5.0')) {
-            $loader->load('compatibility/services_6.3.5.0.xml');
+    public function registerDependencies(): void
+    {
+        $classLoader = new ClassLoader();
+
+        $this->registerPolyfillsAutoloader($classLoader);
+        $this->registerFixturesAutoloader($classLoader);
+
+        $classLoader->register();
+    }
+
+    private function registerPolyfillsAutoloader(ClassLoader $classLoader): void
+    {
+        $classLoader->addPsr4("Shopware\\Core\\", __DIR__ . '/../../polyfill/Shopware/Core', true);
+    }
+
+    private function registerFixturesAutoloader(ClassLoader $classLoader): void
+    {
+        if ($this->shouldLoadFixtures() === false) {
+            return;
         }
 
+        $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
+        # we need to tell Shopware to load our custom fixtures
+        # from our TEST autoload-dev area....
+        $classLoader->addPsr4("MolliePayments\\Fixtures\\", $dirFixtures, true);
+    }
 
+    private function shouldLoadFixtures(): bool
+    {
         $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
+        if ($composerDevReqsInstalled === false) {
+            return false;
+        }
+        $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
+        return is_dir($dirFixtures);
+    }
 
-        if ($composerDevReqsInstalled) {
-            $dirFixtures = __DIR__ . '/../../tests/Fixtures';
+    /**
+     * @return void
+     */
+    public function prepareStorefrontBuild(): void
+    {
+        $pluginRoot = __DIR__ . '/../..';
 
-            if (is_dir($dirFixtures)) {
-                # we need to tell Shopware to load our custom fixtures
-                # from our TEST autoload-dev area....
-                $classLoader = new ClassLoader();
-                $classLoader->addPsr4("MolliePayments\\Fixtures\\", $dirFixtures, true);
-                $classLoader->register();
+        $distFileFolder = $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js';
 
-                $loader->load('services/fixtures/fixtures.xml');
-            }
+        if (!file_exists($distFileFolder)) {
+            mkdir($distFileFolder, 0777, true);
+        }
+
+        if ($this->versionCompare->gte('6.5')) {
+            $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-65.js';
+            $target = $distFileFolder . '/mollie-payments.js';
+        } else {
+            $file = $pluginRoot . '/src/Resources/app/storefront/dist/mollie-payments-64.js';
+            $target = $distFileFolder . '/mollie-payments.js';
+        }
+
+        if (file_exists($file) && !file_exists($target)) {
+            # while we use our current webpack approach
+            # we must not use this.
+            # also it's not perfectly working somehow
+            # copy($file, $target);
         }
     }
 }

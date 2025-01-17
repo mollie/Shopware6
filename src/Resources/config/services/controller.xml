@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 
+
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
@@ -10,7 +11,29 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Admin API Controller -->
 
-        <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService">
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Controller\RequestBagFactory"/>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Controller\OrderController">
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Controller\RequestBagFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase"/>
+            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\CancelLineController"/>
+            <argument type="service" id="order.repository"/>
+        </service>
+
+
+        <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Administration\Snippet\CachedSnippetFinder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator"/>
@@ -18,174 +41,269 @@
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
+            <argument type="service"
+                      id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService"/>
+
+
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Order\OrderController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Order\RefundController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\Order\RefundControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundService"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-        </service>
-
-        <service id="Kiener\MolliePayments\Controller\Api\Order\ShippingController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\SupportController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase">
+            <argument type="service" id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Support\SupportControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieSupportFacade"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Payment\ReturnController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\Payment\ReturnControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Webhook\WebhookController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\Order\OrderRepository"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase">
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\Api\Order\CancelLineController">
+            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <tag name="controller.service_arguments"/>
+        </service>
+
 
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Storefront Controller -->
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\ReturnController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase">
             <argument type="service" id="router"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-
-        <service id="Kiener\MolliePayments\Controller\Storefront\Webhook\WebhookController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\Webhook\WebhookControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderRepository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\iDEAL\iDealController" public="true">
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <argument type="service" id="Shopware\Storefront\Framework\Routing\Router"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectController" public="true">
+        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
             <argument type="service" id="router"/>
-            <argument type="service" id="mollie_payments.logger"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
-            <argument type="service" id="session.flash_bag"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
+            <argument type="service"
+                      id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionController" public="true">
+
+        <service id="Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase">
+            <argument type="service"
+                      id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\AccountController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="mollie_payments.logger"/>
+        <service id="Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase">
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\Route\FinishCheckoutRoute"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute"/>
+            <argument type="service" id="router"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
+            <tag name="controller.service_arguments"/>
         </service>
+
 
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Store API Controller -->
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
-            <argument type="service" id="mollie_payments.logger"/>
+        <service id="Kiener\MolliePayments\Controller\StoreApi\Config\ConfigControllerBase">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardController" public="true">
+        <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectControllerBase">
+            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
+            <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\iDEAL\iDealController" public="true">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionController" public="true">
+        <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="controller.service_arguments"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Controller\StoreApi\POS\PosControllerBase">
+            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
+            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\FinishCheckoutRoute">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute">
+            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <tag name="controller.service_arguments"/>
+        </service>
+
+
     </services>
+
 </container>

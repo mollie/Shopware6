@@ -142,6 +142,18 @@ paths:
         "200":
           description: "successful operation"
 
+  /store-api/mollie/config:
+    get:
+      tags:
+        - "Mollie Config"
+      summary: "Gets the basic Mollie configuration like Profile IDs and more for component integration."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
   /store-api/mollie/creditcard/store-token/{customerId}/{cardToken}:
     post:
       tags:
@@ -159,10 +171,34 @@ paths:
           in: "path"
           description: "Credit Card Token from the Mollie API Response"
           required: true
+        - name: "shouldSaveCardDetail"
+          in: "path"
+          description: "(optional) If provided with TRUE, the credit card data will lead to a new reusable mandate inside Mollie for this customer."
+          required: false
       responses:
         "200":
           description: "successful operation"
 
+  /store-api/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}:
+    post:
+      tags:
+        - "Credit Card"
+      summary: "Save the mandate id that should be used for the upcoming credit card payment."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+        - name: "mandateId"
+          in: "path"
+          description: "Mandate ID from the Mollie that should be used for the payment."
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
 
   /store-api/mollie/ideal/issuers:
     get:
@@ -192,6 +228,40 @@ paths:
         - name: "issuerId"
           in: "path"
           description: "Mollie Issuer ID of Mollie, e.g. ideal_ABNANL2A, ..."
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+
+  /store-api/mollie/pos/terminals:
+    get:
+      tags:
+        - "POS"
+      summary: "Gets a list of available POS terminals"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/pos/store-terminal/{customerId}/{terminalId}:
+    post:
+      tags:
+        - "POS"
+      summary: "Save the selected terminal for an upcoming payment in Shopware"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+        - name: "terminalId"
+          in: "path"
+          description: "Mollie Terminal ID of Mollie, e.g. term_X9X..., ..."
           required: true
       responses:
         "200":
@@ -560,6 +630,44 @@ paths:
         - in: "path"
           name: "subscriptionId"
           description: "ID of the Shopware subscription that will be updated"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/mandates/{customerId}:
+    get:
+      tags:
+        - "Mandates"
+      summary: "Gets all available mandates of the provided customer"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/mandate/revoke/{customerId}/{mandateId}:
+    post:
+      tags:
+        - "Mandates"
+      summary: "Revokes and deletes the saved card with the provided mandate ID inside Mollie"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - name: "customerId"
+          in: "path"
+          description: "Shopware Customer ID"
+          required: true
+        - name: "mandateId"
+          in: "path"
+          description: "Mandate ID from the Mollie that should be removed."
           required: true
       responses:
         "200":

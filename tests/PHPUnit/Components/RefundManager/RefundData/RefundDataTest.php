@@ -4,16 +4,12 @@ namespace MolliePayments\Tests\Components\RefundManager\RefundData;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Refund;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
-
 class RefundDataTest extends TestCase
 {
-
-
     /**
      * This test verifies that the array format
      * of our total values are correct.
@@ -22,7 +18,7 @@ class RefundDataTest extends TestCase
      */
     public function testTotalValues()
     {
-        $data = new RefundData([], [], 5, 2, 6, 9, 1.45);
+        $data = new RefundData([], [], 5, 2, 6, 9, 1.45, 'gross');
 
         $expected = [
             'totals' => [
@@ -34,6 +30,7 @@ class RefundDataTest extends TestCase
             ],
             'cart' => [],
             'refunds' => [],
+            'taxStatus' => 'gross'
         ];
 
         $this->assertEquals($expected, $data->toArray());
@@ -58,9 +55,9 @@ class RefundDataTest extends TestCase
         $lineItem->setReferencedId('product-id-1');
         $lineItem->setPayload(['productNumber' => 'P123']);
 
-        $items[] = new ProductItem($lineItem, [], 2);
+        $items[] = new ProductItem($lineItem, [], 2, '1.233', '2.343', '3.453');
 
-        $data = new RefundData($items, [], 0, 0, 0, 0, 0);
+        $data = new RefundData($items, [], 0, 0, 0, 0, 0, 'gross');
 
         $expected = [
             [
@@ -76,9 +73,15 @@ class RefundDataTest extends TestCase
                     'promotion' => [
                         'discount' => 0.0,
                         'quantity' => 0,
+                        'taxValue' => 0.0,
                     ],
                     'isPromotion' => false,
                     'isDelivery' => false,
+                    'tax' => [
+                        'totalItemTax' => 1.23,
+                        'perItemTax' => 2.34,
+                        'totalToPerItemRoundingDiff' => 3.45,
+                    ],
                 ],
             ]
         ];
@@ -99,9 +102,8 @@ class RefundDataTest extends TestCase
 
         $refunds[] = [];
 
-        $data = new RefundData([], $refunds, 0, 0, 0, 0, 0);
+        $data = new RefundData([], $refunds, 0, 0, 0, 0, 0, 'gross');
 
         $this->assertCount(1, $data->toArray()['refunds']);
     }
-
 }

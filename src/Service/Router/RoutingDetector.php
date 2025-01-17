@@ -2,13 +2,10 @@
 
 namespace Kiener\MolliePayments\Service\Router;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 
 class RoutingDetector
 {
-
     /**
      * This is the ID of the webhook route of the storefront.
      */

@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Struct\LineItemExtraData;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Content\Media\MediaEntity;
@@ -13,6 +14,15 @@ use Shopware\Core\Content\Seo\SeoUrl\SeoUrlEntity;
 
 class LineItemDataExtractor
 {
+    /**
+     * @var UrlParsingService
+     */
+    private $urlParsingService;
+    public function __construct(UrlParsingService $urlParsingService)
+    {
+        $this->urlParsingService = $urlParsingService;
+    }
+
     public function extractExtraData(OrderLineItemEntity $lineItem): LineItemExtraData
     {
         $product = $lineItem->getProduct();
@@ -29,7 +39,9 @@ class LineItemDataExtractor
             && $medias->first() instanceof ProductMediaEntity
             && $medias->first()->getMedia() instanceof MediaEntity
         ) {
-            $extraData->setImageUrl($medias->first()->getMedia()->getUrl());
+            $url = $medias->first()->getMedia()->getUrl();
+            $url = $this->urlParsingService->encodePathAndQuery($url);
+            $extraData->setImageUrl($url);
         }
 
         $seoUrls = $product->getSeoUrls();

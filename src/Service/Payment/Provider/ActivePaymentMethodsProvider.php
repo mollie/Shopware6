@@ -4,17 +4,13 @@ namespace Kiener\MolliePayments\Service\Payment\Provider;
 
 use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Service\Logger\MollieLogger;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Method;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterface
 {
-
     /**
      * @var MollieApiFactory
      */
@@ -49,10 +45,11 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      *
      * @param float $price
      * @param string $currency
+     * @param string $billingCountryCode
      * @param array<mixed> $salesChannelIDs
      * @return Method[]
      */
-    public function getActivePaymentMethodsForAmount(float $price, string $currency, array $salesChannelIDs): array
+    public function getActivePaymentMethodsForAmount(float $price, string $currency, string $billingCountryCode, array $salesChannelIDs): array
     {
         if ($price < 0.01) {
             return [];
@@ -62,8 +59,12 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             'amount' => [
                 'value' => $this->priceFormatter->formatValue($price),
                 'currency' => strtoupper($currency),
-            ]
+            ],
         ];
+
+        if (mb_strlen($billingCountryCode) > 0) {
+            $params['billingCountry'] = $billingCountryCode;
+        }
 
         return $this->getActivePaymentMethods($params, $salesChannelIDs);
     }

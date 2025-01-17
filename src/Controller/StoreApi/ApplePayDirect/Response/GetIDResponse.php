@@ -2,14 +2,11 @@
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
-use Kiener\MolliePayments\Struct\EnabledStruct;
-use Kiener\MolliePayments\Struct\StringStruct;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class GetIDResponse extends StoreApiResponse
 {
-
     /**
      * @var ArrayStruct<mixed, mixed>
      */

@@ -4,21 +4,20 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class UpdateOrderTransactionCustomFields
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoTransactions;
 
 
     /**
-     * @param EntityRepositoryInterface $repoTransactions
+     * @param EntityRepository $repoTransactions
      */
-    public function __construct(EntityRepositoryInterface $repoTransactions)
+    public function __construct(EntityRepository $repoTransactions)
     {
         $this->repoTransactions = $repoTransactions;
     }
@@ -34,7 +33,7 @@ class UpdateOrderTransactionCustomFields
         $data = [
             'id' => $shopwareOrderTransactionId,
             'customFields' => [
-                'mollie_payments' => $struct->toArray(),
+                CustomFieldsInterface::MOLLIE_KEY => $struct->toArray(),
             ]
         ];
 

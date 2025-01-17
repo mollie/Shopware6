@@ -10,7 +10,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderCustomerEnricher
 {
-
     /**
      * @var CustomerService
      */

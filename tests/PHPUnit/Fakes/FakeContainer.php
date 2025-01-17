@@ -2,9 +2,7 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class FakeContainer implements ContainerInterface
 {
@@ -13,10 +11,8 @@ class FakeContainer implements ContainerInterface
         // TODO: Implement get() method.
     }
 
-    public function has(string $id)
+    public function has(string $id): bool
     {
         // TODO: Implement has() method.
     }
-
-
 }

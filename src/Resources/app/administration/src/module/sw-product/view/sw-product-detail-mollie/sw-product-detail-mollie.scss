@@ -17,7 +17,7 @@
     .sw-product-detail-mollie-subscription__description-title,
     .sw-product-detail-mollie-vouchers__description-title {
         font-weight: $font-weight-bold;
-        font-size: $font-size-default;
+        font-size: 14px;
         text-align: center;
     }
 
@@ -34,7 +34,7 @@
     }
 
     .sw-product-feature-set-form__description-body {
-        font-size: $font-size-small;
+        font-size: 12px;
         margin-top: 20px;
         margin-bottom: 30px;
         text-align: center;
@@ -46,6 +46,6 @@
 
     .sw-product-detail-mollie-vouchers__inheritance-warning {
         margin-top: 20px;
-        font-size: $font-size-default;
+        font-size: 14px;
     }
 }

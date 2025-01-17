@@ -12,6 +12,7 @@
                 <locale name="de-DE">./src/Resources/app/administration/src/snippet/de-DE.json</locale>
                 <locale name="en-GB">./src/Resources/app/administration/src/snippet/en-GB.json</locale>
                 <locale name="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</locale>
+                <locale name="it-IT">./src/Resources/app/administration/src/snippet/it-IT.json</locale>
             </locales>
         </set>
 
@@ -27,6 +28,7 @@
                 <locale name="de-DE">./src/Resources/snippet/de_DE/mollie-payments.de-DE.json</locale>
                 <locale name="en-GB">./src/Resources/snippet/en_GB/mollie-payments.en-GB.json</locale>
                 <locale name="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</locale>
+                <locale name="it-IT">./src/Resources/snippet/it_IT/mollie-payments.it-IT.json</locale>
             </locales>
         </set>
 

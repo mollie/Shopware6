@@ -6,7 +6,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface CompatibilityGatewayInterface
 {
-
     /**
      * @param SalesChannelContext $context
      * @return string
@@ -15,10 +14,17 @@ interface CompatibilityGatewayInterface
 
     /**
      * @param string $salesChannelID
+     * @param ?string $domainID
      * @param string $token
      * @return SalesChannelContext
      */
-    public function getSalesChannelContext(string $salesChannelID, string $token): SalesChannelContext;
+    public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext;
+
+    /**
+     * @param SalesChannelContext $context
+     * @return ?string
+     */
+    public function getDomainId(SalesChannelContext $context): ?string;
 
     /**
      * @return string

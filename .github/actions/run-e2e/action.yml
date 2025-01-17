@@ -65,7 +65,7 @@ inputs:
     required: false
   _STORE_API_KEY:
     description: 'This is the Store API Key that is used when launching our Shopware. Its not confidential, its just for here'
-    default: 'SWSCOVFSNKLBYUTKS1VSOEDTUQ'
+    default: 'SWSCOVFSNKLBYUTKS1VSOEDGUQ'
     required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
@@ -89,7 +89,7 @@ runs:
         sleep 15
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
-        docker exec shop bash -c "mysql -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
 
     - name: Update Shopware Config
       shell: bash
@@ -97,6 +97,7 @@ runs:
         docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -105,6 +106,11 @@ runs:
       run: |
         docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
+
+    - name: Configure Shopware
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
 
     - name: Install Plugin
       shell: bash
@@ -120,9 +126,19 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
+
+    - name: DAL Validate
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console dal:validate'
+
+    # --------------------------------------------------------------------------------------------------------------------------------------
+
+
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
@@ -171,7 +187,7 @@ runs:
 
     - name: Store Cypress Results
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: cypress_results_v${{ inputs.SHOPWARE }}${{ inputs.CYPRESS_RESULTS_SUFFIX }}
         retention-days: 1

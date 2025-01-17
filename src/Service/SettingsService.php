@@ -4,19 +4,27 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class SettingsService implements PluginSettingsServiceInterface
 {
-    public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config.';
+    public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
+    private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
+    private const SYSTEM_CORE_CART_CONFIG_DOMAIN = 'core.cart';
 
+    private const PHONE_NUMBER_FIELD_REQUIRED = 'phoneNumberFieldRequired';
+
+    private const PHONE_NUMBER_FIELD = 'showPhoneNumberField';
+
+    private const REQUIRE_DATA_PROTECTION = 'requireDataProtectionCheckbox';
+
+    private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
     const LIVE_API_KEY = 'liveApiKey';
     const TEST_API_KEY = 'testApiKey';
     const LIVE_PROFILE_ID = 'liveProfileId';
     const TEST_PROFILE_ID = 'testProfileId';
-
 
     /**
      * @var SystemConfigService
@@ -25,19 +33,47 @@ class SettingsService implements PluginSettingsServiceInterface
 
     /**
      *
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSalesChannels;
 
+    /**
+     * @var string
+     */
+    private $envShopDomain;
+
+    /**
+     * @var string
+     */
+    private $envDevMode;
+
+    /**
+     * @var string
+     */
+    private $envCypressMode;
+    private PayPalExpressConfig $payPalExpressConfig;
+
+    /**
+     * @var array<string,MollieSettingStruct>
+     */
+    private array $cachedStructs = [];
 
     /**
      * @param SystemConfigService $systemConfigService
-     * @param EntityRepositoryInterface $repoSalesChannels
+     * @param EntityRepository $repoSalesChannels
+     * @param ?string $envShopDomain
+     * @param ?string $envDevMode
+     * @param ?string $envCypressMode
      */
-    public function __construct(SystemConfigService $systemConfigService, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(SystemConfigService $systemConfigService, EntityRepository $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
+
+        $this->envShopDomain = (string)$envShopDomain;
+        $this->envDevMode = (string)$envDevMode;
+        $this->envCypressMode = (string)$envCypressMode;
+        $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
     /**
@@ -48,18 +84,52 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
-        $structData = [];
-        $systemConfigData = $this->systemConfigService->getDomain(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId, true);
+        $cacheKey = $salesChannelId ?? 'all';
 
-        foreach ($systemConfigData as $key => $value) {
-            if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
-                $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
-            } else {
-                $structData[$key] = $value;
+        if (isset($this->cachedStructs[$cacheKey])) {
+            return $this->cachedStructs[$cacheKey];
+        }
+        $structData = [];
+        /** @var array<mixed> $systemConfigData */
+        $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
+
+        if (is_array($systemConfigData) && count($systemConfigData) > 0) {
+            foreach ($systemConfigData as $key => $value) {
+                if (stripos($key, self::SYSTEM_CONFIG_DOMAIN) !== false) {
+                    $structData[substr($key, strlen(self::SYSTEM_CONFIG_DOMAIN))] = $value;
+                } else {
+                    $structData[$key] = $value;
+                }
             }
         }
 
-        return (new MollieSettingStruct())->assign($structData);
+        /** @var array<mixed> $coreSettings */
+        $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
+        if (is_array($coreSettings) && count($coreSettings) > 0) {
+            $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
+            $structData[self::PHONE_NUMBER_FIELD] = $coreSettings[self::PHONE_NUMBER_FIELD] ?? false;
+            $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
+        }
+
+
+        /** @var array<mixed> $cartSettings */
+        $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
+        if (is_array($cartSettings) && count($cartSettings) > 0) {
+            $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
+        }
+
+
+        /**
+         * TODO: remove this when we move to config
+         */
+        if ($this->payPalExpressConfig->isEnabled()) {
+            $structData = $this->payPalExpressConfig->assign($structData);
+        }
+
+
+        $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
+
+        return $this->cachedStructs[$cacheKey];
     }
 
     /**
@@ -91,7 +161,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . $key, $value, $salesChannelId);
+        $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value, $salesChannelId);
     }
 
     /**
@@ -100,7 +170,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function delete(string $key, ?string $salesChannelId = null): void
     {
-        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . $key, $salesChannelId);
+        $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $salesChannelId);
     }
 
     /**
@@ -112,7 +182,7 @@ class SettingsService implements PluginSettingsServiceInterface
     {
         $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
 
-        if (!is_null($profileId)) {
+        if (! is_null($profileId)) {
             $this->set($key, $profileId, $salesChannelId);
         } else {
             $this->delete($key, $salesChannelId);
@@ -128,7 +198,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getEnvMollieShopDomain(): string
     {
-        return trim((string)getenv('MOLLIE_SHOP_DOMAIN'));
+        return trim($this->envShopDomain);
     }
 
     /**
@@ -139,7 +209,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getEnvMollieDevMode(): bool
     {
-        $devMode = trim((string)getenv('MOLLIE_DEV_MODE'));
+        $devMode = trim($this->envDevMode);
         return ($devMode === '1');
     }
 
@@ -148,7 +218,7 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     public function getMollieCypressMode(): bool
     {
-        $devMode = trim((string)getenv('MOLLIE_CYPRESS_MODE'));
+        $devMode = trim($this->envCypressMode);
         return ($devMode === '1');
     }
 }

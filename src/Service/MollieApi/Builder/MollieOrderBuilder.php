@@ -3,10 +3,12 @@
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
+use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieLocaleService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -14,6 +16,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
@@ -61,6 +64,11 @@ class MollieOrderBuilder
     private $urlBuilder;
 
     /**
+     * @var MollieLocaleService
+     */
+    private $mollieLocaleService;
+
+    /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
@@ -79,10 +87,11 @@ class MollieOrderBuilder
      * @param MollieOrderAddressBuilder $addressBuilder
      * @param MollieOrderCustomerEnricher $customerEnricher
      * @param RoutingBuilder $urlBuilder
+     * @param MollieLocaleService $mollieLocaleService
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      */
-    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, RoutingBuilder $urlBuilder, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
+    public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, RoutingBuilder $urlBuilder, MollieLocaleService $mollieLocaleService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
         $this->extractor = $extractor;
@@ -91,6 +100,7 @@ class MollieOrderBuilder
         $this->addressBuilder = $addressBuilder;
         $this->customerEnricher = $customerEnricher;
         $this->urlBuilder = $urlBuilder;
+        $this->mollieLocaleService = $mollieLocaleService;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
     }
@@ -106,7 +116,31 @@ class MollieOrderBuilder
      * @throws \Exception
      * @return array<mixed>
      */
-    public function build(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
+    public function buildPaymentsPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
+    {
+        $orderPayload = $this->buildOrderPayload($order, $transactionId, $paymentMethod, $salesChannelContext, $handler, $paymentData);
+
+        return [
+            'amount' => $orderPayload['amount'],
+            'method' => $orderPayload['method'],
+            'description' => $orderPayload['orderNumber'],
+            'locale' => $orderPayload['locale'],
+            'redirectUrl' => $orderPayload['redirectUrl'],
+            'webhookUrl' => $orderPayload['webhookUrl'],
+        ];
+    }
+
+    /**
+     * @param OrderEntity $order
+     * @param string $transactionId
+     * @param string $paymentMethod
+     * @param SalesChannelContext $salesChannelContext
+     * @param null|PaymentHandler $handler
+     * @param array<mixed> $paymentData
+     * @throws CustomerCouldNotBeFoundException
+     * @return array<mixed>
+     */
+    public function buildOrderPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
         /** @var MollieSettingStruct $settings */
         $settings = $this->settingsService->getSettings($order->getSalesChannelId());
@@ -115,6 +149,7 @@ class MollieOrderBuilder
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
+        $localeCode = $this->mollieLocaleService->getMollieLocale($localeCode);
         $lineItems = $order->getLineItems();
         $isVerticalTaxCalculation = $this->isVerticalTaxCalculation($salesChannelContext);
 
@@ -132,6 +167,11 @@ class MollieOrderBuilder
         if (!empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
             $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+
+            $orderCustomer = $order->getOrderCustomer();
+            if ($orderCustomer instanceof OrderCustomerEntity) {
+                $orderNumberFormatted = str_replace('{customernumber}', (string)$orderCustomer->getCustomerNumber(), (string)$orderNumberFormatted);
+            }
         } else {
             $orderNumberFormatted = $order->getOrderNumber();
         }
@@ -150,7 +190,7 @@ class MollieOrderBuilder
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
 
-        if ($lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
+        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
             $orderData['payment']['sequenceType'] = 'first';
         }
 

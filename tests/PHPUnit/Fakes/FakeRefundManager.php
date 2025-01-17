@@ -12,7 +12,6 @@ use Shopware\Core\Framework\Context;
 
 class FakeRefundManager implements RefundManagerInterface
 {
-
     /**
      * @var OrderEntity
      */
@@ -109,4 +108,8 @@ class FakeRefundManager implements RefundManagerInterface
         return $refund;
     }
 
+    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool
+    {
+        // TODO: Implement cancelAllOrderRefunds() method.
+    }
 }

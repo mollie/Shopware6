@@ -71,7 +71,38 @@ context("Checkout Failure Tests", () => {
 
                 // select giro pay and mark it as "paid"
                 mollieSandbox.initSandboxCookie();
-                molliePaymentList.selectGiropay();
+                molliePaymentList.selectBankTransfer();
+                molliePaymentStatus.selectPaid();
+
+                cy.url().should('include', '/checkout/finish');
+                cy.contains('Thank you for your order');
+            })
+
+            it('C1278577: Retry canceled payment with Mollie Failure Mode', () => {
+
+                scenarioDummyBasket.execute();
+                paymentAction.switchPaymentMethod('PayPal');
+
+                shopware.prepareDomainChange();
+                checkout.placeOrderOnConfirm();
+
+                mollieSandbox.initSandboxCookie();
+                molliePaymentStatus.selectCancelled();
+
+                // verify that we are back in our shop
+                // if the payment fails, the order is finished, but
+                // we still have the option to change the payment method
+                cy.url().should('include', '/mollie/payment/');
+
+                // click on the mollie plugin retry button
+                // which brings us to the mollie payment selection page
+                checkout.mollieFailureModeRetryPayment();
+
+                cy.url().should('include', '/checkout/select-method/');
+
+                // select giro pay and mark it as "paid"
+                mollieSandbox.initSandboxCookie();
+                molliePaymentList.selectBankTransfer();
                 molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');
@@ -142,7 +173,7 @@ context("Checkout Failure Tests", () => {
                 }
 
 
-                paymentAction.switchPaymentMethod('Giropay');
+                paymentAction.switchPaymentMethod('Banktransfer');
 
                 checkout.placeOrderOnEdit();
 
@@ -153,7 +184,7 @@ context("Checkout Failure Tests", () => {
                 cy.contains('Thank you for updating your order');
             })
 
-            it('C4012: Retry cancelled payment with Shopware Failure Mode', () => {
+            it('C4012: Retry canceled payment with Shopware Failure Mode', () => {
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -167,16 +198,22 @@ context("Checkout Failure Tests", () => {
                 // we are now back in our shop
                 // the payment failed, so shopware says the order is complete
                 // but we still need to complete the payment and edit the order
-                cy.url().should('include', '/account/order/edit/');
-
-                if (shopware.isVersionGreaterEqual('6.4.10.0')) {
+                if (shopware.isVersionGreaterEqual('6.6.8.0')) {
+                    cy.url().should('include', '/account/order');
+                }else {
+                    cy.url().should('include', '/account/order/edit/');
+                }
+                //since shopware 6.6.8.0 a cancelled order cannot be edited or paid
+                if(shopware.isVersionGreaterEqual('6.6.8.0')){
+                    cy.contains('was canceled and cannot be edited afterwards.');
+                    return;
+                } else if(shopware.isVersionGreaterEqual('6.4.10.0')){
                     cy.contains('We have received your order, but the payment was aborted');
                 } else {
                     cy.contains('We received your order, but the payment was aborted');
                 }
 
-
-                paymentAction.switchPaymentMethod('PayPal');
+                paymentAction.switchPaymentMethod('Banktransfer');
 
                 checkout.placeOrderOnEdit();
 

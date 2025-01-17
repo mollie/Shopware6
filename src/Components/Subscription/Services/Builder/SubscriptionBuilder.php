@@ -19,7 +19,6 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class SubscriptionBuilder
 {
-
     /**
      * @var IntervalCalculator
      */
@@ -92,7 +91,10 @@ class SubscriptionBuilder
         # as promotions.  because we only offer subscriptions as a 1-item order without mixed carts,
         # this is the perfect way to still have shopware doing every calculation.
         $subscriptionEntity->setAmount($order->getAmountTotal());
-        $subscriptionEntity->setCurrency($order->getCurrency()->getIsoCode());
+        $subscriptionEntity->setCurrencyId($order->getCurrency()->getId());
+        $subscriptionEntity->setTotalRounding($order->getTotalRounding());
+
+        $subscriptionEntity->setCurrency($order->getCurrency());
 
         $subscriptionEntity->setQuantity($lineItem->getQuantity());
 
@@ -100,7 +102,8 @@ class SubscriptionBuilder
         $subscriptionEntity->setProductId((string)$lineItem->getProductId());
         $subscriptionEntity->setOrderId($order->getId());
         $subscriptionEntity->setSalesChannelId($order->getSalesChannelId());
-
+        $subscriptionEntity->setTotalRounding($order->getTotalRounding());
+        $subscriptionEntity->setItemRounding($order->getItemRounding());
 
         # calculate our first start date.
         # this is our current date (now) + 1x the planned interval.

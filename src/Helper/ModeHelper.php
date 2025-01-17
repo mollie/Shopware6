@@ -8,7 +8,6 @@ use Mollie\Api\MollieApiClient;
 
 class ModeHelper
 {
-
     /**
      * @param array<mixed> $data
      * @param MollieApiClient $apiClient

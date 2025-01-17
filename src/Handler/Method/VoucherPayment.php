@@ -7,13 +7,11 @@ use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttribut
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherPayment extends PaymentHandler
 {
-
     /**
      *
      */

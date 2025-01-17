@@ -4,13 +4,30 @@
 {% block component_offcanvas_cart_actions_checkout %}
     {{ parent() }}
     {% if page.cart.lineItems|length > 0 %}
-        {% if mollie_applepaydirect_enabled and ('offcanvas' not in mollie_applepaydirect_restrictions) %}
+
+        {% set applePayVisible = mollie_applepaydirect_enabled and ('offcanvas' not in mollie_applepaydirect_restrictions) %}
+        {% set paypalExpressVisible =  mollie_paypalexpress_enabled and ('offcanvas' not in mollie_paypalexpress_restrictions) %}
+        {% set noticeVisible = applePayVisible or paypalExpressVisible %}
+
+        {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
+
+
+        {% if applePayVisible %}
             {% block component_offcanvas_cart_actions_checkout_apple_direct_component %}
-                <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-offcanvas">
+                <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-offcanvas d-none">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
                 </div>
             {% endblock %}
         {% endif %}
+
+        {% if paypalExpressVisible %}
+            {% block component_offcanvas_cart_actions_checkout_mollie_paypal_express_component %}
+                <div class="mt-2 justify-content-end mollie-paypal-express-offcanvas">
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+                </div>
+            {% endblock %}
+        {% endif %}
+
     {% endif %}
 {% endblock %}
 

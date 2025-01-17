@@ -21,15 +21,14 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class RemindAction extends BaseAction
 {
-
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSalesChannel;
 
@@ -37,6 +36,11 @@ class RemindAction extends BaseAction
      * @var ReminderValidator
      */
     private $reminderValidator;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $log;
 
 
     /**
@@ -51,11 +55,11 @@ class RemindAction extends BaseAction
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      * @param SubscriptionHistoryHandler $subscriptionHistory
      * @param LoggerInterface $logger
-     * @param EntityRepositoryInterface $repoSalesChannel
+     * @param EntityRepository $repoSalesChannel
      * @param ReminderValidator $reminderValidator
      * @throws Exception
      */
-    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, EntityRepositoryInterface $repoSalesChannel, ReminderValidator $reminderValidator)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, EntityRepository $repoSalesChannel, ReminderValidator $reminderValidator)
     {
         parent::__construct(
             $pluginSettings,
@@ -97,13 +101,17 @@ class RemindAction extends BaseAction
                 continue;
             }
 
+            $message = 'Starting Subscription Renewal Reminder from Scheduled Tasks for SalesChannel "%s".';
+            $message = sprintf($message, $salesChannel->getName());
+
+            $this->log->info($message);
+
             $daysOffset = $settings->getSubscriptionsReminderDays();
 
             $availableSubscriptions = $this->getRepository()->findByReminderRangeReached($salesChannel->getId(), $context);
 
             /** @var SubscriptionEntity $subscription */
             foreach ($availableSubscriptions->getElements() as $subscription) {
-
                 # if it's not active in Mollie, then don't do anything
                 if ($subscription->getStatus() !== SubscriptionStatus::ACTIVE && $subscription->getStatus() !== SubscriptionStatus::RESUMED) {
                     continue;

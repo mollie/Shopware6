@@ -2,14 +2,11 @@
 
 namespace MolliePayments\Tests\Fakes\StockUpdater;
 
-
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
-use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class FakeStockManager implements StockManagerInterface
 {
-
     /**
      * @var bool
      */
@@ -90,14 +87,12 @@ class FakeStockManager implements StockManagerInterface
      * @param string $mollieRefundID
      * @return void
      */
-    public function increaseStock(OrderLineItemEntity $lineItem, int $quantity, string $mollieRefundID): void
+    public function increaseStock(OrderLineItemEntity $lineItem, int $quantity): void
     {
         $this->called = true;
 
         $this->lineItemLabel = $lineItem->getLabel();
         $this->productID = $lineItem->getReferencedId();
         $this->quantity = $quantity;
-        $this->mollieRefundID = $mollieRefundID;
     }
-
 }

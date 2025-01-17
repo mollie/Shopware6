@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Mail;
 
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Mail\Service\AbstractMailFactory;
 use Shopware\Core\Content\Mail\Service\AbstractMailSender;
 use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
@@ -52,7 +51,7 @@ class MailService extends AbstractMailService
             $this->getNoReplyAddress($data),
             $this->getRecipients($data['recipientLocale'] ?? null),
             $this->buildContents($data),
-            $this->filterFileAttachments($attachments),
+            [],
             [], // Additional data, but doesn't work properly.
             $this->filterBinaryAttachments($attachments)
         );

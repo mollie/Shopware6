@@ -7,11 +7,13 @@
            name="paymentMethodId"
            value="{{ payment.id }}"
            {% if payment.id is same as(selectedPaymentMethodId) %}checked="checked"{% endif %}
-           class="custom-control-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
+           class="custom-control-input form-check-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
 {% endblock %}
 
 
 {% block component_payment_method_description %}
+
+
     {% if "MolliePayments" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
         <div class="payment-method-description">
             <strong>{{ payment.translated.name }} ({{ "molliePayments.testMode.label"|trans }})</strong>
@@ -35,7 +37,9 @@
             showIfActive: (payment.id is same as(selectedPaymentMethodId)),
             sw64: true
         } %}
-    {% elseif payment.translated.customFields.mollie_payment_method_name == 'ideal' %}
-        {% sw_include '@MolliePayments/storefront/component/payment/component/ideal-fields.html.twig' %}
+    {% elseif payment.translated.customFields.mollie_payment_method_name == 'pointofsale' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/pos-fields.html.twig' %}
+    {% elseif payment.translated.customFields.mollie_payment_method_name == 'bancomatpay' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/bancomat-fields.html.twig' %}
     {% endif %}
 {% endblock %}

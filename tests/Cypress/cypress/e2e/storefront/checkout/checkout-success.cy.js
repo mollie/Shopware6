@@ -15,6 +15,7 @@ import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/Payme
 import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 import CreditCardScreen from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import IDealScreen from "cypress-mollie/src/actions/screens/IDealScreen";
 
 
 const devices = new Devices();
@@ -28,6 +29,7 @@ const paymentAction = new PaymentAction();
 const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
 const mollieKBC = new KBCScreen();
+const idealScreen = new IDealScreen();
 const mollieVoucher = new VoucherScreenAction();
 const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
@@ -40,23 +42,24 @@ const device = devices.getFirstDevice();
 
 
 const payments = [
-    {caseId: 'C4101', key: 'credit-card', name: 'Credit card'},
-    {caseId: 'C4111', key: 'paypal', name: 'PayPal'},
-    {caseId: 'C466903', key: 'billie', name: 'Billie'},
-    {caseId: 'C4114', key: 'klarnapaynow', name: 'Pay now'},
-    {caseId: 'C4115', key: 'klarnapaylater', name: 'Pay later'},
-    {caseId: 'C4117', key: 'klarnasliceit', name: 'Slice it'},
-    {caseId: 'C4118', key: 'ideal', name: 'iDEAL'},
-    {caseId: 'C4116', key: 'sofort', name: 'SOFORT'},
-    {caseId: 'C4120', key: 'eps', name: 'eps'},
-    {caseId: 'C4122', key: 'giropay', name: 'Giropay'},
-    {caseId: 'C4123', key: 'mistercash', name: 'Bancontact'},
-    {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24'},
-    {caseId: 'C4126', key: 'kbc', name: 'KBC'},
-    {caseId: 'C4128', key: 'banktransfer', name: 'Banktransfer'},
-    {caseId: 'C4127', key: 'belfius', name: 'Belfius'},
-    {caseId: 'C4121', key: 'giftcard', name: 'Gift cards'},
-    {caseId: 'C4143', key: 'voucher', name: 'Voucher'},
+    {caseId: 'C4101', key: 'credit-card', name: 'Card', sanity: false},
+    {caseId: 'C4111', key: 'paypal', name: 'PayPal', sanity: true},
+    {caseId: 'C466903', key: 'billie', name: 'Billie', sanity: false},
+    {caseId: '', key: 'klarna', name: 'Klarna', sanity: false},
+    {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
+    {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
+    {caseId: 'C4123', key: 'mistercash', name: 'Bancontact', sanity: false},
+    {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24', sanity: false},
+    {caseId: 'C4126', key: 'kbc', name: 'KBC', sanity: false},
+    {caseId: 'C4128', key: 'banktransfer', name: 'Banktransfer', sanity: false},
+    {caseId: 'C4127', key: 'belfius', name: 'Belfius', sanity: false},
+    {caseId: 'C4121', key: 'giftcard', name: 'Gift cards', sanity: false},
+    {caseId: 'C4143', key: 'voucher', name: 'Voucher', sanity: false},
+    {caseId: 'C3362894', key: 'trustly', name: 'Trustly', sanity: false},
+    {caseId: 'C3362897', key: 'payconiq', name: 'Payconiq', sanity: false},
+    {caseId: 'C3713510', key: 'riverty', name: 'Riverty', sanity: false},
+    {caseId: 'C3713512', key: 'satispay', name: 'Satispay', sanity: false},
+    {caseId: 'C4212005', key: 'paybybank', name: 'Pay by Bank', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
@@ -82,9 +85,15 @@ context("Checkout Tests", () => {
         context(devices.getDescription(device), () => {
             payments.forEach(payment => {
 
-                it(payment.caseId + ': Pay with ' + payment.name, () => {
+                const sanityString = (payment.sanity) ? ' @sanity' : '';
+
+                it(payment.caseId + ': Pay with ' + payment.name + sanityString, () => {
 
                     scenarioDummyBasket.execute();
+
+                    if(payment.key === 'payconiq'){
+                        checkout.changeBillingCountry('Belgium');
+                    }
 
                     paymentAction.switchPaymentMethod(payment.name);
 
@@ -116,11 +125,7 @@ context("Checkout Tests", () => {
 
                     mollieSandbox.initSandboxCookie();
 
-                    if (payment.key === 'klarnapaylater' || payment.key === 'klarnapaynow' || payment.key === 'klarnasliceit') {
-
-                        molliePayment.selectAuthorized();
-
-                    } else if (payment.key === 'billie') {
+                    if (payment.key === 'billie' || payment.key === 'klarna') {
 
                         molliePayment.selectAuthorized();
 
@@ -134,7 +139,9 @@ context("Checkout Tests", () => {
                         molliePayment.selectPaid();
                         molliePaymentMethods.selectPaypal();
                         molliePayment.selectPaid();
-
+                    } else if(payment.key === 'ideal'){
+                        idealScreen.selectING();
+                        molliePayment.selectPaid();
                     } else if (payment.key === 'giftcard') {
 
                         mollieGiftCards.selectBeautyCards();
@@ -143,6 +150,8 @@ context("Checkout Tests", () => {
                         molliePayment.selectPaid();
 
                     } else if (payment.key === 'credit-card') {
+
+                        cy.wait(2000);
 
                         mollieCreditCard.enterValidCard();
                         mollieCreditCard.submitForm();
@@ -164,6 +173,7 @@ context("Checkout Tests", () => {
                 })
 
             })
+
         })
     })
 

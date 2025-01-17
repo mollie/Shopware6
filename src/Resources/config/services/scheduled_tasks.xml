@@ -18,9 +18,29 @@
         <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTaskHandler">
             <argument type="service" id="scheduled_task.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="messenger.message_handler"/>
         </service>
+
+        <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTaskDevHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\ScheduledTask\OrderStatus\ExpireOrderTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\ScheduledTask\OrderStatus\ExpireOrderTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\OrderExpiration\ExpireAction"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+
 
     </services>
 </container>

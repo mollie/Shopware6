@@ -2,14 +2,13 @@
 
 namespace Kiener\MolliePayments\Gateway;
 
-use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
+use Mollie\Api\Resources\Terminal;
 
 interface MollieGatewayInterface
 {
-
     /**
      * @param string $salesChannelID
      */
@@ -25,10 +24,11 @@ interface MollieGatewayInterface
      */
     public function getProfileId(): string;
 
+
     /**
-     * @return Issuer[]
+     * @return Terminal[]
      */
-    public function getIDealIssuers(): array;
+    public function getPosTerminals(): array;
 
     /**
      * @param string $orderId

@@ -2,13 +2,10 @@
 
 namespace MolliePayments\Tests\Fakes\FlowBuilder;
 
-
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
-
 
 class FakeFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
 {
-
     /**
      * @var mixed
      */
@@ -31,5 +28,4 @@ class FakeFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
     {
         $this->dispatchedEvent = $event;
     }
-
 }

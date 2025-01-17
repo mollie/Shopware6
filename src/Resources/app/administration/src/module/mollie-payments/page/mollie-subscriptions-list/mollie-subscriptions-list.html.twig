@@ -1,5 +1,14 @@
 {% block mollie_payments_subscription_list %}
     <sw-page class="mollie-subscriptions">
+        {% block mollie_payments_subscription_list_search_bar %}
+            <template #search-bar>
+                <sw-search-bar initialSearchType="mollie_subscription"
+                               :initialSearch="term"
+                               @search="onSearch">
+                </sw-search-bar>
+            </template>
+        {% endblock %}
+
         {% block mollie_payments_subscription_list_smart_bar_header %}
             <template slot="smart-bar-header">
                 {% block mollie_payments_subscription_list_smart_bar_header_title %}
@@ -41,14 +50,19 @@
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_customer %}
-                        <template #column-customerId="{ item }">
-                            {{ item.customer.firstName }} {{ item.customer.lastName }}
+                        <template #column-customerId="{ item }" >
+                            <div v-if="item.customer">
+                                {{ item.customer.firstName }} {{ item.customer.lastName }}
+                            </div>
+                            <div v-else>
+                                {{ $tc('mollie-payments.subscriptions.list.deletedCustomer') }}
+                            </div>
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_amount %}
                         <template #column-amount="{ item }">
-                            {{ item.amount | currency(item.currency) }}
+                            {{ currencyFilter( item.amount , item.currency.isoCode, item.totalRounding.decimals) }}
                         </template>
                     {% endblock %}
 
@@ -67,27 +81,27 @@
 
                     {% block mollie_payments_subscription_list_content_next_payment_date %}
                         <template #column-nextPaymentAt="{ item }">
-                            {{ item.nextPaymentAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            {{ dateFilter(item.nextPaymentAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_pre_payment_reminder %}
                         <template #column-lastRemindedAt="{ item }">
-                            {{ item.lastRemindedAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            {{ dateFilter(item.lastRemindedAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_created_at %}
                         <template #column-createdAt="{ item }">
                             <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
-                                {{ item.createdAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                                {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                             </router-link>
                         </template>
                     {% endblock %}
 
                     {% block mollie_payments_subscription_list_content_canceled_at %}
                         <template #column-canceledAt="{ item }">
-                            {{ item.canceledAt | date({hour: '2-digit',minute: '2-digit',day: '2-digit',month: '2-digit',year: 'numeric'}) }}
+                            {{ dateFilter(item.canceledAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
                         </template>
                     {% endblock %}
 
@@ -104,6 +118,16 @@
                     {% endblock %}
                 </sw-entity-listing>
             {% endblock %}
+        </template>
+
+        <template #sidebar>
+            <sw-sidebar>
+                <sw-sidebar-item
+                    :icon="compatibilityIcons.refresh"
+                    :title="$tc('sw-product.list.titleSidebarItemRefresh')"
+                    @click="onRefresh"
+                />
+            </sw-sidebar>
         </template>
     </sw-page>
 {% endblock %}

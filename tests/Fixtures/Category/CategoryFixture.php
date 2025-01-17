@@ -3,34 +3,32 @@
 
 namespace MolliePayments\Fixtures\Category;
 
-
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
 use Shopware\Core\Content\Category\CategoryEntity;
+use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
-
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 class CategoryFixture extends Fixture
 {
 
     /**
-     * @var FixtureHelper
-     */
-    private $helper;
-
-    /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $categoryRepository;
 
 
     /**
      * @param FixtureHelper $helper
-     * @param EntityRepositoryInterface $categoryRepository
+     * @param EntityRepository $categoryRepository
      */
-    public function __construct(FixtureHelper $helper, EntityRepositoryInterface $categoryRepository)
+    public function __construct(FixtureHelper $helper, EntityRepository $categoryRepository)
     {
         $this->helper = $helper;
         $this->categoryRepository = $categoryRepository;
@@ -53,24 +51,36 @@ class CategoryFixture extends Fixture
      * @param FixtureBag $bag
      * @return void
      */
-    public function load(FixtureBag $bag): void
+    public function load(): void
     {
-        $catElectronics = $this->helper->Category()->getByName('Free time & electronics');
-        $afterCatId = ($catElectronics instanceof CategoryEntity) ? $catElectronics->getId() : null;
+        $context = new Context(new SystemSource());
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', 'Free time & electronics'));
+        $categorySearchResult = $this->categoryRepository->search($criteria, $context);
 
-        $this->createCategory('0d8eefdd6d12456335280e2ff42431b9', "Voucher", $afterCatId);
-        $this->createCategory('0d9eefdd6d12456335280e2ff42431b2', "Subscriptions", $afterCatId);
-        $this->createCategory('0d9eefdd6d12456335280e2ff42431b9', "Failures", $afterCatId);
-        $this->createCategory('2a2eefdd6d12456335280e2ff42431b9', "Rounding", $afterCatId);
+        /** @var CategoryEntity $category */
+        $category = $categorySearchResult->first();
+
+        $afterCatId = $category->getId();
+        $parentId = $category->getParentId();
+        $cmsPageId = $category->getCmsPageId();
+
+
+        $this->createCategory(Uuid::fromStringToHex('Voucher'), "Voucher", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Subscriptions'), "Subscriptions", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Failures'), "Failures", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Rounding'), "Rounding", $context, $afterCatId, $parentId, $cmsPageId);
+        $this->createCategory(Uuid::fromStringToHex('Cheap'), "Cheap", $context, $afterCatId, $parentId, $cmsPageId);
     }
 
     /**
      * @param string $id
      * @param string $name
-     * @param string|null $afterCategoryId
+     * @param null|string $afterCategoryId
      */
-    private function createCategory(string $id, string $name, ?string $afterCategoryId): void
+    private function createCategory(string $id, string $name, Context $context, ?string $afterCategoryId, ?string $parentId, ?string $cmsPageId): void
     {
+
         $this->categoryRepository->upsert([
             [
                 'id' => $id,
@@ -88,11 +98,10 @@ class CategoryFixture extends Fixture
                 'displayNestedProducts' => true,
                 'visible' => true,
                 'type' => 'page',
-                'cmsPageId' => $this->helper->Cms()->getDefaultCategoryLayout()->getId(),
-                'parentId' => $this->helper->Category()->getByName('Catalogue #1')->getId(),
+                'cmsPageId' => $cmsPageId,
+                'parentId' => $parentId,
                 'afterCategoryId' => $afterCategoryId,
             ],
-        ], Context::createDefaultContext());
+        ], $context);
     }
-
 }

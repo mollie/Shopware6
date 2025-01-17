@@ -110,8 +110,7 @@ class MolliePaymentDoPayTest extends TestCase
         bool $customerIsGuest,
         bool $createCustomersAtMollie,
         bool $shouldCreateMollieCustomer
-    )
-    {
+    ) {
         $this->customer->method('getGuest')->willReturn($customerIsGuest);
         $this->settings->setCreateCustomersAtMollie($createCustomersAtMollie);
 

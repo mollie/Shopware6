@@ -15,11 +15,9 @@ class CustomerStructTest extends TestCase
         $struct = new CustomerStruct();
 
         $struct->assign([
-            'preferred_ideal_issuer' => 'foo',
             'customer_ids' => ['bar'],
         ]);
 
-        $this->assertSame('foo', $struct->getPreferredIdealIssuer());
         $this->assertSame(['bar'], $struct->getCustomerIds());
     }
 
@@ -35,8 +33,7 @@ class CustomerStructTest extends TestCase
         string $profileId,
         bool $testMode,
         string $expectedCustomerId
-    )
-    {
+    ) {
         $struct = new CustomerStruct();
         $struct->assign($testData);
 
@@ -132,7 +129,7 @@ class CustomerStructTest extends TestCase
         $struct->setCustomerId('cst_3test', 'pfl_3', true);
 
         $struct->setCreditCardToken('cc_123');
-        $struct->setPreferredIdealIssuer('ideal_bunq');
+
 
         $customFields = $struct->toCustomFieldsArray();
 
@@ -152,7 +149,6 @@ class CustomerStructTest extends TestCase
                         'test' => 'cst_3test'
                     ],
                 ],
-                'preferred_ideal_issuer' => 'ideal_bunq',
                 'credit_card_token' => 'cc_123',
             ]
         ];

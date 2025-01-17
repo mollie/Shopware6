@@ -7,14 +7,12 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartValidatorInterface;
-use Shopware\Core\Checkout\Cart\Error\Error;
 use Shopware\Core\Checkout\Cart\Error\ErrorCollection;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class AvailabilityInformationValidator implements CartValidatorInterface
 {
-
     /**
      * @var SettingsService
      */
@@ -38,7 +36,7 @@ class AvailabilityInformationValidator implements CartValidatorInterface
      */
     public function validate(Cart $cart, ErrorCollection $errorCollection, SalesChannelContext $salesChannelContext): void
     {
-        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannelId());
+        $settings = $this->pluginSettings->getSettings($salesChannelContext->getSalesChannel()->getId());
 
         if (!$settings->isSubscriptionsEnabled()) {
             $this->clearError($cart);

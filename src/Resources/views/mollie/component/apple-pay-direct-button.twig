@@ -1,4 +1,5 @@
 {% block mollie_apple_pay_direct %}
+
     <div class="mollie-apple-pay-direct {{ cols }}">
         {% if page.product %}
             {# this is for older shopware versions #}
@@ -7,13 +8,21 @@
             {# this is for Shopware >= 6.4 #}
             {% set productId = product.id %}
         {% endif %}
-        <div id="mollie-apd-csrf" class="d-none">
-            <input type="hidden" name="_mollie_csrf_token" value="{{ sw_csrf('frontend.mollie.apple-pay.authorize', {"mode": "token"}) }}">
-            <input type="hidden" name="_mollie_csrf_token" value="{{ sw_csrf('frontend.mollie.apple-pay.shipping-methods', {"mode": "token"}) }}">
-        </div>
+
+
+        {% if mollie_csrf_available %}
+            {#
+            CSRF functions are not available anymore since Shopware 6.5.
+            To avoid function-not-found exception we have to conditionally fetch the required
+            code from a separate file.
+            #}
+            {% sw_include '@MolliePayments/storefront/csrf/components/apple-pay-direct-button-csrf.twig' %}
+        {% endif %}
+
         <input type="hidden" name="id" value="{{ productId }}"/>
         <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
         <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>
+        <input type="hidden" name="withPhone" value="{{ mollie_applepaydirect_phonenumber_required }}">
 
         {% if productId %}
             {% set mode = 'productMode' %}
@@ -24,7 +33,7 @@
         <input type="hidden" name="mode" value="{{ mode }}"/>
 
         {% block mollie_apple_pay_direct_button %}
-            <button type="submit" data-shop-url="{{ seoUrl('frontend.home.page') }}" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay w-100 d-none">
+            <button type="submit" data-shop-url="{{ seoUrl('frontend.home.page') }}" data-applepay-enabled="{{ mollie_applepaydirect_enabled }}" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay mollie-express-button w-100 d-none">
                 {# space to match height other buttons #}
                 &nbsp;
                 {# end important spacer #}

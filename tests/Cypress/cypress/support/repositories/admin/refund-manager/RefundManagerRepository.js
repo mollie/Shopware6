@@ -6,7 +6,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getAmountField() {
-        return cy.get('#sw-field--refundAmount');
+        return cy.get('.refund-amount input');
     }
 
     /**
@@ -22,7 +22,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getDescription() {
-        return cy.get('#sw-field--refundDescription');
+        return cy.get('.refund-description textarea');
     }
 
     /**
@@ -30,7 +30,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getInternalDescription() {
-        return cy.get('#sw-field--refundInternalDescription');
+        return cy.get('.refund-internal-description textarea');
     }
 
     /**
@@ -55,6 +55,14 @@ export default class RefundManagerRepository {
      */
     getFirstRefundStatusLabel() {
         return cy.get('.sw-data-grid__cell--status > .sw-data-grid__cell-content > .sw-container');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getFirstLineItemQuantityInput() {
+        return cy.get('.cy-input-quantity input').first();
     }
 
     /**
@@ -111,6 +119,14 @@ export default class RefundManagerRepository {
      */
     getSelectAllItemsButton() {
         return cy.get('.order-container-top-left > .sw-button-group > :nth-child(1)');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getFirstRefundQuantityInput(){
+        return cy.get('.cy-input-quantity input')
     }
 
 }

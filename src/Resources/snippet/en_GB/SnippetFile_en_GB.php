@@ -2,9 +2,10 @@
 
 namespace Kiener\MolliePayments\Resources\snippet\en_GB;
 
+use Shopware\Core\System\Snippet\Files\AbstractSnippetFile;
 use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
 
-class SnippetFile_en_GB implements SnippetFileInterface
+class SnippetFile_en_GB extends AbstractSnippetFile implements SnippetFileInterface
 {
     public function getName(): string
     {
@@ -31,7 +32,7 @@ class SnippetFile_en_GB implements SnippetFileInterface
 
     public function getAuthor(): string
     {
-        return 'Reinder van Bochove';
+        return 'Mollie B.V.';
     }
 
     public function isBase(): bool

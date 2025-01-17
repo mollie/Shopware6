@@ -5,7 +5,7 @@ export default class OffCanvasRepository {
      * @returns {*}
      */
     getCartButton() {
-        return cy.get('.btn-link');
+        return cy.get('.offcanvas-cart-actions .btn-link');
     }
 
     /**
@@ -24,4 +24,11 @@ export default class OffCanvasRepository {
         return cy.get('.mollie-apple-pay-direct-offcanvas > div > .js-apple-pay');
     }
 
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getPayPalExpressButton(){
+        return cy.get('.mollie-paypal-express-offcanvas button[name="paypal-express"]');
+    }
 }

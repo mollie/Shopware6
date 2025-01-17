@@ -2,38 +2,40 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\OrderLineType;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class UpdateOrderLineItems
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $orderLineRepository;
 
 
     /**
-     * @param EntityRepositoryInterface $orderLineRepository
+     * @param EntityRepository $orderLineRepository
      */
-    public function __construct(EntityRepositoryInterface $orderLineRepository)
+    public function __construct(EntityRepository $orderLineRepository)
     {
         $this->orderLineRepository = $orderLineRepository;
     }
 
     /**
-     * @param Order $mollieOrder
+     * @param OrderLine[] $orderLines
      * @param SalesChannelContext $salesChannelContext
+     * @return void
      */
-    public function updateOrderLineItems(Order $mollieOrder, SalesChannelContext $salesChannelContext): void
+    public function updateOrderLineItems(array $orderLines, OrderLineItemCollection $shopwareOrderLines, SalesChannelContext $salesChannelContext): void
     {
-        /** @var OrderLine $orderLine */
-        foreach ($mollieOrder->lines() as $orderLine) {
+        $updateLines = [];
+        foreach ($orderLines as $orderLine) {
             if ($orderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
             }
@@ -43,17 +45,26 @@ class UpdateOrderLineItems
             if (empty($shopwareLineItemId)) {
                 continue;
             }
+            /** @var OrderLineItemEntity $shopwareLine */
+            $shopwareLine = $shopwareOrderLines->get($shopwareLineItemId);
+            if (! $shopwareLine instanceof OrderLineItemEntity) {
+                continue;
+            }
 
-            $data = [
-                'id' => $shopwareLineItemId,
+            ## we need some customfields for later when we edit an order, for example subscription information
+            $originalCustomFields = $shopwareLine->getPayload()['customFields'] ?? [];
+            $originalCustomFields['order_line_id'] = $orderLine->id;
+
+            $updateLines[] = [
+                'id' => $shopwareLine->getId(),
                 'customFields' => [
-                    'mollie_payments' => [
-                        'order_line_id' => $orderLine->id
-                    ]
-                ]
+                    CustomFieldsInterface::MOLLIE_KEY => $originalCustomFields
+                ],
             ];
-
-            $this->orderLineRepository->update([$data], $salesChannelContext->getContext());
         }
+        if (count($updateLines) === 0) {
+            return;
+        }
+        $this->orderLineRepository->update($updateLines, $salesChannelContext->getContext());
     }
 }

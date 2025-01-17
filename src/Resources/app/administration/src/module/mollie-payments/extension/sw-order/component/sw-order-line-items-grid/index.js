@@ -1,6 +1,9 @@
 import template from './sw-order-line-items-grid.html.twig';
 import './sw-order-line-items-grid.scss';
 import OrderAttributes from '../../../../../../core/models/OrderAttributes';
+import RefundManager from '../../../../components/mollie-refund-manager/RefundManager';
+import MollieShipping from '../../../../components/mollie-ship-order/MollieShipping';
+import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin} = Shopware;
@@ -17,13 +20,19 @@ Component.override('sw-order-line-items-grid', {
     inject: [
         'MolliePaymentsConfigService',
         'MolliePaymentsShippingService',
+        'MolliePaymentsItemCancelService',
         'acl',
     ],
-
+    props: {
+        shopwareVersion: {
+            type: Number,
+            default: 6.4,
+        },
+    },
 
     /**
      *
-     * @returns {{isLoading: boolean, shippingStatus: null, showRefundModal: boolean, isShipOrderLoading: boolean, showShipItemModal: null, showShipOrderModal: boolean, showTrackingInfo: boolean, tracking: {carrier: string, code: string, url: string}, isShipItemLoading: boolean, shipQuantity: number}}
+     * @returns {{isLoading: boolean, shippingStatus: null: boolean, isShipOrderLoading: boolean, showShipItemModal: null, showShipOrderModal: boolean, showTrackingInfo: boolean, tracking: {carrier: string, code: string, url: string}, isShipItemLoading: boolean, shipQuantity: number}}
      */
     data() {
         return {
@@ -31,23 +40,34 @@ Component.override('sw-order-line-items-grid', {
             // ---------------------------------
             configShowRefundManager: true,
             showRefundModal: false,
+            isRefundManagerPossible: false,
             // ---------------------------------
+            isShippingPossible: false,
+            showShipOrderModal: false,
             isShipOrderLoading: false,
             isShipItemLoading: false,
             shipQuantity: 0,
-            showShipOrderModal: false,
             showShipItemModal: null,
-            showTrackingInfo: false,
+            cancelItemModal: null,
             shippingStatus: null,
+            cancelStatus:null,
             tracking: {
                 carrier: '',
                 code: '',
                 url: '',
             },
+            showTrackingInfo: false,
+
+            EVENT_TOGGLE_REFUND_MANAGER: 'toggle-refund-manager-modal',
         };
     },
 
     computed: {
+
+        /**
+         *
+         * @returns {*}
+         */
         getLineItemColumns() {
             const columnDefinitions = this.$super('getLineItemColumns');
 
@@ -62,65 +82,32 @@ Component.override('sw-order-line-items-grid', {
                 }
             );
 
+            columnDefinitions.push(
+                {
+                    property: 'canceledQuantity',
+                    label: this.$tc('sw-order.detailExtended.columnCanceled'),
+                    allowResize: false,
+                    align: 'right',
+                    inlineEdit: false,
+                    width: '100px',
+                }
+            );
             return columnDefinitions;
-        },
-
-        getShipOrderColumns() {
-            return [
-                {
-                    property: 'label',
-                    label: this.$tc('mollie-payments.modals.shipping.order.itemHeader'),
-                },
-                {
-                    property: 'quantity',
-                    label: this.$tc('mollie-payments.modals.shipping.order.quantityHeader'),
-                },
-            ];
-        },
-
-        shippableLineItems() {
-            return this.orderLineItems
-                .filter((item) => this.shippableQuantity(item))
-                .map((item) => {
-                    return {
-                        label: item.label,
-                        quantity: this.shippableQuantity(item),
-                    }
-                });
-        },
-
-        isMollieOrder() {
-            return (this.order.customFields !== null && 'mollie_payments' in this.order.customFields);
-        },
-
-        isShippingPossible() {
-
-            if (!this.isMollieOrder) {
-                return false;
-            }
-
-            const orderAttributes = new OrderAttributes(this.order);
-
-            // this can happen on subscription renewals...they have no order id
-            // and therefore the order cannot be shipped
-            if (orderAttributes.getOrderId() === '') {
-                return false;
-            }
-
-            return this.shippableLineItems.length > 0;
         },
 
         /**
          *
          * @returns {boolean}
          */
-        isRefundManagerPossible() {
+        isMollieOrder() {
+            const attr = new OrderAttributes(this.order);
+            return attr.isMollieOrder();
+        },
 
-            if (!this.configShowRefundManager) {
-                return;
-            }
+        mollieId(){
+            const attr = new OrderAttributes(this.order);
 
-            return this.acl.can('mollie_refund_manager:read');
+            return attr.getMollieID();
         },
 
         /**
@@ -146,37 +133,117 @@ Component.override('sw-order-line-items-grid', {
         this.createdComponent();
     },
 
+
     methods: {
 
-        createdComponent() {
-            // Do not attempt to load the shipping status if this isn't a Mollie order,
-            // or it will trigger an exception in the API.
-            if (this.isMollieOrder) {
-                this.getShippingStatus();
+        /**
+         *
+         * @returns {Promise<void>}
+         */
+        async createdComponent() {
 
-                const me = this;
-
-                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
-                    me.configShowRefundManager = response.enabled;
-                });
+            if (!this.isMollieOrder) {
+                return;
             }
+
+            // hook into our shipping events
+            // we close our modals if shipping happened
+            this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
+                this.onCloseShipOrderModal();
+            });
+
+            this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
+            this.shippingManagerService = new MollieShipping(this.MolliePaymentsShippingService);
+
+            this.reloadData();
         },
 
+        /**
+         *
+         */
+        async reloadData() {
+
+            this.shippingManagerService.isShippingPossible(this.order).then((enabled) => {
+                this.isShippingPossible = enabled;
+            });
+
+            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id);
+
+            await this.loadMollieShippingStatus();
+            await this.loadMollieCancelStatus();
+        },
 
         // ==============================================================================================//
         //  REFUND MANAGER
 
+        /**
+         *
+         */
         onOpenRefundManager() {
             this.showRefundModal = true;
         },
 
+        /**
+         *
+         */
         onCloseRefundManager() {
             this.showRefundModal = false;
+            location.reload();
         },
 
         //==== Shipping =============================================================================================//
 
-        async getShippingStatus() {
+        /**
+         *
+         */
+        onOpenShipOrderModal() {
+            this.showShipOrderModal = true;
+        },
+
+        /**
+         *
+         */
+        onCloseShipOrderModal() {
+            this.showShipOrderModal = false;
+            this.reloadData();
+        },
+
+        //==== Shipping Line Item =============================================================================================//
+        // unfortunately too tightly integrated in here
+
+        /**
+         *
+         * @param item
+         */
+        onOpenShipItemModal(item) {
+            this.showShipItemModal = item.id;
+            this.updateTrackingPrefilling();
+        },
+
+        onOpenCancelItemModal(item){
+            this.cancelItemModal = item.id;
+        },
+        closeCancelItemModal(){
+            this.cancelItemModal = null;
+        },
+
+        /**
+         *
+         */
+        onCloseShipItemModal() {
+            this.isShipItemLoading = false;
+            this.showShipItemModal = false;
+            this.shipQuantity = 0;
+            this.resetTracking();
+
+            this.reloadData();
+        },
+
+        /**
+         *
+         * @returns {Promise<void>}
+         */
+        async loadMollieShippingStatus() {
             await this.MolliePaymentsShippingService
                 .status({
                     orderId: this.order.id,
@@ -186,61 +253,18 @@ Component.override('sw-order-line-items-grid', {
                 });
         },
 
-        onOpenShipOrderModal() {
-            this.showShipOrderModal = true;
+        async loadMollieCancelStatus(){
 
-            this.updateTrackingPrefilling();
-        },
-
-        onCloseShipOrderModal() {
-            this.isShipOrderLoading = false;
-            this.showShipOrderModal = false;
-            this.resetTracking();
-        },
-
-        onConfirmShipOrder() {
-            if (this.showTrackingInfo && !this.validateTracking()) {
-                this.createNotificationError({
-                    message: this.$tc('mollie-payments.modals.shipping.tracking.invalid'),
-                });
-                return;
-            }
-
-            this.isShipOrderLoading = true;
-
-            this.MolliePaymentsShippingService
-                .shipOrder({
-                    orderId: this.order.id,
-                    trackingCarrier: this.tracking.carrier,
-                    trackingCode: this.tracking.code,
-                    trackingUrl: this.tracking.url,
+            await this.MolliePaymentsItemCancelService
+                .status({mollieOrderId: this.mollieId})
+                .then((response)=>{
+                    this.cancelStatus = response
                 })
-                .then(() => {
-                    this.onCloseShipOrderModal();
-                })
-                .then(() => {
-                    this.$emit('ship-item-success');
-                })
-                .catch((response) => {
-                    this.createNotificationError({
-                        message: response.message,
-                    });
-                });
         },
-
-        onOpenShipItemModal(item) {
-            this.showShipItemModal = item.id;
-
-            this.updateTrackingPrefilling();
-        },
-
-        onCloseShipItemModal() {
-            this.isShipItemLoading = false;
-            this.showShipItemModal = false;
-            this.shipQuantity = 0;
-            this.resetTracking();
-        },
-
+        /**
+         *
+         * @param item
+         */
         onConfirmShipItem(item) {
             if (this.shipQuantity === 0) {
                 this.createNotificationError({
@@ -272,13 +296,15 @@ Component.override('sw-order-line-items-grid', {
                         message: this.$tc('mollie-payments.modals.shipping.item.success'),
                     });
                     this.onCloseShipItemModal();
+                    // send global event
+                    this.$root.$emit(MollieShippingEvents.EventShippedOrder);
                 })
                 .then(() => {
                     this.$emit('ship-item-success');
                 })
                 .catch((response) => {
                     this.createNotificationError({
-                        message: response.message,
+                        message: response.response.data.message,
                     });
                 });
         },
@@ -292,6 +318,7 @@ Component.override('sw-order-line-items-grid', {
         },
 
         shippableQuantity(item) {
+
             if (this.shippingStatus === null || this.shippingStatus === undefined) {
                 return '~';
             }
@@ -301,7 +328,6 @@ Component.override('sw-order-line-items-grid', {
             if (itemShippingStatus === null || itemShippingStatus === undefined) {
                 return '~';
             }
-
             return itemShippingStatus.quantityShippable;
         },
 
@@ -318,7 +344,44 @@ Component.override('sw-order-line-items-grid', {
 
             return itemShippingStatus.quantityShipped;
         },
+        canceledQuantity(item){
 
+            if(this.cancelStatus === undefined || this.cancelStatus === null){
+                return '~';
+            }
+            const itemStatus = this.cancelStatus[item.id];
+            if(itemStatus === undefined || itemStatus === null){
+                return '~';
+            }
+            return itemStatus.quantityCanceled;
+        },
+        isCancelable(item){
+
+            if(this.cancelStatus === undefined || this.cancelStatus === null){
+                return false;
+            }
+
+            const itemStatus = this.cancelStatus[item.id];
+            if(itemStatus === undefined || itemStatus === null){
+                return false;
+            }
+
+            return itemStatus.isCancelable;
+        },
+
+        getCancelData(item){
+            if(this.cancelStatus === undefined || this.cancelStatus === null){
+                return {};
+            }
+            const itemStatus = this.cancelStatus[item.id];
+            if(itemStatus === undefined){
+                return {};
+            }
+            itemStatus.shopwareItemId = item.id;
+            itemStatus.label = item.label;
+            itemStatus.payload = item.payload;
+            return itemStatus;
+        },
         //==== Tracking =============================================================================================//
 
         updateTrackingPrefilling() {
@@ -333,6 +396,11 @@ Component.override('sw-order-line-items-grid', {
             }
         },
 
+        validateTracking() {
+            return !string.isEmptyOrSpaces(this.tracking.carrier)
+                && !string.isEmptyOrSpaces(this.tracking.code)
+        },
+
         resetTracking() {
             this.showTrackingInfo = false;
             this.tracking = {
@@ -342,9 +410,5 @@ Component.override('sw-order-line-items-grid', {
             };
         },
 
-        validateTracking() {
-            return !string.isEmptyOrSpaces(this.tracking.carrier)
-                && !string.isEmptyOrSpaces(this.tracking.code)
-        },
     },
 });

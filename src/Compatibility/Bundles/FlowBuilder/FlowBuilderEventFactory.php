@@ -2,19 +2,31 @@
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceledEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccessEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceled\OrderCanceledEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceled\OrderCanceledEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailed\OrderFailedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderFailed\OrderFailedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccess\OrderSuccessEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderSuccess\OrderSuccessEvent651;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\DummyEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStartedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelledEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEndedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPausedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRemindedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkippedEvent;
-use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelled\SubscriptionCancelledEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionCancelled\SubscriptionCancelledEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEnded\SubscriptionEndedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEnded\SubscriptionEndedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPaused\SubscriptionPausedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionPaused\SubscriptionPausedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionReminded\SubscriptionRemindedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionReminded\SubscriptionRemindedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewed\SubscriptionRenewedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionRenewed\SubscriptionRenewedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumed\SubscriptionResumedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionResumed\SubscriptionResumedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkipped\SubscriptionSkippedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkipped\SubscriptionSkippedEvent651;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted\SubscriptionStartedEvent;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionStarted\SubscriptionStartedEvent651;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookReceivedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedAuthorizedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedCancelledEvent;
@@ -35,11 +47,13 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class FlowBuilderEventFactory
 {
-
     /**
      * @var VersionCompare
      */
     private $versionCompare;
+
+
+    private const SW_VERSION_651 = '6.5.1.0';
 
 
     /**
@@ -209,12 +223,16 @@ class FlowBuilderEventFactory
      * @param OrderEntity $orderEntity
      * @param float $amount
      * @param Context $context
-     * @return DummyEvent|RefundStartedEvent
+     * @return DummyEvent|RefundStartedEvent|RefundStartedEvent651
      */
     public function buildRefundStartedEvent(OrderEntity $orderEntity, float $amount, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new RefundStartedEvent651($orderEntity, $amount, $context);
         }
 
         return new RefundStartedEvent($orderEntity, $amount, $context);
@@ -225,12 +243,16 @@ class FlowBuilderEventFactory
      * @param SubscriptionEntity $subscription
      * @param SalesChannelEntity $salesChannel
      * @param Context $context
-     * @return DummyEvent|SubscriptionRemindedEvent
+     * @return DummyEvent|SubscriptionRemindedEvent|SubscriptionRemindedEvent651
      */
     public function buildSubscriptionRemindedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, SalesChannelEntity $salesChannel, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionRemindedEvent651($customer, $subscription, $salesChannel, $context);
         }
 
         return new SubscriptionRemindedEvent($customer, $subscription, $salesChannel, $context);
@@ -240,12 +262,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionStartedEvent
+     * @return DummyEvent|SubscriptionStartedEvent|SubscriptionStartedEvent651
      */
     public function buildSubscriptionStartedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionStartedEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionStartedEvent($subscription, $customer, $context);
@@ -255,12 +281,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionEndedEvent
+     * @return DummyEvent|SubscriptionEndedEvent|SubscriptionEndedEvent651
      */
     public function buildSubscriptionEndedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionEndedEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionEndedEvent($subscription, $customer, $context);
@@ -270,12 +300,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionCancelledEvent
+     * @return DummyEvent|SubscriptionCancelledEvent|SubscriptionCancelledEvent651
      */
     public function buildSubscriptionCancelledEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionCancelledEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionCancelledEvent($subscription, $customer, $context);
@@ -285,12 +319,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionPausedEvent
+     * @return DummyEvent|SubscriptionPausedEvent|SubscriptionPausedEvent651
      */
     public function buildSubscriptionPausedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionPausedEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionPausedEvent($subscription, $customer, $context);
@@ -300,12 +338,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionResumedEvent
+     * @return DummyEvent|SubscriptionResumedEvent|SubscriptionResumedEvent651
      */
     public function buildSubscriptionResumedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionResumedEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionResumedEvent($subscription, $customer, $context);
@@ -315,12 +357,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionSkippedEvent
+     * @return DummyEvent|SubscriptionSkippedEvent|SubscriptionSkippedEvent651
      */
     public function buildSubscriptionSkippedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionSkippedEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionSkippedEvent($subscription, $customer, $context);
@@ -330,12 +376,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param SubscriptionEntity $subscription
      * @param Context $context
-     * @return DummyEvent|SubscriptionRenewedEvent
+     * @return DummyEvent|SubscriptionRenewedEvent|SubscriptionRenewedEvent651
      */
     public function buildSubscriptionRenewedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new SubscriptionRenewedEvent651($subscription, $customer, $context);
         }
 
         return new SubscriptionRenewedEvent($subscription, $customer, $context);
@@ -345,12 +395,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param OrderEntity $order
      * @param Context $context
-     * @return DummyEvent|OrderSuccessEvent
+     * @return DummyEvent|OrderSuccessEvent|OrderSuccessEvent651
      */
     public function buildOrderSuccessEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new OrderSuccessEvent651($order, $customer, $context);
         }
 
         return new OrderSuccessEvent($order, $customer, $context);
@@ -360,12 +414,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param OrderEntity $order
      * @param Context $context
-     * @return DummyEvent|OrderFailedEvent
+     * @return DummyEvent|OrderFailedEvent|OrderFailedEvent651
      */
     public function buildOrderFailedEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new OrderFailedEvent651($order, $customer, $context);
         }
 
         return new OrderFailedEvent($order, $customer, $context);
@@ -375,12 +433,16 @@ class FlowBuilderEventFactory
      * @param CustomerEntity $customer
      * @param OrderEntity $order
      * @param Context $context
-     * @return DummyEvent|OrderCanceledEvent
+     * @return DummyEvent|OrderCanceledEvent|OrderCanceledEvent651
      */
     public function buildOrderCanceledEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
     {
         if ($this->versionCompare->lt(FlowBuilderFactory::FLOW_BUILDER_MIN_VERSION)) {
             return new DummyEvent();
+        }
+
+        if ($this->versionCompare->gte(self::SW_VERSION_651)) {
+            return new OrderCanceledEvent651($order, $customer, $context);
         }
 
         return new OrderCanceledEvent($order, $customer, $context);

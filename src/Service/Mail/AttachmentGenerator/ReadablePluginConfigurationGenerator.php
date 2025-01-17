@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 use Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\Service\ConfigurationService;
 
@@ -27,10 +27,10 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
     ];
 
     public function __construct(
-        ConfigurationService      $configurationService,
-        EntityRepositoryInterface $salesChannelRepository,
-        SettingsService           $settingsService,
-        ApiKeyValidator           $apiKeyValidator
+        ConfigurationService            $configurationService,
+        EntityRepository $salesChannelRepository,
+        SettingsService                 $settingsService,
+        ApiKeyValidator                 $apiKeyValidator
     ) {
         $this->apiKeyValidator = $apiKeyValidator;
 

@@ -44,6 +44,11 @@ class RefundData
     private $roundingItemTotal;
 
     /**
+     * @var string
+     */
+    private $taxStatus;
+
+    /**
      * @param AbstractItem[] $cartItems
      * @param Refund[] $refunds
      * @param float $amountVouchers
@@ -52,7 +57,7 @@ class RefundData
      * @param float $amountRemaining
      * @param float $roundingItemTotal
      */
-    public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining, float $roundingItemTotal)
+    public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining, float $roundingItemTotal, string $taxStatus)
     {
         $this->orderItems = $cartItems;
         $this->refunds = $refunds;
@@ -61,6 +66,7 @@ class RefundData
         $this->amountCompletedRefunds = $amountCompletedRefunds;
         $this->amountRemaining = $amountRemaining;
         $this->roundingItemTotal = $roundingItemTotal;
+        $this->taxStatus = $taxStatus;
     }
 
     /**
@@ -119,6 +125,14 @@ class RefundData
         return $this->roundingItemTotal;
     }
 
+    /**
+     * @return string
+     */
+    public function getTaxStatus(): string
+    {
+        return $this->taxStatus;
+    }
+
 
     /**
      * @return array<mixed>
@@ -135,10 +149,10 @@ class RefundData
         /** @var array<mixed> $refundsArray */
         $refundsArray = $this->refunds;
         foreach ($refundsArray as $refundIndex => $refund) {
-            if (isset($refund['metadata']['composition']) && is_array($refund['metadata']['composition'])) {
-                foreach ($refund['metadata']['composition'] as $compositionIndex => $composition) {
+            if (isset($refund['metadata']) && property_exists($refund['metadata'], 'composition') && is_array($refund['metadata']->composition)) {
+                foreach ($refund['metadata']->composition as $compositionIndex => $composition) {
                     if ((bool)$composition['swReference'] === false) {
-                        $refundsArray[$refundIndex]['metadata']['composition'][$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
+                        $refundsArray[$refundIndex]['metadata']->composition[$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
                     }
                 }
             }
@@ -154,6 +168,7 @@ class RefundData
             ],
             'cart' => $hydratedOrderItems,
             'refunds' => $refundsArray,
+            'taxStatus' => $this->taxStatus,
         ];
     }
 }

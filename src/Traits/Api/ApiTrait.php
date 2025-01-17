@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 trait ApiTrait
 {
-
     /**
      * @param string $error
      * @return JsonResponse

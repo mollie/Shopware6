@@ -4,7 +4,7 @@ import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Application} = Shopware;
+const {Component, Mixin, Application, Filter} = Shopware;
 
 // eslint-disable-next-line no-undef
 const {Criteria} = Shopware.Data;
@@ -38,6 +38,7 @@ Component.register('mollie-subscriptions-list', {
             sortDirection: 'DESC',
             naturalSorting: true,
             showHelp: false,
+            searchConfigEntity: 'mollie_subscription',
         }
     },
 
@@ -90,6 +91,25 @@ Component.register('mollie-subscriptions-list', {
             return this.subscriptions.length;
         },
 
+        /**
+         * Provide icon compatibility for 6.4. Shopware's compatibility mapping will be removed in 6.5
+         * @see vendor/shopware/administration/Resources/app/administration/src/app/component/base/sw-icon/legacy-icon-mapping.js
+         * @returns {object}
+         */
+        compatibilityIcons() {
+            const map = Component.getComponentRegistry();
+            return {
+                refresh: map.has('icons-regular-undo') ? 'regular-undo' : 'default-arrow-360-left',
+            };
+        },
+        currencyFilter() {
+            return Filter.getByName('currency');
+        },
+
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {
@@ -106,14 +126,22 @@ Component.register('mollie-subscriptions-list', {
         /**
          *
          */
-        getList() {
-
+        async getList() {
             this.isLoading = true;
             this.naturalSorting = this.sortBy === 'createdAt';
 
-            const criteria = new Criteria();
+            let criteria = new Criteria();
+
+            // Compatibility for 6.4.4, as admin search was improved in 6.4.5
+            if('addQueryScores' in this) {
+                criteria = await this.addQueryScores(this.term, criteria);
+            } else {
+                criteria.setTerm(this.term);
+            }
+
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
+            criteria.addAssociation('currency');
 
             // eslint-disable-next-line no-undef
             this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result) => {

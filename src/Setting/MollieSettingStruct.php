@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -15,6 +14,8 @@ class MollieSettingStruct extends Struct
 
     public const ORDER_EXPIRES_AT_MIN_DAYS = 1;
     public const ORDER_EXPIRES_AT_MAX_DAYS = 100;
+
+    const APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST = 'applePayDirectDomainAllowList';
 
     /**
      * @var string
@@ -50,6 +51,11 @@ class MollieSettingStruct extends Struct
      * @var bool
      */
     protected $debugMode = false;
+
+    /**
+     * @var int
+     */
+    protected $logFileDays = 0;
 
     /**
      * @var bool
@@ -233,6 +239,76 @@ class MollieSettingStruct extends Struct
      */
     protected $fixRoundingDiffSKU = '';
 
+    /**
+     * @var bool
+     */
+    protected $useShopwareJavascript = false;
+
+
+    /**
+     * @var bool
+     */
+    protected $phoneNumberFieldRequired = false;
+
+    /**
+     * @var bool
+     */
+    protected $showPhoneNumberField = false;
+
+    /**
+     * @var string
+     */
+    protected $applePayDirectDomainAllowList = '';
+
+    /**
+     * @var int
+     */
+    protected $paymentFinalizeTransactionTime;
+
+    /**
+     * @var bool
+     */
+    protected $requireDataProtectionCheckbox = false;
+
+    /**
+     * @var bool
+     */
+    protected $refundManagerCreateCreditNotes = false;
+
+    /**
+     * @var string
+     */
+    protected $refundManagerCreateCreditNotesPrefix = '';
+
+    /**
+     * @var string
+     */
+    protected $refundManagerCreateCreditNotesSuffix = '';
+
+    /**
+     * @var bool
+     */
+    protected $automaticOrderExpire = false;
+
+    /**
+     * @var bool
+     */
+    protected bool $paypalExpressEnabled = false;
+
+    /**
+     * @var int
+     */
+    protected $paypalExpressButtonStyle = 1;
+
+    /**
+     * @var int
+     */
+    protected $paypalExpressButtonShape = 1;
+
+    /**
+     * @var array<mixed>
+     */
+    protected $paypalExpressRestrictions = [];
 
     /**
      * @return string
@@ -317,6 +393,29 @@ class MollieSettingStruct extends Struct
         $this->testMode = $testMode;
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getLogFileDays(): int
+    {
+        if ($this->logFileDays === 0) {
+            // better be safe than sorry, default was always 14
+            return 14;
+        }
+
+        return $this->logFileDays;
+    }
+
+    /**
+     * @param int $logFileDays
+     * @return void
+     */
+    public function setLogFileDays(int $logFileDays): void
+    {
+        $this->logFileDays = $logFileDays;
+    }
+
 
     /**
      * @return bool
@@ -901,5 +1000,159 @@ class MollieSettingStruct extends Struct
     public function setFixRoundingDiffSKU(string $fixRoundingDiffSKU): void
     {
         $this->fixRoundingDiffSKU = $fixRoundingDiffSKU;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUseShopwareJavascript(): bool
+    {
+        return $this->useShopwareJavascript;
+    }
+
+    /**
+     * @param bool $useShopwareJavascript
+     */
+    public function setUseShopwareJavascript(bool $useShopwareJavascript): void
+    {
+        $this->useShopwareJavascript = $useShopwareJavascript;
+    }
+
+    public function isPhoneNumberFieldRequired(): bool
+    {
+        return $this->phoneNumberFieldRequired;
+    }
+
+    public function setPhoneNumberFieldRequired(bool $phoneNumberFieldRequired): void
+    {
+        $this->phoneNumberFieldRequired = $phoneNumberFieldRequired;
+    }
+
+    public function isPhoneNumberFieldShown():bool
+    {
+        return $this->showPhoneNumberField;
+    }
+
+    public function setShowPhoneNumberField(bool $showPhoneNumberField): void
+    {
+        $this->showPhoneNumberField = $showPhoneNumberField;
+    }
+
+
+    public function getApplePayDirectDomainAllowList(): string
+    {
+        return $this->applePayDirectDomainAllowList;
+    }
+
+    public function setApplePayDirectDomainAllowList(string $applePayDirectDomainAllowList): void
+    {
+        $this->applePayDirectDomainAllowList = $applePayDirectDomainAllowList;
+    }
+
+    public function getPaymentFinalizeTransactionTime(): int
+    {
+        return $this->paymentFinalizeTransactionTime;
+    }
+
+    public function setPaymentFinalizeTransactionTime(int $paymentFinalizeTransactionTime): void
+    {
+        $this->paymentFinalizeTransactionTime = $paymentFinalizeTransactionTime;
+    }
+
+    public function isRequireDataProtectionCheckbox(): bool
+    {
+        return $this->requireDataProtectionCheckbox;
+    }
+
+    public function setRequireDataProtectionCheckbox(bool $requireDataProtectionCheckbox): void
+    {
+        $this->requireDataProtectionCheckbox = $requireDataProtectionCheckbox;
+    }
+
+    public function isRefundManagerCreateCreditNotesEnabled(): bool
+    {
+        return $this->refundManagerCreateCreditNotes;
+    }
+
+    public function setRefundManagerCreateCreditNotesEnabled(bool $refundManagerCreateCreditNotes): void
+    {
+        $this->refundManagerCreateCreditNotes = $refundManagerCreateCreditNotes;
+    }
+
+    public function getRefundManagerCreateCreditNotesPrefix(): string
+    {
+        return $this->refundManagerCreateCreditNotesPrefix;
+    }
+
+    public function setRefundManagerCreateCreditNotesPrefix(string $refundManagerCreateCreditNotesPrefix): void
+    {
+        $this->refundManagerCreateCreditNotesPrefix = $refundManagerCreateCreditNotesPrefix;
+    }
+
+    public function getRefundManagerCreateCreditNotesSuffix(): string
+    {
+        return $this->refundManagerCreateCreditNotesSuffix;
+    }
+
+    public function setRefundManagerCreateCreditNotesSuffix(string $refundManagerCreateCreditNotesSuffix): void
+    {
+        $this->refundManagerCreateCreditNotesSuffix = $refundManagerCreateCreditNotesSuffix;
+    }
+
+    public function isAutomaticOrderExpire(): bool
+    {
+        return $this->automaticOrderExpire;
+    }
+
+    public function setAutomaticOrderExpire(bool $automaticOrderExpire): void
+    {
+        $this->automaticOrderExpire = $automaticOrderExpire;
+    }
+
+    public function isPaypalExpressEnabled(): bool
+    {
+        return $this->paypalExpressEnabled;
+    }
+
+    public function setPaypalExpressEnabled(bool $paypalExpressEnabled): void
+    {
+        $this->paypalExpressEnabled = $paypalExpressEnabled;
+    }
+
+    public function getPaypalExpressButtonStyle(): int
+    {
+        return $this->paypalExpressButtonStyle;
+    }
+
+    public function setPaypalExpressButtonStyle(int $paypalExpressButtonStyle): void
+    {
+        $this->paypalExpressButtonStyle = $paypalExpressButtonStyle;
+    }
+
+    public function getPaypalExpressButtonShape(): int
+    {
+        return $this->paypalExpressButtonShape;
+    }
+
+    public function setPaypalExpressButtonShape(int $paypalExpressButtonShape): void
+    {
+        $this->paypalExpressButtonShape = $paypalExpressButtonShape;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPaypalExpressRestrictions(): array
+    {
+        return $this->paypalExpressRestrictions;
+    }
+
+    /**
+     * @param array<string> $paypalExpressRestrictions
+     * @return void
+     */
+    public function setPaypalExpressRestrictions(array $paypalExpressRestrictions): void
+    {
+        $this->paypalExpressRestrictions = $paypalExpressRestrictions;
     }
 }

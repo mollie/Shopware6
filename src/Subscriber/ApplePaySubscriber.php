@@ -8,7 +8,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ApplePaySubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var ApplePayDirect
      */
@@ -41,7 +40,7 @@ class ApplePaySubscriber implements EventSubscriberInterface
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {
         try {
-            $applePayEnabled = $this->applePay->getActiveApplePayID($event->getSalesChannelContext());
+            $applePayEnabled = (bool) $this->applePay->getActiveApplePayID($event->getSalesChannelContext());
         } catch (\Exception $ex) {
             $applePayEnabled = false;
         }

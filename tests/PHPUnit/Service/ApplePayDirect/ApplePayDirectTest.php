@@ -2,22 +2,27 @@
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
-
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainAllowListCanNotBeEmptyException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainNotInAllowListException;
+use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayDirectDomainAllowListItem;
+use Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections\ApplePayDirectDomainAllowList;
+use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Repository\Order\OrderAddressRepository;
-use Kiener\MolliePayments\Repository\PaymentMethod\PaymentMethodRepository;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Service\ShippingMethodService;
 use Kiener\MolliePayments\Service\ShopService;
+use Mollie\Api\Endpoints\WalletEndpoint;
+use Mollie\Api\MollieApiClient;
 use MolliePayments\Tests\Fakes\FakeCartService;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
@@ -35,30 +40,31 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayDirectTest extends TestCase
 {
-
     use MockTrait;
 
+    private SalesChannelContext $scContext;
+
+    private $validationUrlAllowListGateway;
+    private ApplePayDirect $applePay;
+
     /**
-     * This test verifies that our Apple Pay Cart is correctly
-     * built from a provided Shopware Cart object.
+     * @var MollieApiFactory|\PHPUnit\Framework\MockObject\MockObject
      */
-    public function testBuildApplePayCart(): void
+    private $apiFactory;
+
+    protected function setUp(): void
     {
         $swCart = $this->buildShopwareCart();
 
-        /** @var SalesChannelContext $scContext */
-        $scContext = $this->createDummyMock(SalesChannelContext::class, $this);
+        $this->scContext = $this->createDummyMock(SalesChannelContext::class, $this);
 
-
-        $fakeCartService = new FakeCartService($swCart, $scContext);
-
-        /** @var ShippingMethodService $shippingMethodService */
-        $shippingMethodService = $this->createDummyMock(ShippingMethodService::class, $this);
+        $fakeCartService = new FakeCartService($swCart, $this->scContext);
 
         /** @var ApplePayDomainVerificationService $domainVerification */
         $domainVerification = $this->createDummyMock(ApplePayDomainVerificationService::class, $this);
@@ -82,13 +88,13 @@ class ApplePayDirectTest extends TestCase
         $customerService = $this->createDummyMock(CustomerService::class, $this);
 
         /** @var PaymentMethodRepository $repoPaymentMethods */
-        $repoPaymentMethods = $this->createDummyMock(PaymentMethodRepository::class, $this);
+        $repoPaymentMethods = new PaymentMethodRepository($this->createDummyMock(EntityRepository::class, $this));
 
         /** @var CartBackupService $cartBackupService */
         $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);
 
         /** @var MollieApiFactory $apiFactory */
-        $apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);
+        $this->apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);
 
         /** @var ShopService $shopService */
         $shopService = $this->createDummyMock(ShopService::class, $this);
@@ -96,11 +102,14 @@ class ApplePayDirectTest extends TestCase
         /** @var OrderService $orderService */
         $orderService = $this->createDummyMock(OrderService::class, $this);
 
-        /** @var OrderAddressRepository $repoOrderAdresses */
-        $repoOrderAdresses = $this->createDummyMock(OrderAddressRepository::class, $this);
+        /** @var EntityRepository $repoOrderAdresses */
+        $repoOrderAdresses = $this->createDummyMock(EntityRepository::class, $this);
 
+        $this->validationUrlAllowListGateway = $this->createDummyMock(ApplePayDirectDomainAllowListGateway::class, $this);
 
-        $applePay = new ApplePayDirect(
+        $validationUrlSanitizer = new ApplePayDirectDomainSanitizer();
+
+        $this->applePay = new ApplePayDirect(
             $domainVerification,
             $payment,
             $doPay,
@@ -111,13 +120,22 @@ class ApplePayDirectTest extends TestCase
             $customerService,
             $repoPaymentMethods,
             $cartBackupService,
-            $apiFactory,
+            $this->apiFactory,
             $shopService,
             $orderService,
-            $repoOrderAdresses
+            $repoOrderAdresses,
+            $this->validationUrlAllowListGateway,
+            $validationUrlSanitizer
         );
+    }
 
-        $apCart = $applePay->getCart($scContext);
+    /**
+     * This test verifies that our Apple Pay Cart is correctly
+     * built from a provided Shopware Cart object.
+     */
+    public function testBuildApplePayCart(): void
+    {
+        $apCart = $this->applePay->getCart($this->scContext);
 
         $this->assertEquals(34.99, $apCart->getAmount());
         $this->assertEquals(5, $apCart->getTaxes()->getPrice());
@@ -133,6 +151,58 @@ class ApplePayDirectTest extends TestCase
         $this->assertEquals(1, $apCart->getShippings()[0]->getQuantity());
     }
 
+    public function testThrowsExceptionWhenAllowListIsEmptyWhileTryingToCreatePaymentSession(): void
+    {
+        $this->validationUrlAllowListGateway->expects($this->once())
+            ->method('getAllowList')
+            ->willReturn(ApplePayDirectDomainAllowList::create());
+
+        $this->expectException(ApplePayDirectDomainAllowListCanNotBeEmptyException::class);
+        $this->expectExceptionMessage('The Apple Pay Direct domain allow list can not be empty. Please check the configuration.');
+
+        $this->applePay->createPaymentSession('https://example.com', 'example.com', $this->scContext);
+    }
+
+    public function testThrowsExceptionWhenUrlIsNotInAllowListWhileTryingToCreatePaymentSession(): void
+    {
+        $allowList = ApplePayDirectDomainAllowList::create(
+            ApplePayDirectDomainAllowListItem::create('example.com')
+        );
+        $this->validationUrlAllowListGateway->expects($this->once())
+            ->method('getAllowList')
+            ->willReturn($allowList);
+
+        $testDomain = 'example.org';
+
+        $this->expectException(ApplePayDirectDomainNotInAllowListException::class);
+        $this->expectExceptionMessage(sprintf('The given URL %s is not in the Apple Pay Direct domain allow list.', $testDomain));
+
+        $this->applePay->createPaymentSession('https://example.org', $testDomain, $this->scContext);
+    }
+
+    public function testCanCreatePaymentSession(): void
+    {
+        $allowList = ApplePayDirectDomainAllowList::create(
+            ApplePayDirectDomainAllowListItem::create($domain = 'example.com')
+        );
+
+        $this->validationUrlAllowListGateway->expects($this->once())
+            ->method('getAllowList')
+            ->willReturn($allowList);
+
+        $client = $this->createMock(MollieApiClient::class);
+        $client->wallets = $this->createMock(WalletEndpoint::class);
+        $this->apiFactory->expects($this->once())
+            ->method('getLiveClient')
+            ->willReturn($client);
+
+        $client->wallets->expects($this->once())->method('requestApplePayPaymentSession')
+            ->willReturn($expected = random_bytes(16));
+
+        $actual = $this->applePay->createPaymentSession('https://example.com', $domain, $this->scContext);
+
+        $this->assertSame($expected, $actual);
+    }
 
     /**
      * @return Cart
@@ -191,5 +261,4 @@ class ApplePayDirectTest extends TestCase
 
         return $swCart;
     }
-
 }

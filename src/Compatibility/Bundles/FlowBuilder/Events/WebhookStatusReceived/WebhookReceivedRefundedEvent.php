@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 
 class WebhookReceivedRefundedEvent extends AbstractWebhookReceivedEvent
 {
-
     /**
      * @return string
      */

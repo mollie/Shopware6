@@ -1,6 +1,7 @@
 import './init/api-service.init';
 import './init/credit-card-components.init'
 import './extension/sw-flow-sequence-action';
+import './extension/structure/sw-search-bar-item';
 import './component/flow-sequence/action-order-ship-modal';
 import './component/flow-sequence/action-order-refund-modal';
 import './component/credit-card-logo'

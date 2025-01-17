@@ -5,7 +5,7 @@
 
 {% block mollie_credit_card_mandate_list %}
     {% block mollie_credit_card_mandate_list_include %}
-        {% if enableOneClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as 'frontend.account.payment.page' %}
+        {% if enableOneClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as ('frontend.account.payment.page') %}
             {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
                 'mandates': mandates,
                 'compactView': page.enable_one_click_payments_compact_view,
@@ -16,20 +16,22 @@
 {% endblock %}
 
 {% block mollie_credit_card_mandate_form %}
+
     <div class="mollie-credit-card-mandate">
+
         {% block mollie_credit_card_mandate_form_radio %}
             {% if enableOneClickPayments and page.enable_credit_card_components == true and showIfActive and mandates|length > 0 %}
-                <div class="mollie-credit-card-mandate-radio {{ formRadioWrapperClass ?? 'custom-control custom-radio' }}">
+                <div class="mollie-credit-card-mandate-radio {{ formRadioWrapperClass ?? 'custom-control custom-radio form-check' }}">
                     {% block mollie_credit_card_mandate_form_radio_input %}
                         <input type="radio"
                                name="mollieCreditCardMandate"
-                               class="{{ formCheckInputClass ?? 'custom-control-input' }}"
+                               class="{{ formCheckInputClass ?? 'custom-control-input form-check-input' }}"
                                id="mollieCreditCardMandateForm"
                                value="{{ NEW_CARD_MANDATE_OPTION }}"
                         />
                     {% endblock %}
                     {% block mollie_credit_card_mandate_form_radio_label %}
-                        <label class="{{ formCheckLabelClass ?? 'custom-control-label' }}"
+                        <label class="{{ formCheckLabelClass ?? 'custom-control-label form-check-label' }}"
                                for="mollieCreditCardMandateForm">
                             {{ "molliePayments.components.mandate.newCard"|trans|striptags }}
                         </label>
@@ -87,6 +89,7 @@
                             <div id="verificationCodeError" class="error-message"></div>
                         </div>
                     </div>
+
                     <div class="block-group">
                         <div class="tag-line">
                             <i class="icon--lock"></i>&nbsp;<span>{{ "molliePayments.components.creditCard.creditCardTagLine"|trans|striptags }}</span>
@@ -96,31 +99,34 @@
                             </svg>
                         </div>
                     </div>
+
                     {% block mollie_credit_card_mandate_form_component_radio_should_save_card %}
+
                         {% if enableOneClickPayments and not context.customer.guest %}
-                            <div class="block-group">
-                                <div class="{{ formCheckboxWrapperClass ?? 'custom-control custom-checkbox' }} mollie-credit-card-custom-checkbox">
-                                    {% block mollie_creditcard_form_check_store_card_checkbox_input %}
-                                        <input type="checkbox"
-                                               id="mollieShouldSaveCardDetail"
-                                               class="{{ formCheckInputClass ?? 'custom-control-input' }}"
-                                               name="mollieShouldSaveCardDetail"
-                                        />
-                                    {% endblock %}
-                                    {% if not mollieCart.hasSubscription %}
-                                        {# it doesnt make sense to show it for subscriptions, that is always saved anyway #}
+                            {# it doesnt make sense to show it for subscriptions, that is always saved anyway #}
+                            {% if not mollieCart.hasSubscription %}
+                                <div class="block-group">
+                                    <div class="{{ formCheckboxWrapperClass ?? 'custom-control custom-checkbox form-check' }} mollie-credit-card-custom-checkbox">
+                                        {% block mollie_creditcard_form_check_store_card_checkbox_input %}
+                                            <input type="checkbox"
+                                                   id="mollieShouldSaveCardDetail"
+                                                   class="{{ formCheckInputClass ?? 'custom-control-input form-check-input' }}"
+                                                   name="mollieShouldSaveCardDetail"/>
+                                        {% endblock %}
                                         {% block mollie_creditcard_form_check_store_card_checkbox_label %}
-                                            <label class="{{ formCheckLabelClass ?? 'custom-control-label' }}" for="mollieShouldSaveCardDetail">
+                                            <label class="{{ formCheckLabelClass ?? 'custom-control-label form-check-label' }}" for="mollieShouldSaveCardDetail">
                                                 {{ "molliePayments.components.creditCard.saveCardDetailLabel"|trans|striptags }}
                                             </label>
                                         {% endblock %}
-                                    {% endif %}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         {% endif %}
+
                     {% endblock %}
                 {% endif %}
             </div>
         {% endblock %}
+
     </div>
 {% endblock %}

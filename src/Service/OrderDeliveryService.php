@@ -4,17 +4,21 @@ namespace Kiener\MolliePayments\Service;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class OrderDeliveryService
 {
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $orderDeliveryRepository;
 
-    public function __construct(EntityRepositoryInterface $orderDeliveryRepository)
+
+    /**
+     * @param EntityRepository $orderDeliveryRepository
+     */
+    public function __construct(EntityRepository $orderDeliveryRepository)
     {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }
@@ -23,6 +27,9 @@ class OrderDeliveryService
     {
         $criteria = new Criteria([$orderDeliveryId]);
         $criteria->addAssociation('order.transactions.paymentMethod');
+        $criteria->addAssociation('order.deliveries.shippingMethod');
+        $criteria->addAssociation('order.deliveries.stateMachineState');
+        $criteria->addAssociation('shippingMethod');
         $result = $this->orderDeliveryRepository->search($criteria, $context);
 
         return $result->first();

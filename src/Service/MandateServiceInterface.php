@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface MandateServiceInterface
 {
-
     /**
      * @param string $customerId
      * @param string $mandateId

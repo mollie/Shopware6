@@ -1,7 +1,7 @@
 {
     "name": "kiener/mollie-payments-plugin",
     "description": "Mollie Payments",
-    "version": "v3.5.0",
+    "version": "v4.13.0",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
@@ -36,17 +36,21 @@
     "config": {
         "optimize-autoloader": true,
         "allow-plugins": {
-            "infection/extension-installer": true
+            "infection/extension-installer": true,
+            "php-http/discovery": true
         }
     },
     "autoload": {
         "psr-4": {
+            "Mollie\\Shopware\\": "shopware/",
             "Kiener\\MolliePayments\\": "src/",
-            "Mollie\\Api\\": "vendor/mollie/mollie-api-php/src/"
+            "Mollie\\Api\\": "vendor_manual/mollie/mollie-api-php/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "Mollie\\Unit\\": "tests/Unit/",
+            "Mollie\\Integration\\": "tests/Integration/",
             "MolliePayments\\Tests\\": "tests/PHPUnit/",
             "MolliePayments\\PHPStan\\": "tests/PHPStan/",
             "MolliePayments\\Fixtures\\": "tests/Fixtures/"
@@ -61,20 +65,22 @@
         "shopware/administration": "<6,>=7"
     },
     "require": {
+        "php": ">=7.4",
         "ext-curl": "*",
-        "mollie/mollie-api-php": "2.40.1"
+        "shopware/core": "*",
+        "shopware/administration": "*",
+        "shopware/storefront": "*",
+        "shopware/elasticsearch": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "1.8.2",
+        "phpunit/phpunit": "^9",
+        "phpstan/phpstan": "1.10.0",
         "friendsofphp/php-cs-fixer": "^2.18",
         "phpcompatibility/php-compatibility": "^9.3",
         "squizlabs/php_codesniffer": "^3.6",
         "infection/infection": "^0.25.4",
         "boxblinkracer/phpunuhi": "dev-main",
-        "shopware/core": "*",
-        "shopware/administration": "*",
-        "shopware/storefront": "*"
+        "spaze/phpstan-disallowed-calls": "^2.16"
     },
     "scripts": {
         "post-install-cmd": [

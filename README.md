@@ -7,7 +7,7 @@
 
 
 ## Introduction
-Mollie offers various payment methods which can be easily integrated into your Shopware-powered webshop by using our official plugin. Mollie accepts all major payment methods such as Visa, Mastercard, American Express, PayPal, iDEAL, SOFORT Banking, SEPA Bank Transfer, SEPA Direct Debit, Apple Pay, KBC/CBC Payment Button, Bancontact, Belfius Pay Button, paysafecard, CartaSi, Cartes Bancaires, Gift cards, Monizze Vouchers and Sodexo Vouchers.
+Mollie offers various payment methods which can be easily integrated into your Shopware-powered webshop by using our official plugin. Mollie accepts all major payment methods such as Visa, Mastercard, American Express, PayPal, iDEAL, SOFORT Banking, SEPA Bank Transfer, SEPA Direct Debit, Apple Pay, KBC/CBC Payment Button, Bancontact, Belfius Pay Button, paysafecard, CartaSi, Cartes Bancaires, Gift cards, Billie, Monizze Vouchers and Sodexo Vouchers.
 
 1.  Installation is easy.
 2.  Go to  [Mollie](https://www.mollie.com/signup/)  to create your Mollie account
@@ -17,10 +17,12 @@ Mollie offers various payment methods which can be easily integrated into your S
 
 Once the onboarding process in your Mollie account is completed, start accepting payments. You’ll usually be up and running within one working day.
 
-## Shopware 6.4 notes
-If you are using the new currency rounding feature in shopware 6.4 (total rounding interval > 0.01) we will add the rounding difference amount as new lineItem to the mollie order. We are not calculating taxes for it, because Shopware isn't calculating taxes for the discount / surcharge of the rounding amount.
-
-We advise, that you speak to your lawyer or tax consultant if you want to use the new rounding feature.
+## Shopware 6.5 notes
+If you are using the new Shopware 6.5 please keep in mind that the ZIP file of the plugin supports Shopware 6.4 and 6.5 out of the box.
+This means that Administration artifacts are built using Shopware 6.4 which also works in Shopware 6.5.
+Our storefront artifacts are built using a custom webpack implementation that creates a separate **mollie-payments.js** file that is loaded in the storefront.
+If you do not want to use this additional resource (e.g. for agencies), you can revert to the Shopware default behaviour by enabling this in the plugin configuration.
+Afterwards please run `bin/build-storefront.sh` to rebuild the storefront artifacts.
 
 ## Manual installation
 There are two ways of installing this plugin manually: You can either checkout this repository on your machine (in the plugins folder of your Shopware installation) or you can download the zip file above (most recent version can be found here: [master](https://github.com/mollie/Shopware/archive/master.zip)) and extract this on your machine (in the very same plugins folder).

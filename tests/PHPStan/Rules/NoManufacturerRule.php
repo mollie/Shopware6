@@ -15,10 +15,8 @@ use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\Rules\RuleErrorBuilder;
 
-
 final class NoManufacturerRule implements \PHPStan\Rules\Rule
 {
-
     /**
      * @var array
      */
@@ -80,7 +78,6 @@ final class NoManufacturerRule implements \PHPStan\Rules\Rule
     private function hasNodeManufacturer($manufacturer, Node $node)
     {
         if ($node->getDocComment() !== null) {
-
             $comment = $node->getDocComment()->getText();
 
             if ($this->stringContains(strtolower($manufacturer), strtolower($comment))) {
@@ -90,7 +87,6 @@ final class NoManufacturerRule implements \PHPStan\Rules\Rule
 
         /** @var Doc $comment */
         foreach ($node->getComments() as $comment) {
-
             if ($this->stringContains(strtolower($manufacturer), strtolower($comment->getText()))) {
                 return true;
             }
@@ -110,5 +106,4 @@ final class NoManufacturerRule implements \PHPStan\Rules\Rule
 
         return ($pos !== false);
     }
-
 }

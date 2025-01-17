@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 
 class MollieDataBuilder
 {
-
     /**
      * @var RoutingBuilder
      */
@@ -36,10 +35,15 @@ class MollieDataBuilder
     {
         $intervalValue = $interval . ' ' . $intervalUnit;
         $timesValue = ($times > 0) ? $times : null;
+        $currency = $subscription->getCurrency();
+        $currencyIso = '';
 
+        if ($currency !== null) {
+            $currencyIso = $currency->getIsoCode();
+        }
         return [
             'amount' => [
-                'currency' => $subscription->getCurrency(),
+                'currency' => $currencyIso,
                 'value' => number_format($subscription->getAmount(), 2, '.', '')
             ],
             'description' => $subscription->getDescription(),

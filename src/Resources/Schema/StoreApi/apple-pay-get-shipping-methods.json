@@ -1,0 +1,89 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apple Pay Shipping Methods Endpoint",
+    "description": "Endpoint to retrieve shipping methods for Apple Pay integration.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/applepay/shipping-methods": {
+      "post": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
+        "summary": "Retrieve Apple Pay Shipping Methods",
+        "operationId": "retrieveApplePayShippingMethods",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "countryCode": {
+                    "type": "string",
+                    "description": "The country code for which shipping methods are requested."
+                  }
+                },
+                "required": ["countryCode"],
+                "example": {
+                  "countryCode": "NL"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Array of shipping methods.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the shipping method."
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the shipping method."
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "The description of the shipping method."
+                      },
+                      "price": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "The price of the shipping method."
+                      }
+                    },
+                    "required": ["id", "name", "price"]
+                  }
+                },
+                "example": [
+                  {
+                    "id": "shipping_method_1",
+                    "name": "Standard Shipping",
+                    "description": "Delivers within 3-5 business days",
+                    "price": 5.99
+                  },
+                  {
+                    "id": "shipping_method_2",
+                    "name": "Express Shipping",
+                    "description": "Delivers within 1-2 business days",
+                    "price": 12.99
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

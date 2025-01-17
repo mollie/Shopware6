@@ -3,19 +3,16 @@
 namespace Kiener\MolliePayments\Gateway\Mollie;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\Subscription;
-use Mollie\Api\Types\PaymentMethod;
+use Mollie\Api\Resources\Terminal;
 
 class MollieGateway implements MollieGatewayInterface
 {
-
     /**
      * @var MollieApiClient
      */
@@ -88,33 +85,24 @@ class MollieGateway implements MollieGatewayInterface
         return (string)$orgId;
     }
 
+
+
     /**
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Issuer[]
+     * @return array|Terminal[]
      */
-    public function getIDealIssuers(): array
+    public function getPosTerminals(): array
     {
-        $parameters = [
-            'include' => 'issuers',
-        ];
+        $terminals = $this->apiClient->terminals->page();
 
-        /** @var Method $iDeal */
-        $iDeal = $this->apiClient->methods->get(PaymentMethod::IDEAL, $parameters);
+        $list = [];
 
-        $issuers = [];
-
-        /** @var \Mollie\Api\Resources\Issuer $issuer */
-        foreach ($iDeal->issuers as $issuer) {
-            $issuers[] = new Issuer(
-                $issuer->id,
-                $issuer->name,
-                $issuer->image->size1x,
-                $issuer->image->size2x,
-                $issuer->image->svg
-            );
+        /** @var Terminal $terminal */
+        foreach ($terminals as $terminal) {
+            $list[] = $terminal;
         }
 
-        return $issuers;
+        return $list;
     }
 
     /**

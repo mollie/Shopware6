@@ -2,18 +2,16 @@
 
 namespace Kiener\MolliePayments\Service\Cart\Voucher;
 
-use Kiener\MolliePayments\Controller\Api\PaymentMethodController;
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartBehavior;
 use Shopware\Core\Checkout\Cart\CartDataCollectorInterface;
 use Shopware\Core\Checkout\Cart\LineItem\CartDataCollection;
-use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -23,7 +21,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
     public const VOUCHER_PERMITTED = 'mollie-voucher-permitted';
 
     /**
-     * @var EntityRepositoryInterface
+     * @var PaymentMethodRepository
      */
     private $repoPaymentMethods;
 
@@ -35,9 +33,9 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
     /**
      * @param VoucherService $voucherService
-     * @param EntityRepositoryInterface $paymentMethodRepository
+     * @param PaymentMethodRepository $paymentMethodRepository
      */
-    public function __construct(VoucherService $voucherService, EntityRepositoryInterface $paymentMethodRepository)
+    public function __construct(VoucherService $voucherService, PaymentMethodRepository $paymentMethodRepository)
     {
         $this->voucherService = $voucherService;
         $this->repoPaymentMethods = $paymentMethodRepository;
@@ -74,8 +72,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
         $cartHasVoucher = false;
 
         if ($salesChannelHasVoucherMethod) {
-            foreach ($original->getLineItems() as $item) {
-
+            foreach ($original->getLineItems()->getFlat() as $item) {
                 # get the final inherited voucher type of the product
                 # this might even be from the parent
                 $voucherType = $this->voucherService->getFinalVoucherType($item, $context);
@@ -92,7 +89,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
                     $attributes->setVoucherType($voucherType);
 
                     $customFields = $item->getPayload()['customFields'];
-                    $customFields['mollie_payments'] = $attributes->toArray();
+                    $customFields[CustomFieldsInterface::MOLLIE_KEY] = $attributes->toArray();
 
                     $item->setPayloadValue('customFields', $customFields);
                 }
@@ -114,7 +111,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
 
         // Get payment methods
         /** @var array<string> $paymentMethods */
-        $paymentMethods = $this->repoPaymentMethods->searchIds($criteria, $context)->getIds();
+        $paymentMethods = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context)->getIds();
 
         return (string)$paymentMethods[0];
     }

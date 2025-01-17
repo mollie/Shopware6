@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class SetShippingMethodResponse extends StoreApiResponse
 {
-
     /**
      * @var SuccessStruct
      */

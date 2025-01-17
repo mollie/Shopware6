@@ -2,7 +2,6 @@
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
-
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
@@ -10,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilde
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
@@ -19,7 +19,6 @@ use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-
 
 class MollieLineItemBuilderTest extends TestCase
 {
@@ -40,7 +39,7 @@ class MollieLineItemBuilderTest extends TestCase
         $this->builder = new MollieLineItemBuilder(
             (new IsOrderLineItemValid()),
             (new PriceCalculator()),
-            (new LineItemDataExtractor()),
+            (new LineItemDataExtractor(new UrlParsingService())),
             new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
@@ -152,8 +151,8 @@ class MollieLineItemBuilderTest extends TestCase
                 'value' => '0.78'
             ],
             'sku' => 'product-123',
-            'imageUrl' => urlencode('https://phpunit.mollie.local/my-product-1.png'),
-            'productUrl' => urlencode('https://phpunit.mollie.local/my-product-1'),
+            'imageUrl' => 'https://phpunit.mollie.local/my-product-1.png',
+            'productUrl' => 'https://phpunit.mollie.local/my-product-1',
             'metadata' => [
                 'orderLineItemId' => 'line-1'
             ]
@@ -282,5 +281,4 @@ class MollieLineItemBuilderTest extends TestCase
 
         $this->assertEquals($expectedOrderSum, $lineItemSum);
     }
-
 }

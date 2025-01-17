@@ -6,7 +6,6 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
 class RenewalReminderTask extends ScheduledTask
 {
-
     /**
      * @return string
      */

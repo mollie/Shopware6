@@ -5,36 +5,27 @@ namespace Kiener\MolliePayments\Service;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class TransactionService
 {
-    /** @var EntityRepositoryInterface $orderTransactionRepository */
+    /**
+     * @var EntityRepository
+     */
     private $orderTransactionRepository;
+
 
     /**
      * Creates a new instance of the transaction service.
      *
-     * @param EntityRepositoryInterface $orderTransactionRepository
+     * @param EntityRepository $orderTransactionRepository
      */
-    public function __construct(
-        EntityRepositoryInterface $orderTransactionRepository
-    ) {
-        $this->orderTransactionRepository = $orderTransactionRepository;
-    }
-
-    /**
-     * Returns the order transaction repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getRepository(): EntityRepositoryInterface
+    public function __construct(EntityRepository $orderTransactionRepository)
     {
-        return $this->orderTransactionRepository;
+        $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
     /**
@@ -53,9 +44,11 @@ class TransactionService
         }
 
         $transactionCriteria->addAssociation('order.currency');
+        $transactionCriteria->addAssociation('order.lineItems');
+        $transactionCriteria->addAssociation('order.stateMachineState');
 
         /** @var OrderTransactionCollection $transactions */
-        $transactions = $this->getRepository()->search(
+        $transactions = $this->orderTransactionRepository->search(
             $transactionCriteria,
             $context ?? Context::createDefaultContext()
         );
@@ -74,11 +67,9 @@ class TransactionService
      * @param null|Context $context
      * @return EntityWrittenContainerEvent
      */
-    public function updateTransaction(
-        OrderTransactionEntity $transaction,
-        Context                $context = null
-    ): EntityWrittenContainerEvent {
-        return $this->getRepository()->update(
+    public function updateTransaction(OrderTransactionEntity $transaction, Context $context = null): EntityWrittenContainerEvent
+    {
+        return $this->orderTransactionRepository->update(
             [$transaction->getVars()],
             $context ?? Context::createDefaultContext()
         );

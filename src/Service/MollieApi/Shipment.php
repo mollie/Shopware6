@@ -2,27 +2,33 @@
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
+use Kiener\MolliePayments\Event\OrderLinesUpdatedEvent;
+use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
+use Kiener\MolliePayments\Service\MollieApi\Models\MollieShippingItem;
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Resources\ShipmentCollection;
 use Mollie\Api\Types\OrderLineType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Shipment
+class Shipment implements ShipmentInterface
 {
     /**
      * @var Order
      */
     private $orderApiService;
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * @param Order $orderApiService
      */
-    public function __construct(Order $orderApiService)
+    public function __construct(Order $orderApiService, EventDispatcherInterface $eventDispatcher)
     {
         $this->orderApiService = $orderApiService;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -40,22 +46,48 @@ class Shipment
     /**
      * @param string $mollieOrderId
      * @param string $salesChannelId
+     * @param MollieShippingItem[] $items
      * @param null|ShipmentTrackingInfoStruct $tracking
+     * @throws \Exception
      * @return MollieShipment
      */
-    public function shipOrder(
-        string                      $mollieOrderId,
-        string                      $salesChannelId,
-        ?ShipmentTrackingInfoStruct $tracking = null
-    ): MollieShipment {
+    public function shipOrder(string $mollieOrderId, string $salesChannelId, array $items, ?ShipmentTrackingInfoStruct $tracking): MollieShipment
+    {
         try {
             $options = [];
+
             if ($tracking instanceof ShipmentTrackingInfoStruct) {
-                $options['tracking'] = $tracking->toArray();
+                $trackingData = $tracking->toArray();
+
+                /** Make sure that tracking data is only set when the code has a value */
+                if ($trackingData['code'] !== '') {
+                    $options['tracking'] = $trackingData;
+                }
             }
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
-            return $mollieOrder->shipAll($options);
+
+            # if we have no items
+            # then simply ship all
+            if (empty($items)) {
+                return $mollieOrder->shipAll($options);
+            }
+
+            # if we have provided items,
+            # we need to build the structure first
+            foreach ($items as $item) {
+                $options['lines'][] = [
+                    'id' => $item->getMollieItemId(),
+                    'quantity' => $item->getQuantity(),
+                ];
+            }
+
+
+            $shipment = $mollieOrder->createShipment($options);
+
+            $this->eventDispatcher->dispatch(new OrderLinesUpdatedEvent($mollieOrder));
+
+            return $shipment;
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
@@ -75,13 +107,8 @@ class Shipment
      * @param null|ShipmentTrackingInfoStruct $tracking
      * @return MollieShipment
      */
-    public function shipItem(
-        string                      $mollieOrderId,
-        string                      $salesChannelId,
-        string                      $mollieOrderLineId,
-        int                         $quantity,
-        ?ShipmentTrackingInfoStruct $tracking = null
-    ): MollieShipment {
+    public function shipItem(string $mollieOrderId, string $salesChannelId, string $mollieOrderLineId, int $quantity, ?ShipmentTrackingInfoStruct $tracking): MollieShipment
+    {
         try {
             $options = [
                 'lines' => [
@@ -93,11 +120,20 @@ class Shipment
             ];
 
             if ($tracking instanceof ShipmentTrackingInfoStruct) {
-                $options['tracking'] = $tracking->toArray();
+                $trackingData = $tracking->toArray();
+
+                /** Make sure that tracking data is only set when the code has a value */
+                if ($trackingData['code'] !== '') {
+                    $options['tracking'] = $trackingData;
+                }
             }
 
             $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
-            return $mollieOrder->createShipment($options);
+
+
+            $shipment = $mollieOrder->createShipment($options);
+            $this->eventDispatcher->dispatch(new OrderLinesUpdatedEvent($mollieOrder));
+            return $shipment;
         } catch (ApiException $e) {
             throw new MollieOrderCouldNotBeShippedException(
                 $mollieOrderId,
@@ -151,13 +187,20 @@ class Shipment
      */
     public function getTotals(string $mollieOrderId, string $salesChannelId): array
     {
-        $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+        try {
+            $mollieOrder = $this->orderApiService->getMollieOrder($mollieOrderId, $salesChannelId);
+        } catch (CouldNotFetchMollieOrderException $e) {
+            return [
+                'amount' => 0.0,
+                'quantity' => 0,
+                'shippable' => 0
+            ];
+        }
 
         $totalAmount = 0.0;
         $totalQuantity = 0;
-
+        $shippableQuantity = 0;
         foreach ($mollieOrder->lines() as $mollieOrderLine) {
-
             /** @var OrderLine $mollieOrderLine */
             if ($mollieOrderLine->type === OrderLineType::TYPE_SHIPPING_FEE) {
                 continue;
@@ -167,13 +210,14 @@ class Shipment
             if ($mollieOrderLine->amountShipped) {
                 $totalAmount += floatval($mollieOrderLine->amountShipped->value);
             }
-
+            $shippableQuantity += $mollieOrderLine->shippableQuantity;
             $totalQuantity += $mollieOrderLine->quantityShipped;
         }
 
         return [
             'amount' => $totalAmount,
             'quantity' => $totalQuantity,
+            'shippableQuantity' => $shippableQuantity
         ];
     }
 }

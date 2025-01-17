@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class StoreCardTokenResponse extends StoreApiResponse
 {
-
     /**
      * @var SuccessStruct
      */

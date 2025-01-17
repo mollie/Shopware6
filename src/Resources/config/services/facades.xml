@@ -5,15 +5,16 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Kiener\MolliePayments\Facade\MollieShipment">
-            <argument type="service" id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
+
+        <service id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager">
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\DeliveryTransitionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Shipment"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\TrackingInfoStructFactory"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay" public="true">
@@ -27,7 +28,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Order\UpdateOrderLineItems"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
             <argument type="service" id="twig"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MolliePaymentFinalize" public="true">
@@ -44,13 +45,13 @@
 
         <service id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade">
             <argument type="service" id="router"/>
-            <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher"/>
+            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">
@@ -58,7 +59,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <argument type="service" id="order_transaction.repository"/>
         </service>
 

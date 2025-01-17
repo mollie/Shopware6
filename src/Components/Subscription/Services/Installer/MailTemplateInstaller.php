@@ -8,42 +8,42 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class MailTemplateInstaller
 {
-
     /**
      * @var Connection
      */
     private $connection;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoMailTypes;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoMailTemplates;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoSalesChannels;
 
     /**
      * @param Connection $connection
-     * @param EntityRepositoryInterface $repoMailTypes
-     * @param EntityRepositoryInterface $repoMailTemplates
-     * @param EntityRepositoryInterface $repoSalesChannels
+     * @param EntityRepository $repoMailTypes
+     * @param EntityRepository $repoMailTemplates
+     * @param EntityRepository $repoSalesChannels
      */
-    public function __construct(Connection $connection, EntityRepositoryInterface $repoMailTypes, EntityRepositoryInterface $repoMailTemplates, EntityRepositoryInterface $repoSalesChannels)
+    public function __construct(Connection $connection, EntityRepository $repoMailTypes, EntityRepository $repoMailTemplates, EntityRepository $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;
@@ -76,11 +76,14 @@ class MailTemplateInstaller
         # ----------------------------------------------------------------------------------------------
         # update our sample data for the admin mail preview
 
+        $currencyEntity = new CurrencyEntity();
+        $currencyEntity->setIsoCode('EUR');
+
         $subscription = new SubscriptionEntity();
         $subscription->setDescription('1x Sample Product (Order #1233, 24.99 EUR)');
         $subscription->setQuantity(1);
         $subscription->setAmount(24.99);
-        $subscription->setCurrency('EUR');
+        $subscription->setCurrency($currencyEntity);
         $subscription->setMollieCustomerId('cst_123456');
         $subscription->setMollieId('sub_123456');
         $subscription->setNextPaymentAt(new \DateTime());
@@ -312,11 +315,12 @@ class MailTemplateInstaller
                 WHERE `locale`.`code` = :code
                 ";
 
-        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchColumn();
+        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchOne();
+
         if (!$languageId) {
             return null;
         }
 
-        return $languageId;
+        return (string)$languageId;
     }
 }

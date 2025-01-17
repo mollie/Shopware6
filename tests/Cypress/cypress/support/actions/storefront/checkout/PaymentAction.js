@@ -7,7 +7,6 @@ const shopware = new Shopware();
 const repoConfirm = new ConfirmRepository();
 const repoPayments = new PaymentsRepository();
 
-
 export default class PaymentAction {
 
 
@@ -55,19 +54,19 @@ export default class PaymentAction {
             // to see all payment methods
             this.showAllPaymentMethods();
             this.selectPaymentMethod(paymentName);
+            
 
-            // we have to select an iDEAL issuer now (required)
-            if (paymentName === 'iDEAL') {
-                this.selectIDealIssuer('bunq');
+            if (paymentName === 'POS Terminal') {
+                this.selectPosTerminal();
             }
 
         } else {
             this.openPaymentsModal();
             this.selectPaymentMethod(paymentName);
 
-            // we have to select an iDEAL issuer now (required)
-            if (paymentName === 'iDEAL') {
-                this.selectIDealIssuer('bunq');
+
+            if (paymentName === 'POS Terminal') {
+                this.selectPosTerminal();
             }
 
             this.closePaymentsModal();
@@ -84,7 +83,7 @@ export default class PaymentAction {
     fillCreditCardComponents(name, number, expiryDate, cvc) {
 
         // always make sure that the iFrame is loaded
-        cy.wait(1000);
+        cy.wait(2500);
 
         // that iframe seems to need a bit. had some missing characters recently
         // so we click in a textfield, wait and then type
@@ -127,12 +126,14 @@ export default class PaymentAction {
         cy.wait(1000);
     }
 
+
+
     /**
      *
-     * @param issuer
      */
-    selectIDealIssuer(issuer) {
-        cy.get('#iDealIssuer').select(issuer);
+    selectPosTerminal() {
+        const testTerminalID = 'Test terminal';
+        cy.get('#posTerminals').select(testTerminalID);
     }
 
 }

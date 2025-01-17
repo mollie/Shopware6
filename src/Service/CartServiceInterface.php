@@ -7,7 +7,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface CartServiceInterface
 {
-
     /**
      * @param string $productId
      * @param int $quantity
@@ -53,4 +52,11 @@ interface CartServiceInterface
      * @return SalesChannelContext
      */
     public function updatePaymentMethod(SalesChannelContext $context, string $paymentMethodID): SalesChannelContext;
+
+    /**
+     * @param Cart $cart
+     * @param SalesChannelContext $context
+     * @return Cart
+     */
+    public function persistCart(Cart $cart, SalesChannelContext $context):Cart;
 }

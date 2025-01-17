@@ -2,9 +2,10 @@
 
 .mollie-external-link {
     color: $color-shopware-brand-500;
-    font-size: $font-size-small;
+    font-size: 12px;
     text-decoration: underline;
     cursor: pointer;
+    text-align: right;
 
     &:hover,
     &:focus {
@@ -16,7 +17,7 @@
     }
 
     &--small {
-        font-size: $font-size-extra-small;
+        font-size: 11px;
 
         .mollie-external-link__icon {
             margin-left: 2px;

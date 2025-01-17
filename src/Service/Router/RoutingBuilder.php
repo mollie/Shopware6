@@ -7,12 +7,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RoutingBuilder
 {
-
-    /**
-     *
-     */
-    private const ADMIN_DOMAIN_ENV_KEY = 'APP_URL';
-
     /**
      * This has to match the parameter from the Return Route annotations.
      * Otherwise, an exception is being thrown.
@@ -39,6 +33,11 @@ class RoutingBuilder
 
 
     /**
+     * @var string
+     */
+    private $envAppUrl;
+
+    /**
      * @var RouterInterface
      */
     private $router;
@@ -58,12 +57,14 @@ class RoutingBuilder
      * @param RouterInterface $router
      * @param RoutingDetector $routingDetector
      * @param PluginSettingsServiceInterface $pluginSettings
+     * @param ?string $envAppUrl
      */
-    public function __construct(RouterInterface $router, RoutingDetector $routingDetector, PluginSettingsServiceInterface $pluginSettings)
+    public function __construct(RouterInterface $router, RoutingDetector $routingDetector, PluginSettingsServiceInterface $pluginSettings, ?string $envAppUrl)
     {
         $this->router = $router;
         $this->routingDetector = $routingDetector;
         $this->pluginSettings = $pluginSettings;
+        $this->envAppUrl = (string)$envAppUrl;
     }
 
 
@@ -192,12 +193,37 @@ class RoutingBuilder
     }
 
     /**
+     * @return string
+     */
+    public function buildPaypalExpressRedirectUrl(): string
+    {
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+        if ($isStoreApiCall) {
+            return $this->router->generate('store-api.mollie.paypal-express.checkout.finish', [], $this->router::ABSOLUTE_URL);
+        }
+        return $this->router->generate('frontend.mollie.paypal-express.finish', [], $this->router::ABSOLUTE_URL);
+    }
+
+    /**
+     * @return string
+     */
+    public function buildPaypalExpressCancelUrl(): string
+    {
+        $isStoreApiCall = $this->routingDetector->isStoreApiRoute();
+        if ($isStoreApiCall) {
+            return $this->router->generate('store-api.mollie.paypal-express.checkout.cancel', [], $this->router::ABSOLUTE_URL);
+        }
+        return $this->router->generate('frontend.mollie.paypal-express.cancel', [], $this->router::ABSOLUTE_URL);
+    }
+
+
+    /**
      * @param string $url
      * @return string
      */
     private function applyAdminDomain(string $url): string
     {
-        $adminDomain = trim((string)getenv(self::ADMIN_DOMAIN_ENV_KEY));
+        $adminDomain = trim($this->envAppUrl);
         $adminDomain = str_replace('http://', '', $adminDomain);
         $adminDomain = str_replace('https://', '', $adminDomain);
 
@@ -231,9 +257,7 @@ class RoutingBuilder
         # then always use this one and override existing ones
         if ($customDomain !== '') {
             $components = parse_url($url);
-            $host = (is_array($components) && isset($components['host'])) ? (string)$components['host'] : '';
-            # replace old domain with new custom domain
-            $url = str_replace($host, $customDomain, $url);
+            $url = $customDomain . ($components['path'] ?? '');
         }
 
         return $url;

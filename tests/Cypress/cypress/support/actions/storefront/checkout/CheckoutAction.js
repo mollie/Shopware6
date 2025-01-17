@@ -11,7 +11,9 @@ const repoConfirm = new ConfirmRepository();
 const topMenu = new TopMenuAction();
 const listing = new ListingAction();
 const pdp = new PDPAction();
+import Shopware from "Services/shopware/Shopware";
 
+const shopware = new Shopware();
 
 export default class CheckoutAction {
 
@@ -37,7 +39,11 @@ export default class CheckoutAction {
      *
      */
     closeOffcanvasCart() {
-        cy.get('.cart-offcanvas.is-open > .offcanvas-close').click({force: true});
+        let selector = '.cart-offcanvas.is-open > .offcanvas-close';
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            selector = '.cart-offcanvas.show .offcanvas-close';
+        }
+        cy.get(selector).click({force: true});
     }
 
     /**
@@ -80,7 +86,7 @@ export default class CheckoutAction {
      *
      */
     placeOrderOnEdit() {
-        cy.get('#confirmOrderForm > .btn').click();
+        cy.get('#confirmOrderForm .btn').click();
     }
 
     /**
@@ -104,4 +110,20 @@ export default class CheckoutAction {
         cy.get('.header-minimal-back-to-shop > .btn').click();
     }
 
+    changeBillingCountry(billingCountry){
+
+        cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]').click();
+        cy.wait(2000);
+        cy.get('.address-editor-edit').click();
+        cy.wait(1000);
+        cy.get('select.country-select:eq(0)').select(billingCountry);
+        cy.get('.address-form-actions:eq(0) button').click();
+
+        //since 6.6.8.0 the edit address modal does not close automatically
+        if(shopware.isVersionGreaterEqual('6.6.8.0') && shopware.isVersionLower('6.6.9.0')){
+            cy.wait(1000);
+            cy.get('.js-pseudo-modal .modal-dialog .btn-close').click();
+        }
+
+    }
 }

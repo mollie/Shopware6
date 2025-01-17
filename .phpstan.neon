@@ -1,13 +1,34 @@
 parameters:
     level: 8
+    checkGenericClassInNonGenericObjectType: false
     paths:
         - ./src
     excludePaths:
         - ./src/Resources/*
+        - ./src/Compatibility/Bundles/FlowBuilder/Events/*
         # legacy code that is not working with abstract/interface changes
         - ./src/Compatibility/Storefront/Route/PaymentMethodRoute/RemovePaymentMethodRoute63.php
         - ./src/Service/Mail/MailService63.php
+    disallowedFunctionCalls:
+        - function: 'var_dump()'
+          message: 'use some logger instead'
+        - function: 'var_export()'
+          message: 'use some logger instead'
+        - function: 'dd()'
+          message: 'use some logger instead'
+        - function: 'print_r()'
+          message: 'use some logger instead'
+        - function: 'putenv()'
+          message: 'might overwrite existing variables'
+    scanDirectories:
+      - polyfill/Shopware
+    ignoreErrors:
+    		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
+
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
       tags:
         - phpstan.rules.rule
+
+includes:
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon

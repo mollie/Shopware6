@@ -2,14 +2,15 @@
 
 namespace MolliePayments\Fixtures\Product\Traits;
 
-
 use Basecom\FixturePlugin\FixtureHelper;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\Uuid\Uuid;
 
 trait ProductFixtureTrait
 {
-
     /**
      * @param string $id
      * @param string $name
@@ -18,11 +19,13 @@ trait ProductFixtureTrait
      * @param string $description
      * @param float $price
      * @param string $image
+     * @param bool $shippingFree
      * @param array $customFields
-     * @param EntityRepositoryInterface $repoProducts
+     * @param EntityRepository $repoProducts
      * @param FixtureHelper $helper
+     * @return void
      */
-    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, array $customFields, EntityRepositoryInterface $repoProducts, FixtureHelper $helper): void
+    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, EntityRepository $repoProducts, FixtureHelper $helper): void
     {
         # just reuse the product one ;)
         $mediaId = $id;
@@ -47,46 +50,47 @@ trait ProductFixtureTrait
         # delete our temp file again
         unlink($imagePath);
 
-        $repoProducts->upsert([
+        $repoProducts->upsert(
             [
-                'id' => $id,
-                'name' => $name,
-                'taxId' => $helper->SalesChannel()->getTax19()->getId(),
-                'productNumber' => $number,
-                'description' => $description,
-                'visibilities' => [
-                    [
-                        'id' => $visibilityID,
-                        'salesChannelId' => $helper->SalesChannel()->getStorefrontSalesChannel()->getId(),
-                        'visibility' => 30,
-                    ]
-                ],
-                'categories' => [
-                    [
-                        'id' => $helper->Category()->getByName($categoryName)->getId(),
-                    ]
-                ],
-                'stock' => 10,
-                'price' => [
-                    [
-                        'currencyId' => $helper->SalesChannel()->getCurrencyEuro()->getId(),
-                        'gross' => $price,
-                        'net' => $price,
-                        'linked' => true,
-                    ]
-                ],
-                'media' => [
-                    [
-                        'id' => $coverId,
-                        'mediaId' => $mediaId,
-                    ]
-                ],
-                'coverId' => $coverId,
-                'customFields' => $customFields,
-            ]
-        ],
+                [
+                    'id' => $id,
+                    'name' => $name,
+                    'taxId' => $helper->Tax()->getTax19()->getId(),
+                    'productNumber' => $number,
+                    'description' => $description,
+                    'visibilities' => [
+                        [
+                            'id' => $visibilityID,
+                            'salesChannelId' => $helper->SalesChannel()->getStorefrontSalesChannel()->getId(),
+                            'visibility' => 30,
+                        ]
+                    ],
+                    'categories' => [
+                        [
+                            'id' => Uuid::fromStringToHex($categoryName),
+                        ]
+                    ],
+                    'stock' => 10,
+                    'price' => [
+                        [
+                            'currencyId' => Defaults::CURRENCY,
+                            'gross' => $price,
+                            'net' => $price,
+                            'linked' => true,
+                        ]
+                    ],
+                    'media' => [
+                        [
+                            'id' => $coverId,
+                            'mediaId' => $mediaId,
+                        ]
+                    ],
+                    'coverId' => $coverId,
+                    'customFields' => $customFields,
+                    'shippingFree' => $shippingFree,
+                ]
+            ],
             Context::createDefaultContext()
         );
     }
-
 }

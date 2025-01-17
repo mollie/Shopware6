@@ -8,11 +8,6 @@ class RefundMetadata
 {
 
     /**
-     * @var DataCompressor
-     */
-    private $dataCompression;
-
-    /**
      * @var string
      */
     private $type;
@@ -23,7 +18,6 @@ class RefundMetadata
     private $items;
 
 
-
     /**
      * @param string $type
      * @param RefundItem[] $items
@@ -32,28 +26,27 @@ class RefundMetadata
     {
         $this->type = $type;
         $this->items = $items;
-
-        $this->dataCompression = new DataCompressor();
     }
 
     /**
-     * @param array<mixed> $metadata
+     * @param \stdClass $metadata
      * @return RefundMetadata
      */
-    public static function fromArray(array $metadata): RefundMetadata
+    public static function fromArray(\stdClass $metadata): RefundMetadata
     {
-        $type = (string)$metadata['type'];
-        $composition = (isset($metadata['composition'])) ? (array)$metadata['composition'] : [];
+        $type = (string)$metadata->type;
+        $composition = property_exists($metadata, 'composition') ? $metadata->composition : [];
 
         $items = [];
 
         foreach ($composition as $compItem) {
             $items[] = new RefundItem(
-                $compItem['swLineId'],
                 $compItem['mollieLineId'],
-                $compItem['swReference'],
+                (string)$compItem['swReference'],
                 $compItem['quantity'],
-                $compItem['amount']
+                $compItem['amount'],
+                $compItem['swLineId'],
+                $compItem['swLineVersionId']
             );
         }
 
@@ -77,29 +70,15 @@ class RefundMetadata
     }
 
     /**
+     * Used as storage payload inside the Mollie API database.
+     *
      * @return string
      */
-    public function toString(): string
+    public function toMolliePayload(): string
     {
         $data = [
             'type' => $this->type,
         ];
-
-        foreach ($this->items as $item) {
-            if ($item->getQuantity() <= 0) {
-                continue;
-            }
-
-            $swLineId = $this->dataCompression->compress($item->getShopwareLineID());
-
-            $data['composition'][] = [
-                'swLineId' => $swLineId,
-                'mollieLineId' => $item->getMollieLineID(),
-                'swReference' => $item->getShopwareReference(),
-                'quantity' => $item->getQuantity(),
-                'amount' => $item->getAmount(),
-            ];
-        }
 
         return (string)json_encode($data);
     }

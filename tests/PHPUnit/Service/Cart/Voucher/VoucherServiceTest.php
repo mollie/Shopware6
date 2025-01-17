@@ -2,11 +2,9 @@
 
 namespace MolliePayments\Tests\Service\Cart\Voucher;
 
-
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use MolliePayments\Tests\Fakes\Repositories\FakeProductRepository;
-use MolliePayments\Tests\Traits\FakeTrait;
 use MolliePayments\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -17,7 +15,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherServiceTest extends TestCase
 {
-
     use MockTrait;
 
     /**
@@ -79,7 +76,7 @@ class VoucherServiceTest extends TestCase
         $foundProduct->setCustomFields([
             'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
         ]);
-
+        $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
         # build a repo that would return nothing...just in case ;)
         $fakeRepoProducts = new FakeProductRepository(null, $foundProduct);
 
@@ -101,11 +98,13 @@ class VoucherServiceTest extends TestCase
         $this->expectException(ProductNotFoundException::class);
 
         $foundProduct = new ProductEntity();
+
         $foundProduct->setId('ID-123');
         $foundProduct->setParentId('PARENT-123');
+        $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
 
         $fakeRepoProducts = new FakeProductRepository(null, $foundProduct);
-
+        $fakeRepoProducts->throwExceptions = true;
         $item = $this->buildProductLineItem('10001');
 
         $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
@@ -123,15 +122,17 @@ class VoucherServiceTest extends TestCase
         $foundProduct = new ProductEntity();
         $foundProduct->setId('ID-123');
         $foundProduct->setParentId('PARENT-123');
+        $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
 
         $foundParentProduct = new ProductEntity();
         $foundParentProduct->setId('ID-456');
         $foundParentProduct->setCustomFields([
             'mollie_payments_product_voucher_type' => VoucherType::TYPE_GIFT,
         ]);
+        $foundParentProduct->setTranslated(['customFields'=>$foundParentProduct->getCustomFields()]);
 
 
-        $fakeRepoProducts = new FakeProductRepository($foundParentProduct, $foundProduct);
+        $fakeRepoProducts = new FakeProductRepository($foundParentProduct, null);
 
         $item = $this->buildProductLineItem('10001');
 
@@ -172,5 +173,4 @@ class VoucherServiceTest extends TestCase
 
         return $item;
     }
-
 }

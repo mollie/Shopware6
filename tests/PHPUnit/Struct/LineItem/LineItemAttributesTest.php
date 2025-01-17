@@ -9,6 +9,26 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 
 class LineItemAttributesTest extends TestCase
 {
+    /**
+     * This test is very important.
+     * It's used for the CartBeforeSerializationEvent event.
+     * By providing our list of custom mollie fields as whitelist, we ensure that
+     * the custom fields are still available in cart.lineItem.payload.customFields.
+     * Otherwise they are removed in Shopware >= 6.5.
+     */
+    public function testKeyList()
+    {
+        $expected = [
+            'mollie_payments_product_voucher_type',
+            'mollie_payments_product_subscription_enabled',
+            'mollie_payments_product_subscription_interval',
+            'mollie_payments_product_subscription_interval_unit',
+            'mollie_payments_product_subscription_repetition',
+            'mollie_payments_product_subscription_repetition_type',
+        ];
+
+        $this->assertEquals($expected, LineItemAttributes::getKeyList());
+    }
 
     /**
      * This test verifies that our product number from
@@ -122,5 +142,4 @@ class LineItemAttributesTest extends TestCase
 
         $this->assertEquals($expected, $attributes->toArray());
     }
-
 }

@@ -2,6 +2,8 @@
 
 namespace Kiener\MolliePayments\Facade\Controller;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Event\PaymentPageRedirectEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
@@ -17,21 +19,19 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\BusinessEventDispatcher;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 class PaymentReturnFacade
 {
-
     /**
      * @var RouterInterface
      */
     private $router;
 
     /**
-     * @var BusinessEventDispatcher
+     * @var FlowBuilderDispatcherAdapterInterface
      */
     private $eventDispatcher;
 
@@ -65,9 +65,10 @@ class PaymentReturnFacade
      */
     private $logger;
 
+
     /**
      * @param RouterInterface $router
-     * @param BusinessEventDispatcher $eventDispatcher
+     * @param FlowBuilderFactoryInterface $flowFactory
      * @param SettingsService $settingsService
      * @param TransactionService $transactionService
      * @param MollieServiceOrder $orders
@@ -75,10 +76,10 @@ class PaymentReturnFacade
      * @param RoutingDetector $routingDetector
      * @param LoggerInterface $logger
      */
-    public function __construct(RouterInterface $router, BusinessEventDispatcher $eventDispatcher, SettingsService $settingsService, TransactionService $transactionService, MollieServiceOrder $orders, MollieOrderPaymentFlow $molliePaymentFlow, RoutingDetector $routingDetector, LoggerInterface $logger)
+    public function __construct(RouterInterface $router, FlowBuilderFactoryInterface $flowFactory, SettingsService $settingsService, TransactionService $transactionService, MollieServiceOrder $orders, MollieOrderPaymentFlow $molliePaymentFlow, RoutingDetector $routingDetector, LoggerInterface $logger)
     {
         $this->router = $router;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = $flowFactory->createDispatcher();
         $this->settingsService = $settingsService;
         $this->transactionService = $transactionService;
         $this->orders = $orders;
@@ -206,7 +207,7 @@ class PaymentReturnFacade
             $redirectUrl
         );
 
-        $this->eventDispatcher->dispatch($paymentPageRedirectEvent, $paymentPageRedirectEvent::EVENT_NAME);
+        $this->eventDispatcher->dispatch($paymentPageRedirectEvent);
 
         return new RedirectResponse($redirectUrl);
     }

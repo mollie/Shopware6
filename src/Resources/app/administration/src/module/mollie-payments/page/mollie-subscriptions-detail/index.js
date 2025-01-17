@@ -3,7 +3,7 @@ import './mollie-subscriptions-detail.scss';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Application, ApiService} = Shopware;
+const {Component, Mixin, Application, ApiService, Filter} = Shopware;
 
 // eslint-disable-next-line no-undef
 const {Criteria} = Shopware.Data;
@@ -124,6 +124,10 @@ Component.register('mollie-subscriptions-detail', {
             return this.$tc('mollie-payments.subscriptions.detail.history.cardTitle') + ' (' + this.history.length + ')';
         },
 
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     created() {
@@ -150,6 +154,7 @@ Component.register('mollie-subscriptions-detail', {
             criteria.addAssociation('addresses');
             criteria.addAssociation('historyEntries');
             criteria.addAssociation('customer');
+            criteria.addAssociation('currency');
 
             // eslint-disable-next-line no-undef
             this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result) => {

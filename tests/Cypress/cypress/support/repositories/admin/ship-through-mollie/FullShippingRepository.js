@@ -5,8 +5,24 @@ export default class FullShippingRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
+    getSelectAllItemsButton() {
+        return cy.get('[style="grid-template-columns: 1fr 1fr 4fr; place-items: stretch;"] > :nth-child(1) > .sw-button__content');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getFirstItemSelectCheckbox() {
+        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--itemselect > .sw-data-grid__cell-content input');
+    }
+
+    /**
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
     getShippingButton() {
-        return cy.get('.sw-modal__footer > .sw-button--primary');
+        return cy.get('.btn-ship-order', {timeout: 10000});
     }
 
     /**
@@ -14,7 +30,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstItemQuantity() {
-        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content > .sw-data-grid__cell-value');
+        return cy.get('.sw-data-grid__row--0 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content');
     }
 
     /**
@@ -22,7 +38,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getSecondItemQuantity() {
-        return cy.get('.sw-data-grid__row--1 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content > .sw-data-grid__cell-value');
+        return cy.get('.sw-data-grid__row--1 > .sw-data-grid__cell--quantity > .sw-data-grid__cell-content');
     }
 
     /**
@@ -38,7 +54,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingCarrier() {
-        return cy.get('#sw-field--tracking-carrier');
+        return cy.get('.cy-trackiing-carrier input');
     }
 
     /**
@@ -46,7 +62,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingCode() {
-        return cy.get('#sw-field--tracking-code');
+        return cy.get('.cy-tracking-code input');
     }
 
     /**
@@ -54,7 +70,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingUrl() {
-        return cy.get('#sw-field--tracking-url');
+        return cy.get('.cy-tracking-url input');
     }
 
 }

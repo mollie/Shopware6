@@ -9,18 +9,18 @@
 
         <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction">
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieShipment"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
-            <tag name="flow.action" priority="900"/>
+            <tag name="flow.action" key="action.mollie.order.ship" priority="900"/>
         </service>
 
         <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction">
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
-            <argument type="service" id="mollie_payments.logger"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
-            <tag name="flow.action" priority="900"/>
+            <tag name="flow.action" key="action.mollie.order.refund" priority="900"/>
         </service>
 
     </services>

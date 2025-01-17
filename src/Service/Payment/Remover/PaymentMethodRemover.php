@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Service\Payment\Remover;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Exception\MissingRequestException;
 use Kiener\MolliePayments\Exception\MissingRouteException;
-use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
+use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
@@ -14,7 +14,6 @@ use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -36,7 +35,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      */
     protected $requestStack;
 
-
     /**
      * @var OrderService
      */
@@ -48,7 +46,7 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     protected $settingsService;
 
     /**
-     * @var OrderDataExtractor
+     * @var OrderItemsExtractor
      */
     private $orderDataExtractor;
 
@@ -62,10 +60,10 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      * @param RequestStack $requestStack
      * @param OrderService $orderService
      * @param SettingsService $settingsService
-     * @param OrderDataExtractor $orderDataExtractor
+     * @param OrderItemsExtractor $orderDataExtractor
      * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderDataExtractor $orderDataExtractor, LoggerInterface $logger)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->requestStack = $requestStack;
@@ -165,9 +163,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
 
     /**
      * @param Context $context
-     * @throws MissingRequestException
-     * @throws OrderNotFoundException
-     * @throws BadRequestException
      * @return OrderEntity
      */
     public function getOrder(Context $context): OrderEntity
@@ -240,7 +235,7 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      */
     protected function isSubscriptionOrder(OrderEntity $order, Context $context): bool
     {
-        $lineItems = $this->orderDataExtractor->extractLineItems($order, $context);
+        $lineItems = $this->orderDataExtractor->extractLineItems($order);
 
         /** @var OrderLineItemEntity $lineItem */
         foreach ($lineItems as $lineItem) {
@@ -261,7 +256,7 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      */
     protected function isVoucherOrder(OrderEntity $order, Context $context): bool
     {
-        $lineItems = $this->orderDataExtractor->extractLineItems($order, $context);
+        $lineItems = $this->orderDataExtractor->extractLineItems($order);
 
         /** @var OrderLineItemEntity $lineItem */
         foreach ($lineItems as $lineItem) {

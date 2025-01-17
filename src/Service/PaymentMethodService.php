@@ -2,36 +2,51 @@
 
 namespace Kiener\MolliePayments\Service;
 
+use Kiener\MolliePayments\Compatibility\VersionCompare;
+use Kiener\MolliePayments\Handler\Method\AlmaPayment;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
+use Kiener\MolliePayments\Handler\Method\BancomatPayment;
 use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\BilliePayment;
+use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
-use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
+use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
+use Kiener\MolliePayments\Handler\Method\MyBankPayment;
+use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
+use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
+use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
+use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
+use Kiener\MolliePayments\Handler\Method\RivertyPayment;
+use Kiener\MolliePayments\Handler\Method\SatispayPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
+use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
+use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
+use Kiener\MolliePayments\Repository\MediaRepository;
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -41,47 +56,64 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodService
 {
-    /** @var MediaService */
+
+    /**
+     *
+     */
+    public const TECHNICAL_NAME_PREFIX = 'payment_mollie_';
+
+    /**
+     * @var MediaService
+     */
     private $mediaService;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var PaymentMethodRepository
+     */
     private $paymentRepository;
 
-    /** @var PluginIdProvider */
+    /**
+     * @var PluginIdProvider
+     */
     private $pluginIdProvider;
 
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var MediaRepository
+     */
     private $mediaRepository;
 
-    /** @var HttpClientInterface */
+    /**
+     * @var HttpClientInterface
+     */
     private $httpClient;
+
+    /**
+     * @var VersionCompare
+     */
+    private $versionCompare;
+    private PayPalExpressConfig $payPalExpressConfig;
 
 
     /**
+     * @param string $shopwareVersion
      * @param MediaService $mediaService
-     * @param EntityRepositoryInterface $mediaRepository
-     * @param EntityRepositoryInterface $paymentRepository
+     * @param MediaRepository$mediaRepository
+     * @param PaymentMethodRepository $paymentRepository
      * @param PluginIdProvider $pluginIdProvider
      * @param HttpClientInterface $httpClient
      */
-    public function __construct(MediaService $mediaService, EntityRepositoryInterface $mediaRepository, EntityRepositoryInterface $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient)
+    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
         $this->paymentRepository = $paymentRepository;
         $this->pluginIdProvider = $pluginIdProvider;
         $this->httpClient = $httpClient;
+
+        $this->versionCompare = new VersionCompare($shopwareVersion);
+        $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
-    /**
-     * Returns the payment repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getRepository(): EntityRepositoryInterface
-    {
-        return $this->paymentRepository;
-    }
 
     /**
      * @param Context $context
@@ -93,6 +125,9 @@ class PaymentMethodService
         # but always disable them :)
         $this->disablePaymentMethod(IngHomePayPayment::class, $context);
 
+        if (! $this->payPalExpressConfig->isEnabled()) {
+            $this->disablePaymentMethod(PayPalExpressPayment::class, $context);
+        }
 
         // Get installable payment methods
         $installablePaymentMethods = $this->getInstallablePaymentMethods();
@@ -139,6 +174,7 @@ class PaymentMethodService
                 $existingPaymentMethod = null;
             }
 
+            $technicalName = '';
 
             if ($existingPaymentMethod instanceof PaymentMethodEntity) {
                 $paymentMethodData = [
@@ -149,19 +185,32 @@ class PaymentMethodService
                     # make sure to repair some fields in here
                     # so that Mollie does always work for our wonderful customers :)
                     'pluginId' => $pluginId,
-                    'customFields' => [
-                        'mollie_payment_method_name' => $paymentMethod['name'],
-                    ],
                     # ------------------------------------------
                     # unfortunately some fields are required (*sigh)
                     # so we need to provide those with the value of
                     # the existing method!!!
-                    'name' => $existingPaymentMethod->getName(),
+                    'name' => $existingPaymentMethod->getName()
                 ];
+                $translations = $existingPaymentMethod->getTranslations();
 
-                $upsertData[] = $paymentMethodData;
+                if ($translations !== null) {
+                    $paymentMethodData['translations'][Defaults::LANGUAGE_SYSTEM] = [
+                        'name' => $existingPaymentMethod->getName()
+                    ];
+
+                    foreach ($translations as $translation) {
+                        $paymentMethodData['translations'][$translation->getLanguageId()] = [
+                            'name' => $translation->getName()
+                        ];
+                    }
+                }
+
+                if ($this->versionCompare->gte('6.5.7.0')) {
+                    # we do a string cast here, since getTechnicalName will be not nullable in the future
+                    /** @phpstan-ignore-next-line  */
+                    $technicalName = (string)$existingPaymentMethod->getTechnicalName();
+                }
             } else {
-
                 # let's create a full parameter list of everything
                 # that our new payment method needs to have
                 $paymentMethodData = [
@@ -172,18 +221,34 @@ class PaymentMethodService
                     'description' => '',
                     'mediaId' => $mediaId,
                     'afterOrderEnabled' => true,
-                    # ------------------------------------------
-                    'customFields' => [
-                        'mollie_payment_method_name' => $paymentMethod['name'],
-                    ],
+                    'translations' => [
+                        Defaults::LANGUAGE_SYSTEM => [
+                            'name' => $paymentMethod['description']
+                        ]
+                    ]
                 ];
-
-                $upsertData[] = $paymentMethodData;
             }
+
+            if (mb_strlen($technicalName) === 0) {
+                $technicalName = self::TECHNICAL_NAME_PREFIX . $paymentMethod['name'];
+            }
+
+            # custom field name is required to be specific, because we use it in the template to display components
+            $paymentMethodData['customFields'] = [
+                'mollie_payment_method_name' => $paymentMethod['name']
+            ];
+
+            # starting with Shopware 6.5.7.0 this has to be filled out
+            # so that you can still save the payment method in the administration
+            if ($this->versionCompare->gte('6.5.7.0')) {
+                $paymentMethodData['technicalName'] = $technicalName;
+            }
+
+            $upsertData[] = $paymentMethodData;
         }
 
         if (count($upsertData) > 0) {
-            $this->paymentRepository->upsert($upsertData, $context);
+            $this->paymentRepository->getRepository()->upsert($upsertData, $context);
         }
     }
 
@@ -198,15 +263,15 @@ class PaymentMethodService
         $paymentCriteria = new Criteria();
         $paymentCriteria->addFilter(new ContainsFilter('handlerIdentifier', 'MolliePayments'));
 
-        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, $context);
 
-        if (!$paymentMethods->count()) {
+        if (! $paymentMethods->count()) {
             return $installableHandlers;
         }
 
         /** @var PaymentMethodEntity $paymentMethod */
         foreach ($paymentMethods->getEntities() as $paymentMethod) {
-            if (!in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
+            if (! in_array($paymentMethod->getHandlerIdentifier(), $installableHandlers, true)) {
                 continue;
             }
 
@@ -225,10 +290,10 @@ class PaymentMethodService
      */
     public function activatePaymentMethods(array $paymentMethods, array $installedHandlers, Context $context): void
     {
-        if (!empty($paymentMethods)) {
+        if (! empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
                 if (
-                    !isset($paymentMethod['handler']) ||
+                    ! isset($paymentMethod['handler']) ||
                     in_array($paymentMethod['handler'], $installedHandlers, true)
                 ) {
                     continue;
@@ -270,12 +335,9 @@ class PaymentMethodService
      *
      * @return EntityWrittenContainerEvent
      */
-    public function setPaymentMethodActivated(
-        string  $paymentMethodId,
-        bool    $active,
-        Context $context
-    ): EntityWrittenContainerEvent {
-        return $this->paymentRepository->upsert(
+    public function setPaymentMethodActivated(string $paymentMethodId, bool $active, Context $context): EntityWrittenContainerEvent
+    {
+        return $this->paymentRepository->getRepository()->upsert(
             [
                 [
                     'id' => $paymentMethodId,
@@ -300,7 +362,7 @@ class PaymentMethodService
         $paymentCriteria->addFilter(new EqualsFilter('id', $id));
 
         // Get payment methods
-        $paymentMethods = $this->paymentRepository->search($paymentCriteria, Context::createDefaultContext());
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, Context::createDefaultContext());
 
         if ($paymentMethods->getTotal() === 0) {
             return null;
@@ -348,9 +410,10 @@ class PaymentMethodService
         // Fetch ID for update
         $paymentCriteria = new Criteria();
         $paymentCriteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+        $paymentCriteria->addAssociation('translations');
 
         // Get payment IDs
-        $paymentMethods = $this->paymentRepository->search($paymentCriteria, $context);
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, $context);
 
         if ($paymentMethods->getTotal() === 0) {
             return null;
@@ -366,7 +429,7 @@ class PaymentMethodService
      */
     public function getPaymentHandlers(): array
     {
-        return [
+        $paymentHandlers = [
             ApplePayPayment::class,
             BanContactPayment::class,
             BankTransferPayment::class,
@@ -375,21 +438,38 @@ class PaymentMethodService
             CreditCardPayment::class,
             EpsPayment::class,
             GiftCardPayment::class,
-            GiroPayPayment::class,
             iDealPayment::class,
             KbcPayment::class,
             KlarnaPayLaterPayment::class,
             KlarnaPayNowPayment::class,
             KlarnaSliceItPayment::class,
+            KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
             SofortPayment::class,
             VoucherPayment::class,
-            In3Payment::class
+            In3Payment::class,
+            PosPayment::class,
+            TwintPayment::class,
+            BlikPayment::class,
+            BancomatPayment::class,
+            MyBankPayment::class,
+            AlmaPayment::class,
+            TrustlyPayment::class,
+            PayconiqPayment::class,
+            RivertyPayment::class,
+            SatispayPayment::class,
+            PayByBankPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];
+
+        if ($this->payPalExpressConfig->isEnabled()) {
+            $paymentHandlers[] = PayPalExpressPayment::class;
+        }
+
+        return $paymentHandlers;
     }
 
     /**
@@ -402,14 +482,20 @@ class PaymentMethodService
      */
     private function getMediaId(array $paymentMethod, Context $context): ?string
     {
+        $name = $paymentMethod['name'];
+
+        if ($name === PayPalExpressPayment::PAYMENT_METHOD_NAME) {
+            $name = PayPalPayment::PAYMENT_METHOD_NAME;
+        }
+
         /** @var string $fileName */
-        $fileName = $paymentMethod['name'] . '-icon';
+        $fileName = $name . '-icon';
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('fileName', $fileName));
 
         /** @var MediaCollection $icons */
-        $icons = $this->mediaRepository->search($criteria, $context);
+        $icons = $this->mediaRepository->getRepository()->search($criteria, $context);
 
         if ($icons->count() && $icons->first() !== null) {
             return $icons->first()->getId();
@@ -452,9 +538,9 @@ class PaymentMethodService
         $paymentMethodId = $transaction->getPaymentMethodId();
         $paymentMethod = $transaction->getPaymentMethod();
 
-        if (!$paymentMethod instanceof PaymentMethodEntity) {
+        if (! $paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
-            $paymentMethod = $this->paymentRepository->search($criteria, Context::createDefaultContext())->first();
+            $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
         }
 
         return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;

@@ -3,10 +3,6 @@
 namespace MolliePayments\Tests\Subscriber;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Kiener\MolliePayments\Handler\Method\iDealPayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
-use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -16,11 +12,9 @@ use Mollie\Api\Resources\Method;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\DebitPayment;
-use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\InvoicePayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -33,6 +27,7 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
     /** @var CheckoutConfirmPage */
     private $checkoutConfirmPage;
 
+    private PaymentMethodCollection $paymentMethodCollection;
     /**
      * Sets up the test.
      *
@@ -194,8 +189,8 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
         return new CheckoutConfirmPageSubscriber(
             $this->createMock(MollieApiFactory::class),
             $this->setUpSettingsService($limitsEnabled),
-            $this->createMock(EntityRepositoryInterface::class),
-            $this->createMock(EntityRepositoryInterface::class),
+            $this->createMock(EntityRepository::class),
+            $this->createMock(EntityRepository::class),
             $this->setUpActivePaymentMethodsProvider($availablePaymentMethods)
         );
     }
@@ -212,5 +207,4 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
         self::assertArrayHasKey($expected, CheckoutConfirmPageSubscriber::getSubscribedEvents());
     }
-
 }

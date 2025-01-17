@@ -6,7 +6,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 trait RedirectTrait
 {
-
     /**
      * @param string $orderId
      * @param RouterInterface $router
@@ -50,5 +49,10 @@ trait RedirectTrait
             ],
             $router::ABSOLUTE_URL
         );
+    }
+
+    public function getCheckoutCartPage(RouterInterface $router):string
+    {
+        return $router->generate('frontend.checkout.cart.page', [], $router::ABSOLUTE_URL);
     }
 }

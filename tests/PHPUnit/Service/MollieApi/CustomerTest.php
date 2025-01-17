@@ -74,7 +74,7 @@ class CustomerTest extends TestCase
             'getSalesChannelId' => 'buzz',
         ]);
 
-        $actualInstance = $this->customerApiService->createCustomerAtMollie($customerMock);
+        $actualInstance = $this->customerApiService->createCustomerAtMollie($customerMock, 'buzz');
         $this->assertInstanceOf(Customer::class, $actualInstance);
     }
 
@@ -91,19 +91,18 @@ class CustomerTest extends TestCase
             'getSalesChannelId' => 'buzz',
         ]);
 
-        $this->customerApiService->createCustomerAtMollie($customerMock);
+        $this->customerApiService->createCustomerAtMollie($customerMock, 'buzz');
     }
 
     /**
-     * @param string|null $mollieCustomerId
+     * @param null|string $mollieCustomerId
      * @param bool $expectedValue
      * @dataProvider isLegacyCustomerValidTestData
      */
     public function testIsLegacyCustomerValid(
         ?string $mollieCustomerId,
         bool $expectedValue
-    )
-    {
+    ) {
         $actualValue = $this->customerApiService->isLegacyCustomerValid($mollieCustomerId, '');
 
         $this->assertIsBool($actualValue);

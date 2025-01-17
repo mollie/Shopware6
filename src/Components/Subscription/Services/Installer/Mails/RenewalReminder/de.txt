@@ -6,7 +6,7 @@ Wir bereiten Ihr Abonnement für Sie vor.
 
 Abonnement: {{ subscription.description }}
 Nächste Verlängerung: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}.
-Gesamtbetrag: {{ subscription.amount }} {{ subscription.currency }}
+Gesamtbetrag: {{ subscription.amount }} {{ subscription.currency.symbol }}
 
 Diese E-Mail soll Sie nur darüber informieren, dass die Zahlung an diesem Datum erfasst wird.
 

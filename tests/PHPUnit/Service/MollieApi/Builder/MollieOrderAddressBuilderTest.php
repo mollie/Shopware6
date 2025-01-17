@@ -132,9 +132,9 @@ class MollieOrderAddressBuilderTest extends TestCase
     }
 
     /**
-     * @param string|null $salutation
-     * @param string|null $countryISO
-     * @param string|null $additional
+     * @param null|string $salutation
+     * @param null|string $countryISO
+     * @param null|string $additional
      * @return CustomerAddressEntity
      */
     private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): CustomerAddressEntity
@@ -156,5 +156,4 @@ class MollieOrderAddressBuilderTest extends TestCase
             $additional
         );
     }
-
 }

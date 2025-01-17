@@ -2,23 +2,16 @@
 
 namespace MolliePayments\Tests\Service\Routing;
 
-use MolliePayments\Tests\Fakes\FakePluginSettings;
-use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
+use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Fakes\FakeRouter;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-
 class RoutingBuilderTest extends TestCase
 {
-
     /**
      *
      */
@@ -59,7 +52,7 @@ class RoutingBuilderTest extends TestCase
         # prepare our fake server data
         # assign a current domain to replace.
         # also configure our environment variable
-        $builder = $this->createBuilder('https://local.mollie.shop/notify/123', '123.eu.ngrok.io');
+        $builder = $this->createBuilder('https://local.mollie.shop/notify/123', 'https://123.eu.ngrok.io');
 
         $url = $builder->buildWebhookURL('-');
 
@@ -122,7 +115,11 @@ class RoutingBuilderTest extends TestCase
         $fakeRouter = new FakeRouter($fakeURL);
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
 
-        return new RoutingBuilder($fakeRouter, $routingDetector, new FakePluginSettings($fakeEnvDomain));
+        return new RoutingBuilder(
+            $fakeRouter,
+            $routingDetector,
+            new FakePluginSettings($fakeEnvDomain),
+            ''
+        );
     }
-
 }

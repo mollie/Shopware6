@@ -41,6 +41,8 @@ const device = devices.getFirstDevice();
 context("Order Shipping", () => {
 
     before(() => {
+        configAction.setupShop(false, false, false);
+
         configAction.prepareShippingMethods();
         configAction.updateProducts('', false, '', '');
     })
@@ -52,11 +54,14 @@ context("Order Shipping", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C4039: Full Shipping in Administration', () => {
+        it('C4039: Full Shipping in Administration @sanity', () => {
 
             createOrderAndOpenAdmin(2, 1);
 
             adminOrders.openShipThroughMollie();
+
+            // make sure our modal is visible
+            cy.contains('.sw-modal__header', 'Ship through Mollie', {timeout: 50000});
 
             // verify we have 2x 1 item
             // we use contain because linebreaks \n exist.
@@ -64,13 +69,21 @@ context("Order Shipping", () => {
             repoShippingFull.getFirstItemQuantity().should('contain.text', '1');
             repoShippingFull.getSecondItemQuantity().should('contain.text', '1');
 
-            shippingAction.shipOrder();
+            shippingAction.shipFullOrder();
 
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
+            let disabledClassName = 'is--disabled'
+            if (shopware.isVersionGreaterEqual('6.5')) {
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C152048: Full Shipping in Administration with Tracking', () => {
@@ -90,26 +103,56 @@ context("Order Shipping", () => {
             repoShippingFull.getTrackingCode().should('have.value', TRACKING_CODE);
             repoShippingFull.getTrackingUrl().should('not.have.value', '');
 
-            shippingAction.shipOrder();
+            shippingAction.shipFullOrder();
 
             assertShippingStatus('Shipped', 2);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
+            let disabledClassName = 'is--disabled'
+            if (shopware.isVersionGreaterEqual('6.5')) {
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
-        it('C4040: Partial Shipping in Administration', () => {
+        it('C2138608: Partial Batch Shipping in Administration', () => {
+
+            createOrderAndOpenAdmin(2, 1);
+
+            adminOrders.openShipThroughMollie();
+
+            // make sure our modal is visible
+            cy.contains('.sw-modal__header', 'Ship through Mollie', {timeout: 50000});
+
+            // verify we have 2x 1 item
+            // we use contain because linebreaks \n exist.
+            // but we don't add 11 items...so that should be fine
+            repoShippingFull.getFirstItemQuantity().should('contain.text', '1');
+            repoShippingFull.getSecondItemQuantity().should('contain.text', '1');
+
+            shippingAction.shipBatchOrder();
+
+            assertShippingStatus('Shipped (partially)', 1);
+        })
+
+        it('C4040: Line Item Shipping in Administration', () => {
 
             createOrderAndOpenAdmin(2, 2);
 
-
             adminOrders.openLineItemShipping(1);
-
 
             repoShippingItem.getShippedQuantity().should('contain.text', '0');
             repoShippingItem.getShippableQuantity().should('contain.text', '2');
 
             shippingAction.shipLineItem(1);
+
+            // somehow this is required in Shopware 6.5, lets just stick with it, its ok
+            cy.wait(2000);
+            cy.reload();
 
             assertShippingStatus('Shipped (partially)', 1);
 
@@ -135,15 +178,24 @@ context("Order Shipping", () => {
             // so the first item is actually our second one that was not yet shipped.
             repoShippingFull.getFirstItemQuantity().should('contain.text', '2');
 
-            shippingAction.shipOrder();
+            shippingAction.shipFullOrder();
 
             assertShippingStatus('Shipped', 4);
 
-            repoOrderDetails.getMollieActionsButton().click({force: true});
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', 'is--disabled');
+            if (shopware.isVersionLower('6.5')) {
+                repoOrderDetails.getMollieActionsButton().click({force: true});
+            }
+
+            let disabledClassName = 'is--disabled'
+            if (shopware.isVersionGreaterEqual('6.5')) {
+                disabledClassName = 'sw-button--disabled';
+            }
+
+            cy.wait(1000);
+            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
-        it('C4044: Partial Shipping with Tracking', () => {
+        it('C4044: Line Item Shipping with Tracking', () => {
 
             const TRACKING_CODE1 = 'code-1';
             const TRACKING_CODE2 = 'code-2';
@@ -214,17 +266,13 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
     const scenarioDummyBasket = new DummyBasketScenario(itemQty, itemCount);
     scenarioDummyBasket.execute();
 
-    paymentAction.switchPaymentMethod('Pay later');
+    paymentAction.switchPaymentMethod('Klarna');
 
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
 
     mollieSandbox.initSandboxCookie();
     molliePayment.selectAuthorized();
-
-    // increase our viewport for admin
-    // otherwise we don't see a lot (page height)
-    cy.viewport(1920, 2000);
 
     adminLogin.login();
     adminOrders.openOrders();
@@ -242,5 +290,8 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
 
-    repoOrderDetails.getOrderSummarySection().should('contain.text', 'Shipped amount (' + shippedItemsCount + ' items)', {timeout: 6000});
+    if (shopware.isVersionLower('6.5')) {
+        /** since 6.5 you don't see the shipped items in summary **/
+        repoOrderDetails.getOrderSummarySection().should('contain.text', 'Shipped amount (' + shippedItemsCount + ' items)', {timeout: 6000});
+    }
 }

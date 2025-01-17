@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 interface RefundManagerInterface
 {
-
     /**
      * @param OrderEntity $order
      * @param Context $context
@@ -25,6 +24,8 @@ interface RefundManagerInterface
      * @return Refund
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund;
+
+    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool;
 
     /**
      * @param string $orderId

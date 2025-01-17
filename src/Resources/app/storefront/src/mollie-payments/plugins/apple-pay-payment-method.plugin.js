@@ -1,5 +1,4 @@
-import Plugin from 'src/plugin-system/plugin.class';
-import HttpClient from '../services/HttpClient';
+import Plugin from '../Plugin';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
 
@@ -8,10 +7,8 @@ export default class MollieApplePayPaymentMethod extends Plugin {
      */
     init() {
 
-        const me = this;
 
         const hideAlways = this.options.hideAlways;
-        const shopUrl = this.getShopUrl();
 
         // if we don't want to always hide it,
         // then only hide it, if Apple Pay is not active
@@ -24,17 +21,12 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         this.hideApplePay('.payment-method-input.applepay');
 
         // support for >= Shopware 6.4
-        // we have to find the dynamic ID and use that
-        // one as a selector to hide it
-        const client = new HttpClient();
-        client.get(
-            shopUrl + '/mollie/apple-pay/applepay-id',
-            (data) => {
-                me.hideApplePay('#paymentMethod' + data.id);
-            }
-        );
+        this.hideApplePay('#paymentMethod' + this.options.applePayId)
 
-
+        // hide cart apple pay select option
+        if (this.options.hideApplePayOption) {
+            this.hideApplePaySelect(this.options.applePayId);
+        }
     }
 
     /**
@@ -48,6 +40,15 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         if (!!rootElement && !!rootElement.classList) {
             rootElement.remove();
         }
+    }
+
+    /**
+     *
+     * @param applePayId
+     */
+    hideApplePaySelect(applePayId) {
+        const option = document.querySelector('option[value="' + applePayId + '"]');
+        option.remove();
     }
 
     /**

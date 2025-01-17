@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Hydrator;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Order\OrderExtension;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
+use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Mollie\Api\Resources\Refund;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
@@ -33,11 +34,16 @@ class RefundHydrator
             ];
         }
 
-        $metaData = '';
+        $metaData = new \stdClass();
 
-        if (property_exists($refund, 'metadata')) {
-            $metaData = (string)$refund->metadata;
+        if (property_exists($refund, 'metadata') && $refund->metadata !== null) {
+            /** @var \stdClass|string $metaData */
+            $metaData = $refund->metadata;
+            if (is_string($metaData)) {
+                $metaData = json_decode($metaData);
+            }
         }
+
 
         $internalDescription = null;
 
@@ -52,8 +58,28 @@ class RefundHydrator
             $shopwareRefund = $shopwareRefunds->first();
             if ($shopwareRefund !== null) {
                 $internalDescription = $shopwareRefund->getInternalDescription();
+
+                $refundLineItems = $shopwareRefund->getRefundItems()->getElements();
+
+                $metaData->composition = [];
+                /** @var RefundItemEntity $refundLineItem */
+                foreach ($refundLineItems as $refundLineItem) {
+                    $metaData->type = $shopwareRefund->getType();
+
+                    $metaData->composition[]=[
+                        'swLineId' => (string)$refundLineItem->getOrderLineItemId(),
+                        'swLineVersionId' => (string)$refundLineItem->getOrderLineItemVersionId(),
+                        'mollieLineId' => $refundLineItem->getMollieLineId(),
+                        'swReference' => $refundLineItem->getLabel(),
+                        'quantity' => $refundLineItem->getQuantity(),
+                        'amount' => $refundLineItem->getAmount()
+                    ];
+                }
             }
         }
+
+
+
 
         return [
             'id' => $refund->id,
@@ -70,7 +96,7 @@ class RefundHydrator
             'isProcessing' => $refund->isProcessing(),
             'isQueued' => $refund->isQueued(),
             'isTransferred' => $refund->isTransferred(),
-            'metadata' => json_decode($metaData, true),
+            'metadata' => $metaData,
         ];
     }
 }

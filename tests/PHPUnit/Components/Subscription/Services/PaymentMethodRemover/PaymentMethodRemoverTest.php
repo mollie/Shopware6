@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class PaymentMethodRemoverTest extends TestCase
 {
-
     /**
      * This test verifies our allowed payment methods.
      * They are used to filter the existing list of available
@@ -28,9 +27,9 @@ class PaymentMethodRemoverTest extends TestCase
             'creditcard',
             'paypal',
             'directdebit',
+            'trustly'
         ];
 
         $this->assertEquals($expected, SubscriptionRemover::ALLOWED_METHODS);
     }
-
 }

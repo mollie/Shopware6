@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\HttpClient\Response\HttpResponse;
 
 class FakeHttpClient implements HttpClientInterface
 {
-
     /**
      * @param string $method
      * @param string $url
@@ -18,5 +17,4 @@ class FakeHttpClient implements HttpClientInterface
     {
         return new HttpResponse(200, '');
     }
-
 }

@@ -3,14 +3,12 @@
 namespace MolliePayments\Tests\Event;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
-use MolliePayments\Tests\Fakes\FakeSalesChannelContext;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderBuildEventTest extends TestCase
 {
-
     /**
      * This function tests that its possible to assign
      * metadata correctly to our event.
@@ -49,5 +47,4 @@ class MollieOrderBuildEventTest extends TestCase
 
         $this->assertEquals($expected, $event->getMetadata());
     }
-
 }

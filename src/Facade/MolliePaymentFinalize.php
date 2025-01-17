@@ -18,12 +18,10 @@ use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
-use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
-use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
+use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -61,7 +59,7 @@ class MolliePaymentFinalize
     private $subscriptionManager;
 
     /**
-     * @var EntityRepositoryInterface
+     * @var EntityRepository
      */
     private $repoCustomer;
 
@@ -83,11 +81,11 @@ class MolliePaymentFinalize
      * @param Order $mollieOrderService
      * @param OrderService $orderService
      * @param SubscriptionManager $subscriptionManager
-     * @param EntityRepositoryInterface $repoCustomer
+     * @param EntityRepository $repoCustomer
      * @param FlowBuilderFactory $flowBuilderFactory
      * @param FlowBuilderEventFactory $flowBuilderEventFactory
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepositoryInterface $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepository $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
@@ -108,7 +106,8 @@ class MolliePaymentFinalize
      */
     public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): void
     {
-        $order = $transactionStruct->getOrder();
+        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
+
         $customFields = $order->getCustomFields() ?? [];
         $customFieldsStruct = new OrderAttributes($order);
         $mollieOrderId = $customFieldsStruct->getMollieOrderId();
@@ -169,14 +168,14 @@ class MolliePaymentFinalize
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
 
-                throw new CustomerCanceledAsyncPaymentException($orderTransactionID, $message);
+                throw PaymentException::customerCanceled($orderTransactionID, $message);
             } else {
                 $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
                 # fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
 
-                throw new AsyncPaymentFinalizeException($orderTransactionID, $message);
+                throw PaymentException::asyncFinalizeInterrupted($orderTransactionID, $message);
             }
         }
 
@@ -206,7 +205,8 @@ class MolliePaymentFinalize
         if ($this->settingsService->getMollieCypressMode() && $orderAttributes->isTypeSubscription()) {
             if ($mollieOrder->payments() !== null && count($mollieOrder->payments()) > 0) {
                 $paymentDetails = new MolliePaymentDetails();
-                $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[0]);
+                $lasMolliePayment = count($mollieOrder->payments()) -1;
+                $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[$lasMolliePayment]);
                 $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
             }
         }

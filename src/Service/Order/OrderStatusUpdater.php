@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Kiener\MolliePayments\Repository\Order\OrderRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -11,18 +10,20 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 class OrderStatusUpdater
 {
-
+    public const ORDER_STATE_FORCE_OPEN = 'order-state-force-open';
     /**
      * @var OrderStateService
      */
     private $orderHandler;
 
     /**
-     * @var OrderRepository
+     * @var EntityRepository
      */
     private $repoOrders;
 
@@ -31,24 +32,32 @@ class OrderStatusUpdater
      */
     private $transactionTransitionService;
 
+
     /**
      * @var LoggerInterface
      */
     private $logger;
 
+    /**
+     * @var EntityRepository
+     */
+    private $stateMachineStateRepository;
+
 
     /**
      * @param OrderStateService $orderHandler
-     * @param OrderRepository $repoOrders
+     * @param EntityRepository $repoOrders
      * @param TransactionTransitionServiceInterface $transactionTransitionService
      * @param LoggerInterface $logger
      */
-    public function __construct(OrderStateService $orderHandler, OrderRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(OrderStateService $orderHandler, EntityRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, EntityRepository $stateMachineStateRepository, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->logger = $logger;
+
+        $this->stateMachineStateRepository = $stateMachineStateRepository;
     }
 
 
@@ -63,13 +72,22 @@ class OrderStatusUpdater
     {
         $currentShopwareState = $transaction->getStateMachineState();
 
-        if (!$currentShopwareState instanceof StateMachineStateEntity) {
-            return;
+
+        if (! $currentShopwareState instanceof StateMachineStateEntity) {
+            $criteria = new Criteria([$transaction->getStateId()]);
+            $searchResult = $this->stateMachineStateRepository->search($criteria, $context);
+
+            /** @var ?StateMachineStateEntity OrderStatusUpdater.php */
+            $currentShopwareState = $searchResult->first();
+
+            if (! $currentShopwareState instanceof StateMachineStateEntity) {
+                return;
+            }
         }
 
         $order = $transaction->getOrder();
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             return;
         }
 
@@ -87,9 +105,13 @@ class OrderStatusUpdater
         switch ($targetShopwareStatusKey) {
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
                 {
+                    $states = [OrderTransactionStates::STATE_IN_PROGRESS];
+                    if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
+                        $states[] =  OrderTransactionStates::STATE_UNCONFIRMED;
+                    }
                     # if we are already in_progress...then don't switch to OPEN again
                     # otherwise SEPA bank transfer would switch back to OPEN
-                    if ($currentShopwareStatusKey !== OrderTransactionStates::STATE_IN_PROGRESS) {
+                    if (! in_array($currentShopwareStatusKey, $states) || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
                         $addLog = true;
                         $this->transactionTransitionService->reOpenTransaction($transaction, $context);
                     }
@@ -155,7 +177,13 @@ class OrderStatusUpdater
         # last but not least,
         # also update the lastUpdated of the order itself
         # this is required for ERP systems and more (so they know something has changed).
-        $this->repoOrders->updateOrderLastUpdated($order->getId(), $context);
+
+        $this->repoOrders->update([
+            [
+                'id' => $order->getId(),
+                'updatedAt' => new \DateTime(),
+            ]
+        ], $context);
     }
 
     /**
@@ -171,8 +199,8 @@ class OrderStatusUpdater
 
         # let's check if we have configured a final order state.
         # if so, we need to verify, if a transition is even allowed
-        if (!empty($settings->getOrderStateFinalState())) {
-            $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : '';
+        if (! empty($settings->getOrderStateFinalState())) {
+            $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : $order->getStateId();
 
             # test if our current order does already have
             # our configured final order state
@@ -186,7 +214,7 @@ class OrderStatusUpdater
                 # once our final state is reached, we only allow transitions
                 # to chargebacks and refunds.
                 # all other transitions will not happen.
-                if (!in_array($statusTo, $allowedList)) {
+                if (! in_array($statusTo, $allowedList)) {
                     return;
                 }
             }
@@ -198,7 +226,6 @@ class OrderStatusUpdater
         $addLog = false;
 
         switch ($statusTo) {
-
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
                 break;

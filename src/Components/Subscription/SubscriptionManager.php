@@ -23,7 +23,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class SubscriptionManager implements SubscriptionManagerInterface
 {
-
     /**
      * @var CreateAction
      */

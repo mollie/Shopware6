@@ -12,7 +12,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class CustomerExtension extends EntityExtension
 {
-
     /**
      * @return string
      */

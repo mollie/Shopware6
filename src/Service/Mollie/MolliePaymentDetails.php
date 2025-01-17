@@ -6,7 +6,6 @@ use Mollie\Api\Resources\Payment;
 
 class MolliePaymentDetails
 {
-
     /**
      * @param null|Payment $payment
      * @return string

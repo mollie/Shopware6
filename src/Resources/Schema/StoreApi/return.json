@@ -1,0 +1,62 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Payment Endpoint",
+    "description": "Endpoint to handle Mollie payments.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/payment/{swTransactionId}": {
+      "get": {
+        "tags": [
+          "Mollie",
+          "Payment"
+        ],
+        "summary": "Handle Mollie Payment (GET)",
+        "operationId": "handleMolliePaymentGet",
+        "parameters": [
+          {
+            "name": "swTransactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Shopware transaction ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mollie payment handled successfully.",
+            "content": {}
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Mollie",
+          "Payment"
+        ],
+        "summary": "Handle Mollie Payment (POST)",
+        "operationId": "handleMolliePaymentPost",
+        "parameters": [
+          {
+            "name": "swTransactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Shopware transaction ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mollie payment handled successfully.",
+            "content": {}
+          }
+        }
+      }
+    }
+  }
+}

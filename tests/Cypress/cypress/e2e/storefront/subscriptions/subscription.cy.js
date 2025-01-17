@@ -24,6 +24,7 @@ import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatu
 import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
+import SubscriptionRepository from "Repositories/storefront/account/SubscriptionRepository";
 
 
 const devices = new Devices();
@@ -37,6 +38,7 @@ const repoProductDetailsAdmin = new ProductDetailRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
 const repoAdminSubscriptions = new SubscriptionsListRepository();
 const repoAdminSubscriptonDetails = new SubscriptionDetailsRepository();
+const repoSubscriptionStorefront = new SubscriptionRepository();
 
 const configAction = new ShopConfigurationAction();
 const adminProducts = new AdminProductsAction();
@@ -73,112 +75,31 @@ describe('Subscription', () => {
             });
 
             describe('Storefront + Administration', function () {
+                it('C2339889: Purchase subscription after failed payment and verify data in Administration', () =>{
+                    purchaseSubscriptionAndGoToPayment();
 
-                it('C4066: Purchase subscription and verify data in Administration', () => {
+                    molliePayment.selectFailed();
 
-                    configAction.setupPlugin(true, false, false, true);
-                    configAction.updateProducts('', true, 3, 'weeks');
+                    cy.url().should('include', '/payment/failed');
+                    cy.get('.container-main .btn-primary').click();
+                    cy.url().should('include','/checkout/select-method');
+                    cy.get('.grid-button-creditcard[value="creditcard"]').click();
 
-                    dummyUserScenario.execute();
-                    cy.visit('/');
-                    topMenu.clickOnSecondCategory();
-                    listing.clickOnFirstProduct();
-
-                    // we have to see the subscription indicator
-                    // and the add to basket button should show that we can subscribe
-                    cy.contains('Subscription product');
-                    cy.contains('.btn', 'Subscribe');
-                    // we also want to see the translated interval
-                    cy.contains('Every 3 weeks');
-
-                    pdp.addToCart(2);
-
-                    // ------------------------------------------------------------------------------------------------------
-
-                    // verify our warning information in our offcanvas
-                    cy.contains('Not all payments methods are available when ordering subscription products');
-
-                    checkout.goToCheckoutInOffCanvas();
-
-                    // ------------------------------------------------------------------------------------------------------
-
-                    // verify our warning information on the cart page
-                    cy.contains('Not all payments methods are available when ordering subscription products');
-                    // we also want to see the translated interval
-                    cy.contains('Every 3 weeks');
-
-                    // now open our payment methods and verify
-                    // that some of them are not available
-                    // this is a check to at least see that it does something
-                    // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
-                    if (shopware.isVersionGreaterEqual(6.4)) {
-                        paymentAction.showAllPaymentMethods();
-                    } else {
-                        paymentAction.openPaymentsModal();
-                    }
-
-                    assertAvailablePaymentMethods();
-
-                    if (shopware.isVersionLower(6.4)) {
-                        paymentAction.closePaymentsModal();
-                    }
-
-                    paymentAction.switchPaymentMethod('Credit card');
-
-                    shopware.prepareDomainChange();
-                    checkout.placeOrderOnConfirm();
 
                     mollieSandbox.initSandboxCookie();
                     mollieCreditCardForm.enterValidCard();
                     mollieCreditCardForm.submitForm();
                     molliePayment.selectPaid();
 
-                    cy.url().should('include', '/checkout/finish');
-                    cy.contains('Thank you for your order');
+                    assertValidSubscriptionInAdmin();
+                })
 
+                it('C4066: Purchase subscription and verify data in Administration', () => {
+                    purchaseSubscriptionAndGoToPayment();
 
-                    // ------------------------------------------------------------------------------------------------------
+                    molliePayment.selectPaid();
 
-                    adminLogin.login();
-                    adminOrders.openOrders();
-                    adminOrders.openLastOrder();
-
-                    // our latest order must have a subscription "badge"
-                    repoOrdersDetails.getSubscriptionBadge().should('exist');
-
-                    // ------------------------------------------------------------------------------------------------------
-
-                    // verify that we have found a new subscription entry
-                    // attention, this will not be 100% accurate if we have a persisting server
-                    // or multiple subscription tests, but for now it has to work
-                    adminSubscriptions.openSubscriptions();
-                    adminSubscriptions.openSubscription(0);
-
-                    // ------------------------------------------------------------------------------------------------------
-
-                    repoAdminSubscriptonDetails.getMollieCustomerIdField().should('be.visible');
-
-                    vueJs.textField(repoAdminSubscriptonDetails.getMollieCustomerIdField()).containsValue('cst_');
-                    vueJs.textField(repoAdminSubscriptonDetails.getCreatedAtField()).notEmptyValue();
-
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
-                    vueJs.textField(repoAdminSubscriptonDetails.getCanceledAtField()).emptyValue();
-                    vueJs.textField(repoAdminSubscriptonDetails.getMollieSubscriptionIdField()).containsValue('sub_');
-                    vueJs.textField(repoAdminSubscriptonDetails.getMandateField()).containsValue('mdt_');
-                    vueJs.textField(repoAdminSubscriptonDetails.getNextPaymentAtField()).notEmptyValue();
-                    vueJs.textField(repoAdminSubscriptonDetails.getLastRemindedAtField()).emptyValue();
-
-                    // just do a contains, because card-titles are just different
-                    // across shopware versions, and in the end, we just need to make sure we see this exact string
-                    cy.contains("History (2)");
-
-                    // oldest history entry
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(1), 'pending', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(1), 'created');
-                    // latest history entry
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'pending', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'active', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'confirmed');
+                    assertValidSubscriptionInAdmin();
                 })
 
             });
@@ -202,7 +123,7 @@ describe('Subscription', () => {
 
                 it('C183210: Subscription page in Administration has links to customer and order', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     // --------------------------------------------------------------------------------------------------
 
@@ -222,7 +143,7 @@ describe('Subscription', () => {
 
                 it('C183206: Pause subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -241,7 +162,7 @@ describe('Subscription', () => {
 
                 it('C183208: Resume subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -263,7 +184,7 @@ describe('Subscription', () => {
 
                 it('C183207: Skip subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -281,7 +202,7 @@ describe('Subscription', () => {
 
                 it('C183209: Cancel subscription in Administration', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -304,7 +225,7 @@ describe('Subscription', () => {
                 it('C4067: Subscription Indicator on PDP can be turned ON @core', () => {
 
                     configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, true);
+                    configAction.setupPlugin(true, false, false, true,[]);
                     cy.wait(2000);
 
                     cy.visit('/');
@@ -320,7 +241,7 @@ describe('Subscription', () => {
                 it('C4068: Subscription Indicator on PDP can be turned OFF @core', () => {
 
                     configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, false);
+                    configAction.setupPlugin(true, false, false, false,[]);
                     cy.wait(2000);
 
                     cy.visit('/');
@@ -366,7 +287,7 @@ describe('Subscription', () => {
                         paymentAction.openPaymentsModal();
                     }
 
-                    paymentAction.switchPaymentMethod('Credit card');
+                    paymentAction.switchPaymentMethod('Card');
 
                     shopware.prepareDomainChange();
                     checkout.placeOrderOnConfirm();
@@ -387,15 +308,22 @@ describe('Subscription', () => {
 
                 it('C176306: Subscriptions are available in Account', () => {
 
-                    prepareSubscriptionAndOpenDetails();
+                    prepareSubscriptionAndOpenAdminDetails();
 
                     cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
 
                     // side menu needs subscription
+                    cy.wait(2000);
                     cy.contains('.account-aside', 'Subscriptions');
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
+
+                    repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
+                    cy.contains('edit billing address');
+
+                    repoSubscriptionStorefront.getSubscriptionContextMenuButton(0).click();
+                    cy.contains('Repeat subscription');
                 })
 
             })
@@ -404,28 +332,132 @@ describe('Subscription', () => {
 })
 
 
+function purchaseSubscriptionAndGoToPayment(){
+    configAction.setupPlugin(true, false, false, true,[]);
+    configAction.updateProducts('', true, 3, 'weeks');
+
+    dummyUserScenario.execute();
+    cy.visit('/');
+    topMenu.clickOnSecondCategory();
+    listing.clickOnFirstProduct();
+
+    // we have to see the subscription indicator
+    // and the add to basket button should show that we can subscribe
+    cy.contains('Subscription product');
+    cy.contains('.btn', 'Subscribe');
+    // we also want to see the translated interval
+    cy.contains('Every 3 weeks');
+
+    pdp.addToCart(2);
+
+    // ------------------------------------------------------------------------------------------------------
+
+    // verify our warning information in our offcanvas
+    cy.contains('Not all payments methods are available when ordering subscription products');
+
+    checkout.goToCheckoutInOffCanvas();
+
+    // ------------------------------------------------------------------------------------------------------
+
+    // verify our warning information on the cart page
+    cy.contains('Not all payments methods are available when ordering subscription products');
+    // we also want to see the translated interval
+    cy.contains('Every 3 weeks');
+
+    // now open our payment methods and verify
+    // that some of them are not available
+    // this is a check to at least see that it does something
+    // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
+    if (shopware.isVersionGreaterEqual(6.4)) {
+        paymentAction.showAllPaymentMethods();
+    } else {
+        paymentAction.openPaymentsModal();
+    }
+
+    assertAvailablePaymentMethods();
+
+    if (shopware.isVersionLower(6.4)) {
+        paymentAction.closePaymentsModal();
+    }
+
+    paymentAction.switchPaymentMethod('Card');
+
+    shopware.prepareDomainChange();
+    checkout.placeOrderOnConfirm();
+
+    mollieSandbox.initSandboxCookie();
+    mollieCreditCardForm.enterValidCard();
+    mollieCreditCardForm.submitForm();
+}
+
+function assertValidSubscriptionInAdmin(){
+    cy.url().should('include', '/checkout/finish');
+    cy.contains('Thank you for your order');
+    // ------------------------------------------------------------------------------------------------------
+
+    adminLogin.login();
+    adminOrders.openOrders();
+    adminOrders.openLastOrder();
+
+    // our latest order must have a subscription "badge"
+    repoOrdersDetails.getSubscriptionBadge().should('exist');
+
+    // ------------------------------------------------------------------------------------------------------
+
+    // verify that we have found a new subscription entry
+    // attention, this will not be 100% accurate if we have a persisting server
+    // or multiple subscription tests, but for now it has to work
+    adminSubscriptions.openSubscriptions();
+    adminSubscriptions.openSubscription(0);
+
+    // ------------------------------------------------------------------------------------------------------
+
+    repoAdminSubscriptonDetails.getMollieCustomerIdField().should('be.visible');
+
+    vueJs.textField(repoAdminSubscriptonDetails.getMollieCustomerIdField()).containsValue('cst_');
+    vueJs.textField(repoAdminSubscriptonDetails.getCreatedAtField()).notEmptyValue();
+
+    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
+    vueJs.textField(repoAdminSubscriptonDetails.getCanceledAtField()).emptyValue();
+    vueJs.textField(repoAdminSubscriptonDetails.getMollieSubscriptionIdField()).containsValue('sub_');
+    vueJs.textField(repoAdminSubscriptonDetails.getMandateField()).containsValue('mdt_');
+    vueJs.textField(repoAdminSubscriptonDetails.getNextPaymentAtField()).notEmptyValue();
+    vueJs.textField(repoAdminSubscriptonDetails.getLastRemindedAtField()).emptyValue();
+
+    // just do a contains, because card-titles are just different
+    // across shopware versions, and in the end, we just need to make sure we see this exact string
+    cy.contains("History (2)");
+
+    // oldest history entry
+    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(1), 'pending', {matchCase: false});
+    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(1), 'created');
+    // latest history entry
+    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'pending', {matchCase: false});
+    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'active', {matchCase: false});
+    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'confirmed');
+}
+
 function assertAvailablePaymentMethods() {
-    cy.contains('Pay later').should('not.exist');
-    cy.contains('paysafecard').should('not.exist');
+    cy.get('.payment-methods input.klarnapaylater').should('not.exist');
+    cy.get('.payment-methods input.paysafecard').should('not.exist');
 
     cy.contains('iDEAL').should('exist');
-    cy.contains('Credit card').should('exist');
+    cy.contains('Card').should('exist');
     cy.contains('SOFORT').should('exist');
     cy.contains('eps').should('exist');
     cy.contains('Bancontact').should('exist');
     cy.contains('Belfius').should('exist');
-    cy.contains('Giropay').should('exist');
     cy.contains('PayPal').should('exist');
 }
 
-function prepareSubscriptionAndOpenDetails() {
-    configAction.setupPlugin(true, false, false, true);
+function prepareSubscriptionAndOpenAdminDetails() {
+    configAction.setupPlugin(true, false, false, true,[]);
     configAction.updateProducts('', true, 3, 'weeks');
 
     const dummyScenario = new DummyBasketScenario(1)
     dummyScenario.execute();
 
-    paymentAction.switchPaymentMethod('Credit card');
+    paymentAction.switchPaymentMethod('Card');
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
 

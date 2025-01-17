@@ -5,7 +5,7 @@ import MollieRefundsGrid from './grids/MollieRefundsGrid';
 import RefundItemService from './services/RefundItemService';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const {Component, Mixin, Filter} = Shopware;
 
 
 Component.register('mollie-refund-manager', {
@@ -55,7 +55,7 @@ Component.register('mollie-refund-manager', {
             pendingRefunds: 0,
             checkVerifyRefund: false,
             refundDescription: '',
-            refundInternalDescription:'',
+            refundInternalDescription: '',
             roundingDiff: 0,
             // -------------------------------
             // tutorials
@@ -128,10 +128,17 @@ Component.register('mollie-refund-manager', {
          * Return the title with a count
          * @returns {*}
          */
-        descriptionCharacterCountingTitle(){
-            return this.$tc('mollie-payments.refund-manager.summary.lblDescription',0,{characters:this.refundDescription.length})
+        descriptionCharacterCountingTitle() {
+            return this.$tc('mollie-payments.refund-manager.summary.lblDescription', 0, {characters: this.refundDescription.length})
         },
 
+        currencyFilter() {
+            return Filter.getByName('currency');
+        },
+
+        dateFilter() {
+            return Filter.getByName('date');
+        },
     },
 
     methods: {
@@ -152,14 +159,13 @@ Component.register('mollie-refund-manager', {
 
                 // also get the config for the refund manager
                 // so that we can show/hide a few things
-                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId).then((response) => {
-                    me.configVerifyRefund = response.verifyRefund;
-                    me.configAutoStockReset = response.autoStockReset;
-                    me.configShowInstructions = response.showInstructions;
+                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId, this.order.id).then((response) => {
+                    me.configVerifyRefund = response.config.verifyRefund;
+                    me.configAutoStockReset = response.config.autoStockReset;
+                    me.configShowInstructions = response.config.showInstructions;
                 });
             }
         },
-
 
         // ---------------------------------------------------------------------------------------------------------
         // <editor-fold desc="ORDER FORM">
@@ -199,6 +205,13 @@ Component.register('mollie-refund-manager', {
          */
         isItemRefundable(item) {
             return this.itemService.isRefundable(item);
+        },
+
+        /**
+         * Gets if the order tax status is gross
+         */
+        isTaxStatusGross() {
+            return this.order.taxStatus === 'gross';
         },
 
         /**
@@ -258,6 +271,17 @@ Component.register('mollie-refund-manager', {
          */
         onItemAmountChanged(item) {
             this.itemService.onAmountChanged(item);
+            this._calculateFinalAmount();
+        },
+
+        /**
+         * This will be executed if the user changes the
+         * configuration to either activate or deactivate the
+         * Tax Refund in case of Net Orders.
+         * @param item
+         */
+        onItemRefundTaxChanged(item) {
+            this.itemService.onRefundTaxChanged(item);
             this._calculateFinalAmount();
         },
 
@@ -367,7 +391,7 @@ Component.register('mollie-refund-manager', {
             const diff = Math.abs(this.refundAmount - this.remainingAmount);
 
             // show if 5 cents or less diff
-            return diff > 0 && diff <= 0.05;
+            return diff > 0 && diff <= 0.07;
         },
 
         /**
@@ -491,7 +515,7 @@ Component.register('mollie-refund-manager', {
 
         getRefundCompositions(item) {
 
-            if (!item || !item.metadata || !item.metadata.composition) {
+            if (!item || !item.metadata || !item.metadata.composition || item.metadata.composition.length <= 0) {
                 return [
                     this.$tc('mollie-payments.refund-manager.refunds.grid.lblNoComposition'),
                 ];
@@ -502,10 +526,17 @@ Component.register('mollie-refund-manager', {
 
             item.metadata.composition.forEach(function (entry) {
                 let label = entry.label;
-                if(entry.swReference.length > 0){
+                if (entry.swReference.length > 0) {
                     label = entry.swReference;
                 }
-                result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+
+                // we also allow line-item specific refunds with qty 0
+                // in this case, we should not display it to avoid mathematical confusion
+                if (entry.quantity > 0) {
+                    result.push(label + ' (' + entry.quantity + ' x ' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                } else {
+                    result.push(label + ' (' + entry.amount + ' ' + me.order.currency.symbol + ')');
+                }
             });
 
             return result;

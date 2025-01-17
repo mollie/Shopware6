@@ -4,11 +4,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\Subscription\Response;
 
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionUpdateBillingResponse extends StoreApiResponse
 {
-
     /**
      * @var ArrayStruct<mixed, mixed>
      */

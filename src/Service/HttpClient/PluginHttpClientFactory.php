@@ -6,7 +6,6 @@ use Kiener\MolliePayments\Service\HttpClient\Adapter\Curl\CurlClient;
 
 class PluginHttpClientFactory
 {
-
     /**
      * @return HttpClientInterface
      */

@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilde
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
@@ -70,18 +71,18 @@ trait PaymentBuilderTrait
 
     /**
      * @param string $taxStatus
-     * @param OrderLineItemCollection|null $lineItems
-     * @param CurrencyEntity|null $currency
+     * @param null|OrderLineItemCollection $lineItems
+     * @param null|CurrencyEntity $currency
      * @return array<string,mixed>
      */
-    public function getExpectedLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems = null, CurrencyEntity $currency): array
+    public function getExpectedLineItems(string $taxStatus, OrderLineItemCollection $lineItems, CurrencyEntity $currency): array
     {
         $expectedLineItems = [];
 
         $mollieLineItemBuilder = new MollieLineItemBuilder(
             new IsOrderLineItemValid(),
             new PriceCalculator(),
-            new LineItemDataExtractor(),
+            new LineItemDataExtractor(new UrlParsingService()),
             new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
@@ -98,7 +99,7 @@ trait PaymentBuilderTrait
         return $hydrator->hydrate($expectedLineItems, $currency->getIsoCode());
     }
 
-    public function getExpectedDeliveries(string $taxStatus, ?OrderDeliveryCollection $deliveries = null, CurrencyEntity $currency): array
+    public function getExpectedDeliveries(string $taxStatus, OrderDeliveryCollection $deliveries, CurrencyEntity $currency): array
     {
         $mollieShippingLineItemBuilder = new MollieShippingLineItemBuilder(new PriceCalculator());
 
@@ -189,5 +190,4 @@ trait PaymentBuilderTrait
 
         return $order;
     }
-
 }

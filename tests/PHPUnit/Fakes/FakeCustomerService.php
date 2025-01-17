@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
-use Exception;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
+use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -21,13 +20,14 @@ final class FakeCustomerService implements CustomerServiceInterface
     private ?CustomerEntity $customerEntity = null;
     private bool $throwException;
 
-    public function __construct(bool $throwException = false) {
-        $this->setCardTokenResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(),[]);
-        $this->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(),[]);
+    public function __construct(bool $throwException = false)
+    {
+        $this->setCardTokenResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), []);
+        $this->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), []);
         $this->throwException = $throwException;
     }
 
-    public function customerLogin(CustomerEntity $customer, SalesChannelContext $context): ?string
+    public function loginCustomer(CustomerEntity $customer, SalesChannelContext $context): ?string
     {
         return null;
     }
@@ -39,7 +39,7 @@ final class FakeCustomerService implements CustomerServiceInterface
 
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
     {
-       return $this->setCardTokenResponse;
+        return $this->setCardTokenResponse;
     }
 
     public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent
@@ -82,7 +82,7 @@ final class FakeCustomerService implements CustomerServiceInterface
         return [];
     }
 
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, string $paymentMethodId, SalesChannelContext $context): ?CustomerEntity
+    public function createGuestAccount(AddressStruct $shippingAddress, string $paymentMethodId, SalesChannelContext $context, ?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): ?CustomerEntity
     {
         return null;
     }

@@ -4,34 +4,24 @@ namespace Kiener\MolliePayments\Service;
 
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
 class ProductService
 {
-    /** @var EntityRepositoryInterface */
+    /**
+     * @var EntityRepository
+     */
     private $productRepository;
 
-    /**
-     * Creates a new instance of the product service.
-     *
-     * @param EntityRepositoryInterface $productRepository
-     */
-    public function __construct(
-        EntityRepositoryInterface $productRepository
-    ) {
-        $this->productRepository = $productRepository;
-    }
 
     /**
-     * Returns the product repository.
-     *
-     * @return EntityRepositoryInterface
+     * @param EntityRepository $productRepository
      */
-    public function getRepository(): EntityRepositoryInterface
+    public function __construct(EntityRepository $productRepository)
     {
-        return $this->productRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -46,7 +36,7 @@ class ProductService
     {
         $criteria = new Criteria([$productId]);
 
-        $result = $this->getRepository()->search($criteria, $context ?? Context::createDefaultContext());
+        $result = $this->productRepository->search($criteria, $context ?? Context::createDefaultContext());
 
         /** @var null|ProductEntity $product */
         $product = $result->get($productId);

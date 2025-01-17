@@ -25,7 +25,8 @@ export default class AdminAPIClient {
         return this.request({
             method: 'get',
             url,
-            params
+            params,
+            headerEntity: ''
         });
     }
 
@@ -41,7 +42,30 @@ export default class AdminAPIClient {
             method: 'post',
             url,
             data,
-            params
+            params,
+            headerEntity: ''
+        });
+    }
+
+    /**
+     *
+     * @param entity
+     * @param data
+     * @returns {*}
+     */
+    bulkUpdate(entity, data) {
+        return this.request({
+            method: 'post',
+            url: '/_action/sync',
+            data: [
+                {
+                    "action": "upsert",
+                    "entity": entity,
+                    "payload": data,
+                }
+            ],
+            params: [],
+            headerEntity: entity
         });
     }
 
@@ -55,7 +79,8 @@ export default class AdminAPIClient {
         return this.request({
             method: 'delete',
             url,
-            params
+            params,
+            headerEntity: ''
         });
     }
 
@@ -69,7 +94,8 @@ export default class AdminAPIClient {
         return this.request({
             method: 'head',
             url,
-            params
+            params,
+            headerEntity: ''
         });
     }
 
@@ -83,7 +109,8 @@ export default class AdminAPIClient {
         return this.request({
             method: 'options',
             url,
-            params
+            params,
+            headerEntity: ''
         });
     }
 
@@ -99,7 +126,8 @@ export default class AdminAPIClient {
             method: 'put',
             data,
             url,
-            params
+            params,
+            headerEntity: ''
         });
     }
 
@@ -115,7 +143,8 @@ export default class AdminAPIClient {
             method: 'patch',
             data,
             url,
-            params
+            params,
+            headerEntity: ''
         });
     }
 
@@ -127,7 +156,11 @@ export default class AdminAPIClient {
      * @param data
      * @returns {*}
      */
-    request({url, method, params, data}) {
+    request({url, method, params, data, headerEntity}) {
+
+        if (headerEntity === undefined || headerEntity === null) {
+            headerEntity = 'none';
+        }
 
         return this.loginByUserName()
             .then((token) => {
@@ -136,7 +169,8 @@ export default class AdminAPIClient {
                     headers: {
                         Accept: 'application/vnd.api+json',
                         Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'x-cypress-entity': headerEntity
                     },
                     url,
                     method,

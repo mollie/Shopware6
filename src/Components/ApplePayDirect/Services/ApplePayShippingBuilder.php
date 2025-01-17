@@ -11,8 +11,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayShippingBuilder
 {
-
-
     /**
      * @var CartService
      */
@@ -99,8 +97,9 @@ class ApplePayShippingBuilder
 
         $availableShippingMethods = $this->shippingMethods->getActiveShippingMethods($context);
 
-        foreach ($availableShippingMethods as $method) {
+        $this->cartService->clearFakeAddressIfExists($context);
 
+        foreach ($availableShippingMethods as $method) {
             # temporary switch to our shipping method.
             # we will then load the cart for this shipping method
             # in order to get the calculated shipping costs for this.

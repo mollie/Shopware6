@@ -4,24 +4,21 @@ namespace Kiener\MolliePayments;
 
 use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
-use Kiener\MolliePayments\Repository\CustomFieldSet\CustomFieldSetRepository;
-use Kiener\MolliePayments\Service\CustomFieldService;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
-use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
-use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
+use Shopware\Core\Kernel;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '3.5.0';
+    const PLUGIN_VERSION = '4.13.0';
 
 
     /**
@@ -33,21 +30,17 @@ class MolliePayments extends Plugin
         parent::build($container);
 
         $this->container = $container;
-
+        $shopwareVersion = $this->container->getParameter('kernel.shopware_version');
+        if (!is_string($shopwareVersion)) {
+            $shopwareVersion= Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
         # load the dependencies that are compatible
         # with our current shopware version
-        $loader = new DependencyLoader($container);
+        $loader = new DependencyLoader($this->container, new VersionCompare($shopwareVersion));
         $loader->loadServices();
+        $loader->prepareStorefrontBuild();
     }
 
-
-    /**
-     * @return void
-     */
-    public function boot(): void
-    {
-        parent::boot();
-    }
 
     /**
      * @param InstallContext $context
@@ -56,18 +49,9 @@ class MolliePayments extends Plugin
     public function install(InstallContext $context): void
     {
         parent::install($context);
-
-        /** @var EntityRepository $customFieldRepository */
-        $customFieldRepository = $this->container->get('custom_field_set.repository');
-
-        // Add custom fields
-        $customFieldService = new CustomFieldService(
-            new CustomFieldSetRepository(
-                $customFieldRepository
-            )
-        );
-
-        $customFieldService->addCustomFields($context->getContext());
+        if ($this->container === null) {
+            throw new Exception('Container is not initialized');
+        }
 
         $this->runDbMigrations($context->getMigrationCollection());
     }
@@ -90,25 +74,6 @@ class MolliePayments extends Plugin
             $this->runDbMigrations($context->getMigrationCollection());
         }
     }
-
-    /**
-     * @param InstallContext $context
-     * @return void
-     */
-    public function postInstall(InstallContext $context): void
-    {
-        parent::postInstall($context);
-    }
-
-    /**
-     * @param UninstallContext $context
-     * @return void
-     */
-    public function uninstall(UninstallContext $context): void
-    {
-        parent::uninstall($context);
-    }
-
     /**
      * @param ActivateContext $context
      * @throws \Doctrine\DBAL\Exception
@@ -123,13 +88,25 @@ class MolliePayments extends Plugin
         $this->runDbMigrations($context->getMigrationCollection());
     }
 
-    /**
-     * @param DeactivateContext $context
-     * @return void
-     */
-    public function deactivate(DeactivateContext $context): void
+    public function boot(): void
     {
-        parent::deactivate($context);
+        parent::boot();
+
+        if ($this->container === null) {
+            return;
+        }
+        /** @var Container $container */
+        $container = $this->container;
+        
+        $shopwareVersion = $container->getParameter('kernel.shopware_version');
+        if (!is_string($shopwareVersion)) {
+            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
+        }
+        # load the dependencies that are compatible
+        # with our current shopware version
+
+        $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
+        $loader->registerDependencies();
     }
 
 
@@ -139,6 +116,9 @@ class MolliePayments extends Plugin
      */
     private function preparePlugin(Context $context): void
     {
+        if ($this->container === null) {
+            throw new Exception('Container is not initialized');
+        }
         /** @var PluginInstaller $pluginInstaller */
         $pluginInstaller = $this->container->get(PluginInstaller::class);
 

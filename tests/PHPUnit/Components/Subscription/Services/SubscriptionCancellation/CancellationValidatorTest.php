@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class CancellationValidatorTest extends TestCase
 {
-
     /**
      * @var CancellationValidator
      */
@@ -30,8 +29,8 @@ class CancellationValidatorTest extends TestCase
      *
      * @group subscriptions
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testNoCancellationRestrictions()
     {
@@ -50,8 +49,8 @@ class CancellationValidatorTest extends TestCase
      *
      * @group subscriptions
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testNoCancellationWithDaysInRange()
     {
@@ -71,8 +70,8 @@ class CancellationValidatorTest extends TestCase
      *
      * @group subscriptions
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testNoCancellationWithDaysOutsideRange()
     {
@@ -92,8 +91,8 @@ class CancellationValidatorTest extends TestCase
      *
      * @group subscriptions
      *
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function testNoRenewalDateExisting()
     {
@@ -105,6 +104,4 @@ class CancellationValidatorTest extends TestCase
 
         $this->assertEquals(true, $isAllowed);
     }
-
-
 }

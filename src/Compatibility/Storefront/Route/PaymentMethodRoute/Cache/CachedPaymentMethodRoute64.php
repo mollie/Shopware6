@@ -8,11 +8,11 @@ use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\Event\PaymentMethodRouteCacheKeyEvent;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 {
-
     /**
      * @var CartService
      */
@@ -54,14 +54,28 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     public function onGenerateCacheKey(PaymentMethodRouteCacheKeyEvent $event): void
     {
+        $originalRuleIds = $event->getContext()->getRuleIds();
+
+        /**
+         * the cart service changes the rule ids based on cart.
+         * after failed payment we are not in cart anymore but instead on edit order
+         * in this case the cart is empty so the rules will be reset
+         */
         $cart = $this->cartService->getCart($event->getContext()->getToken(), $event->getContext());
 
+        /** we have to collect the original rules before cart service is called and set them again */
+        $event->getContext()->setRuleIds($originalRuleIds);
+
         $parts = $event->getParts();
+        $cacheParts = [];
+        $cacheParts = $this->addVoucherKey($cart, $cacheParts);
+        $cacheParts = $this->addMollieLimitsKey($cacheParts);
+        $cacheParts = $this->addSubscriptionKey($cart, $cacheParts);
+        $cacheParts = $this->addCartAmountKey($cart, $cacheParts);
+        $cacheParts = $this->addCurrencyCodeKey($event->getContext(), $cacheParts);
+        $cacheParts = $this->addBillingAddressKey($event->getContext(), $cacheParts);
 
-        $parts = $this->addVoucherKey($cart, $parts);
-        $parts = $this->addMollieLimitsKey($parts);
-        $parts = $this->addSubscriptionKey($cart, $parts);
-
+        $parts[] = md5(implode('-', $cacheParts));
         $event->setParts($parts);
     }
 
@@ -135,5 +149,51 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param Cart $cart
+     * @param array<mixed> $cacheParts
+     * @return array<mixed>
+     */
+    private function addCartAmountKey(Cart $cart, array $cacheParts): array
+    {
+        $cacheParts[] = $cart->getPrice()->getTotalPrice();
+        return $cacheParts;
+    }
+
+    /**
+     * @param SalesChannelContext $context
+     * @param array<mixed> $cacheParts
+     * @return array<mixed>
+     */
+    private function addCurrencyCodeKey(SalesChannelContext $context, array $cacheParts):array
+    {
+        $cacheParts[] = $context->getCurrency()->getIsoCode();
+        return $cacheParts;
+    }
+
+    /**
+     * @param SalesChannelContext $context
+     * @param array<mixed> $cacheParts
+     * @return array<mixed>
+     */
+    private function addBillingAddressKey(SalesChannelContext $context, array $cacheParts):array
+    {
+        $customer = $context->getCustomer();
+
+        if ($customer === null) {
+            return $cacheParts;
+        }
+
+        $billingAddress = $customer->getActiveBillingAddress();
+
+        if ($billingAddress === null) {
+            return $cacheParts;
+        }
+
+        $cacheParts[]=$billingAddress->getId();
+
+        return $cacheParts;
     }
 }

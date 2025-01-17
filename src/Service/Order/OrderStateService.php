@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Exception;
 use Kiener\MolliePayments\Service\Transition\OrderTransitionServiceInterface;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Psr\Log\LoggerInterface;
@@ -72,11 +71,16 @@ class OrderStateService
             }
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error(
                 $e->getMessage(),
                 [
                     'function' => 'payment-automate-order-state',
+                    'order.id' => $order->getId(),
+                    'order.number' => $order->getOrderNumber(),
+                    'new.state' => $orderState,
+                    'old.state' => $currentStatus,
+                    'trace' => $e->getTraceAsString(),
                 ]
             );
         }

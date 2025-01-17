@@ -11,10 +11,8 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-
 class ApplePayFormatterTest extends TestCase
 {
-
     /**
      * @var ApplePayFormatter
      */

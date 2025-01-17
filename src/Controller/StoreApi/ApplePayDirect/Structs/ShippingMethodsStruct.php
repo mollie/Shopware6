@@ -6,8 +6,6 @@ use Shopware\Core\Framework\Struct\Struct;
 
 class ShippingMethodsStruct extends Struct
 {
-
-
     /**
      * @var array<mixed>
      */

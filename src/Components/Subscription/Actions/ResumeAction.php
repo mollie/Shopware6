@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 
 class ResumeAction extends BaseAction
 {
-
     /**
      * @param string $subscriptionId
      * @param Context $context

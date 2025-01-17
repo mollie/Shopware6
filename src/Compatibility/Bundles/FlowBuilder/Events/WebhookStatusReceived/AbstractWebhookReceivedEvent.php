@@ -18,7 +18,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware, MailAware, SalesChannelAware, BusinessEventInterface
 {
-
     /**
      * @var OrderEntity
      */

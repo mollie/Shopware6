@@ -4,10 +4,9 @@ namespace Kiener\MolliePayments\Service;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class DeliveryService
@@ -15,28 +14,19 @@ class DeliveryService
     private const PARAM_MOLLIE_PAYMENTS = 'mollie_payments';
     private const PARAM_IS_SHIPPED = 'is_shipped';
 
-    /** @var EntityRepositoryInterface $orderDeliveryRepository */
+    /**
+     * @var EntityRepository
+     */
     private $orderDeliveryRepository;
 
     /**
      * Creates a new instance of the transaction service.
      *
-     * @param EntityRepositoryInterface $orderDeliveryRepository
+     * @param EntityRepository $orderDeliveryRepository
      */
-    public function __construct(
-        EntityRepositoryInterface $orderDeliveryRepository
-    ) {
-        $this->orderDeliveryRepository = $orderDeliveryRepository;
-    }
-
-    /**
-     * Returns the order delivery repository.
-     *
-     * @return EntityRepositoryInterface
-     */
-    public function getRepository(): EntityRepositoryInterface
+    public function __construct(EntityRepository $orderDeliveryRepository)
     {
-        return $this->orderDeliveryRepository;
+        $this->orderDeliveryRepository = $orderDeliveryRepository;
     }
 
     /**
@@ -55,8 +45,7 @@ class DeliveryService
 
         $deliveryCriteria->addAssociation('order');
 
-        /** @var EntitySearchResult<OrderDeliveryEntity> $result */
-        $result = $this->getRepository()->search($deliveryCriteria, $context ?? Context::createDefaultContext());
+        $result = $this->orderDeliveryRepository->search($deliveryCriteria, $context ?? Context::createDefaultContext());
 
         /** @var null|OrderDeliveryEntity $delivery */
         $delivery = $result->get($deliveryId);
@@ -81,7 +70,7 @@ class DeliveryService
 
         $deliveryCriteria->addAssociation('order');
 
-        return $this->getRepository()
+        return $this->orderDeliveryRepository
             ->search($deliveryCriteria, $context ?? Context::createDefaultContext())->first();
     }
 
@@ -110,7 +99,7 @@ class DeliveryService
      */
     public function updateDelivery(array $data, Context $context = null): EntityWrittenContainerEvent
     {
-        return $this->getRepository()->update(
+        return $this->orderDeliveryRepository->update(
             [$data],
             $context ?? Context::createDefaultContext()
         );

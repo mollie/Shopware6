@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="Mollie\Shopware\Component\Logger\RecordAnonymizer">
+            <tag name="monolog.processor" channel="mollie"/>
+        </service>
+
+        <service id="Monolog\Processor\WebProcessor">
+            <tag name="monolog.processor" channel="mollie"/>
+        </service>
+
+        <service id="Monolog\Processor\IntrospectionProcessor">
+            <tag name="monolog.processor" channel="mollie"/>
+        </service>
+
+        <service  id="Mollie\Shopware\Component\Logger\PluginSettingsHandler">
+            <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
+            <argument type="service"  id="Doctrine\DBAL\Connection"/>
+            <argument>%kernel.logs_dir%/mollie_%kernel.environment%.log</argument>
+        </service>
+    </services>
+</container>

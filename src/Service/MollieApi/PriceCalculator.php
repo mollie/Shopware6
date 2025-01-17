@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 
 class PriceCalculator
 {
-
     /**
      *
      */
@@ -99,7 +98,6 @@ class PriceCalculator
         #       item #2: 20% tax rate, net price: 13.03, quantity 1
         #       promotion: 50 EUR amount off on full cart
         if ($taxCollection->count() > 1) {
-
             # start by summing up the individual
             # tax amounts from the tax rates
             $vatAmount = 0;
@@ -111,7 +109,14 @@ class PriceCalculator
             # now calculate our fake tax rate
             # from the final price and vat amount value
             $net = $roundedLineItemTotalPrice - $vatAmount;
-            $fakeTaxRate = $vatAmount / $net * 100;
+
+            if ((float)$net !== 0.0) {
+                $fakeTaxRate = $vatAmount / $net * 100;
+            } else {
+                # this happened once, division by zero
+                # so just make 0 out of it (worked for client)
+                $fakeTaxRate = 0;
+            }
 
             $roundedVatRate = round($fakeTaxRate, 2);
 

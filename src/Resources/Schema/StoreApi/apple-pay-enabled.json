@@ -1,0 +1,43 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apple Pay Enabled Endpoint",
+    "description": "Endpoint to check if Apple Pay integration is enabled.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/applepay/enabled": {
+      "get": {
+        "tags": [
+          "Mollie",
+          "ApplePay"
+        ],
+        "summary": "Check Apple Pay Integration Enabled Status",
+        "operationId": "checkApplePayEnabled",
+        "responses": {
+          "200": {
+            "description": "Apple Pay integration status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Indicates if Apple Pay integration is enabled."
+                    }
+                  },
+                  "required": ["enabled"]
+                },
+                "example": {
+                  "enabled": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

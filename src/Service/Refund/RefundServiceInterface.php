@@ -10,7 +10,6 @@ use Shopware\Core\Framework\Context;
 
 interface RefundServiceInterface
 {
-
     /**
      * @param OrderEntity $order
      * @param string $description
@@ -42,9 +41,9 @@ interface RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @return Refund[]
+     * @return array<mixed>
      */
-    public function getRefunds(OrderEntity $order): array;
+    public function getRefunds(OrderEntity $order, Context  $context): array;
 
     /**
      * @param OrderEntity $order

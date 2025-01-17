@@ -7,14 +7,15 @@
     <services>
 
         <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber\BusinessEventCollectorSubscriber">
+            <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventCollector"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"
-                 class="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory">
+        <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory" class="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory">
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventDispatcher" on-invalid="null"/>
+            <argument type="service" id="Shopware\Core\Content\Flow\Dispatching\FlowDispatcher" on-invalid="null"/>
         </service>
 
         <service id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"

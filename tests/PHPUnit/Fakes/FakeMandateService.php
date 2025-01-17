@@ -5,22 +5,16 @@ namespace MolliePayments\Tests\Fakes;
 
 use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
-use Kiener\MolliePayments\Struct\CustomerStruct;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Shopware\Core\Framework\Event\NestedEventCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 final class FakeMandateService implements MandateServiceInterface
 {
     private bool $throwException;
 
-    public function __construct(bool $throwException = false) {
+    public function __construct(bool $throwException = false)
+    {
         $this->throwException = $throwException;
     }
 

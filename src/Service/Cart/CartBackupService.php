@@ -2,31 +2,43 @@
 
 namespace Kiener\MolliePayments\Service\Cart;
 
+use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\CartPersisterInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class CartBackupService
 {
-
     /**
      *
      */
-    private const BACKUP_TOKEN = 'mollie_backup';
+    private const BACKUP_TOKEN = 'mollie_backup_%s';
 
     /**
      * @var CartService
      */
     private $cartService;
 
+    /**
+     * @var AbstractCartPersister|CartPersisterInterface
+     */
+    private $cartPersister;
+    /**
+     * @var array<string, bool>
+     */
+    private array $backupExistingCache;
 
     /**
+     *
      * @param CartService $cartService
+     * @param AbstractCartPersister|CartPersisterInterface $cartPersister
      */
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, $cartPersister)
     {
         $this->cartService = $cartService;
+        $this->cartPersister = $cartPersister;
     }
 
 
@@ -36,9 +48,25 @@ class CartBackupService
      */
     public function isBackupExisting(SalesChannelContext $context): bool
     {
-        $backupCart = $this->cartService->getCart(self::BACKUP_TOKEN, $context);
+        $token = $this->getToken($context->getToken());
+        $value = false;
 
-        return ($backupCart->getLineItems()->count() > 0);
+        if (isset($this->backupExistingCache[$token])) {
+            return $this->backupExistingCache[$token];
+        }
+        try {
+            $backupCart = $this->cartPersister->load($token, $context);
+            $value = $backupCart->getLineItems()->count() > 0;
+        } catch (\Throwable $exception) {
+        }
+        $this->backupExistingCache[$token] = $value;
+
+        return $this->backupExistingCache[$token];
+    }
+
+    private function getToken(string $token): string
+    {
+        return sprintf(self::BACKUP_TOKEN, $token);
     }
 
     /**
@@ -48,11 +76,8 @@ class CartBackupService
     {
         $originalCart = $this->cartService->getCart($context->getToken(), $context);
 
-        # additional language shops do not have a name, so make sure it has a string cast
-        $salesChannelName = (string)$context->getSalesChannel()->getName();
-
         # create new cart with our backup token
-        $newCart = $this->cartService->createNew(self::BACKUP_TOKEN, $salesChannelName);
+        $newCart = $this->cartService->createNew($this->getToken($context->getToken()));
 
         # assign our items to the backup
         # this is the only thing we really need to backup at this stage.
@@ -71,11 +96,11 @@ class CartBackupService
     public function restoreCart(SalesChannelContext $context): Cart
     {
         # get our backup cart
-        $backupCart = $this->cartService->getCart(self::BACKUP_TOKEN, $context);
+        $backupCart = $this->cartService->getCart($this->getToken($context->getToken()), $context);
 
         # create a new "old" original cart (to avoid foreign reference problems)
         # and set the items from our backup
-        $newCart = $this->cartService->createNew($context->getToken(), (string)$context->getSalesChannel()->getName());
+        $newCart = $this->cartService->createNew($context->getToken());
         $newCart->setLineItems($backupCart->getLineItems());
 
         # set and persist
@@ -90,7 +115,7 @@ class CartBackupService
      */
     public function clearBackup(SalesChannelContext $context): void
     {
-        $backupCart = $this->cartService->getCart(self::BACKUP_TOKEN, $context);
+        $backupCart = $this->cartService->getCart($this->getToken($context->getToken()), $context);
 
         # removing does not really work
         # but we can set the item count to 0, which means "not existing" for us
@@ -99,5 +124,15 @@ class CartBackupService
         # set and persist
         $this->cartService->setCart($backupCart);
         $this->cartService->recalculate($backupCart, $context);
+    }
+
+    public function replaceToken(string $oldToken, string $currentToken, SalesChannelContext $context): void
+    {
+        #only cart persister has replace method, so it wont work in shopware 6.4.1.0
+        if ($this->cartPersister instanceof AbstractCartPersister) {
+            $oldToken = $this->getToken($oldToken);
+            $currentToken = $this->getToken($currentToken);
+            $this->cartPersister->replace($oldToken, $currentToken, $context);
+        }
     }
 }

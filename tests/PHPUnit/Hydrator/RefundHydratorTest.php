@@ -31,10 +31,11 @@ class RefundHydratorTest extends TestCase
      */
     public function testRefundHydrator(array $expected, Refund $refund)
     {
-        $orderMock = $this->createMock(OrderEntity::class);;
-        self::assertIsArray($this->refundHydrator->hydrate($refund,$orderMock));
+        $orderMock = $this->createMock(OrderEntity::class);
+        ;
+        self::assertIsArray($this->refundHydrator->hydrate($refund, $orderMock));
 
-        self::assertEquals($expected, $this->refundHydrator->hydrate($refund,$orderMock));
+        self::assertEquals($expected, $this->refundHydrator->hydrate($refund, $orderMock));
     }
 
     /**
@@ -79,8 +80,8 @@ class RefundHydratorTest extends TestCase
     }
 
     /**
-     * @param float|null $amount
-     * @param float|null $settlementAmount
+     * @param null|float $amount
+     * @param null|float $settlementAmount
      * @param string $status
      * @return array
      */
@@ -115,7 +116,7 @@ class RefundHydratorTest extends TestCase
             'isProcessing' => $status == RefundStatus::STATUS_PROCESSING,
             'isQueued' => $status == RefundStatus::STATUS_QUEUED,
             'isTransferred' => $status == RefundStatus::STATUS_REFUNDED,
-            'metadata' => null,
+            'metadata' => new \stdClass(),
         ];
     }
 

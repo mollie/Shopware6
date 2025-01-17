@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Framework\Struct\Struct;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -21,14 +22,14 @@ class CustomerStruct extends Struct
     private $customerIds = [];
 
     /**
-     * @var ?string
-     */
-    private $preferredIdealIssuer;
-
-    /**
      * @var string
      */
     private $creditCardToken;
+
+    /**
+     * @var bool
+     */
+    private $shouldSaveCardDetail;
 
     /**
      * TODO: we need to get rid off this one day, no magic -> we need to explicitly load the values from the MySQL JSON
@@ -93,21 +94,6 @@ class CustomerStruct extends Struct
         $this->customerIds = $customerIds;
     }
 
-    /**
-     * @return null|string
-     */
-    public function getPreferredIdealIssuer(): ?string
-    {
-        return $this->preferredIdealIssuer;
-    }
-
-    /**
-     * @param null|string $preferredIdealIssuer
-     */
-    public function setPreferredIdealIssuer(?string $preferredIdealIssuer): void
-    {
-        $this->preferredIdealIssuer = $preferredIdealIssuer;
-    }
 
     /**
      * @param null|string $creditCardToken
@@ -147,16 +133,18 @@ class CustomerStruct extends Struct
             }
         }
 
-        if (!empty((string)$this->preferredIdealIssuer)) {
-            $mollieData['preferred_ideal_issuer'] = (string)$this->preferredIdealIssuer;
-        }
 
         if (!empty((string)$this->creditCardToken)) {
             $mollieData['credit_card_token'] = (string)$this->creditCardToken;
         }
 
+        if (!empty($this->shouldSaveCardDetail)) {
+            $mollieData['shouldSaveCardDetail'] = $this->shouldSaveCardDetail;
+        }
+
+
         $fullCustomField = [
-            'mollie_payments' => $mollieData
+            CustomFieldsInterface::MOLLIE_KEY => $mollieData
         ];
 
         # now either reset our old customer ID

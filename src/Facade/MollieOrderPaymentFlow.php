@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Facade;
 
+use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -11,12 +12,11 @@ use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieOrderPaymentFlow
 {
@@ -32,20 +32,23 @@ class MollieOrderPaymentFlow
     /** @var PaymentMethodService */
     private $paymentMethodService;
 
-    /** @var EntityRepositoryInterface */
+    /** @var PaymentMethodRepository */
     private $paymentMethodRepository;
 
-    /** @var EntityRepositoryInterface */
+    /** @var EntityRepository */
     private $orderTransactionRepository;
 
-    public function __construct(
-        OrderStatusConverter $orderStatusConverter,
-        OrderStatusUpdater $orderStatusUpdater,
-        SettingsService $settingsService,
-        PaymentMethodService $paymentMethodService,
-        EntityRepositoryInterface $paymentMethodRepository,
-        EntityRepositoryInterface $orderTransactionRepository
-    ) {
+
+    /**
+     * @param OrderStatusConverter $orderStatusConverter
+     * @param OrderStatusUpdater $orderStatusUpdater
+     * @param SettingsService $settingsService
+     * @param PaymentMethodService $paymentMethodService
+     * @param PaymentMethodRepository $paymentMethodRepository
+     * @param EntityRepository $orderTransactionRepository
+     */
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, EntityRepository $orderTransactionRepository)
+    {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
@@ -64,7 +67,7 @@ class MollieOrderPaymentFlow
      * @throws \Mollie\Api\Exceptions\ApiException
      * @return bool
      */
-    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context  $context): bool
+    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context $context): bool
     {
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
         $settings = $this->settingsService->getSettings($salesChannelId);
@@ -78,7 +81,7 @@ class MollieOrderPaymentFlow
 
             // check if it is mollie payment method
             // ensure that we may only fetch mollie payment methods
-            $molliePaymentMethodId = $this->paymentMethodRepository->searchIds(
+            $molliePaymentMethodId = $this->paymentMethodRepository->getRepository()->searchIds(
                 (new Criteria())
                     ->addFilter(
                         new MultiFilter(
@@ -111,8 +114,6 @@ class MollieOrderPaymentFlow
         # our transaction has no payment method here?
         # but it's also done in the finalize...this should be refactored
         if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
-            $mollieOrder->createPayment([]);
-
             return false;
         }
 

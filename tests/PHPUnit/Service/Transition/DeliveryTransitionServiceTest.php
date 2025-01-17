@@ -2,7 +2,6 @@
 
 namespace Kiener\MolliePayments\Tests\Service\Transition;
 
-
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransitionService;
 use PHPUnit\Framework\TestCase;

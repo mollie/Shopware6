@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class ApplePayDomainVerificationServiceTest extends TestCase
 {
-
     /**
      * This test verifies that our download URL of the official Mollie domain verification file
      * is not accidentally changed without recognizing it.
@@ -32,5 +31,4 @@ class ApplePayDomainVerificationServiceTest extends TestCase
             ApplePayDomainVerificationService::LOCAL_FILE
         );
     }
-
 }

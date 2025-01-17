@@ -2,16 +2,13 @@
 
 namespace MolliePayments\Tests\Fakes;
 
-use Kiener\MolliePayments\Gateway\Mollie\Model\Issuer;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
 
-
 class FakeMollieGateway implements MollieGatewayInterface
 {
-
     public function switchClient(string $salesChannelID): void
     {
         // TODO: Implement switchClient() method.
@@ -61,10 +58,4 @@ class FakeMollieGateway implements MollieGatewayInterface
     {
         // TODO: Implement updateSubscription() method.
     }
-
-    public function getIDealIssuers(): array
-    {
-        return [];
-    }
-
 }

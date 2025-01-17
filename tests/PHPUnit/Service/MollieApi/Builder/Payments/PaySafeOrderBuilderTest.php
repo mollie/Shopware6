@@ -4,7 +4,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use DateTime;
 use DateTimeZone;
-use Faker\Extension\Container;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
@@ -45,7 +44,7 @@ class PaySafeOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $order = $this->getOrderEntity($amountTotal, $taxStatus, $currencyISO, $lineItems, $orderNumber);
 
-        $actual = $this->builder->build($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
+        $actual = $this->builder->buildOrderPayload($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))

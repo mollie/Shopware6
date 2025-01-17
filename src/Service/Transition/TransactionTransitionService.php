@@ -45,34 +45,32 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        // Shopware added in_progress status with version 6.2, so this ensures backward compatibility
-        if (!defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_IN_PROGRESS')) {
-            // set open status in < sw6.2
-            $this->reOpenTransaction($transaction, $context);
+        $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
+        $defaultState = OrderTransactionStates::STATE_IN_PROGRESS;
+        $action = StateMachineTransitionActions::ACTION_DO_PAY;
 
-            return;
+        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
+            $defaultState = OrderTransactionStates::STATE_UNCONFIRMED;
+            $action = StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED;
         }
 
-        $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
-
-        if ($this->isFinalOrTargetStatus($technicalName, [OrderTransactionStates::STATE_IN_PROGRESS])) {
+        if ($this->isFinalOrTargetStatus($technicalName, [$defaultState])) {
             return;
         }
 
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_DO_PAY, $availableTransitions)) {
+        if (!$this->transitionIsAllowed($action, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
-        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_DO_PAY, $context);
+        $this->performTransition($entityId, $action, $context);
     }
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
         $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
-        $currentStatusName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_OPEN])) {
             return;
@@ -85,7 +83,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
             $this->logger->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
-                    $currentStatusName
+                    $currentStatus
                 )
             );
 
@@ -97,28 +95,20 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function payTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        // backwards compatibility, the former status StateMachineTransitionActions::ACTION_PAY='pay' does not exist any more
-        // the constant ACTION_PAID has been added with sw 6.2 and should be used instead of legacy ACTION_PAY
-        $payActionName = 'pay';
-
-        if (defined('Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions::ACTION_PAID')) {
-            $payActionName = StateMachineTransitionActions::ACTION_PAID;
-        }
-
         $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
-        if ($this->isFinalOrTargetStatus($currentStatus, [$payActionName])) {
+        if ($this->isFinalOrTargetStatus($currentStatus, [StateMachineTransitionActions::ACTION_PAID])) {
             return;
         }
 
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed($payActionName, $availableTransitions)) {
+        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PAID, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
-        $this->performTransition($entityId, $payActionName, $context);
+        $this->performTransition($entityId, StateMachineTransitionActions::ACTION_PAID, $context);
     }
 
     public function cancelTransaction(OrderTransactionEntity $transaction, Context $context): void
@@ -141,13 +131,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function failTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        // Shopware added failed status with version 6.2, so this ensures backward compatibility
-        if (!defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_FAILED')) {
-            $this->cancelTransaction($transaction, $context);
-
-            return;
-        }
-
         $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
         if ($this->isFinalOrTargetStatus($currentStatus, [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED])) {
@@ -166,13 +149,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function authorizeTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        // Shopware added authorized status with version 6.4.1, so this ensures backward compatibility
-        if (!defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_AUTHORIZED')) {
-            $this->payTransaction($transaction, $context);
-
-            return;
-        }
-
         $authorizedState = OrderTransactionStates::STATE_AUTHORIZED;
 
         $currentStatus = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
@@ -295,6 +271,24 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     private function performTransition(string $entityId, string $transitionName, Context $context): void
     {
-        $this->transitionService->performTransition(OrderTransactionDefinition::ENTITY_NAME, $entityId, $transitionName, $context);
+        $this->logger->debug(
+            sprintf(
+                'Performing transition %s for order transaction %s',
+                $transitionName,
+                $entityId
+            )
+        );
+        try {
+            $this->transitionService->performTransition(OrderTransactionDefinition::ENTITY_NAME, $entityId, $transitionName, $context);
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                $e->getMessage(),
+                [
+                    'method' => 'transaction-transition-service-perform-transition',
+                    'entity.id' => $entityId,
+                    'transition' => $transitionName
+                ]
+            );
+        }
     }
 }

@@ -1,5 +1,8 @@
 {
   "global": {
+    "entities": {
+      "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
+    },
     "businessEvents": {
       "mollie_checkout_order_success": " Order successful",
       "mollie_checkout_order_failed": " Order failed",
@@ -27,13 +30,15 @@
   },
   "mollie-payments": {
     "pluginTitle": "Mollie",
-    "pluginDescription": "Mollie Modul",
+    "pluginDescription": "Mollie Module",
+    "searchPlaceholder": "Search subscriptions...",
     "general": {
       "mainMenuItemGeneral": "Mollie Payments",
       "descriptionTextModule": "Mollie Payments",
       "btnMollieActions": "Mollie Actions",
       "refundThroughMollie": "Refund through Mollie",
-      "shipThroughMollie": "Ship through Mollie"
+      "shipThroughMollie": "Ship through Mollie",
+      "cancelMollieItem": "Cancel through Mollie"
     },
     "config": {
       "info": {
@@ -72,13 +77,17 @@
           "failed": "The payment methods couldn't be updated."
         },
         "mollieLimits": {
-          "link": "Open Mollie Payment Limits"
+          "link": "Show mollie availability rules for payment methods"
         }
       },
       "rounding": {
         "info1": "Shopware can use currency settings to calculate how it rounds an order’s grand total. This includes the number of decimals in your product pricing and the nearest rounding interval, such as 0.50 or 1.00.",
         "info2": "These settings can lead to a different grand total than the total sum of line items. When Mollie cross-checks these amounts and finds that they don’t match, it causes a checkout error.",
         "info3": "You can use this feature to avoid rounding issues in your checkout. When enabled, it adds a separate line item in your Mollie Dashboard for the difference in rounding, and your customers pay the grand total calculated by Shopware."
+      },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "It is not possible to use Klarna Pay now, Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days in the future, unless another maximum is agreed between the merchant and Klarna.",
+        "bankTransferDueDateLimitReached": "It is not possible to set the order life time higher than 100 days."
       },
       "support": {
         "modalTitle": "Request support from Mollie",
@@ -152,7 +161,8 @@
             "resetStock": "Reset Stock"
           },
           "btnResetLine": "Reset Line",
-          "checkDeductPromotion": "Deduct promotion"
+          "checkDeductPromotion": "Deduct promotion",
+          "checkRefundTax": "Refund VAT"
         },
         "roundDiffItemAdded": "Automatic rounding item was added"
       },
@@ -253,7 +263,8 @@
         "order": {
           "description": "The following item quantities will be shipped.",
           "itemHeader": "Item",
-          "quantityHeader": "Quantity"
+          "quantityHeader": "Quantity",
+          "originalQuantityHeader": "Quantity (shippable)"
         },
         "availableTracking": {
           "label": "Available tracking codes",
@@ -266,8 +277,24 @@
           "url": "Url",
           "invalid": "Please enter both Carrier and Code"
         },
-        "confirmButton": "Ship",
-        "cancelButton": "Do not ship"
+        "confirmButton": "Ship order",
+        "cancelButton": "Cancel",
+        "selectAllButton": "Select all",
+        "resetButton": "Reset"
+      },
+      "cancel": {
+        "title": "Cancel item through mollie",
+        "confirmButton": "Cancel item through mollie",
+        "cancelButton": "Close modal",
+        "resetStock": "Reset stocks",
+        "item": {
+          "success": "Product canceled successfully",
+          "failed": {
+            "quantityZero": "Quantity is 0",
+            "invalidLine": "Product does not exist in the order",
+            "quantityTooHigh": "Quantity is too high"
+          }
+        }
       }
     },
     "sw-flow": {
@@ -348,7 +375,8 @@
         },
         "action": {
           "edit": "Edit subscription"
-        }
+        },
+        "deletedCustomer": "Deleted customer"
       },
       "detail": {
         "title": "Mollie subscription",
@@ -403,9 +431,11 @@
   },
   "sw-order": {
     "detailExtended": {
+      "titleCreditCardData" : "Credit Card data",
       "buttonMolliePaymentLink": "Copy to Clipboard",
       "columnRefunded": "Refunded",
       "columnShipped": "Shipped",
+      "columnCanceled": "Canceled",
       "labelMollieOrderId": "Mollie Order ID",
       "labelMollieThirdPartyPaymentId": "Payment Reference",
       "labelMolliePaymentLink": "Mollie Checkout URL",
@@ -437,6 +467,15 @@
       },
       "mollie_subscription": {
         "label": "Subscriptions"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Description"
+        }
       }
     }
   },

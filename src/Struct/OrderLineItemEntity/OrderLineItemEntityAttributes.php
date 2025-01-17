@@ -2,17 +2,21 @@
 
 namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class OrderLineItemEntityAttributes
 {
-
     /**
      * @var OrderLineItemEntity
      */
     private $item;
 
+    /**
+     * @var string
+     */
+    private $productNumber;
 
     /**
      * @var string
@@ -44,21 +48,45 @@ class OrderLineItemEntityAttributes
      */
     private $subscriptionRepetitionCount;
 
+    /**
+     * @var bool
+     */
+    private $isPromotionProduct;
+
 
     /**
      * @param OrderLineItemEntity $lineItem
      */
     public function __construct(OrderLineItemEntity $lineItem)
     {
+        $this->productNumber = '';
+
         $this->item = $lineItem;
+
+        $payload = $lineItem->getPayload();
+
+        if (is_array($payload) && array_key_exists('productNumber', $payload)) {
+            $this->productNumber = (string)$payload['productNumber'];
+        }
 
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
+
+        $this->isPromotionProduct = $lineItem->getType() === 'promotion';
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
         $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
         $this->subscriptionRepetitionCount = (int)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getProductNumber(): string
+    {
+        return (string)$this->productNumber;
     }
 
     /**
@@ -86,6 +114,14 @@ class OrderLineItemEntityAttributes
     public function getMollieOrderLineID(): string
     {
         return $this->mollieOrderLineID;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPromotionProduct(): bool
+    {
+        return $this->isPromotionProduct;
     }
 
     /**
@@ -170,9 +206,9 @@ class OrderLineItemEntityAttributes
 
                     # old structure
                     # check if we have a mollie entry
-                    if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
+                    if ($foundValue === '' && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
                         # load the mollie entry
-                        $mollieData = $customFields['mollie_payments'];
+                        $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
                         # assign our value if we have it
                         $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
                     }
@@ -195,9 +231,9 @@ class OrderLineItemEntityAttributes
 
                 # old structure
                 # check if we have a mollie entry
-                if ($foundValue === '' && array_key_exists('mollie_payments', $customFields)) {
+                if ($foundValue === '' && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
                     # load the mollie entry
-                    $mollieData = $customFields['mollie_payments'];
+                    $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
                     # assign our value if we have it
                     $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
                 }

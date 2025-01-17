@@ -2,6 +2,7 @@
 
 namespace Kiener\MolliePayments\Struct\Order;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -89,6 +90,30 @@ class OrderAttributes
      */
     private $order;
 
+    /**
+     * @var string
+     */
+    private $bankName;
+
+    /**
+     * @var string
+     */
+    private $bankAccount;
+
+    /**
+     * @var string
+     */
+    private $bankBic;
+
+    /**
+     * @var string
+     */
+    private $payPalExpressAuthenticateId;
+
+    /**
+     * @var string
+     */
+    private $bancomatPayPhoneNumber;
 
     /**
      * @param OrderEntity $order
@@ -110,7 +135,12 @@ class OrderAttributes
         $this->creditCardCountryCode = $this->getCustomFieldValue($order, 'creditCardCountryCode');
         $this->creditCardSecurity = $this->getCustomFieldValue($order, 'creditCardSecurity');
         $this->creditCardFeeRegion = $this->getCustomFieldValue($order, 'creditCardFeeRegion');
+        $this->bankName = $this->getCustomFieldValue($order, 'bankName');
+        $this->bankAccount = $this->getCustomFieldValue($order, 'bankAccount');
+        $this->bankBic = $this->getCustomFieldValue($order, 'bankBic');
         $this->timezone = $this->getCustomFieldValue($order, 'timezone');
+        $this->bancomatPayPhoneNumber = $this->getCustomFieldValue($order, 'bancomatPayPhoneNumber');
+        $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order, CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
     }
 
     /**
@@ -318,6 +348,56 @@ class OrderAttributes
     /**
      * @return string
      */
+    public function getBankName(): string
+    {
+        return $this->bankName;
+    }
+
+    /**
+     * @param string $bankName
+     */
+    public function setBankName(string $bankName): void
+    {
+        $this->bankName = $bankName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBankAccount(): string
+    {
+        return $this->bankAccount;
+    }
+
+    /**
+     * @param string $bankAccount
+     */
+    public function setBankAccount(string $bankAccount): void
+    {
+        $this->bankAccount = $bankAccount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBankBic(): string
+    {
+        return $this->bankBic;
+    }
+
+    /**
+     * @param string $bankBic
+     */
+    public function setBankBic(string $bankBic): void
+    {
+        $this->bankBic = $bankBic;
+    }
+
+
+
+    /**
+     * @return string
+     */
     public function getTimezone(): string
     {
         return $this->timezone;
@@ -337,27 +417,73 @@ class OrderAttributes
      */
     public function setCreditCardDetails(?stdClass $details)
     {
-        if (!empty($details->cardNumber)) {
+        if (! empty($details->cardNumber)) {
             $this->creditCardNumber = $details->cardNumber;
         }
-        if (!empty($details->cardHolder)) {
+        if (! empty($details->cardHolder)) {
             $this->creditCardHolder = $details->cardHolder;
         }
-        if (!empty($details->cardAudience)) {
+        if (! empty($details->cardAudience)) {
             $this->creditCardAudience = $details->cardAudience;
         }
-        if (!empty($details->cardLabel)) {
+        if (! empty($details->cardLabel)) {
             $this->creditCardLabel = $details->cardLabel;
         }
-        if (!empty($details->cardCountryCode)) {
+        if (! empty($details->cardCountryCode)) {
             $this->creditCardCountryCode = $details->cardCountryCode;
         }
-        if (!empty($details->cardSecurity)) {
+        if (! empty($details->cardSecurity)) {
             $this->creditCardSecurity = $details->cardSecurity;
         }
-        if (!empty($details->feeRegion)) {
+        if (! empty($details->feeRegion)) {
             $this->creditCardFeeRegion = $details->feeRegion;
         }
+    }
+
+    /**
+     * @param null|stdClass $details
+     * @return void
+     */
+    public function setBankTransferDetails(?stdClass $details)
+    {
+        if (! empty($details->bankName)) {
+            $this->bankName = $details->bankName;
+        }
+        if (! empty($details->bankAccount)) {
+            $this->bankAccount = $details->bankAccount;
+        }
+        if (! empty($details->bankBic)) {
+            $this->bankBic = $details->bankBic;
+        }
+    }
+
+    public function getPayPalExpressAuthenticateId(): string
+    {
+        return $this->payPalExpressAuthenticateId;
+    }
+
+    public function setPayPalExpressAuthenticateId(string $payPalExpressAuthenticateId): void
+    {
+        $this->payPalExpressAuthenticateId = $payPalExpressAuthenticateId;
+    }
+
+
+
+    /**
+     * @return string
+     */
+    public function getBancomatPayPhoneNumber(): string
+    {
+        return $this->bancomatPayPhoneNumber;
+    }
+
+    /**
+     * @param string $bancomatPayPhoneNumber
+     * @return void
+     */
+    public function setBancomatPayPhoneNumber(string $bancomatPayPhoneNumber): void
+    {
+        $this->bancomatPayPhoneNumber = $bancomatPayPhoneNumber;
     }
 
 
@@ -433,8 +559,27 @@ class OrderAttributes
             $mollieData['timezone'] = $this->timezone;
         }
 
+        if ((string)$this->bankName !== '') {
+            $mollieData['bankName'] = $this->bankName;
+        }
+
+        if ((string)$this->bankAccount !== '') {
+            $mollieData['bankAccount'] = $this->bankAccount;
+        }
+
+        if ((string)$this->bankBic !== '') {
+            $mollieData['bankBic'] = $this->bankBic;
+        }
+
+        if ($this->bancomatPayPhoneNumber !== '') {
+            $mollieData['bancomatPayPhoneNumber'] = $this->bancomatPayPhoneNumber;
+        }
+        if ((string)$this->payPalExpressAuthenticateId !== '') {
+            $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;
+        }
+
         return [
-            'mollie_payments' => $mollieData,
+            CustomFieldsInterface::MOLLIE_KEY => $mollieData,
         ];
     }
 
@@ -445,12 +590,12 @@ class OrderAttributes
     {
         # if we already have a mollie subscription ID
         # then we KNOW it's a subscription
-        if (!empty($this->mollieSubscriptionId)) {
+        if (! empty($this->mollieSubscriptionId)) {
             return true;
         }
 
         # also a shopware subscription id reference, means we have one
-        if (!empty($this->swSubscriptionId)) {
+        if (! empty($this->swSubscriptionId)) {
             return true;
         }
 
@@ -480,9 +625,9 @@ class OrderAttributes
         $customFields = $order->getCustomFields();
 
         # check if we have a mollie entry
-        if ($customFields !== null && array_key_exists('mollie_payments', $customFields)) {
+        if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
             # load the mollie entry
-            $mollieData = $customFields['mollie_payments'];
+            $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
             # assign our value if we have it
             $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
         }

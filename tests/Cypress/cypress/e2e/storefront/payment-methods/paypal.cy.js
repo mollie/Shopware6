@@ -36,6 +36,11 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 
 describe('PayPal', () => {
 
+    before(() => {
+        configAction.setupShop(false, false, false);
+        configAction.updateProducts('', false, 0, '');
+    });
+
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
@@ -43,8 +48,6 @@ describe('PayPal', () => {
             beforeEach(() => {
                 devices.setDevice(device);
                 session.resetBrowserSession();
-                configAction.setupShop(false, false, false);
-                configAction.updateProducts('', false, 0, '');
             });
 
             it('C4112: Payment status "pending" leads to successful order', () => {

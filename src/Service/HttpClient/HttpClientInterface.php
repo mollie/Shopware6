@@ -11,7 +11,6 @@ use Kiener\MolliePayments\Service\HttpClient\Response\HttpResponse;
  */
 interface HttpClientInterface
 {
-
     /**
      * @param string $method
      * @param string $url

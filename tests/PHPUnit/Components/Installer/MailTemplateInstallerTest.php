@@ -30,12 +30,12 @@ class MailTemplateInstallerTest extends TestCase
     protected $connection;
 
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var MailTemplateTypeRepositoryInterface
      */
     protected $repoMailTypes;
 
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var MailTemplateRepositoryInterface
      */
     protected $repoMailTemplates;
 
@@ -47,8 +47,10 @@ class MailTemplateInstallerTest extends TestCase
     public function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
+
         $this->repoMailTypes = $this->createMock(EntityRepository::class);
         $this->repoMailTemplates = $this->createMock(EntityRepository::class);
+
         $this->repoSalesChannels = $this->createMock(EntityRepository::class);
 
         $salesChannelSearchResult = $this->createConfiguredMock(EntitySearchResult::class, [
@@ -68,8 +70,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests that nothing new is inserted into the database if we have existing MailType and MailTemplate
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testWithExistingData()
     {
@@ -91,8 +93,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailType when the system default language is not English or German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsNotEnglishOrGerman()
     {
@@ -128,8 +130,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailType when the system default language is English
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsEnglish()
     {
@@ -161,8 +163,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailType when the system default language is German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsGerman()
     {
@@ -196,8 +198,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailTemplate when the system default language is not English or German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsNotEnglishOrGerman()
     {
@@ -233,8 +235,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailTemplate when the system default language is English
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsEnglish()
     {
@@ -266,8 +268,8 @@ class MailTemplateInstallerTest extends TestCase
     /**
      * Tests creating MailTemplate when the system default language is German
      *
-     * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsGerman()
     {
@@ -297,7 +299,7 @@ class MailTemplateInstallerTest extends TestCase
     }
 
     # ----Connection----------------------------------------
-    private function setupConnection($enLangId, $deLangId )
+    private function setupConnection($enLangId, $deLangId)
     {
         $enResult = $this->createConfiguredMock(Result::class, [
             'fetchColumn' => $enLangId,
@@ -332,7 +334,7 @@ class MailTemplateInstallerTest extends TestCase
     private function setupMailTypeRepoWithExistingData($id)
     {
         $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds'  => [$id],
+            'getIds' => [$id],
             'firstId' => $id,
         ]);
 
@@ -354,12 +356,11 @@ class MailTemplateInstallerTest extends TestCase
     private function setupMailTemplateRepoWithExistingData($id)
     {
         $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds'  => [$id],
+            'getIds' => [$id],
             'firstId' => $id,
         ]);
 
         $this->repoMailTemplates->method('searchIds')->willReturn($result);
         $this->repoMailTemplates->expects($this->once())->method('searchIds');
     }
-
 }
