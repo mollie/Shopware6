@@ -1,171 +1,130 @@
 {
-  "checkout": {
-    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products.",
-    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
-    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders."
-  },
-  "error": {
-    "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products.",
-    "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
-    "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
-    "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders."
-  },
-  "molliePayments": {
-    "components": {
-      "creditCard": {
-        "cardExpiryDateLabel": "Expiry date",
-        "cardHolderLabel": "Name on card",
-        "cardNumberLabel": "Card number",
-        "cardVerificationCodeLabel": "CVC/CVV",
-        "creditCardTagLine": "Payment secured and powered by",
-        "headLine": "Enter your card information",
-        "saveCardDetailLabel": "Save card details for future payments"
-      },
-      "ideal": {
-        "selectBank": "Select bank"
-      },
-      "mandate": {
-        "sectionTitle": "Saved cards",
-        "cardTitleLabel": "%name% •••• %number%",
-        "deleteSuccessMessage": "Your card was successfully deleted",
-        "deleteErrorMessage": "There was a problem when removing your card",
-        "newCard": "New card",
-        "remove": "Remove",
-        "subscriptionBadge": "Subscription"
-      },
-      "mandateRemoveModal": {
-        "cancelButton": "Cancel",
-        "cardSubscription": "This card is being used for a subscription. Please cancel the subscription first before removing this card.",
-        "deleteButton": "Delete",
-        "deleteConfirmation": "Are you sure you want to delete?",
-        "title": "Delete Confirmation"
-      }
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products.",
+        "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
+        "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders."
     },
-    "messages": {
-      "payment": {
-        "buttonPayThroughMollie": "Pay with a different payment method",
-        "buttonReturnToShop": "Return to the shop",
-        "error": "Payment failed",
-        "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. "
-      },
-      "redirecting": "Redirecting you to: "
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "The currently selected payment method is not available for subscription products.",
+        "mollie-payments-cart-error-mixedcart": "Your cart contains multiple items in combination with subscription items. Please note you can only purchase 1 subscription item at a time.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Not all payments methods are available when ordering subscription products.",
+        "mollie-payments-cart-guest-account": "Guest Accounts cannot be used for subscription orders."
     },
     "molliePayments": {
-      "components": {
-        "creditCard": {
-          "cardExpiryDateLabel": "Expiry date",
-          "cardHolderLabel": "Name on card",
-          "cardNumberLabel": "Card number",
-          "cardVerificationCodeLabel": "CVC/CVV",
-          "creditCardTagLine": "Payment secured and powered by",
-          "headLine": "Enter your card information",
-          "saveCardDetailLabel": "Save card details for future payments"
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Expiry date",
+                "cardHolderLabel": "Name on card",
+                "cardNumberLabel": "Card number",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Payment secured and powered by",
+                "headLine": "Enter your card information",
+                "saveCardDetailLabel": "Save card details for future payments"
+            },
+            "ideal": {
+                "selectBank": "Select bank"
+            },
+            "pos": {
+              "selectTerminal": "Select terminal"
+            },
+            "mandate": {
+                "sectionTitle": "Saved cards",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Your card was successfully deleted",
+                "deleteErrorMessage": "There was a problem when removing your card",
+                "newCard": "New card",
+                "remove": "Remove",
+                "subscriptionBadge" : "Subscription"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Cancel",
+                "cardSubscription": "This card is being used for a subscription. Please cancel the subscription first before removing this card.",
+                "deleteButton": "Delete",
+                "deleteConfirmation": "Are you sure you want to delete?",
+                "title": "Delete Confirmation"
+            },
+            "bancomatPay": {
+              "headLine": "Phone number",
+              "phoneErrorMessage": "Phone Number is required. For example +31208202070"
+            }
         },
-        "ideal": {
-          "selectBank": "Select bank"
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Pay with a different payment method",
+                "buttonReturnToShop": "Return to the shop",
+                "error": "Payment failed",
+                "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. "
+            },
+            "redirecting": "Redirecting you to: "
         },
-        "pos": {
-          "selectTerminal": "Select terminal"
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Subtotal",
+                "captionTaxes": "Taxes",
+                "paymentError": "The payment with Apple Pay failed."
+            },
+            "paypalExpress": {
+                "paymentError": "The payment with Paypal Express failed."
+            }
         },
-        "mandate": {
-          "sectionTitle": "Saved cards",
-          "cardTitleLabel": "%name% •••• %number%",
-          "deleteSuccessMessage": "Your card was successfully deleted",
-          "deleteErrorMessage": "There was a problem when removing your card",
-          "newCard": "New card",
-          "remove": "Remove",
-          "subscriptionBadge": "Subscription"
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "edit billing address",
+                "btnEditShippingAddress": "edit shipping address",
+                "cancelSubscription": "Subscription has been canceled",
+                "errorCancelSubscription": "The subscription could not be canceled due to an error. Please contact our support.",
+                "errorPause": "There was an error when pausing your subscription",
+                "errorResume": "There was an error when resuming your subscription",
+                "errorSkip": "There was an error when skipping your subscription",
+                "errorUpdateAddress": "There was an error when updating your address",
+                "errorUpdatePayment": "There was an error when updating your payment method",
+                "headlineBillingAddress": "Billing address",
+                "headlineShippingAddress": "Shipping address",
+                "mollieSubscriptionAmount": "Amount",
+                "mollieSubscriptionCancel": "Cancel Subscription",
+                "mollieSubscriptionCancelUntil": "Cancellation possible until",
+                "mollieSubscriptionContextMenuReorder": "Repeat subscription",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Next payment at",
+                "mollieSubscriptionPause": "Pause subscription",
+                "mollieSubscriptionResume": "Resume subscription",
+                "mollieSubscriptionSkip": "Skip subscription",
+                "mollieSubscriptionUpdatePayment": "Update payment",
+                "mollieSubscriptionsHeadline": "Subscription:",
+                "mollieSubscriptionsInfoEmpty": "You have no subscriptions yet.",
+                "mollieSubscriptionsLink": "Subscriptions",
+                "mollieSubscriptionsTitle": "Subscriptions",
+                "mollieSubscriptionsWelcome": "Your recent subscriptions:",
+                "orderActionHide": "Hide",
+                "orderActionView": "View",
+                "shippingEqualToBilling": "Equal to billing address",
+                "successPause": "Your subscription has been paused",
+                "successResume": "Your subscription will now be resumed",
+                "successSkip": "Your subscription has been skipped",
+                "successUpdateAddress": "Your address has been updated successfully",
+                "successUpdatePayment": "Your payment method has been updated successfully"
+            },
+            "options": {
+                "everyDay": "Every day",
+                "everyDays": "Every %value% days",
+                "everyMonth": "Every month",
+                "everyMonths": "Every %value% months",
+                "everyWeek": "Every week",
+                "everyWeeks": "Every %value% weeks",
+                "repetitionCount": "%value% time(s)"
+            },
+            "product": {
+                "addToCartText": "Subscribe",
+                "information": "Subscription product"
+            }
         },
-        "mandateRemoveModal": {
-          "cancelButton": "Cancel",
-          "cardSubscription": "This card is being used for a subscription. Please cancel the subscription first before removing this card.",
-          "deleteButton": "Delete",
-          "deleteConfirmation": "Are you sure you want to delete?",
-          "title": "Delete Confirmation"
+        "order": {
+          "refundedLabel": "Refunded:",
+          "refundPendingLabel": "Refund pending:"
         },
-        "bancomatPay": {
-          "headLine": "Phone number",
-          "phoneErrorMessage": "Phone Number is required. For example +31208202070"
+        "testMode": {
+            "label": "Test mode"
         }
-      },
-      "messages": {
-        "payment": {
-          "buttonPayThroughMollie": "Pay with a different payment method",
-          "buttonReturnToShop": "Return to the shop",
-          "error": "Payment failed",
-          "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. "
-        },
-        "redirecting": "Redirecting you to: "
-      },
-      "payments": {
-        "applePayDirect": {
-          "captionSubtotal": "Subtotal",
-          "captionTaxes": "Taxes",
-          "paymentError": "The payment with Apple Pay failed."
-        },
-        "paypalExpress": {
-          "paymentError": "The payment with Paypal Express failed."
-        }
-      },
-      "subscriptions": {
-        "account": {
-          "btnEditBillingAddress": "edit billing address",
-          "btnEditShippingAddress": "edit shipping address",
-          "cancelSubscription": "Subscription has been canceled",
-          "errorCancelSubscription": "The subscription could not be canceled due to an error. Please contact our support.",
-          "errorPause": "There was an error when pausing your subscription",
-          "errorResume": "There was an error when resuming your subscription",
-          "errorSkip": "There was an error when skipping your subscription",
-          "errorUpdateAddress": "There was an error when updating your address",
-          "errorUpdatePayment": "There was an error when updating your payment method",
-          "headlineBillingAddress": "Billing address",
-          "headlineShippingAddress": "Shipping address",
-          "mollieSubscriptionAmount": "Amount",
-          "mollieSubscriptionCancel": "Cancel Subscription",
-          "mollieSubscriptionCancelUntil": "Cancellation possible until",
-          "mollieSubscriptionContextMenuReorder": "Repeat subscription",
-          "mollieSubscriptionId": "Id",
-          "mollieSubscriptionNextPayment": "Next payment at",
-          "mollieSubscriptionPause": "Pause subscription",
-          "mollieSubscriptionResume": "Resume subscription",
-          "mollieSubscriptionSkip": "Skip subscription",
-          "mollieSubscriptionUpdatePayment": "Update payment",
-          "mollieSubscriptionsHeadline": "Subscription:",
-          "mollieSubscriptionsInfoEmpty": "You have no subscriptions yet.",
-          "mollieSubscriptionsLink": "Subscriptions",
-          "mollieSubscriptionsTitle": "Subscriptions",
-          "mollieSubscriptionsWelcome": "Your recent subscriptions:",
-          "orderActionHide": "Hide",
-          "orderActionView": "View",
-          "shippingEqualToBilling": "Equal to billing address",
-          "successPause": "Your subscription has been paused",
-          "successResume": "Your subscription will now be resumed",
-          "successSkip": "Your subscription has been skipped",
-          "successUpdateAddress": "Your address has been updated successfully",
-          "successUpdatePayment": "Your payment method has been updated successfully"
-        },
-        "options": {
-          "everyDay": "Every day",
-          "everyDays": "Every %value% days",
-          "everyMonth": "Every month",
-          "everyMonths": "Every %value% months",
-          "everyWeek": "Every week",
-          "everyWeeks": "Every %value% weeks",
-          "repetitionCount": "%value% time(s)"
-        },
-        "product": {
-          "addToCartText": "Subscribe",
-          "information": "Subscription product"
-        }
-      },
-      "order": {
-        "refundedLabel": "Refunded:",
-        "refundPendingLabel": "Refund pending:"
-      },
-      "testMode": {
-        "label": "Test mode"
-      }
     }
-  }
 }
