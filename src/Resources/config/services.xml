@@ -163,6 +163,14 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Checkout\Cart\RentDiscountProcessor">
+            <argument type="service" id="Shopware\Core\Checkout\Cart\Price\PercentagePriceCalculator"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
+            <argument type="service" id="order.repository"/>
+            <tag name="shopware.cart.processor" priority="4500" />
+            <tag name="shopware.cart.collector" priority="4500" />
+        </service>
+
 
         <!-- Subscribers -->
         <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber" class="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">

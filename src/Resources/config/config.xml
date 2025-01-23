@@ -1036,6 +1036,182 @@
     </card>
 
     <card>
+        <title>Composition of the subscription order price and discount</title>
+        <title lang="de-DE">Zusammensetzung des Abonnement-Bestellpreises und -Rabatts</title>
+        <input-field type="single-select">
+            <name>numberOfDiscounts</name>
+            <label>How many discounts should be applied?</label>
+            <label lang="de-DE">Wie viele Rabatte sollen gewährt werden?</label>
+            <helpText>Select value how many times discount shoud be applied?</helpText>
+            <helpText lang="de-DE">Wählen Sie einen Wert aus, wie oft der Rabatt angewendet werden soll.</helpText>
+            <options>
+                <option>
+                    <id>1</id>
+                    <name>1</name>
+                    <name lang="de-DE">1</name>
+                </option>
+                <option>
+                    <id>2</id>
+                    <name>2</name>
+                    <name lang="de-DE">2</name>
+                </option>
+                <option>
+                    <id>2</id>
+                    <name>2</name>
+                    <name lang="de-DE">2</name>
+                </option>
+                <option>
+                    <id>3</id>
+                    <name>3</name>
+                    <name lang="de-DE">3</name>
+                </option>
+                <option>
+                    <id>4</id>
+                    <name>4</name>
+                    <name lang="de-DE">4</name>
+                </option>
+                <option>
+                    <id>5</id>
+                    <name>5</name>
+                    <name lang="de-DE">5</name>
+                </option>
+                <option>
+                    <id>6</id>
+                    <name>6</name>
+                    <name lang="de-DE">6</name>
+                </option>
+                <option>
+                    <id>7</id>
+                    <name>7</name>
+                    <name lang="de-DE">7</name>
+                </option>
+                <option>
+                    <id>8</id>
+                    <name>8</name>
+                    <name lang="de-DE">8</name>
+                </option>
+                <option>
+                    <id>9</id>
+                    <name>9</name>
+                    <name lang="de-DE">9</name>
+                </option>
+                <option>
+                    <id>10</id>
+                    <name>10</name>
+                    <name lang="de-DE">10</name>
+                </option>
+                <option>
+                    <id>11</id>
+                    <name>11</name>
+                    <name lang="de-DE">11</name>
+                </option>
+                <option>
+                    <id>12</id>
+                    <name>12</name>
+                    <name lang="de-DE">12</name>
+                </option>
+            </options>
+        </input-field>
+
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval1</name>
+            <label>Discount after the first payment (%)</label>
+            <label lang="de-DE">Rabatt nach der ersten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>13.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval2</name>
+            <label>Discount after the second payment (%)</label>
+            <label lang="de-DE">Rabatt nach der zweiten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>8.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval3</name>
+            <label>Discount after the third payment (%)</label>
+            <label lang="de-DE">Rabatt nach der dritten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>6.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval4</name>
+            <label>Discount after the fourth payment (%)</label>
+            <label lang="de-DE">Rabatt nach der vierten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>6.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval5</name>
+            <label>Discount after the fifth payment (%)</label>
+            <label lang="de-DE">Rabatt nach der fünften Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>6.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval6</name>
+            <label>Discount after the sixt payment (%)</label>
+            <label lang="de-DE">Rabatt nach der sechsten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>6.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval7</name>
+            <label>Discount after the seventh payment (%)</label>
+            <label lang="de-DE">Rabatt nach der siebten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>5.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval8</name>
+            <label>Discount after the eight payment (%)</label>
+            <label lang="de-DE">Rabatt nach der achten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>5.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval9</name>
+            <label>Discount after the ninth payment (%)</label>
+            <label lang="de-DE">Rabatt nach der neunten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>5.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval10</name>
+            <label>Discount after the tenth payment (%)</label>
+            <label lang="de-DE">Rabatt nach der zehnten Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>5.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval11</name>
+            <label>Discount after the eleventh payment (%)</label>
+            <label lang="de-DE">Rabatt nach der elften Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>5.0</defaultValue>
+        </input-field>
+        <input-field type="float">
+            <name>rentDiscountPercentageAtInterval12</name>
+            <label>Discount after the twelfth payment (%)</label>
+            <label lang="de-DE">Rabatt nach der zwölften Zahlung (%)</label>
+            <helpText>Enter value (in decimal format 10.5)</helpText>
+            <helpText lang="de-DE">Wert eingeben (im Dezimalformat 10,5)</helpText>
+            <defaultValue>5.0</defaultValue>
+        </input-field>
+    </card>
+
+    <card>
         <title>Javascript</title>
         <title lang="de-DE">Storefront Javascript</title>
         <title lang="nl-NL">Storefront Javascript</title>
