@@ -28,7 +28,7 @@ final class LoggerSettings extends Struct
         $logFileDays = $settings[self::KEY_LOG_FILE_DAYS] ?? 0;
         $debugMode = $settings[self::KEY_DEBUG_MODE] ?? false;
 
-        return new LoggerSettings($debugMode, $logFileDays);
+        return new LoggerSettings($debugMode, (int)$logFileDays);
     }
 
     public function isDebugMode(): bool
