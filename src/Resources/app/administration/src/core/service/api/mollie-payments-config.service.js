@@ -1,10 +1,7 @@
-
-import MolliePaymentsRefundBundleRepositoryService from './mollie-payments-refund-bundle-repository.service';
 // eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsConfigService extends ApiService {
-    repository;
 
 
     /**
@@ -81,13 +78,19 @@ export default class MolliePaymentsConfigService extends ApiService {
      * @returns {*}
      */
     getRefundManagerConfig(salesChannelId, orderId) {
-        MolliePaymentsRefundBundleRepositoryService.setOrderId(orderId);
-        MolliePaymentsRefundBundleRepositoryService.setClient(this.httpClient);
-        MolliePaymentsRefundBundleRepositoryService.setHeaders(this.getBasicHeaders());
-
-        return MolliePaymentsRefundBundleRepositoryService.fetch().then((response) => {
-            return ApiService.handleResponse(response);
-        });
+        return this.httpClient
+            .post(
+                `_action/${this.getApiBasePath()}/config/refund-manager`,
+                {
+                    'salesChannelId': salesChannelId,
+                    'orderId': orderId,
+                },
+                {
+                    headers: this.getBasicHeaders(),
+                }
+            ).then((response) => {
+                return ApiService.handleResponse(response);
+            });
     }
 
 }

@@ -24,10 +24,9 @@ export default class RefundManager {
 
         let refundManagerPossible = false;
 
-        await this._configService.getRefundManagerConfig(salesChannelId, orderId)
-            .then((response) => {
-                refundManagerPossible = response.config.enabled;
-            });
+        await this._configService.getRefundManagerConfig(salesChannelId, orderId).then((response) => {
+            refundManagerPossible = response.enabled;
+        });
 
         return refundManagerPossible;
     }

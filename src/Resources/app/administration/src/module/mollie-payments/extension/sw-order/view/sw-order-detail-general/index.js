@@ -4,8 +4,6 @@ import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 import RefundManager from '../../../../components/mollie-refund-manager/RefundManager';
 import MollieShipping from '../../../../components/mollie-ship-order/MollieShipping';
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
-import MolliePaymentsRefundBundleRepositoryService
-from '../../../../../../core/service/api/mollie-payments-refund-bundle-repository.service';
 
 // eslint-disable-next-line no-undef
 const {Component, Mixin, Filter} = Shopware;
@@ -261,8 +259,8 @@ Component.override('sw-order-detail-general', {
                 this.molliePaymentUrl = (response.url !== null) ? response.url : '';
             });
 
-            MolliePaymentsRefundBundleRepositoryService.setOrderId(this.order.id);
-            MolliePaymentsRefundBundleRepositoryService.fetch().then((response) => {
+            this.shippingManagerService.isShippingPossible(this.order).then((enabled) => {
+                this.isShippingPossible = enabled;
                 this.isShippingPossible = response.data.shipping.shippableQuantity > 0;
             });
 
