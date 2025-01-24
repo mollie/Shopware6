@@ -1,3 +1,11 @@
+import './module/mollie-payments/components/mollie-pluginconfig-section-info';
+import './module/mollie-payments/components/mollie-pluginconfig-section-api';
+import './module/mollie-payments/components/mollie-pluginconfig-section-payments';
+import './module/mollie-payments/components/mollie-pluginconfig-section-payments-format';
+import './module/mollie-payments/components/mollie-pluginconfig-section-rounding';
+import './module/mollie-payments/components/mollie-pluginconfig-support-modal';
+import './module/mollie-payments/components/mollie-pluginconfig-section-order-lifetime-warning';
+import './module/mollie-payments/components/mollie-pluginconfig-element-orderstate-select';
 import './init/api-service.init';
 import './init/credit-card-components.init'
 import './extension/sw-flow-sequence-action';
