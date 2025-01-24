@@ -60,12 +60,8 @@ build: ##3 Installs the plugin, and builds the artifacts using the Shopware buil
 	# -----------------------------------------------------
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
-	# -----------------------------------------------------
-ifneq ("$(SW_MAJVER)", "6.4")
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
-else
-	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
-endif
+	# -----------------------------------------------------
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console --no-debug theme:refresh
 	cd ../../.. && php bin/console --no-debug theme:compile
