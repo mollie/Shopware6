@@ -12,15 +12,6 @@ Component.register('mollie-pluginconfig-section-payments-format', {
 
         /**
          *
-         * @returns {boolean}
-         */
-        isVisible() {
-            // we know show this all the time for a better UX
-            return true;
-        },
-
-        /**
-         *
          * @returns {string}
          */
         sample1() {
