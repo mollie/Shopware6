@@ -36,8 +36,11 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          */
         getFormat(ordernumber, customerNumber) {
 
-            const template =  document.querySelector('input[name="MolliePayments.config.formatOrderNumber"]');
-
+            const templateElement =  document.querySelector('input[name="MolliePayments.config.formatOrderNumber"]');
+            let template = ''
+            if(templateElement instanceof HTMLInputElement){
+                template = templateElement.value;
+            }
             const stringUtils = new StringUtils();
 
             let text = stringUtils.replace('{ordernumber}', ordernumber, template);
