@@ -1,14 +1,3 @@
-import './acl';
-import './extension/sw-order';
-import './extension/sw-settings';
-import './components/mollie-tracking-info';
-import './components/mollie-refund-manager';
-import './components/mollie-external-link';
-import './components/mollie-internal-link';
-import './components/mollie-ship-order';
-import './components/mollie-cancel-item';
-import './page/mollie-subscriptions-list';
-import './page/mollie-subscriptions-detail';
 
 import defaultSearchConfiguration from './default-search-configuration';
 
