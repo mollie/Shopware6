@@ -57,7 +57,8 @@ Component.override('sw-order-line-items-grid', {
                 url: '',
             },
             showTrackingInfo: false,
-
+            refundedManagerService:null,
+            shippingManagerService:null,
             EVENT_TOGGLE_REFUND_MANAGER: 'toggle-refund-manager-modal',
         };
     },
@@ -140,7 +141,7 @@ Component.override('sw-order-line-items-grid', {
          *
          * @returns {Promise<void>}
          */
-        async createdComponent() {
+         createdComponent() {
 
             if (!this.isMollieOrder) {
                 return;
@@ -163,11 +164,9 @@ Component.override('sw-order-line-items-grid', {
          */
         async reloadData() {
 
-            this.shippingManagerService.isShippingPossible(this.order).then((enabled) => {
-                this.isShippingPossible = enabled;
-            });
+            this.isShippingPossible = await this.shippingManagerService?.isShippingPossible(this.order) || false;
 
-            this.isRefundManagerPossible = this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id);
+            this.isRefundManagerPossible = await this.refundedManagerService?.isRefundManagerAvailable(this.order.salesChannelId, this.order.id) || false;
 
             await this.loadMollieShippingStatus();
             await this.loadMollieCancelStatus();

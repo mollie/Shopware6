@@ -31,11 +31,11 @@ export default class StringUtils {
      */
     replace(search, replaceWith, text) {
 
-        if (text === undefined || text === null) {
+        if (!text) {
             return '';
         }
-
-        return text.split(search).join(replaceWith);
+        const regex = new RegExp(search,"g");
+        return text.replace(regex, replaceWith);
     }
 
 }

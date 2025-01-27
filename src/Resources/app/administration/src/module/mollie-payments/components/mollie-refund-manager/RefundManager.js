@@ -12,7 +12,7 @@ export default class RefundManager {
 
     /**
      * Gets if the refund manager is available
-     * @returns {boolean}
+     * @returns Promise<boolean>
      */
     async isRefundManagerAvailable(salesChannelId, orderId) {
 

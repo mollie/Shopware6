@@ -9,9 +9,9 @@
             <ol class="list">
                 <li class="list-item">
                     {{ $tc('mollie-payments.config.info.onboardingStep1') }}<br/>
-                    <mollie-external-link href="https://www.mollie.com/signup/">
+                    <sw-external-link href="https://www.mollie.com/signup/">
                         https://www.mollie.com/signup
-                    </mollie-external-link>
+                    </sw-external-link>
                 </li>
                 <li class="list-item">
                     {{ $tc('mollie-payments.config.info.onboardingStep2') }}<br/>
@@ -19,10 +19,10 @@
                 </li>
                 <li class="list-item">
                     {{ $tc('mollie-payments.config.info.onboardingStep3') }}<br/>
-                    <mollie-internal-link inline :routerLink="{ name:'sw.sales.channel.list'}"
+                    <sw-internal-link inline :routerLink="{ name:'sw.sales.channel.list'}"
                                           v-if="hasSalesChannelList">
                         {{ $tc('mollie-payments.config.info.onboardingStep3Link') }}
-                    </mollie-internal-link>
+                    </sw-internal-link>
                 </li>
             </ol>
             <br/>
@@ -37,14 +37,14 @@
             <sw-icon name="regular-file"></sw-icon>
             {{ $tc('mollie-payments.config.info.btnDocumentation') }}
         </sw-button>
-        <sw-button class="btn-action" @click="openSupport">
+        <sw-button class="btn-action mollie-support-action" @click="openSupport">
             <sw-icon name="regular-envelope"></sw-icon>
             {{ $tc('mollie-payments.config.info.btnRequestSupport') }}
         </sw-button>
-        <mollie-external-link class="link-troubleshooting"
+        <sw-external-link class="link-troubleshooting"
                               href="https://github.com/mollie/Shopware6/wiki/Troubleshooting">
             {{ $tc('mollie-payments.config.info.btnTroubleshooting') }}
-        </mollie-external-link>
+        </sw-external-link>
     </div>
     <mollie-pluginconfig-support-modal v-if="isSupportOpen" @close="closeSupport"/>
 </sw-container>

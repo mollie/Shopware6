@@ -20,8 +20,6 @@ import './module/mollie-payments/extension/sw-order';
 import './module/mollie-payments/extension/sw-settings';
 import './module/mollie-payments/components/mollie-tracking-info';
 import './module/mollie-payments/components/mollie-refund-manager';
-import './module/mollie-payments/components/mollie-external-link';
-import './module/mollie-payments/components/mollie-internal-link';
 import './module/mollie-payments/components/mollie-ship-order';
 import './module/mollie-payments/components/mollie-cancel-item';
 import './module/mollie-payments/page/mollie-subscriptions-list';

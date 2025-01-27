@@ -16,9 +16,9 @@
                     </sw-button-group>
                 </div>
                 <div class="order-container-top-right">
-                    <mollie-external-link href="https://github.com/mollie/Shopware6/wiki/Refunds">
+                    <sw-external-link href="https://github.com/mollie/Shopware6/wiki/Refunds">
                         {{ $tc('mollie-payments.refund-manager.cart.linkHowTo') }}
-                    </mollie-external-link>
+                    </sw-external-link>
                 </div>
             </sw-container>
             <sw-data-grid :dataSource="orderItems"
@@ -419,9 +419,9 @@
                           variant="warning">
                     {{ $tc('mollie-payments.refund-manager.acl.warningCancel') }}
                 </sw-alert>
-                <mollie-external-link href="https://docs.mollie.com/payments/refunds#refund-statuses">
+                <sw-external-link href="https://docs.mollie.com/payments/refunds#refund-statuses">
                     {{ $tc('mollie-payments.refund-manager.refunds.linkMore') }}
-                </mollie-external-link>
+                </sw-external-link>
             </div>
             <sw-data-grid :dataSource="mollieRefunds"
                           :columns="gridMollieRefundsColumns"
