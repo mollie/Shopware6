@@ -7,6 +7,7 @@ const {Component} = Shopware;
 
 Component.register('mollie-pluginconfig-section-payments-format', {
     template,
+    inject:['actualConfigData','currentSalesChannelId'],
     computed: {
 
         /**
@@ -36,11 +37,7 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          */
         getFormat(ordernumber, customerNumber) {
 
-            const templateElement =  document.querySelector('input[name="MolliePayments.config.formatOrderNumber"]');
-            let template = ''
-            if(templateElement instanceof HTMLInputElement){
-                template = templateElement.value;
-            }
+            const template = this.actualConfigData[this.currentSalesChannelId]['MolliePayments.config.formatOrderNumber'];
             const stringUtils = new StringUtils();
 
             let text = stringUtils.replace('{ordernumber}', ordernumber, template);
