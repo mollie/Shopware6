@@ -1,25 +1,7 @@
-import './acl';
-import './extension/sw-order';
-import './extension/sw-settings';
-import './components/mollie-pluginconfig-element-orderstate-select';
-import './components/mollie-pluginconfig-section-info';
-import './components/mollie-pluginconfig-section-api';
-import './components/mollie-pluginconfig-section-payments';
-import './components/mollie-pluginconfig-section-payments-format';
-import './components/mollie-pluginconfig-section-rounding';
-import './components/mollie-pluginconfig-support-modal';
-import './components/mollie-pluginconfig-section-order-lifetime-warning';
-import './components/mollie-tracking-info';
-import './components/mollie-refund-manager';
-import './components/mollie-external-link';
-import './components/mollie-internal-link';
-import './components/mollie-ship-order';
-import './components/mollie-cancel-item';
-import './page/mollie-subscriptions-list';
-import './page/mollie-subscriptions-detail';
 
 import defaultSearchConfiguration from './default-search-configuration';
-
+import './page/mollie-subscriptions-list';
+import './page/mollie-subscriptions-detail';
 
 // eslint-disable-next-line no-undef
 const {Module,Plugin,Service} = Shopware;

@@ -12,15 +12,6 @@ Component.register('mollie-pluginconfig-section-payments-format', {
 
         /**
          *
-         * @returns {boolean}
-         */
-        isVisible() {
-            // we know show this all the time for a better UX
-            return true;
-        },
-
-        /**
-         *
          * @returns {string}
          */
         sample1() {
@@ -38,7 +29,6 @@ Component.register('mollie-pluginconfig-section-payments-format', {
     },
 
     methods: {
-
         /**
          *
          * @param ordernumber
@@ -47,8 +37,7 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          */
         getFormat(ordernumber, customerNumber) {
 
-            const template = this.actualConfigData[this.currentSalesChannelId]['MolliePayments.config.formatOrderNumber'];
-
+            const template = this.actualConfigData?.[this.currentSalesChannelId]?.['MolliePayments.config.formatOrderNumber'] || '';
             const stringUtils = new StringUtils();
 
             let text = stringUtils.replace('{ordernumber}', ordernumber, template);

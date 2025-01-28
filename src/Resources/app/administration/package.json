@@ -4,7 +4,9 @@
     "description": "",
     "author": "Mollie B.V.",
     "dependencies": {
-        "raw-loader": "^4.0.2"
+        "core-js": "^3.40.0",
+        "raw-loader": "^4.0.2",
+        "regenerator-runtime": "^0.14.1"
     },
     "devDependencies": {
         "@babel/cli": "^7.5.5",

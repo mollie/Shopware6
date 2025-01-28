@@ -12,7 +12,7 @@ export default class RefundManager {
 
     /**
      * Gets if the refund manager is available
-     * @returns {boolean}
+     * @returns Promise<boolean>
      */
     async isRefundManagerAvailable(salesChannelId, orderId) {
 
@@ -24,10 +24,9 @@ export default class RefundManager {
 
         let refundManagerPossible = false;
 
-        await this._configService.getRefundManagerConfig(salesChannelId, orderId)
-            .then((response) => {
-                refundManagerPossible = response.config.enabled;
-            });
+        await this._configService.getRefundManagerConfig(salesChannelId, orderId).then((response) => {
+            refundManagerPossible = response.enabled;
+        });
 
         return refundManagerPossible;
     }
