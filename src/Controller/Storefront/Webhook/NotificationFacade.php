@@ -132,6 +132,7 @@ class NotificationFacade
     /**
      * @param string $swTransactionId
      * @param Context $context
+     * @throws WebhookIsTooEarlyException
      * @throws CustomerCouldNotBeFoundException
      * @return void
      */

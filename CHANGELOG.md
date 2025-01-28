@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] 
 
 ### Added
-
 - Returns for Shopware Commercial plugins are now transferred to Mollie when the return status is set to "Done" and can be canceled with the "Cancelled" status. Please note that refunds cannot be canceled after two hours.
 - MB Way payment method is now available for Mollie Payments.
 - Multibanco payment method is now available for Mollie Payments.
@@ -17,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - The minimum supported Shopware version is now 6.4.5.0.
 - Added a new Monolog channel "mollie." You can now add custom handlers and assign them to the Mollie channel.
+- When a webhook from mollie is sent too early to the shop, a debug message is logged instead of a warning.
 
 ### Fixed
 
