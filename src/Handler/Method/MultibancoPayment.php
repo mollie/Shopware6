@@ -7,7 +7,7 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 class MultibancoPayment extends PaymentHandler
 {
     public const PAYMENT_METHOD_NAME = 'multibanco';
-    public const PAYMENT_METHOD_DESCRIPTION = 'multibanco';
+    public const PAYMENT_METHOD_DESCRIPTION = 'Multibanco';
 
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;

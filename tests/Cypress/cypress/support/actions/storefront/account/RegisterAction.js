@@ -24,8 +24,8 @@ export default class RegisterAction {
         repo.getEmail().clear().type(email);
         repo.getPassword().clear().type(password);
 
-        repo.getStreet().clear().type('Mollie');
-        repo.getZipcode().clear().type('Mollie');
+        repo.getStreet().clear().type('Mollie 13a');
+        repo.getZipcode().clear().type('1234568');
         repo.getCity().clear().type('Mollie');
 
         repo.getCountry().select('Germany');
