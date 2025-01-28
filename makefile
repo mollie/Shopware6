@@ -9,7 +9,9 @@ PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/compo
 
 SW_CLI_VERSION:=$(shell shopware-cli --version 1>/dev/null)
 NODE_VERSION:=$(shell node -v)
-
+SW_VERSION := 6.4.5.0
+# split by dot and use 2nd word and append it to "6."
+SW_MAJVER:=6.$(word 2, $(subst ., ,$(SW_VERSION)))
 
 help:
 	@printf "\033[33mInstallation:%-30s\033[0m %s\n"
@@ -24,10 +26,6 @@ help:
 # ------------------------------------------------------------------------------------------------------------
 
 prod: ##1 Installs all production dependencies
-	# do not switch to production composer PROD, otherwise it would
-	# also install shopware in here -> we just need it for the release composer.json file
-	# so just switch to our dev dependency variant
-	php switch-composer.php dev
 	# ----------------------------------------------------------------
 	@composer validate
 	@composer install --no-dev
@@ -35,13 +33,12 @@ prod: ##1 Installs all production dependencies
 	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
-	php switch-composer.php dev
 	@composer validate
     # we have to run update in dev mode, because dev dependencies are not compatible with newer php version. should be updated when support for 6.4 is dropped
 	@composer update
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install -y --allow-downgrades shopware-cli=0.3.18
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli -y
 
 install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
@@ -62,12 +59,9 @@ clean: ##1 Cleans all dependencies and files
 build: ##3 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# -----------------------------------------------------
 	# CUSTOM WEBPACK
-	php switch-composer.php dev
 	cd ./src/Resources/app/storefront && make build -B
-	# -----------------------------------------------------
-	php switch-composer.php prod
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
-	php switch-composer.php dev
+	# -----------------------------------------------------
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console --no-debug theme:refresh
 	cd ../../.. && php bin/console --no-debug theme:compile
@@ -184,15 +178,12 @@ endif
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	# switch to PROD dependencies before zipping plugin
-	# this is very important for the Shopware Store.
-	php switch-composer.php prod
+
+
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*' '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/switch-composer.php' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*' '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
 	# -------------------------------------------------------------------------------------------------
-	@echo "RESET COMPOSER.JSON"
-	php switch-composer.php dev
 	# -------------------------------------------------------------------------------------------------
 	@echo ""
 	@echo "CONGRATULATIONS"
