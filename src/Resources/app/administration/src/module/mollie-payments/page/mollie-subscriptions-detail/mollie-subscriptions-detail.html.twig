@@ -120,14 +120,14 @@
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_link_shopware_customer %}
-                                <mollie-internal-link inline :routerLink="{ name: 'sw.customer.detail', params: { id: subscription.customerId }, query: { edit: false } }">
+                                <sw-internal-link inline :routerLink="{ name: 'sw.customer.detail', params: { id: subscription.customerId }, query: { edit: false } }">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonShowShopwareCustomer') }}
-                                </mollie-internal-link>
+                                </sw-internal-link>
                             {% endblock %}
                             {% block sw_order_detail_card_basic_link_shopware_order %}
-                                <mollie-internal-link inline :routerLink="{ name: 'sw.order.detail', params: { id: subscription.orderId }, query: { edit: false } }">
+                                <sw-internal-link inline :routerLink="{ name: 'sw.order.detail', params: { id: subscription.orderId }, query: { edit: false } }">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonShowShopwareOrder') }}
-                                </mollie-internal-link>
+                                </sw-internal-link>
                             {% endblock %}
                         </sw-container>
                     </sw-card>

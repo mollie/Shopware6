@@ -67,6 +67,8 @@ Component.override('sw-order-detail-base', {
             this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
                 this.loadMollieData();
             });
+
+            this.loadMollieData();
         },
 
         /**
