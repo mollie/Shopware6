@@ -33,7 +33,7 @@ describe('MW Way', () => {
 
             scenarioDummyBasket.execute();
             checkout.changeBillingCountry('Portugal');
-            paymentAction.switchPaymentMethod('mbway');
+            paymentAction.switchPaymentMethod('MB Way');
 
             // payment would only work using currency CHF which cannot be done at the moment
         })

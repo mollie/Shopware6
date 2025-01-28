@@ -33,7 +33,7 @@ describe('Multibanco', () => {
 
             scenarioDummyBasket.execute();
             checkout.changeBillingCountry('Portugal');
-            paymentAction.switchPaymentMethod('multibanco');
+            paymentAction.switchPaymentMethod('Multibanco');
 
             // payment would only work using currency CHF which cannot be done at the moment
         })
