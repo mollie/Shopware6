@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\MbWayPayment;
+use Kiener\MolliePayments\Handler\Method\MultibancoPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
@@ -149,6 +150,7 @@ class PaymentMethodServiceTest extends TestCase
             SatispayPayment::class,
             PayByBankPayment::class,
             MbWayPayment::class,
+            MultibancoPayment::class,
             PayPalExpressPayment::class,
         ];
 
