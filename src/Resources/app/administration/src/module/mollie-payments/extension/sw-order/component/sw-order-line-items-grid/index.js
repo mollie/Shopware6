@@ -141,7 +141,7 @@ Component.override('sw-order-line-items-grid', {
          *
          * @returns {Promise<void>}
          */
-         createdComponent() {
+        createdComponent() {
 
             if (!this.isMollieOrder) {
                 return;
@@ -165,7 +165,6 @@ Component.override('sw-order-line-items-grid', {
         async reloadData() {
 
             this.isShippingPossible = await this.shippingManagerService?.isShippingPossible(this.order) || false;
-
             this.isRefundManagerPossible = await this.refundedManagerService?.isRefundManagerAvailable(this.order.salesChannelId, this.order.id) || false;
 
             await this.loadMollieShippingStatus();

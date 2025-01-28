@@ -1,6 +1,7 @@
 
 import defaultSearchConfiguration from './default-search-configuration';
-
+import './page/mollie-subscriptions-list';
+import './page/mollie-subscriptions-detail';
 
 // eslint-disable-next-line no-undef
 const {Module,Plugin,Service} = Shopware;

@@ -1,3 +1,5 @@
+import 'regenerator-runtime/runtime';
+import 'core-js/stable';
 import './module/mollie-payments/components/mollie-pluginconfig-section-info';
 import './module/mollie-payments/components/mollie-pluginconfig-section-api';
 import './module/mollie-payments/components/mollie-pluginconfig-section-payments';
@@ -22,8 +24,7 @@ import './module/mollie-payments/components/mollie-tracking-info';
 import './module/mollie-payments/components/mollie-refund-manager';
 import './module/mollie-payments/components/mollie-ship-order';
 import './module/mollie-payments/components/mollie-cancel-item';
-import './module/mollie-payments/page/mollie-subscriptions-list';
-import './module/mollie-payments/page/mollie-subscriptions-detail';
+
 
 
 import deDE from './snippet/de-DE';

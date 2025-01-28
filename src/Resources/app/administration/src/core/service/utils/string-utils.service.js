@@ -34,7 +34,7 @@ export default class StringUtils {
         if (!text) {
             return '';
         }
-        const regex = new RegExp(search,"g");
+        const regex = new RegExp(search,'g');
         return text.replace(regex, replaceWith);
     }
 

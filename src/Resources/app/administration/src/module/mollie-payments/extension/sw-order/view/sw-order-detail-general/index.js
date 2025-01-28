@@ -259,12 +259,19 @@ Component.override('sw-order-detail-general', {
                 this.molliePaymentUrl = (response.url !== null) ? response.url : '';
             });
 
+            if(!this.shippingManagerService){
+                this.shippingManagerService = new MollieShipping(this.MolliePaymentsShippingService);
+            }
+
             this.shippingManagerService.isShippingPossible(this.order).then((enabled) => {
                 this.isShippingPossible = enabled;
             });
 
+            if(!this.refundedManagerService){
+                this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
+            }
             this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id).then((possible)=>{
-                this.isRefundManagerPossible =possible;
+                this.isRefundManagerPossible = possible;
             });
 
 
