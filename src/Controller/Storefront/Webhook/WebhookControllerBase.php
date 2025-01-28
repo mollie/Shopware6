@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
+use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Repository\OrderRepository;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Psr\Log\LoggerInterface;
@@ -70,6 +71,15 @@ class WebhookControllerBase extends AbstractStoreFrontController
             $this->notificationFacade->onNotify($swTransactionId, $context->getContext());
 
             return new JsonResponse(['success' => true]);
+        } catch (WebhookIsTooEarlyException $exception) {
+            $this->logger->debug(
+                'Webhook too early',
+                [
+                    'error' => $exception->getMessage()
+                ]
+            );
+
+            return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], $exception->getStatusCode());
         } catch (ShopwareHttpException $exception) {
             $this->logger->warning(
                 'Warning in Webhook for Transaction ' . $swTransactionId,
