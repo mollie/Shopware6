@@ -13,7 +13,7 @@ use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentMethod;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
+use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -126,7 +126,7 @@ class OrderService implements OrderServiceInterface
             sprintf('Could not find an order with id %s.', $orderId)
         );
 
-        throw new OrderNotFoundException($orderId);
+        throw CartException::orderNotFound($orderId);
     }
 
     /**
@@ -230,7 +230,7 @@ class OrderService implements OrderServiceInterface
         $order = $this->getOrder($orderId, $context->getContext());
 
         if (!$order instanceof OrderEntity) {
-            throw new OrderNotFoundException($orderId);
+            throw CartException::orderNotFound($orderId);
         }
 
         return $order;

@@ -23,7 +23,6 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Api\Resources\Order;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -150,7 +149,7 @@ class NotificationFacade
         $swOrder = $swTransaction->getOrder();
 
         if (! $swOrder instanceof OrderEntity) {
-            throw new OrderNotFoundException('Shopware Order not found for transaction: ' . $swTransactionId);
+            throw new \Exception('Shopware Order not found for transaction: ' . $swTransactionId);
         }
 
         $now = new \DateTime('now', new DateTimeZone('UTC'));

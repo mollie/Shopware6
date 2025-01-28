@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerResponse;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\EmptyOrderIdProvidedConfigException;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\MetaDataNotFoundInRefundConfigException;
-use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\MollieOrderNotFoundConfigException;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\MollieRefundConfigException;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Structs\Collections\OrderLineItemStructCollection;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Structs\OrderLineItemStruct;
@@ -15,7 +14,6 @@ use Kiener\MolliePayments\Service\MollieApi\Order as MollieOrderService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
-use Shopware\Core\Checkout\Cart\Exception\OrderNotFoundException;
 use Shopware\Core\Framework\Context;
 
 class MollieRefundConfigService
@@ -85,8 +83,6 @@ class MollieRefundConfigService
             }
 
             return $this->createResponse($structs, $config);
-        } catch (OrderNotFoundException $exception) {
-            throw MollieOrderNotFoundConfigException::create($orderId);
         } catch (MollieRefundConfigException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
