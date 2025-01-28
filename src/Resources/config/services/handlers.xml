@@ -255,6 +255,14 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+
+        <!-- MB Way PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\MbWayPayment">
+            <argument type="service" id="monolog.logger.mollie"/>
+            <argument type="service" id="service_container"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+      
         <!-- Multibanco PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\MultibancoPayment">
             <argument type="service" id="monolog.logger.mollie"/>
