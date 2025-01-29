@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+
+        <services>
+            <service id="Mollie\Shopware\Component\TranslationImporter\TranslationAppender"/>
+
+            <service id="Mollie\Shopware\Component\TranslationImporter\ImportCSVCommand">
+                <argument type="service" id="shopware.filesystem.private"/>
+                <argument type="service" id="Mollie\Shopware\Component\TranslationImporter\TranslationAppender"/>
+                <argument type="service" id="Kiener\MolliePayments\MolliePayments"/>
+                <tag name="console.command"/>
+            </service>
+
+        </services>
+
+
+</container>

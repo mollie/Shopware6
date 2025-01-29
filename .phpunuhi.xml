@@ -13,6 +13,7 @@
                 <locale name="en-GB">./src/Resources/app/administration/src/snippet/en-GB.json</locale>
                 <locale name="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</locale>
                 <locale name="it-IT">./src/Resources/app/administration/src/snippet/it-IT.json</locale>
+                <locale name="pt-PT">./src/Resources/app/administration/src/snippet/pt-PT.json</locale>
             </locales>
         </set>
 
@@ -29,6 +30,20 @@
                 <locale name="en-GB">./src/Resources/snippet/en_GB/mollie-payments.en-GB.json</locale>
                 <locale name="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</locale>
                 <locale name="it-IT">./src/Resources/snippet/it_IT/mollie-payments.it-IT.json</locale>
+                <locale name="pt-PT">./src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
+            </locales>
+        </set>
+
+        <set name="plugin-settings">
+            <format>
+                <shopware6 type="config" file="src/Resources/config/config.xml"/>
+            </format>
+            <locales>
+                <locale name="en-GB" base="true"></locale>
+                <locale name="de-DE"></locale>
+                <locale name="nl-NL"></locale>
+                <locale name="it-IT"></locale>
+                <locale name="pt-PT"></locale>
             </locales>
         </set>
 
