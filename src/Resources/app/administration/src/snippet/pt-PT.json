@@ -1,0 +1,505 @@
+{
+  "global": {
+    "entities": {
+      "mollie_subscription": "Subscrição Mollie | Subscrições Mollie"
+    },
+    "businessEvents": {
+      "mollie_checkout_order_success": " Encomenda efetuada com sucesso",
+      "mollie_checkout_order_failed": " A encomenda falhou",
+      "mollie_checkout_order_canceled": " Encomenda cancelada",
+      "mollie_webhook_received_All": " Mollie Webhook recebido (todos)",
+      "mollie_webhook_received_status_authorized": " Mollie Webhook recebido (Autorizado)",
+      "mollie_webhook_received_status_failed": " Mollie Webhook Recebido (Não efetuado)",
+      "mollie_webhook_received_status_canceled": " Mollie Webhook recebido (Cancelado)",
+      "mollie_webhook_received_status_expired": " Mollie Webhook Recebido (Expirado)",
+      "mollie_webhook_received_status_pending": " Mollie Webhook recebido (Pendente)",
+      "mollie_webhook_received_status_paid": " Mollie Webhook Recebido (Pago)",
+      "mollie_webhook_received_status_completed": " Mollie Webhook recebido (Concluído)",
+      "mollie_webhook_received_status_refunded": " Mollie Webhook Recebido (Reembolsado)",
+      "mollie_webhook_received_status_partially_refunded": " Mollie Webhook recebido (Parcialmente Reembolsado)",
+      "mollie_refund_started": " Reembolso da Mollie iniciado",
+      "mollie_subscription_started": " Subscrição da Mollie iniciada",
+      "mollie_subscription_ended": " Subscrição da Mollie concluída",
+      "mollie_subscription_cancelled": " Subscrição da Mollie cancelada",
+      "mollie_subscription_paused": " Subscrição da Mollie colocada em pausa",
+      "mollie_subscription_resumed": " Subscrição da Mollie retomada",
+      "mollie_subscription_skipped": " Subscrição da Mollie ignorada",
+      "mollie_subscription_renewed": " Subscrição da Mollie renovada",
+      "mollie_subscription_renewal_reminder": " Lembrete da Mollie para renovar a subscrição"
+    }
+  },
+  "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Módulo Mollie",
+    "searchPlaceholder": "Pesquisar subscrições...",
+    "general": {
+      "mainMenuItemGeneral": "Mollie Payments",
+      "descriptionTextModule": "Mollie Payments",
+      "btnMollieActions": "Mollie Actions",
+      "refundThroughMollie": "Reembolsar através da Mollie",
+      "shipThroughMollie": "Enviar através da Mollie",
+      "cancelMollieItem": "Cancelar através da Mollie"
+    },
+    "config": {
+      "info": {
+        "title": "Olá {userName}, Bem-vindo(a) à Mollie!",
+        "descriptionTop": "A integração é fácil com a Mollie!",
+        "descriptionBottom": "É tudo!",
+        "descriptionFooter": "Se quiser saber mais sobre o nosso plugin, visite a nossa página de documentação oficial.",
+        "onboardingStep1": "Crie uma conta Mollie.",
+        "onboardingStep2": "Insira suas chaves de API na secção abaixo.",
+        "onboardingStep2TestMode": "Ative o \"Modo de teste\" se pretender apenas testar pagamentos.",
+        "onboardingStep3": "Atribua métodos de pagamento ao seu canal de vendas.",
+        "onboardingStep3Link": "para os seus canais de vendas",
+        "btnDocumentation": "Documentação",
+        "btnRequestSupport": "Ajuda",
+        "btnTroubleshooting": "Guia de Resolução de Problemas"
+      },
+      "api": {
+        "apiLinkButton": "Obtenha as suas chaves de API no Painel de Controlo Mollie",
+        "testButton": "Chaves de API de teste",
+        "testApiKeys": {
+          "title": "Mollie Payments",
+          "apiKey": "Chave de API",
+          "isValid": "é válido",
+          "isInvalid": "é inválido"
+        }
+      },
+      "payments": {
+        "format": {
+          "placeholder": "Placeholder",
+          "preview": "Pré-visualização"
+        },
+        "updatePaymentMethods": {
+          "title": "Mollie Payments",
+          "button": "Atualizar métodos de pagamento",
+          "succeeded": "Os métodos de pagamento foram atualizados com sucesso.",
+          "failed": "Não foi possível atualizar os métodos de pagamento."
+        },
+        "mollieLimits": {
+          "link": "Mostrar as regras de disponibilidade da Mollie para os métodos de pagamento"
+        }
+      },
+      "rounding": {
+        "info1": "O Shopware pode usar as definições de moeda para calcular como arredonda o total de uma encomenda. Isso inclui o número de casas decimais nos preços dos seus produtos e o intervalo de arredondamento mais próximo, como 0,50 ou 1,00.",
+        "info2": "Estas definições podem resultar um total diferente do total da soma dos itens. Quando a Mollie verifica que essas quantias não correspondem, cria um erro de checkout.",
+        "info3": "Pode utilizar esta função para evitar problemas de arredondamento no seu checkout. Quando ativada, ela adiciona um item de linha separado no seu Painel de Controlo Mollie para a diferença no arredondamento, e os seus clientes pagam o total calculado pelo Shopware."
+      },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "Não é possível usar o Klarna Pagar Agora, Klarna Financiamento ou Klarna Pagar e 30 dias como método quando a sua data de validade é superior a 28 dias, a menos que outro máximo seja acordado entre o comerciante e o Klarna.",
+        "bankTransferDueDateLimitReached": "Não é possível definir um tempo de vida superior a 100 dias para uma encomenda."
+      },
+      "support": {
+        "modalTitle": "Pedir ajuda à Mollie",
+        "btnCancel": "Cancelar",
+        "btnConfirm": "Pedir ajuda",
+        "btnSupport": "Mais sobre a nossa ajuda",
+        "form": {
+          "name": "O seu nome",
+          "email": "O seu e-mail",
+          "recipient": "Enviar pedido para",
+          "subject": "Assunto",
+          "message": "Mensagem"
+        },
+        "data": {
+          "header": "Dados enviados para a Mollie:",
+          "other": "Outro:",
+          "shopwareVersion": "Versão do Shopware",
+          "pluginLogs": "{plugin} arquivos de log",
+          "pluginConfiguration": "{plugin} configuração",
+          "pluginConfigurationHelpText": "As chaves de API estão excluídas.",
+          "paymentMethods": "Dados do método de pagamento",
+          "paymentMethodsHelpText": "Contém informações sobre que métodos de pagamento estão ativos e atribuídos a cada canal de vendas, bem como o seu estado na sua conta Mollie."
+        },
+        "success": "O pedido de ajuda foi enviado com sucesso. Faremos o nosso melhor para responder o mais rapidamente possível.",
+        "error": "Ocorreu um problema ao enviar o e-mail pelo Shopware. Por favor, tente novamente ou entre em contacto diretamente por e-mail."
+      }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Item é uma subscrição (Mollie)",
+      "cartSubscriptionRule": "Carrinho com subscrições (Mollie)"
+    },
+    "refunds": {
+      "status": {
+        "queued": "Em fila de espera",
+        "pending": "Pendente",
+        "processing": "A processar",
+        "refunded": "Reembolsado",
+        "failed": "Não efetuado",
+        "description": {
+          "queued": "O reembolso é colocado em fila de espera até que haja saldo suficiente para o processar. Ainda é possível cancelar o reembolso.",
+          "pending": "O reembolso será enviado ao banco no próximo dia útil. Ainda é possível cancelar o reembolso.",
+          "processing": "O reembolso foi enviado para o banco. O montante do reembolso será transferido para a conta do consumidor o mais rapidamente possível.",
+          "refunded": "O montante do reembolso foi transferido para o consumidor.",
+          "failed": "O reembolso falhou após o processamento. Por exemplo, o cliente fechou a sua conta bancária. Os fundos serão devolvidos à sua conta."
+        }
+      }
+    },
+    "refund-manager": {
+      "general": {
+        "unitQuantity": "pc."
+      },
+      "acl": {
+        "warningCreate": "Não tem permissões para criar reembolsos",
+        "warningCancel": "Não tem permissões para cancelar reembolsos"
+      },
+      "cart": {
+        "title": "Encomenda ##orderNumber##",
+        "btnSelectAll": "Selecionar Tudo",
+        "btnResetForm": "Reiniciar Formulário",
+        "linkHowTo": "Como utilizar este formulário?",
+        "grid": {
+          "columns": {
+            "item": "Item",
+            "productNumber": "Número do Produto",
+            "unitPrice": "Preço Unitário",
+            "quantity": "Quantidade",
+            "refunded": "Reembolsado",
+            "refundQuantity": "Reembolso",
+            "totalPrice": "Total",
+            "refundAmount": "Reembolso",
+            "resetStock": "Repor o stock"
+          },
+          "btnResetLine": "Redefinir Linha",
+          "checkDeductPromotion": "Deduzir promoção",
+          "checkRefundTax": "Reembolsar o IVA"
+        },
+        "roundDiffItemAdded": "Item de arredondamento automático adicionado"
+      },
+      "instructions": {
+        "linkResetTutorials": "Repor Tutoriais",
+        "btnToggleTutorial": "Mostrar/Ocultar Tutorial",
+        "titleFullRefund": "Reembolso Total",
+        "textFullRefund": "Basta utilizar o botão para o reembolso total. Isto garante que todos os seus itens são marcados como reembolsados e que o montante total é devolvido ao cliente.",
+        "titleStockReset": "Reposição de stock",
+        "textStockReset": "Pode aumentar automaticamente o stock disponível, introduzindo a quantidade que pretende repor em stock. Basta introduzi-la antes de proceder a um reembolso total ou parcial. A reposição do stock pode ser combinada com o processo de reembolso de forma flexível.",
+        "titleShipping": "Envio",
+        "textShipping": "Os itens de envio podem ser reembolsados como qualquer outro artigo. Basta inserir a quantidade total ou um montante parcial personalizado e prosseguir com o reembolso. O reembolso dos custos de envio pode ser combinado com o processo de reembolso efetivo de itens de forma flexível.",
+        "titlePartialAmount": "Reembolso parcial (apenas o montante)",
+        "textPartialAmount": "Basta introduzir o montante parcial no campo de texto e iniciar o reembolso.",
+        "titlePartialItems": "Reembolso parcial (com artigos)",
+        "textPartialItems": "Se pretender marcar quantidades e itens como reembolsados na Mollie, utilize o formulário acima. Defina as suas quantidades e forneça um montante personalizado para cada artigo que será reembolsado. A soma total será então visível no campo de texto do valor final do reembolso. Lembre-se que ainda é possível ajustar esse valor final antes de iniciar o reembolso.",
+        "titlePartialPromotions": "Reembolso Parcial (com promoções)",
+        "textPartialPromotions": "Se tiver uma promoção no seu carrinho, a promoção é um item de linha separado. Se pretender reembolsar todos os artigos com desconto, reembolse os seus valores totais e a totalidade do item de linha da promoção. No entanto, se pretender reembolsar apenas alguns itens com desconto, pode deduzir automaticamente o desconto aplicado a cada item. É claro que pode sempre alterar os valores se estes não estiverem corretos.",
+        "titleRoundingDiff": "Diferença de arredondamento",
+        "textRoundingDiff": "O reembolso total incluirá as diferenças de arredondamento"
+      },
+      "summary": {
+        "dataLoading": "Os dados estão a ser carregados...",
+        "headerExcludingVat": "Sem IVA",
+        "headerIncludingVat": "Com IVA",
+        "captionTotal": "Total",
+        "captionTotalTaxFree": "Total",
+        "captionPendingRefunds": "A aguardar reembolso",
+        "captionVouchers": "Montante do cupão",
+        "captionRefunded": "Montante reembolsado",
+        "captionRemaining": "Montante reembolsável",
+        "btnFixDiff": "Corrigir a diferença",
+        "placeholderDescription": "Introduzir a descrição do extrato do banco/cartão para o consumidor. Máximo de 140 caracteres",
+        "lblDescription": "Descrição (opcional) ({characters}/140 caracteres)",
+        "descriptionHelp": "Sempre que possível, esta mensagem será apresentada no extrato bancário ou do cartão do consumidor. A mensagem será truncada após 140 caracteres.",
+        "placeholderInternalDescription": "Introduza a sua descrição interna",
+        "lblInternalDescription": "Descrição interna (opcional)",
+        "internalDescriptionHelp": "Isto será mostrado como uma descrição local na interface de administração.",
+        "checkVerification": "Verifiquei o montante total do reembolso e as quantidades configuradas para reembolsar e repor em stock.",
+        "btnRefund": "Reembolso",
+        "btnFullRefund": "Reembolso Total",
+        "roundDiffItemAdded": "Item de arredondamento"
+      },
+      "refunds": {
+        "title": "Reembolsos no Painel de Controlo Mollie",
+        "linkMore": "Mais sobre reembolsos",
+        "grid": {
+          "columns": {
+            "amount": "Montante",
+            "status": "Estado",
+            "description": "Descrição",
+            "internalDescription": "Descrição interna",
+            "composition": "Composição",
+            "date": "Data"
+          },
+          "lblNoComposition": "Nenhuma composição disponível",
+          "btnCancelRefund": "Cancelar este reembolso"
+        }
+      },
+      "notifications": {
+        "success": {
+          "refund-created": "Foi criado um reembolso na Mollie. Este pode demorar 2 horas a ficar concluído. Até lá, pode cancelar o reembolso.",
+          "refund-canceled": "O reembolso pendente foi cancelado e eliminado com sucesso."
+        },
+        "error": {
+          "low-amount": "Introduza o montante a reembolsar.",
+          "refund-created": "Algo correu mal ao criar um reembolso.",
+          "refund-canceled": "Ocorreu um problema ao cancelar o reembolso pendente. Por favor, tente novamente no Painel de Controlo Mollie."
+        }
+      }
+    },
+    "vouchers": {
+      "CARD_TITLE": "Cupão",
+      "VOUCHER_INFO_TITLE": "Pagamentos com cupão",
+      "VOUCHER_INFO_DESCRIPTION": "A Mollie permite-lhe aceitar facilmente pagamentos na sua loja virtual utilizando cupão Eco, de oferta e de refeição - uma escolha inteligente para aumentar as suas vendas e a satisfação dos seus clientes. O método de pagamento \"cupão\" só é visível se tiver pelo menos um produto com um tipo de vale atribuído no carrinho.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Atenção, esta configuração só pode ser editada na sua língua predefinida. Altere a sua língua para modificar o tipo de cupão deste produto.",
+      "VOUCHER_BTN_READMORE": "Ler mais",
+      "VOUCHER_TYPE_CAPTION": "Tipo de cupão do produto",
+      "VOUCHER_TYPE_VALUE_NONE": "Nenhum",
+      "VOUCHER_TYPE_VALUE_ECO": "Eco",
+      "VOUCHER_TYPE_VALUE_MEAL": "Refeição",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Presente"
+    },
+    "modals": {
+      "shipping": {
+        "title": "Enviar através da Mollie",
+        "item": {
+          "label": "Item:",
+          "noQuantity": "Por favor, introduza a quantidade a enviar.",
+          "shipAll": "Enviar tudo",
+          "summary": {
+            "quantity": "Quantidade a enviar",
+            "shipped": "Quantidade enviada",
+            "shippable": "Quantidade enviável"
+          },
+          "success": "A encomenda foi enviada com sucesso."
+        },
+        "order": {
+          "description": "As seguintes quantidades de itens serão enviadas.",
+          "itemHeader": "Item",
+          "quantityHeader": "Quantidade",
+          "originalQuantityHeader": "Quantidade (enviável)"
+        },
+        "availableTracking": {
+          "label": "Códigos de rastreio disponíveis",
+          "hint": "Clique em um destes códigos de rastreio para preencher automaticamente todos os dados."
+        },
+        "showTracking": "Adicionar informações de rastreio para este envio",
+        "tracking": {
+          "carrier": "Transportadora",
+          "code": "Código",
+          "url": "URL",
+          "invalid": "Por favor, introduza a Transportadora e o Código"
+        },
+        "confirmButton": "Enviar encomenda",
+        "cancelButton": "Cancelar",
+        "selectAllButton": "Selecionar tudo",
+        "resetButton": "Repor"
+      },
+      "cancel": {
+        "title": "Cancelar item através da Mollie",
+        "confirmButton": "Cancelar item através da Mollie",
+        "cancelButton": "Fechar modal",
+        "resetStock": "Repor stock",
+        "item": {
+          "success": "Produto cancelado com sucesso",
+          "failed": {
+            "quantityZero": "A quantidade é 0",
+            "invalidLine": "O produto não existe na encomenda",
+            "quantityTooHigh": "A quantidade é demasiado elevada"
+          }
+        }
+      }
+    },
+    "sw-flow": {
+      "actions": {
+        "shipOrder": {
+          "editor": {
+            "title": "Enviar Encomenda (Mollie)",
+            "description": "Enviar encomenda na Mollie."
+          },
+          "modal": {
+            "title": "Enviar Encomenda",
+            "description": "Esta ação enviará automaticamente uma encomenda através da Mollie. A sequência de fluxo receberá o número da encomenda e transmiti-lo-á à API da Mollie. Envios bem-sucedidos e falhados serão visíveis nos arquivos de log da Mollie.",
+            "warningConfig": "Certifique-se de que desativa qualquer automação adicional para este tipo de ação para evitar quaisquer interferências.\nAs seguintes funcionalidades ativadas deste plugin podem interferir com esta ação:",
+            "noWarnings": "Sem avisos"
+          }
+        },
+        "refundOrder": {
+          "editor": {
+            "title": "Reembolsar Encomenda (Mollie)",
+            "description": "Reembolsar encomenda através da Mollie."
+          },
+          "modal": {
+            "title": "Reembolsar Encomenda",
+            "description": "Esta ação iniciará automaticamente um reembolso através da Mollie. A sequência de fluxo receberá o número da encomenda e o transmiti-lo-á à API da Mollie. Reembolsos bem-sucedidos e falhados serão visíveis nos arquivos de log da Mollie.",
+            "warning": "Por favor, lembre-se de que os reembolsos podem levar até 2 horas para serem finalizados e visíveis na loja. Até lá, pode sempre cancelar um reembolso pendente, seja na página da encomenda no Shopware ou no Painel de Controlo da Mollie.",
+            "warningConfig": "Por favor, certifique-se de que desativa qualquer automação adicional para este tipo de ação para evitar qualquer interferência."
+          }
+        },
+        "warnings": {
+          "automaticShipping": "Envio automático na configuração do plugin"
+        }
+      }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Pendente",
+        "active": "Ativo",
+        "canceled": "Cancelado",
+        "suspended": "Suspenso",
+        "completed": "Concluído",
+        "paused": "Em pausa",
+        "resumed": "Retomado",
+        "skipped": "Ignorado"
+      },
+      "navigation": {
+        "title": "Subscrições Mollie"
+      },
+      "TYPE_DAYS": "Dia(s)",
+      "TYPE_WEEKS": "Semana(s)",
+      "TYPE_MONTHS": "Mês(es)",
+      "confirm": {
+        "cancelTitle": "Cancelar a subscrição?",
+        "cancel": "Cancelar a subscrição do seu cliente.",
+        "pauseTitle": "Colocar a subscrição em espera?",
+        "pause": "Colocar a subscrição em pausa até retomá-la novamente.",
+        "resumeTitle": "Retomar a subscrição?",
+        "resume": "Continuar a subscrição novamente.",
+        "skipTitle": "Saltar a próxima prestação?",
+        "skip": "Saltar a próxima prestação na subscrição. Continuará automaticamente depois disso."
+      },
+      "alerts": {
+        "cancelSuccess": "A subscrição foi cancelada com sucesso",
+        "pauseSuccess": "A subscrição foi colocada em pausa com sucesso",
+        "resumeSuccess": "A subscrição foi retomada com sucesso",
+        "skipSuccess": "A subscrição foi saltada com sucesso. O próximo pagamento foi atualizado."
+      },
+      "list": {
+        "title": "Subscrições Mollie",
+        "columns": {
+          "customer": "Cliente",
+          "status": "Estado",
+          "description": "Descrição",
+          "amount": "Montante",
+          "nextPaymentAt": "Próximo pagamento",
+          "prePaymentReminder": "Relembrado em",
+          "canceledAt": "Cancelado em",
+          "createdAt": "Criado em"
+        },
+        "action": {
+          "edit": "Editar subscrição"
+        },
+        "deletedCustomer": "Cliente eliminado"
+      },
+      "detail": {
+        "title": "Subscrição Mollie",
+        "buttonCancelSubscription": "Cancelar subscrição",
+        "labelDescription": "Descrição",
+        "labelAmount": "Montante",
+        "labelQuantity": "Quantidade",
+        "labelMollieSubscription": "Subscrição Mollie",
+        "labelMollieCustomer": "Cliente Mollie",
+        "labelMandateId": "Mandato",
+        "labelShopwareCustomer": "Cliente Shopware",
+        "labelCreatedAt": "Criado em",
+        "buttonShowShopwareOrder": "Mostrar ordem do Shopware",
+        "buttonShowShopwareCustomer": "Mostrar cliente do Shopware",
+        "cardTitleSubscription": "Subscrição",
+        "cardTitleStatus": "Estado",
+        "labelStatus": "Estado",
+        "labelNextPaymentAt": "Próximo pagamento em",
+        "labelLastRemindedAt": "Lembrado pela última vez em",
+        "labelCanceledAt": "Cancelado em",
+        "buttonPauseSubscription": "Colocar subscrição em pausa",
+        "buttonResumeSubscription": "Retomar subscrição",
+        "buttonSkipSubscription": "Ignorar subscrição",
+        "history": {
+          "cardTitle": "Histórico",
+          "colDate": "Data",
+          "colComment": "Comentário",
+          "colStatusFrom": "Estado (de)",
+          "colStatusTo": "Estado (para)",
+          "colMollieSubscription": "Subscrição Mollie"
+        }
+      },
+      "product": {
+        "card-title": "Subscrição",
+        "title": "Subscrições Mollie",
+        "description": "Gerir os seus pagamentos recorrentes é mais fácil do que nunca com as nossas funcionalidades úteis. Leve o seu negócio ao próximo nível com opções de acompanhamento eficientes, integrações simples e muito mais. Com as subscrições Mollie, pode criar facilmente produtos de subscrição e programar pagamentos recorrentes para ocorrerem no intervalo e período configurados.",
+        "mollieSubscriptionProduct": "Produto de Subscrição",
+        "mollieSubscriptionIntervalAmount": "Repetir pagamento a cada",
+        "mollieSubscriptionIntervalType": "Unidade de intervalo",
+        "mollieSubscriptionRepetitionAmount": "Número de repetições",
+        "mollieSubscriptionRepetitionPlaceholder": "Introduzir o número ou deixar em branco",
+        "infoDefaultLanguage": "Atenção: esta configuração só pode ser editada na sua língua predefinida. Altere a sua língua para modificar as definições de subscrição deste produto.",
+        "btnReadMore": "Ler mais"
+      }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Subscrição"
+    }
+  },
+  "sw-order": {
+    "detailExtended": {
+      "titleCreditCardData": "Dados do cartão de crédito",
+      "buttonMolliePaymentLink": "Copiar para a área de transferência",
+      "columnRefunded": "Reembolsado",
+      "columnShipped": "Enviado",
+      "columnCanceled": "Cancelado",
+      "labelMollieOrderId": "ID de Encomenda da Mollie",
+      "labelMollieThirdPartyPaymentId": "Referência de pagamento",
+      "labelMolliePaymentLink": "URL do Mollie Checkout",
+      "totalRefunds": "Montante reembolsado",
+      "totalRefundsPending": "A aguardar reembolso",
+      "totalRemaining": "Montante reembolsável",
+      "totalVouchers": "Montante do cupão",
+      "totalShipments": "Montante enviado ({quantity} itens)",
+      "subscriptionBadge": "Pedido de subscrição",
+      "refundManager": {
+        "title": "Gestor de Reembolsos da Mollie",
+        "btnOpenRefundManager": "Abrir Gestor de Reembolsos",
+        "btnCloseRefundManager": "Fechar Gerente de Reembolsos"
+      }
+    }
+  },
+  "sw-customer": {
+    "extendedInfo": {
+      "labelPreferredIdealIssuer": "Emissor iDeal preferido"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "mollie_refund_manager": {
+        "label": "Gestor de Reembolsos"
+      },
+      "mollie_subscription": {
+        "label": "Subscrições"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Descrição"
+        }
+      }
+    }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Reembolso",
+      "subscription": "Subscrição",
+      "webhookReceived": "Webhooks",
+      "status": "Estado",
+      "started": "Iniciado",
+      "ended": "Terminado",
+      "paused": "Em pausa",
+      "renewalReminder": "Lembrete de Renovação",
+      "renewed": "Renovado",
+      "resumed": "Retomado",
+      "skipped": "Ignorado",
+      "all": "Todos",
+      "canceled": "Cancelado",
+      "expired": "Expirado",
+      "partiallyRefunded": "Reembolsado (parcialmente)",
+      "orderSuccess": "Encomenda bem sucedida",
+      "orderFailed": "Encomenda não efetuada",
+      "orderCanceled": "Encomenda cancelada"
+    }
+  }
+}

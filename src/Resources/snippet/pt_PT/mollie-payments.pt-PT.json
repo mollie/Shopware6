@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "O método de pagamento atualmente selecionado não está disponível para produtos de subscrição.",
+        "mollie-payments-cart-error-mixedcart": "O seu carrinho contém vários itens em combinação com itens de subscrição. Tenha em atenção que só pode comprar 1 item de subscrição de cada vez.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nem todos os métodos de pagamento estão disponíveis para encomendar produtos de subscrição.",
+        "mollie-payments-cart-guest-account": "As contas de convidado não podem ser utilizadas para encomendas de subscrições."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "O método de pagamento atualmente selecionado não está disponível para produtos de subscrição.",
+        "mollie-payments-cart-error-mixedcart": "O seu carrinho contém vários itens em combinação com itens de subscrição. Tenha em atenção que só pode comprar 1 item de subscrição de cada vez.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nem todos os métodos de pagamento estão disponíveis para encomendar produtos de subscrição.",
+        "mollie-payments-cart-guest-account": "As contas de convidado não podem ser utilizadas para encomendas de subscrições."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Data de validade",
+                "cardHolderLabel": "Nome no cartão",
+                "cardNumberLabel": "Número do cartão",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Pagamento protegido e proporcionado por",
+                "headLine": "Introduza as informações do cartão",
+                "saveCardDetailLabel": "Guardar os dados do cartão para pagamentos futuros"
+            },
+            "ideal": {
+                "selectBank": "Selecionar banco"
+            },
+            "pos": {
+                "selectTerminal": "Selecionar terminal"
+            },
+            "mandate": {
+                "sectionTitle": "Cartões guardados",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "O seu cartão foi eliminado com sucesso",
+                "deleteErrorMessage": "Ocorreu um problema ao eliminar o seu cartão",
+                "newCard": "Novo cartão",
+                "remove": "Eliminar",
+                "subscriptionBadge": "Subscrição"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Cancelar",
+                "cardSubscription": "Este cartão está a ser utilizado para uma subscrição. Por favor, cancele a subscrição antes de eliminar este cartão.",
+                "deleteButton": "Eliminar",
+                "deleteConfirmation": "Tem a certeza de que pretende eliminar?",
+                "title": "Confirmar a eliminação"
+            },
+            "bancomatPay": {
+                "headLine": "Número de telefone",
+                "phoneErrorMessage": "O número de telefone é obrigatório. Por exemplo +351 912 345 678"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Pagar com um método de pagamento diferente",
+                "buttonReturnToShop": "Voltar à loja",
+                "error": "Pagamento não efetuado",
+                "failed": "O pagamento falhou ou foi cancelado. Será redireccionado para a Mollie, onde poderá concluir o pagamento com o método da sua escolha. "
+            },
+            "redirecting": "Redireccionando-o para: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Subtotal",
+                "captionTaxes": "Impostos",
+                "paymentError": "O pagamento com o Apple Pay falhou."
+            },
+            "paypalExpress": {
+                "paymentError": "O pagamento com Paypal Express falhou."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "editar endereço de faturação",
+                "btnEditShippingAddress": "editar endereço de envio",
+                "cancelSubscription": "A subscrição foi cancelada",
+                "errorCancelSubscription": "A subscrição não pôde ser cancelada devido a um erro. Por favor, contacte o nosso centro de apoio.",
+                "errorPause": "Ocorreu um erro ao colocar a sua subscrição em pausa",
+                "errorResume": "Ocorreu um erro ao retomar a sua subscrição",
+                "errorSkip": "Ocorreu um erro ao saltar a sua subscrição",
+                "errorUpdateAddress": "Ocorreu um erro ao atualizar o seu endereço",
+                "errorUpdatePayment": "Ocorreu um erro ao atualizar o seu método de pagamento",
+                "headlineBillingAddress": "Endereço de faturação",
+                "headlineShippingAddress": "Endereço de envio",
+                "mollieSubscriptionAmount": "Montante",
+                "mollieSubscriptionCancel": "Cancelar subscrição",
+                "mollieSubscriptionCancelUntil": "Cancelamento possível até",
+                "mollieSubscriptionContextMenuReorder": "Repetir subscrição",
+                "mollieSubscriptionId": "ID",
+                "mollieSubscriptionNextPayment": "Próximo pagamento em",
+                "mollieSubscriptionPause": "Colocar a subscrição em pausa",
+                "mollieSubscriptionResume": "Retomar subscrição",
+                "mollieSubscriptionSkip": "Saltar subscrição",
+                "mollieSubscriptionUpdatePayment": "Atualizar pagamento",
+                "mollieSubscriptionsHeadline": "Subscrição:",
+                "mollieSubscriptionsInfoEmpty": "Ainda não tem subscrições.",
+                "mollieSubscriptionsLink": "Subscrições",
+                "mollieSubscriptionsTitle": "Subscrições",
+                "mollieSubscriptionsWelcome": "As suas subscrições recentes:",
+                "orderActionHide": "Ocultar",
+                "orderActionView": "Ver",
+                "shippingEqualToBilling": "Igual ao endereço de faturação",
+                "successPause": "A sua subscrição foi colocada em pausa",
+                "successResume": "A sua subscrição será retomada",
+                "successSkip": "A sua subscrição foi saltada",
+                "successUpdateAddress": "O seu endereço foi atualizado com sucesso",
+                "successUpdatePayment": "O seu método de pagamento foi atualizado com sucesso"
+            },
+            "options": {
+                "everyDay": "Todos os dias",
+                "everyDays": "A cada %value% dias",
+                "everyMonth": "Todos os meses",
+                "everyMonths": "A cada %value% meses",
+                "everyWeek": "Todas as semanas",
+                "everyWeeks": "A cada %value% semanas",
+                "repetitionCount": "%value% vez(es)"
+            },
+            "product": {
+                "addToCartText": "Subscrever",
+                "information": "Produto de subscrição"
+            }
+        },
+        "testMode": {
+            "label": "Modo de teste"
+        }
+    }
+}
