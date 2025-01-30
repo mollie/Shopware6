@@ -407,7 +407,7 @@
 
 
     <card>
-        <title>Order Management<label lang="pt-PT">Cancelamento Automático</label><helpText lang="pt-PT">Se ativado, o plugin cancelará automaticamente as encomendas da Mollie quando estas forem canceladas no Shopware. Apenas encomendas criadas, autorizadas ou parcialmente enviadas serão canceladas. Se parcialmente enviadas, apenas os itens que não foram enviados serão cancelados.</helpText></title>
+        <title>Order Management</title>
         <title lang="de-DE">Auftragsverwaltung</title>
         <title lang="nl-NL">Order beheer</title>
         <title lang="it-IT">Gestione degli Ordini</title><title lang="pt-PT">Gestão de encomendas</title>
@@ -564,7 +564,7 @@
         </input-field>
     </card>
     <card>
-        <title>Order State Automation<label lang="pt-PT">Estado final da encomenda</label><helpText lang="pt-PT">Se ativado, o plugin não fará a transição para um novo estado da encomenda, caso estado final já estiver definido na encomenda. Utilize esta funcionalidade em combinação com plugins e sistemas se os seus fluxos de trabalho não corresponderem ao da Mollie.</helpText></title>
+        <title>Order State Automation</title>
         <title lang="de-DE">Automatisch Order Status setzen</title>
         <title lang="nl-NL">Automatisch bestelstatus instellen</title>
         <title lang="it-IT">Automazione dello Stato dell'Ordine</title><title lang="pt-PT">Automatização do estado da encomenda</title>
@@ -893,7 +893,7 @@
     </card>
 
     <card>
-        <title>Subscriptions<label lang="pt-PT">Ignorar a renovação da subscrição se o pagamento falhar</label><helpText lang="pt-PT">Se ignorado, o plugin não criará novas encomendas nas renovações de subscrições, caso o pagamento tenha falhado. Se não for ignorado, será criada uma nova encomenda e o cliente poderá efetuar um novo pagamento no Shopware.</helpText></title>
+        <title>Subscriptions</title>
         <title lang="de-DE">Abonnements</title>
         <title lang="nl-NL">Abonnementen</title>
         <title lang="it-IT">Abbonamenti</title><title lang="pt-PT">Subscrições</title>
