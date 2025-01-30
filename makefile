@@ -58,6 +58,7 @@ clean: ##1 Cleans all dependencies and files
 
 build: ##3 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# -----------------------------------------------------
+	cd ../../.. && php bin/console plugin:deactivate -c MolliePayments
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
