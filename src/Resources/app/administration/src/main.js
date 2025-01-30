@@ -30,6 +30,9 @@ import './module/mollie-payments/components/mollie-cancel-item';
 import deDE from './snippet/de-DE';
 import enGB from './snippet/en-GB';
 import nlNL from './snippet/nl-NL';
+import itIT from './snippet/it-IT';
+import ptPT from './snippet/pt-PT';
+import esES from './snippet/es-ES';
 
 
 // eslint-disable-next-line no-undef
@@ -38,3 +41,9 @@ Shopware.Locale.extend('de-DE', deDE);
 Shopware.Locale.extend('en-GB', enGB);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('nl-NL', nlNL);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('it-IT', itIT);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('pt-PT', ptPT);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('es-ES', esES);

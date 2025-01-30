@@ -16,5 +16,17 @@
         <service id="Kiener\MolliePayments\Resources\snippet\nl_NL\SnippetFile_nl_NL" public="true">
             <tag name="shopware.snippet.file"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\it_IT\SnippetFile_it_IT" public="true">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\pt_PT\SnippetFile_pt_PT" public="true">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\es_ES\SnippetFile_es_ES" public="true">
+            <tag name="shopware.snippet.file"/>
+        </service>
     </services>
 </container>

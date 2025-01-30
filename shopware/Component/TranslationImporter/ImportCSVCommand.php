@@ -23,7 +23,7 @@ final class ImportCSVCommand extends Command
         'card.orderStateAutomation.ordeStateFinalState.label' => 'card.orderStateAutomation.orderStateFinalState.label',
         'card.orderStateAutomation.ordeStateFinalState.helpText' => 'card.orderStateAutomation.orderStateFinalState.helpText',
         'card.subscriptions.subscriptionsSkipRenewalsOnFailedPayments.label' => 'card.subscriptions.subscriptionSkipRenewalsOnFailedPayments.label',
-        'card.subscriptions.subscriptionsSkipRenewalsOnFailedPayments.helpText' => 'card.subscriptions.subscriptionSkipRenewalsOnFailedPayments.label',
+        'card.subscriptions.subscriptionsSkipRenewalsOnFailedPayments.helpText' => 'card.subscriptions.subscriptionSkipRenewalsOnFailedPayments.helpText',
     ];
 
     public function __construct(Filesystem $fileSystem, AppenderInterface $appender, Plugin $plugin)
