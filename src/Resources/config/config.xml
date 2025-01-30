@@ -2,9 +2,11 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
 
     <card>
-        <title>
-
-        </title>
+        <title> </title>
+        <title lang="de-DE"> </title>
+        <title lang="nl-NL"> </title>
+        <title lang="it-IT"> </title>
+        <title lang="pt-PT"> </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
         </component>

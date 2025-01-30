@@ -1,6 +1,6 @@
 <phpunuhi
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/boxblinkracer/phpunuhi/main/config.xsd"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/boxblinkracer/phpunuhi/refs/heads/main/schema/dev-main.xsd"
 >
     <translations>
 
@@ -33,8 +33,15 @@
                 <locale name="pt-PT">./src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
             </locales>
         </set>
-    <!--
+        <!--
         <set name="plugin-settings">
+            <rules>
+                <emptyContent>
+                    <key name="card.0.title">
+                        <locale>*</locale>
+                    </key>
+                </emptyContent>
+            </rules>
             <format>
                 <shopware6 type="config" file="src/Resources/config/config.xml"/>
             </format>
@@ -46,11 +53,7 @@
                 <locale name="pt-PT"></locale>
             </locales>
         </set>
--->
+        -->
     </translations>
-    <emptyContent>
-        <key name="card.0.title">
-            <locale>*</locale>
-        </key>
-    </emptyContent>
+
 </phpunuhi>

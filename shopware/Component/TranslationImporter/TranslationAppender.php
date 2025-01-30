@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\TranslationImporter;
 
 use DOMDocument;
-use DOMElement;
-use DOMNamedNodeMap;
 use DOMXPath;
 
 final class TranslationAppender implements AppenderInterface
@@ -40,7 +38,6 @@ final class TranslationAppender implements AppenderInterface
             }
 
             foreach ($searchParts as $searchPart) {
-
                 $result = $domXpath->query($path . '/' . $searchPart);
 
                 if ($result->count() === 0) {
@@ -48,15 +45,12 @@ final class TranslationAppender implements AppenderInterface
                 }
                 $path .= '/' . $searchPart;
                 break;
-
             }
-
         }
 
         $replaceXpathQuery = $path . '/' . $lastKeyPart . '[@lang="' . $languageCode . '"]';
         $domElement = $domXpath->query($replaceXpathQuery);
         if ($domElement->count() === 0) {
-
             $replaceXpathQuery = $path . '/following-sibling::' . $lastKeyPart . '[@lang="' . $languageCode . '"]';
             $domElement = $domXpath->query($replaceXpathQuery);
 
@@ -64,11 +58,9 @@ final class TranslationAppender implements AppenderInterface
                 $replaceXpathQuery = $path . '/following::' . $lastKeyPart . '[@lang="' . $languageCode . '"]';
                 $domElement = $domXpath->query($replaceXpathQuery);
             }
-
         }
 
         if ($domElement->count() === 1) {
-
             $oldElement = $domElement->item(0);
 
             if ($oldElement !== null) {
@@ -79,7 +71,6 @@ final class TranslationAppender implements AppenderInterface
             }
 
             return new AppenderResult(sprintf('Replace "%s" with the key %s', $text, $key));
-
         }
 
 
@@ -115,5 +106,4 @@ final class TranslationAppender implements AppenderInterface
         }
         return new AppenderResult(sprintf('Created new entry "%s" with the key %s', $text, $key));
     }
-
 }

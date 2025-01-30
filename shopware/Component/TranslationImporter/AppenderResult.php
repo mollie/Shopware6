@@ -11,9 +11,8 @@ final class AppenderResult
     private string $message;
     private string $status;
 
-    public function __construct(string $message,string $status = self::STATUS_SUCCESS)
+    public function __construct(string $message, string $status = self::STATUS_SUCCESS)
     {
-
         $this->message = $message;
         $this->status = $status;
     }
@@ -27,5 +26,4 @@ final class AppenderResult
     {
         return $this->status;
     }
-
 }
