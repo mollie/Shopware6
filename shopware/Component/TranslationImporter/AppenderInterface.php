@@ -7,5 +7,5 @@ use DOMDocument;
 
 interface AppenderInterface
 {
-    public function append(DOMDocument $config, string $key, string $text, string $languageCode): DOMDocument;
+    public function append(DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult;
 }

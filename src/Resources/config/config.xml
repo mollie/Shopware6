@@ -10,7 +10,7 @@
         </component>
     </card>
     <card>
-        <title >API</title>
+        <title>API</title>
         <title lang="de-DE">API</title>
         <title lang="nl-NL">API</title>
         <title lang="it-IT">API</title>
@@ -53,6 +53,7 @@
         <title lang="de-DE">Logger</title>
         <title lang="nl-NL">Logger</title>
         <title lang="it-IT">Logger</title>
+        <title lang="pt-PT">Logger</title>
         <input-field type="bool">
             <name>debugMode</name>
             <label>Debug Mode</label>
@@ -141,6 +142,8 @@
         <title>Credit card</title>
         <title lang="de-DE">Kreditkarte</title>
         <title lang="nl-NL">Credit card</title>
+        <title lang="it-IT">Carta di Credito</title>
+        <title lang="pt-PT">Cartão de Crédito</title>
         <input-field type="bool">
             <name>enableCreditCardComponents</name>
             <label>Enable Credit Card Components</label>
@@ -322,7 +325,7 @@
         <title>Apple Pay</title>
         <title lang="de-DE">Apple Pay</title>
         <title lang="nl-NL">Apple Pay</title>
-        <title lang="it-IT">Apple Pay</title>
+        <title lang="it-IT">Apple Pay</title><title lang="pt-PT">Apple Pay</title>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>
@@ -351,28 +354,28 @@
                     <name>Category pages</name>
                     <name lang="de-DE">Kategorieseiten</name>
                     <name lang="nl-NL">Categorie pagina's</name>
-                    <name lang="it-IT">Pagine della categorie</name>
+                    <name lang="it-IT">Pagine della categorie</name><name lang="pt-PT">Páginas de categoria</name>
                 </option>
                 <option>
                     <id>pdp</id>
                     <name>Product pages</name>
                     <name lang="de-DE">Produktseiten</name>
                     <name lang="nl-NL">Product pagina's</name>
-                    <name lang="it-IT">Pagine dei prodotti</name>
+                    <name lang="it-IT">Pagine dei prodotti</name><name lang="pt-PT">Páginas de produto</name>
                 </option>
                 <option>
                     <id>offcanvas</id>
                     <name>Offcanvas cart</name>
                     <name lang="de-DE">Offcanvas Warenkorb</name>
                     <name lang="nl-NL">Offcanvas winkelmand</name>
-                    <name lang="it-IT">Carrello offcanvas</name>
+                    <name lang="it-IT">Carrello offcanvas</name><name lang="pt-PT">Carrinho suspenso</name>
                 </option>
                 <option>
                     <id>cart</id>
                     <name>Cart page</name>
                     <name lang="de-DE">Warenkorbseite</name>
                     <name lang="nl-NL">Winkelmand</name>
-                    <name lang="it-IT">Pagina del carrello</name>
+                    <name lang="it-IT">Pagina del carrello</name><name lang="pt-PT">Página do carrinho</name>
                 </option>
             </options>
         </input-field>
@@ -454,11 +457,11 @@
             <label>Automatic Cancellation</label>
             <label lang="de-DE">Automatische Stornierung</label>
             <label lang="nl-NL">Automatische annulering</label>
-            <label lang="it-IT">Annullamento automatico</label>
+            <label lang="it-IT">Annullamento automatico</label><label lang="pt-PT">Cancelamento Automático</label>
             <helpText>If enabled, the plugin will automatically cancel Mollie orders when being cancelled in Shopware. Only orders that are created, authorized or partially shipped will be cancelled. If partially shipped, only items that where not shipped will be cancelled.</helpText>
             <helpText lang="de-DE">Wenn aktiviert, storniert das Plugin Mollie-Bestellungen automatisch, wenn sie in Shopware storniert werden. Nur Bestellungen, die erstellt, autorisiert oder teilweise versandt wurden, werden storniert. Bei teilweisem Versand werden nur Artikel storniert, die nicht versendet wurden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plug-in automatisch Mollie-bestellingen annuleren wanneer ze worden geannuleerd in Shopware. Alleen bestellingen die zijn aangemaakt, geautoriseerd of gedeeltelijk zijn verzonden, worden geannuleerd. Indien gedeeltelijk verzonden, worden alleen artikelen geannuleerd die niet zijn verzonden.</helpText>
-            <helpText lang="it-IT">Se abilitato, il plugin annullerà automaticamente gli ordini Mollie quando vengono annullati in Shopware. Verranno annullati solo gli ordini creati, autorizzati o parzialmente spediti. Se parzialmente spediti, verranno annullati solo gli articoli non spediti.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin annullerà automaticamente gli ordini Mollie quando vengono annullati in Shopware. Verranno annullati solo gli ordini creati, autorizzati o parzialmente spediti. Se parzialmente spediti, verranno annullati solo gli articoli non spediti.</helpText><helpText lang="pt-PT">Se ativado, o plugin cancelará automaticamente as encomendas da Mollie quando estas forem canceladas no Shopware. Apenas encomendas criadas, autorizadas ou parcialmente enviadas serão canceladas. Se parcialmente enviadas, apenas os itens que não foram enviados serão cancelados.</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticOrderExpire</name>
@@ -478,6 +481,7 @@
         <title lang="de-DE">Refund Manager</title>
         <title lang="nl-NL">Refund Manager</title>
         <title lang="it-IT">Refund Manager</title>
+
         <input-field type="bool">
             <name>refundManagerEnabled</name>
             <defaultValue>true</defaultValue>
@@ -500,7 +504,8 @@
             <helpText>Automatically set the entered refund quantity also as the quantity to be used to increase the stock again.</helpText>
             <helpText lang="de-DE">Sofern aktiv, wird die eingegebene Rückerstattungsmenge automatisch als Menge für den Lagerbestand verwendet und dieses Feld vorbefüllt.</helpText>
             <helpText lang="nl-NL">Stel de ingevoerde restitutiehoeveelheid automatisch ook in als de hoeveelheid die moet worden gebruikt om de voorraad weer te vergroten</helpText>
-            <helpText lang="it-IT">Imposta automaticamente la quantità di rimborso inserita anche come quantità da utilizzare per aumentare nuovamente lo stock.</helpText><helpText lang="pt-PT">Definir automaticamente a quantidade de reembolso introduzida bem como a quantidade a utilizar para aumentar novamente o stock.</helpText>
+            <helpText lang="it-IT">Imposta automaticamente la quantità di rimborso inserita anche come quantità da utilizzare per aumentare nuovamente lo stock.</helpText>
+            <helpText lang="pt-PT">Definir automaticamente a quantidade de reembolso introduzida bem como a quantidade a utilizar para aumentar novamente o stock.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerVerifyRefund</name>
@@ -512,7 +517,8 @@
             <helpText>If enabled, a verification checkbox needs to be checked to proceed with the refund. We recommend this to avoid accidental refunds and stock changes.</helpText>
             <helpText lang="de-DE">Wenn aktiv, muss ein Überprüfungskästchen aktiviert werden, um mit der Rückerstattung fortzufahren. Wir empfehlen dies, um versehentliche Rückerstattungen und Bestandsänderungen zu vermeiden.</helpText>
             <helpText lang="nl-NL">Indien actief, moet een selectievakje worden geactiveerd om verder te gaan met de terugbetaling. Wij raden dit aan om onbedoelde terugbetalingen en voorraadwijzigingen te voorkomen.</helpText>
-            <helpText lang="it-IT">Se abilitato, è necessario selezionare una casella di verifica per procedere con il rimborso. Raccomandiamo questa opzione per evitare rimborsi accidentali e modifiche dello stock.</helpText><helpText lang="pt-PT">Se ativado, é necessário marcar uma caixa de verificação para proceder ao reembolso. Recomendamos esta opção para evitar reembolsos acidentais e alterações de stock.</helpText>
+            <helpText lang="it-IT">Se abilitato, è necessario selezionare una casella di verifica per procedere con il rimborso. Raccomandiamo questa opzione per evitare rimborsi accidentali e modifiche dello stock.</helpText>
+            <helpText lang="pt-PT">Se ativado, é necessário marcar uma caixa de verificação para proceder ao reembolso. Recomendamos esta opção para evitar reembolsos acidentais e alterações de stock.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerShowInstructions</name>
@@ -548,7 +554,8 @@
             <helpText>Prefix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="de-DE">Präfix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
             <helpText lang="nl-NL">Voorvoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
-            <helpText lang="it-IT">Prefisso per il numero della nota di credito. La nota di credito è composta da prefisso, nome dell'articolo originale e suffisso</helpText><helpText lang="pt-PT">Prefixo para o número da nota de crédito. A nota de crédito é constituída pelo prefixo, nome original do artigo, e sufixo</helpText>
+            <helpText lang="it-IT">Prefisso per il numero della nota di credito. La nota di credito è composta da prefisso, nome dell'articolo originale e suffisso</helpText>
+            <helpText lang="pt-PT">Prefixo para o número da nota de crédito. A nota de crédito é constituída pelo prefixo, nome original do artigo, e sufixo</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesSuffix</name>
@@ -581,35 +588,35 @@
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
-                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
-                    <name lang="it-IT">Aperto</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
-                    <name lang="it-IT">In corso</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
-                    <name lang="it-IT">Completato</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
-                    <name lang="it-IT">Annullato</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
                 </option>
             </options>
         </input-field>
@@ -625,35 +632,35 @@
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
-                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
-                    <name lang="it-IT">Aperto</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
-                    <name lang="it-IT">In corso</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
-                    <name lang="it-IT">Completato</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
-                    <name lang="it-IT">Annullato</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
                 </option>
             </options>
         </input-field>
@@ -669,35 +676,35 @@
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
-                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
-                    <name lang="it-IT">Aperto</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
-                    <name lang="it-IT">In corso</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
-                    <name lang="it-IT">Completato</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
-                    <name lang="it-IT">Annullato</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
                 </option>
             </options>
         </input-field>
@@ -713,35 +720,35 @@
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
-                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
-                    <name lang="it-IT">Aperto</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
-                    <name lang="it-IT">In corso</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
-                    <name lang="it-IT">Completato</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
-                    <name lang="it-IT">Annullato</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
                 </option>
             </options>
         </input-field>
@@ -757,35 +764,35 @@
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
-                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
-                    <name lang="it-IT">Aperto</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
-                    <name lang="it-IT">In corso</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
-                    <name lang="it-IT">Completato</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
-                    <name lang="it-IT">Annullato</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
                 </option>
             </options>
         </input-field>
@@ -801,35 +808,35 @@
                     <name>Skip this status</name>
                     <name lang="de-DE">nichts machen</name>
                     <name lang="nl-NL">Sla deze status over</name>
-                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
                 </option>
                 <option>
                     <id>open</id>
                     <name>Open</name>
                     <name lang="de-DE">Offen</name>
                     <name lang="nl-NL">Open</name>
-                    <name lang="it-IT">Aperto</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
                 </option>
                 <option>
                     <id>in_progress</id>
                     <name>In progress</name>
                     <name lang="de-DE">In Bearbeitung</name>
                     <name lang="nl-NL">In uitvoering</name>
-                    <name lang="it-IT">In corso</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
                 </option>
                 <option>
                     <id>completed</id>
                     <name>Completed</name>
                     <name lang="de-DE">Komplett</name>
                     <name lang="nl-NL">Voltooid</name>
-                    <name lang="it-IT">Completato</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
                 </option>
                 <option>
                     <id>cancelled</id>
                     <name>Cancelled</name>
                     <name lang="de-DE">Abgebrochen</name>
                     <name lang="nl-NL">Geannuleerd</name>
-                    <name lang="it-IT">Annullato</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
                 </option>
             </options>
         </input-field>
@@ -883,11 +890,11 @@
             <label>Final order state</label>
             <label lang="de-DE">Finaler Bestellstatus</label>
             <label lang="nl-NL">Definitieve Bestelstatus</label>
-            <label lang="it-IT">Stato finale dell'ordine</label>
+            <label lang="it-IT">Stato finale dell'ordine</label><label lang="pt-PT">Estado final da encomenda</label>
             <helpText>If enabled, the plugin will not transition to a new order state, if the final state is already set in the order. Use this feature in combination with plugins and systems if their workflows do not match the one from Mollie.</helpText>
             <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
-            <helpText lang="it-IT">Se abilitato, il plugin non passerà a un nuovo stato dell'ordine se lo stato finale è già impostato nell'ordine. Usa questa funzione in combinazione con plugin e sistemi se i loro flussi di lavoro non corrispondono a quello di Mollie.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin non passerà a un nuovo stato dell'ordine se lo stato finale è già impostato nell'ordine. Usa questa funzione in combinazione con plugin e sistemi se i loro flussi di lavoro non corrispondono a quello di Mollie.</helpText><helpText lang="pt-PT">Se ativado, o plugin não fará a transição para um novo estado da encomenda, caso estado final já estiver definido na encomenda. Utilize esta funcionalidade em combinação com plugins e sistemas se os seus fluxos de trabalho não corresponderem ao da Mollie.</helpText>
         </component>
 
     </card>
@@ -963,11 +970,11 @@
             <label>Skip subscription renewal if payment fails</label>
             <label lang="de-DE">Abonnementverlängerung überspringen, wenn die Zahlung fehlschlägt</label>
             <label lang="nl-NL">Abonnementverlenging overslaan als de betaling mislukt</label>
-            <label lang="it-IT">Salta il rinnovo dell'abbonamento se il pagamento non riesce</label>
+            <label lang="it-IT">Salta il rinnovo dell'abbonamento se il pagamento non riesce</label><label lang="pt-PT">Ignorar a renovação da subscrição se o pagamento falhar</label>
             <helpText>If skipped, the plugin will not create new orders on subscription renewals, if the payment was not successful. If not skipped, then a new order is created and the customer can pay again within Shopware.</helpText>
             <helpText lang="de-DE">Wenn es übersprungen wird, erstellt das Plugin keine neuen Bestellungen bei Abonnementverlängerungen, wenn die Zahlung nicht erfolgreich war. Wenn nicht übersprungen, wird eine neue Bestellung erstellt und der Kunde kann innerhalb von Shopware erneut bezahlen.</helpText>
             <helpText lang="nl-NL">Indien overgeslagen, zal de plug-in geen nieuwe bestellingen maken bij abonnementsverlengingen, als de betaling niet succesvol was. Indien niet overgeslagen, dan wordt er een nieuwe bestelling aangemaakt en kan de klant opnieuw betalen binnen Shopware.</helpText>
-            <helpText lang="it-IT">Se saltato, il plugin non creerà nuovi ordini al momento dei rinnovi degli abbonamenti se il pagamento non è stato completato con successo. Se non è saltato, verrà creato un nuovo ordine e il cliente potrà effettuare nuovamente il pagamento all'interno di Shopware.</helpText>
+            <helpText lang="it-IT">Se saltato, il plugin non creerà nuovi ordini al momento dei rinnovi degli abbonamenti se il pagamento non è stato completato con successo. Se non è saltato, verrà creato un nuovo ordine e il cliente potrà effettuare nuovamente il pagamento all'interno di Shopware.</helpText><helpText lang="pt-PT">Se ignorado, o plugin não criará novas encomendas nas renovações de subscrições, caso o pagamento tenha falhado. Se não for ignorado, será criada uma nova encomenda e o cliente poderá efetuar um novo pagamento no Shopware.</helpText>
         </input-field>
         <input-field type="int">
             <name>subscriptionsReminderDays</name>
@@ -1039,7 +1046,7 @@
         <title>Javascript</title>
         <title lang="de-DE">Storefront Javascript</title>
         <title lang="nl-NL">Storefront Javascript</title>
-        <title lang="it-IT">Storefront Javascript</title>
+        <title lang="it-IT">Storefront Javascript</title><title lang="pt-PT">Javascript</title>
         <input-field type="bool">
             <name>useShopwareJavascript</name>
             <label>Use Shopware default Javascript in Storefront (requires manual compilation)</label>

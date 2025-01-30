@@ -36,11 +36,11 @@ XML;
 
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
     }
 
-    public function testReplaceOldValue():void
+    public function testReplaceOldValue(): void
     {
         $expectedXML = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -69,11 +69,242 @@ XML;
 
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
     }
 
-    public function testfindByNameAndAppendNewTitle():void
+    public function testAppendTitle(): void
+    {
+        $expectedXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <card>
+        <title >API</title>
+        <title lang="de-DE">API</title>
+        <title lang="nl-NL">API</title>
+        <title lang="it-IT">API</title>
+        <title lang="pt-PT">API</title>
+    </card>
+</config>
+XML;
+
+
+        $exampleXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <card>
+        <title >API</title>
+        <title lang="de-DE">API</title>
+        <title lang="nl-NL">API</title>
+        <title lang="it-IT">API</title>
+    </card>
+</config>
+XML;
+        $dom = new \DOMDocument();
+        $dom->loadXML($exampleXML);
+
+
+        $appender = new TranslationAppender();
+        $result = $appender->append($dom, 'card.api.title', 'API', 'pt-PT');
+
+
+        $expectedXML = preg_replace('/\s+/', '', $expectedXML);
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
+        $this->assertEquals($expectedXML, $actualXML);
+    }
+
+    public function testReplaceMultipleOldValues(): void
+    {
+        $exampleXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+  <card>
+        <title >API</title>
+        <title lang="de-DE">API</title>
+        <title lang="nl-NL">API</title>
+        <title lang="it-IT">API</title>
+        <title lang="pt-PT">API</title>
+
+        <input-field type="password">
+            <name>liveApiKey</name>
+            <copyable>true</copyable>
+            <label>Live Key</label>
+            <label lang="de-DE">Live Key</label>
+            <label lang="nl-NL">Live-sleutel</label>
+            <label lang="it-IT">Chiave Live</label><label lang="pt-PT">Chave ativa</label>
+        </input-field>
+        <input-field type="password">
+            <name>testApiKey</name>
+            <copyable>true</copyable>
+            <label>Test Key</label>
+            <label lang="de-DE">Test Key</label>
+            <label lang="nl-NL">Test-sleutel</label>
+            <label lang="it-IT">Chiave Test</label><label lang="pt-PT">Chave de teste</label>
+        </input-field>
+        <input-field type="bool">
+            <name>testMode</name>
+            <label>Test Mode</label>
+            <label lang="de-DE">Test Modus</label>
+            <label lang="nl-NL">Test Modus</label>
+            <label lang="it-IT">Modalità test</label><label lang="pt-PT">Modo de Teste</label>
+            <defaultValue>true</defaultValue>
+            <helpText>Enables the test mode with the Mollie Sandbox payment page. The Storefront will also show (Test Mode) next to the payment method names.</helpText>
+            <helpText lang="de-DE">Aktiviert den Testmodus mit der Mollie Sandbox Zahlungsseite. In der Storefront wird (Test Modus) neben den Zahlungsarten angezeigt.</helpText>
+            <helpText lang="nl-NL">Staat de test modus toe met de Mollie Sandbox betalingspagina. De Storefront zal ook "(Test Mode)" tonen naast de naam van de betaalmethode.</helpText>
+            <helpText lang="it-IT">Abilita la modalità test con la pagina di pagamento di Mollie Sandbox. Lo Storefront mostrerà anche (Modalità test) accanto ai nomi dei metodi di pagamento.</helpText><helpText lang="pt-PT">Ativa o modo de teste com a página de pagamento do Mollie Sandbox. A loja também será mostrada (Modo de teste) ao lado dos nomes dos métodos de pagamento.</helpText>
+        </input-field>
+        <component name="mollie-pluginconfig-section-api">
+            <name>molliePluginConfigSectionApi</name>
+        </component>
+    </card>
+</config>
+XML;
+        $expectedXML = $exampleXML;
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($exampleXML);
+
+
+        $appender = new TranslationAppender();
+        $result = $appender->append($dom, 'card.api.title', 'API', 'pt-PT');
+        $result = $appender->append($dom, 'card.api.liveApiKey.label', 'Chave ativa', 'pt-PT');
+        $result = $appender->append($dom, 'card.api.testApiKey.label', 'Chave de teste', 'pt-PT');
+        $result = $appender->append($dom, 'card.api.testMode.label', 'Modo de Teste', 'pt-PT');
+        $result = $appender->append($dom, 'card.api.testMode.helpText', 'Ativa o modo de teste com a página de pagamento do Mollie Sandbox. A loja também será mostrada (Modo de teste) ao lado dos nomes dos métodos de pagamento.', 'pt-PT');
+
+
+        $expectedXML = preg_replace('/\s+/', '', $expectedXML);
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
+        $this->assertEquals($expectedXML, $actualXML);
+
+    }
+
+    public function testReplaceOldValuesInOptions(): void
+    {
+        $exampleXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+  <card>
+        <title>Order State Automation</title>
+        <title lang="de-DE">Automatisch Order Status setzen</title>
+        <title lang="nl-NL">Automatisch bestelstatus instellen</title>
+        <title lang="it-IT">Automazione dello Stato dell'Ordine</title>
+        <title lang="pt-PT">Automatização do estado da encomenda</title>
+            <input-field type="single-select">
+            <name>orderStateWithPartialRefundTransaction</name>
+            <label>Order state with a partial refund transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer teilweise erstatteten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een gedeeltelijk terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso parziale</label>
+            <label lang="pt-PT">Estado da encomenda com uma transação de reembolso parcial</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="pt-PT">Ignorar este estado</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                    <name lang="pt-PT">Aberto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                    <name lang="pt-PT">Em curso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                    <name lang="pt-PT">Concluído</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                    <name lang="pt-PT">Cancelado</name>
+                </option>
+            </options>
+        </input-field>
+</card>
+</config>
+XML;
+
+$expectedXML = $exampleXML;
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($exampleXML);
+
+
+        $appender = new TranslationAppender();
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.label', 'Estado da encomenda com uma transação de reembolso parcial', 'pt-PT');
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.options.1.name', 'Ignorar este estado', 'pt-PT');
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.options.2.name', 'Aberto', 'pt-PT');
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.options.3.name', 'Em curso', 'pt-PT');
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.options.4.name', 'Concluído', 'pt-PT');
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.options.5.name', 'Cancelado', 'pt-PT');
+
+        $expectedXML = preg_replace('/\s+/', '', $expectedXML);
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
+        $this->assertEquals($expectedXML, $actualXML);
+    }
+
+    public function testReplaceOldValueByNameOrTitle(): void
+    {
+        $expectedXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <card>
+        <title>api</title>
+          <input-field type="password">
+            <name>liveApiKey</name>
+            <label lang="en-GB">Other Key</label><label lang="de-DE">New Key</label>
+          </input-field>
+    </card>
+</config>
+XML;
+
+
+        $exampleXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <card>
+        <title>api</title>
+          <input-field type="password">
+            <name>liveApiKey</name>
+            <label lang="en-GB">Other Key</label><label lang="de-DE">Old Key</label>
+          </input-field>
+    </card>
+</config>
+XML;
+        $dom = new \DOMDocument();
+        $dom->loadXML($exampleXML);
+
+
+        $appender = new TranslationAppender();
+        $result = $appender->append($dom, 'card.api.liveApiKey.label', 'New Key', 'de-DE');
+
+
+        $expectedXML = preg_replace('/\s+/', '', $expectedXML);
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
+        $this->assertEquals($expectedXML, $actualXML);
+    }
+
+    public function testFindByNameAndAppendNewTitle(): void
     {
         $expectedXML = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -105,10 +336,11 @@ XML;
 
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
     }
-    public function testFindByChildNameAndAppendNewLabel():void
+
+    public function testFindByChildNameAndAppendNewLabel(): void
     {
 
         $expectedXML = <<<XML
@@ -165,11 +397,11 @@ XML;
 
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
     }
 
-    public function testAppendOptionsInArray():void
+    public function testAppendOptionsInArray(): void
     {
         $expectedXML = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -329,12 +561,12 @@ XML;
         $result = $appender->append($dom, 'card.applePay.applePayDirectRestrictions.options.2.name', 'Produktseiten', 'de-DE');
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
 
     }
 
-    public function testAppendElementToTheLastElementOfTheSameType():void
+    public function testAppendElementToTheLastElementOfTheSameType(): void
     {
 
         $expectedXML = <<<XML
@@ -392,11 +624,11 @@ XML;
         $result = $appender->append($dom, 'card.api.liveApiKey.label', 'Live Key', 'de-DE');
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
     }
 
-    public function testAppendMultipleTexts():void
+    public function testAppendMultipleTexts(): void
     {
         $expectedXML = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -537,12 +769,697 @@ XML;
 
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.payments.title', 'Pagamentos', 'pt-PT');
-        $result = $appender->append($result, 'card.payments.shopwareFailedPayment.label', 'Utilizar o comportamento padrão do Shopware para pagamentos falhados', 'pt-PT');
-        $result = $appender->append($result, 'card.payments.shopwareFailedPayment.helpText', 'Utilizar o comportamento padrão do Shopware em pagamentos falhados. Se este estiver desativado, a Mollie fornecerá automaticamente uma maneira de tentar novamente o pagamento redirecionando o utilizador para a página de pagamentos da Mollie.', 'pt-PT');
+        $result = $appender->append($dom, 'card.payments.shopwareFailedPayment.label', 'Utilizar o comportamento padrão do Shopware para pagamentos falhados', 'pt-PT');
+        $result = $appender->append($dom, 'card.payments.shopwareFailedPayment.helpText', 'Utilizar o comportamento padrão do Shopware em pagamentos falhados. Se este estiver desativado, a Mollie fornecerá automaticamente uma maneira de tentar novamente o pagamento redirecionando o utilizador para a página de pagamentos da Mollie.', 'pt-PT');
 
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
-        $actualXML = preg_replace('/\s+/', '', $result->saveXML());
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
+    }
+
+    public function testFindOptionInComplexXML(): void
+    {
+        $expectedXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+        <card>
+        <title>Order State Automation</title>
+        <title lang="de-DE">Automatisch Order Status setzen</title>
+        <title lang="nl-NL">Automatisch bestelstatus instellen</title>
+        <title lang="it-IT">Automazione dello Stato dell'Ordine</title><title lang="pt-PT">Automatização do estado da encomenda</title>
+
+        <input-field type="single-select">
+            <name>orderStateWithAPaidTransaction</name>
+            <label>Order state with a paid transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer bezahlten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een betaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione pagata</label><label lang="pt-PT">Estado da encomenda com uma transação paga</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                    <name lang="pt-PT">Ignorar este estado</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithAFailedTransaction</name>
+            <label>Order state with a failed transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer fehlgeschlagenen Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een mislukte transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione non riuscita</label><label lang="pt-PT">Estado da encomenda com uma transação falhada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithACancelledTransaction</name>
+            <label>Order state with a cancelled transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer abgebrochenen Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een geannuleerde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione annullata</label><label lang="pt-PT">Estado da encomenda com uma transação cancelada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithAAuthorizedTransaction</name>
+            <label>Order state with a authorized transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer authorisierten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een geautoriseerde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione autorizzata</label><label lang="pt-PT">Estado da encomenda com uma transação autorizada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithAChargebackTransaction</name>
+            <label>Order state with a charged back transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer zurückgebuchten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een teruggevorderde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione rimborsata</label><label lang="pt-PT">Estado da encomenda com uma transação estornada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithRefundTransaction</name>
+            <label>Order state with a refund transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer zurückerstatteten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso</label><label lang="pt-PT">Estado da encomenda com uma transação de reembolso</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithPartialRefundTransaction</name>
+            <label>Order state with a partial refund transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer teilweise erstatteten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een gedeeltelijk terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso parziale</label><label lang="pt-PT">Estado da encomenda com uma transação de reembolso parcial</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
+                </option>
+            </options>
+        </input-field>
+        <component name="mollie-pluginconfig-element-orderstate-select">
+            <name>orderStateFinalState</name>
+            <entity>state_machine_state</entity>
+            <label>Final order state</label>
+            <label lang="de-DE">Finaler Bestellstatus</label>
+            <label lang="nl-NL">Definitieve Bestelstatus</label>
+            <label lang="it-IT">Stato finale dell'ordine</label>
+            <helpText>If enabled, the plugin will not transition to a new order state, if the final state is already set in the order. Use this feature in combination with plugins and systems if their workflows do not match the one from Mollie.</helpText>
+            <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin non passerà a un nuovo stato dell'ordine se lo stato finale è già impostato nell'ordine. Usa questa funzione in combinazione con plugin e sistemi se i loro flussi di lavoro non corrispondono a quello di Mollie.</helpText>
+        </component>
+
+    </card>
+</config>
+XML;
+
+        $exampleXML = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+        <card>
+        <title>Order State Automation</title>
+        <title lang="de-DE">Automatisch Order Status setzen</title>
+        <title lang="nl-NL">Automatisch bestelstatus instellen</title>
+        <title lang="it-IT">Automazione dello Stato dell'Ordine</title><title lang="pt-PT">Automatização do estado da encomenda</title>
+
+        <input-field type="single-select">
+            <name>orderStateWithAPaidTransaction</name>
+            <label>Order state with a paid transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer bezahlten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een betaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione pagata</label><label lang="pt-PT">Estado da encomenda com uma transação paga</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithAFailedTransaction</name>
+            <label>Order state with a failed transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer fehlgeschlagenen Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een mislukte transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione non riuscita</label><label lang="pt-PT">Estado da encomenda com uma transação falhada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithACancelledTransaction</name>
+            <label>Order state with a cancelled transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer abgebrochenen Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een geannuleerde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione annullata</label><label lang="pt-PT">Estado da encomenda com uma transação cancelada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithAAuthorizedTransaction</name>
+            <label>Order state with a authorized transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer authorisierten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een geautoriseerde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione autorizzata</label><label lang="pt-PT">Estado da encomenda com uma transação autorizada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithAChargebackTransaction</name>
+            <label>Order state with a charged back transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer zurückgebuchten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een teruggevorderde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione rimborsata</label><label lang="pt-PT">Estado da encomenda com uma transação estornada</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithRefundTransaction</name>
+            <label>Order state with a refund transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer zurückerstatteten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso</label><label lang="pt-PT">Estado da encomenda com uma transação de reembolso</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="single-select">
+            <name>orderStateWithPartialRefundTransaction</name>
+            <label>Order state with a partial refund transaction</label>
+            <label lang="de-DE">Bestellstatus bei einer teilweise erstatteten Transaktion</label>
+            <label lang="nl-NL">Bestelstatus bij een gedeeltelijk terugbetaalde transactie</label>
+            <label lang="it-IT">Stato dell'ordine per una transazione di rimborso parziale</label><label lang="pt-PT">Estado da encomenda com uma transação de reembolso parcial</label>
+            <options>
+                <option>
+                    <id>skip</id>
+                    <name>Skip this status</name>
+                    <name lang="de-DE">nichts machen</name>
+                    <name lang="nl-NL">Sla deze status over</name>
+                    <name lang="it-IT">Salta questo stato</name><name lang="pt-PT">Ignorar este estado</name>
+                </option>
+                <option>
+                    <id>open</id>
+                    <name>Open</name>
+                    <name lang="de-DE">Offen</name>
+                    <name lang="nl-NL">Open</name>
+                    <name lang="it-IT">Aperto</name><name lang="pt-PT">Aberto</name>
+                </option>
+                <option>
+                    <id>in_progress</id>
+                    <name>In progress</name>
+                    <name lang="de-DE">In Bearbeitung</name>
+                    <name lang="nl-NL">In uitvoering</name>
+                    <name lang="it-IT">In corso</name><name lang="pt-PT">Em curso</name>
+                </option>
+                <option>
+                    <id>completed</id>
+                    <name>Completed</name>
+                    <name lang="de-DE">Komplett</name>
+                    <name lang="nl-NL">Voltooid</name>
+                    <name lang="it-IT">Completato</name><name lang="pt-PT">Concluído</name>
+                </option>
+                <option>
+                    <id>cancelled</id>
+                    <name>Cancelled</name>
+                    <name lang="de-DE">Abgebrochen</name>
+                    <name lang="nl-NL">Geannuleerd</name>
+                    <name lang="it-IT">Annullato</name><name lang="pt-PT">Cancelado</name>
+                </option>
+            </options>
+        </input-field>
+        <component name="mollie-pluginconfig-element-orderstate-select">
+            <name>orderStateFinalState</name>
+            <entity>state_machine_state</entity>
+            <label>Final order state</label>
+            <label lang="de-DE">Finaler Bestellstatus</label>
+            <label lang="nl-NL">Definitieve Bestelstatus</label>
+            <label lang="it-IT">Stato finale dell'ordine</label>
+            <helpText>If enabled, the plugin will not transition to a new order state, if the final state is already set in the order. Use this feature in combination with plugins and systems if their workflows do not match the one from Mollie.</helpText>
+            <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
+            <helpText lang="it-IT">Se abilitato, il plugin non passerà a un nuovo stato dell'ordine se lo stato finale è già impostato nell'ordine. Usa questa funzione in combinazione con plugin e sistemi se i loro flussi di lavoro non corrispondono a quello di Mollie.</helpText>
+        </component>
+
+    </card>
+</config>
+XML;
+
+        $dom = new \DOMDocument();
+        $dom->loadXML($exampleXML);
+
+
+        $appender = new TranslationAppender();
+        $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithAPaidTransaction.options.1.name', 'Ignorar este estado', 'pt-PT');
+
+
+        $expectedXML = preg_replace('/\s+/', '', $expectedXML);
+        $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
+        $this->assertEquals($expectedXML, $actualXML);
+
     }
 }

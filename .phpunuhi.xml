@@ -33,7 +33,7 @@
                 <locale name="pt-PT">./src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
             </locales>
         </set>
-
+    <!--
         <set name="plugin-settings">
             <format>
                 <shopware6 type="config" file="src/Resources/config/config.xml"/>
@@ -46,6 +46,11 @@
                 <locale name="pt-PT"></locale>
             </locales>
         </set>
-
+-->
     </translations>
+    <emptyContent>
+        <key name="card.0.title">
+            <locale>*</locale>
+        </key>
+    </emptyContent>
 </phpunuhi>
