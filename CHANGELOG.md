@@ -25,3 +25,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed order details in the refund manager for Shopware 6.4.x.
 - Resolved an issue with SwagCustomizedProducts where prices for option values are now correctly added to the order.
 - Fixed the issue with OrderNotFoundException. This class was removed by shopware in 6.5.0 and it is not used within the plugin anymore
+- Fixed an issue with twig rendering, mollie_applepaydirect_restrictions was null and caused an error

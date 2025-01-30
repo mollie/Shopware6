@@ -122,9 +122,7 @@ class SettingsService implements PluginSettingsServiceInterface
         /**
          * TODO: remove this when we move to config
          */
-        if ($this->payPalExpressConfig->isEnabled()) {
-            $structData = $this->payPalExpressConfig->assign($structData);
-        }
+        $structData = $this->payPalExpressConfig->assign($structData);
 
 
         $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
