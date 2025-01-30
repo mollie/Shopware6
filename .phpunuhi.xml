@@ -14,6 +14,7 @@
                 <locale name="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</locale>
                 <locale name="it-IT">./src/Resources/app/administration/src/snippet/it-IT.json</locale>
                 <locale name="pt-PT">./src/Resources/app/administration/src/snippet/pt-PT.json</locale>
+                <locale name="es-ES">./src/Resources/app/administration/src/snippet/es-ES.json</locale>
             </locales>
         </set>
 
@@ -31,9 +32,10 @@
                 <locale name="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</locale>
                 <locale name="it-IT">./src/Resources/snippet/it_IT/mollie-payments.it-IT.json</locale>
                 <locale name="pt-PT">./src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
+                <locale name="es-ES">./src/Resources/snippet/es_ES/mollie-payments.es-ES.json</locale>
             </locales>
         </set>
-        <!--
+    <!--
         <set name="plugin-settings">
             <rules>
                 <emptyContent>
@@ -51,9 +53,10 @@
                 <locale name="nl-NL"></locale>
                 <locale name="it-IT"></locale>
                 <locale name="pt-PT"></locale>
+                <locale name="es-ES"></locale>
             </locales>
         </set>
-        -->
+    -->
     </translations>
 
 </phpunuhi>
