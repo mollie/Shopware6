@@ -18,6 +18,13 @@
         {% set includeJsInHeader = true %}
     {% endif %}
 
+    {% if mollie_paypalexpress_restrictions is null %}
+        {% set mollie_paypalexpress_restrictions = [] %}
+    {% endif %}
+    {% if mollie_applepaydirect_restrictions is null %}
+        {% set mollie_applepaydirect_restrictions = [] %}
+    {% endif %}
+
     {% set restrictions = mollie_applepaydirect_restrictions | merge(mollie_paypalexpress_restrictions) %}
 
     {# requirement check for apple pay direct #}
