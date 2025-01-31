@@ -486,6 +486,7 @@
         <title lang="de-DE">Refund Manager</title>
         <title lang="nl-NL">Refund Manager</title>
         <title lang="it-IT">Refund Manager</title>
+        <title lang="pt-PT">Refund Manager</title>
 
         <input-field type="bool">
             <name>refundManagerEnabled</name>
@@ -494,10 +495,12 @@
             <label lang="de-DE">Refund Manager aktivieren</label>
             <label lang="nl-NL">Refund Manager inschakelen</label>
             <label lang="it-IT">Abilita Refund Manager</label>
+            <label lang="pt-PT">Ativar o Refund Manager</label>
             <helpText>Enable or disable the Refund Manager in the Administration</helpText>
             <helpText lang="de-DE">Aktivieren oder deaktivieren Sie den Refund Manager in der Administration</helpText>
             <helpText lang="nl-NL">Schakel de Refund Manager in of uit in de administratie</helpText>
             <helpText lang="it-IT">Attivare o disattivare il Gestore dei rimborsi nell'Amministrazione.</helpText>
+            <helpText lang="pt-PT">Ativar ou desativar o Refund Manager na Administração</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerAutoStockReset</name>
@@ -544,10 +547,12 @@
             <label lang="de-DE">Gutschriften erstellen</label>
             <label lang="nl-NL">Creditnota's maken</label>
             <label lang="it-IT">Crea note di credito</label>
+            <label lang="pt-PT">Criar Nota de Crédito</label>
             <helpText>Automatically create a credit note in Shopware when a refund is processed.</helpText>
             <helpText lang="de-DE">Erstellt automatisch eine Gutschrift in Shopware, wenn eine Rückerstattung verarbeitet wird.</helpText>
             <helpText lang="nl-NL">Maak automatisch een creditnota in Shopware wanneer een terugbetaling wordt verwerkt.</helpText>
             <helpText lang="it-IT">Crea automaticamente una nota di credito in Shopware quando viene elaborato un rimborso.</helpText>
+            <helpText lang="pt-PT">Criar automaticamente uma nota de crédito no Shopware ao processar um reembolso</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesPrefix</name>
