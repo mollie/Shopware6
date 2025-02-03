@@ -21,7 +21,7 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
         LoggerInterface                  $logger
     ) {
         /** @phpstan-ignore-next-line */
-        parent::__construct($scheduledTaskRepository->getRepository(), $logger);
+        parent::__construct($scheduledTaskRepository, $logger);
         $this->expireAction = $expireAction;
     }
 
