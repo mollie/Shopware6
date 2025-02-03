@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] 
 
+## [4.14.0] - 2025-02-03
 ### Added
 - Returns for Shopware Commercial plugins are now transferred to Mollie when the return status is set to "Done" and can be canceled with the "Cancelled" status. Please note that refunds cannot be canceled after two hours.
 - MB Way payment method is now available for Mollie Payments.
