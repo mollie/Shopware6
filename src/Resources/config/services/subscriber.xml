@@ -72,6 +72,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\AccountOrderPageLoadedSubscriber">
+            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\OrderEditSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
             <tag name="kernel.event_subscriber" />
@@ -95,8 +100,6 @@
             <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
         </service>
-
-
 
     </services>
 </container>
