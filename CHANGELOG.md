@@ -5,7 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+### Added
 - Swish payment method is now available for Mollie Payments.
+
+### Fixed
+- Fixed an issue with transitions at too early webhook calls from Mollie
+
+
 
 ## [4.14.1] - 2025-02-03
 

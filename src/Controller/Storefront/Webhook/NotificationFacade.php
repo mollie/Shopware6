@@ -155,11 +155,11 @@ class NotificationFacade
 
         $now = new \DateTime('now', new DateTimeZone('UTC'));
 
-        /** @var ?\DateTimeImmutable $orderCreatedAt */
-        $orderCreatedAt = $swOrder->getCreatedAt();
+        /** @var ?\DateTimeImmutable $transactionCreatedAt */
+        $transactionCreatedAt = $swTransaction->getCreatedAt();
 
-        if ($orderCreatedAt !== null) {
-            $createdAt = \DateTime::createFromImmutable($orderCreatedAt);
+        if ($transactionCreatedAt !== null) {
+            $createdAt = \DateTime::createFromImmutable($transactionCreatedAt);
             $createdAt->modify('+2 minutes');
 
             if ($now < $createdAt) {
