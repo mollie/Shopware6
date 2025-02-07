@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 
+## [Unreleased]
+- Swish payment method is now available for Mollie Payments.
 
 ## [4.14.1] - 2025-02-03
 
@@ -18,7 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Multibanco payment method is now available for Mollie Payments.
 - Added Portuguese translation
 - Added Spanish translation
-
 
 ### Changed
 
