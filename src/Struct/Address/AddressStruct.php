@@ -89,7 +89,17 @@ final class AddressStruct
             $address->givenName = implode(' ', $nameParts);
         }
 
-        return new AddressStruct($address->givenName, $address->familyName, $address->email, $address->streetAndNumber, $streetAdditional, $address->postalCode, $address->city, $address->country, (string)$address->phone);
+        return new AddressStruct(
+            $address->givenName,
+            (string)$address->familyName,
+            (string)$address->email,
+            (string)$address->streetAndNumber,
+            $streetAdditional,
+            (string)$address->postalCode,
+            (string)$address->city,
+            (string)$address->country,
+            (string)$address->phone
+        );
     }
 
     public function getFirstName(): string
