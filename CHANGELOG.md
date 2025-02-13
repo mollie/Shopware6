@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed an issue with transitions at too early webhook calls from Mollie
-
+- Fix problem with broken PayPal Express checkout in combination with some rare PayPal addresses.
 
 
 ## [4.14.1] - 2025-02-03
