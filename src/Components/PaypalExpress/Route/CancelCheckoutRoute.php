@@ -24,10 +24,10 @@ class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
     private CartServiceInterface $cartService;
 
     public function __construct(
-        SettingsService   $settingsService,
-        CartBackupService $cartBackupService,
-        CartServiceInterface       $cartService,
-        PayPalExpress     $paypalExpress
+        SettingsService      $settingsService,
+        CartBackupService    $cartBackupService,
+        CartServiceInterface $cartService,
+        PayPalExpress        $paypalExpress
     ) {
         $this->settingsService = $settingsService;
         $this->cartBackupService = $cartBackupService;
@@ -51,8 +51,10 @@ class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
 
         $cart = $this->cartService->getCalculatedMainCart($context);
 
-        $this->cartBackupService->restoreCart($context);
-        $this->cartBackupService->clearBackup($context);
+        if ($this->cartBackupService->isBackupExisting($context)) {
+            $this->cartBackupService->restoreCart($context);
+            $this->cartBackupService->clearBackup($context);
+        }
 
         $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
         $sessionId = null;

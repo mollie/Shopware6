@@ -76,6 +76,11 @@ class CartBackupService
     {
         $originalCart = $this->cartService->getCart($context->getToken(), $context);
 
+        # do only create backup if we have items in our cart
+        if ($originalCart->getLineItems()->count() <= 0) {
+            return;
+        }
+
         # create new cart with our backup token
         $newCart = $this->cartService->createNew($this->getToken($context->getToken()));
 

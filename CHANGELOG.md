@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Swish payment method is now available for Mollie Payments.
 
+### Changed
+- Previously a cancellation of an express checkout led to restoring the initial cart. This will not happen anymore if the previous cart was empty. Therefore, the product from the cancelled express checkout will now remain in the cart.
+
 ### Fixed
 - Fixed an issue with transitions at too early webhook calls from Mollie
 - Fix problem with broken PayPal Express checkout in combination with some rare PayPal addresses.
