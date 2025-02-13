@@ -28,7 +28,7 @@ class CartBackupService
     /**
      * @var array<string, bool>
      */
-    private array $backupExistingCache;
+    private array $existingBackups;
 
     /**
      *
@@ -39,29 +39,8 @@ class CartBackupService
     {
         $this->cartService = $cartService;
         $this->cartPersister = $cartPersister;
-    }
 
-
-    /**
-     * @param SalesChannelContext $context
-     * @return bool
-     */
-    public function isBackupExisting(SalesChannelContext $context): bool
-    {
-        $token = $this->getToken($context->getToken());
-        $value = false;
-
-        if (isset($this->backupExistingCache[$token])) {
-            return $this->backupExistingCache[$token];
-        }
-        try {
-            $backupCart = $this->cartPersister->load($token, $context);
-            $value = $backupCart->getLineItems()->count() > 0;
-        } catch (\Throwable $exception) {
-        }
-        $this->backupExistingCache[$token] = $value;
-
-        return $this->backupExistingCache[$token];
+        $this->existingBackups = [];
     }
 
     private function getToken(string $token): string
@@ -76,7 +55,7 @@ class CartBackupService
     {
         $originalCart = $this->cartService->getCart($context->getToken(), $context);
 
-        # do only create backup if we have items in our cart
+        # do not backup empty carts
         if ($originalCart->getLineItems()->count() <= 0) {
             return;
         }
@@ -100,6 +79,14 @@ class CartBackupService
      */
     public function restoreCart(SalesChannelContext $context): Cart
     {
+        # empty carts do not exist in Shopware
+        # so restoring such a cart just means use the existing and clear the line items
+        if (!$this->isBackupExisting($context)) {
+            $cart = $this->cartService->getCart($context->getToken(), $context);
+            $cart->setLineItems(new LineItemCollection());
+            return $cart;
+        }
+
         # get our backup cart
         $backupCart = $this->cartService->getCart($this->getToken($context->getToken()), $context);
 
@@ -139,5 +126,29 @@ class CartBackupService
             $currentToken = $this->getToken($currentToken);
             $this->cartPersister->replace($oldToken, $currentToken, $context);
         }
+    }
+
+
+    /**
+     * @param SalesChannelContext $context
+     * @return bool
+     */
+    public function isBackupExisting(SalesChannelContext $context): bool
+    {
+        $backupToken = $this->getToken($context->getToken());
+
+        if (isset($this->existingBackups[$backupToken])) {
+            return true;
+        }
+
+        try {
+            $this->cartPersister->load($backupToken, $context);
+            # we just assign true to save memory
+            $this->existingBackups[$backupToken] = true;
+            return true;
+        } catch (\Throwable $exception) {
+        }
+
+        return false;
     }
 }

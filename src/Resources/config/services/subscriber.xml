@@ -56,6 +56,9 @@
         <service id="Kiener\MolliePayments\Subscriber\PaypalExpressSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -74,11 +77,6 @@
 
         <service id="Kiener\MolliePayments\Subscriber\OrderEditSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
-            <tag name="kernel.event_subscriber" />
-        </service>
-
-        <service id="Kiener\MolliePayments\Subscriber\ExpressCartRestoreSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <tag name="kernel.event_subscriber" />
         </service>
 

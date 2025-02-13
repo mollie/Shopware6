@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Checkout\Cart;
 
 use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
+use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
@@ -49,20 +50,32 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
         $tempRequest = Request::createFromGlobals();
 
         $isExpressCheckout = (bool)$tempRequest->get('isExpressCheckout', false);
+
         if ($isExpressCheckout === false) {
             return $this->getDecorated()->add($request, $cart, $context, $items);
         }
-        $cartBackupService = $this->container->get(CartBackupService::class); //Shopware 6.4 have circular injection, we have to use contaier
+
+        //Shopware 6.4 have circular injection, we have to use container
+        $cartBackupService = $this->container->get(CartBackupService::class);
+        $cartService = $this->container->get(CartService::class);
+
+        # add product somehow happens twice, so dont backup our express-cart, only originals
         if (!$cartBackupService->isBackupExisting($context)) {
             $cartBackupService->backupCart($context);
         }
 
-        $cartService = $this->container->get(CartService::class);
-
-        $cart = $cartService->getCalculatedMainCart($context);
-
         # clear existing cart and also update it to save it
         $cart->setLineItems(new LineItemCollection());
+
+        $mollieCart = new MollieShopwareCart($cart);
+
+        # we mark the cart as single product express checkout
+        # because this helps us to decide whether express checkout is done or
+        # a checkout of an existing cart is started (offcanvas, cart...)
+        $mollieCart->setSingleProductExpressCheckout(true);
+
+        $cart = $mollieCart->getCart();
+
         $cartService->updateCart($cart);
 
         return $this->getDecorated()->add($request, $cart, $context, $items);

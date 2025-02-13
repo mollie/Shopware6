@@ -14,7 +14,6 @@ export default class PayPalExpressPlugin extends Plugin {
         }
 
         this.bindEvents();
-
     }
 
     bindEvents() {
@@ -28,10 +27,32 @@ export default class PayPalExpressPlugin extends Plugin {
 
         document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, {detail: expressButtons}));
 
-        expressButtons.forEach((button) => {
-            button.addEventListener('click', this.onExpressCheckout)
-        });
+        window.addEventListener('pageshow', this.onPageShow);
 
+        expressButtons.forEach((button) => {
+            button.addEventListener('click', this.onExpressCheckout);
+        });
+    }
+
+    onPageShow() {
+
+        const expressButtonsRepository = new ExpressButtonsRepository();
+
+        const expressButtons = expressButtonsRepository.findAll('.mollie-paypal-button');
+
+        if (expressButtons.length === 0) {
+            return;
+        }
+
+        expressButtons.forEach((button) => {
+            if (!button.classList.contains('processed')) {
+                return;
+            }
+            // remove processed again, so that it doesn't look disabled
+            // because a BACK button in the browser would not refresh the page
+            // and therefore it would still look disabled (even though it would work)
+            button.classList.remove('processed');
+        });
     }
 
     onExpressCheckout(event) {
@@ -40,7 +61,6 @@ export default class PayPalExpressPlugin extends Plugin {
         if (!clickedButton.classList.contains('processed')) {
             return;
         }
-
 
         const submitUrl = clickedButton.getAttribute('data-form-action');
 
@@ -60,6 +80,5 @@ export default class PayPalExpressPlugin extends Plugin {
 
         form.submit();
     }
-
 
 }

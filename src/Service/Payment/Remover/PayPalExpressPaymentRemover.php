@@ -6,8 +6,8 @@ namespace Kiener\MolliePayments\Service\Payment\Remover;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
-use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class PayPalExpressPaymentRemover extends PaymentMethodRemover
@@ -31,12 +31,9 @@ class PayPalExpressPaymentRemover extends PaymentMethodRemover
         }
         if ($this->isCartRoute()) {
             $cart = $this->getCart($context);
-            $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
-            if ($cartExtension instanceof ArrayStruct) {
-                $ppeSessionId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY] ?? '';
-                $ppeAuthId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] ?? '';
-                $showPPEOnly = mb_strlen($ppeSessionId) > 0 || mb_strlen($ppeAuthId);
-            }
+            $mollieShopwareCart = new MollieShopwareCart($cart);
+
+            $showPPEOnly = $mollieShopwareCart->isPayPalExpressComplete();
         }
 
         foreach ($originalData->getPaymentMethods() as $key => $paymentMethod) {

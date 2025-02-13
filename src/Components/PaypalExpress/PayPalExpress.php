@@ -82,7 +82,7 @@ class PayPalExpress
      * @param SalesChannelContext $context
      * @return bool
      */
-    public function isPaypalExpressEnabled(SalesChannelContext $context): bool
+    public function isPaypalExpressPaymentMethodEnabled(SalesChannelContext $context): bool
     {
         try {
             $methodID = $this->getActivePaypalExpressID($context);

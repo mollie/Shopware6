@@ -5,7 +5,6 @@ namespace MolliePayments\Tests\Components\PaypalExpress;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
 use Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute;
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
@@ -19,9 +18,8 @@ class CancelCheckoutRouteTest extends TestCase
         $settingsService = $this->getSettings();
         $cartService = $this->getCartService();
         $paypalExpress = $this->getPaypalExpress();
-        $cartBackupService = $this->createMock(CartBackupService::class);
 
-        $route = new CancelCheckoutRoute($settingsService, $cartBackupService, $cartService, $paypalExpress);
+        $route = new CancelCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
         $this->expectException(DecorationPatternException::class);
         $route->getDecorated();
@@ -32,9 +30,8 @@ class CancelCheckoutRouteTest extends TestCase
         $settingsService = $this->getSettings();
         $cartService = $this->getCartService();
         $paypalExpress = $this->getPaypalExpress();
-        $cartBackupService = $this->createMock(CartBackupService::class);
 
-        $route = new CancelCheckoutRoute($settingsService, $cartBackupService, $cartService, $paypalExpress);
+        $route = new CancelCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
 
         try {
@@ -49,9 +46,8 @@ class CancelCheckoutRouteTest extends TestCase
         $settingsService = $this->getSettings(true);
         $cartService = $this->getCartService();
         $paypalExpress = $this->getPaypalExpress();
-        $cartBackupService = $this->createMock(CartBackupService::class);
 
-        $route = new CancelCheckoutRoute($settingsService, $cartBackupService, $cartService, $paypalExpress);
+        $route = new CancelCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
         try {
             $route->cancelCheckout($this->getContext());
@@ -65,9 +61,8 @@ class CancelCheckoutRouteTest extends TestCase
         $settingsService = $this->getSettings(true);
         $cartService = $this->getCartService(true, true, true);
         $paypalExpress = $this->getPaypalExpress();
-        $cartBackupService = $this->createMock(CartBackupService::class);
 
-        $route = new CancelCheckoutRoute($settingsService, $cartBackupService, $cartService, $paypalExpress);
+        $route = new CancelCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
 
         $response = $route->cancelCheckout($this->getContext());

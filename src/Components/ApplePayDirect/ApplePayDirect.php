@@ -263,17 +263,16 @@ class ApplePayDirect
      */
     public function addProduct(string $productId, int $quantity, SalesChannelContext $context): Cart
     {
-        # if we already have a backup cart, then do NOT backup again.
-        # because this could backup our temp. apple pay cart
-        if (! $this->cartBackupService->isBackupExisting($context)) {
+        # add product somehow happens twice, so dont backup our express-cart, only originals
+        if (!$this->cartBackupService->isBackupExisting($context)) {
             $this->cartBackupService->backupCart($context);
         }
 
-        $cart = $this->cartService->getCalculatedMainCart($context);
+        $currentCart = $this->cartService->getCalculatedMainCart($context);
 
         # clear existing cart and also update it to save it
-        $cart->setLineItems(new LineItemCollection());
-        $this->cartService->updateCart($cart);
+        $currentCart->setLineItems(new LineItemCollection());
+        $this->cartService->updateCart($currentCart);
 
         # add new product to cart
         $this->cartService->addProduct($productId, $quantity, $context);
@@ -342,9 +341,7 @@ class ApplePayDirect
      */
     public function restoreCart(SalesChannelContext $context): void
     {
-        if ($this->cartBackupService->isBackupExisting($context)) {
-            $this->cartBackupService->restoreCart($context);
-        }
+        $this->cartBackupService->restoreCart($context);
 
         $this->cartBackupService->clearBackup($context);
     }
@@ -393,8 +390,7 @@ class ApplePayDirect
             }
 
 
-
-            if (! $customer instanceof CustomerEntity) {
+            if (!$customer instanceof CustomerEntity) {
                 throw new \Exception('Error when creating customer!');
             }
 
@@ -459,7 +455,7 @@ class ApplePayDirect
                 # therefore we always need to make sure to remove the company field in our order
                 $this->repoOrderAdresses->update([
                     [
-                        'id' =>   $address->getId(),
+                        'id' => $address->getId(),
                         'firstName' => $firstname,
                         'lastName' => $lastname,
                         'company' => '',
@@ -481,7 +477,7 @@ class ApplePayDirect
         $transactions = $order->getTransactions();
         $transaction = $transactions->last();
 
-        if (! $transaction instanceof OrderTransactionEntity) {
+        if (!$transaction instanceof OrderTransactionEntity) {
             throw new \Exception('Created Apple Pay Direct order has not OrderTransaction!');
         }
 
@@ -550,8 +546,8 @@ class ApplePayDirect
      *
      * @param SalesChannelContext $context
      * @param string $domain
-     * @throws ApplePayDirectDomainAllowListCanNotBeEmptyException
      * @throws ApplePayDirectDomainNotInAllowListException
+     * @throws ApplePayDirectDomainAllowListCanNotBeEmptyException
      * @return string
      */
     private function getValidDomain(string $domain, SalesChannelContext $context): string
