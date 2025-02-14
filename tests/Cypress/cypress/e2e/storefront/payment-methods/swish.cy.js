@@ -32,7 +32,7 @@ describe('Swish', () => {
 
             scenarioDummyBasket.execute();
 
-            paymentAction.switchPaymentMethod('swish');
+            paymentAction.switchPaymentMethod('Swish');
         })
 
     })
