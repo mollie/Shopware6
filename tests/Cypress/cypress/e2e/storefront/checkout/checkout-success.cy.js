@@ -45,8 +45,8 @@ const payments = [
     {caseId: 'C4101', key: 'credit-card', name: 'Card', sanity: false},
     {caseId: 'C4111', key: 'paypal', name: 'PayPal', sanity: true},
     {caseId: 'C466903', key: 'billie', name: 'Billie', sanity: false},
-    {caseId: '', key: 'klarna', name: 'Klarna', sanity: false},
     {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
+    {caseId: 'C4237625', key: 'klarna', name: 'Klarna', sanity: false},
     {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
     {caseId: 'C4123', key: 'mistercash', name: 'Bancontact', sanity: false},
     {caseId: 'C4125', key: 'przelewy24', name: 'Przelewy24', sanity: false},
@@ -60,9 +60,10 @@ const payments = [
     {caseId: 'C3713510', key: 'riverty', name: 'Riverty', sanity: false},
     {caseId: 'C3713512', key: 'satispay', name: 'Satispay', sanity: false},
     {caseId: 'C4212005', key: 'paybybank', name: 'Pay by Bank', sanity: false},
-    {caseId: '', key: 'mbway', name: 'MB Way', sanity: false},
-    {caseId: '', key: 'multibanco', name: 'Multibanco', sanity: false},
-    {caseId: '', key: 'swish', name: 'Swish', sanity: false},
+    {caseId: 'C4237629', key: 'mbway', name: 'MB Way', sanity: false},
+    {caseId: 'C4237630', key: 'multibanco', name: 'Multibanco', sanity: false},
+    // swish requires a specific currency, we cannot add it here for now (will be manually tested)
+    // {caseId: '', key: 'swish', name: 'Swish', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
