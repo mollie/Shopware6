@@ -86,8 +86,6 @@ export class MollieExpressActions extends Plugin {
             return;
         }
 
-
-
         const privacyNote = new PrivacyNoteElement();
 
         const privacyNoteElement = privacyNote.find(target);
@@ -99,14 +97,15 @@ export class MollieExpressActions extends Plugin {
                 return;
             }
         }
-        target.classList.add('processed');
 
         const expressAddToCart = new ExpressAddToCart();
 
-        expressAddToCart.addItemToCart(target);
-
-        const mollieEvent = new event.constructor(event.type, event);
-        target.dispatchEvent(mollieEvent);
-
+        expressAddToCart.addItemToCartOrSkip(target).then(() => {
+            // set to processed
+            target.classList.add('processed');
+            // now trigger click event again for the real button
+            const mollieEvent = new event.constructor(event.type, event);
+            target.dispatchEvent(mollieEvent);
+        });
     }
 }

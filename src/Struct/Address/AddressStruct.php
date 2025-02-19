@@ -81,7 +81,7 @@ final class AddressStruct
     {
         $streetAdditional = '';
         if (property_exists($address, 'streetAdditional')) {
-            $streetAdditional = $address->streetAdditional;
+            $streetAdditional = (string)$address->streetAdditional;
         }
         if (property_exists($address, 'familyName')) {
             $nameParts = explode(' ', $address->familyName);

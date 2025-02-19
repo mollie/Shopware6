@@ -11,11 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Previously a cancellation of an express checkout led to restoring the initial cart. This will not happen anymore if the previous cart was empty. Therefore, the product from the cancelled express checkout will now remain in the cart.
+- Improve the way how express checkouts (Apple Pay Direct, PayPal Express) backup and restore carts on cancellation.
 
 ### Fixed
 - Fixed an issue with transitions at too early webhook calls from Mollie
 - Fix problem with broken PayPal Express checkout in combination with some rare PayPal addresses.
-
+- Fix problem where it was possible to get stuck in PayPal Express mode after cancelling the authorization.
+- Fix problems with PayPal Express flows where carts were suddenly missing or not correctly restored.
+- Fix problem in PayPal Express (JavaScript) where the checkout was already initialized before the product was correctly added to the cart.
 
 ## [4.14.1] - 2025-02-03
 

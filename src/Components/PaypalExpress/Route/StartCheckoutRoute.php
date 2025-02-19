@@ -8,9 +8,9 @@ use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
-use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,16 +59,12 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
         if ($cart->getLineItems()->count() === 0) {
             throw PaypalExpressException::cartIsEmpty();
         }
+        
+        $mollieShopwareCart = new MollieShopwareCart($cart);
 
+        $sessionId = $mollieShopwareCart->getPayPalExpressSessionID();
 
-        $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
-
-        $sessionId = null;
-
-        if ($cartExtension instanceof ArrayStruct) {
-            $sessionId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY] ?? null;
-        }
-        if ($sessionId === null) {
+        if ($sessionId === '') {
             $session = $this->paypalExpress->startSession($cart, $context);
         } else {
             $session = $this->paypalExpress->loadSession($sessionId, $context);
@@ -78,15 +74,13 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
             throw PaypalExpressException::missingSessionId();
         }
 
-        $cartExtension = [
-            CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY => $session->id
-        ];
+        $mollieShopwareCart->setPayPalExpressSessionID($session->id);
 
         if ($settings->isRequireDataProtectionCheckbox()) {
-            $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION] = (int)$request->get(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, 0);
+            $mollieShopwareCart->setDataProtectionAccepted((int)$request->get(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, 0));
         }
 
-        $cart->addExtension(CustomFieldsInterface::MOLLIE_KEY, new ArrayStruct($cartExtension));
+        $cart = $mollieShopwareCart->getCart();
 
         $this->cartService->persistCart($cart, $context);
 
