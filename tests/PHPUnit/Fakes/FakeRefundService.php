@@ -139,6 +139,16 @@ class FakeRefundService implements RefundServiceInterface
     }
 
     /**
+     * @param array<mixed> $refunds
+     * @return float
+     */
+    public function getPendingRefundAmount(array $refunds): float
+    {
+        // TODO: Implement getPendingRefundAmount() method.
+    }
+
+
+    /**
      * @return Refund
      */
     private function buildFakeRefund(): Refund
