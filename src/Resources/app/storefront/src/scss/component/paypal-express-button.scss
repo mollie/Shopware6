@@ -1,73 +1,71 @@
 .mollie-paypal-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 16px;
-  font-weight: bold;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: 100%;
-  padding: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    padding: 7px;
 }
 
 .paypal-button-pill {
-  border-radius: 30px;
+    border-radius: 30px;
 }
 
 .paypal-button-rect {
-  border-radius: 0;
+    border-radius: 0;
 }
 
 .paypal-theme-gold {
-  color: #000000;
-  background-color: #FFC439FF;
-  border: 1px solid #fcc85b;
+    color: #000;
+    background-color: #ffc439ff;
+    border: 1px solid #fcc85b;
 }
 
 .paypal-theme-gold:hover {
-  background-color: #fcc85b;
+    background-color: #fcc85b;
 }
 
 .paypal-theme-blue {
-  color: #ffffff;
-  background-color: #009CDEFF;
-  border: 1px solid #09adf3;
+    color: #fff;
+    background-color: #009cdeff;
+    border: 1px solid #09adf3;
 }
 
 .paypal-theme-blue:hover {
-  background-color: #09adf3;
+    background-color: #09adf3;
 }
 
 .paypal-theme-silver {
-  color: #000000;
-  background-color: #EEEEEEFF;
-  border: 1px solid #f6f6f6;
+    color: #000;
+    background-color: #eeef;
+    border: 1px solid #f6f6f6;
 }
 
 .paypal-theme-silver:hover {
-  background-color: #f6f6f6;
+    background-color: #f6f6f6;
 }
 
 .paypal-theme-white {
-  color: #000000;
-  background-color: #ffffff;
-  border: 1px solid #f3f3f3;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #f3f3f3;
 }
 
 .paypal-theme-white:hover {
-  background-color: #f3f3f3;
+    background-color: #f3f3f3;
 }
 
 .paypal-theme-black {
-  color: #ffffff;
-  background-color: #000000;
-  border: 1px solid #555555;
+    color: #fff;
+    background-color: #000;
+    border: 1px solid #555;
 }
 
 .paypal-theme-black:hover {
-  background-color: #333333;
+    background-color: #333;
 }
-

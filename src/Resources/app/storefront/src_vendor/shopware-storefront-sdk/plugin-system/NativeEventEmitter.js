@@ -1,5 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
 var NativeEventEmitter = /** @class */ (function () {
     function NativeEventEmitter(el) {
         this._el = el;
@@ -61,7 +61,7 @@ var NativeEventEmitter = /** @class */ (function () {
         this.listeners = [];
         return true;
     };
-    Object.defineProperty(NativeEventEmitter.prototype, "el", {
+    Object.defineProperty(NativeEventEmitter.prototype, 'el', {
         get: function () {
             return this._el;
         },
@@ -69,9 +69,9 @@ var NativeEventEmitter = /** @class */ (function () {
             this._el = value;
         },
         enumerable: false,
-        configurable: true
+        configurable: true,
     });
-    Object.defineProperty(NativeEventEmitter.prototype, "listeners", {
+    Object.defineProperty(NativeEventEmitter.prototype, 'listeners', {
         get: function () {
             return this._listeners;
         },
@@ -79,7 +79,7 @@ var NativeEventEmitter = /** @class */ (function () {
             this._listeners = value;
         },
         enumerable: false,
-        configurable: true
+        configurable: true,
     });
     return NativeEventEmitter;
 }());
