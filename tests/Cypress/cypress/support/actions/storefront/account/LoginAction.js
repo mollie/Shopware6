@@ -11,12 +11,22 @@ export default class LoginAction {
      */
     doLogin(email, password) {
 
+        cy.session('login', () => {
+
+            cy.visit('/account');
+
+            repo.getEmail().clear().type(email, {'force': true});
+            repo.getPassword().clear().type(password, {'force': true});
+
+            repo.getSubmitButton().click();
+
+        }, {
+            cacheAcrossSpecs: true,
+            validate() {
+            }
+        });
+
         cy.visit('/account');
-
-        repo.getEmail().clear().type(email, {'force': true});
-        repo.getPassword().clear().type(password, {'force': true});
-
-        repo.getSubmitButton().click();
     }
 
 }
