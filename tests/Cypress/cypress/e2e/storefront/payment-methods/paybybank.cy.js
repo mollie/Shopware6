@@ -19,16 +19,10 @@ describe('Pay by Bank', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('C4212006: Pay by bank is existing in checkout', () => {
 
-        beforeEach(() => {
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('C4212006: Pay by bank is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

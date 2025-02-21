@@ -27,6 +27,30 @@ const repoOffcanvas = new OffCanvasRepository();
 const repoCart = new CartRepository();
 
 
+let beforeAllCalledConfigDisabled = false;
+let beforeAllCalledConfigEnabled = false;
+
+function beforeEachUIConfigDisabled() {
+    if (!beforeAllCalledConfigDisabled) {
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupShop(true, false, false);
+        beforeAllCalledConfigDisabled = true;
+    }
+
+    devices.setDevice(devices.getFirstDevice());
+}
+
+function beforeEachUIConfigEnabled() {
+    if (!beforeAllCalledConfigEnabled) {
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupShop(true, false, true);
+        beforeAllCalledConfigEnabled = true;
+    }
+
+    devices.setDevice(devices.getFirstDevice());
+}
+
+
 describe('Apple Pay Direct - Storefront Routes', () => {
 
     describe('Functional', () => {
@@ -178,18 +202,11 @@ describe('Apple Pay Direct - UI Tests', () => {
 
     context('Config - Disabled', () => {
 
-        before(function () {
-            devices.setDevice(devices.getFirstDevice());
-            configAction.setupShop(true, false, false);
-        })
-
-        beforeEach(function () {
-            devices.setDevice(devices.getFirstDevice());
-        })
-
         describe('PDP', () => {
 
             it('C4100: Apple Pay Direct hidden if not configured but possible in browser (PDP) @core', () => {
+
+                beforeEachUIConfigDisabled();
 
                 applePayFactory.registerApplePay(true);
 
@@ -205,6 +222,8 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266709: Apple Pay Direct hidden if not configured but possible in browser (Listing) @core', () => {
 
+                beforeEachUIConfigDisabled();
+
                 applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
@@ -217,6 +236,8 @@ describe('Apple Pay Direct - UI Tests', () => {
         describe('Offcanvas', () => {
 
             it('C266710: Apple Pay Direct hidden if not configured but possible in browser (Offcanvas) @core', () => {
+
+                beforeEachUIConfigDisabled();
 
                 applePayFactory.registerApplePay(true);
 
@@ -232,6 +253,8 @@ describe('Apple Pay Direct - UI Tests', () => {
         describe('Cart', () => {
 
             it('C266711: Apple Pay Direct hidden if not configured but possible in browser (Cart) @core', () => {
+
+                beforeEachUIConfigDisabled();
 
                 applePayFactory.registerApplePay(true);
 
@@ -250,18 +273,11 @@ describe('Apple Pay Direct - UI Tests', () => {
 
     context('Config - Enabled', () => {
 
-        before(function () {
-            devices.setDevice(devices.getFirstDevice());
-            configAction.setupShop(true, false, true);
-        })
-
-        beforeEach(function () {
-            devices.setDevice(devices.getFirstDevice());
-        })
-
         describe('PDP', () => {
 
             it('C4099: Apple Pay Direct visible if configured and possible in browser (PDP) @core', () => {
+
+                beforeEachUIConfigEnabled();
 
                 applePayFactory.registerApplePay(true);
 
@@ -273,6 +289,8 @@ describe('Apple Pay Direct - UI Tests', () => {
             })
 
             it('C4085: Apple Pay Direct hidden if configured but not possible in browser (PDP) @core', () => {
+
+                beforeEachUIConfigEnabled();
 
                 applePayFactory.registerApplePay(false);
 
@@ -289,6 +307,8 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266712: Apple Pay Direct visible if configured and possible in browser (Listing) @core', () => {
 
+                beforeEachUIConfigEnabled();
+
                 applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
@@ -298,6 +318,8 @@ describe('Apple Pay Direct - UI Tests', () => {
             })
 
             it('C266713: Apple Pay Direct hidden if configured but not possible in browser (Listing) @core', () => {
+
+                beforeEachUIConfigEnabled();
 
                 applePayFactory.registerApplePay(false);
 
@@ -313,6 +335,8 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266714: Apple Pay Direct visible if configured and possible in browser (Offcanvas) @core', () => {
 
+                beforeEachUIConfigEnabled();
+
                 applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
@@ -324,6 +348,8 @@ describe('Apple Pay Direct - UI Tests', () => {
             })
 
             it('C266715: Apple Pay Direct hidden if configured but not possible in browser (Offcanvas) @core', () => {
+
+                beforeEachUIConfigEnabled();
 
                 applePayFactory.registerApplePay(false);
 
@@ -341,6 +367,8 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266716: Apple Pay Direct visible if configured and possible in browser (Cart) @core', () => {
 
+                beforeEachUIConfigEnabled();
+
                 applePayFactory.registerApplePay(true);
 
                 cy.visit('/');
@@ -354,6 +382,8 @@ describe('Apple Pay Direct - UI Tests', () => {
             })
 
             it('C266717: Apple Pay Direct hidden if configured but not possible in browser (Cart) @core', () => {
+
+                beforeEachUIConfigEnabled();
 
                 applePayFactory.registerApplePay(false);
 

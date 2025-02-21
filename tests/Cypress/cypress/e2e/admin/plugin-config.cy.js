@@ -18,16 +18,18 @@ const shopware = new Shopware();
 const device = devices.getFirstDevice();
 
 
-context("Plugin Config", () => {
+function beforeEach(device) {
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
 
-    beforeEach(() => {
-        session.resetBrowserSession();
-        devices.setDevice(device);
-    });
+context("Plugin Config", () => {
 
     context(devices.getDescription(device), () => {
 
         it('C147522: Onboarding Section is visible @core', () => {
+
+            beforeEach(device);
 
             adminLogin.login();
             pluginAction.openPluginConfiguration();
@@ -36,6 +38,8 @@ context("Plugin Config", () => {
         })
 
         it('C147523: Update Payment Method triggers action @core', () => {
+
+            beforeEach(device);
 
             adminLogin.login();
             pluginAction.openPluginConfiguration();
@@ -47,6 +51,8 @@ context("Plugin Config", () => {
 
         it('C148986: Rounding Settings Information is visible @core', () => {
 
+            beforeEach(device);
+
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
@@ -54,6 +60,8 @@ context("Plugin Config", () => {
         })
 
         it('C4001: Smart Contact Form is responding properly @core', () => {
+
+            beforeEach(device);
 
             adminLogin.login();
             pluginAction.openPluginConfiguration();
@@ -84,6 +92,8 @@ context("Plugin Config", () => {
 
         it('C234008: Custom format for order number shows interactive preview @core', () => {
 
+            beforeEach(device);
+
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
@@ -106,14 +116,14 @@ context("Plugin Config", () => {
 
         it('C1097313: Display order lifetime days warning', () => {
 
+            beforeEach(device);
+
             adminLogin.login();
             pluginAction.openPluginConfiguration();
-
 
             const inputField = '#MolliePayments\\.config\\.orderLifetimeDays';
             const errorDiv = '.bankTransferDueDateLimitReached';
             const klarnaWarningDiv = '.bankTransferDueDateKlarnaLimitReached';
-
 
             cy.get(inputField).clear().type('101');
             cy.get(klarnaWarningDiv).should('not.exist');
@@ -139,7 +149,6 @@ context("Plugin Config", () => {
             pluginAction.savePlugConfiguration();
             cy.get(klarnaWarningDiv).should('not.exist');
             cy.get(errorDiv).should('not.exist');
-
 
         })
     })

@@ -30,23 +30,42 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 const device = devices.getFirstDevice();
 
 
+let beforeAllCalledMollieFailureMode = false;
+let beforeAllCalledMollieShopwareMode = false;
+
+function beforeEachMollieFailureMode(device) {
+
+    if (!beforeAllCalledMollieFailureMode) {
+        configAction.setupShop(true, false, false);
+        configAction.updateProducts('', false, 0, '');
+        beforeAllCalledMollieFailureMode = true;
+    }
+
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
+
+function beforeEachShopwareFailureMode(device) {
+
+    if (!beforeAllCalledMollieShopwareMode) {
+        configAction.setupShop(false, false, false);
+        beforeAllCalledMollieShopwareMode = true;
+    }
+
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
+
+
 context("Checkout Failure Tests", () => {
 
     describe('Mollie Failure Mode', () => {
 
-        before(function () {
-            configAction.setupShop(true, false, false);
-            configAction.updateProducts('', false, 0, '');
-        })
-
-        beforeEach(() => {
-            session.resetBrowserSession();
-            devices.setDevice(device);
-        });
-
         context(devices.getDescription(device), () => {
 
             it('C4009: Retry failed payment with Mollie Failure Mode', () => {
+
+                beforeEachMollieFailureMode(device);
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -80,6 +99,8 @@ context("Checkout Failure Tests", () => {
 
             it('C1278577: Retry canceled payment with Mollie Failure Mode', () => {
 
+                beforeEachMollieFailureMode(device);
+
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
 
@@ -111,6 +132,8 @@ context("Checkout Failure Tests", () => {
 
             it('C4010: Continue Shopping after failed payment in Mollie Failure Mode', () => {
 
+                beforeEachMollieFailureMode(device);
+
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
 
@@ -139,18 +162,11 @@ context("Checkout Failure Tests", () => {
 
     describe('Shopware Failure Mode', () => {
 
-        before(function () {
-            configAction.setupShop(false, false, false);
-        })
-
-        beforeEach(() => {
-            session.resetBrowserSession();
-            devices.setDevice(device);
-        });
-
         context(devices.getDescription(device), () => {
 
             it('C4011: Retry failed payment with Shopware Failure Mode', () => {
+
+                beforeEachShopwareFailureMode(device);
 
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
@@ -186,6 +202,8 @@ context("Checkout Failure Tests", () => {
 
             it('C4012: Retry canceled payment with Shopware Failure Mode', () => {
 
+                beforeEachShopwareFailureMode(device);
+
                 scenarioDummyBasket.execute();
                 paymentAction.switchPaymentMethod('PayPal');
 
@@ -200,14 +218,14 @@ context("Checkout Failure Tests", () => {
                 // but we still need to complete the payment and edit the order
                 if (shopware.isVersionGreaterEqual('6.6.8.0')) {
                     cy.url().should('include', '/account/order');
-                }else {
+                } else {
                     cy.url().should('include', '/account/order/edit/');
                 }
                 //since shopware 6.6.8.0 a cancelled order cannot be edited or paid
-                if(shopware.isVersionGreaterEqual('6.6.8.0')){
+                if (shopware.isVersionGreaterEqual('6.6.8.0')) {
                     cy.contains('was canceled and cannot be edited afterwards.');
                     return;
-                } else if(shopware.isVersionGreaterEqual('6.4.10.0')){
+                } else if (shopware.isVersionGreaterEqual('6.4.10.0')) {
                     cy.contains('We have received your order, but the payment was aborted');
                 } else {
                     cy.contains('We received your order, but the payment was aborted');

@@ -39,21 +39,26 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 const device = devices.getFirstDevice();
 
 
-context("Order Refunds", () => {
+let beforeAllCalled = false;
 
-    before(function () {
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         configAction.setupShop(false, false, false);
         configAction.updateProducts('', false, 0, '');
-    })
+        beforeAllCalled = true;
+    }
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
 
-    beforeEach(() => {
-        session.resetBrowserSession();
-        devices.setDevice(device);
-    });
+
+context("Order Refunds", () => {
 
     context(devices.getDescription(device), () => {
 
         it('C4046: Create full refund and cancel it @sanity', () => {
+
+            beforeEach(device);
 
             createOrderAndOpenAdmin();
 
@@ -91,6 +96,8 @@ context("Order Refunds", () => {
 
 
         it('C4045: Create partial refund and cancel it', () => {
+
+            beforeEach(device);
 
             createOrderAndOpenAdmin();
 
@@ -130,6 +137,8 @@ context("Order Refunds", () => {
         })
 
         it('C139487: Overwrite total amount in full item refund', () => {
+
+            beforeEach(device);
 
             createOrderAndOpenAdmin();
 
@@ -172,6 +181,8 @@ context("Order Refunds", () => {
         })
 
         it('C273581: Canceled refunds should not be visible', () => {
+
+            beforeEach(device);
 
             createOrderAndOpenAdmin();
 

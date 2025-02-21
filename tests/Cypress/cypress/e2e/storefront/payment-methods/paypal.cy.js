@@ -33,24 +33,28 @@ const molliePayment = new PaymentScreenAction();
 const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
+let beforeAllCalled = false;
 
-describe('PayPal', () => {
-
-    before(() => {
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         configAction.setupShop(false, false, false);
         configAction.updateProducts('', false, 0, '');
-    });
+        beforeAllCalled = true;
+    }
+    devices.setDevice(device);
+    session.resetBrowserSession();
+}
+
+
+describe('PayPal', () => {
 
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
-                devices.setDevice(device);
-                session.resetBrowserSession();
-            });
-
             it('C4112: Payment status "pending" leads to successful order', () => {
+
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 
@@ -67,6 +71,8 @@ describe('PayPal', () => {
             })
 
             it('C4113: Paypal Reference Number is visible in Administration', () => {
+
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 

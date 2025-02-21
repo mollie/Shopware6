@@ -27,13 +27,12 @@ describe('iDEAL Issuers', () => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
+            it('C4119: Issuer List on payment selection page', () => {
+
+                // BEFORE EACH
                 devices.setDevice(device);
                 configAction.setupShop(true, false, false);
                 session.resetBrowserSession();
-            });
-
-            it('C4119: Issuer List on payment selection page', () => {
 
                 scenarioDummyBasket.execute();
 

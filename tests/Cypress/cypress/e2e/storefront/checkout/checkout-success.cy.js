@@ -68,22 +68,24 @@ const payments = [
     // {caseId: '', key: 'in3', name: 'in3'},
 ];
 
+let beforeAllCalled = false;
 
-context("Checkout Tests", () => {
-
-    before(function () {
-        devices.setDevice(device);
-
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         // configure our shop
         configAction.setupShop(true, false, false);
         // configure our products for vouchers
         configAction.updateProducts('eco', false, '', '');
-    })
-
-    beforeEach(() => {
-        session.resetBrowserSession();
         devices.setDevice(device);
-    });
+        beforeAllCalled = true;
+    }
+
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
+
+
+context("Checkout Tests", () => {
 
     describe('Successful Checkout', () => {
         context(devices.getDescription(device), () => {
@@ -93,9 +95,11 @@ context("Checkout Tests", () => {
 
                 it(payment.caseId + ': Pay with ' + payment.name + sanityString, () => {
 
+                    beforeEach(device);
+
                     scenarioDummyBasket.execute();
 
-                    if(payment.key === 'payconiq'){
+                    if (payment.key === 'payconiq') {
                         checkout.changeBillingCountry('Belgium');
                     }
 
@@ -143,7 +147,7 @@ context("Checkout Tests", () => {
                         molliePayment.selectPaid();
                         molliePaymentMethods.selectPaypal();
                         molliePayment.selectPaid();
-                    } else if(payment.key === 'ideal'){
+                    } else if (payment.key === 'ideal') {
                         idealScreen.selectING();
                         molliePayment.selectPaid();
                     } else if (payment.key === 'giftcard') {

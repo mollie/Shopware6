@@ -19,16 +19,10 @@ describe('MyBank', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('C3192051: MyBank is existing in checkout', () => {
 
-        beforeEach(() => {
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('C3192051: MyBank is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

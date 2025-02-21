@@ -23,19 +23,22 @@ const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
+function beforeEach(device) {
+    devices.setDevice(device);
+    configAction.setupShop(true, false, false);
+    session.resetBrowserSession();
+}
+
+
 describe('POS Terminals', () => {
 
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
-                devices.setDevice(device);
-                configAction.setupShop(true, false, false);
-                session.resetBrowserSession();
-            });
-
             it('C1341121: Terminals List on payment selection page', () => {
+
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 
@@ -50,6 +53,8 @@ describe('POS Terminals', () => {
             })
 
             it('C1504402: POS Terminal Checkout redirects to custom waiting screen', () => {
+
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 

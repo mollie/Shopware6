@@ -20,16 +20,10 @@ describe('Multibanco', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('MB Way is existing in checkout', () => {
 
-        beforeEach(() => {
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('MB Way is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
             checkout.changeBillingCountry('Portugal');

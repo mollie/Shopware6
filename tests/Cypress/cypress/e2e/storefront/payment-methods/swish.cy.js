@@ -19,16 +19,10 @@ describe('Swish', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('Swish is existing in checkout', () => {
 
-        beforeEach(() => {
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('Swish is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

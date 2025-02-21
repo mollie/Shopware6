@@ -19,16 +19,10 @@ describe('Trustly', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('C3362895: Trustly is existing in checkout', () => {
 
-        beforeEach(() => {
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('C3362895: Trustly is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

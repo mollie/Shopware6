@@ -19,16 +19,11 @@ describe('Bancomat Pay', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('C2775016: Bancomat Pay is existing in checkout', () => {
 
-        beforeEach(() => {
+            devices.setDevice(device);
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('C2775016: Bancomat Pay is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

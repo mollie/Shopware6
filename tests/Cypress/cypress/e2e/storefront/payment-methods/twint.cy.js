@@ -19,16 +19,10 @@ describe('TWINT', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('C1628203: TWINT is existing in checkout', () => {
 
-        beforeEach(() => {
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('C1628203: TWINT is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

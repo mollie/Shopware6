@@ -38,23 +38,27 @@ const repoShippingItem = new LineItemShippingRepository();
 const device = devices.getFirstDevice();
 
 
-context("Order Shipping", () => {
+let beforeAllCalled = false;
 
-    before(() => {
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         configAction.setupShop(false, false, false);
-
         configAction.prepareShippingMethods();
         configAction.updateProducts('', false, '', '');
-    })
+        beforeAllCalled = true;
+    }
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
 
-    beforeEach(() => {
-        session.resetBrowserSession();
-        devices.setDevice(device);
-    });
+
+context("Order Shipping", () => {
 
     context(devices.getDescription(device), () => {
 
         it('C4039: Full Shipping in Administration @sanity', () => {
+
+            beforeEach(device);
 
             createOrderAndOpenAdmin(2, 1);
 
@@ -87,6 +91,8 @@ context("Order Shipping", () => {
         })
 
         it('C152048: Full Shipping in Administration with Tracking', () => {
+
+            beforeEach(device);
 
             const TRACKING_CODE = 'code-123';
 
@@ -121,6 +127,8 @@ context("Order Shipping", () => {
 
         it('C2138608: Partial Batch Shipping in Administration', () => {
 
+            beforeEach(device);
+
             createOrderAndOpenAdmin(2, 1);
 
             adminOrders.openShipThroughMollie();
@@ -140,6 +148,8 @@ context("Order Shipping", () => {
         })
 
         it('C4040: Line Item Shipping in Administration', () => {
+
+            beforeEach(device);
 
             createOrderAndOpenAdmin(2, 2);
 
@@ -197,6 +207,8 @@ context("Order Shipping", () => {
 
         it('C4044: Line Item Shipping with Tracking', () => {
 
+            beforeEach(device);
+
             const TRACKING_CODE1 = 'code-1';
             const TRACKING_CODE2 = 'code-2';
 
@@ -231,6 +243,8 @@ context("Order Shipping", () => {
         })
 
         it('C152049: Shipment offers selection from multiple tracking codes', () => {
+
+            beforeEach(device);
 
             const TRACKING_CODE1 = 'code-1';
             const TRACKING_CODE2 = 'code-2';
