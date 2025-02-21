@@ -1,5 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.toUpperCamelCase = exports.toLowerCamelCase = exports.lcFirst = exports.ucFirst = void 0;
 function ucFirst(value) {
     return value.charAt(0).toUpperCase() + value.slice(1);

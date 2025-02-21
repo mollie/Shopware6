@@ -1,4 +1,5 @@
-const VersionCompare = require('../../../src/core/service/utils/version-compare.utils').default;
+import { expect, test } from 'vitest'
+import VersionCompare from '../../../src/core/service/utils/version-compare.utils';
 
 test('Equals works', () => {
     let result;

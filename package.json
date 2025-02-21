@@ -1,0 +1,27 @@
+{
+  "name": "mollie-shopware6-testing",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Mollie B.V.",
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.15.0",
+    "@babel/preset-env": "^7.15.6",
+    "@babel/runtime": "^7.15.4",
+    "babel-eslint": "10.0.2",
+    "babel-preset-env": "^1.7.0",
+    "deepmerge": "^4.3.1",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "postcss-scss": "^4.0.9",
+    "stylelint": "^14.1.0",
+    "stylelint-config-standard": "^24.0.0",
+    "stylelint-scss": "^4.0.1",
+    "vitest": "^3.0.6"
+  }
+}

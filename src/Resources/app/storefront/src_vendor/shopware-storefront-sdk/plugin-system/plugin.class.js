@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : {"default": mod};
+    return (mod && mod.__esModule) ? mod : {'default': mod};
 };
 
-Object.defineProperty(exports, "__esModule", {value: true});
+Object.defineProperty(exports, '__esModule', {value: true});
 
-var NativeEventEmitter_1 = __importDefault(require("./NativeEventEmitter"));
+var NativeEventEmitter_1 = __importDefault(require('./NativeEventEmitter'));
 
-var deepmerge_1 = __importDefault(require("deepmerge"));
+var deepmerge_1 = __importDefault(require('deepmerge'));
 
 var PluginClass = /** @class */ (function () {
 
@@ -67,7 +67,7 @@ var PluginClass = /** @class */ (function () {
         let dataAttributeOptions = '';
 
         if (typeof this.el.getAttribute === 'function') {
-            dataAttributeOptions = this.el.getAttribute("data-".concat(dashedPluginName, "-options")) || '';
+            dataAttributeOptions = this.el.getAttribute('data-'.concat(dashedPluginName, '-options')) || '';
         }
 
         // static plugin options
@@ -80,17 +80,17 @@ var PluginClass = /** @class */ (function () {
             options,
         ];
 
-        // options which are set via data-plugin-name-config="config name"
+        // options which are set via data-plugin-name-config='config name'
         if (dataAttributeConfig) {
             merge.push(window.PluginConfigManager.get(this._pluginName, dataAttributeConfig));
         }
 
-        // options which are set via data-plugin-name-options="{json..}"
+        // options which are set via data-plugin-name-options='{json..}'
         try {
             if (dataAttributeOptions)
                 merge.push(JSON.parse(dataAttributeOptions));
         } catch (e) {
-            throw new Error("The data attribute \"data-".concat(dashedPluginName, "-options\" could not be parsed to json: ").concat(e.message || ''));
+            throw new Error('The data attribute \'data-'.concat(dashedPluginName, '-options\' could not be parsed to json: ').concat(e.message || ''));
         }
 
         return deepmerge_1.default.all(merge.filter(function (config) {
@@ -107,7 +107,7 @@ var PluginClass = /** @class */ (function () {
             return '';
         }
 
-        const value = this.el.getAttribute("data-".concat(dashedPluginName, "-config")) || '';
+        const value = this.el.getAttribute('data-'.concat(dashedPluginName, '-config')) || '';
 
         try {
             return JSON.parse(value);

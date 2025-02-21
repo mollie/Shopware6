@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import SubscriptionService from '../../../../src/core/service/subscription/subscription.service';
 
 const service = new SubscriptionService(null);

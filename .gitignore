@@ -19,3 +19,5 @@ src/Resources/public/administration/js/
 /src/Resources/public/static/js
 /src/Resources/public/js
 /src/Resources/public/mollie-payments.js
+/node_modules/
+/src/Resources/public/administration/.vite
