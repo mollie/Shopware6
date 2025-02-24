@@ -205,7 +205,7 @@ class RefundDataBuilder
             $refundedTotal = $this->refundService->getRefundedAmount($order);
             $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
             # ----------------------------------------------------------------------------
-            $pendingRefundAmount = $this->getPendingRefundAmount($refunds);
+            $pendingRefundAmount = $this->refundService->getPendingRefundAmount($refunds);
         } catch (PaymentNotFoundException $ex) {
             # if we don't have a payment,
             # then there are no values
@@ -226,25 +226,6 @@ class RefundDataBuilder
             $roundingDiffTotal,
             $taxStatus
         );
-    }
-
-
-    /**
-     * @param array<mixed> $refunds
-     * @return float
-     */
-    private function getPendingRefundAmount(array $refunds): float
-    {
-        $pendingRefundAmount = 0;
-
-        /** @var array<mixed> $refund */
-        foreach ($refunds as $refund) {
-            if ($refund['status'] === 'pending') {
-                $pendingRefundAmount += (float)$refund['amount']['value'];
-            }
-        }
-
-        return $pendingRefundAmount;
     }
 
     /**

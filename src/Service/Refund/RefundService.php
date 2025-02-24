@@ -79,7 +79,31 @@ class RefundService implements RefundServiceInterface
     public function refundFull(OrderEntity $order, string $description, string $internalDescription, array $refundItems, Context $context): Refund
     {
         $mollieOrderId = $this->orders->getMollieOrderId($order);
+
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
+
+        $remainingAmount = $this->getRemainingAmount($order);
+
+        if ($remainingAmount <= 0) {
+            throw new \Exception('No remaining amount to refund for order ' . $order->getOrderNumber());
+        }
+
+        # now check if our remaining amount is not the total amount already
+        # because then we need to do a partial refund if its a "full refund of the REST of the order".
+        $allRefunds = $this->getRefunds($order, $context);
+
+        $refundedAmount = $this->getRefundedAmount($order);
+        $pendingRefundAmount = $this->getPendingRefundAmount($allRefunds);
+
+        # let's just see what has been basically processed or triggered
+        $processedAmount = $refundedAmount + $pendingRefundAmount;
+
+        # if we have already refunded something, but still want to refund the full rest of the order
+        # then we just do a partial refund with the difference
+        if ($processedAmount > 0) {
+            # do a partial refund (but always without items, because we never really know)
+            return $this->refundPartial($order, $description, $internalDescription, $remainingAmount, [], $context);
+        }
 
         $metadata = new RefundMetadata(RefundItemType::FULL, $refundItems);
 
@@ -153,10 +177,10 @@ class RefundService implements RefundServiceInterface
     /**
      * @param OrderEntity $order
      * @param string $refundId
-     * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
+     * @throws CouldNotFetchMollieOrderException
      * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
@@ -191,10 +215,10 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotFetchMollieRefundsException
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
+     * @throws CouldNotFetchMollieRefundsException
      * @return array<mixed>
      */
     public function getRefunds(OrderEntity $order, Context $context): array
@@ -237,9 +261,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
      * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
@@ -277,9 +301,9 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param OrderEntity $order
-     * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
+     * @throws CouldNotExtractMollieOrderIdException
      * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float
@@ -288,6 +312,25 @@ class RefundService implements RefundServiceInterface
 
         return $payment->getAmountRefunded();
     }
+
+    /**
+     * @param array<mixed> $refunds
+     * @return float
+     */
+    public function getPendingRefundAmount(array $refunds): float
+    {
+        $pendingRefundAmount = 0;
+
+        /** @var array<mixed> $refund */
+        foreach ($refunds as $refund) {
+            if ($refund['status'] === 'pending') {
+                $pendingRefundAmount += (float)$refund['amount']['value'];
+            }
+        }
+
+        return $pendingRefundAmount;
+    }
+
 
     /**
      * @param OrderEntity $order

@@ -62,4 +62,10 @@ interface RefundServiceInterface
      * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float;
+
+    /**
+     * @param array<mixed> $refunds
+     * @return float
+     */
+    public function getPendingRefundAmount(array $refunds): float;
 }
