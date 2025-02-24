@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest'
 import OderLifeTimeLimitDetectorService from './../../../../../administration/src/module/mollie-payments/components/mollie-pluginconfig-section-order-lifetime-warning/services/OderLifeTimeLimitDetectorService';
 
 const service = new OderLifeTimeLimitDetectorService();

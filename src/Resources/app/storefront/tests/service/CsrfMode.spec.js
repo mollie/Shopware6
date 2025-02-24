@@ -1,4 +1,5 @@
-import CsrfAjaxMode from "../../src/mollie-payments/services/CsrfAjaxMode";
+import { expect, test } from 'vitest'
+import CsrfAjaxMode from '../../src/mollie-payments/services/CsrfAjaxMode';
 
 test('csrf mode is undefined', () => {
     const fakeConfig = {};

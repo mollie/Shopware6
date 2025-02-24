@@ -1,16 +1,14 @@
 .mollie-express-button.processed {
+    .loader {
+        display: block;
+        position: absolute;
+    }
 
-
-  .loader {
-    display: block;
-    position:absolute;
-  }
-  *:not(.loader){
-    opacity:0.2;
-  }
-
+    *:not(.loader) {
+        opacity: 0.2;
+    }
 }
 
 .mollie-express-button .loader {
-  display: none;
+    display: none;
 }

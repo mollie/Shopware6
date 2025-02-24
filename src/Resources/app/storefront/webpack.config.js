@@ -1,5 +1,5 @@
 const path = require('path')
-const {resolve, join} = require("path");
+const {resolve, join} = require('path');
 
 module.exports = {
     mode: 'production',

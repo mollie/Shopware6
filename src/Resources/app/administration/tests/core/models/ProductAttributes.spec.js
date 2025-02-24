@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest'
 import ProductAttributes from '../../../src/core/models/ProductAttributes';
 
 

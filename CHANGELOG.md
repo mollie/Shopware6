@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Previously a cancellation of an express checkout led to restoring the initial cart. This will not happen anymore if the previous cart was empty. Therefore, the product from the cancelled express checkout will now remain in the cart.
 - Improve the way how express checkouts (Apple Pay Direct, PayPal Express) backup and restore carts on cancellation.
 - Full refunds do now take already pending (partial) refunds into account. It's now way easier to also refund the rest amount of an order.
+- The Administration and Storefront NPM Dev-Dependencies that we use for testing have been moved to a location that Shopware is not using. This should speed up a lot when you develop a shop where the Mollie plugin is installed. 
+
 
 ### Fixed
 - Fixed an issue with transitions at too early webhook calls from Mollie

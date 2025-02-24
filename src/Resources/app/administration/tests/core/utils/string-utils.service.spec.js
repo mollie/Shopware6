@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import StringUtils from '../../../src/core/service/utils/string-utils.service';
 
 const stringUtils = new StringUtils();
