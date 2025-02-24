@@ -33,21 +33,28 @@ const device = devices.getFirstDevice();
 const shopware = new Shopware();
 
 
-context("Order Status Mapping Tests", () => {
+let beforeEachCalled = false;
 
-    before(function () {
+function beforeEach(device) {
+
+    if (!beforeEachCalled) {
         configAction.setupShop(false, false, false);
         configAction.updateProducts('', false, 0, '');
-    })
+        beforeEachCalled = true;
+    }
 
-    beforeEach(() => {
-        session.resetBrowserSession();
-        devices.setDevice(device);
-    });
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
+
+
+context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
         it('C4028: Test Status Open stays Unconfirmed/In progress', () => {
+
+            beforeEach(device);
 
             // we create a SEPA bank transfer payment
             // the payment status will be IN PROGRESS then in Shopware.
@@ -68,7 +75,7 @@ context("Order Status Mapping Tests", () => {
             adminOrders.assertLatestOrderStatus('Open');
             if (shopware.isVersionLower('6.4.4.0')) {
                 adminOrders.assertLatestPaymentStatus('In Progress');
-            }else{
+            } else {
                 adminOrders.assertLatestPaymentStatus('Unconfirmed');
             }
 
@@ -76,6 +83,8 @@ context("Order Status Mapping Tests", () => {
         })
 
         it('C4023: Test Status Paid', () => {
+
+            beforeEach(device);
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
@@ -92,6 +101,8 @@ context("Order Status Mapping Tests", () => {
         })
 
         it('C4024: Test Status Authorized', () => {
+
+            beforeEach(device);
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('Klarna');
@@ -113,6 +124,8 @@ context("Order Status Mapping Tests", () => {
 
         it('C4025: Test Status Failed', () => {
 
+            beforeEach(device);
+
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');
 
@@ -128,6 +141,8 @@ context("Order Status Mapping Tests", () => {
         })
 
         it('C4026: Test Status Cancelled', () => {
+
+            beforeEach(device);
 
             scenarioDummyBasket.execute();
             paymentAction.switchPaymentMethod('PayPal');

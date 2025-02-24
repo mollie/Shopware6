@@ -34,23 +34,28 @@ const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
-describe('SEPA Bank Transfer', () => {
+let beforeAllCalled = false;
 
-    before(() => {
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         configAction.setupShop(false, false, false);
         configAction.updateProducts('', false, 0, '');
-    });
+        beforeAllCalled = true;
+    }
+    devices.setDevice(device);
+    session.resetBrowserSession();
+}
+
+
+describe('SEPA Bank Transfer', () => {
 
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
-                devices.setDevice(device);
-                session.resetBrowserSession();
-            });
-
             it('C4129: Payment status "open" leads to successful order', () => {
+
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 
@@ -67,6 +72,8 @@ describe('SEPA Bank Transfer', () => {
             })
 
             it('C4130: Banktransfer Reference Number is visible in Administration', () => {
+
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 

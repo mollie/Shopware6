@@ -6,39 +6,43 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
-import DummyUserScenario from "Scenarios/DummyUserScenario";
-import AccountAction from "Actions/storefront/account/AccountAction";
+import Session from "Services/utils/Session";
 
 
 const devices = new Devices();
 const shopware = new Shopware();
+const session = new Session();
 
 const configAction = new ShopConfigurationAction();
 const paymentAction = new PaymentAction();
-const accountAction = new AccountAction();
 
 const applePayFactory = new ApplePaySessionMockFactory;
 
-const scenarioDummyUser = new DummyUserScenario();
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 const device = devices.getFirstDevice();
 
 
-context("Apple Pay", () => {
+let beforeAllCalled = false;
 
-    before(function () {
-        devices.setDevice(device);
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         configAction.setupShop(true, false, false);
-    })
+        beforeAllCalled = true;
+    }
 
-    beforeEach(() => {
-        devices.setDevice(device);
-    });
+    session.resetBrowserSession();
+    devices.setDevice(device);
+}
+
+
+context("Apple Pay", () => {
 
     describe('Checkout', () => {
 
         it('C4082: Apple Pay visible if possible in browser (Checkout) @core', () => {
+
+            beforeEach(device);
 
             applePayFactory.registerApplePay(true);
 
@@ -56,6 +60,8 @@ context("Apple Pay", () => {
 
         it('C4080: Apple Pay hidden if not possible in browser (Checkout) @core', () => {
 
+            beforeEach(device);
+
             applePayFactory.registerApplePay(false);
 
             scenarioDummyBasket.execute();
@@ -70,5 +76,5 @@ context("Apple Pay", () => {
             cy.contains('Apple Pay').should('not.exist');
         })
     })
-    
+
 })

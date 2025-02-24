@@ -1,5 +1,4 @@
 import Devices from "Services/utils/Devices";
-import ElementUtils from "Services/utils/Element"
 import Session from "Services/utils/Session"
 import Shopware from "Services/shopware/Shopware"
 import VueJs from "Services/utils/VueJs/VueJs";
@@ -30,7 +29,6 @@ import SubscriptionRepository from "Repositories/storefront/account/Subscription
 const devices = new Devices();
 const session = new Session();
 const shopware = new Shopware();
-const elementUtils = new ElementUtils();
 const vueJs = new VueJs();
 
 
@@ -59,30 +57,31 @@ const dummyUserScenario = new DummyUserScenario();
 
 const testDevices = [devices.getFirstDevice()];
 
-describe('Subscription', () => {
 
-    before(function () {
-        devices.setDevice(devices.getFirstDevice());
-    })
+function beforeEach(device) {
+    devices.setDevice(device);
+    session.resetBrowserSession();
+}
+
+
+describe('Subscription', () => {
 
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
-                devices.setDevice(device);
-                session.resetBrowserSession();
-            });
-
             describe('Storefront + Administration', function () {
-                it('C2339889: Purchase subscription after failed payment and verify data in Administration', () =>{
+                it('C2339889: Purchase subscription after failed payment and verify data in Administration', () => {
+
+                    beforeEach(device);
+
                     purchaseSubscriptionAndGoToPayment();
 
                     molliePayment.selectFailed();
 
                     cy.url().should('include', '/payment/failed');
                     cy.get('.container-main .btn-primary').click();
-                    cy.url().should('include','/checkout/select-method');
+                    cy.url().should('include', '/checkout/select-method');
                     cy.get('.grid-button-creditcard[value="creditcard"]').click();
 
 
@@ -95,6 +94,9 @@ describe('Subscription', () => {
                 })
 
                 it('C4066: Purchase subscription and verify data in Administration', () => {
+
+                    beforeEach(device);
+
                     purchaseSubscriptionAndGoToPayment();
 
                     molliePayment.selectPaid();
@@ -107,6 +109,8 @@ describe('Subscription', () => {
             describe('Administration', () => {
 
                 it('C4065: Subscription Configuration available in Administration @core', () => {
+
+                    beforeEach(device);
 
                     configAction.setupShop(true, false, false);
 
@@ -122,6 +126,8 @@ describe('Subscription', () => {
                 })
 
                 it('C183210: Subscription page in Administration has links to customer and order', () => {
+
+                    beforeEach(device);
 
                     prepareSubscriptionAndOpenAdminDetails();
 
@@ -143,6 +149,8 @@ describe('Subscription', () => {
 
                 it('C183206: Pause subscription in Administration', () => {
 
+                    beforeEach(device);
+
                     prepareSubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
@@ -161,6 +169,8 @@ describe('Subscription', () => {
                 })
 
                 it('C183208: Resume subscription in Administration', () => {
+
+                    beforeEach(device);
 
                     prepareSubscriptionAndOpenAdminDetails();
 
@@ -184,6 +194,8 @@ describe('Subscription', () => {
 
                 it('C183207: Skip subscription in Administration', () => {
 
+                    beforeEach(device);
+
                     prepareSubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -201,6 +213,8 @@ describe('Subscription', () => {
                 })
 
                 it('C183209: Cancel subscription in Administration', () => {
+
+                    beforeEach(device);
 
                     prepareSubscriptionAndOpenAdminDetails();
 
@@ -224,8 +238,10 @@ describe('Subscription', () => {
 
                 it('C4067: Subscription Indicator on PDP can be turned ON @core', () => {
 
+                    beforeEach(device);
+
                     configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, true,[]);
+                    configAction.setupPlugin(true, false, false, true, []);
                     cy.wait(2000);
 
                     cy.visit('/');
@@ -240,8 +256,10 @@ describe('Subscription', () => {
 
                 it('C4068: Subscription Indicator on PDP can be turned OFF @core', () => {
 
+                    beforeEach(device);
+
                     configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, false,[]);
+                    configAction.setupPlugin(true, false, false, false, []);
                     cy.wait(2000);
 
                     cy.visit('/');
@@ -259,6 +277,8 @@ describe('Subscription', () => {
                     if (shopware.isVersionLower(6.4)) {
                         return;
                     }
+
+                    beforeEach(device);
 
                     configAction.setupShop(false, false, false);
 
@@ -308,6 +328,8 @@ describe('Subscription', () => {
 
                 it('C176306: Subscriptions are available in Account', () => {
 
+                    beforeEach(device);
+
                     prepareSubscriptionAndOpenAdminDetails();
 
                     cy.visit('/');
@@ -332,8 +354,8 @@ describe('Subscription', () => {
 })
 
 
-function purchaseSubscriptionAndGoToPayment(){
-    configAction.setupPlugin(true, false, false, true,[]);
+function purchaseSubscriptionAndGoToPayment() {
+    configAction.setupPlugin(true, false, false, true, []);
     configAction.updateProducts('', true, 3, 'weeks');
 
     dummyUserScenario.execute();
@@ -390,7 +412,7 @@ function purchaseSubscriptionAndGoToPayment(){
     mollieCreditCardForm.submitForm();
 }
 
-function assertValidSubscriptionInAdmin(){
+function assertValidSubscriptionInAdmin() {
     cy.url().should('include', '/checkout/finish');
     cy.contains('Thank you for your order');
     // ------------------------------------------------------------------------------------------------------
@@ -451,7 +473,7 @@ function assertAvailablePaymentMethods() {
 }
 
 function prepareSubscriptionAndOpenAdminDetails() {
-    configAction.setupPlugin(true, false, false, true,[]);
+    configAction.setupPlugin(true, false, false, true, []);
     configAction.updateProducts('', true, 3, 'weeks');
 
     const dummyScenario = new DummyBasketScenario(1)

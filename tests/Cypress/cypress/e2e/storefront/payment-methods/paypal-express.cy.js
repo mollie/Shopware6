@@ -25,21 +25,20 @@ const repoCart = new CartRepository();
 const registerRepo = new RegisterRepository();
 
 
+function beforeEach() {
+    devices.setDevice(devices.getFirstDevice());
+}
+
+
 describe('Paypal Express - UI Tests', () => {
-
-
-    before(function () {
-        devices.setDevice(devices.getFirstDevice());
-    })
-
-    beforeEach(function () {
-        devices.setDevice(devices.getFirstDevice());
-    })
 
     describe('PDP', () => {
 
         it('Paypal Express button is visible @core', () => {
-            configAction.setupPlugin(false,false,false,false,[]);
+
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, []);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -52,7 +51,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is hidden because of restriction @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,['pdp']);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, ['pdp']);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -67,7 +68,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is visible @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,[]);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, []);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -79,7 +82,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is hidden because of restriction @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,['plp']);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, ['plp']);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -93,7 +98,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is visible @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,[]);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, []);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -106,8 +113,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is hidden because of restriction @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,['offcanvas'])
+            beforeEach();
 
+            configAction.setupPlugin(false, false, false, false, ['offcanvas'])
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -123,7 +131,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is visible @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,[]);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, []);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -139,7 +149,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is hidden because of restriction @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,['cart']);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, ['cart']);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -157,7 +169,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is visible @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,[]);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, []);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();
@@ -173,7 +187,9 @@ describe('Paypal Express - UI Tests', () => {
 
         it('Paypal Express button is hidden because of restriction @core', () => {
 
-            configAction.setupPlugin(false,false,false,false,['register']);
+            beforeEach();
+
+            configAction.setupPlugin(false, false, false, false, ['register']);
 
             cy.visit('/');
             topMenu.clickOnSecondCategory();

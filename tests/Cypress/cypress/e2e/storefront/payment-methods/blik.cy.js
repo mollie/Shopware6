@@ -19,16 +19,11 @@ describe('Blik payment method', () => {
 
     context(devices.getDescription(device), () => {
 
-        before(function () {
-            devices.setDevice(device);
-        })
+        it('C2557636: Blik is existing in checkout', () => {
 
-        beforeEach(() => {
+            devices.setDevice(device);
             session.resetBrowserSession();
             devices.setDevice(device);
-        });
-
-        it('C2557636: Blik is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 

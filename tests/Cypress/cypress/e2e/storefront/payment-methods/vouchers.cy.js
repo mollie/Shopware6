@@ -38,24 +38,29 @@ const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
-describe('Voucher Payments', () => {
+let beforeAllCalled = false;
 
-    before(function () {
+function beforeEach(device) {
+    if (!beforeAllCalled) {
         devices.setDevice(devices.getFirstDevice());
         configAction.setupShop(false, false, false);
         configAction.updateProducts('', false, 0, '');
-    })
+        beforeAllCalled = true;
+    }
+    devices.setDevice(device);
+    session.resetBrowserSession();
+}
+
+
+describe('Voucher Payments', () => {
 
     testDevices.forEach(device => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
-                devices.setDevice(device);
-                session.resetBrowserSession();
-            });
-
             it('C4144: Voucher Configuration available in Administration @core', () => {
+
+                beforeEach(device);
 
                 adminLogin.login();
 
@@ -69,6 +74,8 @@ describe('Voucher Payments', () => {
             })
 
             it('C4139: Voucher hidden if product is not configured', () => {
+
+                beforeEach(device);
 
                 // hiding of payment methods does not work
                 // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
@@ -107,16 +114,25 @@ describe('Voucher Payments', () => {
             })
 
             it('C4136: Voucher available for ECO products', () => {
+
+                beforeEach(device);
+
                 configAction.updateProducts('eco', false, '', '');
                 testVoucherPayment();
             })
 
             it('C4137: Voucher available for MEAL products', () => {
+
+                beforeEach(device);
+
                 configAction.updateProducts('meal', false, '', '');
                 testVoucherPayment();
             })
 
             it('C4138: Voucher available for GIFT products', () => {
+
+                beforeEach(device);
+
                 configAction.updateProducts('gift', false, '', '');
                 testVoucherPayment();
             })

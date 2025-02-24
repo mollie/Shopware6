@@ -21,11 +21,6 @@ export const getMochaContext = () => cy.state('runnable').ctx;
 
 context("Events Config", () => {
 
-    beforeEach(() => {
-        session.resetBrowserSession();
-        devices.setDevice(device);
-    });
-
     context(devices.getDescription(device), () => {
 
         it('C1277772: Flow Builder does not break Business Events in Admin (Shopware < 6.5)', () => {
@@ -34,6 +29,9 @@ context("Events Config", () => {
                 getMochaContext().skip('Business Events are only available below Shopware 6.5');
                 return;
             }
+
+            session.resetBrowserSession();
+            devices.setDevice(device);
 
             adminLogin.login();
             settingsAction.openBusinessEventsPage();

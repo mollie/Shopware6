@@ -14,10 +14,10 @@ const fakeSubscriptionID = '0d8eefdd6d12456335280e2ff42431b9';
 const loginAction = new StoreApiLoginAction(client);
 
 
-beforeEach(() => {
+function beforeEach() {
     // clear token
     client.clearContextToken();
-})
+}
 
 
 context("Store API Subscription Routes", () => {
@@ -27,6 +27,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription';
 
         it('C266685: /subscription with unauthorized customer (Store API) @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.get(url).then(response => {
                     resolve({'data': response.data});
@@ -38,6 +41,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266686: /subscription with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -64,6 +69,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/billing/update';
 
         it('C266687: /billing/update with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -75,6 +83,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266688: /billing/update with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -100,6 +110,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/shipping/update';
 
         it('C266689: /shipping/update with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -111,6 +124,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266690: /shipping/update with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -136,6 +151,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/payment/update';
 
         it('C266691: /payment/update with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -147,6 +165,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266692: /payment/update with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -171,6 +191,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/pause';
 
         it('C266693: /pause with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -182,6 +205,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266694: /pause with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -206,6 +231,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/resume';
 
         it('C266695: /resume with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -217,6 +245,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266696: /resume with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -241,6 +271,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/skip';
 
         it('C266697: /skip with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -252,6 +285,8 @@ context("Store API Subscription Routes", () => {
         })
 
         it('C266698: /skip with authorized customer @core', () => {
+
+            beforeEach();
 
             loginAction.registerAndLogin('loginDone');
 
@@ -277,6 +312,9 @@ context("Store API Subscription Routes", () => {
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/cancel';
 
         it('C330671: /cancel with unauthorized customer @core', () => {
+
+            beforeEach();
+
             const request = new Promise((resolve) => {
                 client.post(url).then(response => {
                     resolve({'data': response.data});
@@ -289,6 +327,8 @@ context("Store API Subscription Routes", () => {
 
         it('C330672: /cancel with authorized customer @core', () => {
 
+            beforeEach();
+            
             loginAction.registerAndLogin('loginDone');
 
             cy.wait('@loginDone').then(() => {

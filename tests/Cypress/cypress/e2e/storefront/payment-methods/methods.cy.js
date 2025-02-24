@@ -27,13 +27,11 @@ context('Active Payment Methods', () => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
+            it('C3996: Mollie Payment Methods show TEST MODE @core', () => {
+
                 devices.setDevice(device);
                 configAction.setupShop(true, false, false);
                 session.resetBrowserSession();
-            });
-
-            it('C3996: Mollie Payment Methods show TEST MODE @core', () => {
 
                 scenarioDummyBasket.execute();
 
@@ -58,13 +56,11 @@ context('Deprecated Payment Methods', () => {
 
         context(devices.getDescription(device), () => {
 
-            beforeEach(() => {
+            it('C38332: ING Home Pay must not exist @core', () => {
+
                 devices.setDevice(device);
                 configAction.setupShop(true, false, false);
                 session.resetBrowserSession();
-            });
-
-            it('C38332: ING Home Pay must not exist @core', () => {
 
                 scenarioDummyBasket.execute();
 
@@ -78,6 +74,10 @@ context('Deprecated Payment Methods', () => {
             })
 
             it('C38333: SEPA Direct Debit must not exist @core', () => {
+
+                devices.setDevice(device);
+                configAction.setupShop(true, false, false);
+                session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();
 

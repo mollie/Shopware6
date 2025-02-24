@@ -39,21 +39,24 @@ const testDevices = [devices.getFirstDevice()];
 const validCardNumber = '3782 822463 10005';
 
 
-describe('Credit Card Components', () => {
+let beforeAllCalledComponents = false;
 
-    before(function () {
+function beforeEachComponents() {
+    if (!beforeAllCalledComponents) {
         devices.setDevice(devices.getFirstDevice());
         // we need the Shopware failure mode for some tests in this file
         // so let's just do this here once
         configAction.setupShop(false, true, false);
         configAction.updateProducts('', false, 0, '');
-    })
+        beforeAllCalledComponents = true;
+    }
+    devices.setDevice(devices.getFirstDevice());
+    session.resetSessionData();
+    session.resetBrowserSession();
+}
 
-    beforeEach(() => {
-        devices.setDevice(devices.getFirstDevice());
-        session.resetSessionData();
-        session.resetBrowserSession();
-    });
+
+describe('Credit Card Components', () => {
 
     context(devices.getDescription(devices.getFirstDevice()), () => {
 
@@ -64,6 +67,8 @@ describe('Credit Card Components', () => {
                 getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
+
+            beforeEachComponents();
 
             setUp();
 
@@ -100,6 +105,8 @@ describe('Credit Card Components', () => {
                 return;
             }
 
+            beforeEachComponents();
+
             setUp();
 
             payment.fillCreditCardComponents('', validCardNumber, '1228', '1234');
@@ -124,6 +131,8 @@ describe('Credit Card Components', () => {
                 return;
             }
 
+            beforeEachComponents();
+
             setUp();
 
             payment.fillCreditCardComponents(' ', validCardNumber, '1228', '1234');
@@ -145,6 +154,8 @@ describe('Credit Card Components', () => {
                 getMochaContext().skip('This test is not working on Shopware 6.4.0, because the selected payment method is not active and therefore no credit card components are visible. https://issues.shopware.com/issues/NEXT-15044');
                 return;
             }
+
+            beforeEachComponents();
 
             setUp();
 
@@ -168,6 +179,8 @@ describe('Credit Card Components', () => {
                 return;
             }
 
+            beforeEachComponents();
+
             setUp();
 
             payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '12', '1234');
@@ -190,6 +203,8 @@ describe('Credit Card Components', () => {
                 return;
             }
 
+            beforeEachComponents();
+
             setUp();
 
             payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '124');
@@ -206,6 +221,8 @@ describe('Credit Card Components', () => {
         })
 
         it('C4106: Components work on edit order page', () => {
+
+            beforeEachComponents();
 
             scenarioDummyBasket.execute();
 
@@ -261,21 +278,19 @@ describe('Credit Card Components', () => {
 
 describe('Status Tests', () => {
 
-    before(function () {
+    it('C4266: Open Credit Card payment leads to failure', () => {
+
+        // BEFORE
         devices.setDevice(devices.getFirstDevice());
         // turn off credit card components
         // to speed up a few  things
-        configAction.setupPlugin(false, false, false, false,[]);
+        configAction.setupPlugin(false, false, false, false, []);
 
-    })
-
-    beforeEach(() => {
+        // BEFORE (EACH)
         devices.setDevice(devices.getFirstDevice());
         session.resetSessionData();
         session.resetBrowserSession();
-    });
 
-    it('C4266: Open Credit Card payment leads to failure', () => {
 
         setUp();
 
@@ -304,18 +319,16 @@ describe('Status Tests', () => {
 
 describe('Administration Tests', () => {
 
-    before(function () {
-        devices.setDevice(devices.getFirstDevice());
-        configAction.setupPlugin(false, false, false, false,[]);
-    })
+    it('C5520: Credit Card Data is shown in the Administration', () => {
 
-    beforeEach(() => {
+        // BEFORE
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupPlugin(false, false, false, false, []);
+
+        // BEFORE (EACH)
         devices.setDevice(devices.getFirstDevice());
         session.resetSessionData();
         session.resetBrowserSession();
-    });
-
-    it('C5520: Credit Card Data is shown in the Administration', () => {
 
         setUp();
 
@@ -372,7 +385,7 @@ function setUp() {
     // this is a bug, so we just switch to another payment
     // before switching back to credit card
     payment.switchPaymentMethod('PayPal');
-    
+
     if (shopware.isVersionGreaterEqual(6.4)) {
         payment.switchPaymentMethod('Card');
     } else {
