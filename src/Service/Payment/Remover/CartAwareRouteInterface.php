@@ -12,7 +12,7 @@ interface CartAwareRouteInterface
         'store-api.payment.method',
     ];
 
-    public function isCartRoute(string $route = ""): bool;
+    public function isCartRoute(): bool;
 
     public function getCart(\Shopware\Core\System\SalesChannel\SalesChannelContext $context): \Shopware\Core\Checkout\Cart\Cart;
 }

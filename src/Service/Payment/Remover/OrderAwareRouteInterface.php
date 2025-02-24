@@ -8,7 +8,7 @@ interface OrderAwareRouteInterface
         'frontend.account.edit-order.page',
     ];
 
-    public function isOrderRoute(string $route = ""): bool;
+    public function isOrderRoute(): bool;
 
     public function getOrder(\Shopware\Core\Framework\Context $context): \Shopware\Core\Checkout\Order\OrderEntity;
 }

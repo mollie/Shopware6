@@ -88,9 +88,13 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
                 return true;
             }
 
-            $route = $this->getRouteFromRequest();
+            if ($this->isCartRoute()) {
+                return true;
+            }
 
-            return $this->isCartRoute($route) || $this->isOrderRoute($route);
+            if ($this->isOrderRoute()) {
+                return true;
+            }
         } catch (MissingRequestException|MissingRouteException $e) {
             $this->logger
                 ->error('Could not determine if the current route is allowed to remove payment methods', [
@@ -101,19 +105,18 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
             // Make sure Shopware will behave normally in the case of an error.
             return false;
         }
+
+        return false;
     }
 
     /**
-     * @param string $route
-     * @throws MissingRouteException
      * @throws MissingRequestException
+     * @throws MissingRouteException
      * @return bool
      */
-    public function isCartRoute(string $route = ""): bool
+    public function isCartRoute(): bool
     {
-        if (empty($route)) {
-            $route = $this->getRouteFromRequest();
-        }
+        $route = $this->getRouteFromRequest();
 
         return in_array($route, CartAwareRouteInterface::CART_ROUTES);
     }
@@ -147,16 +150,13 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @param string $route
-     * @throws MissingRouteException
      * @throws MissingRequestException
+     * @throws MissingRouteException
      * @return bool
      */
-    public function isOrderRoute(string $route = ""): bool
+    public function isOrderRoute(): bool
     {
-        if (empty($route)) {
-            $route = $this->getRouteFromRequest();
-        }
+        $route = $this->getRouteFromRequest();
 
         return in_array($route, OrderAwareRouteInterface::ORDER_ROUTES);
     }
@@ -181,7 +181,7 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
      * @throws MissingRequestException
      * @return Request
      */
-    protected function getRequestFromStack(): Request
+    private function getRequestFromStack(): Request
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -193,21 +193,21 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @throws MissingRouteException
      * @throws MissingRequestException
+     * @throws MissingRouteException
      * @return string
      */
-    protected function getRouteFromRequest(): string
+    private function getRouteFromRequest(): string
     {
         $request = $this->getRequestFromStack();
 
-        $route = $request->attributes->get('_route');
+        $route = (string)$request->attributes->get('_route');
 
         if (!empty($route)) {
             return $route;
         }
 
-        throw new MissingRouteException($request);
+        return '';
     }
 
 
