@@ -1,5 +1,10 @@
-export default class RefundManagerRepository {
+import Shopware from "Services/shopware/Shopware";
 
+
+const shopware = new Shopware();
+
+
+export default class RefundManagerRepository {
 
     /**
      *
@@ -102,6 +107,15 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstRefundContextButton() {
+
+        cy.log(shopware.getVersion());
+
+        if (shopware.isVersionGreaterEqual('6.6.10.0')) {
+            // selector changed
+            // this works for now, yolo
+            return cy.get('.mollie-refund-manager-refunds > .sw-card__content > .sw-data-grid > .sw-data-grid__wrapper > .sw-data-grid__table > .sw-data-grid__body > .sw-data-grid__row > .sw-data-grid__cell--actions > .sw-data-grid__cell-content > .sw-context-button > .sw-context-button__button');
+        }
+
         return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button');
     }
 
@@ -125,7 +139,7 @@ export default class RefundManagerRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
-    getFirstRefundQuantityInput(){
+    getFirstRefundQuantityInput() {
         return cy.get('.cy-input-quantity input')
     }
 
