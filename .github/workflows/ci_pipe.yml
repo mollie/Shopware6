@@ -24,7 +24,7 @@ jobs:
     name: Review Pipeline
     uses: ./.github/workflows/step_review.yml
     with:
-      PHP_VERSION: 7,4
+      PHP_VERSION: 7.4
 
   # ------------------------------------------------------------------------------------------------------------------------
 
