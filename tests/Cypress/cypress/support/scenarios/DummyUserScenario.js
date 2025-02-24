@@ -26,9 +26,7 @@ export default class DummyUserScenario {
 
         session.resetBrowserSession();
 
-        cy.session('login', () => {
-            login.doLogin(user_email, user_pwd);
-        });
+        login.doLogin(user_email, user_pwd);
 
         // we have to start on the home page
         // after session restoring, so that we can continue as usual
