@@ -335,18 +335,27 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    buySubscriptionAndOpenAdminDetails();
+                    buySubscription();
 
                     cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
 
-                    // side menu needs subscription
+                    // side menu needs subscription item
                     cy.wait(2000);
                     cy.contains('.account-aside', 'Subscriptions');
+
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
 
+                    // the javascript was not working, there is a toggle button that switches between "View" and "Hide".
+                    // let's make sure it's working
+                    cy.contains('View');
+
                     repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
+
+                    // now the toggle button should show "Hide"
+                    cy.contains('Hide');
+
                     cy.contains('edit billing address');
 
                     repoSubscriptionStorefront.getSubscriptionContextMenuButton(0).click();

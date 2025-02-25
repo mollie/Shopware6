@@ -7,6 +7,7 @@ import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plug
 import PayPalExpressPlugin from './mollie-payments/plugins/paypal-express.plugin';
 import MollieBancomatPlugin from './mollie-payments/plugins/bancomat-plugin';
 import {MollieExpressActions} from './mollie-payments/plugins/mollie-express-actions.plugin';
+import AccountSubscriptionsPlugin from './mollie-payments/plugins/account-subscriptions.plugin';
 
 
 export default class MollieRegistration {
@@ -24,15 +25,13 @@ export default class MollieRegistration {
         pluginManager.register('MollieExpressActions', MollieExpressActions);
         pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
 
-
         // fix quantity select on PDP Page
-        pluginManager.register('PayPalExpressPlugin',PayPalExpressPlugin);
+        pluginManager.register('PayPalExpressPlugin', PayPalExpressPlugin);
 
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]');
         pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]');
-
 
         // showing credit card components in the checkout
         // we have 2 versions for < Shopware 6.4 and >= Shopware 6.4
@@ -48,7 +47,12 @@ export default class MollieRegistration {
         // -----------------------------------------------------------------------------
         pluginManager.register('MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]');
 
-        pluginManager.register('MollieBancomatPlugin',MollieBancomatPlugin);
+        // BANCOMAT PAY
+        pluginManager.register('MollieBancomatPlugin', MollieBancomatPlugin);
+
+        // Subscriptions
+        pluginManager.register('AccountSubscriptionsPlugin', AccountSubscriptionsPlugin, '[data-mollie-template-account-subscriptions]');
+
     }
 
 }
