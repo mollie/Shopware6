@@ -9,5 +9,8 @@
     "cypress-testrail": "2.8.1",
     "playwright-webkit": "^1.26.1",
     "webpack": "^5.74.0"
+  },
+  "dependencies": {
+    "cypress-axe": "^1.6.0"
   }
 }

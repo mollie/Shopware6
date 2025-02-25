@@ -61,6 +61,8 @@ let beforeAllCalled = false;
 function beforeEach(device) {
     if (!beforeAllCalled) {
         configAction.setupShop(true, false, false);
+        configAction.setupPlugin(true, false, false, true, []);
+        configAction.updateProducts('', true, 3, 'weeks');
         beforeAllCalled = true;
     }
     devices.setDevice(device);
@@ -132,7 +134,7 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    prepareSubscriptionAndOpenAdminDetails();
+                    buySubscriptionAndOpenAdminDetails();
 
                     // --------------------------------------------------------------------------------------------------
 
@@ -154,7 +156,7 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    prepareSubscriptionAndOpenAdminDetails();
+                    buySubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -175,7 +177,7 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    prepareSubscriptionAndOpenAdminDetails();
+                    buySubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -199,7 +201,7 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    prepareSubscriptionAndOpenAdminDetails();
+                    buySubscriptionAndOpenAdminDetails();
 
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
 
@@ -219,7 +221,7 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    prepareSubscriptionAndOpenAdminDetails();
+                    buySubscriptionAndOpenAdminDetails();
 
                     repoAdminSubscriptonDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
@@ -333,7 +335,7 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    prepareSubscriptionAndOpenAdminDetails();
+                    buySubscriptionAndOpenAdminDetails();
 
                     cy.visit('/');
                     topMenu.clickAccountWidgetSubscriptions();
@@ -351,6 +353,20 @@ describe('Subscription', () => {
                     cy.contains('Repeat subscription');
                 })
 
+                it('C4237799: Accessibility Storefront Account Subscriptions @a11y', () => {
+
+                    beforeEach(device);
+
+                    buySubscription();
+
+                    cy.visit('/');
+                    topMenu.clickAccountWidgetSubscriptions();
+
+                    cy.injectAxe();
+                    cy.checkA11y('.account-content-main');
+                });
+
+
             })
         })
     })
@@ -358,8 +374,6 @@ describe('Subscription', () => {
 
 
 function purchaseSubscriptionAndGoToPayment() {
-    configAction.setupPlugin(true, false, false, true, []);
-    configAction.updateProducts('', true, 3, 'weeks');
 
     dummyUserScenario.execute();
     cy.visit('/');
@@ -415,6 +429,45 @@ function purchaseSubscriptionAndGoToPayment() {
     mollieCreditCardForm.submitForm();
 }
 
+function buySubscription() {
+
+    const dummyScenario = new DummyBasketScenario(1)
+    dummyScenario.execute();
+
+    paymentAction.switchPaymentMethod('Card');
+    shopware.prepareDomainChange();
+    checkout.placeOrderOnConfirm();
+
+    mollieSandbox.initSandboxCookie();
+    cy.wait(1000);
+    mollieCreditCardForm.enterValidCard();
+    mollieCreditCardForm.submitForm();
+    molliePayment.selectPaid();
+}
+
+function buySubscriptionAndOpenAdminDetails() {
+
+    buySubscription();
+
+    adminLogin.login();
+    adminSubscriptions.openSubscriptions();
+    adminSubscriptions.openSubscription(0);
+}
+
+
+function assertAvailablePaymentMethods() {
+    cy.get('.payment-methods input.klarnapaylater').should('not.exist');
+    cy.get('.payment-methods input.paysafecard').should('not.exist');
+
+    cy.contains('iDEAL').should('exist');
+    cy.contains('Card').should('exist');
+    cy.contains('SOFORT').should('exist');
+    cy.contains('eps').should('exist');
+    cy.contains('Bancontact').should('exist');
+    cy.contains('Belfius').should('exist');
+    cy.contains('PayPal').should('exist');
+}
+
 function assertValidSubscriptionInAdmin() {
     cy.url().should('include', '/checkout/finish');
     cy.contains('Thank you for your order');
@@ -460,40 +513,4 @@ function assertValidSubscriptionInAdmin() {
     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'pending', {matchCase: false});
     cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'active', {matchCase: false});
     cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'confirmed');
-}
-
-function assertAvailablePaymentMethods() {
-    cy.get('.payment-methods input.klarnapaylater').should('not.exist');
-    cy.get('.payment-methods input.paysafecard').should('not.exist');
-
-    cy.contains('iDEAL').should('exist');
-    cy.contains('Card').should('exist');
-    cy.contains('SOFORT').should('exist');
-    cy.contains('eps').should('exist');
-    cy.contains('Bancontact').should('exist');
-    cy.contains('Belfius').should('exist');
-    cy.contains('PayPal').should('exist');
-}
-
-function prepareSubscriptionAndOpenAdminDetails() {
-    configAction.setupPlugin(true, false, false, true, []);
-    configAction.updateProducts('', true, 3, 'weeks');
-
-    const dummyScenario = new DummyBasketScenario(1)
-    dummyScenario.execute();
-
-    paymentAction.switchPaymentMethod('Card');
-    shopware.prepareDomainChange();
-    checkout.placeOrderOnConfirm();
-
-    mollieSandbox.initSandboxCookie();
-    cy.wait(1000);
-    mollieCreditCardForm.enterValidCard();
-    mollieCreditCardForm.submitForm();
-    molliePayment.selectPaid();
-
-    adminLogin.login();
-    adminSubscriptions.openSubscriptions();
-    adminSubscriptions.openSubscription(0);
-
 }

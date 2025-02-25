@@ -64,6 +64,7 @@ Please use them if appropriate.
 |---------|-------------------------------------------------------------------------------------------------------------------------------------|
 | @core   | Indicates that the test does not require a Mollie API key. These tests will also run in the PR pipeline before something is merged. |
 | @sanity | Just a few payment and flow tests to see if it still works.                                                                         |
+| @a11y   | Use this tag for accessibility tests                                                                                                |
 
 ### Before and BeforeEach
 

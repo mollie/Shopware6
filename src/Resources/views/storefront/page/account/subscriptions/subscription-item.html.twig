@@ -3,10 +3,10 @@
         <div class="order-item-header">
             <div class="row flex-wrap">
                 {% block page_account_mollie_subscriptions_item_heading %}
-                    <h3 class="col-auto order-table-header-heading heading-mollie-subscriptions">
+                    <h2 class="col-auto order-table-header-heading heading-mollie-subscriptions">
                         {{ "molliePayments.subscriptions.account.mollieSubscriptionsHeadline"|trans|sw_sanitize }}
                         {{ subscription.createdAt | format_date('short', locale=app.request.locale) }}
-                    </h3>
+                    </h2>
                 {% endblock %}
 
                 {% block page_account_mollie_subscriptions_item_status_col %}
@@ -34,6 +34,7 @@
                                         id="accountOrderDropdown"
                                         data-toggle="dropdown"
                                         data-bs-toggle="dropdown"
+                                        aria-label="Subscription Actions"
                                         aria-haspopup="true"
                                         aria-expanded="false">
                                     {% sw_icon 'more-horizontal' %}
