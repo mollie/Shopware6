@@ -17,6 +17,7 @@
 import './commands'
 import axios from "axios";
 
+import 'cypress-axe'
 
 const CypressFilters = require('cypress-filters');
 new CypressFilters().register();
