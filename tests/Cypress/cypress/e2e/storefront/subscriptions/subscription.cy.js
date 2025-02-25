@@ -16,7 +16,6 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import AdminSubscriptionsAction from "Actions/admin/AdminSubscriptionsAction";
-import SubscriptionsListRepository from "Repositories/admin/subscriptions/SubscriptionsListRepository";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
@@ -34,7 +33,6 @@ const vueJs = new VueJs();
 
 const repoProductDetailsAdmin = new ProductDetailRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
-const repoAdminSubscriptions = new SubscriptionsListRepository();
 const repoAdminSubscriptonDetails = new SubscriptionDetailsRepository();
 const repoSubscriptionStorefront = new SubscriptionRepository();
 
@@ -58,7 +56,13 @@ const dummyUserScenario = new DummyUserScenario();
 const testDevices = [devices.getFirstDevice()];
 
 
+let beforeAllCalled = false;
+
 function beforeEach(device) {
+    if (!beforeAllCalled) {
+        configAction.setupShop(true, false, false);
+        beforeAllCalled = true;
+    }
     devices.setDevice(device);
     session.resetBrowserSession();
 }
@@ -71,6 +75,7 @@ describe('Subscription', () => {
         context(devices.getDescription(device), () => {
 
             describe('Storefront + Administration', function () {
+
                 it('C2339889: Purchase subscription after failed payment and verify data in Administration', () => {
 
                     beforeEach(device);
@@ -111,8 +116,6 @@ describe('Subscription', () => {
                 it('C4065: Subscription Configuration available in Administration @core', () => {
 
                     beforeEach(device);
-
-                    configAction.setupShop(true, false, false);
 
                     adminLogin.login();
 
