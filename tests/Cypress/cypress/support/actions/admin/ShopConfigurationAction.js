@@ -18,7 +18,6 @@ export default class ShopConfigurationAction {
      * @param mollieFailureMode
      * @param creditCardComponents
      * @param applePayDirect
-     * @param paypalExpressRestrictions
      */
     setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
 
