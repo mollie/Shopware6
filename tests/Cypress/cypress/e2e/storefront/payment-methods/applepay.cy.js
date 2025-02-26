@@ -26,13 +26,14 @@ const device = devices.getFirstDevice();
 let beforeAllCalled = false;
 
 function beforeEach(device) {
-    if (!beforeAllCalled) {
-        configAction.setupShop(true, false, false);
-        beforeAllCalled = true;
-    }
-
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            configAction.setupShop(true, false, false);
+            beforeAllCalled = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 

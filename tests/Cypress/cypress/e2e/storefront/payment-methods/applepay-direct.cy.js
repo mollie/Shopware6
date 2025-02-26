@@ -31,23 +31,27 @@ let beforeAllCalledConfigDisabled = false;
 let beforeAllCalledConfigEnabled = false;
 
 function beforeEachUIConfigDisabled() {
-    if (!beforeAllCalledConfigDisabled) {
-        devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, false);
-        beforeAllCalledConfigDisabled = true;
-    }
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalledConfigDisabled) {
+            devices.setDevice(devices.getFirstDevice());
+            configAction.setupShop(true, false, false);
+            beforeAllCalledConfigDisabled = true;
+        }
 
-    devices.setDevice(devices.getFirstDevice());
+        devices.setDevice(devices.getFirstDevice());
+    });
 }
 
 function beforeEachUIConfigEnabled() {
-    if (!beforeAllCalledConfigEnabled) {
-        devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, true);
-        beforeAllCalledConfigEnabled = true;
-    }
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalledConfigEnabled) {
+            devices.setDevice(devices.getFirstDevice());
+            configAction.setupShop(true, false, true);
+            beforeAllCalledConfigEnabled = true;
+        }
 
-    devices.setDevice(devices.getFirstDevice());
+        devices.setDevice(devices.getFirstDevice());
+    });
 }
 
 

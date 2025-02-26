@@ -59,14 +59,16 @@ const testDevices = [devices.getFirstDevice()];
 let beforeAllCalled = false;
 
 function beforeEach(device) {
-    if (!beforeAllCalled) {
-        configAction.setupShop(true, false, false);
-        configAction.setupPlugin(true, false, false, true, []);
-        configAction.updateProducts('', true, 3, 'weeks');
-        beforeAllCalled = true;
-    }
-    devices.setDevice(device);
-    session.resetBrowserSession();
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            configAction.setupShop(true, false, false);
+            configAction.setupPlugin(true, false, false, true, []);
+            configAction.updateProducts('', true, 3, 'weeks');
+            beforeAllCalled = true;
+        }
+        devices.setDevice(device);
+        session.resetBrowserSession();
+    });
 }
 
 
@@ -245,9 +247,10 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, true, []);
-                    cy.wait(2000);
+                    cy.wrap(null).then(() => {
+                        configAction.updateProducts('', true, 3, 'weeks');
+                        configAction.setupPlugin(true, false, false, true, []);
+                    });
 
                     cy.visit('/');
                     topMenu.clickOnSecondCategory();
@@ -263,9 +266,10 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    configAction.updateProducts('', true, 3, 'weeks');
-                    configAction.setupPlugin(true, false, false, false, []);
-                    cy.wait(2000);
+                    cy.wrap(null).then(() => {
+                        configAction.updateProducts('', true, 3, 'weeks');
+                        configAction.setupPlugin(true, false, false, false, []);
+                    });
 
                     cy.visit('/');
 
@@ -285,9 +289,10 @@ describe('Subscription', () => {
 
                     beforeEach(device);
 
-                    configAction.setupShop(false, false, false);
-
-                    configAction.updateProducts('', true, 3, 'weeks');
+                    cy.wrap(null).then(() => {
+                        configAction.setupShop(false, false, false);
+                        configAction.updateProducts('', true, 3, 'weeks');
+                    });
 
                     dummyUserScenario.execute();
 
@@ -375,7 +380,6 @@ describe('Subscription', () => {
                     cy.checkA11y('.account-content-main');
                 });
 
-
             })
         })
     })
@@ -462,7 +466,6 @@ function buySubscriptionAndOpenAdminDetails() {
     adminSubscriptions.openSubscriptions();
     adminSubscriptions.openSubscription(0);
 }
-
 
 function assertAvailablePaymentMethods() {
     cy.get('.payment-methods input.klarnapaylater').should('not.exist');

@@ -41,14 +41,16 @@ const device = devices.getFirstDevice();
 let beforeAllCalled = false;
 
 function beforeEach(device) {
-    if (!beforeAllCalled) {
-        configAction.setupShop(false, false, false);
-        configAction.prepareShippingMethods();
-        configAction.updateProducts('', false, '', '');
-        beforeAllCalled = true;
-    }
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            configAction.setupShop(false, false, false);
+            configAction.prepareShippingMethods();
+            configAction.updateProducts('', false, '', '');
+            beforeAllCalled = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 

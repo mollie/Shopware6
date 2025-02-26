@@ -42,17 +42,19 @@ const validCardNumber = '3782 822463 10005';
 let beforeAllCalledComponents = false;
 
 function beforeEachComponents() {
-    if (!beforeAllCalledComponents) {
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalledComponents) {
+            devices.setDevice(devices.getFirstDevice());
+            // we need the Shopware failure mode for some tests in this file
+            // so let's just do this here once
+            configAction.setupShop(false, true, false);
+            configAction.updateProducts('', false, 0, '');
+            beforeAllCalledComponents = true;
+        }
         devices.setDevice(devices.getFirstDevice());
-        // we need the Shopware failure mode for some tests in this file
-        // so let's just do this here once
-        configAction.setupShop(false, true, false);
-        configAction.updateProducts('', false, 0, '');
-        beforeAllCalledComponents = true;
-    }
-    devices.setDevice(devices.getFirstDevice());
-    session.resetSessionData();
-    session.resetBrowserSession();
+        session.resetSessionData();
+        session.resetBrowserSession();
+    });
 }
 
 
