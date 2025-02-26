@@ -21,13 +21,13 @@ export default class ShopConfigurationAction {
      */
     setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
 
+        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false, []);
+
         this._activatePaymentMethods();
 
         this._configureShop();
 
         this.prepareShippingMethods();
-
-        this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false, []);
 
         this._clearCache();
     }
@@ -51,11 +51,22 @@ export default class ShopConfigurationAction {
                 throw new Error('Attention, No Sales Channels found trough Shopware API');
             }
 
+            let systemConfigData = {};
+
+            const mollieConfig = this._getMollieConfiguration(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions);
+
+            // assign "all sales channels" to the configuration
+            systemConfigData[null] = mollieConfig;
+
             channels.forEach(channel => {
                 this._configureSalesChannel(channel.id);
-                this._configureMolliePlugin(channel.id, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions);
+                systemConfigData[channel.id] = mollieConfig;
             });
+
+            this.apiClient.post('/_action/system-config/batch', systemConfigData);
         });
+
+        this._clearCache();
     }
 
     /**
@@ -152,10 +163,8 @@ export default class ShopConfigurationAction {
      * @param paypalExpressRestrictions
      * @private
      */
-    _configureMolliePlugin(channelId, mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions) {
-        const data = {};
-
-        const config = {
+    _getMollieConfiguration(mollieFailureMode, creditCardComponents, applePayDirect, subscriptionIndicator, paypalExpressRestrictions) {
+        return {
             "MolliePayments.config.testMode": true,
             "MolliePayments.config.debugMode": true,
             // ------------------------------------------------------------------
@@ -178,11 +187,6 @@ export default class ShopConfigurationAction {
             // ---------------------------------------------------------------
             "MolliePayments.config.paypalExpressRestrictions": paypalExpressRestrictions
         };
-
-        data[null] = config;        // also add for "All Sales Channels" otherwise things in admin wouldnt work
-        data[channelId] = config;
-
-        this.apiClient.post('/_action/system-config/batch', data);
     }
 
     /**
