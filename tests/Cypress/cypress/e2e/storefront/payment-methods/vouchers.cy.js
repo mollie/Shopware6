@@ -41,14 +41,16 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 let beforeAllCalled = false;
 
 function beforeEach(device) {
-    if (!beforeAllCalled) {
-        devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(false, false, false);
-        configAction.updateProducts('', false, 0, '');
-        beforeAllCalled = true;
-    }
-    devices.setDevice(device);
-    session.resetBrowserSession();
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            devices.setDevice(devices.getFirstDevice());
+            configAction.setupShop(false, false, false);
+            configAction.updateProducts('', false, 0, '');
+            beforeAllCalled = true;
+        }
+        devices.setDevice(device);
+        session.resetBrowserSession();
+    });
 }
 
 

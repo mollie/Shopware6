@@ -36,15 +36,15 @@ const shopware = new Shopware();
 let beforeEachCalled = false;
 
 function beforeEach(device) {
-
-    if (!beforeEachCalled) {
-        configAction.setupShop(false, false, false);
-        configAction.updateProducts('', false, 0, '');
-        beforeEachCalled = true;
-    }
-
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        if (!beforeEachCalled) {
+            configAction.setupShop(false, false, false);
+            configAction.updateProducts('', false, 0, '');
+            beforeEachCalled = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 

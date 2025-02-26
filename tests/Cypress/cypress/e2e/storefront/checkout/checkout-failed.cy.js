@@ -34,26 +34,26 @@ let beforeAllCalledMollieFailureMode = false;
 let beforeAllCalledMollieShopwareMode = false;
 
 function beforeEachMollieFailureMode(device) {
-
-    if (!beforeAllCalledMollieFailureMode) {
-        configAction.setupShop(true, false, false);
-        configAction.updateProducts('', false, 0, '');
-        beforeAllCalledMollieFailureMode = true;
-    }
-
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalledMollieFailureMode) {
+            configAction.setupShop(true, false, false);
+            configAction.updateProducts('', false, 0, '');
+            beforeAllCalledMollieFailureMode = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 function beforeEachShopwareFailureMode(device) {
-
-    if (!beforeAllCalledMollieShopwareMode) {
-        configAction.setupShop(false, false, false);
-        beforeAllCalledMollieShopwareMode = true;
-    }
-
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalledMollieShopwareMode) {
+            configAction.setupShop(false, false, false);
+            beforeAllCalledMollieShopwareMode = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 

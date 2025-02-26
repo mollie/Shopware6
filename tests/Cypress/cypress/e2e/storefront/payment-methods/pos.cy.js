@@ -24,9 +24,11 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 
 
 function beforeEach(device) {
-    devices.setDevice(device);
-    configAction.setupShop(true, false, false);
-    session.resetBrowserSession();
+    cy.wrap(null).then(() => {
+        devices.setDevice(device);
+        configAction.setupShop(true, false, false);
+        session.resetBrowserSession();
+    });
 }
 
 

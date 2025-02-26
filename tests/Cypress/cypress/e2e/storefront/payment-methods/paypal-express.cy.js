@@ -26,7 +26,9 @@ const registerRepo = new RegisterRepository();
 
 
 function beforeEach() {
-    devices.setDevice(devices.getFirstDevice());
+    cy.wrap(null).then(() => {
+        devices.setDevice(devices.getFirstDevice());
+    });
 }
 
 

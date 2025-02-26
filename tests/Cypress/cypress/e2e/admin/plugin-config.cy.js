@@ -19,8 +19,10 @@ const device = devices.getFirstDevice();
 
 
 function beforeEach(device) {
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 context("Plugin Config", () => {

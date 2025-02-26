@@ -33,13 +33,15 @@ const session = new Session();
 let beforeAllCalled = false;
 
 function beforeEach(device) {
-    if (!beforeAllCalled) {
-        configAction.setupShop(false, false, false);
-        configAction.updateProducts('', false, 0, '');
-        beforeAllCalled = true;
-    }
-    session.resetBrowserSession();
-    devices.setDevice(device);
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            configAction.setupShop(false, false, false);
+            configAction.updateProducts('', false, 0, '');
+            beforeAllCalled = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 

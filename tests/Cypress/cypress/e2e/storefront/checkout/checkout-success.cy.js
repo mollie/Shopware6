@@ -71,17 +71,19 @@ const payments = [
 let beforeAllCalled = false;
 
 function beforeEach(device) {
-    if (!beforeAllCalled) {
-        // configure our shop
-        configAction.setupShop(true, false, false);
-        // configure our products for vouchers
-        configAction.updateProducts('eco', false, '', '');
-        devices.setDevice(device);
-        beforeAllCalled = true;
-    }
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            // configure our shop
+            configAction.setupShop(true, false, false);
+            // configure our products for vouchers
+            configAction.updateProducts('eco', false, '', '');
+            devices.setDevice(device);
+            beforeAllCalled = true;
+        }
 
-    session.resetBrowserSession();
-    devices.setDevice(device);
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
 }
 
 
