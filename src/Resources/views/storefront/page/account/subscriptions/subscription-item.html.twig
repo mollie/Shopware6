@@ -274,8 +274,7 @@
                                     data-target="#subscription{{ subscription.id }}"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#subscription{{ subscription.id }}"
-                                    aria-expanded="false"
-                                    aria-controls="collapseExample">
+                                    aria-expanded="false">
                                 {% block page_account_subscription_item_subscription_table_body_cell_toggle_subscription_details_button_text %}
                                     <span class="subscription-view-btn-text">{{ "molliePayments.subscriptions.account.orderActionView"|trans|sw_sanitize }}</span>
                                     <span class="subscription-hide-btn-text d-none">{{ "molliePayments.subscriptions.account.orderActionHide"|trans|sw_sanitize }}</span>
@@ -328,7 +327,8 @@
                                                                                                 data-toggle="modal"
                                                                                                 data-target="#editBillingAddress{{ subscription.id }}"
                                                                                                 data-bs-toggle="modal"
-                                                                                                data-bs-target="#editBillingAddress{{ subscription.id }}">
+                                                                                                data-bs-target="#editBillingAddress{{ subscription.id }}"
+                                                                                                data-test="btn-subscription-edit-billing-address">
                                                                                             {{ "molliePayments.subscriptions.account.btnEditBillingAddress" | trans | sw_sanitize }}
                                                                                         </button>
                                                                                     {% endif %}
@@ -422,7 +422,8 @@
                                                                                                                         {% block component_address_subscription_billing_address_form_actions_submit %}
                                                                                                                             <button type="submit"
                                                                                                                                     class="address-form-submit btn btn-primary"
-                                                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}">
+                                                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}"
+                                                                                                                                    data-test="btn-subscription-edit-billing-address-save">
                                                                                                                                 {% block component_address_subscription_billing_address_form_actions_submit_text %}
                                                                                                                                     {{ "account.addressSaveChange"|trans|sw_sanitize }}
                                                                                                                                 {% endblock %}
@@ -484,7 +485,8 @@
                                                                                             data-toggle="modal"
                                                                                             data-target="#editShippingAddress{{ subscription.id }}"
                                                                                             data-bs-toggle="modal"
-                                                                                            data-bs-target="#editShippingAddress{{ subscription.id }}">
+                                                                                            data-bs-target="#editShippingAddress{{ subscription.id }}"
+                                                                                            data-test="btn-subscription-edit-shipping-address">
                                                                                         {{ "molliePayments.subscriptions.account.btnEditShippingAddress" | trans | sw_sanitize }}
                                                                                     </button>
                                                                                 {% endif %}
@@ -576,7 +578,8 @@
                                                                                                                         {% block component_address_subscription_shipping_address_form_actions_submit %}
                                                                                                                             <button type="submit"
                                                                                                                                     class="address-form-submit btn btn-primary"
-                                                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}">
+                                                                                                                                    title="{{ "account.addressSaveChange"|trans|striptags }}"
+                                                                                                                                    data-test="btn-subscription-edit-shipping-address-save">
                                                                                                                                 {% block component_address_subscription_shipping_address_form_actions_submit_text %}
                                                                                                                                     {{ "account.addressSaveChange"|trans|sw_sanitize }}
                                                                                                                                 {% endblock %}

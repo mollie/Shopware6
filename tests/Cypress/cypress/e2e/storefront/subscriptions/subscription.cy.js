@@ -33,7 +33,7 @@ const vueJs = new VueJs();
 
 const repoProductDetailsAdmin = new ProductDetailRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
-const repoAdminSubscriptonDetails = new SubscriptionDetailsRepository();
+const repoAdminSubscriptionDetails = new SubscriptionDetailsRepository();
 const repoSubscriptionStorefront = new SubscriptionRepository();
 
 const configAction = new ShopConfigurationAction();
@@ -160,19 +160,19 @@ describe('Subscription', () => {
 
                     buySubscriptionAndOpenAdminDetails();
 
-                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
+                    repoAdminSubscriptionDetails.getStatusField().should('be.visible');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Active');
 
-                    repoAdminSubscriptonDetails.getPauseButton().click();
-                    repoAdminSubscriptonDetails.getConfirmButton().click();
+                    repoAdminSubscriptionDetails.getPauseButton().click();
+                    repoAdminSubscriptionDetails.getConfirmButton().click();
                     cy.wait(2000);
 
-                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Paused');
+                    repoAdminSubscriptionDetails.getStatusField().should('be.visible');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Paused');
 
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'paused', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'paused');
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(0), 'paused', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(0), 'paused');
                 })
 
                 it('C183208: Resume subscription in Administration', () => {
@@ -181,22 +181,22 @@ describe('Subscription', () => {
 
                     buySubscriptionAndOpenAdminDetails();
 
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Active');
 
-                    repoAdminSubscriptonDetails.getPauseButton().click();
-                    repoAdminSubscriptonDetails.getConfirmButton().click();
+                    repoAdminSubscriptionDetails.getPauseButton().click();
+                    repoAdminSubscriptionDetails.getConfirmButton().click();
                     cy.wait(2000);
 
-                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Paused');
+                    repoAdminSubscriptionDetails.getStatusField().should('be.visible');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Paused');
 
-                    repoAdminSubscriptonDetails.getResumeButton().click();
-                    repoAdminSubscriptonDetails.getConfirmButton().click();
+                    repoAdminSubscriptionDetails.getResumeButton().click();
+                    repoAdminSubscriptionDetails.getConfirmButton().click();
                     cy.wait(2000);
 
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'paused', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'resumed', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'resumed');
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'paused', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(0), 'resumed', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(0), 'resumed');
                 })
 
                 it('C183207: Skip subscription in Administration', () => {
@@ -205,18 +205,18 @@ describe('Subscription', () => {
 
                     buySubscriptionAndOpenAdminDetails();
 
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Active');
 
-                    repoAdminSubscriptonDetails.getSkipButton().click();
-                    repoAdminSubscriptonDetails.getConfirmButton().click();
+                    repoAdminSubscriptionDetails.getSkipButton().click();
+                    repoAdminSubscriptionDetails.getConfirmButton().click();
                     cy.wait(2000);
 
-                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Skipped');
+                    repoAdminSubscriptionDetails.getStatusField().should('be.visible');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Skipped');
 
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'skipped', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'skipped');
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(0), 'skipped', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(0), 'skipped');
                 })
 
                 it('C183209: Cancel subscription in Administration', () => {
@@ -225,19 +225,19 @@ describe('Subscription', () => {
 
                     buySubscriptionAndOpenAdminDetails();
 
-                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
+                    repoAdminSubscriptionDetails.getStatusField().should('be.visible');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Active');
 
-                    repoAdminSubscriptonDetails.getCancelButton().click();
-                    repoAdminSubscriptonDetails.getConfirmButton().click();
+                    repoAdminSubscriptionDetails.getCancelButton().click();
+                    repoAdminSubscriptionDetails.getConfirmButton().click();
                     cy.wait(2000);
 
-                    repoAdminSubscriptonDetails.getStatusField().should('be.visible');
-                    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Canceled');
+                    repoAdminSubscriptionDetails.getStatusField().should('be.visible');
+                    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Canceled');
 
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'canceled', {matchCase: false});
-                    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'cancel');
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'active', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(0), 'canceled', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(0), 'cancel');
                 })
             })
 
@@ -377,7 +377,28 @@ describe('Subscription', () => {
                     topMenu.clickAccountWidgetSubscriptions();
 
                     cy.injectAxe();
+
+                    // test initial page
                     cy.checkA11y('.account-content-main');
+
+                    // test billing address modal
+                    repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
+                    repoSubscriptionStorefront.getSubscriptionEditBillingAddressButton(0).click();
+                    cy.checkA11y('.account-content-main');
+
+                    // close our modal
+                    repoSubscriptionStorefront.getSubscriptionEditBillingAddressModalSaveButton(0).click();
+
+                    // the save button leads to a reload
+                    cy.injectAxe();
+
+                    // test shipping address modal
+                    repoSubscriptionStorefront.getSubscriptionViewButton(0).click();
+                    repoSubscriptionStorefront.getSubscriptionEditShippingAddressModal(0).click();
+                    cy.checkA11y('.account-content-main');
+
+                    // close our modal
+                    repoSubscriptionStorefront.getSubscriptionEditShippingAddressModalSaveButton(0).click();
                 });
 
             })
@@ -502,27 +523,27 @@ function assertValidSubscriptionInAdmin() {
 
     // ------------------------------------------------------------------------------------------------------
 
-    repoAdminSubscriptonDetails.getMollieCustomerIdField().should('be.visible');
+    repoAdminSubscriptionDetails.getMollieCustomerIdField().should('be.visible');
 
-    vueJs.textField(repoAdminSubscriptonDetails.getMollieCustomerIdField()).containsValue('cst_');
-    vueJs.textField(repoAdminSubscriptonDetails.getCreatedAtField()).notEmptyValue();
+    vueJs.textField(repoAdminSubscriptionDetails.getMollieCustomerIdField()).containsValue('cst_');
+    vueJs.textField(repoAdminSubscriptionDetails.getCreatedAtField()).notEmptyValue();
 
-    vueJs.textField(repoAdminSubscriptonDetails.getStatusField()).equalsValue('Active');
-    vueJs.textField(repoAdminSubscriptonDetails.getCanceledAtField()).emptyValue();
-    vueJs.textField(repoAdminSubscriptonDetails.getMollieSubscriptionIdField()).containsValue('sub_');
-    vueJs.textField(repoAdminSubscriptonDetails.getMandateField()).containsValue('mdt_');
-    vueJs.textField(repoAdminSubscriptonDetails.getNextPaymentAtField()).notEmptyValue();
-    vueJs.textField(repoAdminSubscriptonDetails.getLastRemindedAtField()).emptyValue();
+    vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Active');
+    vueJs.textField(repoAdminSubscriptionDetails.getCanceledAtField()).emptyValue();
+    vueJs.textField(repoAdminSubscriptionDetails.getMollieSubscriptionIdField()).containsValue('sub_');
+    vueJs.textField(repoAdminSubscriptionDetails.getMandateField()).containsValue('mdt_');
+    vueJs.textField(repoAdminSubscriptionDetails.getNextPaymentAtField()).notEmptyValue();
+    vueJs.textField(repoAdminSubscriptionDetails.getLastRemindedAtField()).emptyValue();
 
     // just do a contains, because card-titles are just different
     // across shopware versions, and in the end, we just need to make sure we see this exact string
     cy.contains("History (2)");
 
     // oldest history entry
-    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(1), 'pending', {matchCase: false});
-    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(1), 'created');
+    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(1), 'pending', {matchCase: false});
+    cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(1), 'created');
     // latest history entry
-    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusFromSelector(0), 'pending', {matchCase: false});
-    cy.contains(repoAdminSubscriptonDetails.getHistoryStatusToSelector(0), 'active', {matchCase: false});
-    cy.contains(repoAdminSubscriptonDetails.getHistoryCommentSelector(0), 'confirmed');
+    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'pending', {matchCase: false});
+    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(0), 'active', {matchCase: false});
+    cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(0), 'confirmed');
 }
