@@ -3,31 +3,31 @@
 }
 
 .order-item-status-badge.order-item-status-badge-active {
-    background-color: #26b6cf;
+    background-color: #0042a0;
     color: #fff;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-canceled {
-    background-color: #ffb100;
+    background-color: #b30000;
     color: #fff;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-paused {
-    background-color: #707070;
+    background-color: #595959;
     color: #fff;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-skipped {
     background-color: #ffb100;
-    color: #fff;
+    color: #000000;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-resumed {
-    background-color: #26b6cf;
+    background-color: #0042a0;
     color: #fff;
     margin: 10px 0;
 }
@@ -79,5 +79,5 @@
 }
 
 .btn-mollie-subscription-cancel {
-    color: #e60909;
+    color: #b30000;
 }
