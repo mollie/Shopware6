@@ -1,11 +1,10 @@
-const path = require('path')
 const {resolve, join} = require('path');
 
 module.exports = {
     mode: 'production',
     entry: './src/custom.js',
     output: {
-        path: path.resolve(__dirname, '..', '..', 'public'),
+        path: resolve(__dirname, '..', '..', 'public'),
         filename: 'mollie-payments.js',
     },
     resolve: {

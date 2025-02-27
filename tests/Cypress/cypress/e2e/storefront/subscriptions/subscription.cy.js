@@ -368,7 +368,6 @@ describe('Subscription', () => {
                 })
 
                 it('C4237799: Accessibility Storefront Account Subscriptions @a11y', () => {
-
                     beforeEach(device);
 
                     buySubscription();
