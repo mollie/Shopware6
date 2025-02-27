@@ -173,6 +173,7 @@ export default class ShopConfigurationAction {
             // ------------------------------------------------------------------
             "MolliePayments.config.subscriptionsEnabled": true,
             "MolliePayments.config.subscriptionsShowIndicator": subscriptionIndicator,
+            "MolliePayments.config.subscriptionsAllowAddressEditing": true,
             "MolliePayments.config.subscriptionsAllowPauseResume": true,
             "MolliePayments.config.subscriptionsAllowSkip": true,
             // ---------------------------------------------------------------
