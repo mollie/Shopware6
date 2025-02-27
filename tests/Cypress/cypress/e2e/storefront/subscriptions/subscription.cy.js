@@ -23,6 +23,7 @@ import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCar
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
 import SubscriptionRepository from "Repositories/storefront/account/SubscriptionRepository";
+import {getMochaContext} from "../../admin/business-events.cy";
 
 
 const devices = new Devices();
@@ -368,7 +369,10 @@ describe('Subscription', () => {
                 })
 
                 it('C4237799: Accessibility Storefront Account Subscriptions @a11y', () => {
-
+                    if (shopware.isVersionLower('6.5.0.0')) {
+                        getMochaContext().skip('6.4 default theme has contrast issues, so we skip the Accessibility test');
+                        return;
+                    }
                     beforeEach(device);
 
                     buySubscription();
