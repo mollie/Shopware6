@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Improve the way how express checkouts (Apple Pay Direct, PayPal Express) backup and restore carts on cancellation.
 - Full refunds do now take already pending (partial) refunds into account. It's now way easier to also refund the rest amount of an order.
 - The Administration and Storefront NPM Dev-Dependencies that we use for testing have been moved to a location that Shopware is not using. This should speed up a lot when you develop a shop where the Mollie plugin is installed. 
+- The subscription page in the account has been updated to comply with WCAG standards.
 
 ### Fixed
 - Fixed an issue with transitions at too early webhook calls from Mollie
@@ -21,7 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix problem where it was possible to get stuck in PayPal Express mode after cancelling the authorization.
 - Fix problems with PayPal Express flows where carts were suddenly missing or not correctly restored.
 - Fix problem in PayPal Express (JavaScript) where the checkout was already initialized before the product was correctly added to the cart.
-- Fix broken display of the "View/Hide" toggle buttons of subscriptions in the account. The buttons are now displayed correctly after collapsing and expanding the subscription details.
 
 ## [4.14.1] - 2025-02-03
 
