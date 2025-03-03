@@ -109,9 +109,14 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
                 $mollieShippingAddress
             );
         }
-
+        $oldToken = $context->getToken();
         # create new account or find existing and login
-        $this->paypalExpress->prepareCustomer($shippingAddress, $context, $acceptedDataProtection, $billingAddress);
+        $context = $this->paypalExpress->prepareCustomer($shippingAddress, $context, $acceptedDataProtection, $billingAddress);
+
+        # read a new card after login
+        if ($context->getToken() !== $oldToken) {
+            $cart = $this->cartService->getCalculatedMainCart($context);
+        }
 
         # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
         $mollieShopwareCart = new MollieShopwareCart($cart);
