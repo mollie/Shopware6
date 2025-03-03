@@ -362,16 +362,21 @@ class Order
         ];
 
         $settings = $this->settingsService->getSettings($order->getSalesChannelId());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId($customer->getId(), $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
+
         # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
         if ($paymentHandler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
             $paymentHandler->setEnableSingleClickPayment(true);
+            if (strlen($mollieCustomerId) > 0) {
+                $newPaymentData['payment']['customerId'] = $mollieCustomerId;
+            }
         }
 
         $lineItems = $order->getLineItems();
 
         if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection) {
             # mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
-            $mollieCustomerId = $this->customerService->getMollieCustomerId($customer->getId(), $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
+
 
             foreach ($lineItems as $lineItem) {
                 $attributes = new OrderLineItemEntityAttributes($lineItem);
