@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix problem where it was possible to get stuck in PayPal Express mode after cancelling the authorization.
 - Fix problems with PayPal Express flows where carts were suddenly missing or not correctly restored.
 - Fix problem in PayPal Express (JavaScript) where the checkout was already initialized before the product was correctly added to the cart.
+- Fixed the issue with saved Credit Card. If you paid first with a different payment method and this payment is failed, the next attempt with Credit Card and saved token failed everytime.
 
 ## [4.14.1] - 2025-02-03
 
