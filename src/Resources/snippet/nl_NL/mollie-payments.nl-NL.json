@@ -119,6 +119,10 @@
                 "information": "Abonnement product"
             }
         },
+        "order": {
+          "refundedLabel": "Terugbetaling:",
+          "refundPendingLabel": "Terugbetaling in afwachting:"
+        },
         "testMode": {
             "label": "testmodus"
         }
