@@ -1,7 +1,7 @@
-import Plugin from '../Plugin';
-import ApplePaySessionFactory from '../services/ApplePaySessionFactory';
-import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
-import BuyElementRepository from '../repository/BuyElementRepository';
+import Plugin from '../plugin';
+import ApplePaySessionFactory from '../services/apple-pay-session-factory';
+import ExpressButtonsRepository from '../repository/express-buttons-repository';
+import BuyElementRepository from '../repository/buy-element-repository';
 import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
 
 export default class MollieApplePayDirect extends Plugin {

@@ -1,7 +1,7 @@
-import Plugin from '../Plugin';
-import { PrivacyNoteElement } from '../repository/PrivacyNoteElement';
-import BuyButtonRepository from '../repository/BuyButtonRepository';
-import ExpressAddToCart from '../services/ExpressAddToCart';
+import Plugin from '../plugin';
+import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
+import BuyButtonRepository from '../repository/buy-button-repository';
+import ExpressAddToCart from '../services/express-add-to-cart';
 
 export const MOLLIE_BIND_EXPRESS_EVENTS = 'BindExpressEvents';
 
@@ -18,7 +18,7 @@ export class MollieExpressActions extends Plugin {
     }
 
     bindEvents() {
-        const privacyNote = new PrivacyNoteElement();
+        const privacyNote = new PrivacyNoteElementRepository();
         privacyNote.observeButtons();
 
         document.addEventListener(MOLLIE_BIND_EXPRESS_EVENTS, (event) => {
@@ -72,7 +72,7 @@ export class MollieExpressActions extends Plugin {
             return;
         }
 
-        const privacyNote = new PrivacyNoteElement();
+        const privacyNote = new PrivacyNoteElementRepository();
 
         const privacyNoteElement = privacyNote.find(target);
 

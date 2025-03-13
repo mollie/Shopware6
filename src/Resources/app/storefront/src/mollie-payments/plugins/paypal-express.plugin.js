@@ -1,6 +1,6 @@
 import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
-import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
-import { PrivacyNoteElement } from '../repository/PrivacyNoteElement';
+import ExpressButtonsRepository from '../repository/express-buttons-repository';
+import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
 import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
 
 export default class PayPalExpressPlugin extends Plugin {
@@ -65,7 +65,7 @@ export default class PayPalExpressPlugin extends Plugin {
         form.setAttribute('action', submitUrl);
         form.setAttribute('method', 'POST');
 
-        const privacyNoteElement = new PrivacyNoteElement();
+        const privacyNoteElement = new PrivacyNoteElementRepository();
         const privacyNote = privacyNoteElement.find(clickedButton);
         if (privacyNote instanceof HTMLDivElement) {
             const checkbox = privacyNoteElement.getCheckbox(privacyNote);
