@@ -71,50 +71,81 @@
 
                         <sw-container columns="1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_description %}
-                                <sw-text-field v-model:value="subscription.description" v-model="subscription.description"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelDescription')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="subscription.description"
+                                        {% else %}
+                                        v-model="subscription.description"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelDescription')"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
 
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_amount %}
-                                <sw-text-field v-model:value="subscription.amount" v-model="subscription.amount"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelAmount')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="subscription.amount"
+                                        {% else %}
+                                        v-model="subscription.amount"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelAmount')"
+                                        disabled="disabled">
                                     <template slot="suffix">
                                         {{ subscription.currency.symbol }}
                                     </template>
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_basic_field_quantity %}
-                                <sw-text-field v-model:value="subscription.quantity" v-model="subscription.quantity"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelQuantity')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="subscription.quantity"
+                                        {% else %}
+                                        v-model="subscription.quantity"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelQuantity')"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_customer_name %}
-                                <sw-text-field v-model:value="customerFullName" v-model="customerFullName"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelShopwareCustomer')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="customerFullName"
+                                        {% else %}
+                                        v-model="customerFullName"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelShopwareCustomer')"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_basic_field_mollie_customer_id %}
-                                <sw-text-field class="cy-subscription-customer-id" v-model:value="subscription.mollieCustomerId" v-model="subscription.mollieCustomerId"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelMollieCustomer')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        class="cy-subscription-customer-id"
+                                        {% if VUE3 %}
+                                        v-model:value="subscription.mollieCustomerId"
+                                        {% else %}
+                                        v-model="subscription.mollieCustomerId"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelMollieCustomer')"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_created_at %}
-                                <sw-text-field v-model:value="formattedCreateAt" v-model="formattedCreateAt"
-                                               class="cy-subscription-formatted-created-at"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelCreatedAt')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="formattedCreateAt"
+                                        {% else %}
+                                        v-model="formattedCreateAt"
+                                        {% endif %}
+                                        class="cy-subscription-formatted-created-at"
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelCreatedAt')"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
@@ -136,47 +167,76 @@
                     <sw-card :title="$tc('mollie-payments.subscriptions.detail.cardTitleStatus')" :hero="false" :isLoading="false" :large="false">
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_status %}
-                                <sw-text-field v-model:value="translatedStatus" v-model="translatedStatus"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelStatus')"
-                                               class="cy-subscription-translated-status"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="translatedStatus"
+                                        {% else %}
+                                        v-model="translatedStatus"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelStatus')"
+                                        class="cy-subscription-translated-status"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_status_field_canceled_at %}
-                                <sw-text-field v-model:value="formattedCanceledAt" v-model="formattedCanceledAt"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelCanceledAt')"
-                                               class="cy-subscription-formatted-canceled-at"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="formattedCanceledAt"
+                                        {% else %}
+                                        v-model="formattedCanceledAt"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelCanceledAt')"
+                                        class="cy-subscription-formatted-canceled-at"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_mollie_id %}
-                                <sw-text-field v-model:value="subscription.mollieId"  v-model="subscription.mollieId"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelMollieSubscription')"
-                                               class="cy-subscription-mollie-id"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="subscription.mollieId"
+                                        {% else %}
+                                        v-model="subscription.mollieId"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelMollieSubscription')"
+                                        class="cy-subscription-mollie-id"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_status_field_mandate_id %}
-                                <sw-text-field v-model:value="subscription.mandateId"  v-model="subscription.mandateId"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelMandateId')"
-                                               class="cy-subscription-mandate-id"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="subscription.mandateId"
+                                        {% else %}
+                                        v-model="subscription.mandateId"
+                                        {% endif %}
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelMandateId')"
+                                        class="cy-subscription-mandate-id"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                         </sw-container>
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_status_field_next_payment_at %}
-                                <sw-text-field v-model:value="formattedNextPaymentAt" v-model="formattedNextPaymentAt"
-                                               class="cy-subscription-formatted-next-payment-at"
-                                               :label="$tc('mollie-payments.subscriptions.detail.labelNextPaymentAt')"
-                                               disabled="disabled">
+                                <sw-text-field
+                                        {% if VUE3 %}
+                                        v-model:value="formattedNextPaymentAt"
+                                        {% else %}
+                                        v-model="formattedNextPaymentAt"
+                                        {% endif %}
+                                        class="cy-subscription-formatted-next-payment-at"
+                                        :label="$tc('mollie-payments.subscriptions.detail.labelNextPaymentAt')"
+                                        disabled="disabled">
                                 </sw-text-field>
                             {% endblock %}
                             {% block sw_order_detail_card_status_field_reminded_at %}
                                 <sw-text-field
-                                        v-model:value="formattedLastRemindedAt" v-model="formattedLastRemindedAt"
+                                        {% if VUE3 %}
+                                        v-model:value="formattedLastRemindedAt"
+                                        {% else %}
+                                        v-model="formattedLastRemindedAt"
+                                        {% endif %}
                                         :label="$tc('mollie-payments.subscriptions.detail.labelLastRemindedAt')"
                                         class="cy-subscription-formatted-last-reminded-at"
                                         disabled="disabled">

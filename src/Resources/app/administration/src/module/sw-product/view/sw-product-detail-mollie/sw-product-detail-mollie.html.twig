@@ -31,19 +31,24 @@
 
                     <sw-inherit-wrapper
                             :label="$tc('mollie-payments.vouchers.VOUCHER_TYPE_CAPTION')"
-                            v-model="product.customFields.mollie_payments_product_voucher_type"
+                            {% if VUE3 %}
                             v-model:value="product.customFields.mollie_payments_product_voucher_type"
+                            {% else %}
+                            v-model="product.customFields.mollie_payments_product_voucher_type"
+                            {% endif %}
                             :has-parent="!!parentProduct.id"
                             :inherited-value="parentProduct.customFields.mollie_payments_product_voucher_type">
                         <template #content="props">
                             <sw-select-field
                                     class="mollie-voucher-type"
-                                    :disabled="props.isInherited"
-                                    :value="props.currentValue"
+                                    {% if VUE3 %}
                                     v-model:value="props.currentValue"
-                                    @change="props.updateCurrentValue"
                                     @update:value="props.updateCurrentValue"
-                            >
+                                    {% else %}
+                                    v-model="props.currentValue"
+                                    @change="props.updateCurrentValue"
+                                    {% endif %}
+                                    :disabled="props.isInherited">
                                 <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
                                     {{ type.name }}
                                 </option>
@@ -96,8 +101,11 @@
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-container columns="1fr" v-if="isDefaultLanguage">
                         <sw-inherit-wrapper
-                                v-model="product.customFields.mollie_payments_product_subscription_enabled"
+                                {% if VUE3 %}
                                 v-model:value="product.customFields.mollie_payments_product_subscription_enabled"
+                                {% else %}
+                                v-model="product.customFields.mollie_payments_product_subscription_enabled"
+                                {% endif %}
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_enabled">
                             <template #content="props">
@@ -105,12 +113,14 @@
                                         :map-inheritance="props"
                                         :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionProduct')"
                                         class="mollie-subscription-enabled"
-                                        :disabled="props.isInherited"
-                                        :value="props.currentValue"
+                                        {% if VUE3 %}
                                         v-model:value="props.currentValue"
-                                        @change="props.updateCurrentValue"
                                         @update:value="props.updateCurrentValue"
-                                >
+                                        {% else %}
+                                        v-model="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        {% endif %}
+                                        :disabled="props.isInherited">
                                 </sw-switch-field>
                             </template>
                         </sw-inherit-wrapper>
@@ -121,37 +131,47 @@
                     <sw-container columns="1fr 1fr" gap="30px">
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalAmount')"
-                                v-model="product.customFields.mollie_payments_product_subscription_interval"
+                                {% if VUE3 %}
                                 v-model:value="product.customFields.mollie_payments_product_subscription_interval"
+                                {% else %}
+                                v-model="product.customFields.mollie_payments_product_subscription_interval"
+                                {% endif %}
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_interval">
                             <template #content="props">
                                 <sw-number-field
                                         numberType="int"
-                                        :disabled="props.isInherited"
-                                        :value="props.currentValue"
+                                        {% if VUE3 %}
                                         v-model:value="props.currentValue"
-                                        @change="props.updateCurrentValue"
                                         @update:value="props.updateCurrentValue"
-                                >
+                                        {% else %}
+                                        v-model="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        {% endif %}
+                                        :disabled="props.isInherited">
                                 </sw-number-field>
                             </template>
                         </sw-inherit-wrapper> 
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalType')"
-                                v-model="product.customFields.mollie_payments_product_subscription_interval_unit"
+                                {% if VUE3 %}
                                 v-model:value="product.customFields.mollie_payments_product_subscription_interval_unit"
+                                {% else %}
+                                v-model="product.customFields.mollie_payments_product_subscription_interval_unit"
+                                {% endif %}
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_interval_unit">
                             <template #content="props">
                                 <sw-single-select
-                                        :options="subscriptionIntervalTypes"
-                                        :disabled="props.isInherited"
-                                        :value="props.currentValue"
+                                        {% if VUE3 %}
                                         v-model:value="props.currentValue"
-                                        @change="props.updateCurrentValue"
                                         @update:value="props.updateCurrentValue"
-                                >
+                                        {% else %}
+                                        v-model="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        {% endif %}
+                                        :options="subscriptionIntervalTypes"
+                                        :disabled="props.isInherited">
                                 </sw-single-select>
                             </template>
                         </sw-inherit-wrapper>
@@ -161,19 +181,25 @@
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-container columns="1fr 1fr" gap="30px">
                         <sw-inherit-wrapper
-                                :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionAmount')"
+                                {% if VUE3 %}
                                 v-model:value="product.customFields.mollie_payments_product_subscription_repetition"
+                                {% else %}
+                                v-model="product.customFields.mollie_payments_product_subscription_repetition"
+                                {% endif %}
+                                :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionAmount')"
                                 :has-parent="!!parentProduct.id"
                                 :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_repetition">
                             <template #content="props">
                                 <sw-text-field
-                                        :placeholder="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionPlaceholder')"
-                                        :disabled="props.isInherited"
-                                        :value="props.currentValue"
+                                        {% if VUE3 %}
                                         v-model:value="props.currentValue"
-                                        @change="props.updateCurrentValue"
                                         @update:value="props.updateCurrentValue"
-                                >
+                                        {% else %}
+                                        v-model="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        {% endif %}
+                                        :placeholder="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionPlaceholder')"
+                                        :disabled="props.isInherited">
                                 </sw-text-field>
                             </template>
                         </sw-inherit-wrapper>
