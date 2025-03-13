@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -35,29 +36,16 @@ class ShippingMethodService
         $this->shippingMethodRoute = $shippingMethodRoute;
     }
 
-    /**
-     * @param string $shippingMethodId
-     * @param SalesChannelContext $salesChannelContext
-     *
-     * @return null|ShippingMethodEntity
-     */
     public function getShippingMethodById(string $shippingMethodId, SalesChannelContext $salesChannelContext): ?ShippingMethodEntity
     {
         $criteria = (new Criteria([$shippingMethodId]))->addAssociation('prices');
 
         $result = $this->shippingMethodRepository->search($criteria, $salesChannelContext->getContext());
 
-        /** @var null|ShippingMethodEntity $element */
-        $element = $result->get($shippingMethodId);
-
-        return $element;
+        /** @var null|ShippingMethodEntity */
+        return $result->get($shippingMethodId);
     }
 
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     *
-     * @return ShippingMethodCollection
-     */
     public function getActiveShippingMethods(SalesChannelContext $salesChannelContext): ShippingMethodCollection
     {
         $request = new Request();
@@ -68,7 +56,8 @@ class ShippingMethodService
             ->addFilter(new EqualsFilter('salesChannels.id', $salesChannelContext->getSalesChannel()->getId()))
             ->addFilter(new EqualsAnyFilter('availabilityRuleId', $salesChannelContext->getRuleIds()))
             ->addAssociation('prices')
-            ->addAssociation('salesChannels');
+            ->addAssociation('salesChannels')
+        ;
 
         return $this->shippingMethodRoute->load($request, $salesChannelContext, $criteria)->getShippingMethods();
     }

@@ -59,7 +59,8 @@ class MollieRefundConfigServiceTest extends TestCase
 
         $lineItem->expects(static::once())
             ->method('hasPendingRefund')
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
 
         $lineItem->expects($this->never())->method('getRefundableQuantity');
         $lineItem->expects($this->never())->method('getRefundedCount');
@@ -81,19 +82,23 @@ class MollieRefundConfigServiceTest extends TestCase
 
         $lineItem->expects(static::once())
             ->method('hasPendingRefund')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $lineItem->expects($this->once())
             ->method('getRefundableQuantity')
-            ->willReturn(1);
+            ->willReturn(1)
+        ;
 
         $lineItem->expects($this->once())
             ->method('getRefundedCount')
-            ->willReturn(6);
+            ->willReturn(6)
+        ;
 
         $lineItem->expects($this->once())
             ->method('getOrderedQuantity')
-            ->willReturn(5);
+            ->willReturn(5)
+        ;
 
         $result = $this->service->createResponse($lineItems, $this->config);
 
@@ -111,19 +116,23 @@ class MollieRefundConfigServiceTest extends TestCase
 
         $lineItem->expects(static::once())
             ->method('hasPendingRefund')
-            ->willReturn(false);
+            ->willReturn(false)
+        ;
 
         $lineItem->expects($this->once())
             ->method('getRefundableQuantity')
-            ->willReturn(0);
+            ->willReturn(0)
+        ;
 
         $lineItem->expects($this->once())
             ->method('getRefundedCount')
-            ->willReturn(5);
+            ->willReturn(5)
+        ;
 
         $lineItem->expects($this->once())
             ->method('getOrderedQuantity')
-            ->willReturn(5);
+            ->willReturn(5)
+        ;
 
         $result = $this->service->createResponse($lineItems, $this->config);
 

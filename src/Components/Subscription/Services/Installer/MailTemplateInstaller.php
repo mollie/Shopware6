@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 
@@ -37,12 +38,6 @@ class MailTemplateInstaller
      */
     private $repoSalesChannels;
 
-    /**
-     * @param Connection $connection
-     * @param EntityRepository $repoMailTypes
-     * @param EntityRepository $repoMailTemplates
-     * @param EntityRepository $repoSalesChannels
-     */
     public function __construct(Connection $connection, EntityRepository $repoMailTypes, EntityRepository $repoMailTemplates, EntityRepository $repoSalesChannels)
     {
         $this->connection = $connection;
@@ -51,30 +46,29 @@ class MailTemplateInstaller
         $this->repoSalesChannels = $repoSalesChannels;
     }
 
-
     /**
      * @throws Exception
      */
     public function install(Context $context): void
     {
-        # create a new mail template type
-        # if it's not already existing
+        // create a new mail template type
+        // if it's not already existing
         $reminderTypeID = $this->getReminderMailTypeID($context);
 
         if (empty($reminderTypeID)) {
             $reminderTypeID = $this->createMailTemplateType($this->connection);
         }
 
-        # only create a template if the merchant
-        # does not already have one
+        // only create a template if the merchant
+        // does not already have one
         $existingMailTemplateID = $this->getReminderTemplateID($reminderTypeID, $context);
 
         if (empty($existingMailTemplateID)) {
             $this->createMailTemplate($this->connection, $reminderTypeID);
         }
 
-        # ----------------------------------------------------------------------------------------------
-        # update our sample data for the admin mail preview
+        // ----------------------------------------------------------------------------------------------
+        // update our sample data for the admin mail preview
 
         $currencyEntity = new CurrencyEntity();
         $currencyEntity->setIsoCode('EUR');
@@ -96,7 +90,6 @@ class MailTemplateInstaller
         $customer->setFirstName('John');
         $customer->setLastName('Doe');
 
-
         $this->repoMailTypes->update(
             [
                 [
@@ -105,18 +98,13 @@ class MailTemplateInstaller
                         'customer' => $customer,
                         'subscription' => $subscription,
                         'salesChannel' => $salesChannel,
-                    ]
-                ]
+                    ],
+                ],
             ],
             $context
         );
     }
 
-
-    /**
-     * @param Context $context
-     * @return string
-     */
     private function getReminderMailTypeID(Context $context): string
     {
         $criteria = new Criteria();
@@ -128,14 +116,9 @@ class MailTemplateInstaller
             return '';
         }
 
-        return (string)$result->firstId();
+        return (string) $result->firstId();
     }
 
-    /**
-     * @param string $typeID
-     * @param Context $context
-     * @return string
-     */
     private function getReminderTemplateID(string $typeID, Context $context): string
     {
         $criteria = new Criteria();
@@ -147,13 +130,11 @@ class MailTemplateInstaller
             return '';
         }
 
-        return (string)$result->firstId();
+        return (string) $result->firstId();
     }
 
     /**
-     * @param Connection $connection
      * @throws Exception
-     * @return string
      */
     private function createMailTemplateType(Connection $connection): string
     {
@@ -167,7 +148,7 @@ class MailTemplateInstaller
         $enLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
         $deLangId = $this->getLanguageIdByLocale($connection, 'de-DE');
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         $connection->insert('mail_template_type', [
             'id' => Uuid::fromHexToBytes($mailTemplateTypeId),
@@ -175,15 +156,15 @@ class MailTemplateInstaller
             'available_entities' => json_encode([
                 'customer' => 'customer',
                 'subscription' => 'mollie_subscription',
-                'salesChannel' => 'sales_channel'
+                'salesChannel' => 'sales_channel',
             ]),
             'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
         ]);
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         // If we have an english language ID then insert the english translation
-        if (!empty($enLangId)) {
+        if (! empty($enLangId)) {
             $connection->insert('mail_template_type_translation', [
                 'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
                 'language_id' => $enLangId,
@@ -193,7 +174,7 @@ class MailTemplateInstaller
         }
 
         // If we have a german language ID then insert the german translation
-        if (!empty($deLangId)) {
+        if (! empty($deLangId)) {
             $connection->insert('mail_template_type_translation', [
                 'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
                 'language_id' => $deLangId,
@@ -203,7 +184,7 @@ class MailTemplateInstaller
         }
 
         // If the system default language is not english OR german, insert the english translation for it
-        if (!in_array(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM), [$enLangId, $deLangId])) {
+        if (! in_array(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM), [$enLangId, $deLangId])) {
             $connection->insert('mail_template_type_translation', [
                 'mail_template_type_id' => Uuid::fromHexToBytes($mailTemplateTypeId),
                 'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
@@ -216,10 +197,7 @@ class MailTemplateInstaller
     }
 
     /**
-     * @param Connection $connection
-     * @param string $mailTemplateTypeId
      * @throws Exception
-     * @return void
      */
     private function createMailTemplate(Connection $connection, string $mailTemplateTypeId): void
     {
@@ -237,12 +215,12 @@ class MailTemplateInstaller
         $contentHtmlDE = file_get_contents(__DIR__ . '/Mails/RenewalReminder/de.html');
         $contentPlainDE = file_get_contents(__DIR__ . '/Mails/RenewalReminder/de.txt');
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         $enLangId = $this->getLanguageIdByLocale($connection, 'en-GB');
         $deLangId = $this->getLanguageIdByLocale($connection, 'de-DE');
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         $connection->insert('mail_template', [
             'id' => Uuid::fromHexToBytes($mailTemplateId),
@@ -251,10 +229,10 @@ class MailTemplateInstaller
             'created_at' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
         ]);
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         // If we have an english language ID then insert the english translation
-        if (!empty($enLangId)) {
+        if (! empty($enLangId)) {
             $connection->insert('mail_template_translation', [
                 'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
                 'language_id' => $enLangId,
@@ -267,10 +245,10 @@ class MailTemplateInstaller
             ]);
         }
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         // If we have a german language ID then insert the german translation
-        if (!empty($deLangId)) {
+        if (! empty($deLangId)) {
             $connection->insert('mail_template_translation', [
                 'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
                 'language_id' => $deLangId,
@@ -283,10 +261,10 @@ class MailTemplateInstaller
             ]);
         }
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         // If the system default language is not english OR german, insert the english translation for it
-        if (!in_array(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM), [$enLangId, $deLangId])) {
+        if (! in_array(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM), [$enLangId, $deLangId])) {
             $connection->insert('mail_template_translation', [
                 'mail_template_id' => Uuid::fromHexToBytes($mailTemplateId),
                 'language_id' => Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM),
@@ -301,26 +279,23 @@ class MailTemplateInstaller
     }
 
     /**
-     * @param Connection $connection
-     * @param string $locale
      * @throws Exception
-     * @return null|string
      */
     private function getLanguageIdByLocale(Connection $connection, string $locale): ?string
     {
-        $sql = "
+        $sql = '
                 SELECT `language`.`id`
                 FROM `language`
                 INNER JOIN `locale` ON `locale`.`id` = `language`.`locale_id`
                 WHERE `locale`.`code` = :code
-                ";
+                ';
 
         $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchOne();
 
-        if (!$languageId) {
+        if (! $languageId) {
             return null;
         }
 
-        return (string)$languageId;
+        return (string) $languageId;
     }
 }

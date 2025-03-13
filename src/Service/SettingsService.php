@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -11,6 +12,10 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 class SettingsService implements PluginSettingsServiceInterface
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
+    const LIVE_API_KEY = 'liveApiKey';
+    const TEST_API_KEY = 'testApiKey';
+    const LIVE_PROFILE_ID = 'liveProfileId';
+    const TEST_PROFILE_ID = 'testProfileId';
     private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
     private const SYSTEM_CORE_CART_CONFIG_DOMAIN = 'core.cart';
 
@@ -21,10 +26,6 @@ class SettingsService implements PluginSettingsServiceInterface
     private const REQUIRE_DATA_PROTECTION = 'requireDataProtectionCheckbox';
 
     private const PAYMENT_FINALIZE_TRANSACTION_TIME = 'paymentFinalizeTransactionTime';
-    const LIVE_API_KEY = 'liveApiKey';
-    const TEST_API_KEY = 'testApiKey';
-    const LIVE_PROFILE_ID = 'liveProfileId';
-    const TEST_PROFILE_ID = 'testProfileId';
 
     /**
      * @var SystemConfigService
@@ -32,7 +33,6 @@ class SettingsService implements PluginSettingsServiceInterface
     protected $systemConfigService;
 
     /**
-     *
      * @var EntityRepository
      */
     private $repoSalesChannels;
@@ -59,8 +59,6 @@ class SettingsService implements PluginSettingsServiceInterface
     private array $cachedStructs = [];
 
     /**
-     * @param SystemConfigService $systemConfigService
-     * @param EntityRepository $repoSalesChannels
      * @param ?string $envShopDomain
      * @param ?string $envDevMode
      * @param ?string $envCypressMode
@@ -70,17 +68,14 @@ class SettingsService implements PluginSettingsServiceInterface
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
 
-        $this->envShopDomain = (string)$envShopDomain;
-        $this->envDevMode = (string)$envDevMode;
-        $this->envCypressMode = (string)$envCypressMode;
+        $this->envShopDomain = (string) $envShopDomain;
+        $this->envDevMode = (string) $envDevMode;
+        $this->envCypressMode = (string) $envCypressMode;
         $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
     /**
      * Get Mollie settings from configuration.
-     *
-     * @param null|string $salesChannelId
-     * @return MollieSettingStruct
      */
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
@@ -111,19 +106,16 @@ class SettingsService implements PluginSettingsServiceInterface
             $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
         }
 
-
         /** @var array<mixed> $cartSettings */
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
         if (is_array($cartSettings) && count($cartSettings) > 0) {
             $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
         }
 
-
         /**
          * TODO: remove this when we move to config
          */
         $structData = $this->payPalExpressConfig->assign($structData);
-
 
         $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
 
@@ -134,7 +126,6 @@ class SettingsService implements PluginSettingsServiceInterface
      * Gets all configurations of all sales channels.
      * Every sales channel will be a separate entry in the array.
      *
-     * @param Context $context
      * @return array<string, MollieSettingStruct>
      */
     public function getAllSalesChannelSettings(Context $context): array
@@ -145,37 +136,25 @@ class SettingsService implements PluginSettingsServiceInterface
         $resultIDs = $this->repoSalesChannels->searchIds(new Criteria(), $context)->getIds();
 
         foreach ($resultIDs as $scID) {
-            $allConfigs[(string)$scID] = $this->getSettings((string)$scID);
+            $allConfigs[(string) $scID] = $this->getSettings((string) $scID);
         }
 
         return $allConfigs;
     }
 
-
     /**
-     * @param string $key
      * @param mixed $value
-     * @param null|string $salesChannelId
      */
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
         $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value, $salesChannelId);
     }
 
-    /**
-     * @param string $key
-     * @param null|string $salesChannelId
-     */
     public function delete(string $key, ?string $salesChannelId = null): void
     {
         $this->systemConfigService->delete(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $salesChannelId);
     }
 
-    /**
-     * @param null|string $profileId
-     * @param null|string $salesChannelId
-     * @param bool $testMode
-     */
     public function setProfileId(?string $profileId, ?string $salesChannelId = null, bool $testMode = false): void
     {
         $key = $testMode ? self::TEST_PROFILE_ID : self::LIVE_PROFILE_ID;
@@ -192,7 +171,6 @@ class SettingsService implements PluginSettingsServiceInterface
      * This can be used for local NGROK approaches, or also
      * if you want to use a dedicated domain as the webhook endpoint
      * for your Mollie payments.
-     * @return string
      */
     public function getEnvMollieShopDomain(): string
     {
@@ -203,20 +181,18 @@ class SettingsService implements PluginSettingsServiceInterface
      * This turns on the DEV mode in the plugin.
      * We try to always implement things as close to production as possible,
      * but sometimes we need a DEV mode ;).
-     * @return bool
      */
     public function getEnvMollieDevMode(): bool
     {
         $devMode = trim($this->envDevMode);
-        return ($devMode === '1');
+
+        return $devMode === '1';
     }
 
-    /**
-     * @return bool
-     */
     public function getMollieCypressMode(): bool
     {
         $devMode = trim($this->envCypressMode);
-        return ($devMode === '1');
+
+        return $devMode === '1';
     }
 }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Order;
 
@@ -18,10 +19,6 @@ class UpdateOrderLineItems
      */
     private $orderLineRepository;
 
-
-    /**
-     * @param EntityRepository $orderLineRepository
-     */
     public function __construct(EntityRepository $orderLineRepository)
     {
         $this->orderLineRepository = $orderLineRepository;
@@ -29,8 +26,6 @@ class UpdateOrderLineItems
 
     /**
      * @param OrderLine[] $orderLines
-     * @param SalesChannelContext $salesChannelContext
-     * @return void
      */
     public function updateOrderLineItems(array $orderLines, OrderLineItemCollection $shopwareOrderLines, SalesChannelContext $salesChannelContext): void
     {
@@ -40,7 +35,7 @@ class UpdateOrderLineItems
                 continue;
             }
 
-            $shopwareLineItemId = (string)$orderLine->metadata->orderLineItemId;
+            $shopwareLineItemId = (string) $orderLine->metadata->orderLineItemId;
 
             if (empty($shopwareLineItemId)) {
                 continue;
@@ -51,14 +46,14 @@ class UpdateOrderLineItems
                 continue;
             }
 
-            ## we need some customfields for later when we edit an order, for example subscription information
+            //# we need some customFields for later when we edit an order, for example subscription information
             $originalCustomFields = $shopwareLine->getPayload()['customFields'] ?? [];
             $originalCustomFields['order_line_id'] = $orderLine->id;
 
             $updateLines[] = [
                 'id' => $shopwareLine->getId(),
                 'customFields' => [
-                    CustomFieldsInterface::MOLLIE_KEY => $originalCustomFields
+                    CustomFieldsInterface::MOLLIE_KEY => $originalCustomFields,
                 ],
             ];
         }

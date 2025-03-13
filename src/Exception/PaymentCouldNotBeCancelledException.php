@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -8,9 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class PaymentCouldNotBeCancelledException extends ShopwareHttpException
 {
     /**
-     * @param string $molliePaymentId
      * @param array<string,mixed> $parameters
-     * @param null|\Throwable $previous
      */
     public function __construct(string $molliePaymentId, array $parameters = [], \Throwable $previous = null)
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\MollieAvailability\Service;
 
@@ -25,16 +26,6 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
      */
     private $paymentMethodsProvider;
 
-
-    /**
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
-     * @param ActivePaymentMethodsProviderInterface $paymentMethodsProvider
-     * @param OrderItemsExtractor $orderDataExtractor
-     * @param LoggerInterface $logger
-     */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, ActivePaymentMethodsProviderInterface $paymentMethodsProvider, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
@@ -43,22 +34,19 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
     }
 
     /**
-     * @param PaymentMethodRouteResponse $originalData
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
         $settings = $this->settingsService->getSettings($context->getSalesChannelId());
 
-        # if we do not use the limits
-        # then just return everything
-        if (!$settings->getUseMolliePaymentMethodLimits()) {
+        // if we do not use the limits
+        // then just return everything
+        if (! $settings->getUseMolliePaymentMethodLimits()) {
             return $originalData;
         }
 
-        if (!$this->isAllowedRoute()) {
+        if (! $this->isAllowedRoute()) {
             return $originalData;
         }
         $billingAddress = null;
@@ -71,6 +59,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);
+
                 return $originalData;
             }
 
@@ -81,7 +70,6 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
             }
         }
 
-
         if ($this->isOrderRoute()) {
             try {
                 $order = $this->getOrder($context->getContext());
@@ -89,6 +77,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);
+
                 return $originalData;
             }
 
@@ -97,7 +86,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
             $billingAddress = $order->getBillingAddress();
         }
 
-        if (!isset($price)) {
+        if (! isset($price)) {
             return $originalData;
         }
 
@@ -107,8 +96,6 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
                 $countryIsoCode = $billingCountry->getIso();
             }
         }
-
-
 
         $availableMolliePayments = $this->paymentMethodsProvider->getActivePaymentMethodsForAmount(
             $price,
@@ -123,26 +110,26 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
         foreach ($originalData->getPaymentMethods() as $paymentMethod) {
             $mollieAttributes = new PaymentMethodAttributes($paymentMethod);
 
-            # check if we have even a mollie payment
-            # if not, then always keep that payment method
-            if (!$mollieAttributes->isMolliePayment()) {
+            // check if we have even a mollie payment
+            // if not, then always keep that payment method
+            if (! $mollieAttributes->isMolliePayment()) {
                 continue;
             }
 
             $found = false;
 
-            # now search if we still have it, otherwise just remove it
+            // now search if we still have it, otherwise just remove it
             /** @var Method $mollieMethod */
             foreach ($availableMolliePayments as $mollieMethod) {
-                # if we have found it in the list of available mollie methods
-                # then just keep it
-                if ($mollieMethod->id == $mollieAttributes->getMollieIdentifier()) {
+                // if we have found it in the list of available mollie methods
+                // then just keep it
+                if ($mollieMethod->id === $mollieAttributes->getMollieIdentifier()) {
                     $found = true;
                     break;
                 }
             }
 
-            if (!$found) {
+            if (! $found) {
                 $originalData->getPaymentMethods()->remove($paymentMethod->getId());
             }
         }

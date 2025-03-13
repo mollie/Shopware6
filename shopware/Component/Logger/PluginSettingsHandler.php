@@ -22,11 +22,7 @@ final class PluginSettingsHandler extends AbstractHandler
     private AbstractSettingsService $settingsService;
 
     /**
-     * @param AbstractSettingsService $settingsService
-     * @param Connection $connection
-     * @param string $filePath
      * @param int|Level|string $level
-     * @param bool $bubble
      */
     public function __construct(AbstractSettingsService $settingsService, Connection $connection, string $filePath, bool $bubble = true)
     {
@@ -38,8 +34,8 @@ final class PluginSettingsHandler extends AbstractHandler
 
     /**
      * We need to define types here because shopware 6.4 uses old monologger where LogRecord does not exists.
+     *
      * @param array|LogRecord $record
-     * @return bool
      */
     public function handle($record): bool
     {
@@ -51,7 +47,6 @@ final class PluginSettingsHandler extends AbstractHandler
         if ($channel !== self::LOG_CHANNEL) {
             return false;
         }
-
 
         if ($this->fileHandler === null) {
             $this->fileHandler = $this->initializeHandler();
@@ -69,6 +64,7 @@ final class PluginSettingsHandler extends AbstractHandler
         }
 
         $this->connectedCache = $this->connection->isConnected();
+
         return $this->connectedCache;
     }
 
@@ -78,6 +74,7 @@ final class PluginSettingsHandler extends AbstractHandler
 
         $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : LogLevel::INFO;
         $maxFiles = $loggerSettings->getLogFileDays();
+
         return new RotatingFileHandler($this->filePath, $maxFiles, $logLevel);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Refund\Mollie;
 
@@ -6,7 +7,6 @@ use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 
 class RefundMetadata
 {
-
     /**
      * @var string
      */
@@ -17,9 +17,7 @@ class RefundMetadata
      */
     private $items;
 
-
     /**
-     * @param string $type
      * @param RefundItem[] $items
      */
     public function __construct(string $type, array $items)
@@ -28,13 +26,9 @@ class RefundMetadata
         $this->items = $items;
     }
 
-    /**
-     * @param \stdClass $metadata
-     * @return RefundMetadata
-     */
     public static function fromArray(\stdClass $metadata): RefundMetadata
     {
-        $type = (string)$metadata->type;
+        $type = (string) $metadata->type;
         $composition = property_exists($metadata, 'composition') ? $metadata->composition : [];
 
         $items = [];
@@ -42,7 +36,7 @@ class RefundMetadata
         foreach ($composition as $compItem) {
             $items[] = new RefundItem(
                 $compItem['mollieLineId'],
-                (string)$compItem['swReference'],
+                (string) $compItem['swReference'],
                 $compItem['quantity'],
                 $compItem['amount'],
                 $compItem['swLineId'],
@@ -53,9 +47,6 @@ class RefundMetadata
         return new RefundMetadata($type, $items);
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
@@ -71,8 +62,6 @@ class RefundMetadata
 
     /**
      * Used as storage payload inside the Mollie API database.
-     *
-     * @return string
      */
     public function toMolliePayload(): string
     {
@@ -80,6 +69,6 @@ class RefundMetadata
             'type' => $this->type,
         ];
 
-        return (string)json_encode($data);
+        return (string) json_encode($data);
     }
 }

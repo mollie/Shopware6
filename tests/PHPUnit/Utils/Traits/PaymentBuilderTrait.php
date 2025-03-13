@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Utils\Traits;
 
@@ -25,8 +26,6 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 trait PaymentBuilderTrait
 {
     /**
-     * @param CustomerAddressEntity $address
-     * @param string $email
      * @return array<string,mixed>
      */
     public function getExpectedTestAddress(CustomerAddressEntity $address, string $email): array
@@ -58,21 +57,10 @@ trait PaymentBuilderTrait
         return $this->getCustomerAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
     }
 
-    private function getDummyCustomer(CustomerAddressEntity $billing, CustomerAddressEntity $shipping, string $email): CustomerEntity
-    {
-        $customer = new CustomerEntity();
-        $customer->setId(Uuid::randomHex());
-        $customer->setDefaultBillingAddress($billing);
-        $customer->setDefaultShippingAddress($shipping);
-        $customer->setEmail($email);
-
-        return $customer;
-    }
-
     /**
-     * @param string $taxStatus
      * @param null|OrderLineItemCollection $lineItems
      * @param null|CurrencyEntity $currency
+     *
      * @return array<string,mixed>
      */
     public function getExpectedLineItems(string $taxStatus, OrderLineItemCollection $lineItems, CurrencyEntity $currency): array
@@ -163,14 +151,6 @@ trait PaymentBuilderTrait
         return new OrderLineItemCollection([$lineItemOne, $lineItemTwo]);
     }
 
-    /**
-     * @param float $amountTotal
-     * @param string $taxStatus
-     * @param string $currencyISO
-     * @param OrderLineItemCollection $lineItems
-     * @param string $orderNumber
-     * @return OrderEntity
-     */
     public function getOrderEntity(float $amountTotal, string $taxStatus, string $currencyISO, OrderLineItemCollection $lineItems, string $orderNumber): OrderEntity
     {
         $currency = new CurrencyEntity();
@@ -189,5 +169,16 @@ trait PaymentBuilderTrait
         $order->setSalesChannelId(Uuid::randomHex());
 
         return $order;
+    }
+
+    private function getDummyCustomer(CustomerAddressEntity $billing, CustomerAddressEntity $shipping, string $email): CustomerEntity
+    {
+        $customer = new CustomerEntity();
+        $customer->setId(Uuid::randomHex());
+        $customer->setDefaultBillingAddress($billing);
+        $customer->setDefaultShippingAddress($shipping);
+        $customer->setEmail($email);
+
+        return $customer;
     }
 }

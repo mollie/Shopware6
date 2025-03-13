@@ -12,17 +12,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class CustomerExtension extends EntityExtension
 {
-    /**
-     * @return string
-     */
     public function getDefinitionClass(): string
     {
         return CustomerDefinition::class;
     }
 
-    /**
-     * @param FieldCollection $collection
-     */
     public function extendFields(FieldCollection $collection): void
     {
         $collection->add((new OneToManyAssociationField('subscriptions', SubscriptionDefinition::class, 'customer_id'))->addFlags(new CascadeDelete()));

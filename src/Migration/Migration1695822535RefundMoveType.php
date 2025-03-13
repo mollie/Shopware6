@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
@@ -7,19 +8,13 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1695822535RefundMoveType extends MigrationStep
 {
-
-    /**
-     * @return int
-     */
     public function getCreationTimestamp(): int
     {
         return 1695822535;
     }
 
     /**
-     * @param Connection $connection
      * @throws \Doctrine\DBAL\Exception
-     * @return void
      */
     public function update(Connection $connection): void
     {
@@ -36,10 +31,6 @@ class Migration1695822535RefundMoveType extends MigrationStep
         $utils->deleteColumn('mollie_refund_item', 'type');
     }
 
-    /**
-     * @param Connection $connection
-     * @return void
-     */
     public function updateDestructive(Connection $connection): void
     {
         // implement update destructive

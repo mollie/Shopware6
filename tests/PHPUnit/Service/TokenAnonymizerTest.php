@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service;
 
@@ -18,8 +19,6 @@ class TokenAnonymizerTest extends TestCase
     /**
      * function tests that token is anoymized as expected
      *
-     * @param string $expected
-     * @param string $token
      * @dataProvider getTestData
      */
     public function testAnonymize(string $expected, string $token): void
@@ -35,7 +34,7 @@ class TokenAnonymizerTest extends TestCase
             'test that empty string returns empty string' => ['', '   '],
             'anonymize short min char token' => ['t****', 't'],
             'anonymize short char token' => ['t****', 'tes'],
-            'anonymize standard way' => ['ord****obar', 'ord_foobar']
+            'anonymize standard way' => ['ord****obar', 'ord_foobar'],
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Fixer;
 
@@ -12,14 +13,6 @@ class RoundingDifferenceFixer
     public const DEFAULT_TITLE = 'Automatic Rounding Difference';
     private const DEFAULT_SKU = '';
 
-
-    /**
-     * @param float $orderTotal
-     * @param MollieLineItemCollection $lineItems
-     * @param string $title
-     * @param string $sku
-     * @return MollieLineItemCollection
-     */
     public function fixAmountDiff(float $orderTotal, MollieLineItemCollection $lineItems, string $title, string $sku): MollieLineItemCollection
     {
         $sumLines = 0;
@@ -28,9 +21,9 @@ class RoundingDifferenceFixer
             $sumLines += $lineItem->getPrice()->getTotalAmount();
         }
 
-        # our good old diff problem with floating points :)
-        # to avoid that 0.01 is 0.009999999998,
-        # we multiply with a high number and divide again
+        // our good old diff problem with floating points :)
+        // to avoid that 0.01 is 0.009999999998,
+        // we multiply with a high number and divide again
         $diff = ($orderTotal * 10000) - ($sumLines * 10000);
         $diff = $diff / 10000;
 
@@ -45,8 +38,8 @@ class RoundingDifferenceFixer
                 0
             );
 
-            $name = (!empty($title)) ? $title : self::DEFAULT_TITLE;
-            $sku = (!empty($sku)) ? $sku : self::DEFAULT_SKU;
+            $name = (! empty($title)) ? $title : self::DEFAULT_TITLE;
+            $sku = (! empty($sku)) ? $sku : self::DEFAULT_SKU;
 
             $mollieLineItem = new MollieLineItem(
                 OrderLineType::TYPE_PHYSICAL,
@@ -59,7 +52,7 @@ class RoundingDifferenceFixer
                 ''
             );
 
-            # we need this for further (technical) identification later on (e.g. in refund manager)
+            // we need this for further (technical) identification later on (e.g. in refund manager)
             $mollieLineItem->addMetaData('type', 'rounding');
 
             $lineItems->add($mollieLineItem);

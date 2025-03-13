@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -18,9 +19,7 @@ class ApiKeyValidator
     }
 
     /**
-     * @param string $key
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return bool
      */
     public function validate(string $key): bool
     {
@@ -29,10 +28,10 @@ class ApiKeyValidator
         /** @var Profile $profile */
         $profile = $apiClient->profiles->getCurrent();
 
-        if (!$profile instanceof Profile) {
+        if (! $profile instanceof Profile) {
             return false;
         }
 
-        return !empty($profile->id);
+        return ! empty($profile->id);
     }
 }

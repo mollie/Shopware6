@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory;
 
@@ -16,26 +17,15 @@ class SubscriptionHistoryHandler
      */
     private $repoSubscriptions;
 
-
-    /**
-     * @param SubscriptionRepository $repoSubscriptions
-     */
     public function __construct(SubscriptionRepository $repoSubscriptions)
     {
         $this->repoSubscriptions = $repoSubscriptions;
     }
 
-
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $initialStatus
-     * @param Context $context
-     * @return void
-     */
     public function markCreated(SubscriptionEntity $subscription, string $initialStatus, Context $context): void
     {
-        # if it's the first one, then we have to add the
-        # history for backward compatibility (in new versions it should be added immediately
+        // if it's the first one, then we have to add the
+        // history for backward compatibility (in new versions it should be added immediately
         /** @var DateTime $date */
         $date = $subscription->getCreatedAt();
 
@@ -44,13 +34,6 @@ class SubscriptionHistoryHandler
         $this->addHistory($date, $subscription, $comment, '', $initialStatus, '', $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $oldStatus
-     * @param string $newStatus
-     * @param Context $context
-     * @return void
-     */
     public function markConfirmed(SubscriptionEntity $subscription, string $oldStatus, string $newStatus, Context $context): void
     {
         $comment = 'confirmed';
@@ -58,11 +41,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, $oldStatus, $newStatus, $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
-     * @return void
-     */
     public function markBillingUpdated(SubscriptionEntity $subscription, Context $context): void
     {
         $comment = 'billing address updated';
@@ -70,11 +48,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, '', '', $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
-     * @return void
-     */
     public function markShipping(SubscriptionEntity $subscription, Context $context): void
     {
         $comment = 'shipping address updated';
@@ -82,11 +55,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, '', '', $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
-     * @return void
-     */
     public function markReminded(SubscriptionEntity $subscription, Context $context): void
     {
         $comment = 'reminded about renewal';
@@ -94,11 +62,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, '', '', $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
-     * @return void
-     */
     public function markRenewed(SubscriptionEntity $subscription, Context $context): void
     {
         $comment = 'renewed';
@@ -106,12 +69,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, '', '', $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $mandateId
-     * @param Context $context
-     * @return void
-     */
     public function markPaymentUpdated(SubscriptionEntity $subscription, string $mandateId, Context $context): void
     {
         $comment = 'payment method updated to ' . $mandateId;
@@ -119,13 +76,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, '', '', $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $oldStatus
-     * @param string $newStatus
-     * @param Context $context
-     * @return void
-     */
     public function markPaused(SubscriptionEntity $subscription, string $oldStatus, string $newStatus, Context $context): void
     {
         $comment = 'paused';
@@ -133,13 +83,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, $oldStatus, $newStatus, $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $oldStatus
-     * @param string $newStatus
-     * @param Context $context
-     * @return void
-     */
     public function markResumed(SubscriptionEntity $subscription, string $oldStatus, string $newStatus, Context $context): void
     {
         $comment = 'resumed';
@@ -147,13 +90,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, $oldStatus, $newStatus, $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $oldStatus
-     * @param string $newStatus
-     * @param Context $context
-     * @return void
-     */
     public function markSkipped(SubscriptionEntity $subscription, string $oldStatus, string $newStatus, Context $context): void
     {
         $comment = 'skipped';
@@ -161,13 +97,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, $oldStatus, $newStatus, $subscription->getMollieId(), $context);
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param string $oldStatus
-     * @param string $newStatus
-     * @param Context $context
-     * @return void
-     */
     public function markCanceled(SubscriptionEntity $subscription, string $oldStatus, string $newStatus, Context $context): void
     {
         $comment = 'canceled';
@@ -175,17 +104,6 @@ class SubscriptionHistoryHandler
         $this->addHistory(new DateTime(), $subscription, $comment, $oldStatus, $newStatus, $subscription->getMollieId(), $context);
     }
 
-
-    /**
-     * @param \DateTimeInterface $date
-     * @param SubscriptionEntity $subscription
-     * @param string $comment
-     * @param string $oldStatus
-     * @param string $newStatus
-     * @param string $mollieSubId
-     * @param Context $context
-     * @return void
-     */
     private function addHistory(\DateTimeInterface $date, SubscriptionEntity $subscription, string $comment, string $oldStatus, string $newStatus, string $mollieSubId, Context $context): void
     {
         $history = new SubscriptionHistoryEntity();

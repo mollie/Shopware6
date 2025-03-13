@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
@@ -8,22 +9,18 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1652444730SubscriptionAddresses extends MigrationStep
 {
-    /**
-     * @return int
-     */
     public function getCreationTimestamp(): int
     {
         return 1652444730;
     }
 
     /**
-     * @param Connection $connection
      * @throws \Doctrine\DBAL\Exception
      */
     public function update(Connection $connection): void
     {
         $connection->exec(
-            "CREATE TABLE IF NOT EXISTS mollie_subscription_address (
+            'CREATE TABLE IF NOT EXISTS mollie_subscription_address (
                       `id` binary(16) NOT NULL,
                       `subscription_id` binary(16) NOT NULL,
                       `salutation_id` binary(16) DEFAULT NULL,
@@ -45,9 +42,8 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
                       `updated_at` datetime(3) DEFAULT NULL,
                       PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                "
+                '
         );
-
 
         $this->createColumn('mollie_subscription', 'billing_address_id', 'binary(16)', $connection);
         $this->createColumn('mollie_subscription', 'shipping_address_id', 'binary(16)', $connection);
@@ -59,38 +55,25 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
         $this->buildIndex('mollie_subscription_address', 'idx.mollie_subscription_address.subscription_id', 'subscription_id', $connection);
     }
 
-    /**
-     * @param Connection $connection
-     */
     public function updateDestructive(Connection $connection): void
     {
         // implement update destructive
     }
 
     /**
-     * @param string $table
-     * @param string $column
-     * @param string $type
-     * @param Connection $connection
      * @throws Exception
-     * @return void
      */
     private function createColumn(string $table, string $column, string $type, Connection $connection): void
     {
-        $colQuery = $connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetch();
+        $colQuery = $connection->executeQuery('SHOW COLUMNS FROM ' . $table . " LIKE '" . $column . "'")->fetch();
 
         if ($colQuery === false) {
-            $connection->exec("ALTER TABLE " . $table . " ADD " . $column . " " . $type);
+            $connection->exec('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . $type);
         }
     }
 
     /**
-     * @param string $table
-     * @param string $indexName
-     * @param string $targetField
-     * @param Connection $connection
      * @throws Exception
-     * @return void
      */
     private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
     {
@@ -100,10 +83,10 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
             WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
         ")->fetch();
 
-        $isExisting = ((int)$indexExistsCheck['indexIsThere'] === 1);
+        $isExisting = ((int) $indexExistsCheck['indexIsThere'] === 1);
 
-        if (!$isExisting) {
-            $connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
+        if (! $isExisting) {
+            $connection->exec('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
         }
     }
 }

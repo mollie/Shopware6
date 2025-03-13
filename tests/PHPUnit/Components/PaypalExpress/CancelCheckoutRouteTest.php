@@ -33,7 +33,6 @@ class CancelCheckoutRouteTest extends TestCase
 
         $route = new CancelCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
-
         try {
             $route->cancelCheckout($this->getContext());
         } catch (HttpException $e) {
@@ -63,7 +62,6 @@ class CancelCheckoutRouteTest extends TestCase
         $paypalExpress = $this->getPaypalExpress();
 
         $route = new CancelCheckoutRoute($settingsService, $cartService, $paypalExpress);
-
 
         $response = $route->cancelCheckout($this->getContext());
         $this->assertNotNull($response->getSessionId());

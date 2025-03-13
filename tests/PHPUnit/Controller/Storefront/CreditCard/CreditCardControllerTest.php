@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CreditCardControllerTest extends TestCase
 {
-    public function testResponseNotSuccessWithoutCustomer():void
+    public function testResponseNotSuccessWithoutCustomer(): void
     {
         $customerService = new FakeCustomerService();
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
@@ -25,13 +25,13 @@ final class CreditCardControllerTest extends TestCase
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
-            'result' => null
+            'result' => null,
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseNotSuccessWithErrors():void
+    public function testResponseNotSuccessWithErrors(): void
     {
         $customerService = new FakeCustomerService();
 
@@ -46,13 +46,13 @@ final class CreditCardControllerTest extends TestCase
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
-            'result' => ['test error']
+            'result' => ['test error'],
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseSuccess():void
+    public function testResponseSuccess(): void
     {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();
@@ -65,13 +65,13 @@ final class CreditCardControllerTest extends TestCase
         $expected = new JsonResponse([
             'success' => true,
             'customerId' => 'test',
-            'result' => []
+            'result' => [],
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseNotSuccessWithoutCustomerStoreMandateId():void
+    public function testResponseNotSuccessWithoutCustomerStoreMandateId(): void
     {
         $customerService = new FakeCustomerService();
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
@@ -82,13 +82,13 @@ final class CreditCardControllerTest extends TestCase
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
-            'result' => null
+            'result' => null,
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseNotSuccessWithErrorsStoreMandateId():void
+    public function testResponseNotSuccessWithErrorsStoreMandateId(): void
     {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();
@@ -102,13 +102,13 @@ final class CreditCardControllerTest extends TestCase
         $expected = new JsonResponse([
             'success' => false,
             'customerId' => 'test',
-            'result' => ['test error']
+            'result' => ['test error'],
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseSuccessStoreMandateId():void
+    public function testResponseSuccessStoreMandateId(): void
     {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();
@@ -121,13 +121,13 @@ final class CreditCardControllerTest extends TestCase
         $expected = new JsonResponse([
             'success' => true,
             'customerId' => 'test',
-            'result' => []
+            'result' => [],
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseNotSuccessWithoutCustomerRevokeMandate():void
+    public function testResponseNotSuccessWithoutCustomerRevokeMandate(): void
     {
         $customerService = new FakeCustomerService();
         $salesChannelContext = $this->createMock(SalesChannelContext::class);
@@ -139,16 +139,13 @@ final class CreditCardControllerTest extends TestCase
             'success' => false,
             'customerId' => 'test',
             'mandateId' => 'test',
-            'result' => null
+            'result' => null,
         ]);
 
         $this->assertEquals($expected, $actualResponse);
     }
 
-    /**
-     *
-     */
-    public function testResponseNotSuccessWithErrorsRevokeMandate():void
+    public function testResponseNotSuccessWithErrorsRevokeMandate(): void
     {
         $customerService = new FakeCustomerService(true);
         $customerService = $customerService->withFakeCustomer();
@@ -168,7 +165,7 @@ final class CreditCardControllerTest extends TestCase
         $this->assertEquals($expected, $actualResponse);
     }
 
-    public function testResponseSuccessRevokeMandate():void
+    public function testResponseSuccessRevokeMandate(): void
     {
         $customerService = new FakeCustomerService();
         $customerService = $customerService->withFakeCustomer();

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Command\Install;
 
@@ -14,7 +15,6 @@ class SetupCommand extends Command
 {
     public static $defaultName = 'mollie:configuration:setup';
 
-
     /**
      * @var PluginInstaller
      */
@@ -25,11 +25,6 @@ class SetupCommand extends Command
      */
     private $logger;
 
-
-    /**
-     * @param PluginInstaller $pluginInstaller
-     * @param LoggerInterface $logger
-     */
     public function __construct(PluginInstaller $pluginInstaller, LoggerInterface $logger)
     {
         $this->pluginInstaller = $pluginInstaller;
@@ -38,22 +33,14 @@ class SetupCommand extends Command
         parent::__construct();
     }
 
-
-    /**
-     * @return void
-     */
     protected function configure(): void
     {
         $this
-            ->setName((string)self::$defaultName)
-            ->setDescription('Installs and configures the plugin without the need to disable and activate it again.');
+            ->setName((string) self::$defaultName)
+            ->setDescription('Installs and configures the plugin without the need to disable and activate it again.')
+        ;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

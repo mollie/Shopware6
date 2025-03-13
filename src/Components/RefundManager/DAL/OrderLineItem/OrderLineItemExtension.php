@@ -13,17 +13,11 @@ class OrderLineItemExtension extends EntityExtension
 {
     const ORDER_LINE_ITEM_PROPERTY_NAME = 'mollieRefundLineItems';
 
-    /**
-     * @return string
-     */
     public function getDefinitionClass(): string
     {
         return OrderLineItemDefinition::class;
     }
 
-    /**
-     * @param FieldCollection $collection
-     */
     public function extendFields(FieldCollection $collection): void
     {
         $collection->add(new OneToManyAssociationField(self::ORDER_LINE_ITEM_PROPERTY_NAME, RefundItemDefinition::class, 'order_line_item_id'));

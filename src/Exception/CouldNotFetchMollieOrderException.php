@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -8,7 +9,7 @@ class CouldNotFetchMollieOrderException extends \RuntimeException
         string $mollieOrderId,
         ?\Throwable $previous = null
     ) {
-        $message = sprintf("Could not fetch the Mollie Order for ID %s", $mollieOrderId);
+        $message = sprintf('Could not fetch the Mollie Order for ID %s', $mollieOrderId);
         parent::__construct($message, 0, $previous);
     }
 }

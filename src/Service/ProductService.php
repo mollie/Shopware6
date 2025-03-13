@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -15,10 +16,6 @@ class ProductService
      */
     private $productRepository;
 
-
-    /**
-     * @param EntityRepository $productRepository
-     */
     public function __construct(EntityRepository $productRepository)
     {
         $this->productRepository = $productRepository;
@@ -28,9 +25,8 @@ class ProductService
      * Finds a product by id.
      *
      * @param string $productId
-     * @param null|Context $context
+     *
      * @throws InconsistentCriteriaIdsException
-     * @return null|ProductEntity
      */
     public function getProductById($productId, Context $context = null): ?ProductEntity
     {
@@ -38,9 +34,7 @@ class ProductService
 
         $result = $this->productRepository->search($criteria, $context ?? Context::createDefaultContext());
 
-        /** @var null|ProductEntity $product */
-        $product = $result->get($productId);
-
-        return $product;
+        /** @var null|ProductEntity */
+        return $result->get($productId);
     }
 }

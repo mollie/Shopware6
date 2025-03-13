@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
 
@@ -10,8 +11,6 @@ class SubscriptionEventsTest extends TestCase
     /**
      * This test verifies that our loaded event
      * name is not accidentally changed
-     *
-     * @return void
      */
     public function testLoadedEvent(): void
     {

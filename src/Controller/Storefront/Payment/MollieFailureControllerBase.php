@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
@@ -98,18 +99,6 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
      */
     private $customerService;
 
-    /**
-     * @param RouterInterface $router
-     * @param CompatibilityGatewayInterface $compatibilityGateway
-     * @param MollieApiFactory $apiFactory
-     * @param OrderStateService $orderStateService
-     * @param TransactionService $transactionService
-     * @param LoggerInterface $logger
-     * @param TransactionTransitionServiceInterface $transactionTransitionService
-     * @param FlowBuilderFactoryInterface $flowBuilderFactory
-     * @param MollieServiceOrder $mollieOrderService
-     * @param OrderStatusConverter $orderStatusConverter
-     */
     public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, CustomerService $customerService)
     {
         $this->router = $router;
@@ -127,14 +116,9 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
         $this->customerService = $customerService;
     }
 
-
     /**
-     *
-     * @param SalesChannelContext $salesChannelContext
-     * @param string $transactionId
-     *
      * @throws ApiException
-     * @return null|Response
+     *
      * @return RedirectResponse|Response
      */
     public function paymentFailedAction(SalesChannelContext $salesChannelContext, string $transactionId): ?Response
@@ -145,7 +129,7 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
          */
         $transaction = $this->transactionService->getTransactionById($transactionId, null, $salesChannelContext->getContext());
 
-        if (!$transaction instanceof OrderTransactionEntity) {
+        if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->critical(sprintf('Transaction with id %s could not be read from database', $transactionId));
             throw new CouldNotFetchTransactionException($transactionId);
         }
@@ -153,7 +137,7 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
         $order = $transaction->getOrder();
 
         // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             $this->logger->critical(sprintf('Could not fetch order from transaction with id %s', $transactionId));
             throw new MissingOrderInTransactionException($transactionId);
         }
@@ -166,17 +150,14 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
             ]
         );
 
-
-        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
-        $customFieldArray = $order->getCustomFields() ?? [];
-
         $customFields = new OrderAttributes($order);
 
+        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
         $mollieOrderId = $customFields->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
             $this->logger->critical(sprintf('Could not fetch mollie order id from order with number %s', $order->getOrderNumber()));
-            throw new MissingMollieOrderIdException((string)$order->getOrderNumber());
+            throw new MissingMollieOrderIdException((string) $order->getOrderNumber());
         }
 
         // TODO: Refactor to use Service/MollieApi/Order::getMollieOrder
@@ -192,20 +173,15 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
 
         return $this->returnFailedRedirect(
             $salesChannelContext,
-            (string)$mollieOrder->getCheckoutUrl(),
+            (string) $mollieOrder->getCheckoutUrl(),
             $order,
             $mollieOrder,
             $transactionId
         );
     }
 
-
     /**
-     *
-     * @param SalesChannelContext $context
-     * @param string $transactionId
      * @throws Exception
-     * @return RedirectResponse
      */
     public function retry(SalesChannelContext $context, string $transactionId): RedirectResponse
     {
@@ -217,10 +193,9 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
 
         $order = $transaction->getOrder();
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             throw new Exception('Order for transaction with ID ' . $transaction->getOrderId() . ' not found');
         }
-
 
         $orderAttributes = new OrderAttributes($order);
 
@@ -231,26 +206,25 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
             ]
         );
 
-
-        # REOPEN the order
+        // REOPEN the order
         $this->orderStateService->setOrderState($order, OrderStates::STATE_OPEN, $context->getContext());
 
-        # if we redirect to the payment screen, set the transaction to in progress
+        // if we redirect to the payment screen, set the transaction to in progress
         $this->transactionTransitionService->processTransaction($transaction, $context->getContext());
 
-        # now fetch the Mollie order
+        // now fetch the Mollie order
         $mollieOrder = $this->mollieOrderService->getMollieOrder(
             $orderAttributes->getMollieOrderId(),
             $order->getSalesChannelId(),
             [
-                'embed' => 'payments'
+                'embed' => 'payments',
             ]
         );
 
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
 
-        # if its a failed status, then we have to create a new payment
-        # otherwise no payment would exist, and we are not able to redirect to the payment screen
+        // if its a failed status, then we have to create a new payment
+        // otherwise no payment would exist, and we are not able to redirect to the payment screen
         if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
             $settings = $this->settingsService->getSettings($context->getSalesChannelId());
             $paymentData = [];
@@ -263,7 +237,7 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
                 /** @var string $customerId */
                 $customerId = $customer->getCustomerId();
 
-                # mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
+                // mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
                 $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
 
                 foreach ($lineItems as $lineItem) {
@@ -278,24 +252,15 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
             $mollieOrder->createPayment($paymentData);
         }
 
-        $redirectUrl = (string)$orderAttributes->getMolliePaymentUrl();
+        $redirectUrl = (string) $orderAttributes->getMolliePaymentUrl();
 
-        if (!filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
+        if (! filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
             throw new Exception('The redirect URL is invalid.');
         }
 
         return new RedirectResponse($redirectUrl);
     }
 
-
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     * @param string $redirectUrl
-     * @param OrderEntity $order
-     * @param Order $mollieOrder
-     * @param string $transactionId
-     * @return Response
-     */
     private function returnFailedRedirect(SalesChannelContext $salesChannelContext, string $redirectUrl, OrderEntity $order, Order $mollieOrder, string $transactionId): Response
     {
         $orderAttributes = new OrderAttributes($order);

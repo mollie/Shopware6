@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress;
 
@@ -7,6 +8,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 
 /**
  * @extends EntityCollection<SubscriptionAddressEntity>
+ *
  * @method void add(SubscriptionEntity $entity)
  * @method void set(string $key, SubscriptionEntity $entity)
  * @method SubscriptionAddressEntity[]     getIterator()
@@ -17,9 +19,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
  */
 class SubscriptionAddressCollection extends EntityCollection
 {
-    /**
-     * @return string
-     */
     protected function getExpectedClass(): string
     {
         return SubscriptionAddressEntity::class;

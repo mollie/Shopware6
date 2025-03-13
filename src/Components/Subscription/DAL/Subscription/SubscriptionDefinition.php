@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
@@ -33,40 +34,27 @@ class SubscriptionDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription';
 
-    /**
-     * @return string
-     */
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return SubscriptionEntity::class;
     }
 
-    /**
-     * @return string
-     */
     public function getCollectionClass(): string
     {
         return SubscriptionCollection::class;
     }
 
-    /**
-     * @return FieldCollection
-     */
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey(), new ApiAware()),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             (new FkField('customer_id', 'customerId', CustomerDefinition::class))->addFlags(new ApiAware()),
 
@@ -77,14 +65,14 @@ class SubscriptionDefinition extends EntityDefinition
             (new FkField('currency_id', 'currencyId', CurrencyDefinition::class))->addFlags(new ApiAware(), new Required()),
             (new JsonField('metadata', 'metadata')),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
-            # do not show in API!!!!!!
+            // do not show in API!!!!!!
             (new StringField('mollie_id', 'mollieId')),
             (new StringField('mollie_customer_id', 'mollieCustomerId')),
             (new StringField('mandate_id', 'mandateId')),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             (new DateTimeField('next_payment_at', 'nextPaymentAt'))->addFlags(new ApiAware()),
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),
@@ -100,12 +88,12 @@ class SubscriptionDefinition extends EntityDefinition
             new CreatedAtField(),
             new UpdatedAtField(),
 
-            # --------------------------------------------------------------------------------------------------------------------------
-            # RUNTIME FIELDS
+            // --------------------------------------------------------------------------------------------------------------------------
+            // RUNTIME FIELDS
 
             (new DateTimeField('cancelUntil', 'cancelUntil'))->addFlags(new Runtime()),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
             new ManyToOneAssociationField('currency', 'currency_id', CurrencyDefinition::class, 'id', false),

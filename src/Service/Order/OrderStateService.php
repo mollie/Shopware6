@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Order;
 
@@ -18,11 +19,6 @@ class OrderStateService
     /** @var OrderTransitionServiceInterface */
     protected $orderTransitionService;
 
-
-    /**
-     * @param LoggerInterface $logger
-     * @param OrderTransitionServiceInterface $orderTransitionService
-     */
     public function __construct(LoggerInterface $logger, OrderTransitionServiceInterface $orderTransitionService)
     {
         $this->logger = $logger;
@@ -31,12 +27,6 @@ class OrderStateService
 
     /**
      * Handle order state automation.
-     *
-     * @param OrderEntity $order
-     * @param string $orderState
-     * @param Context $context
-     *
-     * @return bool
      */
     public function setOrderState(OrderEntity $order, string $orderState, Context $context): bool
     {

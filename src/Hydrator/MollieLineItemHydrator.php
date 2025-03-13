@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Hydrator;
 
@@ -12,18 +13,12 @@ class MollieLineItemHydrator
      */
     private $priceBuilder;
 
-
-    /**
-     * @param MollieOrderPriceBuilder $priceBuilder
-     */
     public function __construct(MollieOrderPriceBuilder $priceBuilder)
     {
         $this->priceBuilder = $priceBuilder;
     }
 
     /**
-     * @param MollieLineItemCollection $lineItems
-     * @param string $currencyCode
      * @return array<int,array<string,mixed>>
      */
     public function hydrate(MollieLineItemCollection $lineItems, string $currencyCode): array
@@ -33,10 +28,10 @@ class MollieLineItemHydrator
         foreach ($lineItems as $lineItem) {
             $price = $lineItem->getPrice();
 
-            # get custom meta data from our prepared mollie item
+            // get custom meta data from our prepared mollie item
             $metadata = $lineItem->getMetaData();
 
-            # always add our line item id
+            // always add our line item id
             $metadata['orderLineItemId'] = $lineItem->getLineItemId();
 
             $lines[] = [

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct\Order;
 
@@ -30,7 +30,7 @@ class OrderAttributesTest extends TestCase
         $order->setCustomFields([
             'mollie_payments' => [
                 'mollieSubscriptionId' => 'sub_xyz',
-            ]
+            ],
         ]);
 
         $attributes = new OrderAttributes($order);
@@ -47,7 +47,7 @@ class OrderAttributesTest extends TestCase
         $order->setCustomFields([
             'mollie_payments' => [
                 'swSubscriptionId' => '1231244142',
-            ]
+            ],
         ]);
 
         $attributes = new OrderAttributes($order);
@@ -66,7 +66,7 @@ class OrderAttributesTest extends TestCase
                 'bankName' => $expectedBankName,
                 'bankBic' => $expectedBankBIC,
                 'bankAccount' => $expectedBankAccount,
-            ]
+            ],
         ]);
 
         $attributes = new OrderAttributes($order);

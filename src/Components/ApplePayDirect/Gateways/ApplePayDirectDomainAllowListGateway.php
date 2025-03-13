@@ -17,8 +17,6 @@ class ApplePayDirectDomainAllowListGateway
 
     /**
      * ApplePayDirectDomainAllowListItem constructor.
-     *
-     * @param SettingsService $settingsService
      */
     public function __construct(SettingsService $settingsService)
     {
@@ -27,9 +25,6 @@ class ApplePayDirectDomainAllowListGateway
 
     /**
      * Get the ApplePayDirectDomainAllowList
-     *
-     * @param SalesChannelContext $context
-     * @return ApplePayDirectDomainAllowList
      */
     public function getAllowList(SalesChannelContext $context): ApplePayDirectDomainAllowList
     {

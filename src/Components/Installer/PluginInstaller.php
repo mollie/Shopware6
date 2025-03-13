@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Installer;
 
@@ -30,13 +31,6 @@ class PluginInstaller
      */
     private $subscriptionMailInstaller;
 
-
-    /**
-     * @param CustomFieldsInstaller $customFieldsInstaller
-     * @param PaymentMethodService $paymentMethodService
-     * @param ApplePayDirect $applePay
-     * @param MailTemplateInstaller $subscriptionMailInstaller
-     */
     public function __construct(CustomFieldsInstaller $customFieldsInstaller, PaymentMethodService $paymentMethodService, ApplePayDirect $applePay, MailTemplateInstaller $subscriptionMailInstaller)
     {
         $this->customFieldsInstaller = $customFieldsInstaller;
@@ -46,9 +40,7 @@ class PluginInstaller
     }
 
     /**
-     * @param Context $context
      * @throws \Doctrine\DBAL\Exception
-     * @return void
      */
     public function install(Context $context): void
     {

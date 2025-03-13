@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\ApplePayDirect;
 
@@ -27,9 +28,6 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
 {
     use RedirectTrait;
 
-    /**
-     *
-     */
     private const SNIPPET_ERROR = 'molliePayments.payments.applePayDirect.paymentError';
 
     private const FLOWBUILDER_SUCCESS = 'success';
@@ -40,12 +38,10 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
      */
     private $applePay;
 
-
     /**
      * @var RouterInterface
      */
     private $router;
-
 
     /**
      * @var FlowBuilderDispatcherAdapterInterface
@@ -72,15 +68,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
      */
     private $logger;
 
-
     /**
-     * @param ApplePayDirect $applePay
-     * @param RouterInterface $router
-     * @param LoggerInterface $logger
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param EntityRepository $repoCustomers
-     * @param OrderService $orderService
      * @throws \Exception
      */
     public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, EntityRepository $repoCustomers, OrderService $orderService)
@@ -96,12 +84,6 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
-
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @return JsonResponse
-     */
     public function isPaymentAvailable(SalesChannelContext $context): JsonResponse
     {
         try {
@@ -114,7 +96,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             $this->logger->error('Apple Pay Direct available: ' . $ex->getMessage());
 
             return new JsonResponse([
-                'available' => false
+                'available' => false,
             ]);
         }
     }
@@ -127,9 +109,6 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
      * ATTENTION:
      * this is not about Apple Pay Direct - but the namespace of the URL is a good one (/apple-pay)
      * and I don't want to create all kinds of new controllers
-     *
-     * @param SalesChannelContext $context
-     * @return JsonResponse
      */
     public function getApplePayID(SalesChannelContext $context): JsonResponse
     {
@@ -140,9 +119,9 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 'id' => $id,
             ]);
         } catch (\Throwable $ex) {
-            # ! WE DO NOT LOG IN HERE!
-            # otherwise we would always get logs if its just not enabled
-            # so this is either a valid response or invalid one...that's it
+            // ! WE DO NOT LOG IN HERE!
+            // otherwise we would always get logs if its just not enabled
+            // so this is either a valid response or invalid one...that's it
 
             return new JsonResponse([
                 'id' => 'not-found',
@@ -150,23 +129,17 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function addProduct(SalesChannelContext $context, Request $request): JsonResponse
     {
-        # we do only allow a few errors from within here
-        # the rest should only be visible in the LOG files
+        // we do only allow a few errors from within here
+        // the rest should only be visible in the LOG files
         $allowErrorMessage = false;
 
         try {
-            $content = json_decode((string)$request->getContent(), true);
+            $content = json_decode((string) $request->getContent(), true);
 
-            $productId = (isset($content['id'])) ? (string)$content['id'] : '';
-            $quantity = (isset($content['quantity'])) ? (int)$content['quantity'] : 0;
+            $productId = (isset($content['id'])) ? (string) $content['id'] : '';
+            $quantity = (isset($content['quantity'])) ? (int) $content['quantity'] : 0;
 
             if (empty($productId)) {
                 $allowErrorMessage = true;
@@ -180,7 +153,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
 
             $this->applePay->addProduct($productId, $quantity, $context);
 
-            return new JsonResponse(['success' => true,]);
+            return new JsonResponse(['success' => true]);
         } catch (\Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when adding product: ' . $ex->getMessage());
 
@@ -194,19 +167,12 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param Request $request
-     * @return JsonResponse
-     * @return JsonResponse
-     */
     public function createPaymentSession(SalesChannelContext $context, Request $request): JsonResponse
     {
         try {
-            $content = json_decode((string)$request->getContent(), true);
+            $content = json_decode((string) $request->getContent(), true);
 
-            $validationURL = (string)$content['validationUrl'];
+            $validationURL = (string) $content['validationUrl'];
 
             $session = $this->applePay->createPaymentSession($validationURL, '', $context);
 
@@ -225,20 +191,14 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function getShippingMethods(SalesChannelContext $context, Request $request): JsonResponse
     {
         $allowErrorMessage = false;
 
         try {
-            $content = json_decode((string)$request->getContent(), true);
+            $content = json_decode((string) $request->getContent(), true);
 
-            $countryCode = (isset($content['countryCode'])) ? (string)$content['countryCode'] : '';
+            $countryCode = (isset($content['countryCode'])) ? (string) $content['countryCode'] : '';
 
             if (empty($countryCode)) {
                 $allowErrorMessage = true;
@@ -266,20 +226,14 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function setShippingMethod(SalesChannelContext $context, Request $request): JsonResponse
     {
         $allowErrorMessage = false;
 
         try {
-            $json = json_decode((string)$request->getContent(), true);
+            $json = json_decode((string) $request->getContent(), true);
 
-            $shippingMethodID = (isset($json['identifier'])) ? (string)$json['identifier'] : '';
+            $shippingMethodID = (isset($json['identifier'])) ? (string) $json['identifier'] : '';
 
             if (empty($shippingMethodID)) {
                 $allowErrorMessage = true;
@@ -307,31 +261,24 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param Request $request
-     * @return Response
-     */
     public function startPayment(SalesChannelContext $context, Request $request): Response
     {
         try {
-            $email = (string)$request->get('email', '');
-            $firstname = (string)$request->get('firstname', '');
-            $lastname = (string)$request->get('lastname', '');
-            $street = (string)$request->get('street', '');
-            $zipcode = (string)$request->get('postalCode', '');
-            $city = (string)$request->get('city', '');
-            $countryCode = (string)$request->get('countryCode', '');
-            $phone = (string)$request->get('phone', '');
-            $acceptedDataProtection = (int)$request->get('acceptedDataProtection', '0');
+            $email = (string) $request->get('email', '');
+            $firstname = (string) $request->get('firstname', '');
+            $lastname = (string) $request->get('lastname', '');
+            $street = (string) $request->get('street', '');
+            $zipcode = (string) $request->get('postalCode', '');
+            $city = (string) $request->get('city', '');
+            $countryCode = (string) $request->get('countryCode', '');
+            $phone = (string) $request->get('phone', '');
+            $acceptedDataProtection = (int) $request->get('acceptedDataProtection', '0');
 
-            $paymentToken = (string)$request->get('paymentToken', '');
+            $paymentToken = (string) $request->get('paymentToken', '');
 
             if (empty($paymentToken)) {
                 throw new \Exception('PaymentToken not found!');
             }
-
 
             $this->applePay->prepareCustomer(
                 $firstname,
@@ -347,29 +294,25 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 $context
             );
 
-
-            # forward to the finish-payment page,
-            # where our customer is correctly known, and where we
-            # can continue with our correct sales channel context.
+            // forward to the finish-payment page,
+            // where our customer is correctly known, and where we
+            // can continue with our correct sales channel context.
             return $this->forwardToRoute('frontend.mollie.apple-pay.finish-payment', []);
         } catch (\Throwable $ex) {
             $this->logger->error('Apple Pay Direct error when starting payment: ' . $ex->getMessage());
 
-            # if we have an error here, we have to redirect to the confirm page
+            // if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
-            # also add an error for our target page
+            // also add an error for our target page
 
             $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
+
             return new RedirectResponse($returnUrl);
         }
     }
 
     /**
-     *
-     * @param SalesChannelContext $context
-     * @param Request $request
      * @throws \Exception
-     * @return RedirectResponse
      */
     public function finishPayment(SalesChannelContext $context, Request $request): RedirectResponse
     {
@@ -381,9 +324,8 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         $countryCode = $request->get('countryCode', '');
         $paymentToken = $request->get('paymentToken', '');
 
-
-        # ----------------------------------------------------------------------------
-        # STEP 1: Create Order
+        // ----------------------------------------------------------------------------
+        // STEP 1: Create Order
         try {
             if (empty($paymentToken)) {
                 throw new \Exception('PaymentToken not found!');
@@ -398,17 +340,17 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 ]
             );
 
-            # if we have an error here, we have to redirect to the confirm page
+            // if we have an error here, we have to redirect to the confirm page
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
-            # also add an error for our target page
+            // also add an error for our target page
 
             $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
+
             return new RedirectResponse($returnUrl);
         }
 
-
-        # ----------------------------------------------------------------------------
-        # STEP 2: Start Payment (CHECKPOINT: we have a valid shopware order now)
+        // ----------------------------------------------------------------------------
+        // STEP 2: Start Payment (CHECKPOINT: we have a valid shopware order now)
         try {
             $returnUrl = $this->getCheckoutFinishPage($order->getId(), $this->router);
 
@@ -425,7 +367,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 $context
             );
 
-            # fire our custom storefront event
+            // fire our custom storefront event
             $this->fireFlowBuilderStorefrontEvent(self::FLOWBUILDER_SUCCESS, $order, $context->getContext());
 
             return new RedirectResponse($returnUrl);
@@ -437,54 +379,45 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
                 ]
             );
 
-            # we already have a valid Order ID.
-            # so we just need to make sure to edit that order
+            // we already have a valid Order ID.
+            // so we just need to make sure to edit that order
             $returnUrl = $this->getEditOrderPage($order->getId(), $this->router);
 
-            # also add an error for our target page
+            // also add an error for our target page
             $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
 
-            # fire our custom storefront event
+            // fire our custom storefront event
             $this->fireFlowBuilderStorefrontEvent(self::FLOWBUILDER_FAILED, $order, $context->getContext());
 
             return new RedirectResponse($returnUrl);
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @return JsonResponse
-     */
     public function restoreCart(SalesChannelContext $context): JsonResponse
     {
         try {
             $this->applePay->restoreCart($context);
 
-            return new JsonResponse(['success' => true,]);
+            return new JsonResponse(['success' => true]);
         } catch (\Throwable $ex) {
             $this->logger->error('Apple Pay Direct restoring cart error: ' . $ex->getMessage());
 
-            return new JsonResponse(['success' => false,], 500);
+            return new JsonResponse(['success' => false], 500);
         }
     }
 
     /**
-     * @param string $status
-     * @param OrderEntity $order
-     * @param Context $context
      * @throws \Exception
-     * @return void
      */
     private function fireFlowBuilderStorefrontEvent(string $status, OrderEntity $order, Context $context): void
     {
         $orderCustomer = $order->getOrderCustomer();
 
-        if (!$orderCustomer instanceof OrderCustomerEntity) {
+        if (! $orderCustomer instanceof OrderCustomerEntity) {
             return;
         }
 
-        $criteria = new Criteria([(string)$orderCustomer->getCustomerId()]);
+        $criteria = new Criteria([(string) $orderCustomer->getCustomerId()]);
 
         $customers = $this->repoCustomers->search($criteria, $context);
 
@@ -492,7 +425,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             return;
         }
 
-        # we also have to reload the order because data is missing
+        // we also have to reload the order because data is missing
         $finalOrder = $this->orderService->getOrder($order->getId(), $context);
 
         switch ($status) {

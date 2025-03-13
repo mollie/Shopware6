@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct;
 
@@ -12,6 +13,7 @@ class MollieLineItemCollectionTest extends TestCase
     /**
      * This test verifies that our total amount of the cart
      * is always correctly calculated from the sum of items.
+     *
      * @return void
      */
     public function testCartTotalAmount()

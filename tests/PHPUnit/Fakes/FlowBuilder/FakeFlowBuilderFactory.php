@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes\FlowBuilder;
 
@@ -12,18 +13,11 @@ class FakeFlowBuilderFactory implements FlowBuilderFactoryInterface
      */
     private $dispatcher;
 
-
-    /**
-     * @param FlowBuilderDispatcherAdapterInterface $dispatcher
-     */
     public function __construct(FlowBuilderDispatcherAdapterInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @return FlowBuilderDispatcherAdapterInterface
-     */
     public function createDispatcher(): FlowBuilderDispatcherAdapterInterface
     {
         return $this->dispatcher;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer;
 
@@ -9,21 +10,17 @@ class MollieRequestAnonymizer
      */
     private $placeholder;
 
-
-    /**
-     * @param string $placeholder
-     */
     public function __construct(string $placeholder)
     {
         $this->placeholder = $placeholder;
     }
-
 
     /**
      * Anonymizes the Mollie Orders API request data
      * https://docs.mollie.com/reference/v2/orders-api/create-order
      *
      * @param array<mixed> $requestData
+     *
      * @return array<mixed>
      */
     public function anonymize(array $requestData)

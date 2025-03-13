@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -45,13 +46,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
      */
     private $logger;
 
-    /**
-     * @param SettingsService $settings
-     * @param ShipmentManager $mollieShipment
-     * @param OrderService $orderService
-     * @param EntityRepository $repoOrderTransactions
-     * @param LoggerInterface $logger
-     */
     public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, EntityRepository $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->settings = $settings;
@@ -60,7 +54,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
         $this->repoOrderTransactions = $repoOrderTransactions;
         $this->logger = $logger;
     }
-
 
     /**
      * @return array<mixed>
@@ -72,9 +65,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param StateMachineStateChangeEvent $event
-     */
     public function onOrderDeliveryChanged(StateMachineStateChangeEvent $event): void
     {
         if ($event->getTransitionSide() !== StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER) {
@@ -87,13 +77,12 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        # get the configuration of the sales channel from the order
+        // get the configuration of the sales channel from the order
         $configSalesChannel = $this->settings->getSettings($event->getSalesChannelId());
 
-
-        # if we don't even configure automatic shipping
-        # then don't even look into our order to find out if we should actually starts
-        if (!$configSalesChannel->getAutomaticShipping()) {
+        // if we don't even configure automatic shipping
+        // then don't even look into our order to find out if we should actually starts
+        if (! $configSalesChannel->getAutomaticShipping()) {
             return;
         }
 
@@ -103,22 +92,22 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             $order = $this->orderService->getOrderByDeliveryId($orderDeliveryId, $event->getContext());
 
             $swTransaction = $this->getLatestOrderTransaction($order->getId(), $event->getContext());
-            if (!$swTransaction) {
-                throw new \Exception('Order '.$order->getOrderNumber().' does not have transactions');
+            if (! $swTransaction) {
+                throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have transactions');
             }
-            # verify if the customer really paid with Mollie in the end
+            // verify if the customer really paid with Mollie in the end
             $paymentMethod = $swTransaction->getPaymentMethod();
 
-            if (!$paymentMethod instanceof PaymentMethodEntity) {
+            if (! $paymentMethod instanceof PaymentMethodEntity) {
                 throw new \Exception('Transaction ' . $swTransaction->getId() . ' has no payment method!');
             }
 
             $paymentMethodAttributes = new PaymentMethodAttributes($paymentMethod);
 
-            if (!$paymentMethodAttributes->isMolliePayment()) {
-                # just skip it if it has been paid
-                # with another payment provider
-                # do NOT throw an error
+            if (! $paymentMethodAttributes->isMolliePayment()) {
+                // just skip it if it has been paid
+                // with another payment provider
+                // do NOT throw an error
                 return;
             }
 
@@ -126,12 +115,13 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
 
             $this->mollieShipment->shipOrderRest($order, null, $event->getContext());
         } catch (\Throwable $ex) {
-            $this->logger->error('Failed to transfer delivery state to mollie: '.$ex->getMessage(), ['exception' => $ex]);
+            $this->logger->error('Failed to transfer delivery state to mollie: ' . $ex->getMessage(), ['exception' => $ex]);
+
             return;
         }
     }
 
-    private function getLatestOrderTransaction(string $orderId, Context $context):?OrderTransactionEntity
+    private function getLatestOrderTransaction(string $orderId, Context $context): ?OrderTransactionEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('order.id', $orderId));
@@ -139,7 +129,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
         $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('paymentMethod');
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
-
 
         $result = $this->repoOrderTransactions->search($criteria, $context);
 

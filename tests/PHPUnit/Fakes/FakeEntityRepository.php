@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -14,9 +15,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Write\CloneBehavior;
 
 class FakeEntityRepository implements EntityRepositoryInterface
 {
-    /** @var EntityDefinition */
-    private $definition;
-
     /** @var array<Criteria> */
     public $criteria = [];
 
@@ -49,6 +47,8 @@ class FakeEntityRepository implements EntityRepositoryInterface
 
     /** @var array<EntitySearchResult> */
     public $entitySearchResults = [];
+    /** @var EntityDefinition */
+    private $definition;
 
     public function __construct(EntityDefinition $definition)
     {

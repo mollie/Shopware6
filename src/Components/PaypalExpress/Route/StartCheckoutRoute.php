@@ -23,11 +23,10 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
     private CartServiceInterface $cartService;
     private PayPalExpress $paypalExpress;
 
-
     public function __construct(
-        SettingsService      $settingsService,
+        SettingsService $settingsService,
         CartServiceInterface $cartService,
-        PayPalExpress        $paypalExpress
+        PayPalExpress $paypalExpress
     ) {
         $this->settingsService = $settingsService;
         $this->cartService = $cartService;
@@ -40,11 +39,8 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
     }
 
     /**
-     * @param Request $request
-     * @param SalesChannelContext $context
      * @throws \Mollie\Api\Exceptions\ApiException
      * @throws PaymentException
-     * @return StartCheckoutResponse
      */
     public function startCheckout(Request $request, SalesChannelContext $context): StartCheckoutResponse
     {
@@ -59,7 +55,7 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
         if ($cart->getLineItems()->count() === 0) {
             throw PaypalExpressException::cartIsEmpty();
         }
-        
+
         $mollieShopwareCart = new MollieShopwareCart($cart);
 
         $sessionId = $mollieShopwareCart->getPayPalExpressSessionID();
@@ -70,14 +66,14 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
             $session = $this->paypalExpress->loadSession($sessionId, $context);
         }
 
-        if (!property_exists($session, 'id') || $session->id === null) {
+        if (! property_exists($session, 'id') || $session->id === null) {
             throw PaypalExpressException::missingSessionId();
         }
 
         $mollieShopwareCart->setPayPalExpressSessionID($session->id);
 
         if ($settings->isRequireDataProtectionCheckbox()) {
-            $mollieShopwareCart->setDataProtectionAccepted((int)$request->get(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, 0));
+            $mollieShopwareCart->setDataProtectionAccepted((int) $request->get(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, 0));
         }
 
         $cart = $mollieShopwareCart->getCart();

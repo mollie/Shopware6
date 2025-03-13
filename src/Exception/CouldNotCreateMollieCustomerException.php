@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -10,7 +11,7 @@ class CouldNotCreateMollieCustomerException extends \Exception
         ?\Throwable $previous = null
     ) {
         $message = sprintf(
-            "Could not create a customer at Mollie for customer %s (%s)",
+            'Could not create a customer at Mollie for customer %s (%s)',
             $customerNumber,
             $customerName
         );

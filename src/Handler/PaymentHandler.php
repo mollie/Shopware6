@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Handler;
 
@@ -56,23 +57,15 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      */
     private $container;
 
-
-    /**
-     * @param LoggerInterface $logger
-     * @param ContainerInterface $container
-     */
     public function __construct(LoggerInterface $logger, ContainerInterface $container)
     {
         $this->logger = $logger;
         $this->container = $container;
     }
 
-
     /**
      * @param array<mixed> $orderData
-     * @param OrderEntity $orderEntity
-     * @param SalesChannelContext $salesChannelContext
-     * @param CustomerEntity $customer
+     *
      * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
@@ -88,11 +81,8 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      *
      * Throw a
      *
-     * @param AsyncPaymentTransactionStruct $transaction
-     * @param RequestDataBag $dataBag
-     * @param SalesChannelContext $salesChannelContext
-     *
      * @throws ApiException
+     *
      * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
      *                          payment
      */
@@ -110,7 +100,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             ]
         );
 
-
         try {
             $paymentData = $this->payFacade->startMolliePayment(
                 $this->paymentMethod,
@@ -126,7 +115,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
                 'Error when starting Mollie payment: ' . $exception->getMessage(),
                 [
                     'function' => 'order-prepare',
-                    'exception' => $exception
+                    'exception' => $exception,
                 ]
             );
 
@@ -134,9 +123,9 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         }
 
         try {
-            # before we send the customer to the Mollie payment page
-            # we will process the order transaction, which means we set it to be IN PROGRESS.
-            # this is just how it works at the moment, I did only add the comment for it here :)
+            // before we send the customer to the Mollie payment page
+            // we will process the order transaction, which means we set it to be IN PROGRESS.
+            // this is just how it works at the moment, I did only add the comment for it here :)
             $this->transactionTransitionService->processTransaction($transaction->getOrderTransaction(), $salesChannelContext->getContext());
         } catch (\Exception $exception) {
             $this->logger->warning(
@@ -144,7 +133,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
         }
 
-        /**
+        /*
          * Redirect the customer to the payment URL. Afterwards the
          * customer is redirected back to Shopware's finish page, which
          * leads to the @finalize function.
@@ -152,20 +141,15 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         return new RedirectResponse($paymentUrl);
     }
 
-    /**
-     * @param AsyncPaymentTransactionStruct $transaction
-     * @param Request $request
-     * @param SalesChannelContext $salesChannelContext
-     */
     public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
     {
         $this->loadServices();
 
         $orderAttributes = new OrderAttributes($transaction->getOrder());
-        $molliedID = $orderAttributes->getMollieOrderId();
+        $mollieID = $orderAttributes->getMollieOrderId();
 
         $this->logger->info(
-            'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod . ' and Mollie ID' . $molliedID,
+            'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod . ' and Mollie ID' . $mollieID,
             [
                 'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
             ]
@@ -175,20 +159,20 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
         } catch (AsyncPaymentFinalizeException|CustomerCanceledAsyncPaymentException|PaymentException $ex) {
             $this->logger->error(
-                'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
+                'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $mollieID . ', ' . $ex->getMessage()
             );
 
-            # these are already correct exceptions
-            # that cancel the Shopware order in a coordinated way by Shopware
+            // these are already correct exceptions
+            // that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
         } catch (Throwable $ex) {
-            # this processes all unhandled exceptions.
-            # we need to log whatever happens in here, and then also
-            # throw an exception that breaks the order in a coordinated way.
-            # Only the 2 exceptions above, lead to a correct failure-behaviour in Shopware.
-            # All other exceptions would lead to a 500 exception in the storefront.
+            // this processes all unhandled exceptions.
+            // we need to log whatever happens in here, and then also
+            // throw an exception that breaks the order in a coordinated way.
+            // Only the 2 exceptions above, lead to a correct failure-behaviour in Shopware.
+            // All other exceptions would lead to a 500 exception in the storefront.
             $this->logger->error(
-                'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
+                'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $mollieID . ', ' . $ex->getMessage()
             );
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransaction()->getId(), 'An unknown error happened when finalizing the order. Please see the Shopware logs for more. It can be that the payment in Mollie was succesful and the Shopware order is now cancelled or failed!');
         }
@@ -202,7 +186,6 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
      * I have no clue, but lazy loading will fix this.
      *
      * @throws \Exception
-     * @return void
      */
     private function loadServices(): void
     {

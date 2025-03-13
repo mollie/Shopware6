@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Event;
 
@@ -14,8 +15,6 @@ class MollieOrderBuildEventTest extends TestCase
      * metadata correctly to our event.
      * This can be used by 3rd party developers, and the core system of the
      * Mollie plugin will then use that metadata when building the orders.
-     *
-     * @return void
      */
     public function testMetadata(): void
     {
@@ -28,18 +27,17 @@ class MollieOrderBuildEventTest extends TestCase
             $fakeSalesChannelContext
         );
 
-        # default should be an empty array
-        # and not NULL
+        // default should be an empty array
+        // and not NULL
         $this->assertEquals([], $event->getMetadata());
 
-        # assign our custom metadata
-        # to our event
+        // assign our custom metadata
+        // to our event
         $event->setMetadata(
             [
-                'phpunit' => true
+                'phpunit' => true,
             ]
         );
-
 
         $expected = [
             'phpunit' => true,

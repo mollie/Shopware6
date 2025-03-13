@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service;
 
@@ -11,44 +12,36 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieLocaleServiceTest extends TestCase
 {
-
     /**
      * @var SalesChannelContext
      */
     private $fakeSalesChannelContext;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->fakeSalesChannelContext = $this->getMockBuilder(SalesChannelContext::class)
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMock()
+        ;
     }
-
 
     /**
      * This test verifies that the available locales are correct.
      * This is a list of possible values that Mollie allows.
-     *
-     * @return void
      */
     public function testAvailableLocales(): void
     {
-        # our data provider has no flat list of values, but we still want to reuse it.
-        # so lets just extract the first internal value of each item to get a flat list
-        # of expected locales.
-        $expected = array_map(function ($list) {
+        // our data provider has no flat list of values, but we still want to reuse it.
+        // so lets just extract the first internal value of each item to get a flat list
+        // of expected locales.
+        $expected = array_map(static function ($list) {
             return $list[0];
         }, $this->getAvailableLocales());
 
         $this->assertEquals($expected, MollieLocaleService::AVAILABLE_LOCALES);
     }
-
 
     /**
      * @return string[]
@@ -75,7 +68,7 @@ class MollieLocaleServiceTest extends TestCase
             ['hu_HU'],
             ['pl_PL'],
             ['lv_LV'],
-            ['lt_LT']
+            ['lt_LT'],
         ];
     }
 
@@ -85,9 +78,6 @@ class MollieLocaleServiceTest extends TestCase
      * That locale is in the list of available locales and should therefore be correctly returned in our function.
      *
      * @dataProvider getAvailableLocales
-     *
-     * @param string $locale
-     * @return void
      */
     public function testAvailableLocalesAreFound(string $locale): void
     {
@@ -122,8 +112,6 @@ class MollieLocaleServiceTest extends TestCase
     /**
      * This test verifies that we get en_GB as default if our sales channel
      * does not have a locale or language set.
-     *
-     * @return void
      */
     public function testSalesChannelWithoutLocale(): void
     {
@@ -134,26 +122,6 @@ class MollieLocaleServiceTest extends TestCase
         $detectedLocale = $service->getLocale($this->fakeSalesChannelContext);
 
         $this->assertEquals('en_GB', $detectedLocale);
-    }
-
-    /**
-     * @param string $locale
-     * @return LanguageEntity
-     */
-    private function buildSalesChannelLanguage(string $locale): LanguageEntity
-    {
-        # we always need to make sure to use this pattern nl-NL
-        # this is how it looks like in Shopware
-        $locale = str_replace('_', '-', $locale);
-
-        $foundLocale = new LocaleEntity();
-        $foundLocale->setCode($locale);
-        $foundLocale->setUniqueIdentifier('test-locale');
-
-        $scLanguage = new LanguageEntity();
-        $scLanguage->setLocale($foundLocale);
-        $scLanguage->setUniqueIdentifier('test-language');
-        return $scLanguage;
     }
 
     /**
@@ -188,7 +156,24 @@ class MollieLocaleServiceTest extends TestCase
             'hu_HU' => ['hu-HU', 'hu_HU'],
             'pl_PL' => ['pl-PL', 'pl_PL'],
             'lv_LV' => ['lv-LV', 'lv_LV'],
-            'lt_LT' => ['lt-LT', 'lt_LT']
+            'lt_LT' => ['lt-LT', 'lt_LT'],
         ];
+    }
+
+    private function buildSalesChannelLanguage(string $locale): LanguageEntity
+    {
+        // we always need to make sure to use this pattern nl-NL
+        // this is how it looks like in Shopware
+        $locale = str_replace('_', '-', $locale);
+
+        $foundLocale = new LocaleEntity();
+        $foundLocale->setCode($locale);
+        $foundLocale->setUniqueIdentifier('test-locale');
+
+        $scLanguage = new LanguageEntity();
+        $scLanguage->setLocale($foundLocale);
+        $scLanguage->setUniqueIdentifier('test-language');
+
+        return $scLanguage;
     }
 }

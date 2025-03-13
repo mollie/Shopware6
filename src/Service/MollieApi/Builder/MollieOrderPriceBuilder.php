@@ -1,23 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
 class MollieOrderPriceBuilder
 {
-    /**
-     *
-     */
     public const MOLLIE_FALLBACK_CURRENCY_CODE = 'EUR';
 
-    /**
-     *
-     */
     public const MOLLIE_PRICE_PRECISION = 2;
 
-
     /**
-     * @param null|float $price
-     * @param null|string $currency
      * @return array<mixed>
      */
     public function build(?float $price, ?string $currency): array
@@ -28,12 +20,11 @@ class MollieOrderPriceBuilder
 
         return [
             'currency' => $currency,
-            'value' => $this->formatValue($price)
+            'value' => $this->formatValue($price),
         ];
     }
 
     /**
-     * @param null|float $price
      * @return string
      */
     public function formatValue(?float $price)

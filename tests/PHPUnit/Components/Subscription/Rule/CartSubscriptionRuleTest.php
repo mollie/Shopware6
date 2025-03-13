@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\Rule;
 
@@ -18,26 +19,16 @@ class CartSubscriptionRuleTest extends TestCase
      */
     private $rule;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->rule = new CartSubscriptionRule();
     }
 
-    /**
-     * @return void
-     */
     public function testGetName(): void
     {
         static::assertSame('mollie_cart_subscription_rule', $this->rule->getName());
     }
 
-    /**
-     * @return void
-     */
     public function testGetConstraints(): void
     {
         $ruleConstraints = $this->rule->getConstraints();
@@ -52,7 +43,6 @@ class CartSubscriptionRuleTest extends TestCase
      *
      * @testWith        [true, false]
      *                  [false, true]
-     * @return void
      */
     public function testNonSubscriptionCart(bool $expected, bool $lookingForSubscription): void
     {
@@ -61,9 +51,8 @@ class CartSubscriptionRuleTest extends TestCase
 
         $cart->setLineItems(new LineItemCollection([$lineItem]));
 
-
         $this->rule->assign([
-            'isSubscription' => $lookingForSubscription
+            'isSubscription' => $lookingForSubscription,
         ]);
 
         $match = $this->rule->match(
@@ -83,7 +72,6 @@ class CartSubscriptionRuleTest extends TestCase
      *
      * @testWith        [true, true]
      *                  [false, false]
-     * @return void
      */
     public function testSubscriptionCart(bool $expected, bool $lookingForSubscription): void
     {
@@ -97,15 +85,14 @@ class CartSubscriptionRuleTest extends TestCase
             'customFields' => $lineItemAttributes->toArray(),
         ]);
 
-        # just verify it's really a subscription now
+        // just verify it's really a subscription now
         $lineItemAttributes = new LineItemAttributes($lineItem);
         static::assertSame(true, $lineItemAttributes->isSubscriptionProduct(), 'item is not a subscription item');
-
 
         $cart->setLineItems(new LineItemCollection([$lineItem]));
 
         $this->rule->assign([
-            'isSubscription' => $lookingForSubscription
+            'isSubscription' => $lookingForSubscription,
         ]);
 
         $match = $this->rule->match(

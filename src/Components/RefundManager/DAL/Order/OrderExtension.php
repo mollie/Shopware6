@@ -14,17 +14,11 @@ class OrderExtension extends EntityExtension
 {
     const REFUND_PROPERTY_NAME = 'mollie_refunds';
 
-    /**
-     * @return string
-     */
     public function getDefinitionClass(): string
     {
         return OrderDefinition::class;
     }
 
-    /**
-     * @param FieldCollection $collection
-     */
     public function extendFields(FieldCollection $collection): void
     {
         $collection->add((new OneToManyAssociationField(self::REFUND_PROPERTY_NAME, RefundDefinition::class, 'order_id'))->addFlags(new CascadeDelete()));

@@ -29,7 +29,7 @@ class MollieLocaleService
         'hu_HU',
         'pl_PL',
         'lv_LV',
-        'lt_LT'
+        'lt_LT',
     ];
 
     /**
@@ -42,13 +42,9 @@ class MollieLocaleService
         $this->repoLanguages = $repoLanguages;
     }
 
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     * @return string
-     */
     public function getLocale(SalesChannelContext $salesChannelContext): string
     {
-        # Get the language object from the sales channel context.
+        // Get the language object from the sales channel context.
         $locale = '';
 
         $salesChannel = $salesChannelContext->getSalesChannel();
@@ -57,12 +53,9 @@ class MollieLocaleService
         $languageCriteria = new Criteria([$languageId]);
         $languageCriteria->addAssociation('locale');
 
-
         $languagesResult = $this->repoLanguages->search($languageCriteria, $salesChannelContext->getContext());
 
         $language = $languagesResult->first();
-
-
 
         if ($language !== null && $language->getLocale() !== null) {
             $locale = $language->getLocale()->getCode();
@@ -73,13 +66,13 @@ class MollieLocaleService
 
     public function getMollieLocale(?string $locale): string
     {
-        # Set the locale based on the current storefront.
+        // Set the locale based on the current storefront.
         if ($locale !== null && $locale !== '') {
             $locale = str_replace('-', '_', $locale);
         }
 
-        # Check if the shop locale is available.
-        if ($locale === '' || !in_array($locale, self::AVAILABLE_LOCALES, true)) {
+        // Check if the shop locale is available.
+        if ($locale === '' || ! in_array($locale, self::AVAILABLE_LOCALES, true)) {
             $locale = 'en_GB';
         }
 

@@ -26,7 +26,6 @@ class SubscriptionCartCollectorTest extends TestCase
     private $original;
     private $behavior;
 
-
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -40,17 +39,18 @@ class SubscriptionCartCollectorTest extends TestCase
     public function testDispatchesEventWhenAProductIsAMollieSubscriptionProduct(): void
     {
         // this will cause the line item to be considered a subscription product and trigger the event
-        $subscriptionProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => true,]);
+        $subscriptionProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => true]);
 
         // this will cause the line item to be considered a regular product and not trigger the event
-        $regularProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => false,]);
+        $regularProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => false]);
 
         $this->configureGetLineItemsMethodOfCart($subscriptionProduct, $regularProduct);
 
         // we expect the event to be dispatched only once
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(MollieSubscriptionCartItemAddedEvent::class));
+            ->with($this->isInstanceOf(MollieSubscriptionCartItemAddedEvent::class))
+        ;
 
         $this->collector->collect($this->data, $this->original, $this->context, $this->behavior);
     }
@@ -58,7 +58,7 @@ class SubscriptionCartCollectorTest extends TestCase
     public function testDoesNotDispatchEventWhenNoMollieSubscriptionProductIsAdded(): void
     {
         // this will cause the line item to be considered a regular product and not trigger the event
-        $regularProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => false,]);
+        $regularProduct = $this->createLineItemMockWithPayloadValue([self::SUBSCRIPTION_ENABLED => false]);
 
         $this->configureGetLineItemsMethodOfCart($regularProduct);
 

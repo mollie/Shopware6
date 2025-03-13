@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
@@ -62,16 +63,6 @@ class SubscriptionPageLoader
      */
     private $container;
 
-
-    /**
-     * @param GenericPageLoaderInterface $genericLoader
-     * @param EntityRepository $repoSubscriptions
-     * @param CustomerService $customerService
-     * @param AbstractCountryRoute $countryRoute
-     * @param AbstractSalutationRoute $salutationRoute
-     * @param SettingsService $settingsService
-     * @param ContainerInterface $container
-     */
     public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
@@ -83,16 +74,12 @@ class SubscriptionPageLoader
         $this->container = $container;
     }
 
-
     /**
-     * @param Request $request
-     * @param SalesChannelContext $salesChannelContext
      * @throws \Exception
-     * @return SubscriptionPage
      */
     public function load(Request $request, SalesChannelContext $salesChannelContext): SubscriptionPage
     {
-        if (!$salesChannelContext->getCustomer() && $request->get('deepLinkCode', false) === false) {
+        if (! $salesChannelContext->getCustomer() && $request->get('deepLinkCode', false) === false) {
             throw new \Exception('Customer not logged in');
         }
 
@@ -117,8 +104,8 @@ class SubscriptionPageLoader
         /** @var StorefrontSearchResult<SubscriptionEntity> $storefrontSubscriptions */
         $storefrontSubscriptions = StorefrontSearchResult::createFrom($subscriptions);
 
-        # ---------------------------------------------------------------------------------------------
-        # assign data for our page
+        // ---------------------------------------------------------------------------------------------
+        // assign data for our page
 
         $page->setSubscriptions($storefrontSubscriptions);
         $page->setDeepLinkCode($request->get('deepLinkCode'));
@@ -131,21 +118,19 @@ class SubscriptionPageLoader
         $page->setAllowPauseResume($settings->isSubscriptionsAllowPauseResume());
         $page->setAllowSkip($settings->isSubscriptionsAllowSkip());
 
-        # ---------------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------------------------
 
         return $page;
     }
 
     /**
-     * @param Request $request
-     * @param SalesChannelContext $context
      * @return null|StorefrontSearchResult<SubscriptionEntity>
      */
     private function getSubscriptions(Request $request, SalesChannelContext $context): ?EntitySearchResult
     {
         $customer = $context->getCustomer();
 
-        if (!$customer instanceof CustomerEntity) {
+        if (! $customer instanceof CustomerEntity) {
             return null;
         }
 
@@ -160,25 +145,21 @@ class SubscriptionPageLoader
         return $this->repoSubscriptions->search($criteria, $context->getContext());
     }
 
-    /**
-     * @param Request $request
-     * @param null|string $customerId
-     * @return Criteria
-     */
     private function createCriteria(Request $request, string $customerId = null): Criteria
     {
         $limit = $request->get('limit');
-        $limit = $limit ? (int)$limit : 10;
+        $limit = $limit ? (int) $limit : 10;
         $page = $request->get('p');
-        $page = $page ? (int)$page : 1;
+        $page = $page ? (int) $page : 1;
 
         $criteria = (new Criteria())
             ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
             ->setLimit($limit)
             ->setOffset(($page - 1) * $limit)
-            ->setTotalCountMode(Criteria::TOTAL_COUNT_MODE_EXACT);
+            ->setTotalCountMode(Criteria::TOTAL_COUNT_MODE_EXACT)
+        ;
 
-        if (!is_null($customerId)) {
+        if (! is_null($customerId)) {
             $criteria->addFilter(new EqualsFilter('mollieCustomerId', $customerId));
         }
 
@@ -189,16 +170,12 @@ class SubscriptionPageLoader
         return $criteria;
     }
 
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     * @return CountryCollection
-     */
     private function getCountries(SalesChannelContext $salesChannelContext): CountryCollection
     {
         $criteria = (new Criteria())
             ->addFilter(new EqualsFilter('country.active', true))
-            ->addAssociation('states');
-
+            ->addAssociation('states')
+        ;
 
         /** @var string $version */
         $version = $this->container->getParameter('kernel.shopware_version');
@@ -208,7 +185,7 @@ class SubscriptionPageLoader
         if ($versionCompare->gt('6.3.5.2')) {
             $countries = $this->countryRoute->load(new Request(), $criteria, $salesChannelContext)->getCountries();
         } else {
-            # @phpstan-ignore-next-line
+            // @phpstan-ignore-next-line
             $countries = $this->countryRoute->load($criteria, $salesChannelContext)->getCountries();
         }
 

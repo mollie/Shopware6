@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\Services\PaymentMethodRemover;
 
@@ -27,7 +27,7 @@ class PaymentMethodRemoverTest extends TestCase
             'creditcard',
             'paypal',
             'directdebit',
-            'trustly'
+            'trustly',
         ];
 
         $this->assertEquals($expected, SubscriptionRemover::ALLOWED_METHODS);

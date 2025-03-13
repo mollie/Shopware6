@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service;
 
@@ -73,10 +74,11 @@ class MolliePaymentExtractorTest extends TestCase
         $transaction = new OrderTransactionEntity();
         $transaction->setId(Uuid::randomHex());
         $transaction->setCreatedAt($createdAt);
-        if (!is_null($paymentMethodName)) {
+        if (! is_null($paymentMethodName)) {
             $payment = $this->createPaymentMethod($paymentMethodName);
             $transaction->setPaymentMethod($payment);
         }
+
         return $transaction;
     }
 
@@ -85,6 +87,7 @@ class MolliePaymentExtractorTest extends TestCase
         $payment = new PaymentMethodEntity();
         $payment->setId(Uuid::randomHex());
         $payment->setHandlerIdentifier($methodName);
+
         return $payment;
     }
 }

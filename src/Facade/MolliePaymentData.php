@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Facade;
 
@@ -6,7 +7,6 @@ use Mollie\Api\Resources\OrderLine;
 
 class MolliePaymentData
 {
-
     /**
      * @var string
      */
@@ -28,10 +28,7 @@ class MolliePaymentData
     private $changeStatusUrl;
 
     /**
-     * @param string $id
-     * @param string $checkoutUrl
      * @param OrderLine[] $mollieLineItems
-     * @param string $changeStatusUrl
      */
     public function __construct(string $id, string $checkoutUrl, array $mollieLineItems, string $changeStatusUrl)
     {
@@ -41,17 +38,11 @@ class MolliePaymentData
         $this->changeStatusUrl = $changeStatusUrl;
     }
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getCheckoutUrl(): string
     {
         return $this->checkoutUrl;

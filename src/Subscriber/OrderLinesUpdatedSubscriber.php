@@ -51,7 +51,7 @@ class OrderLinesUpdatedSubscriber implements EventSubscriberInterface
         try {
             $mollieOrder->createShipment(['lines' => $shippingOptions]);
         } catch (\Exception $exception) {
-            $this->logger->error("Failed to update shipping costs", ['message' => $exception->getMessage(), 'options' => $shippingOptions]);
+            $this->logger->error('Failed to update shipping costs', ['message' => $exception->getMessage(), 'options' => $shippingOptions]);
         }
     }
 }

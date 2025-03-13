@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -11,7 +12,7 @@ class CouldNotCancelMollieRefundException extends \RuntimeException
         ?\Throwable $previous = null
     ) {
         $message = sprintf(
-            "Could not cancel the refund with id %s for order %s (Order number %s)",
+            'Could not cancel the refund with id %s for order %s (Order number %s)',
             $refundId,
             $mollieOrderId,
             $orderNumber

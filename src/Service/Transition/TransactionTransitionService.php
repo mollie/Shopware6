@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Transition;
 
@@ -28,15 +29,10 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      */
     private $logger;
 
-    /**
-     * @param TransitionServiceInterface $transitionService
-     * @param CompatibilityFactory $compatibilityFactory
-     * @param LoggerInterface $loggerService
-     */
     public function __construct(
         TransitionServiceInterface $transitionService,
-        CompatibilityFactory       $compatibilityFactory,
-        LoggerInterface            $loggerService
+        CompatibilityFactory $compatibilityFactory,
+        LoggerInterface $loggerService
     ) {
         $this->transitionService = $transitionService;
         $this->compatibilityFactory = $compatibilityFactory;
@@ -61,7 +57,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed($action, $availableTransitions)) {
+        if (! $this->transitionIsAllowed($action, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
@@ -79,7 +75,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
             $this->logger->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
@@ -104,7 +100,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PAID, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PAID, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
@@ -122,7 +118,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
@@ -140,7 +136,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_FAIL, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_FAIL, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
@@ -160,7 +156,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_AUTHORIZE, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_AUTHORIZE, $availableTransitions)) {
             $this->reOpenTransaction($transaction, $context);
         }
 
@@ -178,7 +174,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REFUND, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REFUND, $availableTransitions)) {
             $this->payTransaction($transaction, $context);
         }
 
@@ -196,7 +192,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REFUND_PARTIALLY, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REFUND_PARTIALLY, $availableTransitions)) {
             $this->payTransaction($transaction, $context);
         }
 
@@ -217,13 +213,14 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
         if ($chargebackState !== 'chargeback') {
             $this->processTransaction($transaction, $context);
+
             return;
         }
 
         $entityId = $transaction->getId();
         $availableTransitions = $this->getAvailableTransitions($entityId, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CHARGEBACK, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CHARGEBACK, $availableTransitions)) {
             $this->payTransaction($transaction, $context);
         }
 
@@ -231,9 +228,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     }
 
     /**
-     * @param string $currentStatus
      * @param array<mixed> $targetStatus
-     * @return bool
      */
     private function isFinalOrTargetStatus(string $currentStatus, array $targetStatus): bool
     {
@@ -250,9 +245,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     }
 
     /**
-     * @param string $transition
      * @param array<mixed> $availableTransitions
-     * @return bool
      */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
@@ -260,8 +253,6 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     }
 
     /**
-     * @param string $entityId
-     * @param Context $context
      * @return array<mixed>
      */
     private function getAvailableTransitions(string $entityId, Context $context): array
@@ -286,7 +277,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
                 [
                     'method' => 'transaction-transition-service-perform-transition',
                     'entity.id' => $entityId,
-                    'transition' => $transitionName
+                    'transition' => $transitionName,
                 ]
             );
         }

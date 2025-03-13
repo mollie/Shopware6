@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service;
 
@@ -32,10 +33,6 @@ class OrderServiceTest extends TestCase
     private $orderRepository;
     private $orderService;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->testOrder = new OrderEntity();
@@ -55,28 +52,9 @@ class OrderServiceTest extends TestCase
         );
     }
 
-
-    private function setUpOrderRepositoryWithoutOrder()
-    {
-        $searchResult = $this->createConfiguredMock(EntitySearchResult::class, [
-            'first' => null
-        ]);
-
-        $idSearchResult = $this->createConfiguredMock(IdSearchResult::class, [
-            'firstId' => null
-        ]);
-
-        $this->orderRepository->entitySearchResults[] = $searchResult;
-        $this->orderRepository->idSearchResults[] = $idSearchResult;
-
-        $this->orderRepository->entitySearchResults[] = $searchResult;
-    }
-
     /**
      * This test verifies that we get a found order from the repository
      * and also that our passed criteria arguments contain the order ID that we use as argument.
-     *
-     * @return void
      */
     public function testGetOrderFindsEntity(): void
     {
@@ -93,8 +71,6 @@ class OrderServiceTest extends TestCase
     /**
      * This test verifies that our service correctly returns
      * a found order entity when searching by order number.
-     *
-     * @return void
      */
     public function testGetOrderByNumberReturnsOrder(): void
     {
@@ -107,8 +83,6 @@ class OrderServiceTest extends TestCase
      * This test verifies that our repository gets the correctly built filter criteria.
      * The service builds a new equalsFilter with the orderNumber.
      * We extract this filter and verify that our inputArgument is used as value in this filter.
-     *
-     * @return void
      */
     public function testGetOrderByNumberUsesCorrectCriteria(): void
     {
@@ -120,8 +94,8 @@ class OrderServiceTest extends TestCase
 
         $this->assertInstanceOf(Criteria::class, $receivedCriteria);
 
-        # search all orderNumber "equals" filter, and just extract the sent-value.
-        # this helps us to verify that our correct $orderNumber has been used.
+        // search all orderNumber "equals" filter, and just extract the sent-value.
+        // this helps us to verify that our correct $orderNumber has been used.
         $sentOrderNumberValues = [];
         foreach ($receivedCriteria->getFilters() as $filter) {
             if ($filter instanceof EqualsFilter && $filter->getField() === 'orderNumber') {
@@ -133,15 +107,14 @@ class OrderServiceTest extends TestCase
         $this->assertContains($orderNumber, $sentOrderNumberValues, 'no orderNumber filter has been found with a correct value');
     }
 
-
     public function testGetMollieOrderId()
     {
         $order = $this->createConfiguredMock(OrderEntity::class, [
             'getCustomFields' => [
                 CustomFieldsInterface::MOLLIE_KEY => [
-                    CustomFieldsInterface::ORDER_KEY => 'fizz'
-                ]
-            ]
+                    CustomFieldsInterface::ORDER_KEY => 'fizz',
+                ],
+            ],
         ]);
 
         $actualValue = $this->orderService->getMollieOrderId($order);
@@ -152,7 +125,7 @@ class OrderServiceTest extends TestCase
     {
         $order = $this->createConfiguredMock(OrderEntity::class, [
             'getOrderNumber' => 'not_important',
-            'getCustomFields' => null
+            'getCustomFields' => null,
         ]);
 
         $this->expectException(CouldNotExtractMollieOrderIdException::class);
@@ -164,9 +137,9 @@ class OrderServiceTest extends TestCase
         $orderLineItem = $this->createConfiguredMock(OrderLineItemEntity::class, [
             'getCustomFields' => [
                 CustomFieldsInterface::MOLLIE_KEY => [
-                    CustomFieldsInterface::ORDER_LINE_KEY => 'buzz'
-                ]
-            ]
+                    CustomFieldsInterface::ORDER_LINE_KEY => 'buzz',
+                ],
+            ],
         ]);
 
         $actualValue = $this->orderService->getMollieOrderLineId($orderLineItem);
@@ -177,10 +150,26 @@ class OrderServiceTest extends TestCase
     {
         $orderLineItem = $this->createConfiguredMock(OrderLineItemEntity::class, [
             'getId' => 'not_important',
-            'getCustomFields' => null
+            'getCustomFields' => null,
         ]);
 
         $this->expectException(CouldNotExtractMollieOrderLineIdException::class);
         $this->orderService->getMollieOrderLineId($orderLineItem);
+    }
+
+    private function setUpOrderRepositoryWithoutOrder()
+    {
+        $searchResult = $this->createConfiguredMock(EntitySearchResult::class, [
+            'first' => null,
+        ]);
+
+        $idSearchResult = $this->createConfiguredMock(IdSearchResult::class, [
+            'firstId' => null,
+        ]);
+
+        $this->orderRepository->entitySearchResults[] = $searchResult;
+        $this->orderRepository->idSearchResults[] = $idSearchResult;
+
+        $this->orderRepository->entitySearchResults[] = $searchResult;
     }
 }

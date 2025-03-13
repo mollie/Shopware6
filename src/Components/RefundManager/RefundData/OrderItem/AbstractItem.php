@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
@@ -19,11 +20,6 @@ abstract class AbstractItem
      */
     private $taxDiff;
 
-    /**
-     * @param float $taxTotal
-     * @param float $taxPerItem
-     * @param float $taxDiff
-     */
     public function __construct(float $taxTotal, float $taxPerItem, float $taxDiff)
     {
         $this->taxTotal = $taxTotal;
@@ -32,18 +28,11 @@ abstract class AbstractItem
     }
 
     /**
-     * @param string $id
-     * @param string $label
-     * @param string $referenceNumber
-     * @param bool $isPromotion
-     * @param bool $isDelivery
-     * @param float $unitPrice
-     * @param int $quantity
-     * @param float $totalPrice
-     * @param float $promotionDiscount
-     * @param int $promotionAffectedQty
-     * @param float $promotionTaxValue
-     * @param int $refundedQty
+     * @return array<mixed>
+     */
+    abstract public function toArray(): array;
+
+    /**
      * @return array<mixed>
      */
     protected function buildArray(string $id, string $label, string $referenceNumber, bool $isPromotion, bool $isDelivery, float $unitPrice, int $quantity, float $totalPrice, float $promotionDiscount, int $promotionAffectedQty, float $promotionTaxValue, int $refundedQty): array
@@ -73,9 +62,4 @@ abstract class AbstractItem
             ],
         ];
     }
-
-    /**
-     * @return array<mixed>
-     */
-    abstract public function toArray(): array;
 }

@@ -26,9 +26,6 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
      */
     private $refundItemRepository;
 
-    /**
-     * @param EntityRepository $refundItemRepository
-     */
     public function __construct(EntityRepository $refundItemRepository)
     {
         $this->refundItemRepository = $refundItemRepository;
@@ -38,12 +35,12 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
     {
         /** @var \stdClass|string $oldMetadata */
         $oldMetadata = $refund->metadata;
-        if (!is_string($oldMetadata)) {
+        if (! is_string($oldMetadata)) {
             return $order;
         }
 
         $oldMetadata = json_decode($oldMetadata);
-        if (!property_exists($oldMetadata, 'composition') || !is_array($oldMetadata->composition)) {
+        if (! property_exists($oldMetadata, 'composition') || ! is_array($oldMetadata->composition)) {
             return $order;
         }
 
@@ -56,7 +53,6 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
             return $order;
         }
 
-
         $shopwareRefunds = $shopwareRefunds->filterByProperty('mollieRefundId', $refund->id);
 
         /** @var ?RefundEntity $shopwareRefund */
@@ -68,7 +64,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
 
         $refundLineItems = $shopwareRefund->getRefundItems()->getElements();
 
-        /**
+        /*
          * Exit criteria, if we have refund line items, then we exit here
          */
         if (count($refundLineItems) > 0) {
@@ -118,6 +114,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
          */
         $refundItems = $this->createEntitiesByEvent($entityWrittenContainerEvent);
         $shopwareRefund->setRefundItems($refundItems);
+
         return $order;
     }
 
@@ -151,6 +148,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
 
             $collection->add($swRefundItem);
         }
+
         return $collection;
     }
 
@@ -163,7 +161,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
             if ($customFields === null) {
                 continue;
             }
-            if (!isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY])) {
+            if (! isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY])) {
                 continue;
             }
             if ($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_LINE_KEY] === $mollieLineId) {
@@ -171,6 +169,7 @@ class CompositionMigrationService implements CompositionMigrationServiceInterfac
                 break;
             }
         }
+
         return $foundItem;
     }
 }

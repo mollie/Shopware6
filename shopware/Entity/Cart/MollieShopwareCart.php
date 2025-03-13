@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Mollie\Shopware\Entity\Cart;
 
@@ -13,34 +14,30 @@ class MollieShopwareCart
 
     private ?Struct $cartExtension;
 
-    /**
-     * @param Cart $cart
-     */
     public function __construct(Cart $cart)
     {
         $this->cart = $cart;
         $this->cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
     }
 
-
     public function getCart(): Cart
     {
         return $this->cart;
     }
 
-    public function setSingleProductExpressCheckout(bool $true) : void
+    public function setSingleProductExpressCheckout(bool $true): void
     {
         $this->setExtensionKey(CustomFieldsInterface::SINGLE_PRODUCT_EXPRESS_CHECKOUT, $true);
     }
 
     public function isSingleProductExpressCheckout(): bool
     {
-        return (bool)$this->getExtensionKey(CustomFieldsInterface::SINGLE_PRODUCT_EXPRESS_CHECKOUT, false);
+        return (bool) $this->getExtensionKey(CustomFieldsInterface::SINGLE_PRODUCT_EXPRESS_CHECKOUT, false);
     }
 
     public function isDataProtectionAccepted(): int
     {
-        return (int)$this->getExtensionKey(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, 0);
+        return (int) $this->getExtensionKey(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, 0);
     }
 
     public function setDataProtectionAccepted(int $accepted): void
@@ -52,7 +49,7 @@ class MollieShopwareCart
 
     public function getPayPalExpressSessionID(): string
     {
-        return (string)$this->getExtensionKey(CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY, '');
+        return (string) $this->getExtensionKey(CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY, '');
     }
 
     public function setPayPalExpressSessionID(string $sessionId): void
@@ -62,7 +59,7 @@ class MollieShopwareCart
 
     public function getPayPalExpressAuthId(): string
     {
-        return (string)$this->getExtensionKey(CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID, '');
+        return (string) $this->getExtensionKey(CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID, '');
     }
 
     public function setPayPalExpressAuthenticateId(string $authenticatedId): void
@@ -72,7 +69,6 @@ class MollieShopwareCart
 
     /**
      * Gets if the user is in PPE mode and has successfully authenticated
-     * @return bool
      */
     public function isPayPalExpressComplete(): bool
     {
@@ -89,11 +85,10 @@ class MollieShopwareCart
 
     /**
      * Gets if the user has started PPE, but is somehow has not successfully finished the authentication
-     * @return bool
      */
     public function isPayPalExpressIncomplete(): bool
     {
-        return (mb_strlen($this->getPayPalExpressSessionID()) > 0 && $this->getPayPalExpressAuthId() === '');
+        return $this->getPayPalExpressSessionID() !== '' && $this->getPayPalExpressAuthId() === '';
     }
 
     public function clearPayPalExpress(): void
@@ -106,17 +101,17 @@ class MollieShopwareCart
     // </editor-fold>
 
     /**
-     * @param string $key
      * @param mixed $defaultValue
+     *
      * @return mixed
      */
     private function getExtensionKey(string $key, $defaultValue)
     {
-        if (!$this->cartExtension instanceof Struct) {
+        if (! $this->cartExtension instanceof Struct) {
             return $defaultValue;
         }
 
-        if (!array_key_exists($key, $this->cartExtension->getVars())) {
+        if (! array_key_exists($key, $this->cartExtension->getVars())) {
             return $defaultValue;
         }
 
@@ -132,11 +127,11 @@ class MollieShopwareCart
 
     private function clearExtensionKey(string $key): void
     {
-        if (!$this->cartExtension instanceof Struct) {
+        if (! $this->cartExtension instanceof Struct) {
             return;
         }
 
-        if (!array_key_exists($key, $this->cartExtension->getVars())) {
+        if (! array_key_exists($key, $this->cartExtension->getVars())) {
             return;
         }
 

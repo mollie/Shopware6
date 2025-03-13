@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -11,10 +12,6 @@ class FakeTranslator implements TranslatorInterface
      */
     private $snippets;
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function addSnippet(string $key, string $value): void
     {
         $this->snippets[$key] = $value;
@@ -22,9 +19,9 @@ class FakeTranslator implements TranslatorInterface
 
     /**
      * @param string $id
-     * @param array $parameters
      * @param null $domain
      * @param null $locale
+     *
      * @return mixed|string
      */
     public function trans($id, array $parameters = [], $domain = null, $locale = null): string

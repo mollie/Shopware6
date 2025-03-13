@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -26,11 +27,6 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $versionCompare;
 
-    /**
-     * @param SettingsService $settingsService
-     * @param StorefrontPluginRegistryInterface $pluginRegistry
-     * @param VersionCompare $versionCompare
-     */
     public function __construct(SettingsService $settingsService, StorefrontPluginRegistryInterface $pluginRegistry, VersionCompare $versionCompare)
     {
         $this->settingsService = $settingsService;
@@ -39,7 +35,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
@@ -49,15 +45,13 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param StorefrontRenderEvent $event
      * @throws \Exception
-     * @return void
      */
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
-        $useJsValue = (int)$settings->isUseShopwareJavascript();
+        $useJsValue = (int) $settings->isUseShopwareJavascript();
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
 
         $mollieJavascriptAlreadyExists = false;

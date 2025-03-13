@@ -27,10 +27,6 @@ class OrderTagService
      */
     private $tagRepository;
 
-    /**
-     * @param EntityRepository $orderRepository
-     * @param EntityRepository $tagRepository
-     */
     public function __construct(
         EntityRepository $orderRepository,
         EntityRepository $tagRepository
@@ -54,7 +50,7 @@ class OrderTagService
         /** @var null|OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->get($orderId);
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             throw CouldNotTagOrderException::forSubscription(sprintf('Order with ID "%s" not found', $orderId));
         }
 
@@ -63,13 +59,13 @@ class OrderTagService
         /** @var null|TagEntity $tag */
         $tag = $this->tagRepository->search($criteria, $context)->first();
 
-        if (!$tag instanceof TagEntity) {
+        if (! $tag instanceof TagEntity) {
             throw CouldNotTagOrderException::forSubscription(sprintf('Tag with name "%s" and ID "%s" not found', $subscriptionTag->getName(), $subscriptionTag->getId()));
         }
 
         $orderTags = $order->getTags();
 
-        if (!$orderTags instanceof TagCollection) {
+        if (! $orderTags instanceof TagCollection) {
             throw CouldNotTagOrderException::forSubscription(sprintf('Order with ID "%s" does not provide its tag collection', $entity->getOrderId()));
         }
 

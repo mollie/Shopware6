@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Support;
 
@@ -23,32 +24,21 @@ class SupportControllerBase extends AbstractController
      */
     protected $logger;
 
-
-    /**
-     * @param MollieSupportFacade $supportFacade
-     * @param LoggerInterface $logger
-     */
     public function __construct(MollieSupportFacade $supportFacade, LoggerInterface $logger)
     {
         $this->supportFacade = $supportFacade;
         $this->logger = $logger;
     }
 
-    /**
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function requestSupport(Request $request, Context $context): JsonResponse
     {
         $data = $request->request;
 
-        $name = (string)$data->get('name');
-        $email = (string)$data->get('email');
-        $recipientLocale = (string)$data->get('recipientLocale');
-        $subject = (string)$data->get('subject');
-        $message = (string)$data->get('message');
+        $name = (string) $data->get('name');
+        $email = (string) $data->get('email');
+        $recipientLocale = (string) $data->get('recipientLocale');
+        $subject = (string) $data->get('subject');
+        $message = (string) $data->get('message');
 
         return $this->sendSupportRequest(
             $name,
@@ -61,21 +51,15 @@ class SupportControllerBase extends AbstractController
         );
     }
 
-    /**
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function requestSupportLegacy(Request $request, Context $context): JsonResponse
     {
         $data = $request->request;
 
-        $name = (string)$data->get('name');
-        $email = (string)$data->get('email');
-        $recipientLocale = (string)$data->get('recipientLocale');
-        $subject = (string)$data->get('subject');
-        $message = (string)$data->get('message');
+        $name = (string) $data->get('name');
+        $email = (string) $data->get('email');
+        $recipientLocale = (string) $data->get('recipientLocale');
+        $subject = (string) $data->get('subject');
+        $message = (string) $data->get('message');
 
         return $this->sendSupportRequest(
             $name,
@@ -88,16 +72,6 @@ class SupportControllerBase extends AbstractController
         );
     }
 
-    /**
-     * @param string $name
-     * @param string $email
-     * @param null|string $recipientLocale
-     * @param string $host
-     * @param string $subject
-     * @param string $message
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function sendSupportRequest(string $name, string $email, ?string $recipientLocale, string $host, string $subject, string $message, Context $context): JsonResponse
     {
         try {
@@ -123,13 +97,13 @@ class SupportControllerBase extends AbstractController
                 $e->getMessage(),
                 [
                     'error' => $message,
-                    'exceptionParams' => $e->getParameters()
+                    'exceptionParams' => $e->getParameters(),
                 ]
             );
 
             return $this->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         } catch (\Throwable $e) {
             $this->logger->error(
@@ -141,7 +115,7 @@ class SupportControllerBase extends AbstractController
 
             return $this->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }

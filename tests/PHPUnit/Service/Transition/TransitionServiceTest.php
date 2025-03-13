@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service\Transition;
 
@@ -51,7 +52,8 @@ class TransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with($definitionName, $orderId, 'stateId', $context)
-            ->willReturn([$transition1, $transition2]);
+            ->willReturn([$transition1, $transition2])
+        ;
 
         $availableTransitions = $this->transitionService->getAvailableTransitions($definitionName, $orderId, $context);
 

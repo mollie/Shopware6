@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -21,7 +22,7 @@ class CancelOrderSubscriber implements EventSubscriberInterface
      * our cancellation (if enabled in the config).
      */
     public const AUTOMATIC_TRIGGER_ACTIONS = [
-        StateMachineTransitionActions::ACTION_CANCEL
+        StateMachineTransitionActions::ACTION_CANCEL,
     ];
 
     /**
@@ -30,9 +31,8 @@ class CancelOrderSubscriber implements EventSubscriberInterface
     public const ALLOWED_CANCELLABLE_MOLLIE_STATES = [
         OrderStatus::STATUS_CREATED,
         OrderStatus::STATUS_AUTHORIZED,
-        OrderStatus::STATUS_SHIPPING
+        OrderStatus::STATUS_SHIPPING,
     ];
-
 
     /**
      * @var OrderService
@@ -54,13 +54,6 @@ class CancelOrderSubscriber implements EventSubscriberInterface
      */
     private $logger;
 
-
-    /**
-     * @param MollieApiFactory $apiFactory
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
-     * @param LoggerInterface $loggerService
-     */
     public function __construct(MollieApiFactory $apiFactory, OrderService $orderService, SettingsService $settingsService, LoggerInterface $loggerService)
     {
         $this->orderService = $orderService;
@@ -69,22 +62,16 @@ class CancelOrderSubscriber implements EventSubscriberInterface
         $this->logger = $loggerService;
     }
 
-
     /**
      * @return array<mixed>
      */
     public static function getSubscribedEvents(): array
     {
         return [
-            'state_machine.order.state_changed' => ['onOrderStateChanges']
+            'state_machine.order.state_changed' => ['onOrderStateChanges'],
         ];
     }
 
-
-    /**
-     * @param StateMachineStateChangeEvent $event
-     * @return void
-     */
     public function onOrderStateChanges(StateMachineStateChangeEvent $event): void
     {
         if ($event->getTransitionSide() !== StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER) {
@@ -94,54 +81,54 @@ class CancelOrderSubscriber implements EventSubscriberInterface
         $apiSource = $event->getContext()->getSource();
 
         if ($apiSource instanceof SalesChannelApiSource) {
-            # do NOT cancel directly within the context of a Storefront
-            # the user might retry the payment if the first one is cancelled
-            # and we must never cancel the full order, because then he cannot retry the payment.
+            // do NOT cancel directly within the context of a Storefront
+            // the user might retry the payment if the first one is cancelled
+            // and we must never cancel the full order, because then he cannot retry the payment.
             return;
         }
 
         $transitionName = $event->getTransition()->getTransitionName();
 
         try {
-            # if we don't have at least one of our
-            # actions that automatically trigger this feature, continue
-            if (!in_array($transitionName, self::AUTOMATIC_TRIGGER_ACTIONS, true)) {
+            // if we don't have at least one of our
+            // actions that automatically trigger this feature, continue
+            if (! in_array($transitionName, self::AUTOMATIC_TRIGGER_ACTIONS, true)) {
                 return;
             }
 
-            # get order and extract our Mollie Order ID
+            // get order and extract our Mollie Order ID
             $order = $this->orderService->getOrder($event->getTransition()->getEntityId(), $event->getContext());
 
-            # -----------------------------------------------------------------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------------------------------
 
-            # check if we have activated this feature in our plugin configuration
+            // check if we have activated this feature in our plugin configuration
             $settings = $this->settingsService->getSettings($order->getSalesChannelId());
 
-            if (!$settings->isAutomaticCancellation()) {
+            if (! $settings->isAutomaticCancellation()) {
                 return;
             }
 
-            # -----------------------------------------------------------------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------------------------------
 
             $orderAttributes = new OrderAttributes($order);
 
             $mollieOrderId = $orderAttributes->getMollieOrderId();
 
-            # if we don't have a Mollie Order ID continue
-            # this can also happen for subscriptions where we only have a tr_xxx Transaction ID.
-            # but cancellation only works on orders anyway
+            // if we don't have a Mollie Order ID continue
+            // this can also happen for subscriptions where we only have a tr_xxx Transaction ID.
+            // but cancellation only works on orders anyway
             if (empty($mollieOrderId)) {
                 return;
             }
 
-            # -----------------------------------------------------------------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------------------------------
 
             $apiClient = $this->apiFactory->getClient($order->getSalesChannelId());
 
             $mollieOrder = $apiClient->orders->get($mollieOrderId);
 
-            # check if the status of the Mollie order allows
-            # a cancellation based on our whitelist.
+            // check if the status of the Mollie order allows
+            // a cancellation based on our whitelist.
             if (in_array($mollieOrder->status, self::ALLOWED_CANCELLABLE_MOLLIE_STATES, true)) {
                 $this->logger->debug('Starting auto-cancellation of order: ' . $order->getOrderNumber() . ', ' . $mollieOrderId);
 

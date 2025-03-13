@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -22,9 +23,8 @@ class Mandate
     }
 
     /**
-     * @param string $customerId
-     * @param string $salesChannelId
      * @throws CouldNotFetchMollieCustomerMandatesException
+     *
      * @return BaseCollection|MandateCollection
      */
     public function getMandatesByMollieCustomerId(string $customerId, string $salesChannelId)
@@ -39,11 +39,7 @@ class Mandate
     }
 
     /**
-     * @param string $customerId
-     * @param string $mandateId
-     * @param string $salesChannelId
      * @throws CouldNotRevokeMollieCustomerMandateException
-     * @return void
      */
     public function revokeMandateByMollieCustomerId(string $customerId, string $mandateId, string $salesChannelId): void
     {

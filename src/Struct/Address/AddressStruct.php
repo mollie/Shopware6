@@ -50,16 +50,6 @@ final class AddressStruct
      */
     private $phone;
 
-    /**
-     * @param string $firstName
-     * @param string $lastName
-     * @param string $email
-     * @param string $street
-     * @param string $streetAdditional
-     * @param string $zipCode
-     * @param string $city
-     * @param string $countryCode
-     */
     public function __construct(string $firstName, string $lastName, string $email, string $street, string $streetAdditional, string $zipCode, string $city, string $countryCode, string $phone)
     {
         $this->firstName = $firstName;
@@ -74,14 +64,13 @@ final class AddressStruct
     }
 
     /**
-     * @param \stdClass $address
      * @return self
      */
     public static function createFromApiResponse(\stdClass $address)
     {
         $streetAdditional = '';
         if (property_exists($address, 'streetAdditional')) {
-            $streetAdditional = (string)$address->streetAdditional;
+            $streetAdditional = (string) $address->streetAdditional;
         }
         if (property_exists($address, 'familyName')) {
             $nameParts = explode(' ', $address->familyName);
@@ -91,14 +80,14 @@ final class AddressStruct
 
         return new AddressStruct(
             $address->givenName,
-            (string)$address->familyName,
-            (string)$address->email,
-            (string)$address->streetAndNumber,
+            (string) $address->familyName,
+            (string) $address->email,
+            (string) $address->streetAndNumber,
             $streetAdditional,
-            (string)$address->postalCode,
-            (string)$address->city,
-            (string)$address->country,
-            (string)$address->phone
+            (string) $address->postalCode,
+            (string) $address->city,
+            (string) $address->country,
+            (string) $address->phone
         );
     }
 
@@ -146,7 +135,6 @@ final class AddressStruct
     {
         return $this->phone;
     }
-
 
     public function getMollieAddressId(): string
     {

@@ -25,7 +25,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class CancelItemFacadeBuilder
 {
-
     /** @var MollieApiClient */
     private $mollieClient;
 
@@ -67,7 +66,6 @@ class CancelItemFacadeBuilder
         $mockOrder = $this->testCase->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $mockOrder->method('lines')->willReturn($oderLineCollection);
 
-
         $mockOrderEndpoint = $this->testCase->getMockBuilder(OrderEndpoint::class)->disableOriginalConstructor()->getMock();
         $mockOrderEndpoint->method('get')->willReturn($mockOrder);
 
@@ -90,9 +88,6 @@ class CancelItemFacadeBuilder
     {
         return $this->stockManager;
     }
-
-
-
 
     public function bild(): CancelItemFacade
     {

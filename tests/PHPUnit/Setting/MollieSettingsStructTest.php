@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Setting;
 
@@ -14,15 +15,15 @@ final class MollieSettingsStructTest extends TestCase
      * test to get a maximum range of order life time days
      *
      * @dataProvider orderLifeTimeDaysData
+     *
      * @param $lifeTimeDays
-     * @param null|int $realLifeTimeDays
      */
     public function testGetOrderLifetimeDays($lifeTimeDays, ?int $realLifeTimeDays)
     {
         $settingsStruct = new MollieSettingStruct();
 
         $settingsStruct->assign([
-            'orderLifetimeDays' => $lifeTimeDays
+            'orderLifetimeDays' => $lifeTimeDays,
         ]);
         $actualValue = $settingsStruct->getOrderLifetimeDays();
         $this->assertSame($realLifeTimeDays, $actualValue);
@@ -32,9 +33,9 @@ final class MollieSettingsStructTest extends TestCase
      * test get the correct calculation based on oderLifetimeDays config
      *
      * @dataProvider orderLifeTimeDaysData
+     *
      * @param $lifeTimeDays
-     * @param null|int $realLifeTimeDays
-     * @param null|string $expectedDateString
+     *
      * @throws \Exception
      */
     public function testGetOrderLifetimeDate($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
@@ -42,7 +43,7 @@ final class MollieSettingsStructTest extends TestCase
         $settingsStruct = new MollieSettingStruct();
 
         $settingsStruct->assign([
-            'orderLifetimeDays' => $lifeTimeDays
+            'orderLifetimeDays' => $lifeTimeDays,
         ]);
         $actualValue = $settingsStruct->getOrderLifetimeDate();
         $this->assertSame($expectedDateString, $actualValue);
@@ -52,16 +53,15 @@ final class MollieSettingsStructTest extends TestCase
      * test get the correct calculation based on paymentMethodBankTransferDueDateDays config
      *
      * @dataProvider orderBankTransferDueDays
+     *
      * @param $lifeTimeDays
-     * @param null|int $realLifeTimeDays
-     * @param null|string $expectedDateString
      */
     public function testBankTransferDueDays($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
         $settingsStruct = new MollieSettingStruct();
 
         $settingsStruct->assign([
-            'paymentMethodBankTransferDueDateDays' => $lifeTimeDays
+            'paymentMethodBankTransferDueDateDays' => $lifeTimeDays,
         ]);
         $actualValue = $settingsStruct->getPaymentMethodBankTransferDueDateDays();
         $this->assertSame($realLifeTimeDays, $actualValue);
@@ -71,9 +71,9 @@ final class MollieSettingsStructTest extends TestCase
      * test to get correct value range based on paymentMethodBankTransferDueDateDays config
      *
      * @dataProvider orderBankTransferDueDays
+     *
      * @param $lifeTimeDays
-     * @param null|int $realLifeTimeDays
-     * @param null|string $expectedDateString
+     *
      * @throws \Exception
      */
     public function testBankTransferDueDate($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
@@ -82,12 +82,12 @@ final class MollieSettingsStructTest extends TestCase
 
         $settingsStruct->assign([
             'orderLifetimeDays' => $lifeTimeDays,
-            'paymentMethodBankTransferDueDateDays' => $realLifeTimeDays
+            'paymentMethodBankTransferDueDateDays' => $realLifeTimeDays,
         ]);
         $actualValue = $settingsStruct->getPaymentMethodBankTransferDueDate();
         $this->assertSame($expectedDateString, $actualValue);
     }
-    
+
     public function orderLifeTimeDaysData()
     {
         $today = (new DateTime())->setTimezone(new DateTimeZone('UTC'));

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace PHPUnit\Components\Subscription\Services\Builder;
 
@@ -11,10 +12,9 @@ class IntervalCalculatorTest extends TestCase
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
      * to the configuration of the subscription.
+     *
      * @testWith    ["day"]
      *              ["days"]
-     *
-     * @param string $unit
      */
     public function testIntervalWithDays(string $unit)
     {
@@ -32,10 +32,9 @@ class IntervalCalculatorTest extends TestCase
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
      * to the configuration of the subscription.
+     *
      * @testWith    ["week"]
      *              ["weeks"]
-     *
-     * @param string $unit
      */
     public function testIntervalWithWeeks(string $unit)
     {
@@ -53,10 +52,9 @@ class IntervalCalculatorTest extends TestCase
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
      * to the configuration of the subscription.
+     *
      * @testWith    ["month"]
      *              ["months"]
-     *
-     * @param string $unit
      */
     public function testIntervalWithMonths(string $unit)
     {

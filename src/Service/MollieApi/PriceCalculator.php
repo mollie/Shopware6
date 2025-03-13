@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -11,19 +12,8 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 
 class PriceCalculator
 {
-    /**
-     *
-     */
     public const MOLLIE_PRICE_PRECISION = 2;
 
-
-    /**
-     * @param CalculatedPrice $price
-     * @param float $lineItemTotalPrice
-     * @param string $orderTaxType
-     * @param bool $isVerticalTaxCalculation
-     * @return LineItemPriceStruct
-     */
     public function calculateLineItemPrice(CalculatedPrice $price, float $lineItemTotalPrice, string $orderTaxType, bool $isVerticalTaxCalculation = false): LineItemPriceStruct
     {
         $taxCollection = $price->getCalculatedTaxes();
@@ -40,14 +30,13 @@ class PriceCalculator
             $vatRate = 0.0;
         }
 
-        # this can be the NET or GROSS price
-        # depending on the customer group setting
+        // this can be the NET or GROSS price
+        // depending on the customer group setting
         $unitPriceOriginal = $price->getUnitPrice();
 
-        # we need a gross price for Mollie
-        # let's first assume this is a gross price
+        // we need a gross price for Mollie
+        // let's first assume this is a gross price
         $unitPriceGross = $price->getUnitPrice();
-
 
         // If the order is of type TAX_STATE_NET the $lineItemTotalPrice and unit price is a net price.
         // For correct mollie api tax calculations we have to calculate the shopware gross price
@@ -84,51 +73,49 @@ class PriceCalculator
         $vatAmount = $roundedLineItemTotalPrice * ($roundedVatRate / (100 + $roundedVatRate));
         $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
 
-
-        # if we have multiple tax rates and amounts (very likely a promotion)
-        # then we have to combine those amounts and fake a new calculated tax rate.
-        # if we would just use e.g. the highest tax rate for calculation, then it could happen
-        # then the total amounts of vat rates is a negative one (promotion is negative). so we always have
-        # to use the correct pre-calculated tax amounts and build a single sum.
-        # and that obviously leads to a non-existing tax rate that we have to calculate in here
-        # steps to reproduce: make sure to have a multi-tax promotion where the higher tax rate would lead to a bigger vat amount for the whole cart.
-        #                     this means that the actual calculation would need more items with the lower tax rate.
-        # sample cart:
-        #       item #1: 10% tax rate, net price: 11.34, quantity 3
-        #       item #2: 20% tax rate, net price: 13.03, quantity 1
-        #       promotion: 50 EUR amount off on full cart
+        // if we have multiple tax rates and amounts (very likely a promotion)
+        // then we have to combine those amounts and fake a new calculated tax rate.
+        // if we would just use e.g. the highest tax rate for calculation, then it could happen
+        // then the total amounts of vat rates is a negative one (promotion is negative). so we always have
+        // to use the correct pre-calculated tax amounts and build a single sum.
+        // and that obviously leads to a non-existing tax rate that we have to calculate in here
+        // steps to reproduce: make sure to have a multi-tax promotion where the higher tax rate would lead to a bigger vat amount for the whole cart.
+        //                     this means that the actual calculation would need more items with the lower tax rate.
+        // sample cart:
+        //       item #1: 10% tax rate, net price: 11.34, quantity 3
+        //       item #2: 20% tax rate, net price: 13.03, quantity 1
+        //       promotion: 50 EUR amount off on full cart
         if ($taxCollection->count() > 1) {
-            # start by summing up the individual
-            # tax amounts from the tax rates
+            // start by summing up the individual
+            // tax amounts from the tax rates
             $vatAmount = 0;
             foreach ($taxCollection->getElements() as $tax) {
                 $vatAmount += $tax->getTax();
             }
             $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
 
-            # now calculate our fake tax rate
-            # from the final price and vat amount value
+            // now calculate our fake tax rate
+            // from the final price and vat amount value
             $net = $roundedLineItemTotalPrice - $vatAmount;
 
-            if ((float)$net !== 0.0) {
+            if ((float) $net !== 0.0) {
                 $fakeTaxRate = $vatAmount / $net * 100;
             } else {
-                # this happened once, division by zero
-                # so just make 0 out of it (worked for client)
+                // this happened once, division by zero
+                // so just make 0 out of it (worked for client)
                 $fakeTaxRate = 0;
             }
 
             $roundedVatRate = round($fakeTaxRate, 2);
 
-            # if we have a net price, then the calculated gross price is wrong.
-            # we now have a new mixed vat rate, which doesn't match our already calculated gross price.
+            // if we have a net price, then the calculated gross price is wrong.
+            // we now have a new mixed vat rate, which doesn't match our already calculated gross price.
             if ($orderTaxType === CartPrice::TAX_STATE_NET) {
-                # the total amount is already correct,
-                # so we just divide it by the quantity, and that should work.
+                // the total amount is already correct,
+                // so we just divide it by the quantity, and that should work.
                 $unitPriceGross = round($roundedLineItemTotalPrice / $price->getQuantity(), 2);
             }
         }
-
 
         return new LineItemPriceStruct($unitPriceGross, $roundedLineItemTotalPrice, $roundedVatAmount, $roundedVatRate);
     }
@@ -136,9 +123,6 @@ class PriceCalculator
     /**
      * Return a calculated tax struct for a line item. The tax rate is recalculated from multiple taxRates to
      * one taxRate that will fit for the lineItem
-     *
-     * @param CalculatedTaxCollection $taxCollection
-     * @return null|CalculatedTax
      */
     public function getHighestTax(CalculatedTaxCollection $taxCollection): ?CalculatedTax
     {
@@ -151,7 +135,7 @@ class PriceCalculator
                 return 0;
             }
 
-            return ($taxOne->getTaxRate() < $taxTwo->getTaxRate() ? 1 : -1);
+            return $taxOne->getTaxRate() < $taxTwo->getTaxRate() ? 1 : -1;
         });
 
         return $taxCollection->first();

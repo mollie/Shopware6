@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Handler\Method;
 
@@ -16,12 +17,9 @@ class Przelewy24Payment extends PaymentHandler
     /** @var string */
     protected $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-
     /**
      * @param array<mixed> $orderData
-     * @param OrderEntity $orderEntity
-     * @param SalesChannelContext $salesChannelContext
-     * @param CustomerEntity $customer
+     *
      * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array

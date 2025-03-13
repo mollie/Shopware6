@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
@@ -10,11 +11,9 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class PosOrderBuilderTest extends AbstractMollieOrderBuilder
 {
-
     /**
      * This test verifies that the identifier of our payment is correct.
      * This is required for the functionality with Mollie.
-     * @return void
      */
     public function testMollieIdentifier(): void
     {
@@ -24,7 +23,6 @@ class PosOrderBuilderTest extends AbstractMollieOrderBuilder
     /**
      * This test verifies that the default name of our payment is correct.
      * This is also used in Cypress tests.
-     * @return void
      */
     public function testDefaultName(): void
     {
@@ -34,7 +32,6 @@ class PosOrderBuilderTest extends AbstractMollieOrderBuilder
     /**
      * This test verifies that the terminal ID is extracted from the customers
      * custom fields, if it is set.
-     * @return void
      */
     public function testTerminalIsExtractedFromCustomer(): void
     {
@@ -48,8 +45,8 @@ class PosOrderBuilderTest extends AbstractMollieOrderBuilder
         $customer->setCustomFields(
             [
                 'mollie_payments' => [
-                    'preferred_pos_terminal' => 'term_123'
-                ]
+                    'preferred_pos_terminal' => 'term_123',
+                ],
             ]
         );
 

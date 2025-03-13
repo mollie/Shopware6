@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -12,16 +13,11 @@ use Shopware\Core\Framework\Context;
 
 class OrderDeliveryExtractor
 {
-
     /**
      * @var LoggerInterface
      */
     private $logger;
 
-
-    /**
-     * @param LoggerInterface $loggerService
-     */
     public function __construct(LoggerInterface $loggerService)
     {
         $this->logger = $loggerService;
@@ -31,7 +27,7 @@ class OrderDeliveryExtractor
     {
         $deliveries = $orderEntity->getDeliveries();
 
-        if (!$deliveries instanceof OrderDeliveryCollection) {
+        if (! $deliveries instanceof OrderDeliveryCollection) {
             $this->logger->critical(
                 sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId())
             );
@@ -52,7 +48,7 @@ class OrderDeliveryExtractor
          */
         $delivery = $deliveries->first();
 
-        if (!$delivery instanceof OrderDeliveryEntity) {
+        if (! $delivery instanceof OrderDeliveryEntity) {
             $this->logger->critical(
                 sprintf('Could not fetch deliveries from order with id %s', $orderEntity->getId())
             );

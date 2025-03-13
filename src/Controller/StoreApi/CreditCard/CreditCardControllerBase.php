@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\CreditCard;
 
@@ -26,31 +27,20 @@ class CreditCardControllerBase
      */
     private $mandateService;
 
-
-    /**
-     * @param CustomerService $customerService
-     * @param MandateServiceInterface $mandateService
-     */
     public function __construct(CustomerService $customerService, MandateServiceInterface $mandateService)
     {
         $this->customerService = $customerService;
         $this->mandateService = $mandateService;
     }
 
-
     /**
-     *
-     * @param string $customerId
-     * @param string $cardToken
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return StoreApiResponse
      */
     public function saveCardToken(string $customerId, string $cardToken, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
-        if (!$customer instanceof CustomerEntity) {
+        if (! $customer instanceof CustomerEntity) {
             throw new Exception('Customer with ID ' . $customerId . ' not found in Shopware');
         }
 
@@ -58,24 +48,19 @@ class CreditCardControllerBase
             $customer,
             $cardToken,
             $context,
-            $data->getBoolean('shouldSaveCardDetail', false)
+            $data->getBoolean('shouldSaveCardDetail')
         );
 
         return new StoreCardTokenResponse($result !== null);
     }
 
     /**
-     *
-     * @param string $customerId
-     * @param string $mandateId
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return StoreApiResponse
      */
     public function saveMandateId(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
-        if (!$customer instanceof CustomerEntity) {
+        if (! $customer instanceof CustomerEntity) {
             throw new Exception('Customer with ID ' . $customerId . ' not found in Shopware');
         }
 
@@ -89,12 +74,7 @@ class CreditCardControllerBase
     }
 
     /**
-     *
-     * @param string $customerId
-     * @param string $mandateId
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return StoreApiResponse
      */
     public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
@@ -104,11 +84,7 @@ class CreditCardControllerBase
     }
 
     /**
-     *
-     * @param string $customerId
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return StoreApiResponse
      */
     public function getMandates(string $customerId, SalesChannelContext $context): StoreApiResponse
     {

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -20,7 +21,6 @@ class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenera
     ];
 
     /**
-     * @param Context $context
      * @return array<mixed>
      */
     public function generate(Context $context): array
@@ -48,7 +48,7 @@ class JsonPluginConfigurationGenerator extends AbstractPluginConfigurationGenera
         return [
             'content' => json_encode($configs),
             'fileName' => 'plugin_configuration.json',
-            'mimeType' => 'application/json'
+            'mimeType' => 'application/json',
         ];
     }
 }

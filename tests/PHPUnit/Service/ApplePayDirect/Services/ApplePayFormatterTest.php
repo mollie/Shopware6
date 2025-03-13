@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
@@ -18,10 +19,6 @@ class ApplePayFormatterTest extends TestCase
      */
     private $formatter;
 
-
-    /**
-     *
-     */
     public function setUp(): void
     {
         $fakeSnippets = new FakeTranslator();
@@ -78,7 +75,7 @@ class ApplePayFormatterTest extends TestCase
                 'label' => 'My Shop',
                 'type' => 'final',
                 'amount' => 61.0,
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $formattedCart);
@@ -102,9 +99,6 @@ class ApplePayFormatterTest extends TestCase
         $this->assertEquals('My Shop (Test Mode)', $formattedCart['total']['label']);
     }
 
-    /**
-     * @return ApplePayCart
-     */
     private function getSampleCart(): ApplePayCart
     {
         $cart = new ApplePayCart();

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress;
 
@@ -24,41 +25,28 @@ class SubscriptionAddressDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription_address';
 
-    /**
-     * @return string
-     */
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return SubscriptionAddressEntity::class;
     }
 
-    /**
-     * @return string
-     */
     public function getCollectionClass(): string
     {
         return SubscriptionAddressCollection::class;
     }
 
-    /**
-     * @return FieldCollection
-     */
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
             (new FkField('subscription_id', 'subscriptionId', SubscriptionDefinition::class))->addFlags(new ApiAware()),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             (new FkField('salutation_id', 'salutationId', SalutationDefinition::class))->addFlags(new Required()),
             (new StringField('title', 'title'))->addFlags(new ApiAware()),
@@ -81,7 +69,7 @@ class SubscriptionAddressDefinition extends EntityDefinition
             new CreatedAtField(),
             new UpdatedAtField(),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             (new ManyToOneAssociationField('country', 'country_id', CountryDefinition::class, 'id', true))->addFlags(new ApiAware()),
             (new ManyToOneAssociationField('countryState', 'country_state_id', CountryStateDefinition::class, 'id', true))->addFlags(new ApiAware()),
@@ -90,7 +78,6 @@ class SubscriptionAddressDefinition extends EntityDefinition
             new ManyToOneAssociationField('subscription', 'subscription_id', SubscriptionDefinition::class, 'id', false),
             new OneToOneAssociationField('billingSubscription', 'id', 'billing_address_id', SubscriptionDefinition::class, false),
             new OneToOneAssociationField('shippingSubscription', 'id', 'shipping_address_id', SubscriptionDefinition::class, false),
-
         ]);
     }
 }

@@ -21,9 +21,6 @@ class CancelItemResponse
         return $this->success === true;
     }
 
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;
@@ -34,17 +31,20 @@ class CancelItemResponse
         $clone = clone $this;
         $clone->success = false;
         $clone->message = $message;
+
         return $clone;
     }
 
     /**
      * @param array<mixed> $data
+     *
      * @return $this
      */
     public function withData(array $data): self
     {
         $clone = clone $this;
         $clone->data = $data;
+
         return $clone;
     }
 
@@ -64,7 +64,7 @@ class CancelItemResponse
         return [
             'message' => $this->message,
             'success' => $this->success,
-            'data' => $this->data
+            'data' => $this->data,
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\Subscription\Response;
 
@@ -12,10 +13,6 @@ class SubscriptionCancelResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     *
-     */
     public function __construct()
     {
         $this->object = new ArrayStruct(

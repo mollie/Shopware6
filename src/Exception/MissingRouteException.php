@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -13,7 +14,7 @@ class MissingRouteException extends ShopwareHttpException
     {
         $message = 'Could not determine the route';
         $parameters = [
-            'request' => $request
+            'request' => $request,
         ];
 
         parent::__construct($message, $parameters, $previous);

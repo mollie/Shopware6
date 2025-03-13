@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -76,10 +77,8 @@ class CustomerService implements CustomerServiceInterface
      */
     private $configService;
 
-
     /** @var string */
     private $shopwareVersion;
-
 
     /**
      * @var ContainerInterface
@@ -89,32 +88,19 @@ class CustomerService implements CustomerServiceInterface
     /** @var EntityRepository */
     private $customerAddressRepository;
 
-
-    /**
-     * @param EntityRepository $countryRepository
-     * @param EntityRepository $customerRepository
-     * @param Customer $customerApiService
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface $logger
-     * @param SalesChannelContextPersister $salesChannelContextPersister
-     * @param EntityRepository $salutationRepository
-     * @param SettingsService $settingsService
-     * @param string $shopwareVersion
-     * @param ConfigService $configService
-     */
     public function __construct(
-        EntityRepository         $countryRepository,
-        EntityRepository        $customerRepository,
+        EntityRepository $countryRepository,
+        EntityRepository $customerRepository,
         EntityRepository $customerAddressRepository,
-        Customer                           $customerApiService,
-        EventDispatcherInterface           $eventDispatcher,
-        LoggerInterface                    $logger,
-        SalesChannelContextPersister       $salesChannelContextPersister,
-        EntityRepository      $salutationRepository,
-        SettingsService                    $settingsService,
-        string                             $shopwareVersion,
-        ConfigService                      $configService,
-        ContainerInterface                 $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
+        Customer $customerApiService,
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger,
+        SalesChannelContextPersister $salesChannelContextPersister,
+        EntityRepository $salutationRepository,
+        SettingsService $settingsService,
+        string $shopwareVersion,
+        ConfigService $configService,
+        ContainerInterface $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -132,11 +118,6 @@ class CustomerService implements CustomerServiceInterface
 
     /**
      * Login the customer.
-     *
-     * @param CustomerEntity $customer
-     * @param SalesChannelContext $context
-     *
-     * @return null|string
      */
     public function loginCustomer(CustomerEntity $customer, SalesChannelContext $context): ?string
     {
@@ -161,7 +142,7 @@ class CustomerService implements CustomerServiceInterface
                 'shippingAddressId' => null,
             ];
 
-            /** @phpstan-ignore-next-line */
+            /* @phpstan-ignore-next-line */
             $this->salesChannelContextPersister->save($newToken, $params);
         } elseif (version_compare($this->shopwareVersion, '6.3.4', '<') && version_compare($this->shopwareVersion, '6.3.3', '>=')) {
             // Shopware 6.3.3.x
@@ -197,23 +178,13 @@ class CustomerService implements CustomerServiceInterface
         return $newToken;
     }
 
-    /**
-     * @param SalesChannelContext $context
-     * @return bool
-     */
     public function isCustomerLoggedIn(SalesChannelContext $context): bool
     {
-        return ($context->getCustomer() instanceof CustomerEntity);
+        return $context->getCustomer() instanceof CustomerEntity;
     }
 
     /**
      * Stores the credit card token in the custom fields of the customer.
-     *
-     * @param CustomerEntity $customer
-     * @param string $cardToken
-     * @param SalesChannelContext $context
-     * @param bool $shouldSaveCardDetail
-     * @return EntityWrittenContainerEvent
      */
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent
     {
@@ -230,7 +201,7 @@ class CustomerService implements CustomerServiceInterface
         // Store shouldSaveCardDetail in the custom fields
         $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] = $shouldSaveCardDetail;
 
-        $this->logger->debug("Setting Credit Card Token", [
+        $this->logger->debug('Setting Credit Card Token', [
             'customerId' => $customer->getId(),
             'customFields' => $customFields,
         ]);
@@ -238,18 +209,12 @@ class CustomerService implements CustomerServiceInterface
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
             'id' => $customer->getId(),
-            'customFields' => $customFields
+            'customFields' => $customFields,
         ]], $context->getContext());
     }
 
     /**
      * Stores the credit mandate id in the custom fields of the customer.
-     *
-     * @param CustomerEntity $customer
-     * @param string $mandateId
-     * @param Context $context
-     *
-     * @return EntityWrittenContainerEvent
      */
     public function setMandateId(CustomerEntity $customer, string $mandateId, Context $context): EntityWrittenContainerEvent
     {
@@ -259,7 +224,7 @@ class CustomerService implements CustomerServiceInterface
         // Store the mandate id in the custom fields
         $customFields[CustomFieldsInterface::MOLLIE_KEY][self::CUSTOM_FIELDS_KEY_MANDATE_ID] = $mandateId;
 
-        $this->logger->debug("Setting Credit Card Mandate Id", [
+        $this->logger->debug('Setting Credit Card Mandate Id', [
             'customerId' => $customer->getId(),
             'customFields' => $customFields,
         ]);
@@ -267,32 +232,22 @@ class CustomerService implements CustomerServiceInterface
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
             'id' => $customer->getId(),
-            'customFields' => $customFields
+            'customFields' => $customFields,
         ]], $context);
     }
 
     /**
-     * @param string $customerID
      * @param array<mixed> $customFields
-     * @param Context $context
-     * @return EntityWrittenContainerEvent
      */
     public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context): EntityWrittenContainerEvent
     {
         // Store the custom fields on the customer
         return $this->customerRepository->update([[
             'id' => $customerID,
-            'customFields' => $customFields
+            'customFields' => $customFields,
         ]], $context);
     }
 
-
-    /**
-     * @param CustomerEntity $customer
-     * @param string $terminalId
-     * @param Context $context
-     * @return EntityWrittenContainerEvent
-     */
     public function setPosTerminal(CustomerEntity $customer, string $terminalId, Context $context): EntityWrittenContainerEvent
     {
         $customFields = $customer->getCustomFields();
@@ -305,31 +260,22 @@ class CustomerService implements CustomerServiceInterface
 
         return $this->customerRepository->update([[
             'id' => $customer->getId(),
-            'customFields' => $customFields
+            'customFields' => $customFields,
         ]], $context);
     }
 
     /**
-     * @param string $customerId
-     * @param string $salesChannelId
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
-     * @return string
      */
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
         $struct = $this->getCustomerStruct($customerId, $context);
 
-        return $struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+        return $struct->getCustomerId((string) $settings->getProfileId(), $settings->isTestMode());
     }
 
     /**
-     * @param string $customerId
-     * @param string $mollieCustomerId
-     * @param string $profileId
-     * @param bool $testMode
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
      */
     public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context): void
@@ -345,10 +291,6 @@ class CustomerService implements CustomerServiceInterface
 
     /**
      * Return a customer entity with address associations.
-     *
-     * @param string $customerId
-     * @param Context $context
-     * @return null|CustomerEntity
      */
     public function getCustomer(string $customerId, Context $context): ?CustomerEntity
     {
@@ -373,10 +315,7 @@ class CustomerService implements CustomerServiceInterface
     }
 
     /**
-     * @param string $customerId
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
-     * @return CustomerStruct
      */
     public function getCustomerStruct(string $customerId, Context $context): CustomerStruct
     {
@@ -397,7 +336,7 @@ class CustomerService implements CustomerServiceInterface
         $molliePaymentsCustomFields = $customFields[CustomFieldsInterface::MOLLIE_KEY] ?? [];
         if (! is_array($molliePaymentsCustomFields)) {
             $this->logger->warning('Customer customFields for MolliePayments are invalid. Array is expected', [
-                'currentCustomFields' => $molliePaymentsCustomFields
+                'currentCustomFields' => $molliePaymentsCustomFields,
             ]);
             $molliePaymentsCustomFields = [];
         }
@@ -411,7 +350,7 @@ class CustomerService implements CustomerServiceInterface
      * Return an array of address data.
      *
      * @param null|CustomerAddressEntity|OrderAddressEntity $address
-     * @param CustomerEntity $customer
+     *
      * @return array<mixed>
      */
     public function getAddressArray($address, CustomerEntity $customer): array
@@ -433,18 +372,6 @@ class CustomerService implements CustomerServiceInterface
         ];
     }
 
-    /**
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $email
-     * @param string $phone
-     * @param string $street
-     * @param string $zipCode
-     * @param string $city
-     * @param string $countryISO2
-     * @param SalesChannelContext $context
-     * @return null|CustomerEntity
-     */
     public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
     {
         $countryId = $this->getCountryId($countryISO2, $context->getContext());
@@ -469,25 +396,22 @@ class CustomerService implements CustomerServiceInterface
         try {
             $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
             $response = $abstractRegisterRoute->register($data, $context, false);
+
             return $response->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
-            /** we have to store the errors in an array because getErrors returns a generator */
+            /* we have to store the errors in an array because getErrors returns a generator */
             foreach ($e->getErrors() as $error) {
-                $errors[]=$error;
+                $errors[] = $error;
             }
-            $this->logger->error($e->getMessage(), ['errors'=>$errors]);
+            $this->logger->error($e->getMessage(), ['errors' => $errors]);
+
             return null;
         }
     }
 
     /**
      * Returns a country id by its iso code.
-     *
-     * @param string $countryCode
-     * @param Context $context
-     *
-     * @return null|string
      */
     public function getCountryId(string $countryCode, Context $context): ?string
     {
@@ -499,7 +423,7 @@ class CustomerService implements CustomerServiceInterface
             /** @var string[] $countries */
             $countries = $this->countryRepository->searchIds($criteria, $context)->getIds();
 
-            return ! empty($countries) ? (string)$countries[0] : null;
+            return ! empty($countries) ? (string) $countries[0] : null;
         } catch (Exception $e) {
             return null;
         }
@@ -507,10 +431,6 @@ class CustomerService implements CustomerServiceInterface
 
     /**
      * Returns a salutation id by its key.
-     *
-     * @param Context $context
-     *
-     * @return null|string
      */
     public function getSalutationId(Context $context): ?string
     {
@@ -522,16 +442,13 @@ class CustomerService implements CustomerServiceInterface
             /** @var string[] $salutations */
             $salutations = $this->salutationRepository->searchIds($criteria, $context)->getIds();
 
-            return ! empty($salutations) ? (string)$salutations[0] : null;
+            return ! empty($salutations) ? (string) $salutations[0] : null;
         } catch (Exception $e) {
             return null;
         }
     }
 
     /**
-     * @param string $customerId
-     * @param string $salesChannelId
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
      * @throws CouldNotCreateMollieCustomerException
      */
@@ -556,25 +473,26 @@ class CustomerService implements CustomerServiceInterface
         if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
             $this->setMollieCustomerId(
                 $customerId,
-                (string)$struct->getLegacyCustomerId(),
-                (string)$settings->getProfileId(),
+                (string) $struct->getLegacyCustomerId(),
+                (string) $settings->getProfileId(),
                 $settings->isTestMode(),
                 $context
             );
 
             $struct->setLegacyCustomerId(null);
             $struct->setCustomerId(
-                (string)$struct->getLegacyCustomerId(),
-                (string)$settings->getProfileId(),
+                (string) $struct->getLegacyCustomerId(),
+                (string) $settings->getProfileId(),
                 $settings->isTestMode()
             );
 
             return;
         }
 
-        $mollieCustomerId = $struct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+        $mollieCustomerId = $struct->getCustomerId((string) $settings->getProfileId(), $settings->isTestMode());
         try {
             $this->customerApiService->getMollieCustomerById($mollieCustomerId, $salesChannelId);
+
             return;
         } catch (CouldNotFetchMollieCustomerException $e) {
             $this->logger->warning('No customer found for the current mollie id and sales channel combination, creating a new one.', [
@@ -594,12 +512,11 @@ class CustomerService implements CustomerServiceInterface
         $this->setMollieCustomerId(
             $customerId,
             $mollieCustomer->id,
-            (string)$settings->getProfileId(),
+            (string) $settings->getProfileId(),
             $settings->isTestMode(),
             $context
         );
     }
-
 
     public function findCustomerByEmail(string $email, SalesChannelContext $context): ?CustomerEntity
     {
@@ -608,7 +525,6 @@ class CustomerService implements CustomerServiceInterface
         $criteria->addFilter(new EqualsFilter('guest', true));
         $criteria->addFilter(new EqualsFilter('active', true));
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
-
 
         $searchResult = $this->customerRepository->search($criteria, $context->getContext());
 
@@ -632,6 +548,7 @@ class CustomerService implements CustomerServiceInterface
         if ($bindCustomers && $foundCustomer->getBoundSalesChannelId() === null) {
             return null;
         }
+
         return $foundCustomer;
     }
 
@@ -644,7 +561,7 @@ class CustomerService implements CustomerServiceInterface
         $criteria = new Criteria();
         $criteria->addFilter(new AndFilter([
             new EqualsFilter('customerId', $customer->getId()),
-            new EqualsAnyFilter('customFields.' . CustomFieldsInterface::MOLLIE_KEY . '.' . self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID, $mollieAddressIds)
+            new EqualsAnyFilter('customFields.' . CustomFieldsInterface::MOLLIE_KEY . '.' . self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID, $mollieAddressIds),
         ]));
 
         $customerAddressSearchResult = $this->customerAddressRepository->search($criteria, $context);
@@ -655,7 +572,7 @@ class CustomerService implements CustomerServiceInterface
             $billingAddressId = $shippingAddressId;
 
             $addresses = [
-                $this->createShopwareAddressArray($shippingAddressId, $customer->getId(), $customer->getSalutationId(), $shippingAddress, $context)
+                $this->createShopwareAddressArray($shippingAddressId, $customer->getId(), $customer->getSalutationId(), $shippingAddress, $context),
             ];
             if ($billingAddress !== null) {
                 $billingAddressId = Uuid::randomHex();
@@ -666,16 +583,14 @@ class CustomerService implements CustomerServiceInterface
                 'id' => $customer->getId(),
                 'defaultBillingAddressId' => $shippingAddressId,
                 'defaultShippingAddressId' => $billingAddressId,
-                'addresses' => $addresses
+                'addresses' => $addresses,
             ];
 
             return $this->customerRepository->upsert([$customer], $context);
         }
 
-
         $defaultShippingAddressId = null;
         $defaultBillingAddressId = null;
-
 
         /** @var CustomerAddressEntity $customerAddress */
         foreach ($customerAddressSearchResult->getElements() as $customerAddress) {
@@ -703,7 +618,7 @@ class CustomerService implements CustomerServiceInterface
         //customer have addresses, might be from old PPE orders, might be from shopware, lets find them and select them
         $addresses = [];
 
-        // we havent found a default adress, create a new one
+        // we haven't found a default address, create a new one
         if ($defaultShippingAddressId === null) {
             $defaultShippingAddressId = Uuid::randomHex();
             $addresses[] = $this->createShopwareAddressArray($defaultShippingAddressId, $customer->getId(), $customer->getSalutationId(), $shippingAddress, $context);
@@ -715,7 +630,7 @@ class CustomerService implements CustomerServiceInterface
             $addresses[] = $this->createShopwareAddressArray($defaultBillingAddressId, $customer->getId(), $customer->getSalutationId(), $billingAddress, $context);
         }
 
-        //we dont have a billing adress, we use the shipping adress as billing
+        //we dont have a billing address, we use the shipping address as billing
         if ($billingAddress === null && $defaultBillingAddressId === null) {
             $defaultBillingAddressId = $defaultShippingAddressId;
         }
@@ -728,6 +643,7 @@ class CustomerService implements CustomerServiceInterface
         if (count($addresses) > 0) {
             $customer['addresses'] = $addresses;
         }
+
         return $this->customerRepository->upsert([$customer], $context);
     }
 
@@ -745,10 +661,8 @@ class CustomerService implements CustomerServiceInterface
 
         $settings = $this->settingsService->getSettings($context->getSalesChannelId());
         if ($settings->isRequireDataProtectionCheckbox()) {
-            $data->set('acceptedDataProtection', (bool)$acceptedDataProtection);
+            $data->set('acceptedDataProtection', (bool) $acceptedDataProtection);
         }
-
-
 
         $shippingAddressData = new RequestDataBag();
         $shippingAddressData->set('firstName', $shippingAddress->getFirstName());
@@ -760,7 +674,7 @@ class CustomerService implements CustomerServiceInterface
         $shippingAddressData->set('countryId', $countryId);
         $customFields = new RequestDataBag();
         $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
-            CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()]
+            CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $shippingAddress->getMollieAddressId()],
         ]);
         $shippingAddressData->set('customFields', $customFields);
         $data->set('shippingAddress', $shippingAddressData);
@@ -777,7 +691,7 @@ class CustomerService implements CustomerServiceInterface
             $billingAddressData->set('countryId', $countryId);
             $customFields = new RequestDataBag();
             $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
-                CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()]
+                CustomFieldsInterface::MOLLIE_KEY => [self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $billingAddress->getMollieAddressId()],
             ]);
             $billingAddressData->set('customFields', $customFields);
 
@@ -786,26 +700,21 @@ class CustomerService implements CustomerServiceInterface
 
         try {
             $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
-            $response = $abstractRegisterRoute->register($data, $context, false);
-            return $response->getCustomer();
+
+            return $abstractRegisterRoute->register($data, $context, false)->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
-            /** we have to store the errors in an array because getErrors returns a generator */
+            /* we have to store the errors in an array because getErrors returns a generator */
             foreach ($e->getErrors() as $error) {
                 $errors[] = $error;
             }
             $this->logger->error($e->getMessage(), ['errors' => $errors]);
+
             return null;
         }
     }
 
-
     /**
-     * @param string $addressId
-     * @param string $customerId
-     * @param null|string $salutationId
-     * @param AddressStruct $address
-     * @param Context $context
      * @return array<mixed>
      */
     private function createShopwareAddressArray(string $addressId, string $customerId, ?string $salutationId, AddressStruct $address, Context $context): array
@@ -823,13 +732,14 @@ class CustomerService implements CustomerServiceInterface
             'phoneNumber' => '',
             'customFields' => [
                 CustomFieldsInterface::MOLLIE_KEY => [
-                    self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $address->getMollieAddressId()
-                ]
-            ]
+                    self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $address->getMollieAddressId(),
+                ],
+            ],
         ];
         if ($salutationId !== null) {
             $addressArray['salutationId'] = $salutationId;
         }
+
         return $addressArray;
     }
 }

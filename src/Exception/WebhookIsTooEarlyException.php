@@ -9,10 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 class WebhookIsTooEarlyException extends ShopwareHttpException
 {
     public const MOLLIE_PAYMENTS__WEBHOOK_TOO_EARLY = 'MOLLIE_PAYMENTS__WEBHOOK_TOO_EARLY';
+
     public function __construct(string $oderNumber, \DateTimeInterface $now, \DateTimeInterface $updatedTime)
     {
         $message = 'Webhook is too early for order: {{orderNumber}}. Request will be accepted after: {{lastUpdateTime}}. Current Time is :{{now}}';
-        $parameters =[
+        $parameters = [
             'orderNumber' => $oderNumber,
             'lastUpdateTime' => $updatedTime->format('Y-m-d H:i:s'),
             'now' => $now->format('Y-m-d H:i:s'),
@@ -20,6 +21,7 @@ class WebhookIsTooEarlyException extends ShopwareHttpException
 
         parent::__construct($message, $parameters);
     }
+
     public function getErrorCode(): string
     {
         return self::MOLLIE_PAYMENTS__WEBHOOK_TOO_EARLY;

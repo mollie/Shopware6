@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
@@ -25,6 +26,10 @@ class OrderTest extends TestCase
 {
     use BuilderTestTrait;
 
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
 
     /**
      * @var MollieApiClient
@@ -41,13 +46,7 @@ class OrderTest extends TestCase
      */
     private $paymentApiService;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-
-    /***
+    /*
      * @return void
      */
     protected function setUp(): void
@@ -80,7 +79,7 @@ class OrderTest extends TestCase
     {
         $mollieOrder = $this->createMock(Order::class);
         $orderEndpoint = $this->createConfiguredMock(OrderEndpoint::class, [
-            'get' => $mollieOrder
+            'get' => $mollieOrder,
         ]);
 
         $orderEndpoint->expects($this->once())->method('get');
@@ -110,9 +109,6 @@ class OrderTest extends TestCase
     }
 
     /**
-     * @param string $type
-     * @param int $shippableQuantity
-     * @param bool $expectedValue
      * @dataProvider getIsCompletelyShippedData
      */
     public function testIsCompletelyShipped(string $type, int $shippableQuantity, bool $expectedValue)
@@ -125,11 +121,11 @@ class OrderTest extends TestCase
         $mollieOrderLineCollection->append($mollieOrderLine);
 
         $mollieOrder = $this->createConfiguredMock(Order::class, [
-            'lines' => $mollieOrderLineCollection
+            'lines' => $mollieOrderLineCollection,
         ]);
 
         $orderEndpoint = $this->createConfiguredMock(OrderEndpoint::class, [
-            'get' => $mollieOrder
+            'get' => $mollieOrder,
         ]);
 
         $orderEndpoint->expects($this->once())->method('get');

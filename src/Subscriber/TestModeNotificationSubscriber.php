@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -17,6 +18,15 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
     /** @var SettingsService */
     private $settingsService;
 
+    /**
+     * Creates a new instance of PaymentMethodSubscriber.
+     */
+    public function __construct(
+        SettingsService $settingsService
+    ) {
+        $this->settingsService = $settingsService;
+    }
+
     public static function getSubscribedEvents()
     {
         return [
@@ -24,19 +34,8 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
             AccountPaymentMethodPageLoadedEvent::class => 'addTestModeInformationToPages',
             AccountEditOrderPageLoadedEvent::class => 'addTestModeInformationToPages',
             CheckoutConfirmPageLoadedEvent::class => 'addTestModeInformationToPages',
-            CheckoutFinishPageLoadedEvent::class => 'addTestModeInformationToPages'
+            CheckoutFinishPageLoadedEvent::class => 'addTestModeInformationToPages',
         ];
-    }
-
-    /**
-     * Creates a new instance of PaymentMethodSubscriber.
-     *
-     * @param SettingsService $settingsService
-     */
-    public function __construct(
-        SettingsService $settingsService
-    ) {
-        $this->settingsService = $settingsService;
     }
 
     public function addTestModeInformationToPages(PageLoadedEvent $event): void

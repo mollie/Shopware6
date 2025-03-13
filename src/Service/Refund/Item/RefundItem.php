@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Refund\Item;
 
@@ -33,13 +34,8 @@ class RefundItem
      */
     private $shopwareLineVersionId;
 
-
     /**
      * @param string $shopwareLineID
-     * @param string $mollieLineID
-     * @param string $shopwareReference
-     * @param int $quantity
-     * @param float $amount
      */
     public function __construct(string $mollieLineID, string $shopwareReference, int $quantity, float $amount, ?string $shopwareLineID, ?string $shopwareLineVersionId)
     {
@@ -51,7 +47,6 @@ class RefundItem
         $this->shopwareLineVersionId = $shopwareLineVersionId;
     }
 
-
     /**
      * @return string
      */
@@ -60,41 +55,26 @@ class RefundItem
         return $this->shopwareLineID;
     }
 
-    /**
-     * @return int
-     */
     public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    /**
-     * @return string
-     */
     public function getShopwareReference(): string
     {
         return $this->shopwareReference;
     }
 
-    /**
-     * @return float
-     */
     public function getAmount(): float
     {
         return $this->amount;
     }
 
-    /**
-     * @return string
-     */
     public function getMollieLineID(): string
     {
         return $this->mollieLineID;
     }
 
-    /**
-     * @return null|string
-     */
     public function getShopwareLineVersionId(): ?string
     {
         return $this->shopwareLineVersionId;

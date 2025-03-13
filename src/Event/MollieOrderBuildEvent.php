@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Event;
 
@@ -32,12 +33,8 @@ class MollieOrderBuildEvent
      */
     private $salesChannelContext;
 
-
     /**
      * @param array<mixed> $orderData
-     * @param OrderEntity $order
-     * @param string $transactionId
-     * @param SalesChannelContext $salesChannelContext
      */
     public function __construct(array $orderData, OrderEntity $order, string $transactionId, SalesChannelContext $salesChannelContext)
     {
@@ -49,25 +46,16 @@ class MollieOrderBuildEvent
         $this->metadata = [];
     }
 
-    /**
-     * @return OrderEntity
-     */
     public function getOrder(): OrderEntity
     {
         return $this->order;
     }
 
-    /**
-     * @return string
-     */
     public function getTransactionId(): string
     {
         return $this->transactionId;
     }
 
-    /**
-     * @return SalesChannelContext
-     */
     public function getSalesChannelContext(): SalesChannelContext
     {
         return $this->salesChannelContext;

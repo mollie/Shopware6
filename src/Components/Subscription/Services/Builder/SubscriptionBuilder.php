@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 
@@ -24,29 +25,23 @@ class SubscriptionBuilder
      */
     private $intervalCalculator;
 
-
-    /**
-     */
     public function __construct()
     {
         $this->intervalCalculator = new IntervalCalculator();
     }
 
-
     /**
-     * @param OrderEntity $order
      * @throws Exception
-     * @return SubscriptionEntity
      */
     public function buildSubscription(OrderEntity $order): SubscriptionEntity
     {
-        if (!$order->getLineItems() instanceof OrderLineItemCollection) {
+        if (! $order->getLineItems() instanceof OrderLineItemCollection) {
             throw new Exception('Order does not have line items');
         }
 
         $item = $order->getLineItems()->first();
 
-        if (!$item instanceof OrderLineItemEntity) {
+        if (! $item instanceof OrderLineItemEntity) {
             throw new Exception('Order does not have a valid line item');
         }
 
@@ -54,18 +49,15 @@ class SubscriptionBuilder
     }
 
     /**
-     * @param OrderLineItemEntity $lineItem
-     * @param OrderEntity $order
      * @throws Exception
-     * @return SubscriptionEntity
      */
     private function buildItemSubscription(OrderLineItemEntity $lineItem, OrderEntity $order): SubscriptionEntity
     {
-        if (!$order->getCurrency() instanceof CurrencyEntity) {
+        if (! $order->getCurrency() instanceof CurrencyEntity) {
             throw new Exception('Order does not have a currency');
         }
 
-        if (!$order->getOrderCustomer() instanceof OrderCustomerEntity) {
+        if (! $order->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new Exception('Order does not have an order customer entity');
         }
 
@@ -78,18 +70,18 @@ class SubscriptionBuilder
 
         $description = $lineItem->getQuantity() . 'x ' . $lineItem->getLabel() . ' (Order #' . $order->getOrderNumber() . ', ' . $lineItem->getTotalPrice() . ' ' . $order->getCurrency()->getIsoCode() . ')';
 
-        # -----------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------
 
         $subscriptionEntity = new SubscriptionEntity();
         $subscriptionEntity->setId(Uuid::randomHex());
 
         $subscriptionEntity->setDescription($description);
 
-        # ATTENTION
-        # the amount needs to be the total amount of our order
-        # and not the price amount. because it would have shipping as well
-        # as promotions.  because we only offer subscriptions as a 1-item order without mixed carts,
-        # this is the perfect way to still have shopware doing every calculation.
+        // ATTENTION
+        // the amount needs to be the total amount of our order
+        // and not the price amount. because it would have shipping as well
+        // as promotions.  because we only offer subscriptions as a 1-item order without mixed carts,
+        // this is the perfect way to still have shopware doing every calculation.
         $subscriptionEntity->setAmount($order->getAmountTotal());
         $subscriptionEntity->setCurrencyId($order->getCurrency()->getId());
         $subscriptionEntity->setTotalRounding($order->getTotalRounding());
@@ -98,16 +90,16 @@ class SubscriptionBuilder
 
         $subscriptionEntity->setQuantity($lineItem->getQuantity());
 
-        $subscriptionEntity->setCustomerId((string)$order->getOrderCustomer()->getCustomerId());
-        $subscriptionEntity->setProductId((string)$lineItem->getProductId());
+        $subscriptionEntity->setCustomerId((string) $order->getOrderCustomer()->getCustomerId());
+        $subscriptionEntity->setProductId((string) $lineItem->getProductId());
         $subscriptionEntity->setOrderId($order->getId());
         $subscriptionEntity->setSalesChannelId($order->getSalesChannelId());
         $subscriptionEntity->setTotalRounding($order->getTotalRounding());
         $subscriptionEntity->setItemRounding($order->getItemRounding());
 
-        # calculate our first start date.
-        # this is our current date (now) + 1x the planned interval.
-        # we already charge now, so we start the recurrency in 1 interval.
+        // calculate our first start date.
+        // this is our current date (now) + 1x the planned interval.
+        // we already charge now, so we start the re-currency in 1 interval.
         $firstStartDate = $this->intervalCalculator->getNextIntervalDate(
             $order->getOrderDateTime(),
             $interval,
@@ -149,13 +141,12 @@ class SubscriptionBuilder
             $subscriptionEntity->setBillingAddress($address);
         }
 
-
         if ($order->getDeliveries() instanceof OrderDeliveryCollection) {
             foreach ($order->getDeliveries() as $delivery) {
                 $shippingAddress = $delivery->getShippingOrderAddress();
 
-                # if we have a different shipping address
-                # then lets create it for our subscription
+                // if we have a different shipping address
+                // then lets create it for our subscription
                 if ($shippingAddress instanceof OrderAddressEntity && $shippingAddress->getId() !== $order->getBillingAddressId()) {
                     $address = new SubscriptionAddressEntity();
                     $address->setId(Uuid::randomHex());

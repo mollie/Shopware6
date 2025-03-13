@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
@@ -21,10 +22,6 @@ class ApplePayFormatter
      */
     private $routingDetector;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param RoutingDetector $routingDetector
-     */
     public function __construct(TranslatorInterface $translator, RoutingDetector $routingDetector)
     {
         $this->translator = $translator;
@@ -32,8 +29,6 @@ class ApplePayFormatter
     }
 
     /**
-     * @param ShippingMethodEntity $shippingMethod
-     * @param float $shippingCosts
      * @return array<mixed>
      */
     public function formatShippingMethod(ShippingMethodEntity $shippingMethod, float $shippingCosts): array
@@ -53,16 +48,13 @@ class ApplePayFormatter
     }
 
     /**
-     * @param ApplePayCart $cart
-     * @param SalesChannelEntity $shop
-     * @param bool $isTestMode
      * @return array<mixed>
      */
     public function formatCart(ApplePayCart $cart, SalesChannelEntity $shop, bool $isTestMode): array
     {
         $shopName = $shop->getName();
 
-        # snippets in headless somehow do not work, weird..so let's do a static translation
+        // snippets in headless somehow do not work, weird..so let's do a static translation
         $isStoreApiScope = $this->routingDetector->isStoreApiRoute();
 
         if ($isTestMode) {
@@ -70,18 +62,18 @@ class ApplePayFormatter
             $shopName .= ' (' . $snippetTestMode . ')';
         }
 
-        # -----------------------------------------------------
-        # INITIAL DATA
-        # -----------------------------------------------------
+        // -----------------------------------------------------
+        // INITIAL DATA
+        // -----------------------------------------------------
         $data = [
             'label' => $shopName,
             'amount' => $this->prepareFloat($cart->getAmount()),
             'items' => [],
         ];
 
-        # -----------------------------------------------------
-        # SUBTOTAL
-        # -----------------------------------------------------
+        // -----------------------------------------------------
+        // SUBTOTAL
+        // -----------------------------------------------------
         $snippetCaptionSubtotal = ($isStoreApiScope) ? 'Subtotal' : $this->translator->trans('molliePayments.payments.applePayDirect.captionSubtotal');
         $data['items'][] = [
             'label' => $snippetCaptionSubtotal,
@@ -89,9 +81,9 @@ class ApplePayFormatter
             'amount' => $this->prepareFloat($cart->getProductAmount()),
         ];
 
-        # -----------------------------------------------------
-        # SHIPPING DATA
-        # -----------------------------------------------------
+        // -----------------------------------------------------
+        // SHIPPING DATA
+        // -----------------------------------------------------
         foreach ($cart->getShippings() as $shipping) {
             $data['items'][] = [
                 'label' => $shipping->getName(),
@@ -100,9 +92,9 @@ class ApplePayFormatter
             ];
         }
 
-        # -----------------------------------------------------
-        # TAXES DATA
-        # -----------------------------------------------------
+        // -----------------------------------------------------
+        // TAXES DATA
+        // -----------------------------------------------------
         if ($cart->getTaxes() instanceof ApplePayLineItem) {
             $snippetCaptionTaxes = ($isStoreApiScope) ? 'Taxes' : $this->translator->trans('molliePayments.payments.applePayDirect.captionTaxes');
             $data['items'][] = [
@@ -112,9 +104,9 @@ class ApplePayFormatter
             ];
         }
 
-        # -----------------------------------------------------
-        # TOTAL DATA
-        # -----------------------------------------------------
+        // -----------------------------------------------------
+        // TOTAL DATA
+        // -----------------------------------------------------
         $data['total'] = [
             'label' => $shopName,
             'amount' => $this->prepareFloat($cart->getAmount()),
@@ -131,12 +123,11 @@ class ApplePayFormatter
      * the value by rounding the number up to the number
      * of decimals we find here!
      *
-     * @param float $value
      * @return float
      */
     private function prepareFloat(float $value)
     {
-        $countDecimals = strlen((string)substr((string)strrchr((string)$value, "."), 1));
+        $countDecimals = strlen((string) substr((string) strrchr((string) $value, '.'), 1));
 
         return round($value, $countDecimals);
     }

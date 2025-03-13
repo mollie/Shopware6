@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
@@ -30,10 +31,6 @@ class MollieLineItemBuilderTest extends TestCase
      */
     private $builder;
 
-
-    /**
-     * @return void
-     */
     public function setUp(): void
     {
         $this->builder = new MollieLineItemBuilder(
@@ -47,11 +44,8 @@ class MollieLineItemBuilderTest extends TestCase
         );
     }
 
-
     /**
      * This test verifies that our constant for custom products is not touched.
-     *
-     * @return void
      */
     public function testConstants(): void
     {
@@ -61,8 +55,6 @@ class MollieLineItemBuilderTest extends TestCase
     /**
      * This test verifies that an empty order item list leads to
      * an empty array.
-     *
-     * @return void
      */
     public function testNoLineItems(): void
     {
@@ -100,10 +92,6 @@ class MollieLineItemBuilderTest extends TestCase
      * and working for the Mollie API as payload.
      *
      * @dataProvider getStructureData
-     *
-     * @param string $itemType
-     * @param string $mollieLineType
-     * @return void
      */
     public function testLineItemStructure(string $itemType, string $mollieLineType): void
     {
@@ -139,23 +127,23 @@ class MollieLineItemBuilderTest extends TestCase
             'quantity' => 1,
             'unitPrice' => [
                 'currency' => 'EUR',
-                'value' => '4.90'
+                'value' => '4.90',
             ],
             'totalAmount' => [
                 'currency' => 'EUR',
-                'value' => '4.90'
+                'value' => '4.90',
             ],
             'vatRate' => '19.00',
             'vatAmount' => [
                 'currency' => 'EUR',
-                'value' => '0.78'
+                'value' => '0.78',
             ],
             'sku' => 'product-123',
             'imageUrl' => 'https://phpunit.mollie.local/my-product-1.png',
             'productUrl' => 'https://phpunit.mollie.local/my-product-1',
             'metadata' => [
-                'orderLineItemId' => 'line-1'
-            ]
+                'orderLineItemId' => 'line-1',
+            ],
         ];
 
         self::assertCount(1, $lineItems);
@@ -167,8 +155,6 @@ class MollieLineItemBuilderTest extends TestCase
      * These need to be rounded to 2 decimals.
      * Usually there is a rounding difference. This is why we also have to fix the rounding so that the final sum is correct.
      * This is a real world scenario from a Github Issue: https://github.com/mollie/Shopware6/issues/439
-     *
-     * @return void
      */
     public function testLineItemsWithHigherPrecision(): void
     {
@@ -190,14 +176,13 @@ class MollieLineItemBuilderTest extends TestCase
 
         $lineItems = $this->builder->buildLineItemPayload($order, 'EUR', $settings, false);
 
-
         $lineItemSum = 0;
         foreach ($lineItems as $item) {
-            $lineItemSum += (float)$item['totalAmount']['value'];
+            $lineItemSum += (float) $item['totalAmount']['value'];
         }
 
-        # make sure that our separate line items are correctly rounded
-        # Mollie only allows 2 decimals
+        // make sure that our separate line items are correctly rounded
+        // Mollie only allows 2 decimals
         $this->assertEquals('2.73', $lineItems[0]['totalAmount']['value']);
         $this->assertEquals('2.93', $lineItems[1]['totalAmount']['value']);
         $this->assertEquals('1.65', $lineItems[2]['totalAmount']['value']);
@@ -207,16 +192,15 @@ class MollieLineItemBuilderTest extends TestCase
         $this->assertEquals(14.82, $lineItemSum);
     }
 
-
     /**
      * @return array[]
      */
     public function getRoundingFixerData(): array
     {
         return [
-            "Enable Fixing, but not difference, items remain the same" => [true, 2.73, 2.73, 1, 2.73],
-            "Enable Fixing with difference, diff item is added" => [true, 2.73, 3.00, 2, 3.0],
-            "Disable Fixing with difference, items remain the same" => [false, 2.73, 3.00, 1, 2.73],
+            'Enable Fixing, but not difference, items remain the same' => [true, 2.73, 2.73, 1, 2.73],
+            'Enable Fixing with difference, diff item is added' => [true, 2.73, 3.00, 2, 3.0],
+            'Disable Fixing with difference, items remain the same' => [false, 2.73, 3.00, 1, 2.73],
         ];
     }
 
@@ -228,19 +212,12 @@ class MollieLineItemBuilderTest extends TestCase
      *
      * @dataProvider getRoundingFixerData
      *
-     * @param bool $fixRoundingIssues
-     * @param float $swItemUnitPrice
-     * @param float $swOrderTotal
-     * @param int $lineItemCount
-     * @param float $expectedOrderSum
-     *
      * @return void
      */
     public function testRoundingFixerIsUsedCorrectly(bool $fixRoundingIssues, float $swItemUnitPrice, float $swOrderTotal, int $lineItemCount, float $expectedOrderSum)
     {
         $settings = new MollieSettingStruct();
         $settings->setFixRoundingDiffEnabled($fixRoundingIssues);
-
 
         $item1 = $this->getOrderLineItem(
             '',
@@ -266,17 +243,15 @@ class MollieLineItemBuilderTest extends TestCase
 
         $lineItems = $this->builder->buildLineItemPayload($order, 'EUR', $settings, true);
 
-
-        # check if we have the expected number of items
-        # this is either with, or without our diff-line-item
+        // check if we have the expected number of items
+        // this is either with, or without our diff-line-item
         $this->assertCount($lineItemCount, $lineItems);
 
-
-        # now sum up the line items of the hydrated array
-        # this has to match the values that we expect to be.
+        // now sum up the line items of the hydrated array
+        // this has to match the values that we expect to be.
         $lineItemSum = 0;
         foreach ($lineItems as $item) {
-            $lineItemSum += (float)$item['totalAmount']['value'];
+            $lineItemSum += (float) $item['totalAmount']['value'];
         }
 
         $this->assertEquals($expectedOrderSum, $lineItemSum);

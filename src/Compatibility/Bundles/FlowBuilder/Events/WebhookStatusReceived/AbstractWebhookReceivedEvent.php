@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived;
 
@@ -28,72 +29,47 @@ abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware,
      */
     private $context;
 
-
-    /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
-     */
     public function __construct(OrderEntity $orderEntity, Context $context)
     {
         $this->order = $orderEntity;
         $this->context = $context;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'mollie.webhook_received.status.' . $this->getMollieStatus();
     }
 
-    /**
-     * @return EventDataCollection
-     */
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
             ->add('order', new EntityType(OrderDefinition::class))
-            ->add('mollieStatus', new ScalarValueType('string'));
+            ->add('mollieStatus', new ScalarValueType('string'))
+        ;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderId(): string
     {
         return $this->order->getId();
     }
 
-    /**
-     * @return OrderEntity
-     */
     public function getOrder(): OrderEntity
     {
         return $this->order;
     }
 
-    /**
-     * @return string
-     */
     abstract public function getMollieStatus(): string;
 
-    /**
-     * @return Context
-     */
     public function getContext(): Context
     {
         return $this->context;
     }
 
-    /**
-     * @return MailRecipientStruct
-     */
     public function getMailStruct(): MailRecipientStruct
     {
         $customer = $this->order->getOrderCustomer();
 
-        if (!$customer instanceof OrderCustomerEntity) {
+        if (! $customer instanceof OrderCustomerEntity) {
             return new MailRecipientStruct([]);
         }
 
@@ -102,9 +78,6 @@ abstract class AbstractWebhookReceivedEvent extends Event implements OrderAware,
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function getSalesChannelId(): string
     {
         return $this->order->getSalesChannelId();

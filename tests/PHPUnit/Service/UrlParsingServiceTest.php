@@ -52,7 +52,6 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-
     /**
      * @dataProvider hashProvider
      */
@@ -82,8 +81,8 @@ class UrlParsingServiceTest extends TestCase
     public function notFoundProvider(): array
     {
         return [
-            ['https://www.example.com/product', ['https://www.example.com/product','']],
-            ['https://www.example.com/code/product', ['https://www.example.com/code/product','']],
+            ['https://www.example.com/product', ['https://www.example.com/product', '']],
+            ['https://www.example.com/code/product', ['https://www.example.com/code/product', '']],
         ];
     }
 

@@ -13,7 +13,6 @@ class CancelCheckoutResponse extends StoreApiResponse
 {
     private string $sessionId;
 
-
     public function __construct(string $sessionId)
     {
         $this->sessionId = $sessionId;

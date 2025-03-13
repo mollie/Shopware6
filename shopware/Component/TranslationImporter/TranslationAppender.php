@@ -15,25 +15,24 @@ final class TranslationAppender implements AppenderInterface
         $keyParts = explode('.', $key);
         $lastKeyPart = array_pop($keyParts);
 
-
         $path = '/';
         foreach ($keyParts as $keyPart) {
             $keyPart = mb_strtolower($keyPart);
 
             $searchParts = [
-                "following-sibling::" . $keyPart, //search for the HTMLElement
-                "following::" . $keyPart, //search for the HTMLElement
-                "following::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]",//search for the title which contains the key part,
-                "following::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]",//search for the name which contains the key part,
-                "descendant::" . $keyPart, //search for the HTMLElement
-                "descendant::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]",//search for the title which contains the key part,
-                "descendant::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]",//search for the name which contains the key part,
+                'following-sibling::' . $keyPart, //search for the HTMLElement
+                'following::' . $keyPart, //search for the HTMLElement
+                "following::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the title which contains the key part,
+                "following::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the name which contains the key part,
+                'descendant::' . $keyPart, //search for the HTMLElement
+                "descendant::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the title which contains the key part,
+                "descendant::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the name which contains the key part,
             ];
 
             if (is_numeric($keyPart)) {
                 //convert options.0. to options/*[0]
                 $searchParts = [
-                    "*[" . $keyPart . "]"
+                    '*[' . $keyPart . ']',
                 ];
             }
 
@@ -73,7 +72,6 @@ final class TranslationAppender implements AppenderInterface
             return new AppenderResult(sprintf('Replace "%s" with the key %s', $text, $key));
         }
 
-
         $domElement = $domXpath->query($path);
 
         //we expect to find exactly one node, not multiple
@@ -98,12 +96,14 @@ final class TranslationAppender implements AppenderInterface
         if ($targetChildren->count() === 1) {
             $targetNode = $targetChildren->item(0);
             $targetNode->parentNode->insertBefore($newNode, $targetNode->nextSibling);
+
             return new AppenderResult(sprintf('Appended "%s" with the key %s', $text, $key));
         }
 
         if ($targetChildren->count() === 0) {
             $domElement->item(0)->appendChild($newNode);
         }
+
         return new AppenderResult(sprintf('Created new entry "%s" with the key %s', $text, $key));
     }
 }

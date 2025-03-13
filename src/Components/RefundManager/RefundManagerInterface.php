@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager;
 
@@ -10,28 +11,11 @@ use Shopware\Core\Framework\Context;
 
 interface RefundManagerInterface
 {
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return RefundData
-     */
     public function getData(OrderEntity $order, Context $context): RefundData;
 
-    /**
-     * @param OrderEntity $order
-     * @param RefundRequest $request
-     * @param Context $context
-     * @return Refund
-     */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund;
 
     public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool;
 
-    /**
-     * @param string $orderId
-     * @param string $refundId
-     * @param Context $context
-     * @return bool
-     */
     public function cancelRefund(string $orderId, string $refundId, Context $context): bool;
 }

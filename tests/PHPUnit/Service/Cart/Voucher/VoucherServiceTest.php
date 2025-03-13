@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\Cart\Voucher;
 
@@ -22,12 +23,10 @@ class VoucherServiceTest extends TestCase
      */
     private $salesChannelContext;
 
-
     public function setUp(): void
     {
         $this->salesChannelContext = $this->createMock(SalesChannelContext::class);
     }
-
 
     /**
      * This test verifies that line items with invalid product numbers
@@ -35,11 +34,11 @@ class VoucherServiceTest extends TestCase
      */
     public function testInvalidProductNumber()
     {
-        # build a repo that would return nothing...just in case ;)
+        // build a repo that would return nothing...just in case ;)
         $fakeRepoProducts = new FakeProductRepository(null, null);
 
-        # build a product line item that
-        # has no valid product number...
+        // build a product line item that
+        // has no valid product number...
         $item = $this->buildProductLineItem('');
 
         $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
@@ -54,7 +53,7 @@ class VoucherServiceTest extends TestCase
      */
     public function testUnknownProductThrowsNoException()
     {
-        # build a repo that would return nothing...just in case ;)
+        // build a repo that would return nothing...just in case ;)
         $fakeRepoProducts = new FakeProductRepository(null, null);
 
         $item = $this->buildProductLineItem('10001');
@@ -76,8 +75,8 @@ class VoucherServiceTest extends TestCase
         $foundProduct->setCustomFields([
             'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
         ]);
-        $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
-        # build a repo that would return nothing...just in case ;)
+        $foundProduct->setTranslated(['customFields' => $foundProduct->getCustomFields()]);
+        // build a repo that would return nothing...just in case ;)
         $fakeRepoProducts = new FakeProductRepository(null, $foundProduct);
 
         $item = $this->buildProductLineItem('10001');
@@ -101,7 +100,7 @@ class VoucherServiceTest extends TestCase
 
         $foundProduct->setId('ID-123');
         $foundProduct->setParentId('PARENT-123');
-        $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
+        $foundProduct->setTranslated(['customFields' => $foundProduct->getCustomFields()]);
 
         $fakeRepoProducts = new FakeProductRepository(null, $foundProduct);
         $fakeRepoProducts->throwExceptions = true;
@@ -122,15 +121,14 @@ class VoucherServiceTest extends TestCase
         $foundProduct = new ProductEntity();
         $foundProduct->setId('ID-123');
         $foundProduct->setParentId('PARENT-123');
-        $foundProduct->setTranslated(['customFields'=>$foundProduct->getCustomFields()]);
+        $foundProduct->setTranslated(['customFields' => $foundProduct->getCustomFields()]);
 
         $foundParentProduct = new ProductEntity();
         $foundParentProduct->setId('ID-456');
         $foundParentProduct->setCustomFields([
             'mollie_payments_product_voucher_type' => VoucherType::TYPE_GIFT,
         ]);
-        $foundParentProduct->setTranslated(['customFields'=>$foundParentProduct->getCustomFields()]);
-
+        $foundParentProduct->setTranslated(['customFields' => $foundParentProduct->getCustomFields()]);
 
         $fakeRepoProducts = new FakeProductRepository($foundParentProduct, null);
 
@@ -148,12 +146,12 @@ class VoucherServiceTest extends TestCase
      */
     public function testCustomProductPluginIsSkipped()
     {
-        # build a repo that would return nothing...just in case ;)
+        // build a repo that would return nothing...just in case ;)
         $fakeRepoProducts = new FakeProductRepository(null, null);
 
-        # build a product line item with * as number.
-        # this is what custom products does.
-        # and just to be safe, let's try it with a space ;)
+        // build a product line item with * as number.
+        // this is what custom products does.
+        // and just to be safe, let's try it with a space ;)
         $item = $this->buildProductLineItem('* ');
 
         $vouchers = new VoucherService($fakeRepoProducts, new NullLogger());
@@ -162,10 +160,6 @@ class VoucherServiceTest extends TestCase
         $this->assertEquals('', $voucherType);
     }
 
-    /**
-     * @param string $productNumber
-     * @return LineItem
-     */
     private function buildProductLineItem(string $productNumber): LineItem
     {
         $item = new LineItem('id-123', 'product');

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers;
 
@@ -8,11 +9,12 @@ class DummyFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterfac
 {
     /**
      * @param mixed $event
+     *
      * @return void
      */
     public function dispatch($event)
     {
-        # do nothing, it's just a dummy one
-        # for older Shopware versions
+        // do nothing, it's just a dummy one
+        // for older Shopware versions
     }
 }

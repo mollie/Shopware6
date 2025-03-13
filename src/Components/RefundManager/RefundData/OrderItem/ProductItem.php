@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
@@ -31,14 +32,8 @@ class ProductItem extends AbstractItem
      */
     private $alreadyRefundedQty;
 
-
     /**
-     * @param OrderLineItemEntity $lineItem
      * @param array<mixed> $promotionCompositions
-     * @param int $alreadyRefundedQuantity
-     * @param float $taxTotal
-     * @param float $taxPerItem
-     * @param float $taxDiff
      */
     public function __construct(OrderLineItemEntity $lineItem, array $promotionCompositions, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
@@ -48,29 +43,6 @@ class ProductItem extends AbstractItem
         $this->extractPromotionDiscounts($promotionCompositions);
 
         parent::__construct($taxTotal, $taxPerItem, $taxDiff);
-    }
-
-    /**
-     * @param array<mixed> $promotionCompositions
-     * @return void
-     */
-    private function extractPromotionDiscounts(array $promotionCompositions)
-    {
-        $this->promotionDiscount = 0;
-        $this->promotionAffectedQuantity = 0;
-        $this->promotionTaxValue = 0;
-
-        foreach ($promotionCompositions as $composition) {
-            foreach ($composition as $compItem) {
-                # the ID is the reference ID
-                # if they match, then our current line item was in that promotion
-                if ($compItem['id'] === $this->lineItem->getReferencedId()) {
-                    $this->promotionDiscount += round((float)$compItem['discount'], 2);
-                    $this->promotionAffectedQuantity += (int)$compItem['quantity'];
-                    $this->promotionTaxValue += round((float)$compItem['taxValue'], 2);
-                }
-            }
-        }
     }
 
     /**
@@ -94,23 +66,6 @@ class ProductItem extends AbstractItem
         );
     }
 
-
-    /**
-     * @return string
-     */
-    private function getProductNumber(): string
-    {
-        if ($this->lineItem->getPayload() === null) {
-            return '';
-        }
-
-        if (!isset($this->lineItem->getPayload()['productNumber'])) {
-            return '';
-        }
-
-        return (string)$this->lineItem->getPayload()['productNumber'];
-    }
-
     public function getAlreadyRefundedQty(): int
     {
         return $this->alreadyRefundedQty;
@@ -119,5 +74,42 @@ class ProductItem extends AbstractItem
     public function getId(): string
     {
         return $this->lineItem->getId();
+    }
+
+    /**
+     * @param array<mixed> $promotionCompositions
+     *
+     * @return void
+     */
+    private function extractPromotionDiscounts(array $promotionCompositions)
+    {
+        $this->promotionDiscount = 0;
+        $this->promotionAffectedQuantity = 0;
+        $this->promotionTaxValue = 0;
+
+        foreach ($promotionCompositions as $composition) {
+            foreach ($composition as $compItem) {
+                // the ID is the reference ID
+                // if they match, then our current line item was in that promotion
+                if ($compItem['id'] === $this->lineItem->getReferencedId()) {
+                    $this->promotionDiscount += round((float) $compItem['discount'], 2);
+                    $this->promotionAffectedQuantity += (int) $compItem['quantity'];
+                    $this->promotionTaxValue += round((float) $compItem['taxValue'], 2);
+                }
+            }
+        }
+    }
+
+    private function getProductNumber(): string
+    {
+        if ($this->lineItem->getPayload() === null) {
+            return '';
+        }
+
+        if (! isset($this->lineItem->getPayload()['productNumber'])) {
+            return '';
+        }
+
+        return (string) $this->lineItem->getPayload()['productNumber'];
     }
 }

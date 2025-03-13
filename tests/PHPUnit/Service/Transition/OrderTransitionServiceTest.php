@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service\Transition;
 
@@ -54,7 +55,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1, $transition2]);
+            ->willReturn([$transition1, $transition2])
+        ;
 
         $availableTransitions = $this->orderTransitionService->getAvailableTransitions($order, $context);
 
@@ -86,7 +88,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -97,7 +100,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())
             ->method('transition')
-            ->with($expectedTransition, $context);
+            ->with($expectedTransition, $context)
+        ;
 
         $this->orderTransitionService->openOrder($order, $context);
     }
@@ -126,7 +130,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition1 = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -144,7 +149,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context]);
+            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+        ;
 
         $this->orderTransitionService->openOrder($order, $context);
     }
@@ -170,10 +176,12 @@ class OrderTransitionServiceTest extends TestCase
         $context = $this->createMock(Context::class);
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('getAvailableTransitions');
+            ->method('getAvailableTransitions')
+        ;
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('transition');
+            ->method('transition')
+        ;
 
         $this->orderTransitionService->openOrder($order, $context);
     }
@@ -201,7 +209,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -212,7 +221,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())
             ->method('transition')
-            ->with($expectedTransition, $context);
+            ->with($expectedTransition, $context)
+        ;
 
         $this->orderTransitionService->processOrder($order, $context);
     }
@@ -241,7 +251,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition1 = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -259,7 +270,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context]);
+            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+        ;
 
         $this->orderTransitionService->processOrder($order, $context);
     }
@@ -285,10 +297,12 @@ class OrderTransitionServiceTest extends TestCase
         $context = $this->createMock(Context::class);
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('getAvailableTransitions');
+            ->method('getAvailableTransitions')
+        ;
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('transition');
+            ->method('transition')
+        ;
 
         $this->orderTransitionService->processOrder($order, $context);
     }
@@ -316,7 +330,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -327,7 +342,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())
             ->method('transition')
-            ->with($expectedTransition, $context);
+            ->with($expectedTransition, $context)
+        ;
 
         $this->orderTransitionService->completeOrder($order, $context);
     }
@@ -356,7 +372,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturnOnConsecutiveCalls([$transition1], [$transition1]);
+            ->willReturnOnConsecutiveCalls([$transition1], [$transition1])
+        ;
 
         $expectedTransition1 = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -374,7 +391,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context]);
+            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+        ;
 
         $this->orderTransitionService->completeOrder($order, $context);
     }
@@ -403,7 +421,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturnOnConsecutiveCalls([$transition1], [$transition1]);
+            ->willReturnOnConsecutiveCalls([$transition1], [$transition1])
+        ;
 
         $expectedTransition1 = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -428,7 +447,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->exactly(3))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context], [$expectedTransition3, $context]);
+            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context], [$expectedTransition3, $context])
+        ;
 
         $this->orderTransitionService->completeOrder($order, $context);
     }
@@ -454,10 +474,12 @@ class OrderTransitionServiceTest extends TestCase
         $context = $this->createMock(Context::class);
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('getAvailableTransitions');
+            ->method('getAvailableTransitions')
+        ;
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('transition');
+            ->method('transition')
+        ;
 
         $this->orderTransitionService->completeOrder($order, $context);
     }
@@ -485,7 +507,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -496,7 +519,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())
             ->method('transition')
-            ->with($expectedTransition, $context);
+            ->with($expectedTransition, $context)
+        ;
 
         $this->orderTransitionService->cancelOrder($order, $context);
     }
@@ -525,7 +549,8 @@ class OrderTransitionServiceTest extends TestCase
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturn([$transition1]);
+            ->willReturn([$transition1])
+        ;
 
         $expectedTransition1 = new Transition(
             OrderDefinition::ENTITY_NAME,
@@ -543,7 +568,8 @@ class OrderTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context]);
+            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+        ;
 
         $this->orderTransitionService->cancelOrder($order, $context);
     }
@@ -569,10 +595,12 @@ class OrderTransitionServiceTest extends TestCase
         $context = $this->createMock(Context::class);
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('getAvailableTransitions');
+            ->method('getAvailableTransitions')
+        ;
 
         $this->stateMachineRegistry->expects($this->never())
-            ->method('transition');
+            ->method('transition')
+        ;
 
         $this->orderTransitionService->cancelOrder($order, $context);
     }

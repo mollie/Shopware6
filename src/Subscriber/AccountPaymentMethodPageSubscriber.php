@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -27,6 +28,14 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
      */
     private $mandateService;
 
+    public function __construct(
+        SettingsService $settingsService,
+        MandateServiceInterface $mandateService
+    ) {
+        $this->settingsService = $settingsService;
+        $this->mandateService = $mandateService;
+    }
+
     /**
      * @return array<mixed>>
      */
@@ -37,27 +46,10 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param SettingsService $settingsService
-     * @param MandateServiceInterface $mandateService
-     */
-    public function __construct(
-        SettingsService $settingsService,
-        MandateServiceInterface $mandateService
-    ) {
-        $this->settingsService = $settingsService;
-        $this->mandateService = $mandateService;
-    }
-
-
-    /**
-     * @param AccountPaymentMethodPageLoadedEvent $args
-     * @return void
-     */
     public function addDataToPage(AccountPaymentMethodPageLoadedEvent $args): void
     {
-        # load our settings for the
-        # current request
+        // load our settings for the
+        // current request
         $this->settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannel()->getId());
 
         $this->addMollieSingleClickPaymentDataToPage($args);
@@ -65,8 +57,6 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
 
     /**
      * Adds the components variable to the storefront.
-     *
-     * @param AccountPaymentMethodPageLoadedEvent $args
      */
     private function addMollieSingleClickPaymentDataToPage(AccountPaymentMethodPageLoadedEvent $args): void
     {
@@ -74,24 +64,23 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
             'enable_one_click_payments' => $this->settings->isOneClickPaymentsEnabled(),
         ]);
 
-        if (!$this->settings->isOneClickPaymentsEnabled()) {
+        if (! $this->settings->isOneClickPaymentsEnabled()) {
             return;
         }
 
         try {
             $salesChannelContext = $args->getSalesChannelContext();
             $loggedInCustomer = $salesChannelContext->getCustomer();
-            if (!$loggedInCustomer instanceof CustomerEntity) {
+            if (! $loggedInCustomer instanceof CustomerEntity) {
                 return;
             }
 
             $mandates = $this->mandateService->getCreditCardMandatesByCustomerId($loggedInCustomer->getId(), $salesChannelContext);
 
             $args->getPage()->setExtensions([
-                'MollieCreditCardMandateCollection' => $mandates
+                'MollieCreditCardMandateCollection' => $mandates,
             ]);
         } catch (Exception $e) {
-            //
         }
     }
 }

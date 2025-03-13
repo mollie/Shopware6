@@ -28,10 +28,8 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->factory = new TrackingInfoStructFactory(new UrlParsingService(), new NullLogger());
     }
 
-
     /**
      * @throws \Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundException
-     * @return void
      */
     public function testTrackingFromOrder(): void
     {
@@ -52,7 +50,6 @@ class TrackingInfoStructFactoryTest extends TestCase
         $order = new OrderEntity();
         $order->setDeliveries(new OrderDeliveryCollection([$deliveryEntity]));
 
-
         $trackingInfoStruct = $this->factory->trackingFromOrder($order);
 
         $this->assertNotNull($trackingInfoStruct);
@@ -63,7 +60,6 @@ class TrackingInfoStructFactoryTest extends TestCase
 
     /**
      * @throws NoDeliveriesFoundExceptions
-     * @return void
      */
     public function testOnlyOneCodeAccepted(): void
     {
@@ -77,7 +73,7 @@ class TrackingInfoStructFactoryTest extends TestCase
         $deliveryEntity->setShippingMethod($shippingMethod);
         $deliveryEntity->setTrackingCodes([
             '1234',
-            'test'
+            'test',
         ]);
 
         $order = new OrderEntity();
@@ -88,9 +84,6 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertNull($trackingInfoStruct);
     }
 
-    /**
-     * @return void
-     */
     public function testInfoStructCreatedByArguments(): void
     {
         $trackingInfoStruct = $this->factory->create(
@@ -161,11 +154,6 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
-
-
-    /**
-     * @return array
-     */
     public function invalidShippingUrlPatterns(): array
     {
         return [
@@ -175,8 +163,6 @@ class TrackingInfoStructFactoryTest extends TestCase
 
     /**
      * @dataProvider invalidShippingUrlPatterns
-     * @param string $invalidPattern
-     * @return void
      */
     public function testUrlEmptyOnInvalidShippingURLs(string $invalidPattern): void
     {

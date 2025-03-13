@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
@@ -8,22 +9,18 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1644753635CreateSubscription extends MigrationStep
 {
-    /**
-     * @return int
-     */
     public function getCreationTimestamp(): int
     {
         return 1644753635;
     }
 
     /**
-     * @param Connection $connection
      * @throws Exception
      */
     public function update(Connection $connection): void
     {
         $connection->exec(
-            "CREATE TABLE IF NOT EXISTS mollie_subscription (
+            'CREATE TABLE IF NOT EXISTS mollie_subscription (
                     id BINARY(16) NOT NULL,
                     customer_id BINARY(16) NOT NULL,
                     mollie_id VARCHAR(255),
@@ -43,7 +40,7 @@ class Migration1644753635CreateSubscription extends MigrationStep
                     metadata json NULL,
                     PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                "
+                '
         );
 
         $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.id', 'id', $connection);
@@ -54,21 +51,12 @@ class Migration1644753635CreateSubscription extends MigrationStep
         $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.sales_channel_id', 'sales_channel_id', $connection);
     }
 
-    /**
-     * @param Connection $connection
-     * @return void
-     */
     public function updateDestructive(Connection $connection): void
     {
     }
 
     /**
-     * @param string $table
-     * @param string $indexName
-     * @param string $targetField
-     * @param Connection $connection
      * @throws Exception
-     * @return void
      */
     private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
     {
@@ -78,10 +66,10 @@ class Migration1644753635CreateSubscription extends MigrationStep
             WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
         ")->fetch();
 
-        $isExisting = ((int)$indexExistsCheck['indexIsThere'] === 1);
+        $isExisting = ((int) $indexExistsCheck['indexIsThere'] === 1);
 
-        if (!$isExisting) {
-            $connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
+        if (! $isExisting) {
+            $connection->exec('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
         }
     }
 }

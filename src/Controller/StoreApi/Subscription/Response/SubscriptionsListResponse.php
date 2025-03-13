@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\Subscription\Response;
 
@@ -11,7 +12,6 @@ class SubscriptionsListResponse extends StoreApiResponse
      * @var ArrayStruct<mixed, mixed>
      */
     protected $object;
-
 
     /**
      * @param array<mixed> $subscriptions

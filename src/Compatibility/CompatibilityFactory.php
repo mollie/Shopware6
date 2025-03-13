@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility;
 
@@ -18,20 +19,12 @@ class CompatibilityFactory
      */
     private $salesChannelContextService;
 
-
-    /**
-     * @param string $shopwareVersion
-     * @param SalesChannelContextServiceInterface $salesChannelContextService
-     */
     public function __construct(string $shopwareVersion, SalesChannelContextServiceInterface $salesChannelContextService)
     {
         $this->shopwareVersion = $shopwareVersion;
         $this->salesChannelContextService = $salesChannelContextService;
     }
 
-    /**
-     * @return CompatibilityGatewayInterface
-     */
     public function createGateway(): CompatibilityGatewayInterface
     {
         return new CompatibilityGateway(

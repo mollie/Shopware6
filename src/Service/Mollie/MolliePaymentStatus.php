@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mollie;
 
@@ -27,25 +28,24 @@ class MolliePaymentStatus
     const MOLLIE_PAYMENT_PARTIALLY_REFUNDED = 'partially_refunded';
     const MOLLIE_PAYMENT_CHARGEBACK = 'chargeback';
 
-
     /**
      * Gets if the provided payment status means that
      * it's allowed to cancel an (open) order.
      *
      * @param string $paymentIdentifier
      * @param string $status
+     *
      * @return bool
      */
     public static function isFailedStatus($paymentIdentifier, $status)
     {
-        # some payment methods have certain states that can happen
-        # which would be "valid" for Mollie, but not for an eCommerce shop that has either a SUCCESS or a FAILED page.
+        // some payment methods have certain states that can happen
+        // which would be "valid" for Mollie, but not for an eCommerce shop that has either a SUCCESS or a FAILED page.
         if ($paymentIdentifier === 'creditcard' && $status === MolliePaymentStatus::MOLLIE_PAYMENT_OPEN) {
-            # we don't know why, but it can happen.
-            # if a credit card is OPEN then it's not valid. it will fail after 15 minutes...so show an error
+            // we don't know why, but it can happen.
+            // if a credit card is OPEN then it's not valid. it will fail after 15 minutes...so show an error
             return true;
         }
-
 
         $list = [
             MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED,
@@ -53,7 +53,7 @@ class MolliePaymentStatus
             MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED,
         ];
 
-        return (in_array($status, $list, true));
+        return in_array($status, $list, true);
     }
 
     /**
@@ -62,6 +62,7 @@ class MolliePaymentStatus
      * This does not mean that its already completely paid.
      *
      * @param string $status
+     *
      * @return bool
      */
     public static function isApprovedStatus($status)
@@ -70,9 +71,9 @@ class MolliePaymentStatus
             MolliePaymentStatus::MOLLIE_PAYMENT_OPEN,
             MolliePaymentStatus::MOLLIE_PAYMENT_PAID,
             MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED,
-            MolliePaymentStatus::MOLLIE_PAYMENT_PENDING
+            MolliePaymentStatus::MOLLIE_PAYMENT_PENDING,
         ];
 
-        return (in_array($status, $list, true));
+        return in_array($status, $list, true);
     }
 }

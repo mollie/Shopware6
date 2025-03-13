@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs;
 
@@ -16,10 +17,8 @@ class ApplePayCartStruct extends Struct
      */
     private $apiAlias;
 
-
     /**
      * @param mixed[] $cart
-     * @param string $apiAlias
      */
     public function __construct(array $cart, string $apiAlias)
     {
@@ -27,15 +26,10 @@ class ApplePayCartStruct extends Struct
         $this->apiAlias = $apiAlias;
     }
 
-
-    /**
-     * @return string
-     */
     public function getApiAlias(): string
     {
         return $this->apiAlias;
     }
-
 
     /**
      * @return array<mixed>

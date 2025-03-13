@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
@@ -7,24 +8,18 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 
 class Migration1669796049CreateRefund extends MigrationStep
 {
-    /**
-     * @return int
-     */
-
     public function getCreationTimestamp(): int
     {
         return 1669796049;
     }
 
     /**
-     * @param Connection $connection
      * @throws \Doctrine\DBAL\Exception
-     * @return void
      */
     public function update(Connection $connection): void
     {
         $connection->exec(
-            "
+            '
                 CREATE TABLE IF NOT EXISTS `mollie_refund` (
                   `id` BINARY(16) NOT NULL,
                   `order_id` BINARY(16) NULL,
@@ -35,14 +30,10 @@ class Migration1669796049CreateRefund extends MigrationStep
                   `updated_at` DATETIME(3) NULL,
                   PRIMARY KEY (`id`)
                 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-                "
+                '
         );
     }
 
-    /**
-     * @param Connection $connection
-     * @return void
-     */
     public function updateDestructive(Connection $connection): void
     {
     }

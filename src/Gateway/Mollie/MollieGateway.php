@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Gateway\Mollie;
 
@@ -23,18 +24,12 @@ class MollieGateway implements MollieGatewayInterface
      */
     private $factory;
 
-
-    /**
-     * @param MollieApiFactory $factory
-     */
     public function __construct(MollieApiFactory $factory)
     {
         $this->factory = $factory;
     }
 
-
     /**
-     * @param string $salesChannelID
      * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      */
     public function switchClient(string $salesChannelID): void
@@ -44,34 +39,32 @@ class MollieGateway implements MollieGatewayInterface
 
     /**
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return string
      */
     public function getProfileId(): string
     {
         $profile = $this->apiClient->profiles->get('me');
 
-        if (!$profile instanceof Profile) {
+        if (! $profile instanceof Profile) {
             return '';
         }
 
-        return (string)$profile->id;
+        return (string) $profile->id;
     }
 
     /**
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return string
      */
     public function getOrganizationId(): string
     {
         $profile = $this->apiClient->profiles->get('me');
 
-        if (!$profile instanceof Profile) {
+        if (! $profile instanceof Profile) {
             return '';
         }
 
-        # the organization is in a full dashboard URL
-        # so we grab it, and extract that slug with the organization id
-        $orgId = (string)$profile->_links->dashboard->href;
+        // the organization is in a full dashboard URL
+        // so we grab it, and extract that slug with the organization id
+        $orgId = (string) $profile->_links->dashboard->href;
 
         $parts = explode('/', $orgId);
 
@@ -82,13 +75,12 @@ class MollieGateway implements MollieGatewayInterface
             }
         }
 
-        return (string)$orgId;
+        return (string) $orgId;
     }
-
-
 
     /**
      * @throws \Mollie\Api\Exceptions\ApiException
+     *
      * @return array|Terminal[]
      */
     public function getPosTerminals(): array
@@ -106,26 +98,20 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @param string $orderId
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Order
      */
     public function getOrder(string $orderId): Order
     {
-        $order = $this->apiClient->orders->get(
+        return $this->apiClient->orders->get(
             $orderId,
             [
                 'embed' => 'payments',
             ]
         );
-
-        return $order;
     }
 
     /**
-     * @param string $paymentId
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Payment
      */
     public function getPayment(string $paymentId): Payment
     {
@@ -134,8 +120,8 @@ class MollieGateway implements MollieGatewayInterface
 
     /**
      * @param array<mixed> $data
+     *
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Payment
      */
     public function createPayment(array $data): Payment
     {
@@ -143,10 +129,9 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @param string $customerID
      * @param array<mixed> $data
+     *
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Subscription
      */
     public function createSubscription(string $customerID, array $data): Subscription
     {
@@ -154,10 +139,7 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $customerId
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return void
      */
     public function cancelSubscription(string $subscriptionId, string $customerId): void
     {
@@ -168,9 +150,6 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $customerId
-     * @param string $mandateId
      * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function updateSubscription(string $subscriptionId, string $customerId, string $mandateId): void
@@ -185,10 +164,7 @@ class MollieGateway implements MollieGatewayInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $customerId
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Subscription
      */
     public function getSubscription(string $subscriptionId, string $customerId): Subscription
     {

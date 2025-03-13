@@ -23,12 +23,10 @@ interface CustomerServiceInterface
     public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent;
 
     /**
-     * @param string $customerID
      * @param array<mixed> $customFields
-     * @param Context $context
-     * @return EntityWrittenContainerEvent
      */
     public function saveCustomerCustomFields(string $customerID, array $customFields, Context $context): EntityWrittenContainerEvent;
+
     public function getMollieCustomerId(string $customerId, string $salesChannelId, Context $context): string;
 
     public function setMollieCustomerId(string $customerId, string $mollieCustomerId, string $profileId, bool $testMode, Context $context): void;
@@ -39,7 +37,7 @@ interface CustomerServiceInterface
 
     /**
      * @param null|CustomerAddressEntity|OrderAddressEntity $address
-     * @param CustomerEntity $customer
+     *
      * @return array<string, mixed>
      */
     public function getAddressArray($address, CustomerEntity $customer): array;

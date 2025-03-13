@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\LineItem;
 
@@ -47,9 +48,6 @@ class LineItemAttributes
      */
     private $isPromotionProduct;
 
-    /**
-     * @param LineItem $lineItem
-     */
     public function __construct(LineItem $lineItem)
     {
         $this->productNumber = '';
@@ -58,18 +56,18 @@ class LineItemAttributes
         $payload = $lineItem->getPayload();
 
         if (array_key_exists('productNumber', $payload)) {
-            $this->productNumber = (string)$payload['productNumber'];
+            $this->productNumber = (string) $payload['productNumber'];
         }
 
         $this->isPromotionProduct = array_key_exists('promotionId', $payload);
 
         $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
-        $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
-        $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
-        $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
-        $this->subscriptionRepetition = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
-        $this->subscriptionRepetitionType = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
+        $this->subscriptionProduct = (bool) $this->getCustomFieldValue($lineItem, 'subscription_enabled');
+        $this->subscriptionInterval = (int) $this->getCustomFieldValue($lineItem, 'subscription_interval');
+        $this->subscriptionIntervalUnit = $this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
+        $this->subscriptionRepetition = $this->getCustomFieldValue($lineItem, 'subscription_repetition');
+        $this->subscriptionRepetitionType = $this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
     }
 
     /**
@@ -87,49 +85,31 @@ class LineItemAttributes
         ];
     }
 
-    /**
-     * @return string
-     */
     public function getProductNumber(): string
     {
         return $this->productNumber;
     }
 
-    /**
-     * @return bool
-     */
     public function isPromotionProduct(): bool
     {
         return $this->isPromotionProduct;
     }
 
-    /**
-     * @return string
-     */
     public function getVoucherType(): string
     {
         return $this->voucherType;
     }
 
-    /**
-     * @param string $voucherType
-     */
     public function setVoucherType(string $voucherType): void
     {
         $this->voucherType = $voucherType;
     }
 
-    /**
-     * @return bool
-     */
     public function isSubscriptionProduct(): bool
     {
         return $this->subscriptionProduct;
     }
 
-    /**
-     * @param bool $subscriptionProduct
-     */
     public function setSubscriptionProduct(bool $subscriptionProduct): void
     {
         $this->subscriptionProduct = $subscriptionProduct;
@@ -159,9 +139,6 @@ class LineItemAttributes
         return $this->subscriptionRepetition;
     }
 
-    /**
-     * @return string
-     */
     public function getSubscriptionRepetitionType(): string
     {
         return $this->subscriptionRepetitionType;
@@ -176,13 +153,13 @@ class LineItemAttributes
 
         $prefix = 'mollie_payments_product_';
 
-        # lets save some space and only store
-        # what is existing
+        // lets save some space and only store
+        // what is existing
         if ($this->voucherType !== null) {
             $mollieData[$prefix . 'voucher_type'] = $this->voucherType;
         }
 
-        # only save if it's a subscription product
+        // only save if it's a subscription product
         if ($this->subscriptionProduct) {
             $mollieData[$prefix . 'subscription_enabled'] = $this->subscriptionProduct;
 
@@ -206,38 +183,33 @@ class LineItemAttributes
         return $mollieData;
     }
 
-    /**
-     * @param LineItem $lineItem
-     * @param string $keyName
-     * @return string
-     */
     private function getCustomFieldValue(LineItem $lineItem, string $keyName): string
     {
         $foundValue = '';
 
         if ($lineItem->getPayload() !== null) {
-            # check if we have customFields in our payload
+            // check if we have customFields in our payload
             if (array_key_exists('customFields', $lineItem->getPayload())) {
-                # load the custom fields
+                // load the custom fields
                 $customFields = $lineItem->getPayload()['customFields'];
 
-                # ---------------------------------------------------------------------------
-                # search in new structure
+                // ---------------------------------------------------------------------------
+                // search in new structure
                 if (is_array($customFields)) {
                     $fullKey = 'mollie_payments_product_' . $keyName;
-                    $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
+                    $foundValue = (array_key_exists($fullKey, $customFields)) ? (string) $customFields[$fullKey] : '';
                 }
 
-                # ---------------------------------------------------------------------------
-                # check if old structure exists
-                # and load, but we migrate to the new one
-                # check if we have customFields
+                // ---------------------------------------------------------------------------
+                // check if old structure exists
+                // and load, but we migrate to the new one
+                // check if we have customFields
                 if ($foundValue === '') {
                     if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
-                        # load the mollie entry
+                        // load the mollie entry
                         $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
-                        # assign our value if we have it
-                        $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+                        // assign our value if we have it
+                        $foundValue = (array_key_exists($keyName, $mollieData)) ? (string) $mollieData[$keyName] : '';
                     }
                 }
             }

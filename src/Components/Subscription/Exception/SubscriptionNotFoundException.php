@@ -1,13 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Exception;
 
 class SubscriptionNotFoundException extends \Exception
 {
-    /**
-     * @param string $subscriptionId
-     * @param null|\Throwable $previous
-     */
     public function __construct(string $subscriptionId, ?\Throwable $previous = null)
     {
         $message = 'Subscription ' . $subscriptionId . ' not found in Shopware';

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -21,8 +22,6 @@ class DeliveryService
 
     /**
      * Creates a new instance of the transaction service.
-     *
-     * @param EntityRepository $orderDeliveryRepository
      */
     public function __construct(EntityRepository $orderDeliveryRepository)
     {
@@ -32,8 +31,6 @@ class DeliveryService
     /**
      * @param string $deliveryId
      * @param null|string $versionId
-     * @param null|Context $context
-     * @return null|OrderDeliveryEntity
      */
     public function getDeliveryById($deliveryId, $versionId = null, Context $context = null): ?OrderDeliveryEntity
     {
@@ -47,18 +44,10 @@ class DeliveryService
 
         $result = $this->orderDeliveryRepository->search($deliveryCriteria, $context ?? Context::createDefaultContext());
 
-        /** @var null|OrderDeliveryEntity $delivery */
-        $delivery = $result->get($deliveryId);
-
-        return $delivery;
+        /** @var null|OrderDeliveryEntity */
+        return $result->get($deliveryId);
     }
 
-    /**
-     * @param string $orderId
-     * @param null|string $orderVersionId
-     * @param null|Context $context
-     * @return null|OrderDeliveryEntity
-     */
     public function getDeliveryByOrderId(string $orderId, string $orderVersionId = null, Context $context = null): ?OrderDeliveryEntity
     {
         $deliveryCriteria = new Criteria();
@@ -76,12 +65,12 @@ class DeliveryService
 
     /**
      * @param array<mixed> $customFields
-     * @param bool $shipped
+     *
      * @return array<mixed>
      */
     public function addShippedToCustomFields(array $customFields, bool $shipped = false): array
     {
-        if (!isset($customFields[self::PARAM_MOLLIE_PAYMENTS])) {
+        if (! isset($customFields[self::PARAM_MOLLIE_PAYMENTS])) {
             $customFields[self::PARAM_MOLLIE_PAYMENTS] = [];
         }
 
@@ -94,8 +83,6 @@ class DeliveryService
      * Updates a delivery in the database.
      *
      * @param array<mixed> $data
-     * @param null|Context $context
-     * @return EntityWrittenContainerEvent
      */
     public function updateDelivery(array $data, Context $context = null): EntityWrittenContainerEvent
     {

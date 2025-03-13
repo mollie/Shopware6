@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -8,9 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class MollieOrderCouldNotBeFetchedException extends ShopwareHttpException
 {
     /**
-     * @param string $mollieOrderID
      * @param array<string,mixed> $parameters
-     * @param null|\Throwable $previous
      */
     public function __construct(string $mollieOrderID, array $parameters = [], \Throwable $previous = null)
     {

@@ -21,11 +21,10 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
     private CartServiceInterface $cartService;
     private PayPalExpress $paypalExpress;
 
-
     public function __construct(
-        SettingsService      $settingsService,
+        SettingsService $settingsService,
         CartServiceInterface $cartService,
-        PayPalExpress        $paypalExpress
+        PayPalExpress $paypalExpress
     ) {
         $this->settingsService = $settingsService;
         $this->cartService = $cartService;
@@ -57,27 +56,25 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
 
         $payPalExpressSession = $this->paypalExpress->loadSession($payPalExpressSessionId, $context);
 
-
         $methodDetails = $payPalExpressSession->methodDetails;
 
-
-        if (!property_exists($methodDetails, 'shippingAddress') || $methodDetails->shippingAddress === null) {
+        if (! property_exists($methodDetails, 'shippingAddress') || $methodDetails->shippingAddress === null) {
             throw PaypalExpressException::shippingAddressMissing();
         }
-        if (!property_exists($methodDetails, 'billingAddress') || $methodDetails->billingAddress === null) {
+        if (! property_exists($methodDetails, 'billingAddress') || $methodDetails->billingAddress === null) {
             throw PaypalExpressException::billingAddressMissing();
         }
 
         $billingAddress = null;
 
         $mollieShippingAddress = $methodDetails->shippingAddress;
-        if (!property_exists($mollieShippingAddress, 'phone')) {
+        if (! property_exists($mollieShippingAddress, 'phone')) {
             $mollieShippingAddress->phone = '';
         }
-        if (!property_exists($mollieShippingAddress, 'streetAdditional')) {
+        if (! property_exists($mollieShippingAddress, 'streetAdditional')) {
             $mollieShippingAddress->streetAdditional = '';
         }
-        if (!property_exists($mollieShippingAddress, 'email')) {
+        if (! property_exists($mollieShippingAddress, 'email')) {
             $mollieShippingAddress->email = '';
         }
 
@@ -94,31 +91,25 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
             try {
                 $billingAddress = AddressStruct::createFromApiResponse($methodDetails->billingAddress);
             } catch (\Throwable $e) {
-                throw PaypalExpressException::billingAddressError(
-                    $e->getMessage(),
-                    $methodDetails->billingAddress
-                );
+                throw PaypalExpressException::billingAddressError($e->getMessage(), $methodDetails->billingAddress);
             }
         }
 
         try {
             $shippingAddress = AddressStruct::createFromApiResponse($mollieShippingAddress);
         } catch (\Throwable $e) {
-            throw PaypalExpressException::shippingAddressError(
-                $e->getMessage(),
-                $mollieShippingAddress
-            );
+            throw PaypalExpressException::shippingAddressError($e->getMessage(), $mollieShippingAddress);
         }
         $oldToken = $context->getToken();
-        # create new account or find existing and login
+        // create new account or find existing and login
         $context = $this->paypalExpress->prepareCustomer($shippingAddress, $context, $acceptedDataProtection, $billingAddress);
 
-        # read a new card after login
+        // read a new card after login
         if ($context->getToken() !== $oldToken) {
             $cart = $this->cartService->getCalculatedMainCart($context);
         }
 
-        # we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
+        // we have to update the cart extension before a new user is created and logged in, otherwise the extension is not saved
         $mollieShopwareCart = new MollieShopwareCart($cart);
         $mollieShopwareCart->setPayPalExpressAuthenticateId($payPalExpressSession->authenticationId);
 

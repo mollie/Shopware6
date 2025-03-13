@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -12,31 +13,24 @@ class FakeRouter implements RouterInterface
      */
     private $url;
 
-
     /**
      * FakeRouter constructor.
-     * @param string $url
      */
     public function __construct(string $url)
     {
         $this->url = $url;
     }
 
-
     /**
      * @param string $name
      * @param array $parameters
      * @param int $referenceType
-     * @return string
      */
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
     {
         return $this->url;
     }
 
-    /**
-     * @param RequestContext $context
-     */
     public function setContext(RequestContext $context)
     {
     }
@@ -57,6 +51,7 @@ class FakeRouter implements RouterInterface
 
     /**
      * @param string $pathinfo
+     *
      * @return array|void
      */
     public function match($pathinfo): array

@@ -57,66 +57,41 @@ final class RefundItemEntity extends Entity
      */
     protected $orderLineItem;
 
-
-    /**
-     * @return string
-     */
     public function getRefundId(): string
     {
         return $this->refundId;
     }
 
-    /**
-     * @param string $refundId
-     */
     public function setRefundId(string $refundId): void
     {
         $this->refundId = $refundId;
     }
 
-    /**
-     * @return string
-     */
     public function getMollieLineId(): string
     {
         return $this->mollieLineId;
     }
 
-    /**
-     * @param string $mollieLineId
-     */
     public function setMollieLineId(string $mollieLineId): void
     {
         $this->mollieLineId = $mollieLineId;
     }
 
-    /**
-     * @return int
-     */
     public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    /**
-     * @param int $quantity
-     */
     public function setQuantity(int $quantity): void
     {
         $this->quantity = $quantity;
     }
 
-    /**
-     * @return float
-     */
     public function getAmount(): float
     {
         return $this->amount;
     }
 
-    /**
-     * @param float $amount
-     */
     public function setAmount(float $amount): void
     {
         $this->amount = $amount;
@@ -130,86 +105,52 @@ final class RefundItemEntity extends Entity
         return $this->orderLineItemId;
     }
 
-    /**
-     * @param string $orderLineItemId
-     */
     public function setOrderLineItemId(string $orderLineItemId): void
     {
         $this->orderLineItemId = $orderLineItemId;
     }
 
-    /**
-     * @return null|OrderLineItemEntity
-     */
     public function getOrderLineItem(): ?OrderLineItemEntity
     {
         return $this->orderLineItem;
     }
 
-    /**
-     * @param OrderLineItemEntity $orderLineItem
-     */
     public function setOrderLineItem(OrderLineItemEntity $orderLineItem): void
     {
         $this->orderLineItem = $orderLineItem;
     }
 
-    /**
-     * @return null|RefundEntity
-     */
     public function getRefund(): ?RefundEntity
     {
         return $this->refund;
     }
 
-    /**
-     * @param null|RefundEntity $refund
-     */
     public function setRefund(?RefundEntity $refund): void
     {
         $this->refund = $refund;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return (string) $this->label;
     }
 
-    /**
-     * @param string $label
-     */
     public function setLabel(string $label): void
     {
         $this->label = $label;
     }
 
-    /**
-     * @return null|string
-     */
     public function getOrderLineItemVersionId(): ?string
     {
         return $this->orderLineItemVersionId;
     }
 
-    /**
-     * @param null|string $orderLineItemVersionId
-     */
     public function setOrderLineItemVersionId(?string $orderLineItemVersionId): void
     {
         $this->orderLineItemVersionId = $orderLineItemVersionId;
     }
 
     /**
-     * @param string $mollieLineId
-     * @param string $label
-     * @param int $quantity
-     * @param float $amount
-     * @param null|string $oderLineItemId
-     * @param null|string $oderLineItemVersionId
-     * @param null|string $refundId
      * @return array<mixed>
      */
     public static function createArray(string $mollieLineId, string $label, int $quantity, float $amount, ?string $oderLineItemId, ?string $oderLineItemVersionId, ?string $refundId): array
@@ -223,7 +164,7 @@ final class RefundItemEntity extends Entity
             'orderLineItemVersionId' => $oderLineItemVersionId,
         ];
 
-        /**
+        /*
          * refundId is not given when we create a new entry because the id is created by shopware dal
          */
         if ($refundId !== null && $refundId !== '') {

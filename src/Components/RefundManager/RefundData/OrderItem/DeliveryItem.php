@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
@@ -16,14 +17,6 @@ class DeliveryItem extends AbstractItem
      */
     private $alreadyRefundedQty;
 
-
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param int $alreadyRefundedQuantity
-     * @param float $taxTotal
-     * @param float $taxPerItem
-     * @param float $taxDiff
-     */
     public function __construct(OrderDeliveryEntity $delivery, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
         $this->delivery = $delivery;
@@ -32,13 +25,12 @@ class DeliveryItem extends AbstractItem
         parent::__construct($taxTotal, $taxPerItem, $taxDiff);
     }
 
-
     /**
      * @return array<mixed>
      */
     public function toArray(): array
     {
-        $label = ($this->delivery->getShippingMethod() !== null) ? (string)$this->delivery->getShippingMethod()->getName() : 'UNKNOWN NAME';
+        $label = ($this->delivery->getShippingMethod() !== null) ? (string) $this->delivery->getShippingMethod()->getName() : 'UNKNOWN NAME';
 
         return $this->buildArray(
             $this->delivery->getId(),

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
@@ -12,36 +13,27 @@ class MigrationUtils
      */
     private $connection;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
 
-
     /**
-     * @param string $table
-     * @param string $column
-     * @param string $type
-     * @param string $default
-     * @param string $after
      * @throws Exception
      */
     public function createColumn(string $table, string $column, string $type, string $default, string $after): void
     {
         $colQuery = $this->columnExists($table, $column);
 
-        # only create if not yet existing
+        // only create if not yet existing
         if ($colQuery === false) {
-            $sql = "ALTER TABLE " . $table . " ADD " . $column . " " . $type . ' NULL ';
+            $sql = 'ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . $type . ' NULL ';
 
-            if (!empty($default)) {
+            if (! empty($default)) {
                 $sql .= ' DEFAULT ' . $default;
             }
 
-            if (!empty($after)) {
+            if (! empty($after)) {
                 $sql .= ' AFTER `' . $after . '`';
             }
 
@@ -50,31 +42,27 @@ class MigrationUtils
     }
 
     /**
-     * @param string $table
-     * @param string $column
      * @throws Exception
-     * @return void
      */
     public function deleteColumn(string $table, string $column): void
     {
         $colQuery = $this->columnExists($table, $column);
 
-        # only delete if existing
+        // only delete if existing
         if ($colQuery !== false) {
-            $sql = "ALTER TABLE " . $table . " DROP " . $column;
+            $sql = 'ALTER TABLE ' . $table . ' DROP ' . $column;
             $this->connection->exec($sql);
         }
     }
 
     public function columnExists(string $table, string $column): bool
     {
-        return (bool)$this->connection->executeQuery("SHOW COLUMNS FROM " . $table . " LIKE '" . $column . "'")->fetchOne();
+        return (bool) $this->connection->executeQuery('SHOW COLUMNS FROM ' . $table . " LIKE '" . $column . "'")->fetchOne();
     }
 
     /**
-     * @param string $table
-     * @param string $keyName
      * @param array<mixed> $columns
+     *
      * @throws Exception
      */
     public function addKey(string $table, string $keyName, array $columns): void
@@ -87,15 +75,12 @@ class MigrationUtils
 
         $columnsString = implode(',', $columns);
 
-        $sql = "ALTER TABLE `" . $table . "` ADD KEY `" . $keyName . "` (" . $columnsString . ")";
+        $sql = 'ALTER TABLE `' . $table . '` ADD KEY `' . $keyName . '` (' . $columnsString . ')';
 
         $this->connection->exec($sql);
     }
 
     /**
-     * @param string $tableName
-     * @param string $constraintName
-     * @param string $sqlContent
      * @throws Exception
      */
     public function addConstraint(string $tableName, string $constraintName, string $sqlContent): void
@@ -106,17 +91,14 @@ class MigrationUtils
             return;
         }
 
-        $sql = "ALTER TABLE `" . $tableName . "`
-                ADD CONSTRAINT `" . $constraintName . "` 
-                " . $sqlContent;
+        $sql = 'ALTER TABLE `' . $tableName . '`
+                ADD CONSTRAINT `' . $constraintName . '` 
+                ' . $sqlContent;
 
         $this->connection->exec($sql);
     }
 
     /**
-     * @param string $table
-     * @param string $indexName
-     * @param string $targetField
      * @throws Exception
      */
     public function buildIndex(string $table, string $indexName, string $targetField): void
@@ -127,13 +109,12 @@ class MigrationUtils
             return;
         }
 
-        $this->connection->exec("CREATE INDEX `" . $indexName . "` ON " . $table . " (" . $targetField . ");");
+        $this->connection->exec('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
     }
 
     /**
-     * @param string $table
-     * @param string $indexName
      * @throws Exception
+     *
      * @return bool
      */
     private function isIndexExisting(string $table, string $indexName)
@@ -144,6 +125,6 @@ class MigrationUtils
             WHERE table_schema = DATABASE() and table_name = '" . $table . "' and index_name = '" . $indexName . "';
         ")->fetch();
 
-        return ((int)$indexExistsCheck['foundCount'] >= 1);
+        return (int) $indexExistsCheck['foundCount'] >= 1;
     }
 }

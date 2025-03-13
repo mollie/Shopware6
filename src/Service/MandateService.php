@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -27,13 +28,6 @@ class MandateService implements MandateServiceInterface
     /** @var SubscriptionManager */
     private $subscriptionManager;
 
-
-    /**
-     *
-     * @param CustomerServiceInterface $customerService
-     * @param MandateApiService $mandateApiService
-     * @param SubscriptionManager $subscriptionManager
-     */
     public function __construct(CustomerServiceInterface $customerService, MandateApiService $mandateApiService, SubscriptionManager $subscriptionManager)
     {
         $this->customerService = $customerService;
@@ -41,13 +35,8 @@ class MandateService implements MandateServiceInterface
         $this->subscriptionManager = $subscriptionManager;
     }
 
-
     /**
-     * @param string $customerId
-     * @param string $mandateId
-     * @param SalesChannelContext $context
      * @throws CouldNotRevokeMollieCustomerMandateException
-     * @return void
      */
     public function revokeMandateByCustomerId(string $customerId, string $mandateId, SalesChannelContext $context): void
     {
@@ -69,11 +58,8 @@ class MandateService implements MandateServiceInterface
     }
 
     /**
-     * @param string $customerId
-     * @param SalesChannelContext $context
      * @throws CouldNotFetchMollieCustomerMandatesException
      * @throws Exception
-     * @return MandateCollection
      */
     public function getCreditCardMandatesByCustomerId(string $customerId, SalesChannelContext $context): MandateCollection
     {
@@ -92,15 +78,15 @@ class MandateService implements MandateServiceInterface
      * This function will parse the mandate collection to struct, and only get the creditcard method
      *
      * @param array<Mandate> $mandates
+     *
      * @throws Exception
-     * @return MandateCollection
      */
     private function parseCreditCardMandateToStruct(array $mandates, string $customerId, Context $context): MandateCollection
     {
         $mandateCollection = new MandateCollection();
         foreach ($mandates as $mandate) {
             // only get the mandate has method type creditcard
-            if (!$mandate instanceof Mandate || $mandate->method !== self::MANDATE_METHOD_CREDIT_CARD) {
+            if (! $mandate instanceof Mandate || $mandate->method !== self::MANDATE_METHOD_CREDIT_CARD) {
                 continue;
             }
 
@@ -124,7 +110,7 @@ class MandateService implements MandateServiceInterface
             $mandateStruct->setCreatedAt($mandate->createdAt);
             $mandateStruct->setDetails($details);
 
-            # check if this mandate has connected subscriptions
+            // check if this mandate has connected subscriptions
             $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandate->id, $context);
             $beingUsedForSubscription = false;
 
@@ -135,7 +121,6 @@ class MandateService implements MandateServiceInterface
                 }
             }
             $mandateStruct->setBeingUsedForSubscription($beingUsedForSubscription);
-
 
             $mandateCollection->add($mandateStruct);
         }

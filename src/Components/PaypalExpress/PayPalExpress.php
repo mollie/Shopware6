@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\PaypalExpress;
 
@@ -19,7 +20,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class PayPalExpress
 {
-
     /**
      * define how often we ask the session until we get the shipping address
      */
@@ -59,14 +59,6 @@ class PayPalExpress
      */
     private $cartService;
 
-    /**
-     * @param PaymentMethodRepository $repoPaymentMethods
-     * @param MollieApiFactory $mollieApiFactory
-     * @param MollieOrderPriceBuilder $priceBuilder
-     * @param RoutingBuilder $urlBuilder
-     * @param CustomerService $customerService
-     * @param CartServiceInterface $cartService
-     */
     public function __construct(PaymentMethodRepository $repoPaymentMethods, MollieApiFactory $mollieApiFactory, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $urlBuilder, CustomerService $customerService, CartServiceInterface $cartService)
     {
         $this->repoPaymentMethods = $repoPaymentMethods;
@@ -77,26 +69,19 @@ class PayPalExpress
         $this->cartService = $cartService;
     }
 
-
-    /**
-     * @param SalesChannelContext $context
-     * @return bool
-     */
     public function isPaypalExpressPaymentMethodEnabled(SalesChannelContext $context): bool
     {
         try {
             $methodID = $this->getActivePaypalExpressID($context);
 
-            return (! empty($methodID));
+            return ! empty($methodID);
         } catch (\Exception $ex) {
             return false;
         }
     }
 
     /**
-     * @param SalesChannelContext $context
      * @throws \Exception
-     * @return string
      */
     public function getActivePaypalExpressID(SalesChannelContext $context): string
     {
@@ -113,15 +98,11 @@ class PayPalExpress
             throw new \Exception('Payment Method PayPal Express not found in system');
         }
 
-        return (string)$paymentMethods[0];
+        return (string) $paymentMethods[0];
     }
 
-
     /**
-     * @param Cart $cart
-     * @param SalesChannelContext $context
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Session
      */
     public function startSession(Cart $cart, SalesChannelContext $context): Session
     {
@@ -146,12 +127,12 @@ class PayPalExpress
     public function loadSession(string $sessionId, SalesChannelContext $context): Session
     {
         $mollie = $this->mollieApiFactory->getLiveClient($context->getSalesChannelId());
-        /**
+        /*
          * if we load the session from mollie api, we dont get the shipping address at first time. usually it takes several seconds until the data from paypal is transfered to mollie
          * so we try to load the session at least 5 times with increased waiting time.
          */
-        for ($i = 0; $i < self::SESSION_MAX_RETRY; $i++) {
-            $sleepTimer = self::SESSION_BASE_TIMEOUT * ($i+1);
+        for ($i = 0; $i < self::SESSION_MAX_RETRY; ++$i) {
+            $sleepTimer = self::SESSION_BASE_TIMEOUT * ($i + 1);
             usleep($sleepTimer);
             $session = $mollie->sessions->get($sessionId);
             if ($session->methodDetails !== null && property_exists($session->methodDetails, 'shippingAddress') && $session->methodDetails->shippingAddress !== null) {
@@ -162,14 +143,8 @@ class PayPalExpress
         return $session;
     }
 
-
-
     /**
-     * @param AddressStruct $shippingAddress
-     * @param SalesChannelContext $context
-     * @param null|AddressStruct $billingAddress
      * @throws \Exception
-     * @return SalesChannelContext
      */
     public function prepareCustomer(AddressStruct $shippingAddress, SalesChannelContext $context, ?int $acceptedDataProtection, ?AddressStruct $billingAddress = null): SalesChannelContext
     {
@@ -178,14 +153,12 @@ class PayPalExpress
 
         $customer = $context->getCustomer();
 
-        # if we are not logged in,
-        # then we have to create a new guest customer for our express order
-        # check here for instance because of phpstan
+        // if we are not logged in,
+        // then we have to create a new guest customer for our express order
+        // check here for instance because of phpstan
         if ($customer === null) {
-
-            # find existing customer by email
+            // find existing customer by email
             $customer = $this->customerService->findCustomerByEmail($shippingAddress->getEmail(), $context);
-
 
             if ($customer === null) {
                 $updateShippingAddress = false;
@@ -198,24 +171,22 @@ class PayPalExpress
                 );
             }
 
-
             if (! $customer instanceof CustomerEntity) {
                 throw new \Exception('Error when creating customer!');
             }
 
-            # now start the login of our customer.
-            # Our SalesChannelContext will be correctly updated after our
-            # forward to the finish-payment page.
+            // now start the login of our customer.
+            // Our SalesChannelContext will be correctly updated after our
+            // forward to the finish-payment page.
             $this->customerService->loginCustomer($customer, $context);
         }
 
-        # if we have an existing customer, we want reuse his shipping address instead of creating new one
+        // if we have an existing customer, we want reuse his shipping address instead of creating new one
         if ($updateShippingAddress) {
             $this->customerService->reuseOrCreateAddresses($customer, $shippingAddress, $context->getContext(), $billingAddress);
         }
 
-
-        # also (always) update our payment method to use Apple Pay for our cart
+        // also (always) update our payment method to use Apple Pay for our cart
         return $this->cartService->updatePaymentMethod($context, $paypalExpressId);
     }
 

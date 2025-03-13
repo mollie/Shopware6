@@ -19,6 +19,7 @@ class FakeOrderLineItemRepository extends EntityRepository
     {
         $this->collection = $collection;
     }
+
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
         // TODO: Implement update() method.

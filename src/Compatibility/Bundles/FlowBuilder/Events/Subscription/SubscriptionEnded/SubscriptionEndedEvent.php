@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionEnded;
 
@@ -21,7 +22,6 @@ class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, 
 {
     use JsonSerializableTrait;
 
-
     /**
      * @var SubscriptionEntity
      */
@@ -37,12 +37,6 @@ class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, 
      */
     protected $context;
 
-
-    /**
-     * @param SubscriptionEntity $subscription
-     * @param CustomerEntity $customer
-     * @param Context $context
-     */
     public function __construct(SubscriptionEntity $subscription, CustomerEntity $customer, Context $context)
     {
         $this->subscription = $subscription;
@@ -50,60 +44,39 @@ class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, 
         $this->context = $context;
     }
 
-
-    /**
-     * @return EventDataCollection
-     */
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
             ->add('subscription', new EntityType(SubscriptionDefinition::class))
-            ->add('customer', new EntityType(CustomerDefinition::class));
+            ->add('customer', new EntityType(CustomerDefinition::class))
+        ;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'mollie.subscription.ended';
     }
 
-    /**
-     * @return Context
-     */
     public function getContext(): Context
     {
         return $this->context;
     }
 
-    /**
-     * @return SubscriptionEntity
-     */
     public function getSubscription(): SubscriptionEntity
     {
         return $this->subscription;
     }
 
-    /**
-     * @return string
-     */
     public function getCustomerId(): string
     {
         return $this->customer->getId();
     }
 
-    /**
-     * @return CustomerEntity
-     */
     public function getCustomer(): CustomerEntity
     {
         return $this->customer;
     }
 
-    /**
-     * @return MailRecipientStruct
-     */
     public function getMailStruct(): MailRecipientStruct
     {
         return new MailRecipientStruct([
@@ -111,9 +84,6 @@ class SubscriptionEndedEvent extends Event implements CustomerAware, MailAware, 
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function getSalesChannelId(): string
     {
         return $this->customer->getSalesChannelId();

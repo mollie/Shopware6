@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct\OrderLineItemEntity;
 
@@ -30,7 +31,7 @@ class OrderLineItemEntityTest extends TestCase
     {
         $item = new OrderLineItemEntity();
         $item->setPayload([
-            'customFields' => []
+            'customFields' => [],
         ]);
 
         $attributes = new OrderLineItemEntityAttributes($item);
@@ -64,9 +65,8 @@ class OrderLineItemEntityTest extends TestCase
         $item->setPayload([
             'customFields' => [
                 'mollie_payments' => [
-
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $attributes = new OrderLineItemEntityAttributes($item);
@@ -85,8 +85,8 @@ class OrderLineItemEntityTest extends TestCase
             'customFields' => [
                 'mollie_payments' => [
                     'voucher_type' => VoucherType::TYPE_MEAL,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $attributes = new OrderLineItemEntityAttributes($item);
@@ -115,7 +115,7 @@ class OrderLineItemEntityTest extends TestCase
     {
         $item = new OrderLineItemEntity();
         $item->setPayload([
-            'composition' => []
+            'composition' => [],
         ]);
 
         $attributes = new OrderLineItemEntityAttributes($item);
@@ -131,7 +131,7 @@ class OrderLineItemEntityTest extends TestCase
     {
         $item = new OrderLineItemEntity();
         $item->setPayload([
-            'discountType' => []
+            'discountType' => [],
         ]);
 
         $attributes = new OrderLineItemEntityAttributes($item);

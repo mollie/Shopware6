@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\CreditCard;
 
@@ -29,12 +30,6 @@ class CreditCardControllerBase extends AbstractStoreFrontController
      */
     private $logger;
 
-
-    /**
-     * @param CustomerServiceInterface $customerService
-     * @param MandateServiceInterface $mandateService
-     * @param LoggerInterface $logger
-     */
     public function __construct(CustomerServiceInterface $customerService, MandateServiceInterface $mandateService, LoggerInterface $logger)
     {
         $this->customerService = $customerService;
@@ -42,14 +37,6 @@ class CreditCardControllerBase extends AbstractStoreFrontController
         $this->logger = $logger;
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param string $customerId
-     * @param string $cardToken
-     *
-     * @return JsonResponse
-     */
     public function storeCardToken(SalesChannelContext $context, string $customerId, string $cardToken, Request $data): JsonResponse
     {
         $result = null;
@@ -72,18 +59,10 @@ class CreditCardControllerBase extends AbstractStoreFrontController
         return new JsonResponse([
             'success' => $success,
             'customerId' => $customerId,
-            'result' => $result
+            'result' => $result,
         ]);
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param string $customerId
-     * @param string $mandateId
-     *
-     * @return JsonResponse
-     */
     public function storeMandateId(string $customerId, string $mandateId, SalesChannelContext $context): JsonResponse
     {
         $result = null;
@@ -104,18 +83,10 @@ class CreditCardControllerBase extends AbstractStoreFrontController
         return new JsonResponse([
             'success' => $success,
             'customerId' => $customerId,
-            'result' => $result
+            'result' => $result,
         ]);
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param string $customerId
-     * @param string $mandateId
-     *
-     * @return JsonResponse
-     */
     public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): JsonResponse
     {
         $success = false;
@@ -134,7 +105,7 @@ class CreditCardControllerBase extends AbstractStoreFrontController
                 $this->logger->error(
                     'One-Click Payments  error when removing mandate from customer',
                     [
-                        'error' => $exception
+                        'error' => $exception,
                     ]
                 );
 
@@ -147,7 +118,7 @@ class CreditCardControllerBase extends AbstractStoreFrontController
                 'success' => $success,
                 'customerId' => $customerId,
                 'mandateId' => $mandateId,
-                'result' => $result
+                'result' => $result,
             ]
         );
     }

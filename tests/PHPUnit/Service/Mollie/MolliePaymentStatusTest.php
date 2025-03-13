@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\Mollie;
 
@@ -41,7 +42,6 @@ class MolliePaymentStatusTest extends TestCase
 
         $this->assertEquals($expected, $isApproved);
     }
-
 
     /**
      * @return array[]

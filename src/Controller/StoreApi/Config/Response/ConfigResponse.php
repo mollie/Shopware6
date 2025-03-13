@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\Config\Response;
 
@@ -12,13 +13,6 @@ class ConfigResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param string $profileId
-     * @param bool $isTestMode
-     * @param string $defaultLocale
-     * @param bool $oneClickEnabled
-     */
     public function __construct(string $profileId, bool $isTestMode, string $defaultLocale, bool $oneClickEnabled)
     {
         $this->object = new ArrayStruct(

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail;
 
@@ -23,16 +24,10 @@ class MailService63 extends AbstractMailService
      */
     private $mailSender;
 
-
-    /**
-     * @param DataValidator $dataValidator
-     * @param MessageFactory $mailFactory
-     * @param MailSender $mailSender
-     */
     public function __construct(
-        DataValidator  $dataValidator,
+        DataValidator $dataValidator,
         MessageFactory $mailFactory, // @phpstan-ignore-line
-        MailSender     $mailSender // @phpstan-ignore-line
+        MailSender $mailSender // @phpstan-ignore-line
     ) {
         $this->dataValidator = $dataValidator;
         $this->mailFactory = $mailFactory;
@@ -40,7 +35,7 @@ class MailService63 extends AbstractMailService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function send(array $data, array $attachments = []): void
     {

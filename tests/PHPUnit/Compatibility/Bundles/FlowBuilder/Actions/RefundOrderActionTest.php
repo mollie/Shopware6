@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
@@ -13,7 +14,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 class RefundOrderActionTest extends TestCase
 {
     use FlowBuilderTestTrait;
-
 
     /**
      * This test verifies that our action name is not
@@ -33,6 +33,7 @@ class RefundOrderActionTest extends TestCase
      * as well as the correct order. So we also verify that a full refund request is built
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testRefundAction()
@@ -47,19 +48,18 @@ class RefundOrderActionTest extends TestCase
 
         $flowEvent = $this->buildOrderStateFlowEvent($order, 'action.mollie.order.refund');
 
-        # build our action and
-        # start the handling process with our prepared data
+        // build our action and
+        // start the handling process with our prepared data
         $action = new RefundOrderAction($fakeOrderService, $fakeRefundManager, new NullLogger());
         $action->handle($flowEvent);
 
-
-        # verify the passed request object
+        // verify the passed request object
         $this->assertEquals('ord-123', $fakeRefundManager->getRefundRequest()->getOrderNumber());
         $this->assertEquals('Refund through Shopware Flow Builder', $fakeRefundManager->getRefundRequest()->getDescription());
         $this->assertEquals(null, $fakeRefundManager->getRefundRequest()->getAmount(), 'amount needs to be NULL to detect it as full refund');
         $this->assertEquals([], $fakeRefundManager->getRefundRequest()->getItems());
 
-        # verify that the correct order has been fetched
+        // verify that the correct order has been fetched
         $this->assertEquals('ord-123', $fakeRefundManager->getRefundedOrder()->getOrderNumber());
     }
 }

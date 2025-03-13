@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct;
 
@@ -16,10 +17,8 @@ class ArrayStruct extends Struct
      */
     private $apiAlias;
 
-
     /**
      * @param array<mixed> $data
-     * @param string $apiAlias
      */
     public function __construct(array $data, string $apiAlias)
     {
@@ -43,9 +42,6 @@ class ArrayStruct extends Struct
         $this->data = $data;
     }
 
-    /**
-     * @return string
-     */
     public function getApiAlias(): string
     {
         return $this->apiAlias;

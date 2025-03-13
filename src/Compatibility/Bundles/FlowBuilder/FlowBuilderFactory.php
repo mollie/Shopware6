@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
@@ -10,9 +11,6 @@ use Shopware\Core\Content\Flow\Dispatching\FlowDispatcher;
 
 class FlowBuilderFactory implements FlowBuilderFactoryInterface
 {
-    /**
-     *
-     */
     public const FLOW_BUILDER_MIN_VERSION = '6.4.6.0';
 
     /**
@@ -31,12 +29,11 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
      */
     private $flowDispatcher;
 
-
     /**
-     * @param string $shopwareVersion
      * @param \Shopware\Core\Framework\Event\BusinessEventDispatcher $businessEventDispatcher
      * @param FlowDispatcher $flowDispatcher
      */
+
     /** @phpstan-ignore-next-line */
     public function __construct(string $shopwareVersion, $businessEventDispatcher, $flowDispatcher)
     {
@@ -45,10 +42,8 @@ class FlowBuilderFactory implements FlowBuilderFactoryInterface
         $this->flowDispatcher = $flowDispatcher;
     }
 
-
     /**
      * @throws \Exception
-     * @return FlowBuilderDispatcherAdapterInterface
      */
     public function createDispatcher(): FlowBuilderDispatcherAdapterInterface
     {

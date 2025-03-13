@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -34,12 +35,6 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
      */
     protected $salesChannelDataExtractor;
 
-    /**
-     * @param EntityRepository $salesChannelRepository
-     * @param MollieApiFactory $apiFactory
-     * @param PaymentMethodRepository $paymentMethodRepository
-     * @param SalesChannelDataExtractor $salesChannelDataExtractor
-     */
     public function __construct(EntityRepository $salesChannelRepository, MollieApiFactory $apiFactory, PaymentMethodRepository $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
     {
         parent::__construct($salesChannelRepository);
@@ -50,7 +45,6 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     }
 
     /**
-     * @param Context $context
      * @return array<mixed>
      */
     public function generate(Context $context): array
@@ -72,6 +66,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
 
     /**
      * @param Context $context
+     *
      * @return array<mixed>
      */
     public function getShopwarePaymentMethodStatus($context): array
@@ -96,7 +91,6 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     }
 
     /**
-     * @param SalesChannelEntity $salesChannel
      * @return array<mixed>
      */
     public function getSalesChannelPaymentMethodAssignments(SalesChannelEntity $salesChannel): array
@@ -111,7 +105,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
             $paymentMethods = $this->salesChannelDataExtractor->extractPaymentMethods($salesChannel);
 
             $paymentMethods->sort(function (PaymentMethodEntity $a, PaymentMethodEntity $b) {
-                return strnatcmp((string)$a->getPluginId(), (string)$b->getPluginId()) ?: strnatcmp((string)$a->getName(), (string)$b->getName());
+                return strnatcmp((string) $a->getPluginId(), (string) $b->getPluginId()) ?: strnatcmp((string) $a->getName(), (string) $b->getName());
             });
 
             foreach ($paymentMethods as $paymentMethod) {
@@ -124,13 +118,11 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         }
 
         $fileContent = array_merge($fileContent, $this->getLivePaymentMethodData($salesChannel));
-        $fileContent = array_merge($fileContent, $this->getTestPaymentMethodData($salesChannel));
 
-        return $fileContent;
+        return array_merge($fileContent, $this->getTestPaymentMethodData($salesChannel));
     }
 
     /**
-     * @param SalesChannelEntity $salesChannel
      * @return array<mixed>
      */
     protected function getLivePaymentMethodData(SalesChannelEntity $salesChannel): array
@@ -139,11 +131,11 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         $fileContent[] = '= Status in Mollie for Live API key =';
 
         $apiClient = $this->apiFactory->getLiveClient($salesChannel->getId());
+
         return array_merge($fileContent, $this->getMolliePaymentMethodStatus($apiClient));
     }
 
     /**
-     * @param SalesChannelEntity $salesChannel
      * @return array<mixed>
      */
     protected function getTestPaymentMethodData(SalesChannelEntity $salesChannel): array
@@ -152,11 +144,11 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
         $fileContent[] = '= Status in Mollie for Test API key =';
 
         $apiClient = $this->apiFactory->getTestClient($salesChannel->getId());
+
         return array_merge($fileContent, $this->getMolliePaymentMethodStatus($apiClient));
     }
 
     /**
-     * @param MollieApiClient $apiClient
      * @return array<mixed>
      */
     protected function getMolliePaymentMethodStatus(MollieApiClient $apiClient): array
@@ -167,7 +159,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
 
             /** @var Method $method */
             foreach ($methods as $method) {
-                $fileContent[] = sprintf('%s: %s', $method->description, (string)$method->status);
+                $fileContent[] = sprintf('%s: %s', $method->description, (string) $method->status);
             }
         } catch (ApiException $e) {
             $fileContent[] = 'Could not get payment methods from Mollie, perhaps the API key is invalid';

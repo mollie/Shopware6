@@ -37,10 +37,8 @@ class StartCheckoutRouteTest extends TestCase
         $cartService = $this->getCartService();
         $paypalExpress = $this->getPaypalExpress();
 
-
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();
-
 
         try {
             $route->startCheckout($request, $this->getContext());
@@ -55,7 +53,6 @@ class StartCheckoutRouteTest extends TestCase
         $cartService = $this->getCartService(true);
 
         $paypalExpress = $this->getPaypalExpress();
-
 
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();
@@ -74,7 +71,6 @@ class StartCheckoutRouteTest extends TestCase
 
         $paypalExpress = $this->getPaypalExpress(false, true);
 
-
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();
 
@@ -91,7 +87,6 @@ class StartCheckoutRouteTest extends TestCase
         $cartService = $this->getCartService(true, true, true);
 
         $paypalExpress = $this->getPaypalExpress(false, false, true);
-
 
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();
@@ -110,7 +105,6 @@ class StartCheckoutRouteTest extends TestCase
 
         $paypalExpress = $this->getPaypalExpress(true, true);
 
-
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();
 
@@ -127,7 +121,6 @@ class StartCheckoutRouteTest extends TestCase
 
         $paypalExpress = $this->getPaypalExpress(true, false, true);
 
-
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();
 
@@ -143,7 +136,6 @@ class StartCheckoutRouteTest extends TestCase
         $cartService = $this->getCartService(true, true, true);
 
         $paypalExpress = $this->getPaypalExpress(true, false, true);
-
 
         $route = new StartCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $request = new Request();

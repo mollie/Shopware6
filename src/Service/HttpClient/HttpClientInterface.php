@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\HttpClient;
 
@@ -11,11 +12,5 @@ use Kiener\MolliePayments\Service\HttpClient\Response\HttpResponse;
  */
 interface HttpClientInterface
 {
-    /**
-     * @param string $method
-     * @param string $url
-     * @param string $content
-     * @return HttpResponse
-     */
     public function sendRequest(string $method, string $url, string $content = ''): HttpResponse;
 }

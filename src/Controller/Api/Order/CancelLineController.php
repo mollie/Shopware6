@@ -40,7 +40,7 @@ class CancelLineController extends AbstractController
             /** @var OrderLine $line */
             foreach ($lines as $line) {
                 $metadata = $line->metadata;
-                if (!is_object($metadata) || ! property_exists($metadata, 'orderLineItemId')) {
+                if (! is_object($metadata) || ! property_exists($metadata, 'orderLineItemId')) {
                     continue;
                 }
                 $id = $metadata->orderLineItemId;
@@ -51,7 +51,7 @@ class CancelLineController extends AbstractController
                     'status' => $line->status,
                     'isCancelable' => $line->isCancelable,
                     'cancelableQuantity' => $line->cancelableQuantity,
-                    'quantityCanceled' => $line->quantityCanceled
+                    'quantityCanceled' => $line->quantityCanceled,
                 ];
             }
         }
@@ -68,6 +68,7 @@ class CancelLineController extends AbstractController
         $resetStock = $request->get('resetStock', false);
 
         $result = $this->cancelItemFacade->cancelItem($mollieOrderId, $mollieLineId, $shopwareOrderLineId, $quantity, $resetStock, $context);
+
         return new JsonResponse($result->toArray());
     }
 }

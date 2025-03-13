@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Resources\Payment;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -38,13 +38,6 @@ class SubscriptionRenewing
      */
     private $orderCloneService;
 
-
-    /**
-     * @param NumberRangeValueGeneratorInterface $numberRanges
-     * @param EntityRepository $repoOrderAddress
-     * @param OrderService $orderService
-     * @param OrderCloneService $orderCloneService
-     */
     public function __construct(NumberRangeValueGeneratorInterface $numberRanges, EntityRepository $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
     {
         $this->numberRanges = $numberRanges;
@@ -53,53 +46,46 @@ class SubscriptionRenewing
         $this->orderCloneService = $orderCloneService;
     }
 
-
     /**
-     * @param SubscriptionEntity $subscription
-     * @param Payment $molliePayment
-     * @param Context $context
      * @throws \Exception
-     * @return OrderEntity
      */
     public function renewSubscription(SubscriptionEntity $subscription, Payment $molliePayment, Context $context): OrderEntity
     {
         $order = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             throw new EntityNotFoundException('order', $subscription->getOrderId());
         }
 
-        # get the next order number
+        // get the next order number
         $newOrderNumber = $this->numberRanges->getValue('order', $context, $subscription->getSalesChannelId());
 
-
-        # if we have a separate shipping address
-        # make sure that our cloned order also contains 2 addresses (1 for shipping)
+        // if we have a separate shipping address
+        // make sure that our cloned order also contains 2 addresses (1 for shipping)
         $needsSeparateShippingAddress = ($subscription->getShippingAddress() instanceof SubscriptionAddressEntity);
 
-        # now let's clone our previous order and create a new one from it
+        // now let's clone our previous order and create a new one from it
         $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context);
 
         $order = $this->orderService->getOrder($orderId, $context);
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             throw new \Exception('Cannot renew subscription. Order with ID ' . $orderId . ' not found for subscription: ' . $subscription->getMollieId());
         }
 
-        if (!$order->getTransactions() instanceof OrderTransactionCollection) {
+        if (! $order->getTransactions() instanceof OrderTransactionCollection) {
             throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a list of order transactions');
         }
 
         $lastTransaction = $order->getTransactions()->last();
 
-        if (!$lastTransaction instanceof OrderTransactionEntity) {
+        if (! $lastTransaction instanceof OrderTransactionEntity) {
             throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a last order transaction');
         }
 
-
         $billing = $subscription->getBillingAddress();
 
-        # now update the billing and shipping address
+        // now update the billing and shipping address
         if ($billing instanceof SubscriptionAddressEntity) {
             $this->repoOrderAddress->update(
                 [
@@ -119,7 +105,7 @@ class SubscriptionRenewing
                         'city' => $billing->getCity(),
                         'countryId' => $billing->getCountryId(),
                         'countryStateId' => $billing->getCountryStateId(),
-                    ]
+                    ],
                 ],
                 $context
             );
@@ -147,16 +133,16 @@ class SubscriptionRenewing
                             'city' => $shipping->getCity(),
                             'countryId' => $shipping->getCountryId(),
                             'countryStateId' => $shipping->getCountryStateId(),
-                        ]
+                        ],
                     ],
                     $context
                 );
             }
         }
 
-        # also make sure to update our metadata
-        # that is stored in the custom fields of the
-        # Shopware order and its transactions
+        // also make sure to update our metadata
+        // that is stored in the custom fields of the
+        // Shopware order and its transactions
         $this->orderService->updateMollieData(
             $order,
             $lastTransaction->getId(),
@@ -166,7 +152,6 @@ class SubscriptionRenewing
             $molliePayment,
             $context
         );
-
 
         return $order;
     }

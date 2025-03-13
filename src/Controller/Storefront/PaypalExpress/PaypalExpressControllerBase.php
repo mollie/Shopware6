@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\PaypalExpress;
 
@@ -32,14 +33,6 @@ class PaypalExpressControllerBase extends StorefrontController
     private AbstractFinishCheckoutRoute $finishCheckoutRoute;
     private AbstractCancelCheckoutRoute $cancelCheckoutRoute;
 
-
-    /**
-     * @param AbstractStartCheckoutRoute $startCheckoutRoute
-     * @param AbstractFinishCheckoutRoute $finishCheckoutRoute
-     * @param AbstractCancelCheckoutRoute $cancelCheckoutRoute
-     * @param RouterInterface $router
-     * @param LoggerInterface $logger
-     */
     public function __construct(AbstractStartCheckoutRoute $startCheckoutRoute, AbstractFinishCheckoutRoute $finishCheckoutRoute, AbstractCancelCheckoutRoute $cancelCheckoutRoute, RouterInterface $router, LoggerInterface $logger)
     {
         $this->router = $router;
@@ -50,10 +43,7 @@ class PaypalExpressControllerBase extends StorefrontController
     }
 
     /**
-     * @param Request $request
-     * @param SalesChannelContext $context
      * @throws ApiException
-     * @return Response
      */
     public function startCheckout(Request $request, SalesChannelContext $context): Response
     {
@@ -73,6 +63,7 @@ class PaypalExpressControllerBase extends StorefrontController
                 ['message' => $e->getMessage()]
             );
         }
+
         return new RedirectResponse($redirectUrl);
     }
 
@@ -89,13 +80,10 @@ class PaypalExpressControllerBase extends StorefrontController
                 ['message' => $e->getMessage()]
             );
         }
+
         return new RedirectResponse($redirectUrl);
     }
 
-    /**
-     * @param SalesChannelContext $context
-     * @return Response
-     */
     public function finishCheckout(SalesChannelContext $context): Response
     {
         try {
@@ -110,6 +98,7 @@ class PaypalExpressControllerBase extends StorefrontController
                 ['message' => $e->getMessage()]
             );
         }
+
         return new RedirectResponse($returnUrl);
     }
 }

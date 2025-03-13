@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Handler\Method;
 
@@ -23,12 +24,6 @@ class BankTransferPayment extends PaymentHandler
     /** @var SettingsService */
     private $settingsService;
 
-
-    /**
-     * @param LoggerInterface $logger
-     * @param \Psr\Container\ContainerInterface $container
-     * @param SettingsService $settingsService
-     */
     public function __construct(LoggerInterface $logger, \Psr\Container\ContainerInterface $container, SettingsService $settingsService)
     {
         parent::__construct($logger, $container);
@@ -37,17 +32,16 @@ class BankTransferPayment extends PaymentHandler
 
     /**
      * @param array<mixed> $orderData
-     * @param OrderEntity $orderEntity
-     * @param SalesChannelContext $salesChannelContext
-     * @param CustomerEntity $customer
+     *
      * @throws \Exception
+     *
      * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
 
-        $dueDateDays = (int)$settings->getPaymentMethodBankTransferDueDateDays();
+        $dueDateDays = (int) $settings->getPaymentMethodBankTransferDueDateDays();
 
         if ($dueDateDays > 0) {
             $dueDate = $settings->getPaymentMethodBankTransferDueDate();

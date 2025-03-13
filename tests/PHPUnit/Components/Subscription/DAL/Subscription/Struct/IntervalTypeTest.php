@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription\Struct;
 
@@ -9,30 +10,24 @@ class IntervalTypeTest extends TestCase
 {
     /**
      * This test verifies that the value of our constant is correct.
-     *
-     * @return void
      */
-    public function test_DAYS(): void
+    public function testDAYS(): void
     {
         static::assertSame('days', IntervalType::DAYS);
     }
 
     /**
      * This test verifies that the value of our constant is correct.
-     *
-     * @return void
      */
-    public function test_WEEKS(): void
+    public function testWEEKS(): void
     {
         static::assertSame('weeks', IntervalType::WEEKS);
     }
 
     /**
      * This test verifies that the value of our constant is correct.
-     *
-     * @return void
      */
-    public function test_MONTHS(): void
+    public function testMONTHS(): void
     {
         static::assertSame('months', IntervalType::MONTHS);
     }

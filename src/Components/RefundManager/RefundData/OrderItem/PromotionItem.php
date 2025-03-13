@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem;
 
@@ -23,13 +24,8 @@ class PromotionItem extends AbstractItem
      */
     private $alreadyRefundedQty;
 
-
     /**
      * @param OrderDeliveryEntity|OrderLineItemEntity $lineItem
-     * @param int $alreadyRefundedQuantity
-     * @param float $taxTotal
-     * @param float $taxPerItem
-     * @param float $taxDiff
      */
     private function __construct($lineItem, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
     {
@@ -47,11 +43,6 @@ class PromotionItem extends AbstractItem
     }
 
     /**
-     * @param OrderLineItemEntity $lineItem
-     * @param int $alreadyRefundedQuantity
-     * @param float $taxTotal
-     * @param float $taxPerItem
-     * @param float $taxDiff
      * @return PromotionItem
      */
     public static function fromOrderLineItem(OrderLineItemEntity $lineItem, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
@@ -60,11 +51,6 @@ class PromotionItem extends AbstractItem
     }
 
     /**
-     * @param OrderDeliveryEntity $lineItem
-     * @param int $alreadyRefundedQuantity
-     * @param float $taxTotal
-     * @param float $taxPerItem
-     * @param float $taxDiff
      * @return PromotionItem
      */
     public static function fromOrderDeliveryItem(OrderDeliveryEntity $lineItem, int $alreadyRefundedQuantity, float $taxTotal, float $taxPerItem, float $taxDiff)
@@ -92,19 +78,19 @@ class PromotionItem extends AbstractItem
                 0,
                 $this->alreadyRefundedQty
             );
-        } else {
-            $label = '';
+        }
+        $label = '';
 
-            $method = $this->orderDeliveryItem->getShippingMethod();
-            if ($method instanceof ShippingMethodEntity) {
-                $label = (string)$method->getName();
-            }
+        $method = $this->orderDeliveryItem->getShippingMethod();
+        if ($method instanceof ShippingMethodEntity) {
+            $label = (string) $method->getName();
+        }
 
-            if (empty($label)) {
-                $label = 'SHIPPING';
-            }
+        if (empty($label)) {
+            $label = 'SHIPPING';
+        }
 
-            return $this->buildArray(
+        return $this->buildArray(
                 $this->orderDeliveryItem->getId(),
                 $label,
                 'SHIPPING',
@@ -118,15 +104,11 @@ class PromotionItem extends AbstractItem
                 0,
                 $this->alreadyRefundedQty
             );
-        }
     }
 
-    /**
-     * @return string
-     */
     public function getProductNumber(): string
     {
-        # delivery items have no product number
+        // delivery items have no product number
         if ($this->orderDeliveryItem !== null) {
             return '';
         }
@@ -135,8 +117,8 @@ class PromotionItem extends AbstractItem
             return '';
         }
 
-        # for promotions we use the voucher code as number to display
-        # this one is in the reference ID
-        return (string)$this->orderLineItem->getReferencedId();
+        // for promotions we use the voucher code as number to display
+        // this one is in the reference ID
+        return (string) $this->orderLineItem->getReferencedId();
     }
 }

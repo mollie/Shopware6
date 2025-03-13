@@ -106,6 +106,7 @@ final class FakeCustomerService implements CustomerServiceInterface
     {
         $customerService = clone $this;
         $customerService->setCardTokenResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), $errors);
+
         return $customerService;
     }
 
@@ -113,6 +114,7 @@ final class FakeCustomerService implements CustomerServiceInterface
     {
         $customerService = clone $this;
         $customerService->setMandateIdResponse = new EntityWrittenContainerEvent(new Context(new SystemSource()), new NestedEventCollection(), $errors);
+
         return $customerService;
     }
 
@@ -120,6 +122,7 @@ final class FakeCustomerService implements CustomerServiceInterface
     {
         $customerService = clone $this;
         $customerService->customerEntity = new CustomerEntity();
+
         return $customerService;
     }
 }

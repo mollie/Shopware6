@@ -53,17 +53,11 @@ class RefundCreditNoteService
      */
     private $logger;
 
-    /**
-     * @param EntityRepository $orderRepository
-     * @param EntityRepository $orderLineItemRepository
-     * @param SettingsService $settingsService
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         EntityRepository $orderRepository,
         EntityRepository $orderLineItemRepository,
-        SettingsService  $settingsService,
-        LoggerInterface  $logger
+        SettingsService $settingsService,
+        LoggerInterface $logger
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
@@ -74,14 +68,101 @@ class RefundCreditNoteService
         $this->logger = $logger;
     }
 
+    public function createCreditNotes(OrderEntity $order, Refund $refund, RefundRequest $refundRequest, Context $context): void
+    {
+        if (! $this->enabled) {
+            $this->logger->debug('Credit note creation is disabled');
+
+            return;
+        }
+        $orderId = $order->getId();
+        $refundId = $refund->id;
+
+        $lineItems = [];
+
+        $orderLineItems = $order->getLineItems();
+        $orderDeliveries = $order->getDeliveries();
+        $refundAmount = $refundRequest->getAmount();
+
+        if (count($refundRequest->getItems()) > 0) {
+            foreach ($refundRequest->getItems() as $refundLineItem) {
+                $orderLineItemId = $refundLineItem->getLineId();
+                $totalAmount = $refundLineItem->getAmount();
+                $quantity = max(1, $refundLineItem->getQuantity());
+                if ($totalAmount <= 0.0) {
+                    continue;
+                }
+                $unitPrice = $totalAmount / $quantity;
+
+                $refundAmount -= $totalAmount;
+                $refundAmount = round($refundAmount, 2);
+
+                if ($orderLineItems === null) {
+                    continue;
+                }
+
+                $filteredOrderLineItems = $orderLineItems->filter(function (OrderLineItemEntity $item) use ($orderLineItemId) {
+                    return $item->getId() === $orderLineItemId;
+                });
+
+                if ($filteredOrderLineItems->count() === 0) {
+                    if ($orderDeliveries === null) {
+                        continue;
+                    }
+
+                    $filteredOrderDeliveries = $orderDeliveries->filter(function (OrderDeliveryEntity $item) use ($orderLineItemId) {
+                        return $item->getId() === $orderLineItemId;
+                    });
+                    if ($filteredOrderDeliveries->count() === 0) {
+                        continue;
+                    }
+
+                    $orderDelivery = $filteredOrderDeliveries->first();
+                    $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, null, $orderDelivery);
+                    continue;
+                }
+                $orderLineItem = $filteredOrderLineItems->first();
+
+                $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, $orderLineItem);
+            }
+        }
+
+        if ($refundAmount > 0) {
+            $lineItems[] = $this->getLineItemArray($orderId, $refundId, $refundAmount, 1, $refundAmount);
+        }
+
+        $this->logger->debug('Adding credit note to order', ['orderId' => $orderId, 'refundId' => $refundId, 'lineItems' => $lineItems]);
+        $this->orderRepository->upsert([[
+            'id' => $orderId,
+            'lineItems' => $lineItems,
+        ]], $context);
+    }
+
+    public function cancelCreditNotes(string $orderId, Context $context): void
+    {
+        //do not check for enabled, because credit notes could be created before and you still want to delete them, even if the feature is disabled now
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $criteria->addFilter(new EqualsFilter('type', LineItem::CREDIT_LINE_ITEM_TYPE));
+        $this->logger->debug('Start cancel credit notes', ['orderId' => $orderId]);
+        $searchResult = $this->orderLineItemRepository->searchIds($criteria, $context);
+        if ($searchResult->getTotal() === 0) {
+            $this->logger->debug('No credit notes found', ['orderId' => $orderId]);
+
+            return;
+        }
+        $ids = $searchResult->getIds();
+        $toDelete = [];
+        foreach ($ids as $id) {
+            $toDelete[] = ['id' => $id];
+        }
+        $this->orderLineItemRepository->delete($toDelete, $context);
+
+        $this->logger->debug('Deleted credit notes from order', ['orderId' => $orderId, 'total' => count($ids)]);
+    }
+
     /**
-     * @param string $orderId
-     * @param string $refundId
-     * @param float $unitPrice
-     * @param int $quantity
-     * @param float $totalAmount
-     * @param null|OrderLineItemEntity $orderLineItemEntity
-     * @param null|OrderDeliveryEntity $orderDeliveryEntity
      * @return array<mixed>
      */
     private function getLineItemArray(string $orderId, string $refundId, float $unitPrice, int $quantity, float $totalAmount, ?OrderLineItemEntity $orderLineItemEntity = null, ?OrderDeliveryEntity $orderDeliveryEntity = null): array
@@ -116,10 +197,9 @@ class RefundCreditNoteService
 
         $label = trim(sprintf('%s%s%s', $this->prefix, $label, $this->suffix));
 
-
         return [
-            'id' => Uuid::fromBytesToHex(md5($id, true)), #@todo remove once 6.4 reached end of life
-            'identifier' => Uuid::fromBytesToHex(md5($id, true)), #@todo remove once 6.4 reached end of life
+            'id' => Uuid::fromBytesToHex(md5($id, true)), //@todo remove once 6.4 reached end of life
+            'identifier' => Uuid::fromBytesToHex(md5($id, true)), //@todo remove once 6.4 reached end of life
             'quantity' => $quantity,
             'label' => $label,
             'type' => LineItem::CREDIT_LINE_ITEM_TYPE,
@@ -127,103 +207,9 @@ class RefundCreditNoteService
             'customFields' => [
                 CustomFieldsInterface::MOLLIE_KEY => [
                     'type' => 'refund',
-                    'refundId' => $refundId
+                    'refundId' => $refundId,
                 ],
             ],
         ];
-    }
-
-    public function createCreditNotes(OrderEntity $order, Refund $refund, RefundRequest $refundRequest, Context $context): void
-    {
-        if (! $this->enabled) {
-            $this->logger->debug('Credit note creation is disabled');
-            return;
-        }
-        $orderId = $order->getId();
-        $refundId = $refund->id;
-
-        $lineItems = [];
-
-
-        $orderLineItems = $order->getLineItems();
-        $orderDeliveries = $order->getDeliveries();
-        $refundAmount = $refundRequest->getAmount();
-
-        if (count($refundRequest->getItems()) > 0) {
-            foreach ($refundRequest->getItems() as $refundLineItem) {
-                $orderLineItemId = $refundLineItem->getLineId();
-                $totalAmount = $refundLineItem->getAmount();
-                $quantity = max(1, $refundLineItem->getQuantity());
-                if ($totalAmount <= 0.0) {
-                    continue;
-                }
-                $unitPrice = $totalAmount / $quantity;
-
-                $refundAmount -= $totalAmount;
-                $refundAmount = round($refundAmount, 2);
-
-                if ($orderLineItems === null) {
-                    continue;
-                }
-
-                $filteredOrderLineItems = $orderLineItems->filter(function (OrderLineItemEntity $item) use ($orderLineItemId) {
-                    return $item->getId() === $orderLineItemId;
-                });
-
-                if ($filteredOrderLineItems->count() === 0) {
-                    if ($orderDeliveries === null) {
-                        continue;
-                    }
-                    
-                    $filteredOrderDeliveries = $orderDeliveries->filter(function (OrderDeliveryEntity $item) use ($orderLineItemId) {
-                        return $item->getId() === $orderLineItemId;
-                    });
-                    if ($filteredOrderDeliveries->count() === 0) {
-                        continue;
-                    }
-
-                    $orderDelivery = $filteredOrderDeliveries->first();
-                    $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, null, $orderDelivery);
-                    continue;
-                }
-                $orderLineItem = $filteredOrderLineItems->first();
-
-                $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, $orderLineItem);
-            }
-        }
-
-        if ($refundAmount > 0) {
-            $lineItems[] = $this->getLineItemArray($orderId, $refundId, $refundAmount, 1, $refundAmount);
-        }
-
-        $this->logger->debug('Adding credit note to order', ['orderId' => $orderId, 'refundId' => $refundId, 'lineItems' => $lineItems]);
-        $this->orderRepository->upsert([[
-            'id' => $orderId,
-            'lineItems' => $lineItems,
-        ]], $context);
-    }
-
-    public function cancelCreditNotes(string $orderId, Context $context): void
-    {
-
-        //do not check for enabled, because credit notes could be created before and you still want to delete them, even if the feature is disabled now
-
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
-        $criteria->addFilter(new EqualsFilter('type', LineItem::CREDIT_LINE_ITEM_TYPE));
-        $this->logger->debug('Start cancel credit notes', ['orderId' => $orderId]);
-        $searchResult = $this->orderLineItemRepository->searchIds($criteria, $context);
-        if ($searchResult->getTotal() === 0) {
-            $this->logger->debug('No credit notes found', ['orderId' => $orderId]);
-            return;
-        }
-        $ids = $searchResult->getIds();
-        $toDelete = [];
-        foreach ($ids as $id) {
-            $toDelete[] = ['id' => $id];
-        }
-        $this->orderLineItemRepository->delete($toDelete, $context);
-
-        $this->logger->debug('Deleted credit notes from order', ['orderId' => $orderId, 'total' => count($ids)]);
     }
 }

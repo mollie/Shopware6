@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use League\Flysystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApplePayDomainVerificationService
 {
@@ -19,7 +21,6 @@ class ApplePayDomainVerificationService
      */
     public const LOCAL_FILE = '/.well-known/apple-developer-merchantid-domain-association';
 
-
     /**
      * @var Filesystem
      */
@@ -30,11 +31,6 @@ class ApplePayDomainVerificationService
      */
     private $httpClient;
 
-
-    /**
-     * @param Filesystem $filesystem
-     * @param HttpClientInterface $httpClient
-     */
     public function __construct(Filesystem $filesystem, HttpClientInterface $httpClient)
     {
         $this->filesystem = $filesystem;
@@ -49,7 +45,7 @@ class ApplePayDomainVerificationService
     {
         $response = $this->httpClient->sendRequest('GET', self::URL_FILE);
 
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+        if ($response->getStatusCode() < Response::HTTP_OK || $response->getStatusCode() >= Response::HTTP_MULTIPLE_CHOICES) {
             return;
         }
 

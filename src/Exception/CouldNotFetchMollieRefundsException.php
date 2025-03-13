@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -10,7 +11,7 @@ class CouldNotFetchMollieRefundsException extends \RuntimeException
         ?\Throwable $previous = null
     ) {
         $message = sprintf(
-            "Could not fetch refunds for the Mollie Order with ID %s (Order number %s)",
+            'Could not fetch refunds for the Mollie Order with ID %s (Order number %s)',
             $mollieOrderId,
             $orderNumber
         );

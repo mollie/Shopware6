@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
@@ -30,12 +31,6 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
      */
     private $logger;
 
-
-    /**
-     * @param OrderServiceInterface $orderService
-     * @param RefundManagerInterface $refundManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(OrderServiceInterface $orderService, RefundManagerInterface $refundManager, LoggerInterface $logger)
     {
         $this->orderService = $orderService;
@@ -43,9 +38,6 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    /**
-     * @return string
-     */
     public static function getName(): string
     {
         return 'action.mollie.order.refund';
@@ -70,9 +62,7 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
     }
 
     /**
-     * @param StorableFlow $flow
      * @throws \Exception
-     * @return void
      */
     public function handleFlow(StorableFlow $flow): void
     {
@@ -82,7 +72,6 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
     }
 
     /**
-     * @param FlowEvent $event
      * @throws \Exception
      */
     public function handle(FlowEvent $event): void
@@ -95,7 +84,7 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 
         $baseEvent = $event->getEvent();
 
-        if (!$baseEvent instanceof OrderAware) {
+        if (! $baseEvent instanceof OrderAware) {
             return;
         }
 
@@ -105,10 +94,7 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
     }
 
     /**
-     * @param string $orderId
-     * @param Context $context
      * @throws \Exception
-     * @return void
      */
     private function refundOrder(string $orderId, Context $context): void
     {
@@ -122,7 +108,7 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
             $this->logger->info('Starting Refund through Flow Builder Action for order: ' . $orderNumber);
 
             $request = new RefundRequest(
-                (string)$order->getOrderNumber(),
+                (string) $order->getOrderNumber(),
                 'Refund through Shopware Flow Builder',
                 '',
                 null

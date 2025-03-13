@@ -19,24 +19,30 @@ class FakeCustomerRepository extends EntityRepository
     public function __construct(EntityDefinition $definition)
     {
     }
-    public function search(Criteria $criteria, Context $context):EntitySearchResult
+
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
         return $this->entitySearchResults[0];
     }
+
     public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
         $this->data = [$data];
+
         return $this->entityWrittenContainerEvents[0];
     }
+
     public function update(array $data, Context $context): EntityWrittenContainerEvent
     {
         $this->data = [$data];
+
         return $this->entityWrittenContainerEvents[0];
     }
 
     public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
         $this->data = [$data];
+
         return $this->entityWrittenContainerEvents[0];
     }
 }

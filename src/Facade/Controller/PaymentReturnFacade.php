@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Facade\Controller;
 
@@ -65,17 +66,6 @@ class PaymentReturnFacade
      */
     private $logger;
 
-
-    /**
-     * @param RouterInterface $router
-     * @param FlowBuilderFactoryInterface $flowFactory
-     * @param SettingsService $settingsService
-     * @param TransactionService $transactionService
-     * @param MollieServiceOrder $orders
-     * @param MollieOrderPaymentFlow $molliePaymentFlow
-     * @param RoutingDetector $routingDetector
-     * @param LoggerInterface $logger
-     */
     public function __construct(RouterInterface $router, FlowBuilderFactoryInterface $flowFactory, SettingsService $settingsService, TransactionService $transactionService, MollieServiceOrder $orders, MollieOrderPaymentFlow $molliePaymentFlow, RoutingDetector $routingDetector, LoggerInterface $logger)
     {
         $this->router = $router;
@@ -88,61 +78,54 @@ class PaymentReturnFacade
         $this->logger = $logger;
     }
 
-
     /**
-     * @param string $transactionId
-     * @param Context $context
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return null|Response
      */
     public function returnAction(string $transactionId, Context $context): ?Response
     {
-        # Get the transaction from the order transaction repository. With the
-        # transaction we can fetch the order from the database.
+        // Get the transaction from the order transaction repository. With the
+        // transaction we can fetch the order from the database.
         $transaction = $this->transactionService->getTransactionById($transactionId, null, $context);
 
-        if (!$transaction instanceof OrderTransactionEntity) {
+        if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->critical('Transaction with id ' . $transactionId . ' could not be read from database');
             throw new CouldNotFetchTransactionException($transactionId);
         }
 
-        # --------------------------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------------------------
 
         $swOrder = $transaction->getOrder();
 
         // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
-        if (!$swOrder instanceof OrderEntity) {
+        if (! $swOrder instanceof OrderEntity) {
             $this->logger->critical(sprintf('Could not fetch order from transaction with id %s', $transactionId));
             throw new MissingOrderInTransactionException($transactionId);
         }
-
 
         $orderAttributes = new OrderAttributes($swOrder);
 
         $this->logger->debug('Customer is returning to Shopware for order: ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId());
 
-
         $mollieOrderId = $orderAttributes->getMollieOrderId();
 
         if (empty($mollieOrderId)) {
             $this->logger->critical(sprintf('Could not fetch mollie order id from order with number %s', $swOrder->getOrderNumber()));
-            throw new MissingMollieOrderIdException((string)$swOrder->getOrderNumber());
+            throw new MissingMollieOrderIdException((string) $swOrder->getOrderNumber());
         }
 
-        # --------------------------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------------------------
 
-        # now grab our sales channel of the order
-        # and also the correct plugin configuration for this sales channel
+        // now grab our sales channel of the order
+        // and also the correct plugin configuration for this sales channel
         $salesChannelId = $swOrder->getSalesChannelId();
         $settings = $this->settingsService->getSettings($salesChannelId);
-
 
         try {
             $mollieOrder = $this->orders->getMollieOrder(
                 $mollieOrderId,
                 $salesChannelId,
                 [
-                    'embed' => 'payments'
+                    'embed' => 'payments',
                 ]
             );
         } catch (\Exception $e) {
@@ -150,18 +133,17 @@ class PaymentReturnFacade
             throw $e;
         }
 
-
-        # --------------------------------------------------------------------------------------------------------------------
-        # SHOPWARE DEFAULT WAY
-        # if we have enabled the Shopware default way to handle payments,
-        # then just redirect to the transaction return URL that shopware did create for us.
-        # this is usually the finalizeURL.
-        # also, if we have a Admin-API route (from our headless approach), then we also go with the default way
+        // --------------------------------------------------------------------------------------------------------------------
+        // SHOPWARE DEFAULT WAY
+        // if we have enabled the Shopware default way to handle payments,
+        // then just redirect to the transaction return URL that shopware did create for us.
+        // this is usually the finalizeURL.
+        // also, if we have a Admin-API route (from our headless approach), then we also go with the default way
         $useShopwareDefault = ($this->routingDetector->isAdminApiRoute() || $settings->isShopwareStandardFailureMode());
 
         if ($useShopwareDefault) {
             return $this->navigateShopwareStandardRoute(
-                (string)$orderAttributes->getTransactionReturnUrl(),
+                (string) $orderAttributes->getTransactionReturnUrl(),
                 $swOrder,
                 $mollieOrder,
                 $salesChannelId,
@@ -169,16 +151,16 @@ class PaymentReturnFacade
             );
         }
 
-        # --------------------------------------------------------------------------------------------------------------------
-        # MOLLIE CUSTOM MODE
-        # this is only done in the Storefront, and only if we have activated this feature.
-        # depending on the success of the payment, we either redirect
-        # to the standard Shopware success route, or to our custom failure route and page in the Storefront.
+        // --------------------------------------------------------------------------------------------------------------------
+        // MOLLIE CUSTOM MODE
+        // this is only done in the Storefront, and only if we have activated this feature.
+        // depending on the success of the payment, we either redirect
+        // to the standard Shopware success route, or to our custom failure route and page in the Storefront.
         $success = $this->molliePaymentFlow->process($transaction, $swOrder, $mollieOrder, $salesChannelId, $context);
 
         if ($success) {
             return $this->navigateShopwareStandardRoute(
-                (string)$orderAttributes->getTransactionReturnUrl(),
+                (string) $orderAttributes->getTransactionReturnUrl(),
                 $swOrder,
                 $mollieOrder,
                 $salesChannelId,
@@ -189,14 +171,6 @@ class PaymentReturnFacade
         return $this->navigateMollieFailurePage($transactionId);
     }
 
-    /**
-     * @param string $redirectUrl
-     * @param OrderEntity $order
-     * @param Order $mollieOrder
-     * @param string $salesChannelId
-     * @param Context $context
-     * @return Response
-     */
     private function navigateShopwareStandardRoute(string $redirectUrl, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context $context): Response
     {
         $paymentPageRedirectEvent = new PaymentPageRedirectEvent(
@@ -212,14 +186,10 @@ class PaymentReturnFacade
         return new RedirectResponse($redirectUrl);
     }
 
-    /**
-     * @param string $transactionId
-     * @return Response
-     */
     private function navigateMollieFailurePage(string $transactionId): Response
     {
         $params = [
-            'transactionId' => $transactionId
+            'transactionId' => $transactionId,
         ];
 
         $redirectUrl = $this->router->generate(

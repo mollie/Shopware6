@@ -25,14 +25,6 @@ abstract class AbstractTag extends Struct
 
     abstract public static function create(): self;
 
-    /**
-     * @return static
-     */
-    protected static function createObject(string $name, string $id): self
-    {
-        return new static($name, $id);
-    }
-
     public function getName(): string
     {
         return $this->name;
@@ -41,5 +33,13 @@ abstract class AbstractTag extends Struct
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * @return static
+     */
+    protected static function createObject(string $name, string $id): self
+    {
+        return new static($name, $id);
     }
 }

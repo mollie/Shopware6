@@ -14,9 +14,6 @@ class PayPalExpressPaymentRemover extends PaymentMethodRemover
 {
     /**
      * remove all payment methods,except paypal expres, if we have a paypal express auth id. hide paypal express if we havent started a paypal session yet
-     * @param PaymentMethodRouteResponse $originalData
-     * @param SalesChannelContext $context
-     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -27,7 +24,7 @@ class PayPalExpressPaymentRemover extends PaymentMethodRemover
 
         if ($this->isOrderRoute()) {
             $order = $this->getOrder($context->getContext());
-            $showPPEOnly = (bool)($order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] ?? false);
+            $showPPEOnly = (bool) ($order->getCustomFields()[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] ?? false);
         }
         if ($this->isCartRoute()) {
             $cart = $this->getCart($context);
@@ -49,7 +46,6 @@ class PayPalExpressPaymentRemover extends PaymentMethodRemover
                 $originalData->getPaymentMethods()->remove($key);
             }
         }
-
 
         return $originalData;
     }

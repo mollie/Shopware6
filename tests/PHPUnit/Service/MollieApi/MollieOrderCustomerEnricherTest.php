@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
@@ -22,7 +23,7 @@ class MollieOrderCustomerEnricherTest extends TestCase
         $customerStruct->setCustomerId('foo', 'bar', false);
 
         $customerService = $this->createConfiguredMock(CustomerService::class, [
-            'getCustomerStruct' => $customerStruct
+            'getCustomerStruct' => $customerStruct,
         ]);
 
         $this->mollieOrderCustomerEnricher = new MollieOrderCustomerEnricher($customerService);
@@ -32,12 +33,12 @@ class MollieOrderCustomerEnricherTest extends TestCase
     {
         $expectedOrderData = [
             'payment' => [
-                'customerId' => 'foo'
-            ]
+                'customerId' => 'foo',
+            ],
         ];
 
         $customer = $this->createConfiguredMock(CustomerEntity::class, [
-            'getId' => 'fizz'
+            'getId' => 'fizz',
         ]);
 
         $settings = new MollieSettingStruct();
@@ -45,7 +46,7 @@ class MollieOrderCustomerEnricherTest extends TestCase
         $settings->setTestMode(false);
 
         $salesChannelContext = $this->createConfiguredMock(SalesChannelContext::class, [
-            'getContext' => $this->createMock(Context::class)
+            'getContext' => $this->createMock(Context::class),
         ]);
 
         $actualOrderData = $this->mollieOrderCustomerEnricher->enrich([], $customer, $settings, $salesChannelContext);

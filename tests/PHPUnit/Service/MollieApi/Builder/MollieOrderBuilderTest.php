@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
@@ -34,15 +35,13 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
      * of the payload for our request.
      *
      * @dataProvider getFormatValues
-     * @param string $expected
-     * @param string $format
+     *
      * @throws \Exception
-     * @return void
      */
     public function testOrderNumberFormat(string $expected, string $format): void
     {
-        # set a custom format for
-        # our current settings that are used in our fake/mock
+        // set a custom format for
+        // our current settings that are used in our fake/mock
         $this->settingStruct->setFormatOrderNumber($format);
 
         $order = new OrderEntity();

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\Subscription\Response;
 
@@ -12,10 +13,6 @@ class SubscriptionPaymentUpdateResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param string $checkoutUrl
-     */
     public function __construct(string $checkoutUrl)
     {
         $this->object = new ArrayStruct(

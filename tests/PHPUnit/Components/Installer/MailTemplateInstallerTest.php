@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Installer;
 
@@ -71,6 +71,7 @@ class MailTemplateInstallerTest extends TestCase
      * Tests that nothing new is inserted into the database if we have existing MailType and MailTemplate
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testWithExistingData()
@@ -83,17 +84,19 @@ class MailTemplateInstallerTest extends TestCase
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
 
-    # -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Tests creating MailType when the system default language is not English or German
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsNotEnglishOrGerman()
@@ -115,14 +118,16 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->equalTo('mail_template_type_translation'), $this->containsEqual($deLangId)],
                 [
                     $this->equalTo('mail_template_type_translation'),
-                    $this->containsEqual(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM))
+                    $this->containsEqual(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM)),
                 ],
-            );
+            )
+        ;
 
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
@@ -131,6 +136,7 @@ class MailTemplateInstallerTest extends TestCase
      * Tests creating MailType when the system default language is English
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsEnglish()
@@ -150,12 +156,14 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->equalTo('mail_template_type'), $this->isType(IsType::TYPE_ARRAY)],
                 [$this->equalTo('mail_template_type_translation'), $this->containsEqual($enLangId)],
                 [$this->equalTo('mail_template_type_translation'), $this->containsEqual($deLangId)],
-            );
+            )
+        ;
 
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
@@ -164,6 +172,7 @@ class MailTemplateInstallerTest extends TestCase
      * Tests creating MailType when the system default language is German
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testCreateMailTypeWhereDefaultLangIsGerman()
@@ -183,22 +192,25 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->equalTo('mail_template_type'), $this->isType(IsType::TYPE_ARRAY)],
                 [$this->equalTo('mail_template_type_translation'), $this->containsEqual($enLangId)],
                 [$this->equalTo('mail_template_type_translation'), $this->containsEqual($deLangId)],
-            );
+            )
+        ;
 
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
 
-    # -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Tests creating MailTemplate when the system default language is not English or German
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsNotEnglishOrGerman()
@@ -220,14 +232,16 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->equalTo('mail_template_translation'), $this->containsEqual($deLangId)],
                 [
                     $this->equalTo('mail_template_translation'),
-                    $this->containsEqual(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM))
+                    $this->containsEqual(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM)),
                 ],
-            );
+            )
+        ;
 
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
@@ -236,6 +250,7 @@ class MailTemplateInstallerTest extends TestCase
      * Tests creating MailTemplate when the system default language is English
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsEnglish()
@@ -255,12 +270,14 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->equalTo('mail_template'), $this->isType(IsType::TYPE_ARRAY)],
                 [$this->equalTo('mail_template_translation'), $this->containsEqual($enLangId)],
                 [$this->equalTo('mail_template_translation'), $this->containsEqual($deLangId)],
-            );
+            )
+        ;
 
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
@@ -269,6 +286,7 @@ class MailTemplateInstallerTest extends TestCase
      * Tests creating MailTemplate when the system default language is German
      *
      * @throws \Doctrine\DBAL\Exception
+     *
      * @return void
      */
     public function testCreateMailTemplateWhereDefaultLangIsGerman()
@@ -288,17 +306,19 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->equalTo('mail_template'), $this->isType(IsType::TYPE_ARRAY)],
                 [$this->equalTo('mail_template_translation'), $this->containsEqual($enLangId)],
                 [$this->equalTo('mail_template_translation'), $this->containsEqual($deLangId)],
-            );
+            )
+        ;
 
         $this->repoMailTypes
             ->expects($this->once())
             ->method('update')
-            ->with($this->isType(IsType::TYPE_ARRAY));
+            ->with($this->isType(IsType::TYPE_ARRAY))
+        ;
 
         $this->mailTemplateInstaller->install(Context::createDefaultContext());
     }
 
-    # ----Connection----------------------------------------
+    // ----Connection----------------------------------------
     private function setupConnection($enLangId, $deLangId)
     {
         $enResult = $this->createConfiguredMock(Result::class, [
@@ -317,10 +337,11 @@ class MailTemplateInstallerTest extends TestCase
                 [$this->isType(IsType::TYPE_STRING), $this->containsEqual('en-GB')],
                 [$this->isType(IsType::TYPE_STRING), $this->containsEqual('de-DE')],
             )
-            ->willReturnOnConsecutiveCalls($enResult, $deResult);
+            ->willReturnOnConsecutiveCalls($enResult, $deResult)
+        ;
     }
 
-    # ----MailType----------------------------------------
+    // ----MailType----------------------------------------
     private function setupMailTypeRepoWithoutData()
     {
         $result = $this->createConfiguredMock(IdSearchResult::class, [
@@ -342,7 +363,7 @@ class MailTemplateInstallerTest extends TestCase
         $this->repoMailTypes->expects($this->once())->method('searchIds');
     }
 
-    # ----MailTemplate----------------------------------------
+    // ----MailTemplate----------------------------------------
     private function setupMailTemplateRepoWithoutData()
     {
         $result = $this->createConfiguredMock(IdSearchResult::class, [

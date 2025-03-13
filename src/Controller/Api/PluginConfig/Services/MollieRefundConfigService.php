@@ -34,9 +34,9 @@ class MollieRefundConfigService
     private $mollieOrderService;
 
     public function __construct(
-        OrderService           $orderService,
+        OrderService $orderService,
         RefundManagerInterface $refundManager,
-        MollieOrderService     $mollieOrderService
+        MollieOrderService $mollieOrderService
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;
@@ -64,13 +64,14 @@ class MollieRefundConfigService
             foreach ($mollieOrder->lines() as $line) {
                 $structs[] = OrderLineItemStruct::createWithId($line->metadata->orderLineItemId)
                     ->setRefundableQuantity($line->refundableQuantity)
-                    ->setOrderedQuantity($line->quantity);
+                    ->setOrderedQuantity($line->quantity)
+                ;
             }
 
             $structs = OrderLineItemStructCollection::create(...$structs);
 
             foreach ($refunds as $refund) {
-                if (!isset($refund['metadata'], $refund['metadata']->composition)) {
+                if (! isset($refund['metadata'], $refund['metadata']->composition)) {
                     throw MetaDataNotFoundInRefundConfigException::create();
                 }
 
@@ -78,7 +79,8 @@ class MollieRefundConfigService
                 foreach ($composition as $item) {
                     $structs->getById($item['swLineId'])
                         ->setHasPendingRefund($refund['isPending'])
-                        ->setRefundedCount($item['quantity']);
+                        ->setRefundedCount($item['quantity'])
+                    ;
                 }
             }
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Traits;
 
@@ -10,11 +11,6 @@ use Shopware\Core\Framework\Event\FlowEvent;
 
 trait FlowBuilderTestTrait
 {
-    /**
-     * @param OrderEntity $order
-     * @param string $actionName
-     * @return FlowEvent
-     */
     protected function buildOrderStateFlowEvent(OrderEntity $order, string $actionName): FlowEvent
     {
         $event = new OrderStateMachineStateChangeEvent(

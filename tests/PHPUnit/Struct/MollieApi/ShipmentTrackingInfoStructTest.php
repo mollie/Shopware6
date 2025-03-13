@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Struct\MollieApi;
 
@@ -10,17 +11,17 @@ class ShipmentTrackingInfoStructTest extends TestCase
     /**
      * @var string
      */
-    private $carrier = "Mollie";
+    private $carrier = 'Mollie';
 
     /**
      * @var string
      */
-    private $code = "1234567890";
+    private $code = '1234567890';
 
     /**
      * @var string
      */
-    private $url = "https://mollie.com";
+    private $url = 'https://mollie.com';
 
     public function testStructSetsValuesCorrectly()
     {

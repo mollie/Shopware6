@@ -27,7 +27,7 @@ class PaypalExpressException extends HttpException
             self::PAYMENT_METHOD_DISABLED,
             'Paypal Express is not enabled for SalesChannelId: {{salesChannelId}}',
             [
-                'salesChannelId' => $salesChannelId
+                'salesChannelId' => $salesChannelId,
             ]
         );
     }
@@ -85,10 +85,11 @@ class PaypalExpressException extends HttpException
             'Failed to parse billing address with following error {{error}}',
             [
                 'error' => $message,
-                'billingAddress' => (array)$billingAddress
+                'billingAddress' => (array) $billingAddress,
             ]
         );
     }
+
     public static function shippingAddressError(string $message, \stdClass $shippingAddress): PaypalExpressException
     {
         return new self(
@@ -97,7 +98,7 @@ class PaypalExpressException extends HttpException
             'Failed to parse shipping address with following error {{error}}',
             [
                 'error' => $message,
-                'shippingAddress' => (array)$shippingAddress
+                'shippingAddress' => (array) $shippingAddress,
             ]
         );
     }

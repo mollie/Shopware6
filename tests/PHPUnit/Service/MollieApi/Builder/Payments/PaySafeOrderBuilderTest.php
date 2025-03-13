@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
@@ -26,7 +27,6 @@ class PaySafeOrderBuilderTest extends AbstractMollieOrderBuilder
             new FakeContainer()
         );
 
-
         $customerNumber = 'fooBar';
         $this->customer->setCustomerNumber($customerNumber);
 
@@ -48,7 +48,8 @@ class PaySafeOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
-            ->format('Y-m-d');
+            ->format('Y-m-d')
+        ;
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
@@ -57,14 +58,14 @@ class PaySafeOrderBuilderTest extends AbstractMollieOrderBuilder
             'orderNumber' => $orderNumber,
             'payment' => [
                 'webhookUrl' => $redirectWebhookUrl,
-                'customerReference' => $customerNumber
+                'customerReference' => $customerNumber,
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $expectedOrderLifeTime,
         ];
 
         self::assertSame($expected, $actual);

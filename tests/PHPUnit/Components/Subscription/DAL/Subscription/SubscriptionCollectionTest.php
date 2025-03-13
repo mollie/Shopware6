@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
 
@@ -22,7 +23,6 @@ class SubscriptionCollectionTest extends TestCase
         $this->assertCount(0, $collection->getFlatList());
     }
 
-
     /**
      * This test verifies that our key based collection can be
      * converted into a simple array list. there should not be a key with
@@ -42,9 +42,9 @@ class SubscriptionCollectionTest extends TestCase
 
         $flatList = $collection->getFlatList();
 
-        # we should have a list of 2
+        // we should have a list of 2
         $this->assertCount(2, $flatList);
-        # our keys must be 0,1, ...and NOT the IDs of our entities
+        // our keys must be 0,1, ...and NOT the IDs of our entities
         $this->assertEquals(0, array_keys($flatList)[0]);
         $this->assertEquals(1, array_keys($flatList)[1]);
     }

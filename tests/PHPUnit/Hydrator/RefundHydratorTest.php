@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Hydrator;
 
@@ -15,24 +16,18 @@ class RefundHydratorTest extends TestCase
      */
     private $refundHydrator;
 
-
-    /**
-     * @return void
-     */
     public function setUp(): void
     {
         $this->refundHydrator = new RefundHydrator();
     }
 
     /**
-     * @param array $expected
-     * @param Refund $refund
      * @dataProvider getHydratorTestData
      */
     public function testRefundHydrator(array $expected, Refund $refund)
     {
         $orderMock = $this->createMock(OrderEntity::class);
-        ;
+
         self::assertIsArray($this->refundHydrator->hydrate($refund, $orderMock));
 
         self::assertEquals($expected, $this->refundHydrator->hydrate($refund, $orderMock));
@@ -46,58 +41,52 @@ class RefundHydratorTest extends TestCase
         return [
             'Refund with amount 12.99, settlementAmount -12.99' => [
                 $this->getExpectedData(12.99, -12.99),
-                $this->getRefund(12.99, -12.99)
+                $this->getRefund(12.99, -12.99),
             ],
             'Refund with amount 12.99, settlementAmount null' => [
                 $this->getExpectedData(12.99, null),
-                $this->getRefund(12.99, null)
+                $this->getRefund(12.99, null),
             ],
             'Refund with amount null, settlementAmount -12.99' => [
                 $this->getExpectedData(null, -12.99),
-                $this->getRefund(null, -12.99)
+                $this->getRefund(null, -12.99),
             ],
             'Refund with amount null, settlementAmount null' => [
                 $this->getExpectedData(null, null),
-                $this->getRefund(null, null)
+                $this->getRefund(null, null),
             ],
             'Refund with status processing' => [
                 $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_PROCESSING),
-                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_PROCESSING)
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_PROCESSING),
             ],
             'Refund with status pending' => [
                 $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_PENDING),
-                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_PENDING)
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_PENDING),
             ],
             'Refund with status failed' => [
                 $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_FAILED),
-                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_FAILED)
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_FAILED),
             ],
             'Refund with status refunded' => [
                 $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_REFUNDED),
-                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_REFUNDED)
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_REFUNDED),
             ],
         ];
     }
 
-    /**
-     * @param null|float $amount
-     * @param null|float $settlementAmount
-     * @param string $status
-     * @return array
-     */
     private function getExpectedData(?float $amount, ?float $settlementAmount, string $status = RefundStatus::STATUS_QUEUED): array
     {
-        if (!is_null($amount)) {
+        if (! is_null($amount)) {
             $amount = [
                 'value' => $amount,
-                'currency' => 'EUR'
+                'currency' => 'EUR',
             ];
         }
 
-        if (!is_null($settlementAmount)) {
+        if (! is_null($settlementAmount)) {
             $settlementAmount = [
                 'value' => $settlementAmount,
-                'currency' => 'EUR'
+                'currency' => 'EUR',
             ];
         }
 
@@ -122,17 +111,17 @@ class RefundHydratorTest extends TestCase
 
     private function getRefund(?float $amount, ?float $settlementAmount, string $status = RefundStatus::STATUS_QUEUED): Refund
     {
-        if (!is_null($amount)) {
+        if (! is_null($amount)) {
             $amount = [
                 'value' => $amount,
-                'currency' => 'EUR'
+                'currency' => 'EUR',
             ];
         }
 
-        if (!is_null($settlementAmount)) {
+        if (! is_null($settlementAmount)) {
             $settlementAmount = [
                 'value' => $settlementAmount,
-                'currency' => 'EUR'
+                'currency' => 'EUR',
             ];
         }
 
@@ -154,9 +143,9 @@ class RefundHydratorTest extends TestCase
         $refundMock->description = 'description';
         $refundMock->createdAt = '2015-08-01T12:34:56+0100';
         $refundMock->status = $status;
-        $refundMock->_links = (object)[];
-        $refundMock->amount = $amount ? (object)$amount : null;
-        $refundMock->settlementAmount = $settlementAmount ? (object)$settlementAmount : null;
+        $refundMock->_links = (object) [];
+        $refundMock->amount = $amount ? (object) $amount : null;
+        $refundMock->settlementAmount = $settlementAmount ? (object) $settlementAmount : null;
 
         return $refundMock;
     }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct;
 
@@ -23,9 +24,6 @@ class CustomerStructTest extends TestCase
 
     /**
      * @param $testData
-     * @param string $profileId
-     * @param bool $testMode
-     * @param string $expectedCustomerId
      * @dataProvider mollieCustomerIdsTestData
      */
     public function testGetCustomerId(
@@ -48,70 +46,50 @@ class CustomerStructTest extends TestCase
                 $this->customerIds(),
                 'foo',
                 false,
-                'cst_123'
+                'cst_123',
             ],
             'profileId foo, test' => [
                 $this->customerIds(),
                 'foo',
                 true,
-                'cst_321'
+                'cst_321',
             ],
             'profileId bar, live' => [
                 $this->customerIds(),
                 'bar',
                 false,
-                'cst_789'
+                'cst_789',
             ],
             'profileId bar, test' => [
                 $this->customerIds(),
                 'bar',
                 true,
-                'cst_987'
+                'cst_987',
             ],
             'profileId baz, live' => [
                 $this->customerIds(),
                 'baz',
                 false,
-                'cst_456'
+                'cst_456',
             ],
             'profileId baz, test' => [
                 $this->customerIds(),
                 'baz',
                 true,
-                'cst_654'
+                'cst_654',
             ],
             'profileId doesn\'t exist, live' => [
                 $this->customerIds(),
                 'fizz',
                 false,
-                ''
+                '',
             ],
             'profileId doesn\'t exist, test' => [
                 $this->customerIds(),
                 'fizz',
                 true,
-                ''
+                '',
             ],
-        ];
-    }
-
-    private function customerIds()
-    {
-        return [
-            'customer_ids' => [
-                'foo' => [
-                    'live' => 'cst_123',
-                    'test' => 'cst_321',
-                ],
-                'bar' => [
-                    'live' => 'cst_789',
-                    'test' => 'cst_987',
-                ],
-                'baz' => [
-                    'live' => 'cst_456',
-                    'test' => 'cst_654',
-                ]
-            ]
         ];
     }
 
@@ -130,7 +108,6 @@ class CustomerStructTest extends TestCase
 
         $struct->setCreditCardToken('cc_123');
 
-
         $customFields = $struct->toCustomFieldsArray();
 
         $expected = [
@@ -138,19 +115,19 @@ class CustomerStructTest extends TestCase
                 'customer_ids' => [
                     'pfl_1' => [
                         'live' => '',
-                        'test' => 'cst_1test'
+                        'test' => 'cst_1test',
                     ],
                     'pfl_2' => [
                         'live' => 'cst_2live',
-                        'test' => ''
+                        'test' => '',
                     ],
                     'pfl_3' => [
                         'live' => 'cst_3live',
-                        'test' => 'cst_3test'
+                        'test' => 'cst_3test',
                     ],
                 ],
                 'credit_card_token' => 'cc_123',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $customFields);
@@ -175,7 +152,7 @@ class CustomerStructTest extends TestCase
                 'customer_ids' => [
                     'pfl_1' => [
                         'live' => '',
-                        'test' => 'cst_1test'
+                        'test' => 'cst_1test',
                     ],
                 ],
             ],
@@ -207,12 +184,32 @@ class CustomerStructTest extends TestCase
                 'customer_ids' => [
                     'pfl_2' => [
                         'live' => '',
-                        'test' => 'cst_2test'
+                        'test' => 'cst_2test',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $customFields);
+    }
+
+    private function customerIds()
+    {
+        return [
+            'customer_ids' => [
+                'foo' => [
+                    'live' => 'cst_123',
+                    'test' => 'cst_321',
+                ],
+                'bar' => [
+                    'live' => 'cst_789',
+                    'test' => 'cst_987',
+                ],
+                'baz' => [
+                    'live' => 'cst_456',
+                    'test' => 'cst_654',
+                ],
+            ],
+        ];
     }
 }

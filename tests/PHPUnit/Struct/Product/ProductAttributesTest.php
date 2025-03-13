@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct\Product;
 
@@ -18,9 +19,8 @@ class ProductAttributesTest extends TestCase
         $product = new ProductEntity();
         $product->setCustomFields([]);
         $product->setTranslated([
-            'customFields' => $product->getCustomFields()
+            'customFields' => $product->getCustomFields(),
         ]);
-
 
         $attributes = new ProductAttributes($product);
 
@@ -38,11 +38,11 @@ class ProductAttributesTest extends TestCase
         $product->setCustomFields([
             'mollie_payments_product_voucher_type' => VoucherType::TYPE_ECO,
             'mollie_payments' => [
-                'voucher_type' => VoucherType::TYPE_MEAL
-            ]
+                'voucher_type' => VoucherType::TYPE_MEAL,
+            ],
         ]);
         $product->setTranslated([
-            'customFields' => $product->getCustomFields()
+            'customFields' => $product->getCustomFields(),
         ]);
 
         $attributes = new ProductAttributes($product);
@@ -61,7 +61,7 @@ class ProductAttributesTest extends TestCase
             'mollie_payments_product_voucher_type' => '5',
         ]);
         $product->setTranslated([
-            'customFields' => $product->getCustomFields()
+            'customFields' => $product->getCustomFields(),
         ]);
 
         $attributes = new ProductAttributes($product);

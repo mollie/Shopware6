@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -10,7 +11,7 @@ class CouldNotFetchMollieCustomerException extends \Exception
         ?\Throwable $previous = null
     ) {
         $message = sprintf(
-            "Could not fetch the Mollie customer ID %s for sales channel %s",
+            'Could not fetch the Mollie customer ID %s for sales channel %s',
             $mollieCustomerId,
             $salesChannelId
         );

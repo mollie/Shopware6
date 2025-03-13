@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Transition;
 
@@ -24,9 +25,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     /**
      * Performs the required transitions to get the order to open state from any
      * Shopware default state
-     *
-     * @param OrderEntity $order
-     * @param Context $context
      */
     public function openOrder(OrderEntity $order, Context $context): void
     {
@@ -38,7 +36,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($order, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
             $this->performTransition($order, StateMachineTransitionActions::ACTION_COMPLETE, $context);
         }
 
@@ -48,9 +46,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     /**
      * Performs the required transitions to get the order to in_process state from any
      * Shopware default state
-     *
-     * @param OrderEntity $order
-     * @param Context $context
      */
     public function processOrder(OrderEntity $order, Context $context): void
     {
@@ -62,7 +57,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($order, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PROCESS, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_PROCESS, $availableTransitions)) {
             $this->performTransition($order, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
@@ -72,9 +67,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     /**
      * Performs the required transitions to get the order to complete state from any
      * Shopware default state
-     *
-     * @param OrderEntity $order
-     * @param Context $context
      */
     public function completeOrder(OrderEntity $order, Context $context): void
     {
@@ -86,7 +78,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($order, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_COMPLETE, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_COMPLETE, $availableTransitions)) {
             $this->processOrder($order, $context);
         }
 
@@ -96,9 +88,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     /**
      * Performs the required transitions to get the order to cancelled state from any
      * Shopware default state
-     *
-     * @param OrderEntity $order
-     * @param Context $context
      */
     public function cancelOrder(OrderEntity $order, Context $context): void
     {
@@ -110,7 +99,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($order, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
             $this->performTransition($order, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
@@ -120,8 +109,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     /**
      * Gets the currently available transitions for the order entity
      *
-     * @param OrderEntity $order
-     * @param Context $context
      * @return array<string>
      */
     public function getAvailableTransitions(OrderEntity $order, Context $context): array
@@ -132,9 +119,7 @@ class OrderTransitionService implements OrderTransitionServiceInterface
     /**
      * Checks if the requested transition is allowed for the current order state
      *
-     * @param string $transition
      * @param array<mixed> $availableTransitions
-     * @return bool
      */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
@@ -143,10 +128,6 @@ class OrderTransitionService implements OrderTransitionServiceInterface
 
     /**
      * Performs the order transition
-     *
-     * @param OrderEntity $order
-     * @param string $transitionName
-     * @param Context $context
      */
     private function performTransition(OrderEntity $order, string $transitionName, Context $context): void
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
 
@@ -54,7 +55,6 @@ class ApplePayCartTest extends TestCase
         $this->assertEquals(1, $cart->getShippings()[0]->getQuantity());
         $this->assertEquals(3.49, $cart->getShippings()[0]->getPrice());
     }
-
 
     /**
      * This test verifies that our total amount

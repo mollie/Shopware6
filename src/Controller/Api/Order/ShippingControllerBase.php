@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
@@ -43,12 +44,6 @@ class ShippingControllerBase extends AbstractController
      */
     private $logger;
 
-
-    /**
-     * @param ShipmentManager $shipmentFacade
-     * @param OrderService $orderService
-     * @param LoggerInterface $logger
-     */
     public function __construct(ShipmentManager $shipmentFacade, OrderService $orderService, LoggerInterface $logger)
     {
         $this->shipment = $shipmentFacade;
@@ -56,60 +51,30 @@ class ShippingControllerBase extends AbstractController
         $this->logger = $logger;
     }
 
-
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function status(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->getStatusResponse($data->get('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function statusLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->getStatusResponse($data->get('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function total(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->getTotalResponse($data->get('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function totalLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->getTotalResponse($data->get('orderId'), $context);
     }
 
-
     /**
      * This is the custom operational route for shipping using the API.
      * This shipment is based on ship all or rest of items automatically.
      * It can be used by 3rd parties, ERP systems and more.
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
      */
     public function shipOrderOperational(Request $request, Context $context): JsonResponse
     {
@@ -119,13 +84,13 @@ class ShippingControllerBase extends AbstractController
         $trackingUrl = '';
 
         try {
-            $content = (string)$request->getContent();
+            $content = (string) $request->getContent();
             $jsonData = json_decode($content, true);
 
-            $orderNumber = (string)$jsonData['orderNumber'];
-            $trackingCarrier = (string)$jsonData['trackingCarrier'];
-            $trackingCode = (string)$jsonData['trackingCode'];
-            $trackingUrl = (string)$jsonData['trackingUrl'];
+            $orderNumber = (string) $jsonData['orderNumber'];
+            $trackingCarrier = (string) $jsonData['trackingCarrier'];
+            $trackingCode = (string) $jsonData['trackingCode'];
+            $trackingUrl = (string) $jsonData['trackingUrl'];
 
             if ($orderNumber === '') {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
@@ -146,7 +111,7 @@ class ShippingControllerBase extends AbstractController
             $this->logger->error(
                 'Error when shipping order: ' . $orderNumber,
                 [
-                    'error' => $e
+                    'error' => $e,
                 ]
             );
 
@@ -166,10 +131,6 @@ class ShippingControllerBase extends AbstractController
      * This shipment is based on ship all or rest of items automatically.
      * It can be used by 3rd parties, ERP systems and more.
      * This comes without tracking information. Please use the POST version.
-     *
-     * @param QueryDataBag $query
-     * @param Context $context
-     * @return JsonResponse
      */
     public function shipOrderOperationalDeprecated(QueryDataBag $query, Context $context): JsonResponse
     {
@@ -195,7 +156,7 @@ class ShippingControllerBase extends AbstractController
             $this->logger->error(
                 'Error when shipping order (deprecated): ' . $orderNumber,
                 [
-                    'error' => $e
+                    'error' => $e,
                 ]
             );
 
@@ -211,10 +172,6 @@ class ShippingControllerBase extends AbstractController
      * This is the custom operational route for batch shipping of orders using the API.
      * This shipment requires a valid list of line items to be provided.
      * It can be used by 3rd parties, ERP systems and more.
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
      */
     public function shipOrderBatchOperational(Request $request, Context $context): JsonResponse
     {
@@ -225,16 +182,16 @@ class ShippingControllerBase extends AbstractController
         $trackingUrl = '';
 
         try {
-            $content = (string)$request->getContent();
+            $content = (string) $request->getContent();
             $jsonData = json_decode($content, true);
 
-            $orderNumber = (string)$jsonData['orderNumber'];
+            $orderNumber = (string) $jsonData['orderNumber'];
             $requestItems = $jsonData['items'];
-            $trackingCarrier = (string)$jsonData['trackingCarrier'];
-            $trackingCode = (string)$jsonData['trackingCode'];
-            $trackingUrl = (string)$jsonData['trackingUrl'];
+            $trackingCarrier = (string) $jsonData['trackingCarrier'];
+            $trackingCode = (string) $jsonData['trackingCode'];
+            $trackingUrl = (string) $jsonData['trackingUrl'];
 
-            if (!is_array($requestItems)) {
+            if (! is_array($requestItems)) {
                 $requestItems = [];
             }
 
@@ -250,14 +207,14 @@ class ShippingControllerBase extends AbstractController
 
             $orderItems = $order->getLineItems();
 
-            if (!$orderItems instanceof OrderLineItemCollection) {
+            if (! $orderItems instanceof OrderLineItemCollection) {
                 throw new Exception('Shopware order does not have any line requestItems!');
             }
 
             $shipmentItems = [];
 
-            # we need to look up the internal line item ids for the order
-            # because we are only provided product numbers
+            // we need to look up the internal line item ids for the order
+            // because we are only provided product numbers
             foreach ($orderItems as $orderItem) {
                 foreach ($requestItems as $requestItem) {
                     $orderItemAttr = new OrderLineItemEntityAttributes($orderItem);
@@ -265,7 +222,7 @@ class ShippingControllerBase extends AbstractController
                     $productNumber = $requestItem['productNumber'];
                     $quantity = $requestItem['quantity'];
 
-                    # check if we have found our product by number
+                    // check if we have found our product by number
                     if ($orderItemAttr->getProductNumber() === $productNumber) {
                         $shipmentItems[] = new ShipmentLineItem(
                             $orderItem->getId(),
@@ -294,7 +251,7 @@ class ShippingControllerBase extends AbstractController
             $this->logger->error(
                 'Error when shipping batch order: ' . $orderNumber,
                 [
-                    'error' => $e
+                    'error' => $e,
                 ]
             );
 
@@ -314,10 +271,7 @@ class ShippingControllerBase extends AbstractController
      * This is the custom operational route for shipping items using the API.
      * It can be used by 3rd parties, ERP systems and more.
      *
-     * @param Request $request
-     * @param Context $context
      * @throws \Exception
-     * @return JsonResponse
      */
     public function shipItemOperational(Request $request, Context $context): JsonResponse
     {
@@ -329,15 +283,15 @@ class ShippingControllerBase extends AbstractController
         $trackingUrl = '';
 
         try {
-            $content = (string)$request->getContent();
+            $content = (string) $request->getContent();
             $jsonData = json_decode($content, true);
 
-            $orderNumber = (string)$jsonData['orderNumber'];
-            $itemProductNumber = (string)$jsonData['productNumber'];
-            $quantity = (int)($jsonData['quantity'] ?? 0);
-            $trackingCarrier = (string)($jsonData['trackingCarrier'] ?? '');
-            $trackingCode = (string)($jsonData['trackingCode'] ?? '');
-            $trackingUrl = (string)($jsonData['trackingUrl'] ?? '');
+            $orderNumber = (string) $jsonData['orderNumber'];
+            $itemProductNumber = (string) $jsonData['productNumber'];
+            $quantity = (int) ($jsonData['quantity'] ?? 0);
+            $trackingCarrier = (string) ($jsonData['trackingCarrier'] ?? '');
+            $trackingCode = (string) ($jsonData['trackingCode'] ?? '');
+            $trackingUrl = (string) ($jsonData['trackingUrl'] ?? '');
 
             if ($orderNumber === '') {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
@@ -364,7 +318,7 @@ class ShippingControllerBase extends AbstractController
             $this->logger->error(
                 'Error when shipping item of order: ' . $orderNumber,
                 [
-                    'error' => $e
+                    'error' => $e,
                 ]
             );
 
@@ -386,10 +340,7 @@ class ShippingControllerBase extends AbstractController
      * It can be used by 3rd parties, ERP systems and more.
      *  This comes without tracking information. Please use the POST version.
      *
-     * @param QueryDataBag $query
-     * @param Context $context
      * @throws \Exception
-     * @return JsonResponse
      */
     public function shipItemOperationalDeprecated(QueryDataBag $query, Context $context): JsonResponse
     {
@@ -425,7 +376,7 @@ class ShippingControllerBase extends AbstractController
             $this->logger->error(
                 'Error when shipping item of order (deprecated): ' . $orderNumber,
                 [
-                    'error' => $e
+                    'error' => $e,
                 ]
             );
 
@@ -441,10 +392,6 @@ class ShippingControllerBase extends AbstractController
 
     /**
      * This is the plain action API route that is used in the Shopware Administration.
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
      */
     public function shipOrderAdmin(RequestDataBag $data, Context $context): JsonResponse
     {
@@ -469,12 +416,6 @@ class ShippingControllerBase extends AbstractController
         );
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function shipOrderAdminLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId');
@@ -500,10 +441,6 @@ class ShippingControllerBase extends AbstractController
 
     /**
      * This is the plain action API route that is used in the Shopware Administration.
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
      */
     public function shipItemAdmin(RequestDataBag $data, Context $context): JsonResponse
     {
@@ -525,12 +462,6 @@ class ShippingControllerBase extends AbstractController
         );
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function shipItemAdminLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId');
@@ -551,32 +482,23 @@ class ShippingControllerBase extends AbstractController
         );
     }
 
-
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function getTotalResponse(string $orderId, Context $context): JsonResponse
     {
         try {
             $totals = $this->shipment->getTotals($orderId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
+
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
+
             return $this->json(['message' => $e->getMessage()], 500);
         }
 
         return $this->json($totals);
     }
 
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function getStatusResponse(string $orderId, Context $context): JsonResponse
     {
         try {
@@ -585,9 +507,11 @@ class ShippingControllerBase extends AbstractController
             $status = $this->shipment->getShopwareStatus($orderId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
+
             return $this->json(['message' => $e->getMessage()], $e->getStatusCode());
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
+
             return $this->json(['message' => $e->getMessage()], 500);
         }
 
@@ -595,13 +519,7 @@ class ShippingControllerBase extends AbstractController
     }
 
     /**
-     * @param string $orderId
-     * @param string $trackingCarrier
-     * @param string $trackingCode
-     * @param string $trackingUrl
      * @param array<mixed> $lineItems
-     * @param Context $context
-     * @return JsonResponse
      */
     private function processAdminShipOrder(string $orderId, string $trackingCarrier, string $trackingCode, string $trackingUrl, array $lineItems, Context $context): JsonResponse
     {
@@ -612,11 +530,11 @@ class ShippingControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-            if (!$order instanceof OrderEntity) {
+            if (! $order instanceof OrderEntity) {
                 throw new \InvalidArgumentException('Order with ID: ' . $orderId . ' not found!');
             }
 
-            # hydrate to our real item struct
+            // hydrate to our real item struct
             $items = $this->hydrateShippingItems($lineItems);
 
             $tracking = new TrackingData($trackingCarrier, $trackingCode, $trackingUrl);
@@ -634,16 +552,6 @@ class ShippingControllerBase extends AbstractController
         }
     }
 
-    /**
-     * @param string $orderId
-     * @param string $itemId
-     * @param int $quantity
-     * @param string $trackingCarrier
-     * @param string $trackingCode
-     * @param string $trackingUrl
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function processShipItem(string $orderId, string $itemId, int $quantity, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): JsonResponse
     {
         try {
@@ -657,7 +565,7 @@ class ShippingControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-            if (!$order instanceof OrderEntity) {
+            if (! $order instanceof OrderEntity) {
                 throw new \InvalidArgumentException('Order with id: ' . $orderId . ' not found!');
             }
 
@@ -686,10 +594,6 @@ class ShippingControllerBase extends AbstractController
         }
     }
 
-    /**
-     * @param Shipment $shipment
-     * @return JsonResponse
-     */
     private function shipmentToJson(Shipment $shipment): JsonResponse
     {
         $lines = [];
@@ -703,11 +607,11 @@ class ShippingControllerBase extends AbstractController
                 'type' => $orderLine->type,
                 'status' => $orderLine->status,
                 'quantity' => $orderLine->quantity,
-                'unitPrice' => (array)$orderLine->unitPrice,
+                'unitPrice' => (array) $orderLine->unitPrice,
                 'vatRate' => $orderLine->vatRate,
-                'vatAmount' => (array)$orderLine->vatAmount,
-                'totalAmount' => (array)$orderLine->totalAmount,
-                'createdAt' => $orderLine->createdAt
+                'vatAmount' => (array) $orderLine->vatAmount,
+                'totalAmount' => (array) $orderLine->totalAmount,
+                'createdAt' => $orderLine->createdAt,
             ];
         }
 
@@ -716,14 +620,12 @@ class ShippingControllerBase extends AbstractController
             'orderId' => $shipment->orderId,
             'createdAt' => $shipment->createdAt,
             'lines' => $lines,
-            'tracking' => $shipment->tracking
+            'tracking' => $shipment->tracking,
         ]);
     }
 
     /**
-     * @param Exception $e
      * @param array<mixed> $additionalData
-     * @return JsonResponse
      */
     private function exceptionToJson(Exception $e, array $additionalData = []): JsonResponse
     {
@@ -735,12 +637,13 @@ class ShippingControllerBase extends AbstractController
         return $this->json([
             'error' => get_class($e),
             'message' => $e->getMessage(),
-            'data' => $additionalData
+            'data' => $additionalData,
         ], 400);
     }
 
     /**
      * @param array<mixed> $items
+     *
      * @return ShipmentLineItem[]
      */
     private function hydrateShippingItems(array $items): array

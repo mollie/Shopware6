@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service;
 
@@ -71,10 +72,6 @@ class PaymentMethodServiceTest extends TestCase
      */
     private $paymentMethodService;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -84,7 +81,7 @@ class PaymentMethodServiceTest extends TestCase
         $paymentMethod->setHandlerIdentifier('handler-id-123');
 
         $this->context = $this->createMock(Context::class);
-        ;
+
         $this->mediaRepository = new FakeMediaRepository(new MediaDefinition());
         $this->paymentMethodRepository = new FakePaymentMethodRepository($paymentMethod);
 
@@ -103,8 +100,6 @@ class PaymentMethodServiceTest extends TestCase
      * Starting with Shopware 6.5.7.0 a new technical name is
      * required for a payment method.
      * This test verifies that our used prefix is always the same.
-     *
-     * @return void
      */
     public function testTechnicalPaymentMethodPrefix(): void
     {
@@ -114,7 +109,6 @@ class PaymentMethodServiceTest extends TestCase
     /**
      * This test verifies that our list of officially supported payment
      * methods is not touched without recognizing it.
-     * @return void
      */
     public function testSupportedMethods(): void
     {

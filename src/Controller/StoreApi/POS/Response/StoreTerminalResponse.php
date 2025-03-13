@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\POS\Response;
 
@@ -12,9 +13,6 @@ class StoreTerminalResponse extends StoreApiResponse
      */
     protected $object;
 
-    /**
-     * @param bool $success
-     */
     public function __construct(bool $success)
     {
         $this->object = new ArrayStruct(

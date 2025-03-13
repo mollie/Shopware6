@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mollie;
 
@@ -8,10 +9,6 @@ use Mollie\Api\Resources\PaymentCollection;
 
 class OrderStatusConverter
 {
-    /**
-     * @param Order $order
-     * @return string
-     */
     public function getMollieOrderStatus(Order $order): string
     {
         $payment = $this->getLatestPayment($order);
@@ -54,10 +51,6 @@ class OrderStatusConverter
         return $targetStatus;
     }
 
-    /**
-     * @param null|Payment $payment
-     * @return string
-     */
     public function getMolliePaymentStatus(?Payment $payment = null): string
     {
         if ($payment === null) {
@@ -86,14 +79,11 @@ class OrderStatusConverter
             $status = MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED;
         }
 
-
         return $status;
     }
 
     /**
      * @TODO we should move this somewhere else, but i had to (re)use this for now - so it's now public
-     * @param Order $order
-     * @return null|Payment
      */
     public function getLatestPayment(Order $order): ?Payment
     {
@@ -101,7 +91,7 @@ class OrderStatusConverter
 
         $payments = $order->payments();
 
-        if (!$payments instanceof PaymentCollection) {
+        if (! $payments instanceof PaymentCollection) {
             return null;
         }
 
@@ -125,9 +115,6 @@ class OrderStatusConverter
 
     /**
      * Gets if the provided order is fully refunded.
-     *
-     * @param Order $order
-     * @return bool
      */
     private function isOrderFullyRefunded(Order $order): bool
     {
@@ -139,14 +126,11 @@ class OrderStatusConverter
         $refundedValue = $order->amountRefunded->value;
 
         // both of them are strings, but that's totally fine
-        return ($orderValue === $refundedValue);
+        return $orderValue === $refundedValue;
     }
 
     /**
      * Gets if the provided order is partially refunded.
-     *
-     * @param Order $order
-     * @return bool
      */
     private function isOrderPartiallyRefunded(Order $order): bool
     {
@@ -158,6 +142,6 @@ class OrderStatusConverter
         $refundedValue = $order->amountRefunded->value;
 
         // both of them are strings, but that's totally fine
-        return ($orderValue !== $refundedValue);
+        return $orderValue !== $refundedValue;
     }
 }

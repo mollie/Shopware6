@@ -413,7 +413,7 @@ class OrderLine extends BaseResource
         ];
 
         // Explicitly filter only NULL values to keep "vatRate => 0" intact
-        return array_filter($data, function ($value) {
+        return array_filter($data, static function ($value) {
             return $value !== null;
         });
     }

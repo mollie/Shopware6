@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\MollieApi;
 
@@ -37,49 +38,31 @@ class ShipmentTrackingInfoStruct extends Struct
         ];
     }
 
-    /**
-     * @return string
-     */
     public function getCarrier(): string
     {
         return $this->carrier;
     }
 
-    /**
-     * @param string $carrier
-     */
     public function setCarrier(string $carrier): void
     {
         $this->carrier = $carrier;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     */
     public function setCode(string $code): void
     {
         $this->code = $code;
     }
 
-    /**
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
     public function setUrl(string $url): void
     {
         $this->url = $url;
