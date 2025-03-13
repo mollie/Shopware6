@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -12,10 +13,6 @@ class TokenAnonymizer
 
     const TOKEN_ANONYMIZER_COUNT_LAST_CHARACTERS = 4;
 
-    /**
-     * @param string $value
-     * @return string
-     */
     public function anonymize(string $value): string
     {
         $value = trim($value);
@@ -34,9 +31,6 @@ class TokenAnonymizer
         return sprintf('%s%s%s', $firstChars, $this->getPlaceHolder(), $lastChars);
     }
 
-    /**
-     * @return string
-     */
     private function getPlaceHolder(): string
     {
         return str_repeat(self::TOKEN_ANONYMIZER_PLACEHOLDER_SYMBOL, self::TOKEN_ANONYMIZER_PLACEHOLDER_COUNT);

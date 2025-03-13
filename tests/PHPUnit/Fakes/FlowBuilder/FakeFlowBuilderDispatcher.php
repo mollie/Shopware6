@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes\FlowBuilder;
 
@@ -11,7 +12,6 @@ class FakeFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
      */
     private $dispatchedEvent;
 
-
     /**
      * @return mixed
      */
@@ -22,6 +22,7 @@ class FakeFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
 
     /**
      * @param $event
+     *
      * @return mixed|void
      */
     public function dispatch($event)

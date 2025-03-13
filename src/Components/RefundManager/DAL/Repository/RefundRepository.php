@@ -27,29 +27,17 @@ class RefundRepository implements RefundRepositoryInterface
 
     /**
      * @param array<mixed> $data
-     * @param Context $context
-     * @return EntityWrittenContainerEvent
      */
     public function create(array $data, Context $context): EntityWrittenContainerEvent
     {
         return $this->mollieRefundRepository->create($data, $context);
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param Context $context
-     * @return EntitySearchResult
-     */
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
         return $this->mollieRefundRepository->search($criteria, $context);
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param Context $context
-     * @return IdSearchResult
-     */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
         return $this->mollieRefundRepository->searchIds($criteria, $context);
@@ -57,8 +45,6 @@ class RefundRepository implements RefundRepositoryInterface
 
     /**
      * @param array<mixed> $ids
-     * @param Context $context
-     * @return EntityWrittenContainerEvent
      */
     public function delete(array $ids, Context $context): EntityWrittenContainerEvent
     {

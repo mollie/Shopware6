@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\SalesChannel;
 
@@ -8,10 +9,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class SalesChannelDataExtractor
 {
-    /**
-     * @param SalesChannelEntity $salesChannelEntity
-     * @return PaymentMethodCollection
-     */
     public function extractPaymentMethods(SalesChannelEntity $salesChannelEntity): PaymentMethodCollection
     {
         $paymentMethods = $salesChannelEntity->getPaymentMethods();
@@ -20,6 +17,6 @@ class SalesChannelDataExtractor
             return $paymentMethods;
         }
 
-        throw new SalesChannelPaymentMethodsException((string)$salesChannelEntity->getName());
+        throw new SalesChannelPaymentMethodsException((string) $salesChannelEntity->getName());
     }
 }

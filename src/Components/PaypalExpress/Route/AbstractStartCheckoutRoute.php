@@ -9,5 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractStartCheckoutRoute
 {
     abstract public function getDecorated(): AbstractStartCheckoutRoute;
+
     abstract public function startCheckout(Request $request, SalesChannelContext $context): StartCheckoutResponse;
 }

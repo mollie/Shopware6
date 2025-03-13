@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Subscriber;
 
@@ -28,10 +29,9 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
     private $checkoutConfirmPage;
 
     private PaymentMethodCollection $paymentMethodCollection;
+
     /**
      * Sets up the test.
-     *
-     * @return void
      */
     public function setUp(): void
     {
@@ -42,9 +42,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the active payment methods provider for certain payment methods.
-     *
-     * @param array $methods
-     * @return ActivePaymentMethodsProvider
      */
     public function setUpActivePaymentMethodsProvider(array $methods): ActivePaymentMethodsProvider
     {
@@ -55,9 +52,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the available payment methods from Mollie.
-     *
-     * @param array $methods
-     * @return array
      */
     public function setUpAvailableMethods(array $methods): array
     {
@@ -77,9 +71,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets op the event args for the checkout confirm page.
-     *
-     * @param array $paymentHandlers
-     * @return CheckoutConfirmPageLoadedEvent
      */
     public function setUpArgs(array $paymentHandlers = []): CheckoutConfirmPageLoadedEvent
     {
@@ -102,9 +93,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the cart for a certain amount.
-     *
-     * @param float $totalAmount
-     * @return Cart
      */
     public function setUpCart(float $totalAmount = 100.0): Cart
     {
@@ -119,9 +107,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the checkout confirm page.
-     *
-     * @param PaymentMethodCollection $paymentMethodCollection
-     * @return CheckoutConfirmPage
      */
     public function setUpCheckoutConfirmPage(PaymentMethodCollection $paymentMethodCollection): CheckoutConfirmPage
     {
@@ -135,9 +120,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the currency entity for a certain iso code.
-     *
-     * @param string $isoCode
-     * @return CurrencyEntity
      */
     public function setUpCurrency(string $isoCode = 'NL'): CurrencyEntity
     {
@@ -149,8 +131,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the sales channel context.
-     *
-     * @return SalesChannelContext
      */
     public function setUpSalesChannelContext(): SalesChannelContext
     {
@@ -162,9 +142,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the settings service.
-     *
-     * @param bool $limitsEnabled
-     * @return SettingsService
      */
     public function setUpSettingsService(bool $limitsEnabled = true): SettingsService
     {
@@ -179,10 +156,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Sets up the checkout confirm page subscriber.
-     *
-     * @param array $availablePaymentMethods
-     * @param bool $limitsEnabled
-     * @return CheckoutConfirmPageSubscriber
      */
     public function setUpSubscriber(array $availablePaymentMethods, bool $limitsEnabled = true): CheckoutConfirmPageSubscriber
     {
@@ -199,7 +172,6 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
      * Test if subscribed events contains checkout confirm page loaded event.
      *
      * @testdox Subscriber has the expected subscribed events.
-     * @return void
      */
     public function testSubscribedEvents(): void
     {

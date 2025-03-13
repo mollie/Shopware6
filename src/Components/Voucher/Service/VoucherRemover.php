@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Voucher\Service;
 
@@ -21,16 +22,6 @@ class VoucherRemover extends PaymentMethodRemover
      */
     private $voucherService;
 
-
-    /**
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
-     * @param VoucherService $voucherService
-     * @param OrderItemsExtractor $orderDataExtractor
-     * @param LoggerInterface $logger
-     */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, VoucherService $voucherService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
@@ -39,11 +30,11 @@ class VoucherRemover extends PaymentMethodRemover
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        if (!$this->isAllowedRoute()) {
+        if (! $this->isAllowedRoute()) {
             return $originalData;
         }
 
@@ -52,18 +43,17 @@ class VoucherRemover extends PaymentMethodRemover
             $voucherPermitted = $this->isVoucherOrder($order, $context->getContext());
         } else {
             $cart = $this->getCart($context);
-            $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
+            $voucherPermitted = (bool) $cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
         }
 
-
-        # if voucher is allowed, then simply continue.
-        # we don't have to remove a payment method in that case
+        // if voucher is allowed, then simply continue.
+        // we don't have to remove a payment method in that case
         if ($voucherPermitted) {
             return $originalData;
         }
 
-        # now search for our voucher payment method
-        # so that we can remove it from our list
+        // now search for our voucher payment method
+        // so that we can remove it from our list
         foreach ($originalData->getPaymentMethods() as $paymentMethod) {
             if ($this->voucherService->isVoucherPaymentMethod($paymentMethod)) {
                 $originalData->getPaymentMethods()->remove($paymentMethod->getId());

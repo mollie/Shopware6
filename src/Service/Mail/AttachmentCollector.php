@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail;
 
@@ -11,7 +12,6 @@ class AttachmentCollector
      */
     protected $generators;
 
-
     /**
      * @param iterable<mixed> $generators
      */
@@ -21,7 +21,6 @@ class AttachmentCollector
     }
 
     /**
-     * @param Context $context
      * @return array<mixed>
      */
     public function collect(Context $context): array

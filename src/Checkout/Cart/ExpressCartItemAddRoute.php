@@ -38,18 +38,14 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
     }
 
     /**
-     * @param Request $request
-     * @param Cart $cart
-     * @param SalesChannelContext $context
      * @param ?array<mixed> $items
-     * @return CartResponse
      */
     public function add(Request $request, Cart $cart, SalesChannelContext $context, ?array $items): CartResponse
     {
         //we have to create a new request from global variables, because the request is not set here in the route
         $tempRequest = Request::createFromGlobals();
 
-        $isExpressCheckout = (bool)$tempRequest->get('isExpressCheckout', false);
+        $isExpressCheckout = (bool) $tempRequest->get('isExpressCheckout', false);
 
         if ($isExpressCheckout === false) {
             return $this->getDecorated()->add($request, $cart, $context, $items);
@@ -59,19 +55,19 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
         $cartBackupService = $this->container->get(CartBackupService::class);
         $cartService = $this->container->get(CartService::class);
 
-        # add product somehow happens twice, so dont backup our express-cart, only originals
-        if (!$cartBackupService->isBackupExisting($context)) {
+        // add product somehow happens twice, so dont backup our express-cart, only originals
+        if (! $cartBackupService->isBackupExisting($context)) {
             $cartBackupService->backupCart($context);
         }
 
-        # clear existing cart and also update it to save it
+        // clear existing cart and also update it to save it
         $cart->setLineItems(new LineItemCollection());
 
         $mollieCart = new MollieShopwareCart($cart);
 
-        # we mark the cart as single product express checkout
-        # because this helps us to decide whether express checkout is done or
-        # a checkout of an existing cart is started (off canvas, cart...)
+        // we mark the cart as single product express checkout
+        // because this helps us to decide whether express checkout is done or
+        // a checkout of an existing cart is started (off canvas, cart...)
         $mollieCart->setSingleProductExpressCheckout(true);
 
         $cart = $mollieCart->getCart();

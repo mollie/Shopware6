@@ -8,8 +8,9 @@ class UrlParsingService
     /**
      * Checks if a given string is a valid URL.
      *
-     * @param string $value The string to be checked.
-     * @return bool True if the string is a valid URL, false otherwise.
+     * @param string $value the string to be checked
+     *
+     * @return bool true if the string is a valid URL, false otherwise
      */
     public function isUrl(string $value): bool
     {
@@ -24,10 +25,11 @@ class UrlParsingService
      * - As a path segment (e.g., /code/12345/)
      * - As a hash fragment (e.g., #code=12345)
      *
-     * @param string $value The URL to be parsed.
+     * @param string $value the URL to be parsed
+     *
      * @return array{0: string, 1: string} An array where:
-     *               - Index 0 contains the parsed tracking code (if found), or an empty string if no code is found.
-     *               - Index 1 contains the original URL.
+     *                  - Index 0 contains the parsed tracking code (if found), or an empty string if no code is found.
+     *                  - Index 1 contains the original URL.
      */
     public function parseTrackingCodeFromUrl(string $value): array
     {
@@ -36,9 +38,9 @@ class UrlParsingService
             $urlQuery = parse_url($value, PHP_URL_FRAGMENT);
         }
         if ($urlQuery === null) {
-            return [$value,''];
+            return [$value, ''];
         }
-        $urlQuery = (string)$urlQuery;
+        $urlQuery = (string) $urlQuery;
         $urlWithoutQuery = str_replace($urlQuery, '', $value);
 
         return [$urlQuery, $urlWithoutQuery . '%s'];
@@ -58,13 +60,13 @@ class UrlParsingService
 
         $pass = isset($urlParts['pass']) ? ':' . $urlParts['pass'] : '';
 
-        $pass = ($user || $pass) ? "$pass@" : '';
+        $pass = ($user || $pass) ? "{$pass}@" : '';
 
         $path = $urlParts['path'] ?? '';
 
         if (mb_strlen($path) > 0) {
             $pathParts = explode('/', $path);
-            array_walk($pathParts, function (&$pathPart) {
+            array_walk($pathParts, function (& $pathPart) {
                 $pathPart = rawurlencode($pathPart);
             });
             $path = implode('/', $pathParts);
@@ -75,7 +77,6 @@ class UrlParsingService
             $urlParts['query'] = $this->sanitizeQuery(explode('&', $urlParts['query']));
             $query = '?' . implode('&', $urlParts['query']);
         }
-
 
         $fragment = isset($urlParts['fragment']) ? '#' . rawurlencode($urlParts['fragment']) : '';
 
@@ -89,8 +90,9 @@ class UrlParsingService
      * 'key=value'. It applies the sanitizeQueryPart method to each query string to ensure the keys
      * and values are URL encoded, making them safe for use in URLs.
      *
-     * @param string[] $query An array of query strings to be sanitized.
-     * @return string[] The sanitized array with URL encoded query strings.
+     * @param string[] $query an array of query strings to be sanitized
+     *
+     * @return string[] the sanitized array with URL encoded query strings
      */
     public function sanitizeQuery(array $query): array
     {
@@ -105,8 +107,9 @@ class UrlParsingService
      * its key and value components, URL encodes each component, and then recombines them into a single
      * query string part.
      *
-     * @param string $queryPart A single query string part to be sanitized.
-     * @return string The sanitized query string part with URL encoded components.
+     * @param string $queryPart a single query string part to be sanitized
+     *
+     * @return string the sanitized query string part with URL encoded components
      */
     public function sanitizeQueryPart(string $queryPart): string
     {

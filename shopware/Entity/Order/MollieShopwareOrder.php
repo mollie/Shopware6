@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Mollie\Shopware\Entity\Order;
 
@@ -10,20 +11,14 @@ class MollieShopwareOrder
 {
     private OrderEntity $order;
 
-    /**
-     * @param OrderEntity $order
-     */
     public function __construct(OrderEntity $order)
     {
         $this->order = $order;
     }
 
-    /**
-     * @return null|OrderTransactionEntity
-     */
     public function getLatestTransaction(): ?OrderTransactionEntity
     {
-        if (!$this->order->getTransactions() instanceof OrderTransactionCollection) {
+        if (! $this->order->getTransactions() instanceof OrderTransactionCollection) {
             return null;
         }
 

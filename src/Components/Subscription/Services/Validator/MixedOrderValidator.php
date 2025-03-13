@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Validator;
 
@@ -9,10 +10,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class MixedOrderValidator
 {
-    /**
-     * @param OrderEntity $order
-     * @return bool
-     */
     public function isMixedCart(OrderEntity $order): bool
     {
         $subscriptionItemsCount = 0;
@@ -21,7 +18,7 @@ class MixedOrderValidator
 
         $lineItems = $order->getLineItems();
 
-        if (!$lineItems instanceof OrderLineItemCollection) {
+        if (! $lineItems instanceof OrderLineItemCollection) {
             return false;
         }
 
@@ -29,19 +26,19 @@ class MixedOrderValidator
             $attributes = new OrderLineItemEntityAttributes($lineItem);
 
             if ($attributes->isSubscriptionProduct()) {
-                $subscriptionItemsCount++;
+                ++$subscriptionItemsCount;
             } else {
-                # promotions are ok
-                $otherItemsCount++;
+                // promotions are ok
+                ++$otherItemsCount;
             }
 
             if ($otherItemsCount > 0) {
-                # mixed cart with other items
+                // mixed cart with other items
                 $isMixedCart = true;
             }
 
             if ($subscriptionItemsCount > 1) {
-                # mixed cart with multiple subscription items
+                // mixed cart with multiple subscription items
                 $isMixedCart = true;
             }
         }

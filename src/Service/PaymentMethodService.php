@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -59,10 +60,6 @@ use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodService
 {
-
-    /**
-     *
-     */
     public const TECHNICAL_NAME_PREFIX = 'payment_mollie_';
 
     /**
@@ -96,14 +93,8 @@ class PaymentMethodService
     private $versionCompare;
     private PayPalExpressConfig $payPalExpressConfig;
 
-
     /**
-     * @param string $shopwareVersion
-     * @param MediaService $mediaService
      * @param MediaRepository$mediaRepository
-     * @param PaymentMethodRepository $paymentRepository
-     * @param PluginIdProvider $pluginIdProvider
-     * @param HttpClientInterface $httpClient
      */
     public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
@@ -117,15 +108,11 @@ class PaymentMethodService
         $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
-
-    /**
-     * @param Context $context
-     */
     public function installAndActivatePaymentMethods(Context $context): void
     {
-        # install payment methods that are not allowed anymore.
-        # we still need the min the database
-        # but always disable them :)
+        // install payment methods that are not allowed anymore.
+        // we still need the min the database
+        // but always disable them :)
         $this->disablePaymentMethod(IngHomePayPayment::class, $context);
 
         if (! $this->payPalExpressConfig->isEnabled()) {
@@ -155,7 +142,6 @@ class PaymentMethodService
 
     /**
      * @param array<mixed> $paymentMethods
-     * @param Context $context
      */
     public function addPaymentMethods(array $paymentMethods, Context $context): void
     {
@@ -170,7 +156,6 @@ class PaymentMethodService
             // Upload icon to the media repository
             $mediaId = $this->getMediaId($paymentMethod, $context);
 
-
             try {
                 $existingPaymentMethod = $this->getPaymentMethod($identifier, $context);
             } catch (InconsistentCriteriaIdsException $e) {
@@ -181,54 +166,54 @@ class PaymentMethodService
 
             if ($existingPaymentMethod instanceof PaymentMethodEntity) {
                 $paymentMethodData = [
-                    # ALWAYS ADD THE ID, otherwise upsert would create NEW entries!
+                    // ALWAYS ADD THE ID, otherwise upsert would create NEW entries!
                     'id' => $existingPaymentMethod->getId(),
                     'handlerIdentifier' => $paymentMethod['handler'],
-                    # ------------------------------------------
-                    # make sure to repair some fields in here
-                    # so that Mollie does always work for our wonderful customers :)
+                    // ------------------------------------------
+                    // make sure to repair some fields in here
+                    // so that Mollie does always work for our wonderful customers :)
                     'pluginId' => $pluginId,
-                    # ------------------------------------------
-                    # unfortunately some fields are required (*sigh)
-                    # so we need to provide those with the value of
-                    # the existing method!!!
-                    'name' => $existingPaymentMethod->getName()
+                    // ------------------------------------------
+                    // unfortunately some fields are required (*sigh)
+                    // so we need to provide those with the value of
+                    // the existing method!!!
+                    'name' => $existingPaymentMethod->getName(),
                 ];
                 $translations = $existingPaymentMethod->getTranslations();
 
                 if ($translations !== null) {
                     $paymentMethodData['translations'][Defaults::LANGUAGE_SYSTEM] = [
-                        'name' => $existingPaymentMethod->getName()
+                        'name' => $existingPaymentMethod->getName(),
                     ];
 
                     foreach ($translations as $translation) {
                         $paymentMethodData['translations'][$translation->getLanguageId()] = [
-                            'name' => $translation->getName()
+                            'name' => $translation->getName(),
                         ];
                     }
                 }
 
                 if ($this->versionCompare->gte('6.5.7.0')) {
-                    # we do a string cast here, since getTechnicalName will be not nullable in the future
+                    // we do a string cast here, since getTechnicalName will be not nullable in the future
                     /** @phpstan-ignore-next-line  */
-                    $technicalName = (string)$existingPaymentMethod->getTechnicalName();
+                    $technicalName = (string) $existingPaymentMethod->getTechnicalName();
                 }
             } else {
-                # let's create a full parameter list of everything
-                # that our new payment method needs to have
+                // let's create a full parameter list of everything
+                // that our new payment method needs to have
                 $paymentMethodData = [
                     'handlerIdentifier' => $paymentMethod['handler'],
                     'pluginId' => $pluginId,
-                    # ------------------------------------------
+                    // ------------------------------------------
                     'name' => $paymentMethod['description'],
                     'description' => '',
                     'mediaId' => $mediaId,
                     'afterOrderEnabled' => true,
                     'translations' => [
                         Defaults::LANGUAGE_SYSTEM => [
-                            'name' => $paymentMethod['description']
-                        ]
-                    ]
+                            'name' => $paymentMethod['description'],
+                        ],
+                    ],
                 ];
             }
 
@@ -236,13 +221,13 @@ class PaymentMethodService
                 $technicalName = self::TECHNICAL_NAME_PREFIX . $paymentMethod['name'];
             }
 
-            # custom field name is required to be specific, because we use it in the template to display components
+            // custom field name is required to be specific, because we use it in the template to display components
             $paymentMethodData['customFields'] = [
-                'mollie_payment_method_name' => $paymentMethod['name']
+                'mollie_payment_method_name' => $paymentMethod['name'],
             ];
 
-            # starting with Shopware 6.5.7.0 this has to be filled out
-            # so that you can still save the payment method in the administration
+            // starting with Shopware 6.5.7.0 this has to be filled out
+            // so that you can still save the payment method in the administration
             if ($this->versionCompare->gte('6.5.7.0')) {
                 $paymentMethodData['technicalName'] = $technicalName;
             }
@@ -257,7 +242,7 @@ class PaymentMethodService
 
     /**
      * @param array<mixed> $installableHandlers
-     * @param Context $context
+     *
      * @return array<mixed>
      */
     public function getInstalledPaymentMethodHandlers(array $installableHandlers, Context $context): array
@@ -289,15 +274,14 @@ class PaymentMethodService
      *
      * @param array<mixed> $paymentMethods
      * @param array<mixed> $installedHandlers
-     * @param Context $context
      */
     public function activatePaymentMethods(array $paymentMethods, array $installedHandlers, Context $context): void
     {
         if (! empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
                 if (
-                    ! isset($paymentMethod['handler']) ||
-                    in_array($paymentMethod['handler'], $installedHandlers, true)
+                    ! isset($paymentMethod['handler'])
+                    || in_array($paymentMethod['handler'], $installedHandlers, true)
                 ) {
                     continue;
                 }
@@ -311,11 +295,6 @@ class PaymentMethodService
         }
     }
 
-    /**
-     * @param string $handlerName
-     * @param Context $context
-     * @return void
-     */
     public function disablePaymentMethod(string $handlerName, Context $context): void
     {
         $existingPaymentMethod = $this->getPaymentMethod($handlerName, $context);
@@ -331,12 +310,6 @@ class PaymentMethodService
 
     /**
      * Activates a payment method in Shopware
-     *
-     * @param string $paymentMethodId
-     * @param bool $active
-     * @param Context $context
-     *
-     * @return EntityWrittenContainerEvent
      */
     public function setPaymentMethodActivated(string $paymentMethodId, bool $active, Context $context): EntityWrittenContainerEvent
     {
@@ -344,8 +317,8 @@ class PaymentMethodService
             [
                 [
                     'id' => $paymentMethodId,
-                    'active' => $active
-                ]
+                    'active' => $active,
+                ],
             ],
             $context
         );
@@ -355,7 +328,9 @@ class PaymentMethodService
      * Get payment method by ID.
      *
      * @param string $id
+     *
      * @throws InconsistentCriteriaIdsException
+     *
      * @return PaymentMethodEntity
      */
     public function getPaymentMethodById($id): ?PaymentMethodEntity
@@ -398,31 +373,6 @@ class PaymentMethodService
         }
 
         return $paymentMethods;
-    }
-
-    /**
-     * Get payment method ID by name.
-     *
-     * @param string $handlerIdentifier
-     * @param Context $context
-     *
-     * @return null|PaymentMethodEntity
-     */
-    private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
-    {
-        // Fetch ID for update
-        $paymentCriteria = new Criteria();
-        $paymentCriteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
-        $paymentCriteria->addAssociation('translations');
-
-        // Get payment IDs
-        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, $context);
-
-        if ($paymentMethods->getTotal() === 0) {
-            return null;
-        }
-
-        return $paymentMethods->first();
     }
 
     /**
@@ -478,11 +428,45 @@ class PaymentMethodService
         return $paymentHandlers;
     }
 
+    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder): bool
+    {
+        $paymentMethodId = $transaction->getPaymentMethodId();
+        $paymentMethod = $transaction->getPaymentMethod();
+
+        if (! $paymentMethod instanceof PaymentMethodEntity) {
+            $criteria = new Criteria([$paymentMethodId]);
+            $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
+        }
+
+        return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
+    }
+
+    /**
+     * Get payment method ID by name.
+     *
+     * @param string $handlerIdentifier
+     */
+    private function getPaymentMethod($handlerIdentifier, Context $context): ?PaymentMethodEntity
+    {
+        // Fetch ID for update
+        $paymentCriteria = new Criteria();
+        $paymentCriteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+        $paymentCriteria->addAssociation('translations');
+
+        // Get payment IDs
+        $paymentMethods = $this->paymentRepository->getRepository()->search($paymentCriteria, $context);
+
+        if ($paymentMethods->getTotal() === 0) {
+            return null;
+        }
+
+        return $paymentMethods->first();
+    }
+
     /**
      * Retrieve the icon from the database, or add it.
      *
      * @param array<mixed> $paymentMethod
-     * @param Context $context
      *
      * @return string
      */
@@ -534,28 +518,6 @@ class PaymentMethodService
         );
     }
 
-    /**
-     * @param OrderTransactionEntity $transaction
-     * @param Order $mollieOrder
-     * @return bool
-     */
-    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder): bool
-    {
-        $paymentMethodId = $transaction->getPaymentMethodId();
-        $paymentMethod = $transaction->getPaymentMethod();
-
-        if (! $paymentMethod instanceof PaymentMethodEntity) {
-            $criteria = new Criteria([$paymentMethodId]);
-            $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
-        }
-
-        return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
-    }
-
-    /**
-     * @param string $url
-     * @return string
-     */
     private function downloadFile(string $url): string
     {
         $response = $this->httpClient->sendRequest('GET', $url);

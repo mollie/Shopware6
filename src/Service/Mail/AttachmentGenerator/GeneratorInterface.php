@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -8,6 +9,7 @@ interface GeneratorInterface
 {
     /**
      * Generates an attachment to be added to an email
+     *
      * @return array<string, mixed>
      */
     public function generate(Context $context): array;

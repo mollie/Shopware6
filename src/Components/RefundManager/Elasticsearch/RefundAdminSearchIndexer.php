@@ -19,30 +19,21 @@ use Shopware\Elasticsearch\Admin\Indexer\AbstractAdminIndexer;
 
 class RefundAdminSearchIndexer extends AbstractAdminIndexer
 {
-    private Connection $connection;
-    private IteratorFactory $factory;
-    /**
-     * @var EntityRepository
-     */
-    private EntityRepository $repository;
-    private int $indexingBatchSize;
-
     /**
      * elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
      */
     private const TYPE_BINARY = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
+    private Connection $connection;
+    private IteratorFactory $factory;
 
-    /**
-     * @param Connection $connection
-     * @param IteratorFactory $factory
-     * @param EntityRepository $repository
-     * @param int $indexingBatchSize
-     */
+    private EntityRepository $repository;
+    private int $indexingBatchSize;
+
     public function __construct(
-        Connection       $connection,
-        IteratorFactory  $factory,
+        Connection $connection,
+        IteratorFactory $factory,
         EntityRepository $repository,
-        int              $indexingBatchSize
+        int $indexingBatchSize
     ) {
         $this->connection = $connection;
         $this->factory = $factory;
@@ -97,14 +88,13 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
 
         $mapped = [];
         foreach ($data as $row) {
-            $id = (string)$row['id'];
+            $id = (string) $row['id'];
             $text = \implode(' ', array_filter($row));
             $mapped[$id] = ['id' => $id, 'text' => \strtolower($text)];
         }
 
         return $mapped;
     }
-
 
     /**
      * @param array<string, mixed> $result
@@ -118,7 +108,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
         $ids = array_column($result['hits'], 'id');
 
         return [
-            'total' => (int)$result['total'],
+            'total' => (int) $result['total'],
             'data' => $this->repository->search(new Criteria($ids), $context)->getEntities(),
         ];
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Storefront\Struct;
 
@@ -16,9 +17,6 @@ class TestModePageExtensionStruct extends Struct
         $this->testMode = $testMode;
     }
 
-    /**
-     * @return bool
-     */
     public function isTestMode(): bool
     {
         return $this->testMode;

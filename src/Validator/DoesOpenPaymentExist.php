@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Validator;
 
@@ -9,7 +10,6 @@ class DoesOpenPaymentExist
 {
     /**
      * @param Payment[] $payments
-     * @return bool
      */
     public static function validate(array $payments): bool
     {

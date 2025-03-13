@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
@@ -14,7 +15,7 @@ class Migration1672671475RefundItem extends MigrationStep
 
     public function update(Connection $connection): void
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
   CREATE TABLE IF NOT EXISTS `mollie_refund_item` (
                       `id` binary(16) NOT NULL,
                       `order_line_item_id` binary(16) NULL,

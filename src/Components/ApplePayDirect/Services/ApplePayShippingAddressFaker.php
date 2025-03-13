@@ -20,13 +20,12 @@ class ApplePayShippingAddressFaker
     private EntityRepository $customerAddressRepository;
 
     public function __construct(
-        EntityRepository        $customerRepository,
-        EntityRepository        $customerAddressRepository
+        EntityRepository $customerRepository,
+        EntityRepository $customerAddressRepository
     ) {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;
     }
-
 
     public function createFakeShippingAddress(string $countryId, CustomerEntity $customerEntity, Context $context): string
     {
@@ -43,10 +42,10 @@ class ApplePayShippingAddressFaker
                         'firstName' => $customerEntity->getFirstName(),
                         'lastName' => $customerEntity->getLastName(),
                         'city' => 'not provided', //city is not necessary for rule builder
-                        'street' => 'not provided' //apple pay event "onshippingcontactselected"  does not provide a street https://developer.apple.com/documentation/apple_pay_on_the_web/applepaysession/1778009-onshippingcontactselected
-                    ]
-                ]
-            ]
+                        'street' => 'not provided', //apple pay event "onshippingcontactselected"  does not provide a street https://developer.apple.com/documentation/apple_pay_on_the_web/applepaysession/1778009-onshippingcontactselected
+                    ],
+                ],
+            ],
         ], $context);
 
         return $applePayAddressId;
@@ -57,14 +56,14 @@ class ApplePayShippingAddressFaker
         $applePayAddressId = $this->generateAddressId($customerEntity);
         $this->customerAddressRepository->delete([
             [
-                'id' => $applePayAddressId
-            ]
+                'id' => $applePayAddressId,
+            ],
         ], $context);
     }
 
     private function generateAddressId(CustomerEntity $customerEntity): string
     {
-        /** We cant use here Uuid::fromString because it does not exists in SW6.4 */
+        /* We cant use here Uuid::fromString because it does not exists in SW6.4 */
         return Uuid::fromBytesToHex(md5($customerEntity->getId() . '-' . self::ID_SUFFIX, true));
     }
 }

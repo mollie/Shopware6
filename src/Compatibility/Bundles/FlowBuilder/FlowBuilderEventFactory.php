@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder;
 
@@ -47,27 +48,18 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class FlowBuilderEventFactory
 {
+    private const SW_VERSION_651 = '6.5.1.0';
     /**
      * @var VersionCompare
      */
     private $versionCompare;
 
-
-    private const SW_VERSION_651 = '6.5.1.0';
-
-
-    /**
-     * @param string $shopwareVersion
-     */
     public function __construct(string $shopwareVersion)
     {
         $this->versionCompare = new VersionCompare($shopwareVersion);
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param string $status
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedEvent
      */
     public function buildWebhookReceivedAll(OrderEntity $orderEntity, string $status, Context $context)
@@ -80,8 +72,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedFailedEvent
      */
     public function buildWebhookReceivedFailedEvent(OrderEntity $orderEntity, Context $context)
@@ -94,8 +84,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedCancelledEvent
      */
     public function buildWebhookReceivedCancelledEvent(OrderEntity $orderEntity, Context $context)
@@ -108,8 +96,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedExpiredEvent
      */
     public function buildWebhookReceivedExpiredEvent(OrderEntity $orderEntity, Context $context)
@@ -122,8 +108,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedPendingEvent
      */
     public function buildWebhookReceivedPendingEvent(OrderEntity $orderEntity, Context $context)
@@ -136,8 +120,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedAuthorizedEvent
      */
     public function buildWebhookReceivedAuthorizedEvent(OrderEntity $orderEntity, Context $context)
@@ -150,8 +132,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedPaidEvent
      */
     public function buildWebhookReceivedPaidEvent(OrderEntity $orderEntity, Context $context)
@@ -164,8 +144,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedChargebackEvent
      */
     public function buildWebhookReceivedChargebackEvent(OrderEntity $orderEntity, Context $context)
@@ -178,8 +156,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedRefundedEvent
      */
     public function buildWebhookReceivedRefundedEvent(OrderEntity $orderEntity, Context $context)
@@ -192,8 +168,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedPartialRefundedEvent
      */
     public function buildWebhookReceivedPartialRefundedEvent(OrderEntity $orderEntity, Context $context)
@@ -206,8 +180,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param Context $context
      * @return DummyEvent|WebhookReceivedCompletedEvent
      */
     public function buildWebhookReceivedCompletedEvent(OrderEntity $orderEntity, Context $context)
@@ -220,9 +192,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param OrderEntity $orderEntity
-     * @param float $amount
-     * @param Context $context
      * @return DummyEvent|RefundStartedEvent|RefundStartedEvent651
      */
     public function buildRefundStartedEvent(OrderEntity $orderEntity, float $amount, Context $context)
@@ -239,10 +208,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param SalesChannelEntity $salesChannel
-     * @param Context $context
      * @return DummyEvent|SubscriptionRemindedEvent|SubscriptionRemindedEvent651
      */
     public function buildSubscriptionRemindedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, SalesChannelEntity $salesChannel, Context $context)
@@ -259,9 +224,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionStartedEvent|SubscriptionStartedEvent651
      */
     public function buildSubscriptionStartedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -278,9 +240,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionEndedEvent|SubscriptionEndedEvent651
      */
     public function buildSubscriptionEndedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -297,9 +256,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionCancelledEvent|SubscriptionCancelledEvent651
      */
     public function buildSubscriptionCancelledEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -316,9 +272,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionPausedEvent|SubscriptionPausedEvent651
      */
     public function buildSubscriptionPausedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -335,9 +288,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionResumedEvent|SubscriptionResumedEvent651
      */
     public function buildSubscriptionResumedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -354,9 +304,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionSkippedEvent|SubscriptionSkippedEvent651
      */
     public function buildSubscriptionSkippedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -373,9 +320,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @return DummyEvent|SubscriptionRenewedEvent|SubscriptionRenewedEvent651
      */
     public function buildSubscriptionRenewedEvent(CustomerEntity $customer, SubscriptionEntity $subscription, Context $context)
@@ -392,9 +336,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param OrderEntity $order
-     * @param Context $context
      * @return DummyEvent|OrderSuccessEvent|OrderSuccessEvent651
      */
     public function buildOrderSuccessEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
@@ -411,9 +352,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param OrderEntity $order
-     * @param Context $context
      * @return DummyEvent|OrderFailedEvent|OrderFailedEvent651
      */
     public function buildOrderFailedEvent(CustomerEntity $customer, OrderEntity $order, Context $context)
@@ -430,9 +368,6 @@ class FlowBuilderEventFactory
     }
 
     /**
-     * @param CustomerEntity $customer
-     * @param OrderEntity $order
-     * @param Context $context
      * @return DummyEvent|OrderCanceledEvent|OrderCanceledEvent651
      */
     public function buildOrderCanceledEvent(CustomerEntity $customer, OrderEntity $order, Context $context)

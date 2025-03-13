@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Facade;
 
@@ -73,18 +74,6 @@ class MolliePaymentFinalize
      */
     private $flowBuilderEventFactory;
 
-
-    /**
-     * @param OrderStatusConverter $orderStatusConverter
-     * @param OrderStatusUpdater $orderStatusUpdater
-     * @param SettingsService $settingsService
-     * @param Order $mollieOrderService
-     * @param OrderService $orderService
-     * @param SubscriptionManager $subscriptionManager
-     * @param EntityRepository $repoCustomer
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     */
     public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepository $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
@@ -98,10 +87,7 @@ class MolliePaymentFinalize
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
     }
 
-
     /**
-     * @param AsyncPaymentTransactionStruct $transactionStruct
-     * @param SalesChannelContext $salesChannelContext
      * @throws \Exception
      */
     public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): void
@@ -127,10 +113,10 @@ class MolliePaymentFinalize
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
 
-        # Attention
-        # Our payment status will either be set by us, or automatically by Shopware using exceptions below.
-        # But the order status, is something that we always have to set MANUALLY in both cases.
-        # That's why we do this here, before throwing exceptions.
+        // Attention
+        // Our payment status will either be set by us, or automatically by Shopware using exceptions below.
+        // But the order status, is something that we always have to set MANUALLY in both cases.
+        // That's why we do this here, before throwing exceptions.
         $this->orderStatusUpdater->updateOrderStatus(
             $order,
             $paymentStatus,
@@ -138,54 +124,51 @@ class MolliePaymentFinalize
             $salesChannelContext->getContext()
         );
 
-
         $paymentMethod = $transactionStruct->getOrderTransaction()->getPaymentMethod();
 
-        # in some combinations (older Shopware versions + Mollie failure mode)
-        # we don't have a payment method in the order transaction.
-        # so we grab our identifier from the mollie order
+        // in some combinations (older Shopware versions + Mollie failure mode)
+        // we don't have a payment method in the order transaction.
+        // so we grab our identifier from the mollie order
         if ($paymentMethod instanceof PaymentMethodEntity) {
-            # load our correct key
-            # from the shopware payment method custom field
+            // load our correct key
+            // from the shopware payment method custom field
             $mollieAttributes = new PaymentMethodAttributes($paymentMethod);
             $molliePaymentMethodKey = $mollieAttributes->getMollieIdentifier();
         } else {
-            # load it from the mollie order id
+            // load it from the mollie order id
             $molliePaymentMethodKey = $mollieOrder->method;
         }
 
-
-        # now either set the payment status for successful payments
-        # or make sure to throw an exception for Shopware in case of failed payments.
+        // now either set the payment status for successful payments
+        // or make sure to throw an exception for Shopware in case of failed payments.
         if (MolliePaymentStatus::isFailedStatus($molliePaymentMethodKey, $paymentStatus)) {
             $orderTransactionID = $transactionStruct->getOrderTransaction()->getUniqueIdentifier();
 
-            # let's also create a different handling, if the customer either cancelled
-            # or if the payment really failed. this will lead to a different order payment status in the end.
+            // let's also create a different handling, if the customer either cancelled
+            // or if the payment really failed. this will lead to a different order payment status in the end.
             if ($paymentStatus === MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED) {
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
-                # fire flow builder event
+                // fire flow builder event
                 $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
 
                 throw PaymentException::customerCanceled($orderTransactionID, $message);
-            } else {
-                $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
-
-                # fire flow builder event
-                $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
-
-                throw PaymentException::asyncFinalizeInterrupted($orderTransactionID, $message);
             }
+            $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
+
+            // fire flow builder event
+            $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
+
+            throw PaymentException::asyncFinalizeInterrupted($orderTransactionID, $message);
         }
 
-        # --------------------------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------------------------
 
         $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
 
-        # now update the custom fields of the order
-        # we want to have as much information as possible in the shopware order
-        # this includes the Mollie Payment ID and maybe additional references
+        // now update the custom fields of the order
+        // we want to have as much information as possible in the shopware order
+        // this includes the Mollie Payment ID and maybe additional references
         $this->orderService->updateMollieDataCustomFields(
             $order,
             $mollieOrderId,
@@ -194,46 +177,41 @@ class MolliePaymentFinalize
             $salesChannelContext->getContext()
         );
 
-        # --------------------------------------------------------------------------------------------------------------------
-        # attention this is indeed a "hack".
-        # we don't have real webhooks in our cypress pipeline tests.
-        # this means the real subscription-handshake cannot be done.
-        # but we still need a mollie subscription. so there is a hidden cypress ENV mode.
-        # if enabled, we immediately create a subscription in this RETURN url instead of the webhook
+        // --------------------------------------------------------------------------------------------------------------------
+        // attention this is indeed a "hack".
+        // we don't have real webhooks in our cypress pipeline tests.
+        // this means the real subscription-handshake cannot be done.
+        // but we still need a mollie subscription. so there is a hidden cypress ENV mode.
+        // if enabled, we immediately create a subscription in this RETURN url instead of the webhook
         $orderAttributes = new OrderAttributes($order);
 
         if ($this->settingsService->getMollieCypressMode() && $orderAttributes->isTypeSubscription()) {
             if ($mollieOrder->payments() !== null && count($mollieOrder->payments()) > 0) {
                 $paymentDetails = new MolliePaymentDetails();
-                $lasMolliePayment = count($mollieOrder->payments()) -1;
+                $lasMolliePayment = count($mollieOrder->payments()) - 1;
                 $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[$lasMolliePayment]);
                 $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
             }
         }
 
-        # --------------------------------------------------------------------------------------------------------------------
-        # FLOW BUILDER
+        // --------------------------------------------------------------------------------------------------------------------
+        // FLOW BUILDER
 
         $this->fireFlowBuilderEvent(self::FLOWBUILDER_SUCCESS, $order, $salesChannelContext->getContext());
     }
 
-
     /**
-     * @param string $status
-     * @param OrderEntity $order
-     * @param Context $context
      * @throws \Exception
-     * @return void
      */
     private function fireFlowBuilderEvent(string $status, OrderEntity $order, Context $context): void
     {
         $orderCustomer = $order->getOrderCustomer();
 
-        if (!$orderCustomer instanceof OrderCustomerEntity) {
+        if (! $orderCustomer instanceof OrderCustomerEntity) {
             return;
         }
 
-        $criteria = new Criteria([(string)$orderCustomer->getCustomerId()]);
+        $criteria = new Criteria([(string) $orderCustomer->getCustomerId()]);
 
         $customers = $this->repoCustomer->search($criteria, $context);
 
@@ -241,7 +219,7 @@ class MolliePaymentFinalize
             return;
         }
 
-        # we also have to reload the order because data is missing
+        // we also have to reload the order because data is missing
         $finalOrder = $this->orderService->getOrder($order->getId(), $context);
 
         switch ($status) {

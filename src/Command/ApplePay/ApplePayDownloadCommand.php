@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Command\ApplePay;
 
@@ -13,7 +14,6 @@ class ApplePayDownloadCommand extends Command
 {
     public static $defaultName = 'mollie:applepay:download-verification';
 
-
     /**
      * @var ApplePayDirect
      */
@@ -24,11 +24,6 @@ class ApplePayDownloadCommand extends Command
      */
     private $logger;
 
-
-    /**
-     * @param ApplePayDirect $applePay
-     * @param LoggerInterface $logger
-     */
     public function __construct(ApplePayDirect $applePay, LoggerInterface $logger)
     {
         $this->applePay = $applePay;
@@ -37,22 +32,14 @@ class ApplePayDownloadCommand extends Command
         parent::__construct();
     }
 
-
-    /**
-     * @return void
-     */
     protected function configure(): void
     {
         $this
-            ->setName((string)self::$defaultName)
-            ->setDescription('Download the latest Apple Pay Domain Verification File of Mollie.');
+            ->setName((string) self::$defaultName)
+            ->setDescription('Download the latest Apple Pay Domain Verification File of Mollie.')
+        ;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\Mandate;
 
@@ -6,6 +7,7 @@ use Shopware\Core\Framework\Struct\StructCollection;
 
 /**
  * @extends StructCollection<MandateStruct>
+ *
  * @method void                add(MandateStruct $entity)
  * @method void                set(string $key, MandateStruct $entity)
  * @method MandateStruct[]    getIterator()

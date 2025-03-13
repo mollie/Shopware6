@@ -13,7 +13,7 @@ final class CartConvertedSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CartConvertedEvent::class => 'savePayPalExpressData'
+            CartConvertedEvent::class => 'savePayPalExpressData',
         ];
     }
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\RefundData;
 
@@ -51,11 +52,6 @@ class RefundData
     /**
      * @param AbstractItem[] $cartItems
      * @param Refund[] $refunds
-     * @param float $amountVouchers
-     * @param float $amountPendingRefunds
-     * @param float $amountCompletedRefunds
-     * @param float $amountRemaining
-     * @param float $roundingItemTotal
      */
     public function __construct(array $cartItems, array $refunds, float $amountVouchers, float $amountPendingRefunds, float $amountCompletedRefunds, float $amountRemaining, float $roundingItemTotal, string $taxStatus)
     {
@@ -85,54 +81,35 @@ class RefundData
         return $this->refunds;
     }
 
-    /**
-     * @return float
-     */
     public function getAmountVouchers(): float
     {
         return $this->amountVouchers;
     }
 
-    /**
-     * @return float
-     */
     public function getAmountPendingRefunds(): float
     {
         return $this->amountPendingRefunds;
     }
 
-    /**
-     * @return float
-     */
     public function getAmountCompletedRefunds(): float
     {
         return $this->amountCompletedRefunds;
     }
 
-    /**
-     * @return float
-     */
     public function getAmountRemaining(): float
     {
         return $this->amountRemaining;
     }
 
-    /**
-     * @return float
-     */
     public function getRoundingItemTotal(): float
     {
         return $this->roundingItemTotal;
     }
 
-    /**
-     * @return string
-     */
     public function getTaxStatus(): string
     {
         return $this->taxStatus;
     }
-
 
     /**
      * @return array<mixed>
@@ -151,7 +128,7 @@ class RefundData
         foreach ($refundsArray as $refundIndex => $refund) {
             if (isset($refund['metadata']) && property_exists($refund['metadata'], 'composition') && is_array($refund['metadata']->composition)) {
                 foreach ($refund['metadata']->composition as $compositionIndex => $composition) {
-                    if ((bool)$composition['swReference'] === false) {
+                    if ((bool) $composition['swReference'] === false) {
                         $refundsArray[$refundIndex]['metadata']->composition[$compositionIndex]['label'] = self::ROUNDING_ITEM_LABEL;
                     }
                 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -21,16 +22,11 @@ class FakeShipmentManager implements ShipmentManagerInterface
      */
     private $shippedOrderNumber;
 
-
-    /**
-     *
-     */
     public function __construct()
     {
         $this->isFullyShipped = false;
         $this->shippedOrderNumber = '';
     }
-
 
     /**
      * @return false
@@ -40,21 +36,11 @@ class FakeShipmentManager implements ShipmentManagerInterface
         return $this->isFullyShipped;
     }
 
-    /**
-     * @return string
-     */
     public function getShippedOrderNumber(): string
     {
         return $this->shippedOrderNumber;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param null|TrackingData $tracking
-     * @param array $shippingItems
-     * @param Context $context
-     * @return Shipment
-     */
     public function shipOrder(OrderEntity $order, ?TrackingData $tracking, array $shippingItems, Context $context): Shipment
     {
         $this->isFullyShipped = true;
@@ -63,25 +49,11 @@ class FakeShipmentManager implements ShipmentManagerInterface
         return new Shipment(new MollieApiClient());
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param string $itemIdentifier
-     * @param int $quantity
-     * @param null|TrackingData $tracking
-     * @param Context $context
-     * @return Shipment
-     */
     public function shipItem(OrderEntity $order, string $itemIdentifier, int $quantity, ?TrackingData $tracking, Context $context): Shipment
     {
         return new Shipment(new MollieApiClient());
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param null|TrackingData $tracking
-     * @param Context $context
-     * @return Shipment
-     */
     public function shipOrderRest(OrderEntity $order, ?TrackingData $tracking, Context $context): Shipment
     {
         $this->isFullyShipped = true;

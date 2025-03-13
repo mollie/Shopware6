@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Country;
 
@@ -12,17 +12,11 @@ use Shopware\Core\System\Country\CountryDefinition;
 
 class CountryExtension extends EntityExtension
 {
-    /**
-     * @return string
-     */
     public function getDefinitionClass(): string
     {
         return CountryDefinition::class;
     }
 
-    /**
-     * @param FieldCollection $collection
-     */
     public function extendFields(FieldCollection $collection): void
     {
         $collection->add((new OneToManyAssociationField('subscriptionAddress', SubscriptionAddressDefinition::class, 'country_id'))->addFlags(new CascadeDelete()));

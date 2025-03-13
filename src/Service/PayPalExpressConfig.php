@@ -15,9 +15,9 @@ class PayPalExpressConfig
     private array $restrictions = [];
 
     public function __construct(
-        ?int    $enabled = null,
-        ?int    $buttonStyle = null,
-        ?int    $buttonShape = null,
+        ?int $enabled = null,
+        ?int $buttonStyle = null,
+        ?int $buttonShape = null,
         ?string $restrictions = ''
     ) {
         $this->enabled = $enabled ?? 0;
@@ -37,6 +37,7 @@ class PayPalExpressConfig
 
     /**
      * @param array<mixed> $structData
+     *
      * @return array<mixed>
      */
     public function assign(array $structData): array
@@ -45,6 +46,7 @@ class PayPalExpressConfig
         $structData['paypalExpressButtonStyle'] = $structData['paypalExpressButtonStyle'] ?? $this->buttonStyle;
         $structData['paypalExpressButtonShape'] = $structData['paypalExpressButtonShape'] ?? $this->buttonShape;
         $structData['paypalExpressRestrictions'] = array_unique(array_merge($structData['paypalExpressRestrictions'] ?? [], $this->restrictions));
+
         return $structData;
     }
 }

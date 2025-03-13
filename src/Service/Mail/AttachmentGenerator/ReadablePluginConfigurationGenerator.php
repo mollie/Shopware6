@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -38,8 +39,8 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
     }
 
     /**
-     * @param Context $context
      * @throws \Mollie\Api\Exceptions\ApiException
+     *
      * @return array<mixed>
      */
     public function generate(Context $context): array
@@ -50,10 +51,10 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
         $fileContent = [];
 
         foreach ($this->getPluginConfiguration($context) as $config) {
-            $fileContent[] = "[ " . $config['label'] . " ]";
+            $fileContent[] = '[ ' . $config['label'] . ' ]';
 
             foreach ($config['config'] as $key => $value) {
-                if (!empty($value) && in_array($key, ['liveApiKey', 'testApiKey'])) {
+                if (! empty($value) && in_array($key, ['liveApiKey', 'testApiKey'])) {
                     $value = $this->apiKeyValidator->validate($value) ? 'Valid' : 'Invalid';
                 }
 
@@ -64,7 +65,7 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
                 }
 
                 if (empty($value)) {
-                    $value = "Empty";
+                    $value = 'Empty';
                 }
 
                 if ($isDefaultValue) {
@@ -73,10 +74,10 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
 
                 $label = array_key_exists($key, $translations) ? $translations[$key] : $key;
 
-                $fileContent[] = $label . ": " . $value;
+                $fileContent[] = $label . ': ' . $value;
             }
 
-            $fileContent[] = "";
+            $fileContent[] = '';
         }
 
         return [
@@ -87,7 +88,6 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
     }
 
     /**
-     * @param Context $context
      * @return array<mixed>
      */
     protected function getPluginConfiguration(Context $context): array
@@ -102,7 +102,7 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
             [
                 'label' => 'Global settings',
                 'config' => $global,
-            ]
+            ],
         ];
 
         /** @var SalesChannelEntity $salesChannel */

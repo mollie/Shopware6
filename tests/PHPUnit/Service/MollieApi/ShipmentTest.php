@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
@@ -40,6 +41,120 @@ class ShipmentTest extends TestCase
         $this->orderApiService->method('getMollieOrder')->willReturn($this->mollieOrder);
 
         $this->shipmentApiService = new Shipment($this->orderApiService, $dispatcher);
+    }
+
+    /**
+     * Tests if shipAll is being called
+     */
+    public function testShipOrder()
+    {
+        $this->mollieOrder
+            ->expects($this->once())
+            ->method('shipAll')
+            ->willReturn($this->createMock(MollieShipment::class))
+        ;
+
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
+    }
+
+    /**
+     * Tests if correct exception is being thrown if order cannot be shipped
+     */
+    public function testShipOrderCannotBeShippedException()
+    {
+        $this->mollieOrder
+            ->expects($this->once())
+            ->method('shipAll')
+            ->willThrowException(new ApiException())
+        ;
+
+        $this->expectException(MollieOrderCouldNotBeShippedException::class);
+
+        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
+    }
+
+    /**
+     * Tests if createShipment is being called
+     */
+    public function testShipItem()
+    {
+        $this->mollieOrder
+            ->expects($this->once())
+            ->method('createShipment')
+            ->willReturn($this->createMock(MollieShipment::class))
+        ;
+
+        $this->mollieOrder->method('lines')->willReturn([]);
+
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
+    }
+
+    /**
+     * Tests if correct exception is being thrown if item cannot be shipped
+     */
+    public function testShipItemCannotBeShippedException()
+    {
+        $this->mollieOrder
+            ->expects($this->once())
+            ->method('createShipment')
+            ->willThrowException(new ApiException())
+        ;
+        $this->mollieOrder->method('lines')->willReturn([]);
+
+        $this->expectException(MollieOrderCouldNotBeShippedException::class);
+
+        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
+    }
+
+    /**
+     * Test for getting the status of the mollie order lines. shipping fee order line is excluded
+     *
+     * @return void
+     */
+    public function testGetStatus()
+    {
+        $this->setUpOrderLines();
+
+        $expectedStatus = [
+            'foo' => [
+                'id' => 'foo',
+                'mollieOrderLineId' => 'odl_1',
+                'quantity' => 5,
+                'quantityShippable' => 3,
+                'quantityShipped' => 2,
+            ],
+            'bar' => [
+                'id' => 'bar',
+                'mollieOrderLineId' => 'odl_2',
+                'quantity' => 2,
+                'quantityShippable' => 1,
+                'quantityShipped' => 1,
+            ],
+            'bax' => [
+                'id' => 'bax',
+                'mollieOrderLineId' => 'odl_4',
+                'quantity' => 2,
+                'quantityShippable' => 0,
+                'quantityShipped' => 2,
+            ],
+        ];
+
+        $actualStatus = $this->shipmentApiService->getStatus('mollieOrderId', 'salesChannelId');
+        $this->assertSame($expectedStatus, $actualStatus);
+    }
+
+    public function testGetTotals()
+    {
+        $this->setUpOrderLines();
+
+        $expectedTotals = [
+            'amount' => 175.0,
+            'quantity' => 5,
+            'shippableQuantity' => 4,
+        ];
+
+        $actualTotals = $this->shipmentApiService->getTotals('mollieOrderId', 'salesChannelId');
+        $this->assertSame($expectedTotals, $actualTotals);
     }
 
     protected function setUpOrderLines()
@@ -95,117 +210,5 @@ class ShipmentTest extends TestCase
 
             return $collection;
         });
-    }
-
-    /**
-     * Tests if shipAll is being called
-     */
-    public function testShipOrder()
-    {
-        $this->mollieOrder
-            ->expects($this->once())
-            ->method('shipAll')
-            ->willReturn($this->createMock(MollieShipment::class));
-
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
-    }
-
-    /**
-     * Tests if correct exception is being thrown if order cannot be shipped
-     */
-    public function testShipOrderCannotBeShippedException()
-    {
-        $this->mollieOrder
-            ->expects($this->once())
-            ->method('shipAll')
-            ->willThrowException(new ApiException());
-
-        $this->expectException(MollieOrderCouldNotBeShippedException::class);
-
-        $this->shipmentApiService->shipOrder('mollieOrderId', 'salesChannelId', [], null);
-    }
-
-    /**
-     * Tests if createShipment is being called
-     */
-    public function testShipItem()
-    {
-        $this->mollieOrder
-            ->expects($this->once())
-            ->method('createShipment')
-            ->willReturn($this->createMock(MollieShipment::class));
-
-        $this->mollieOrder->method('lines')->willReturn([]);
-
-
-
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
-    }
-
-    /**
-     * Tests if correct exception is being thrown if item cannot be shipped
-     */
-    public function testShipItemCannotBeShippedException()
-    {
-        $this->mollieOrder
-            ->expects($this->once())
-            ->method('createShipment')
-            ->willThrowException(new ApiException());
-        $this->mollieOrder->method('lines')->willReturn([]);
-
-        $this->expectException(MollieOrderCouldNotBeShippedException::class);
-
-        $this->shipmentApiService->shipItem('mollieOrderId', 'salesChannelId', 'mollieOrderLineId', 1, null);
-    }
-
-    /**
-     * Test for getting the status of the mollie order lines. shipping fee order line is excluded
-     *
-     * @return void
-     */
-    public function testGetStatus()
-    {
-        $this->setUpOrderLines();
-
-        $expectedStatus = [
-            'foo' => [
-                'id' => 'foo',
-                'mollieOrderLineId' => 'odl_1',
-                'quantity' => 5,
-                'quantityShippable' => 3,
-                'quantityShipped' => 2,
-            ],
-            'bar' => [
-                'id' => 'bar',
-                'mollieOrderLineId' => 'odl_2',
-                'quantity' => 2,
-                'quantityShippable' => 1,
-                'quantityShipped' => 1,
-            ],
-            'bax' => [
-                'id' => 'bax',
-                'mollieOrderLineId' => 'odl_4',
-                'quantity' => 2,
-                'quantityShippable' => 0,
-                'quantityShipped' => 2,
-            ],
-        ];
-
-        $actualStatus = $this->shipmentApiService->getStatus('mollieOrderId', 'salesChannelId');
-        $this->assertSame($expectedStatus, $actualStatus);
-    }
-
-    public function testGetTotals()
-    {
-        $this->setUpOrderLines();
-
-        $expectedTotals = [
-            'amount' => 175.0,
-            'quantity' => 5,
-            'shippableQuantity' => 4
-        ];
-
-        $actualTotals = $this->shipmentApiService->getTotals('mollieOrderId', 'salesChannelId');
-        $this->assertSame($expectedTotals, $actualTotals);
     }
 }

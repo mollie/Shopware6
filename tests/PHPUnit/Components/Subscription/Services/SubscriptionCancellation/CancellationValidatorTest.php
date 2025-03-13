@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionCancellation;
 
@@ -13,15 +13,10 @@ class CancellationValidatorTest extends TestCase
      */
     private $validator;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->validator = new CancellationValidator();
     }
-
 
     /**
      * This test verifies that we can cancel the subscription
@@ -30,6 +25,7 @@ class CancellationValidatorTest extends TestCase
      * @group subscriptions
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testNoCancellationRestrictions()
@@ -50,6 +46,7 @@ class CancellationValidatorTest extends TestCase
      * @group subscriptions
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testNoCancellationWithDaysInRange()
@@ -71,6 +68,7 @@ class CancellationValidatorTest extends TestCase
      * @group subscriptions
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testNoCancellationWithDaysOutsideRange()
@@ -92,6 +90,7 @@ class CancellationValidatorTest extends TestCase
      * @group subscriptions
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testNoRenewalDateExisting()

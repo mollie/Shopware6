@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service\Transition;
 
@@ -53,7 +54,7 @@ class DeliveryTransitionServiceTest extends TestCase
             OrderDeliveryStates::STATE_OPEN => [
                 StateMachineTransitionActions::ACTION_CANCEL,
                 StateMachineTransitionActions::ACTION_SHIP,
-                StateMachineTransitionActions::ACTION_SHIP_PARTIALLY
+                StateMachineTransitionActions::ACTION_SHIP_PARTIALLY,
             ],
             OrderDeliveryStates::STATE_PARTIALLY_SHIPPED => [
                 StateMachineTransitionActions::ACTION_CANCEL,
@@ -77,7 +78,7 @@ class DeliveryTransitionServiceTest extends TestCase
             ],
             OrderDeliveryStates::STATE_CANCELLED => [
                 StateMachineTransitionActions::ACTION_REOPEN,
-            ]
+            ],
         ];
     }
 
@@ -94,7 +95,8 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
         $this->stateMachineRegistry->expects($this->once())->method('transition')
-            ->with($expectedTransition, $this->context);
+            ->with($expectedTransition, $this->context)
+        ;
 
         $this->deliveryTransitionService->reOpenDelivery($delivery, $this->context);
     }
@@ -126,7 +128,8 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
         $this->stateMachineRegistry->expects($this->once())->method('transition')
-            ->with($expectedTransition, $this->context);
+            ->with($expectedTransition, $this->context)
+        ;
 
         $this->deliveryTransitionService->partialShipDelivery($delivery, $this->context);
     }
@@ -158,7 +161,8 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
         $this->stateMachineRegistry->expects($this->once())->method('transition')
-            ->with($expectedTransition, $this->context);
+            ->with($expectedTransition, $this->context)
+        ;
 
         $this->deliveryTransitionService->shipDelivery($delivery, $this->context);
     }
@@ -194,7 +198,8 @@ class DeliveryTransitionServiceTest extends TestCase
             ->withConsecutive(
                 [$expectedTransition1, $this->context],
                 [$expectedTransition2, $this->context]
-            );
+            )
+        ;
 
         $this->deliveryTransitionService->shipDelivery($delivery, $this->context);
     }
@@ -212,7 +217,8 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
         $this->stateMachineRegistry->expects($this->once())->method('transition')
-            ->with($expectedTransition, $this->context);
+            ->with($expectedTransition, $this->context)
+        ;
 
         $this->deliveryTransitionService->partialReturnDelivery($delivery, $this->context);
     }
@@ -250,7 +256,8 @@ class DeliveryTransitionServiceTest extends TestCase
                 [$expectedTransition1, $this->context],
                 [$expectedTransition2, $this->context],
                 [$expectedTransition3, $this->context]
-            );
+            )
+        ;
 
         $this->deliveryTransitionService->partialReturnDelivery($delivery, $this->context);
     }
@@ -268,7 +275,8 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
         $this->stateMachineRegistry->expects($this->once())->method('transition')
-            ->with($expectedTransition, $this->context);
+            ->with($expectedTransition, $this->context)
+        ;
 
         $this->deliveryTransitionService->returnDelivery($delivery, $this->context);
     }
@@ -306,11 +314,11 @@ class DeliveryTransitionServiceTest extends TestCase
                 [$expectedTransition1, $this->context],
                 [$expectedTransition2, $this->context],
                 [$expectedTransition3, $this->context]
-            );
+            )
+        ;
 
         $this->deliveryTransitionService->returnDelivery($delivery, $this->context);
     }
-
 
     private function createDeliveryWithState(string $state): OrderDeliveryEntity
     {
@@ -341,7 +349,8 @@ class DeliveryTransitionServiceTest extends TestCase
         $this->stateMachineRegistry
             ->method('getAvailableTransitions')
             ->with(OrderDeliveryDefinition::ENTITY_NAME, 'deliveryId', 'stateId', $this->context)
-            ->willReturn($transitions);
+            ->willReturn($transitions)
+        ;
     }
 
     private function createTransitionForAction($action)

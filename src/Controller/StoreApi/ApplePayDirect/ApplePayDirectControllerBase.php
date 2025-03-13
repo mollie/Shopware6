@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect;
 
@@ -30,23 +31,14 @@ class ApplePayDirectControllerBase
      */
     private $logger;
 
-
-    /**
-     * @param ApplePayDirect $applePay
-     * @param LoggerInterface $logger
-     */
     public function __construct(ApplePayDirect $applePay, LoggerInterface $logger)
     {
         $this->applePay = $applePay;
         $this->logger = $logger;
     }
 
-
     /**
-     *
-     * @param SalesChannelContext $context
      * @throws \Exception
-     * @return StoreApiResponse
      */
     public function isEnabled(SalesChannelContext $context): StoreApiResponse
     {
@@ -56,10 +48,7 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     *
-     * @param SalesChannelContext $context
      * @throws \Exception
-     * @return StoreApiResponse
      */
     public function getId(SalesChannelContext $context): StoreApiResponse
     {
@@ -78,16 +67,12 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     *
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $context
      * @throws \Throwable
-     * @return StoreApiResponse
      */
     public function addProduct(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         $productId = $data->getAlnum('productId');
-        $quantity = (int)$data->getAlnum('quantity', '0');
+        $quantity = (int) $data->getAlnum('quantity', '0');
 
         if (empty($productId)) {
             throw new \Exception('Please provide a product ID!');
@@ -103,16 +88,12 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     *
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $context
      * @throws \Throwable
-     * @return StoreApiResponse
      */
     public function createPaymentSession(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         $validationURL = $data->get('validationUrl');
-        $domain = (string)$data->get('domain');
+        $domain = (string) $data->get('domain');
 
         if (empty($validationURL)) {
             throw new \Exception('Please provide a validation url!');
@@ -124,10 +105,7 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     *
-     * @param SalesChannelContext $context
      * @throws \Throwable
-     * @return StoreApiResponse
      */
     public function getCart(SalesChannelContext $context): StoreApiResponse
     {
@@ -136,13 +114,8 @@ class ApplePayDirectControllerBase
         return new GetCartResponse($formattedCart);
     }
 
-
     /**
-     *
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $context
      * @throws \Throwable
-     * @return StoreApiResponse
      */
     public function getShippingMethods(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -158,11 +131,7 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     *
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $context
      * @throws \Throwable
-     * @return StoreApiResponse
      */
     public function setShippingMethod(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -178,37 +147,32 @@ class ApplePayDirectControllerBase
     }
 
     /**
-     *
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $context
      * @throws \Exception
-     * @return StoreApiResponse
      */
     public function pay(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
-        $email = (string)$data->get('email', '');
-        $firstname = (string)$data->get('firstname', '');
-        $lastname = (string)$data->get('lastname', '');
-        $street = (string)$data->get('street', '');
-        $city = (string)$data->get('city', '');
-        $zipcode = (string)$data->get('postalCode', '');
-        $countryCode = (string)$data->get('countryCode', '');
-        $phone = (string)$data->get('phone', '');
+        $email = (string) $data->get('email', '');
+        $firstname = (string) $data->get('firstname', '');
+        $lastname = (string) $data->get('lastname', '');
+        $street = (string) $data->get('street', '');
+        $city = (string) $data->get('city', '');
+        $zipcode = (string) $data->get('postalCode', '');
+        $countryCode = (string) $data->get('countryCode', '');
+        $phone = (string) $data->get('phone', '');
 
-        $acceptedDataProtection = (int)$data->get('acceptedDataProtection', '0');
+        $acceptedDataProtection = (int) $data->get('acceptedDataProtection', '0');
 
-        $paymentToken = (string)$data->get('paymentToken', '');
-        $finishUrl = (string)$data->get('finishUrl', '');
-        $errorUrl = (string)$data->get('errorUrl', '');
-
+        $paymentToken = (string) $data->get('paymentToken', '');
+        $finishUrl = (string) $data->get('finishUrl', '');
+        $errorUrl = (string) $data->get('errorUrl', '');
 
         if (empty($paymentToken)) {
             throw new \Exception('PaymentToken not found!');
         }
         try {
-            # make sure to create a customer if necessary
-            # then update to our apple pay payment method
-            # and return the new context
+            // make sure to create a customer if necessary
+            // then update to our apple pay payment method
+            // and return the new context
             $newContext = $this->applePay->prepareCustomer(
                 $firstname,
                 $lastname,
@@ -223,18 +187,17 @@ class ApplePayDirectControllerBase
                 $context
             );
 
-            # we only start our TRY/CATCH here!
-            # we always need to throw exceptions on an API level
-            # but if something BELOW breaks, we want to navigate to the error page.
-            # customers are ready, data is ready, but the handling has a problem.
+            // we only start our TRY/CATCH here!
+            // we always need to throw exceptions on an API level
+            // but if something BELOW breaks, we want to navigate to the error page.
+            // customers are ready, data is ready, but the handling has a problem.
 
-
-            # create our new Shopware Order
+            // create our new Shopware Order
             $order = $this->applePay->createOrder($newContext);
 
-            # now create the Mollie payment for it
-            # there should not be a checkout URL required for apple pay,
-            # so we just create the payment and redirect.
+            // now create the Mollie payment for it
+            // there should not be a checkout URL required for apple pay,
+            // so we just create the payment and redirect.
             $this->applePay->createPayment(
                 $order,
                 $finishUrl,
@@ -254,11 +217,6 @@ class ApplePayDirectControllerBase
         }
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @return StoreApiResponse
-     */
     public function restoreCart(SalesChannelContext $context): StoreApiResponse
     {
         $this->applePay->restoreCart($context);

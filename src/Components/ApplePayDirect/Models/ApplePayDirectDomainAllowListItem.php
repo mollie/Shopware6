@@ -14,8 +14,6 @@ class ApplePayDirectDomainAllowListItem
 
     /**
      * ApplePayDirectDomainAllowListItem constructor.
-     *
-     * @param string $value
      */
     private function __construct(string $value)
     {
@@ -24,9 +22,6 @@ class ApplePayDirectDomainAllowListItem
 
     /**
      * Create a new ApplePayDirectDomainAllowListItem
-     *
-     * @param string $value
-     * @return self
      */
     public static function create(string $value): self
     {
@@ -43,7 +38,6 @@ class ApplePayDirectDomainAllowListItem
      * Compare the value with the given value
      *
      * @param string $value value that will be compared
-     * @return bool
      */
     public function equals(string $value): bool
     {

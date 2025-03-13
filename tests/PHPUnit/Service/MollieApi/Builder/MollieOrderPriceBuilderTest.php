@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
@@ -18,7 +19,7 @@ class MollieOrderPriceBuilderTest extends TestCase
         $currency = 'EUR';
         $expected = [
             'currency' => $currency,
-            'value' => '0.00'
+            'value' => '0.00',
         ];
 
         self::assertSame($expected, (new MollieOrderPriceBuilder())->build(null, $currency));
@@ -30,7 +31,7 @@ class MollieOrderPriceBuilderTest extends TestCase
 
         $expected = [
             'currency' => MollieOrderPriceBuilder::MOLLIE_FALLBACK_CURRENCY_CODE,
-            'value' => (string)$price
+            'value' => (string) $price,
         ];
 
         self::assertSame($expected, (new MollieOrderPriceBuilder())->build($price, null));
@@ -43,7 +44,7 @@ class MollieOrderPriceBuilderTest extends TestCase
 
         $expected = [
             'currency' => $currency,
-            'value' => '1.35'
+            'value' => '1.35',
         ];
 
         self::assertSame($expected, (new MollieOrderPriceBuilder())->build($price, $currency));

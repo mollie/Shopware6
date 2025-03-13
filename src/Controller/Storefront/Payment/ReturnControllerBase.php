@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
@@ -15,21 +16,13 @@ class ReturnControllerBase extends AbstractStoreFrontController
      */
     private $returnFacade;
 
-
-    /**
-     * @param PaymentReturnFacade $returnFacade
-     */
     public function __construct(PaymentReturnFacade $returnFacade)
     {
         $this->returnFacade = $returnFacade;
     }
 
     /**
-     *
-     * @param SalesChannelContext $salesChannelContext
-     * @param string $swTransactionId
      * @throws ApiException
-     * @return null|Response
      */
     public function payment(SalesChannelContext $salesChannelContext, string $swTransactionId): ?Response
     {

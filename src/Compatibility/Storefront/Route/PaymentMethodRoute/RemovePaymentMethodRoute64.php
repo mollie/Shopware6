@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute;
 
@@ -22,7 +23,6 @@ class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
     private $paymentMethodRemovers;
 
     /**
-     * @param AbstractPaymentMethodRoute                  $corePaymentMethodRoute
      * @param \Traversable<PaymentMethodRemoverInterface> $paymentMethodRemovers
      */
     public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
@@ -31,20 +31,11 @@ class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
         $this->paymentMethodRemovers = iterator_to_array($paymentMethodRemovers);
     }
 
-    /**
-     * @return AbstractPaymentMethodRoute
-     */
     public function getDecorated(): AbstractPaymentMethodRoute
     {
         return $this->corePaymentMethodRoute;
     }
 
-    /**
-     * @param Request             $request
-     * @param SalesChannelContext $context
-     * @param Criteria            $criteria
-     * @return PaymentMethodRouteResponse
-     */
     public function load(Request $request, SalesChannelContext $context, Criteria $criteria): PaymentMethodRouteResponse
     {
         $originalData = $this->corePaymentMethodRoute->load($request, $context, $criteria);

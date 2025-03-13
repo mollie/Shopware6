@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Facade;
 
@@ -38,15 +39,6 @@ class MollieOrderPaymentFlow
     /** @var EntityRepository */
     private $orderTransactionRepository;
 
-
-    /**
-     * @param OrderStatusConverter $orderStatusConverter
-     * @param OrderStatusUpdater $orderStatusUpdater
-     * @param SettingsService $settingsService
-     * @param PaymentMethodService $paymentMethodService
-     * @param PaymentMethodRepository $paymentMethodRepository
-     * @param EntityRepository $orderTransactionRepository
-     */
     public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, EntityRepository $orderTransactionRepository)
     {
         $this->orderStatusConverter = $orderStatusConverter;
@@ -57,15 +49,8 @@ class MollieOrderPaymentFlow
         $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
-
     /**
-     * @param OrderTransactionEntity $transaction
-     * @param OrderEntity $order
-     * @param Order $mollieOrder
-     * @param string $salesChannelId
-     * @param Context $context
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return bool
      */
     public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context $context): bool
     {
@@ -76,7 +61,7 @@ class MollieOrderPaymentFlow
         $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
 
         //now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
-        if (!$this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {
+        if (! $this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {
             $currentCustomerSelectedPaymentMethod = $mollieOrder->method;
 
             // check if it is mollie payment method
@@ -88,7 +73,7 @@ class MollieOrderPaymentFlow
                             'AND',
                             [
                                 new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
-                                new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod)
+                                new EqualsFilter('customFields.mollie_payment_method_name', $currentCustomerSelectedPaymentMethod),
                             ]
                         )
                     ),
@@ -96,23 +81,23 @@ class MollieOrderPaymentFlow
             )->firstId();
 
             // if payment method has changed, update it
-            if (!is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
+            if (! is_null($molliePaymentMethodId) && $molliePaymentMethodId !== $transaction->getPaymentMethodId()) {
                 $transaction->setPaymentMethodId($molliePaymentMethodId);
 
                 $this->orderTransactionRepository->update(
                     [
                         [
                             'id' => $transaction->getUniqueIdentifier(),
-                            'paymentMethodId' => $molliePaymentMethodId
-                        ]
+                            'paymentMethodId' => $molliePaymentMethodId,
+                        ],
                     ],
                     $context
                 );
             }
         }
 
-        # our transaction has no payment method here?
-        # but it's also done in the finalize...this should be refactored
+        // our transaction has no payment method here?
+        // but it's also done in the finalize...this should be refactored
         if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
             return false;
         }

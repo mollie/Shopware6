@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionReminder;
 
@@ -13,15 +13,10 @@ class ReminderValidatorTest extends TestCase
      */
     private $validator;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->validator = new ReminderValidator();
     }
-
 
     /**
      * We have not reached the 2 days range where our
@@ -84,6 +79,7 @@ class ReminderValidatorTest extends TestCase
      * reminder has already been sent today.
      *
      * @group subscriptions
+     *
      * @return void
      */
     public function testNoReminderIfAlreadyReminded()
@@ -132,6 +128,7 @@ class ReminderValidatorTest extends TestCase
      * if we don't even have an upcoming renewal.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testNoNextRenewalLeadsToNoReminder()

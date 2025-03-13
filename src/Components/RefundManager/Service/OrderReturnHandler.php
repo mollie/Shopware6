@@ -13,9 +13,7 @@ use Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnL
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class OrderReturnHandler
@@ -30,11 +28,9 @@ class OrderReturnHandler
     private OrderService $orderService;
 
     private bool $featureDisabled = false;
+
     /**
-     * @param RefundManagerInterface $refundManager
      * @param ?EntityRepository $orderReturnRepository
-     * @param OrderService $orderService
-     * @param LoggerInterface $logger
      */
     public function __construct(
         RefundManagerInterface $refundManager,
@@ -58,12 +54,12 @@ class OrderReturnHandler
         if ($orderReturn === null) {
             return;
         }
-        $request = $this->createRequestFromOrder((string)$order->getOrderNumber(), $orderReturn);
+        $request = $this->createRequestFromOrder((string) $order->getOrderNumber(), $orderReturn);
         $order = $this->orderService->getOrder($order->getId(), $context); //need to load the order again because the line items are not loaded in the event
         try {
             $this->refundManager->refund($order, $request, $context);
         } catch (\Throwable $throwable) {
-            $this->logger->error("Error during refund status change: {{message}}", ['message'=>$throwable->getMessage()]);
+            $this->logger->error('Error during refund status change: {{message}}', ['message' => $throwable->getMessage()]);
         }
     }
 
@@ -80,7 +76,7 @@ class OrderReturnHandler
     {
         $request = new RefundRequest(
             $orderNumber,
-            (string)$orderReturn->getInternalComment(),
+            (string) $orderReturn->getInternalComment(),
             '',
             $orderReturn->getAmountTotal()
         );
@@ -110,11 +106,11 @@ class OrderReturnHandler
             $this->logger->warning('Failed to find order return for order {{orderNumber}}', [
                 'orderNumber' => $order->getOrderNumber(),
             ]);
+
             return null;
         }
 
-        /** @var OrderReturnEntity $orderReturn */
-        $orderReturn = $orderReturnSearchResult->first();
-        return $orderReturn;
+        /* @var OrderReturnEntity $orderReturn */
+        return $orderReturnSearchResult->first();
     }
 }

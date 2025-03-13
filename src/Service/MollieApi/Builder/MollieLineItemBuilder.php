@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
@@ -25,7 +26,6 @@ class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS = 'customized-products-option';
-
 
     /**
      * @var IsOrderLineItemValid
@@ -62,15 +62,6 @@ class MollieLineItemBuilder
      */
     private $shippingLineItemBuilder;
 
-    /**
-     * @param IsOrderLineItemValid $orderLineItemValidator
-     * @param PriceCalculator $priceCalculator
-     * @param LineItemDataExtractor $lineItemDataExtractor
-     * @param CompatibilityGatewayInterface $compatibilityGateway
-     * @param RoundingDifferenceFixer $orderAmountFixer
-     * @param MollieLineItemHydrator $mollieLineItemHydrator
-     * @param MollieShippingLineItemBuilder $shippingLineItemBuilder
-     */
     public function __construct(IsOrderLineItemValid $orderLineItemValidator, PriceCalculator $priceCalculator, LineItemDataExtractor $lineItemDataExtractor, CompatibilityGatewayInterface $compatibilityGateway, RoundingDifferenceFixer $orderAmountFixer, MollieLineItemHydrator $mollieLineItemHydrator, MollieShippingLineItemBuilder $shippingLineItemBuilder)
     {
         $this->orderLineItemValidator = $orderLineItemValidator;
@@ -82,12 +73,7 @@ class MollieLineItemBuilder
         $this->shippingLineItemBuilder = $shippingLineItemBuilder;
     }
 
-
     /**
-     * @param OrderEntity $order
-     * @param string $currencyISO
-     * @param MollieSettingStruct $settings
-     * @param bool $isVerticalTaxCalculation
      * @return array<mixed>
      */
     public function buildLineItemPayload(OrderEntity $order, string $currencyISO, MollieSettingStruct $settings, bool $isVerticalTaxCalculation): array
@@ -95,7 +81,6 @@ class MollieLineItemBuilder
         $fixRoundingDifferences = $settings->isFixRoundingDiffEnabled();
         $fixRoundingTitle = $settings->getFixRoundingDiffName();
         $fixRoundingSKU = $settings->getFixRoundingDiffSKU();
-
 
         $mollieOrderLines = $this->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $isVerticalTaxCalculation);
 
@@ -113,9 +98,9 @@ class MollieLineItemBuilder
             }
         }
 
-        # if we should automatically fix any rounding issues
-        # then proceed with this. It will make sure that a separate line item
-        # is created so that the sum of line item values matches the order total value.
+        // if we should automatically fix any rounding issues
+        // then proceed with this. It will make sure that a separate line item
+        // is created so that the sum of line item values matches the order total value.
         if ($fixRoundingDifferences) {
             $mollieOrderLines = $this->roundingDiffFixer->fixAmountDiff(
                 $order->getAmountTotal(),
@@ -128,13 +113,6 @@ class MollieLineItemBuilder
         return $this->mollieLineItemHydrator->hydrate($mollieOrderLines, $currencyISO);
     }
 
-
-    /**
-     * @param string $taxStatus
-     * @param null|OrderLineItemCollection $lineItems
-     * @param bool $isVerticalTaxCalculation
-     * @return MollieLineItemCollection
-     */
     public function buildLineItems(string $taxStatus, ?OrderLineItemCollection $lineItems, bool $isVerticalTaxCalculation): MollieLineItemCollection
     {
         $lines = new MollieLineItemCollection();
@@ -166,10 +144,8 @@ class MollieLineItemBuilder
             }
         }
 
-
         foreach ($lineItems as $item) {
-
-            /** Filter out the product from customized products plugin */
+            /* Filter out the product from customized products plugin */
             if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
                 $lineItemChildren = $item->getChildren();
 
@@ -193,7 +169,7 @@ class MollieLineItemBuilder
             }
 
             if (! $itemPrice instanceof CalculatedPrice) {
-                throw new MissingPriceLineItemException((string)$item->getProductId());
+                throw new MissingPriceLineItemException((string) $item->getProductId());
             }
 
             $price = $this->priceCalculator->calculateLineItemPrice(
@@ -204,14 +180,14 @@ class MollieLineItemBuilder
             );
 
             $mollieLineItem = new MollieLineItem(
-                (string)$this->getLineItemType($item),
+                (string) $this->getLineItemType($item),
                 $item->getLabel(),
                 $item->getQuantity(),
                 $price,
                 $item->getId(),
                 $extraData->getSku(),
-                (string)$extraData->getImageUrl(),
-                (string)$extraData->getProductUrl()
+                (string) $extraData->getImageUrl(),
+                (string) $extraData->getProductUrl()
             );
 
             $lines->add($mollieLineItem);
@@ -220,12 +196,8 @@ class MollieLineItemBuilder
         return $lines;
     }
 
-
     /**
      * Return the type of the line item.
-     *
-     * @param OrderLineItemEntity $item
-     * @return string
      */
     private function getLineItemType(OrderLineItemEntity $item): string
     {

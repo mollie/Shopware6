@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing;
 
@@ -32,12 +33,6 @@ class OrderCloneService
      */
     private $processor;
 
-
-    /**
-     * @param EntityRepository $repoOrders
-     * @param OrderConverter $orderConverter
-     * @param Processor $processor
-     */
     public function __construct(EntityRepository $repoOrders, OrderConverter $orderConverter, Processor $processor)
     {
         $this->repoOrders = $repoOrders;
@@ -45,38 +40,29 @@ class OrderCloneService
         $this->processor = $processor;
     }
 
-
     /**
-     * @param OrderEntity $existingOrder
-     * @param string $newOrderNumber
-     * @param bool $needsSeparateShippingAddress
-     * @param Context $context
      * @throws \Exception
-     * @return string
      */
     public function createNewOrder(OrderEntity $existingOrder, string $newOrderNumber, bool $needsSeparateShippingAddress, Context $context): string
     {
-        if (!$existingOrder->getAddresses() instanceof OrderAddressCollection) {
+        if (! $existingOrder->getAddresses() instanceof OrderAddressCollection) {
             throw new \Exception('Order does not have an address collection');
         }
 
-        if (!$existingOrder->getOrderCustomer() instanceof OrderCustomerEntity) {
+        if (! $existingOrder->getOrderCustomer() instanceof OrderCustomerEntity) {
             throw new \Exception('Order does not have an order customer assigned');
         }
 
         $newOrderId = Uuid::randomHex();
 
-
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($existingOrder, $context);
 
-        # we start by converting our existing order
-        # into a cart. this one will be adjusted and later on converted into a new order
+        // we start by converting our existing order
+        // into a cart. this one will be adjusted and later on converted into a new order
         $cart = $this->orderConverter->convertToCart($existingOrder, $context);
-
 
         $behavior = new CartBehavior($salesChannelContext->getPermissions());
         $cart = $this->processor->process($cart, $salesChannelContext, $behavior);
-
 
         $conversionContext = new OrderConversionContext();
         $conversionContext->setIncludeCustomer(true);
@@ -85,17 +71,15 @@ class OrderCloneService
         $conversionContext->setIncludeTransactions(true);
         $conversionContext->setIncludeOrderDate(false);
 
-
         $orderData = $this->orderConverter->convertToOrder($cart, $salesChannelContext, $conversionContext);
 
-
-        # if we only have 1 billing address, but we need a separate
-        # shipping address, then we need to duplicate the existing one to
-        # have a separate shipping address
+        // if we only have 1 billing address, but we need a separate
+        // shipping address, then we need to duplicate the existing one to
+        // have a separate shipping address
         $duplicateShippingAddress = (count($existingOrder->getAddresses()) <= 1) && $needsSeparateShippingAddress;
 
-        # -----------------------------------------------------------------
-        # adjust the data so that it has new IDs and will be inserted again
+        // -----------------------------------------------------------------
+        // adjust the data so that it has new IDs and will be inserted again
 
         $orderData['id'] = $newOrderId;
         $orderData['orderNumber'] = $newOrderNumber;
@@ -104,36 +88,33 @@ class OrderCloneService
         $orderData['orderCustomer'] = $this->getOrderCustomer($existingOrder->getOrderCustomer());
         $orderData['addresses'] = $this->getOrderAddresses($existingOrder->getAddresses(), $duplicateShippingAddress);
 
-        # only set our first transaction.
-        # we don't need the history, but without this, we don't have any transaction at all
+        // only set our first transaction.
+        // we don't need the history, but without this, we don't have any transaction at all
         $orderData['transactions'] = [
-            $orderData['transactions'][0]
+            $orderData['transactions'][0],
         ];
 
-        # we need a lookup and mapping of old address IDs and new ones
-        # our new order has new IDs. the order structure has some
-        # references to address which already exist in the exiting order.
-        # we need to create those same references with our new IDs.
-        # so we just store the [oldID] = $newID
+        // we need a lookup and mapping of old address IDs and new ones
+        // our new order has new IDs. the order structure has some
+        // references to address which already exist in the exiting order.
+        // we need to create those same references with our new IDs.
+        // so we just store the [oldID] = $newID
         $mappingsAddressIDs = [];
-
 
         foreach ($orderData['addresses'] as $index => $address) {
             $oldAddressId = $orderData['addresses'][$index]['id'];
             $newAddressId = Uuid::randomHex();
 
-            # add our mapping for this address
+            // add our mapping for this address
             $mappingsAddressIDs[$oldAddressId] = $newAddressId;
 
             $orderData['addresses'][$index]['id'] = $newAddressId;
         }
 
-
-        # reference our new billing address id
-        # for our new order
+        // reference our new billing address id
+        // for our new order
         $oldBillingAddressID = $existingOrder->getBillingAddressId();
         $orderData['billingAddressId'] = $mappingsAddressIDs[$oldBillingAddressID];
-
 
         foreach ($orderData['lineItems'] as $index => $lineitem) {
             $orderData['lineItems'][$index]['id'] = Uuid::randomHex();
@@ -145,15 +126,14 @@ class OrderCloneService
 
             $orderData['deliveries'][$index]['id'] = $newDeliveryId;
 
-
             if ($existingOrder->getDeliveries() instanceof OrderDeliveryCollection) {
                 /** @var OrderDeliveryEntity $orderDelivery */
                 $orderDelivery = $existingOrder->getDeliveries()->get($oldDeliveryId);
 
                 $orderData['deliveries'][$index]['shippingOrderAddressId'] = $mappingsAddressIDs[$orderDelivery->getShippingOrderAddressId()];
 
-                # if we have duplicated our billing address as shipping address
-                # then we use the second ID as shipping in our duplicated address
+                // if we have duplicated our billing address as shipping address
+                // then we use the second ID as shipping in our duplicated address
                 if ($duplicateShippingAddress) {
                     $orderData['deliveries'][$index]['shippingOrderAddressId'] = $orderData['addresses'][1]['id'];
                 }
@@ -168,7 +148,6 @@ class OrderCloneService
     }
 
     /**
-     * @param OrderCustomerEntity $orderCustomer
      * @return array<mixed>
      */
     private function getOrderCustomer(OrderCustomerEntity $orderCustomer): array
@@ -183,8 +162,6 @@ class OrderCloneService
     }
 
     /**
-     * @param OrderAddressCollection $addresses
-     * @param bool $duplicateAddress
      * @return array<mixed>
      */
     private function getOrderAddresses(OrderAddressCollection $addresses, bool $duplicateAddress): array

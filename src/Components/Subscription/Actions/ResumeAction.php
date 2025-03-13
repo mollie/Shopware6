@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
@@ -10,10 +11,7 @@ use Shopware\Core\Framework\Context;
 class ResumeAction extends BaseAction
 {
     /**
-     * @param string $subscriptionId
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function resumeSubscription(string $subscriptionId, Context $context): void
     {
@@ -21,34 +19,34 @@ class ResumeAction extends BaseAction
 
         $settings = $this->getPluginSettings($subscription->getSalesChannelId());
 
-        # -------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------
 
-        if (!$settings->isSubscriptionsEnabled()) {
+        if (! $settings->isSubscriptionsEnabled()) {
             throw new Exception('Subscription cannot be resumed. Subscriptions are disabled for this Sales Channel');
         }
 
-        if (!$settings->isSubscriptionsAllowPauseResume()) {
+        if (! $settings->isSubscriptionsAllowPauseResume()) {
             throw new Exception('Subscriptions cannot be resumed in this sales channel. Please adjust the plugin configuration.');
         }
 
-        if (!$subscription->isResumeAllowed()) {
+        if (! $subscription->isResumeAllowed()) {
             throw new Exception('Resuming of the subscription is not possible because of its current status!');
         }
 
-        # -------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------
 
         $oldStatus = $subscription->getStatus();
         $newStatus = SubscriptionStatus::RESUMED;
 
         $metaData = $subscription->getMetadata();
 
-        # TODO, what if we are in the currently (cancelled) period
+        // TODO, what if we are in the currently (cancelled) period
         $jsonPayload = $this->getPayloadBuilder()->buildRequestPayload(
             $subscription,
             $metaData->getStartDate(),
-            (string)$metaData->getInterval(),
+            (string) $metaData->getInterval(),
             $metaData->getIntervalUnit(),
-            (int)$metaData->getTimes(),
+            (int) $metaData->getTimes(),
             $subscription->getMandateId()
         );
 
@@ -56,28 +54,27 @@ class ResumeAction extends BaseAction
 
         $newMollieSubscription = $gateway->createSubscription($subscription->getMollieCustomerId(), $jsonPayload);
 
-        # -------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------
 
         $this->getRepository()->confirmNewSubscription(
             $subscription->getId(),
-            (string)$newMollieSubscription->id,
+            (string) $newMollieSubscription->id,
             $newStatus,
-            (string)$newMollieSubscription->customerId,
+            (string) $newMollieSubscription->customerId,
             $subscription->getMandateId(),
-            (string)$newMollieSubscription->nextPaymentDate,
+            (string) $newMollieSubscription->nextPaymentDate,
             $context
         );
 
-        # -------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------
 
-        # fetch latest data again, just to be safe
+        // fetch latest data again, just to be safe
         $subscription = $this->getRepository()->findById($subscriptionId, $context);
 
-
-        # also add a history entry for this subscription
+        // also add a history entry for this subscription
         $this->getStatusHistory()->markResumed($subscription, $oldStatus, $newStatus, $context);
 
-        # FLOW BUILDER / BUSINESS EVENTS
+        // FLOW BUILDER / BUSINESS EVENTS
         $event = $this->getFlowBuilderEventFactory()->buildSubscriptionResumedEvent($subscription->getCustomer(), $subscription, $context);
         $this->getFlowBuilderDispatcher()->dispatch($event);
     }

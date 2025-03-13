@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Compatibility;
 
@@ -9,7 +10,6 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 class CompatibilityGatewayOrderTransactionStateTest extends TestCase
 {
     private $salesChannelContextService;
-
 
     protected function setUp(): void
     {

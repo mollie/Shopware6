@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager;
 
@@ -39,6 +40,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 class RefundManager implements RefundManagerInterface
 {
     /**
+     * @var EntityRepository
+     */
+    protected $refundRepository;
+    /**
      * @var OrderServiceInterface
      */
     private $orderService;
@@ -74,28 +79,11 @@ class RefundManager implements RefundManagerInterface
     private $flowBuilderEventFactory;
 
     /**
-     * @var EntityRepository
-     */
-    protected $refundRepository;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
     private RefundCreditNoteService $creditNoteService;
 
-
-    /**
-     * @param RefundDataBuilder $refundDataBuilder
-     * @param OrderServiceInterface $orderService
-     * @param RefundServiceInterface $refundService
-     * @param Order $mollieOrder
-     * @param FlowBuilderFactoryInterface $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param StockManagerInterface $stockUpdater
-     * @param EntityRepository $refundRepository
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         RefundDataBuilder $refundDataBuilder,
         OrderServiceInterface $orderService,
@@ -121,12 +109,6 @@ class RefundManager implements RefundManagerInterface
         $this->creditNoteService = $creditNoteService;
     }
 
-
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return RefundData
-     */
     public function getData(OrderEntity $order, Context $context): RefundData
     {
         try {
@@ -146,11 +128,7 @@ class RefundManager implements RefundManagerInterface
     }
 
     /**
-     * @param OrderEntity $order
-     * @param RefundRequest $request
-     * @param Context $context
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return Refund
      */
     public function refund(OrderEntity $order, RefundRequest $request, Context $context): Refund
     {
@@ -161,46 +139,44 @@ class RefundManager implements RefundManagerInterface
         $refundType = '';
 
         if ($orderAttributes->isTypeSubscription()) {
-            # pure subscription orders do not
-            # have a real mollie order
+            // pure subscription orders do not
+            // have a real mollie order
         } else {
-            # first thing is, we have to fetch the matching Mollie order for this Shopware order
+            // first thing is, we have to fetch the matching Mollie order for this Shopware order
             $mollieOrderId = $this->orderService->getMollieOrderId($order);
             $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
         }
 
         $this->logger->info('Starting refund for order: ' . $order->getOrderNumber());
 
-        # ------------------------------------------------------------------------
-        # we start to build our items for the actual refund service.
-        # so we iterate through our request items and make sure
-        # to grab additional data that we need for the actual refund.
+        // ------------------------------------------------------------------------
+        // we start to build our items for the actual refund service.
+        // so we iterate through our request items and make sure
+        // to grab additional data that we need for the actual refund.
         $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
 
-
-        # ------------------------------------------------------------------------
-        # DIFFERENT TYPES OF REFUND
-        # ------------------------------------------------------------------------
+        // ------------------------------------------------------------------------
+        // DIFFERENT TYPES OF REFUND
+        // ------------------------------------------------------------------------
 
         /** @var null|Refund $refund */
         $refund = null;
 
         if ($request->isFullRefundAmountOnly()) {
-            # we have a full refund, but only with amount
-            # and no items. to make sure that we have clean data
-            # we have to extract all items, so that they will be added to the metadata
+            // we have a full refund, but only with amount
+            // and no items. to make sure that we have clean data
+            // we have to extract all items, so that they will be added to the metadata
             $requestItems = $this->buildRequestItemsFromOrder($order);
             $request->setItems($requestItems);
             $this->appendRoundingItemFromMollieOrder($request, $mollieOrder);
 
-            # convert again
+            // convert again
             $serviceItems = $this->convertToRefundItems($request, $order, $mollieOrder);
-
 
             if ($orderAttributes->isTypeSubscription()) {
                 $refundType = RefundItemType::PARTIAL;
 
-                # we only have a transaction in the case of a subscription
+                // we only have a transaction in the case of a subscription
                 $refund = $this->refundService->refundPartial(
                     $order,
                     $request->getDescription(),
@@ -241,7 +217,7 @@ class RefundManager implements RefundManagerInterface
                 $order,
                 $request->getDescription(),
                 $request->getInternalDescription(),
-                (float)$request->getAmount(),
+                (float) $request->getAmount(),
                 [],
                 $context
             );
@@ -252,19 +228,18 @@ class RefundManager implements RefundManagerInterface
                 $order,
                 $request->getDescription(),
                 $request->getInternalDescription(),
-                (float)$request->getAmount(),
+                (float) $request->getAmount(),
                 $serviceItems,
                 $context
             );
         }
 
         if (! $refund instanceof Refund) {
-            # a problem happened, lets finish with an exception
-            throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
+            // a problem happened, lets finish with an exception
+            throw new CouldNotCreateMollieRefundException('', (string) $order->getOrderNumber());
         }
 
-        $refundAmount = (float)$refund->amount->value;
-
+        $refundAmount = (float) $refund->amount->value;
 
         $refundData = [
             'orderId' => $order->getId(),
@@ -281,24 +256,21 @@ class RefundManager implements RefundManagerInterface
             $refundData['refundItems'] = $refundItems;
         }
 
-
-        # SAVE LOCAL REFUND
-        # ---------------------------------------------------------------------------------------------
+        // SAVE LOCAL REFUND
+        // ---------------------------------------------------------------------------------------------
         $this->refundRepository->create([$refundData], $context);
 
-
-        # DISPATCH FLOW BUILDER
-        # ---------------------------------------------------------------------------------------------
+        // DISPATCH FLOW BUILDER
+        // ---------------------------------------------------------------------------------------------
         $event = $this->flowBuilderEventFactory->buildRefundStartedEvent($order, $refundAmount, $context);
         $this->flowBuilderDispatcher->dispatch($event);
 
-
-        # ---------------------------------------------------------------------------------------------
-        # RESET STOCK
-        # if everything worked above, iterate through all our
-        # refund items and increase their stock
+        // ---------------------------------------------------------------------------------------------
+        // RESET STOCK
+        // if everything worked above, iterate through all our
+        // refund items and increase their stock
         foreach ($request->getItems() as $item) {
-            # skip if nothing should be added to the stock
+            // skip if nothing should be added to the stock
             if ($item->getStockIncreaseQty() <= 0) {
                 continue;
             }
@@ -306,7 +278,7 @@ class RefundManager implements RefundManagerInterface
             $orderItem = $this->getOrderItem($order, $item->getLineId());
 
             if ($orderItem instanceof OrderLineItemEntity) {
-                # and now simply call our stock manager
+                // and now simply call our stock manager
                 $this->stockManager->increaseStock(
                     $orderItem,
                     $item->getStockIncreaseQty()
@@ -314,15 +286,10 @@ class RefundManager implements RefundManagerInterface
             }
         }
         $this->creditNoteService->createCreditNotes($order, $refund, $request, $context);
+
         return $refund;
     }
 
-    /**
-     * @param string $orderId
-     * @param string $refundId
-     * @param Context $context
-     * @return bool
-     */
     public function cancelRefund(string $orderId, string $refundId, Context $context): bool
     {
         $order = $this->orderService->getOrder($orderId, $context);
@@ -334,15 +301,14 @@ class RefundManager implements RefundManagerInterface
             ]
         );
 
-        # first try to cancel on the mollie side
+        // first try to cancel on the mollie side
         $success = $this->refundService->cancel($order, $refundId);
 
         if (! $success) {
             return false;
         }
 
-
-        # if mollie worked, also delete our entry from the database
+        // if mollie worked, also delete our entry from the database
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('mollieRefundId', $refundId));
 
@@ -356,7 +322,7 @@ class RefundManager implements RefundManagerInterface
 
         $this->refundRepository->delete([
             [
-                'id' => $swRefundId
+                'id' => $swRefundId,
             ],
         ], $context);
 
@@ -365,9 +331,20 @@ class RefundManager implements RefundManagerInterface
         return true;
     }
 
+    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool
+    {
+        $refunds = $this->refundService->getRefunds($order, $context);
+        if (count($refunds) === 0) {
+            return true;
+        }
+        foreach ($refunds as $refund) {
+            $this->cancelRefund($order->getId(), $refund['id'], $context);
+        }
+
+        return true;
+    }
+
     /**
-     * @param OrderEntity $orderEntity
-     * @param string $lineID
      * @return OrderLineItemEntity
      */
     private function getOrderItem(OrderEntity $orderEntity, string $lineID): ?OrderLineItemEntity
@@ -385,9 +362,7 @@ class RefundManager implements RefundManagerInterface
         return null;
     }
 
-
     /**
-     * @param OrderEntity $order
      * @return array<mixed>
      */
     private function buildRequestItemsFromOrder(OrderEntity $order)
@@ -419,18 +394,6 @@ class RefundManager implements RefundManagerInterface
         return $items;
     }
 
-    public function cancelAllOrderRefunds(OrderEntity $order, Context $context): bool
-    {
-        $refunds = $this->refundService->getRefunds($order, $context);
-        if (count($refunds) === 0) {
-            return true;
-        }
-        foreach ($refunds as $refund) {
-            $this->cancelRefund($order->getId(), $refund['id'], $context);
-        }
-        return true;
-    }
-
     private function appendRoundingItemFromMollieOrder(RefundRequest $request, ?\Mollie\Api\Resources\Order $mollieOrder): void
     {
         if ($mollieOrder === null) {
@@ -456,9 +419,8 @@ class RefundManager implements RefundManagerInterface
     }
 
     /**
-     * @param RefundRequest $request
-     * @param OrderEntity $order
      * @param ?\Mollie\Api\Resources\Order $mollieOrder
+     *
      * @return RefundItem[]
      */
     private function convertToRefundItems(RefundRequest $request, OrderEntity $order, ?\Mollie\Api\Resources\Order $mollieOrder): array
@@ -472,27 +434,27 @@ class RefundManager implements RefundManagerInterface
             $orderLineItemVersionId = null;
             $orderItem = $this->getOrderItem($order, $requestItem->getLineId());
 
-            # if we have a real line item, then extract
-            # the external Mollie Line ID from it
+            // if we have a real line item, then extract
+            // the external Mollie Line ID from it
             if ($orderItem instanceof OrderLineItemEntity) {
                 $orderItemAttributes = new OrderLineItemEntityAttributes($orderItem);
                 $mollieLineID = $orderItemAttributes->getMollieOrderLineID();
                 $orderLineItemId = $orderItem->getId();
                 $orderLineItemVersionId = $orderItem->getVersionId();
-                $shopwareReferenceID = (string)$orderItem->getReferencedId();
+                $shopwareReferenceID = (string) $orderItem->getReferencedId();
                 if (isset($orderItem->getPayload()['productNumber'])) {
-                    $shopwareReferenceID = (string)$orderItem->getPayload()['productNumber'];
+                    $shopwareReferenceID = (string) $orderItem->getPayload()['productNumber'];
                 }
             } else {
-                # yeah i know complexity...but for now lets keep it compact :)
+                // yeah i know complexity...but for now lets keep it compact :)
                 if ($mollieOrder instanceof \Mollie\Api\Resources\Order && $order->getDeliveries() instanceof OrderDeliveryCollection) {
-                    # if we do not have an item
-                    # then it might be a delivery in Shopware
+                    // if we do not have an item
+                    // then it might be a delivery in Shopware
                     foreach ($order->getDeliveries() as $delivery) {
-                        # check if the current delivery ID is the one from our
-                        # request item that we should refund. then a delivery needs to be refunded
+                        // check if the current delivery ID is the one from our
+                        // request item that we should refund. then a delivery needs to be refunded
                         if ($delivery->getId() === $requestItem->getLineId()) {
-                            # now just extract the line item id from our Mollie line items
+                            // now just extract the line item id from our Mollie line items
                             /** @var OrderLine $line */
                             foreach ($mollieOrder->lines as $line) {
                                 if ($line->metadata->orderLineItemId === $delivery->getId()) {
@@ -509,19 +471,19 @@ class RefundManager implements RefundManagerInterface
                 }
             }
 
-            # if we didn't find a valid mollie line ID
-            # then it's just not existing in Mollie.
-            # this can happen on free shippings...
+            // if we didn't find a valid mollie line ID
+            // then it's just not existing in Mollie.
+            // this can happen on free shippings...
             if (empty($mollieLineID)) {
                 continue;
             }
 
-            # finally, build our refund item
-            # for our refund service with all
-            # required information
+            // finally, build our refund item
+            // for our refund service with all
+            // required information
             $serviceItems[] = new RefundItem(
                 $mollieLineID,
-                (string)$shopwareReferenceID,
+                (string) $shopwareReferenceID,
                 $requestItem->getQuantity(),
                 $requestItem->getAmount(),
                 $orderLineItemId,
@@ -534,6 +496,7 @@ class RefundManager implements RefundManagerInterface
 
     /**
      * @param RefundItem[] $serviceItems
+     *
      * @return array<mixed>
      */
     private function convertToRepositoryArray(array $serviceItems): array

@@ -8,6 +8,7 @@ use Throwable;
 class MollieRefundConfigException extends \Exception
 {
     public const CODE = 1000;
+
     final protected function __construct(string $message, Throwable $previous = null)
     {
         parent::__construct($message, self::CODE, $previous);

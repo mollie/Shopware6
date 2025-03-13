@@ -15,6 +15,7 @@ class OrderReturnSubscriber implements EventSubscriberInterface
     {
         $this->orderReturnHandler = $orderReturnHandler;
     }
+
     public static function getSubscribedEvents()
     {
         return [
@@ -22,7 +23,6 @@ class OrderReturnSubscriber implements EventSubscriberInterface
             'state_enter.order_return.state.cancelled' => ['onOrderReturnCancelled', 10],
         ];
     }
-
 
     public function onOrderReturnCancelled(OrderStateMachineStateChangeEvent $event): void
     {

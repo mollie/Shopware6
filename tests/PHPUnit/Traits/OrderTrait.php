@@ -1,5 +1,5 @@
-<?php declare(strict_types=1);
-
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Traits;
 
@@ -28,63 +28,12 @@ use Shopware\Core\System\Salutation\SalutationEntity;
 
 trait OrderTrait
 {
-
-    /**
-     * @param string $mollieOrderID
-     * @return OrderEntity
-     */
-    protected function buildMollieOrder(string $mollieOrderID): OrderEntity
-    {
-        $order = new OrderEntity();
-        $order->setId(Uuid::randomHex());
-        $order->setSalesChannelId(Uuid::randomHex());
-
-        $order->setCustomFields([
-            'mollie_payments' => [
-                'order_id' => $mollieOrderID,
-                'payment_id' => 'tr_unit_test',
-            ]]);
-
-
-        $shippingMethod = new ShippingMethodEntity();
-        $shippingMethod->setId(Uuid::randomHex());
-        $shippingMethod->setName('Test Shipping Method');
-        $shippingMethod->setTrackingUrl('https://www.mollie.com/search?q=%s');
-
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId(Uuid::randomHex());
-        $delivery->setTrackingCodes([]);
-        $delivery->setShippingMethod($shippingMethod);
-
-        $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
-
-        return $order;
-    }
-
-    /**
-     * @param string $productNumber
-     * @return OrderLineItemEntity
-     */
-    protected function buildLineItemEntity(string $productNumber): OrderLineItemEntity
-    {
-        $lineItem = new OrderLineItemEntity();
-
-        $lineItem->setId(Uuid::randomHex());
-
-        $lineItem->setPayload([
-            'productNumber' => $productNumber,
-        ]);
-
-        return $lineItem;
-    }
-
-
     public function getCustomerAddressEntity(
-        string  $firstName,
-        string  $lastName,
-        string  $street,
-        string  $zipCode,
-        string  $city,
+        string $firstName,
+        string $lastName,
+        string $street,
+        string $zipCode,
+        string $city,
         ?string $salutationName,
         ?string $countryISO,
         ?string $additional
@@ -92,7 +41,7 @@ trait OrderTrait
         $customerAddress = new CustomerAddressEntity();
         $customerAddress->setId(Uuid::randomHex());
 
-        if (!empty($salutationName)) {
+        if (! empty($salutationName)) {
             $salutation = new SalutationEntity();
             $salutation->setId(Uuid::randomHex());
             $salutation->setDisplayName($salutationName);
@@ -102,14 +51,14 @@ trait OrderTrait
         $customerAddress->setFirstName($firstName);
         $customerAddress->setLastName($lastName);
         $customerAddress->setStreet($street);
-        if (!empty($additional)) {
+        if (! empty($additional)) {
             $customerAddress->setAdditionalAddressLine1($additional);
         }
 
         $customerAddress->setZipcode($zipCode);
         $customerAddress->setCity($city);
 
-        if (!empty($countryISO)) {
+        if (! empty($countryISO)) {
             $country = new CountryEntity();
             $country->setId(Uuid::randomHex());
             $country->setIso($countryISO);
@@ -123,14 +72,14 @@ trait OrderTrait
         string $lineItemId,
         string $productNumber,
         string $label,
-        int    $quantity,
-        float  $unitPrice,
-        float  $taxRate,
-        float  $taxAmount,
+        int $quantity,
+        float $unitPrice,
+        float $taxRate,
+        float $taxAmount,
         string $lineItemType = LineItem::PRODUCT_LINE_ITEM_TYPE,
         string $seoUrl = '',
         string $imageUrl = '',
-        int    $position = 1
+        int $position = 1
     ): OrderLineItemEntity {
         $productId = Uuid::randomHex();
         $totalPrice = $quantity * $unitPrice;
@@ -152,14 +101,14 @@ trait OrderTrait
         $product = new ProductEntity();
         $product->setId($productId);
         $product->setProductNumber($productNumber);
-        if (!empty($seoUrl)) {
+        if (! empty($seoUrl)) {
             $seoUrlEntity = new SeoUrlEntity();
             $seoUrlEntity->setId(Uuid::randomHex());
             $seoUrlEntity->setUrl($seoUrl);
             $seoUrls = new SeoUrlCollection([$seoUrlEntity]);
             $product->setSeoUrls($seoUrls);
         }
-        if (!empty($imageUrl)) {
+        if (! empty($imageUrl)) {
             $mediaEntity = new MediaEntity();
             $mediaEntity->setId(Uuid::randomHex());
             $mediaEntity->setUrl($imageUrl);
@@ -171,7 +120,6 @@ trait OrderTrait
         }
 
         $lineItem->setProduct($product);
-
 
         $lineItem->setPayload([
             'productNumber' => $productNumber,
@@ -205,5 +153,45 @@ trait OrderTrait
         $language->setLocale($locale);
 
         return $language;
+    }
+
+    protected function buildMollieOrder(string $mollieOrderID): OrderEntity
+    {
+        $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
+        $order->setSalesChannelId(Uuid::randomHex());
+
+        $order->setCustomFields([
+            'mollie_payments' => [
+                'order_id' => $mollieOrderID,
+                'payment_id' => 'tr_unit_test',
+            ], ]);
+
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId(Uuid::randomHex());
+        $shippingMethod->setName('Test Shipping Method');
+        $shippingMethod->setTrackingUrl('https://www.mollie.com/search?q=%s');
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId(Uuid::randomHex());
+        $delivery->setTrackingCodes([]);
+        $delivery->setShippingMethod($shippingMethod);
+
+        $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
+
+        return $order;
+    }
+
+    protected function buildLineItemEntity(string $productNumber): OrderLineItemEntity
+    {
+        $lineItem = new OrderLineItemEntity();
+
+        $lineItem->setId(Uuid::randomHex());
+
+        $lineItem->setPayload([
+            'productNumber' => $productNumber,
+        ]);
+
+        return $lineItem;
     }
 }

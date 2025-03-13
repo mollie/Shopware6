@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -19,15 +20,10 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
      */
     protected $settingsService;
 
-    /**
-     * @param ConfigurationService $configurationService
-     * @param EntityRepository $salesChannelRepository
-     * @param SettingsService $settingsService
-     */
     public function __construct(
-        ConfigurationService            $configurationService,
+        ConfigurationService $configurationService,
         EntityRepository $salesChannelRepository,
-        SettingsService                 $settingsService
+        SettingsService $settingsService
     ) {
         parent::__construct($salesChannelRepository);
 
@@ -36,7 +32,6 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
     }
 
     /**
-     * @param Context $context
      * @return array<string, mixed>
      */
     protected function getConfigurationElements(Context $context): array
@@ -56,7 +51,6 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
     }
 
     /**
-     * @param Context $context
      * @return array<string, mixed>
      */
     protected function getConfigurationTranslations(Context $context): array
@@ -65,8 +59,8 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
         $translations = [];
 
         foreach ($this->getConfigurationElements($context) as $element) {
-            if (array_key_exists('config', $element) &&
-                array_key_exists('label', $element['config'])) {
+            if (array_key_exists('config', $element)
+                && array_key_exists('label', $element['config'])) {
                 $name = substr($element['name'], strlen(SettingsService::SYSTEM_CONFIG_DOMAIN));
                 $translations[$name] = $element['config']['label'][$locale];
             }
@@ -76,7 +70,6 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
     }
 
     /**
-     * @param Context $context
      * @return array<string, mixed>
      */
     protected function getConfigurationDefaultValues(Context $context): array
@@ -84,7 +77,7 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
         $defaults = [];
 
         foreach ($this->getConfigurationElements($context) as $element) {
-            if (!array_key_exists('config', $element)) {
+            if (! array_key_exists('config', $element)) {
                 continue;
             }
 

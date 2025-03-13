@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -10,7 +11,6 @@ use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
-use Kiener\MolliePayments\Service\MollieApi\Payment as MolliePayment;
 use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
@@ -69,14 +69,6 @@ class Order
      */
     private $customerService;
 
-    /**
-     * @param MollieApiFactory $clientFactory
-     * @param MolliePayment $paymentApiService
-     * @param RoutingBuilder $routingBuilder
-     * @param MollieRequestAnonymizer $requestAnonymizer
-     * @param LoggerInterface $logger
-     * @param SettingsService $settingsService
-     */
     public function __construct(MollieApiFactory $clientFactory, PaymentApiService $paymentApiService, RoutingBuilder $routingBuilder, MollieRequestAnonymizer $requestAnonymizer, LoggerInterface $logger, SettingsService $settingsService, CustomerService $customerService)
     {
         $this->clientFactory = $clientFactory;
@@ -89,10 +81,7 @@ class Order
     }
 
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @param array<mixed> $parameters
-     * @return MollieOrder
      */
     public function getMollieOrder(string $mollieOrderId, string $salesChannelId, array $parameters = []): MollieOrder
     {
@@ -114,10 +103,7 @@ class Order
     }
 
     /**
-     * @param string $paymentId
-     * @param string $salesChannelId
      * @param array<mixed> $parameters
-     * @return Payment
      */
     public function getMolliePayment(string $paymentId, string $salesChannelId, array $parameters = []): Payment
     {
@@ -139,11 +125,7 @@ class Order
     }
 
     /**
-     * @param string $mollieOrderId
-     * @param string $mollieOrderLineId
-     * @param string $salesChannelId
      * @throws \Exception
-     * @return OrderLine
      */
     public function getMollieOrderLine(string $mollieOrderId, string $mollieOrderLineId, string $salesChannelId): OrderLine
     {
@@ -151,7 +133,7 @@ class Order
 
         $orderLine = $order->lines()->get($mollieOrderLineId);
 
-        if (!$orderLine instanceof OrderLine) {
+        if (! $orderLine instanceof OrderLine) {
             throw new \Exception('No order line found for mollie order ' . $mollieOrderId);
         }
 
@@ -160,9 +142,8 @@ class Order
 
     /**
      * @param array<mixed> $params
-     * @param string $orderSalesChannelContextId
+     *
      * @throws ApiException
-     * @return Payment
      */
     public function createPayment(array $params, string $orderSalesChannelContextId): Payment
     {
@@ -173,15 +154,12 @@ class Order
 
     /**
      * @param array<mixed> $orderData
-     * @param string $orderSalesChannelContextId
-     * @param SalesChannelContext $salesChannelContext
-     * @return MollieOrder
      */
     public function createOrder(array $orderData, string $orderSalesChannelContextId, SalesChannelContext $salesChannelContext): MollieOrder
     {
         $apiClient = $this->clientFactory->getClient($orderSalesChannelContextId);
 
-        /**
+        /*
          * Create an order at Mollie based on the prepared array of order data.
          */
         try {
@@ -190,7 +168,7 @@ class Order
             $this->logger->debug(
                 'Mollie Order Request',
                 [
-                    'body' => $anonymizedData
+                    'body' => $anonymizedData,
                 ]
             );
 
@@ -200,7 +178,7 @@ class Order
                 'Could not create Mollie order',
                 [
                     'function' => 'finalize-payment',
-                    'exception' => $e
+                    'exception' => $e,
                 ]
             );
 
@@ -209,23 +187,15 @@ class Order
     }
 
     /**
-     * @param string $mollieOrderId
-     * @param string $paymentMethod
-     * @param string $swOrderTransactionID
-     * @param PaymentHandler $paymentHandler
-     * @param OrderEntity $order
-     * @param CustomerEntity $customer
-     * @param SalesChannelContext $salesChannelContext
      * @throws ApiException
-     * @return Payment
      */
     public function createOrReusePayment(string $mollieOrderId, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
     {
-        # fetch the current Mollie order including
-        # all its existing payments and transactions
+        // fetch the current Mollie order including
+        // all its existing payments and transactions
         $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelContext->getSalesChannel()->getId(), ['embed' => 'payments']);
 
-        # We cannot reuse this order if it's cancelled or expired.
+        // We cannot reuse this order if it's cancelled or expired.
         switch ($mollieOrder->status) {
             case OrderStatus::STATUS_CANCELED:
                 throw new MollieOrderCancelledException($mollieOrderId);
@@ -233,19 +203,18 @@ class Order
                 throw new MollieOrderExpiredException($mollieOrderId);
         }
 
-        # now search for an open payment
-        # if it's still open, then we just reuse this one
+        // now search for an open payment
+        // if it's still open, then we just reuse this one
         $existingOpenPayment = $this->getOpenPayment($mollieOrder);
 
+        // it's not possible to have more than 1 payment OPEN
+        // also, OPEN payments cannot be cancelled.
+        // there are circumstances where we retry even though a payment is open.
+        // this could be a navigation to the orders in the account where a change-payment method is possible.
+        // so if we have no OPEN payment, we just create a new one
+        // if we have one, we make sure to update this one
 
-        # it's not possible to have more than 1 payment OPEN
-        # also, OPEN payments cannot be cancelled.
-        # there are circumstances where we retry even though a payment is open.
-        # this could be a navigation to the orders in the account where a change-payment method is possible.
-        # so if we have no OPEN payment, we just create a new one
-        # if we have one, we make sure to update this one
-
-        if (!$existingOpenPayment instanceof Payment) {
+        if (! $existingOpenPayment instanceof Payment) {
             return $this->createNewOrderPayment(
                 $mollieOrder,
                 $paymentMethod,
@@ -257,11 +226,11 @@ class Order
             );
         }
 
-        # -------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------
 
-        # verify if we can cancel the previous payment.
-        # if we can, better to these, just to have some nice and clean data.
-        # we will then create a new payment for our attempt.
+        // verify if we can cancel the previous payment.
+        // if we can, better to these, just to have some nice and clean data.
+        // we will then create a new payment for our attempt.
         if ($existingOpenPayment->isCancelable) {
             $this->paymentApiService->delete(
                 $existingOpenPayment->id,
@@ -279,28 +248,23 @@ class Order
             );
         }
 
-
-        # TODO does not yet work and I'm not quite sure if that is even happening?!
-        # we have to update the payment method, if it switches.
-        # otherwise one would still see the previous one
-        # $existingOpenPayment = $this->updateExistingPayment(
-        #     $existingOpenPayment,
-        #     $paymentMethod,
-        #     $salesChannelContext->getSalesChannelId()
-        # );
+        // TODO does not yet work and I'm not quite sure if that is even happening?!
+        // we have to update the payment method, if it switches.
+        // otherwise one would still see the previous one
+        // $existingOpenPayment = $this->updateExistingPayment(
+        //     $existingOpenPayment,
+        //     $paymentMethod,
+        //     $salesChannelContext->getSalesChannelId()
+        // );
 
         return $existingOpenPayment;
     }
 
-    /**
-     * @param MollieOrder $mollieOrder
-     * @return null|Payment
-     */
     public function getPaidPayment(MollieOrder $mollieOrder): ?Payment
     {
         $payments = $mollieOrder->payments();
 
-        if (!$payments instanceof PaymentCollection) {
+        if (! $payments instanceof PaymentCollection) {
             return null;
         }
 
@@ -312,107 +276,6 @@ class Order
         }
 
         return null;
-    }
-
-    /**
-     * @param MollieOrder $mollieOrder
-     * @return null|Payment
-     */
-    private function getOpenPayment(MollieOrder $mollieOrder): ?Payment
-    {
-        $payments = $mollieOrder->payments();
-
-        if (!$payments instanceof PaymentCollection) {
-            return null;
-        }
-
-        /** @var Payment $payment */
-        foreach ($payments as $payment) {
-            if ($payment->isOpen()) {
-                return $payment;
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
-     * @param MollieOrder $mollieOrder
-     * @param string $paymentMethod
-     * @param string $swOrderTransactionID
-     * @param PaymentHandler $paymentHandler
-     * @param OrderEntity $order
-     * @param CustomerEntity $customer
-     * @param SalesChannelContext $salesChannelContext
-     * @throws ApiException
-     * @return Payment
-     */
-    private function createNewOrderPayment(MollieOrder $mollieOrder, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
-    {
-        $webhookUrl = $this->routingBuilder->buildWebhookURL($swOrderTransactionID);
-
-
-        # let's create a new order body
-        # for our new payment.
-        $newPaymentData = [
-            'payment' => [
-                'method' => $paymentMethod,
-            ],
-        ];
-
-        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
-        $mollieCustomerId = $this->customerService->getMollieCustomerId($customer->getId(), $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
-
-        # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
-        if ($paymentHandler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
-            $paymentHandler->setEnableSingleClickPayment(true);
-            if (strlen($mollieCustomerId) > 0) {
-                $newPaymentData['payment']['customerId'] = $mollieCustomerId;
-            }
-        }
-
-        $lineItems = $order->getLineItems();
-
-        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection) {
-            # mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
-
-
-            foreach ($lineItems as $lineItem) {
-                $attributes = new OrderLineItemEntityAttributes($lineItem);
-                if ($attributes->isSubscriptionProduct()) {
-                    $newPaymentData['payment']['sequenceType'] = 'first';
-                    $newPaymentData['payment']['customerId'] = $mollieCustomerId;
-                    break;
-                }
-            }
-        }
-
-        # now we have to add payment specific data
-        # like we would do with initial orders too
-        $tmpOrder = $paymentHandler->processPaymentMethodSpecificParameters($newPaymentData, $order, $salesChannelContext, $customer);
-        # extract our modified and final payment data
-        $finalPaymentData = $tmpOrder['payment'];
-
-
-        # create our new payment with the
-        # Mollie API for our existing order
-        /** @var Payment $payment */
-        $payment = $mollieOrder->createPayment($finalPaymentData);
-
-        # unfortunately the API has a bug at the moment.
-        # we cannot modify the webhook URL with the create method.
-        # but we need to make sure to change it to the new OrderTransactionID of Shopware
-        $apiClient = $this->clientFactory->getClient($salesChannelContext->getSalesChannelId());
-
-        $apiClient->payments->update(
-            $payment->id,
-            [
-                'webhookUrl' => $webhookUrl,
-            ]
-        );
-
-        return $payment;
     }
 
     public function getPaymentUrl(string $mollieOrderId, string $salesChannelId): ?string
@@ -446,10 +309,7 @@ class Order
     }
 
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @throws CouldNotFetchMollieOrderException
-     * @return bool
      */
     public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
     {
@@ -457,8 +317,8 @@ class Order
 
         /** @var OrderLine $mollieOrderLine */
         foreach ($mollieOrder->lines() as $mollieOrderLine) {
-            if ($mollieOrderLine->shippableQuantity > 0 &&
-                in_array($mollieOrderLine->type, [
+            if ($mollieOrderLine->shippableQuantity > 0
+                && in_array($mollieOrderLine->type, [
                     OrderLineType::TYPE_PHYSICAL,
                     OrderLineType::TYPE_DIGITAL,
                     OrderLineType::TYPE_DISCOUNT,
@@ -471,23 +331,16 @@ class Order
         return true;
     }
 
-    /**
-     * @param string $mollieOrderId
-     * @param string $molliePaymentId
-     * @param null|string $salesChannelId
-     * @return Payment
-     */
     public function getCompletedPayment(string $mollieOrderId, string $molliePaymentId, ?string $salesChannelId): Payment
     {
         $allowed = [
             PaymentStatus::STATUS_PAID,
-            PaymentStatus::STATUS_AUTHORIZED // Klarna
+            PaymentStatus::STATUS_AUTHORIZED, // Klarna
         ];
 
-
-        if (!empty($mollieOrderId)) {
-            # ORDER_ID, ord_123
-            $mollieOrder = $this->getMollieOrder($mollieOrderId, (string)$salesChannelId, ['embed' => 'payments']);
+        if (! empty($mollieOrderId)) {
+            // ORDER_ID, ord_123
+            $mollieOrder = $this->getMollieOrder($mollieOrderId, (string) $salesChannelId, ['embed' => 'payments']);
 
             $payments = $mollieOrder->payments();
 
@@ -505,14 +358,99 @@ class Order
 
             throw new PaymentNotFoundException($mollieOrderId);
         }
-        # TRANSACTION_ID,.... tr_abc
+        // TRANSACTION_ID,.... tr_abc
 
-        $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);
+        $payment = $this->getMolliePayment($molliePaymentId, (string) $salesChannelId);
 
         if (in_array($payment->status, $allowed)) {
             return $payment;
         }
 
         throw new PaymentNotFoundException($molliePaymentId);
+    }
+
+    private function getOpenPayment(MollieOrder $mollieOrder): ?Payment
+    {
+        $payments = $mollieOrder->payments();
+
+        if (! $payments instanceof PaymentCollection) {
+            return null;
+        }
+
+        /** @var Payment $payment */
+        foreach ($payments as $payment) {
+            if ($payment->isOpen()) {
+                return $payment;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws ApiException
+     */
+    private function createNewOrderPayment(MollieOrder $mollieOrder, string $paymentMethod, string $swOrderTransactionID, PaymentHandler $paymentHandler, OrderEntity $order, CustomerEntity $customer, SalesChannelContext $salesChannelContext): Payment
+    {
+        $webhookUrl = $this->routingBuilder->buildWebhookURL($swOrderTransactionID);
+
+        // let's create a new order body
+        // for our new payment.
+        $newPaymentData = [
+            'payment' => [
+                'method' => $paymentMethod,
+            ],
+        ];
+
+        $settings = $this->settingsService->getSettings($order->getSalesChannelId());
+        $mollieCustomerId = $this->customerService->getMollieCustomerId($customer->getId(), $salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
+
+        // set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
+        if ($paymentHandler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
+            $paymentHandler->setEnableSingleClickPayment(true);
+            if (strlen($mollieCustomerId) > 0) {
+                $newPaymentData['payment']['customerId'] = $mollieCustomerId;
+            }
+        }
+
+        $lineItems = $order->getLineItems();
+
+        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection) {
+            // mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
+
+            foreach ($lineItems as $lineItem) {
+                $attributes = new OrderLineItemEntityAttributes($lineItem);
+                if ($attributes->isSubscriptionProduct()) {
+                    $newPaymentData['payment']['sequenceType'] = 'first';
+                    $newPaymentData['payment']['customerId'] = $mollieCustomerId;
+                    break;
+                }
+            }
+        }
+
+        // now we have to add payment specific data
+        // like we would do with initial orders too
+        $tmpOrder = $paymentHandler->processPaymentMethodSpecificParameters($newPaymentData, $order, $salesChannelContext, $customer);
+        // extract our modified and final payment data
+        $finalPaymentData = $tmpOrder['payment'];
+
+        // create our new payment with the
+        // Mollie API for our existing order
+        /** @var Payment $payment */
+        $payment = $mollieOrder->createPayment($finalPaymentData);
+
+        // unfortunately the API has a bug at the moment.
+        // we cannot modify the webhook URL with the create method.
+        // but we need to make sure to change it to the new OrderTransactionID of Shopware
+        $apiClient = $this->clientFactory->getClient($salesChannelContext->getSalesChannelId());
+
+        $apiClient->payments->update(
+            $payment->id,
+            [
+                'webhookUrl' => $webhookUrl,
+            ]
+        );
+
+        return $payment;
     }
 }

@@ -33,7 +33,6 @@ class FinishCheckoutRouteTest extends TestCase
         $cartService = $this->getCartService();
         $paypalExpress = $this->getPaypalExpress();
 
-
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
         try {
@@ -49,7 +48,6 @@ class FinishCheckoutRouteTest extends TestCase
         $cartService = $this->getCartService();
         $paypalExpress = $this->getPaypalExpress();
 
-
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
         try {
@@ -64,7 +62,6 @@ class FinishCheckoutRouteTest extends TestCase
         $settingsService = $this->getSettings(true);
         $cartService = $this->getCartService(true, true, true);
         $paypalExpress = $this->getPaypalExpress(true, false, true);
-
 
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
@@ -83,7 +80,6 @@ class FinishCheckoutRouteTest extends TestCase
         $methodDetails->shippingAddress = new \stdClass();
 
         $paypalExpress = $this->getPaypalExpress(true, false, true, false, false, $methodDetails);
-
 
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
@@ -108,7 +104,6 @@ class FinishCheckoutRouteTest extends TestCase
         $methodDetails->billingAddress = $billingAddress;
 
         $paypalExpress = $this->getPaypalExpress(true, false, true, false, true, $methodDetails);
-
 
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
@@ -139,7 +134,6 @@ class FinishCheckoutRouteTest extends TestCase
         $methodDetails->billingAddress = $billingAddress;
 
         $paypalExpress = $this->getPaypalExpress(true, false, true, false, false, $methodDetails);
-
 
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
 
@@ -177,7 +171,6 @@ class FinishCheckoutRouteTest extends TestCase
         $methodDetails->billingAddress = $billingAddress;
 
         $paypalExpress = $this->getPaypalExpress(true, false, true, false, true, $methodDetails);
-
 
         $route = new FinishCheckoutRoute($settingsService, $cartService, $paypalExpress);
         $response = $route->finishCheckout($this->getContext());

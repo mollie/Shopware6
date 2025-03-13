@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response;
 
@@ -13,10 +14,6 @@ class CreditCardMandatesResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param MandateCollection $mandates
-     */
     public function __construct(MandateCollection $mandates)
     {
         $this->object = new ArrayStruct(

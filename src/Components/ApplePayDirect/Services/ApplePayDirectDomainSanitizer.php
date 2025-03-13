@@ -10,20 +10,17 @@ class ApplePayDirectDomainSanitizer
 {
     /**
      * Sanitize the given domain
-     *
-     * @param string $domain
-     * @return string
      */
     public function sanitizeDomain(string $domain): string
     {
-        # we need to have a protocol before the parse url command
-        # in order to have it work correctly
+        // we need to have a protocol before the parse url command
+        // in order to have it work correctly
         if (strpos($domain, 'http') !== 0) {
             $domain = 'https://' . $domain;
         }
 
-        # now extract the raw domain without protocol
-        # and without any sub shop urls
-        return (string)parse_url($domain, PHP_URL_HOST);
+        // now extract the raw domain without protocol
+        // and without any sub shop urls
+        return (string) parse_url($domain, PHP_URL_HOST);
     }
 }

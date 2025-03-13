@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -8,16 +9,11 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class OrderItemsExtractor
 {
-
-    /**
-     * @param OrderEntity $orderEntity
-     * @return OrderLineItemCollection
-     */
     public function extractLineItems(OrderEntity $orderEntity): OrderLineItemCollection
     {
         $lineItems = $orderEntity->getLineItems();
 
-        if (!$lineItems instanceof OrderLineItemCollection) {
+        if (! $lineItems instanceof OrderLineItemCollection) {
             throw new OrderLineItemsNotFoundException($orderEntity->getId());
         }
 

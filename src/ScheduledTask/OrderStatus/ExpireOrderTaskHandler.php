@@ -17,10 +17,10 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
 
     public function __construct(
         EntityRepository $scheduledTaskRepository,
-        ExpireAction                     $expireAction,
-        LoggerInterface                  $logger
+        ExpireAction $expireAction,
+        LoggerInterface $logger
     ) {
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         parent::__construct($scheduledTaskRepository, $logger);
         $this->expireAction = $expireAction;
     }
@@ -37,7 +37,7 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
     public static function getHandledMessages(): iterable
     {
         return [
-            ExpireOrderTask::class
+            ExpireOrderTask::class,
         ];
     }
 }

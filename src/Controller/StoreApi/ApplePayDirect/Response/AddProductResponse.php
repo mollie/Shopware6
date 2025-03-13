@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
@@ -12,9 +13,6 @@ class AddProductResponse extends StoreApiResponse
      */
     protected $object;
 
-    /**
-     * @param Cart $object
-     */
     public function __construct(Cart $object)
     {
         $this->object = $object;

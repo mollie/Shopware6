@@ -30,17 +30,9 @@ final class OrderLineMetaDataStruct
     public function __construct(OrderLine $orderLine)
     {
         $this->id = $orderLine->id;
-        $this->quantity = (int)$orderLine->quantity;
+        $this->quantity = (int) $orderLine->quantity;
         $this->type = $this->getTypeFromMetaData($orderLine->metadata, self::TYPE_LINE_ITEM);
-        $this->amount = (float)$orderLine->totalAmount->value;
-    }
-
-    private function getTypeFromMetaData(\stdClass $metaData, string $default): string
-    {
-        if (property_exists($metaData, 'type') === false) {
-            return $default;
-        }
-        return (string)$metaData->type;
+        $this->amount = (float) $orderLine->totalAmount->value;
     }
 
     public function isRoundingItem(): bool
@@ -61,5 +53,14 @@ final class OrderLineMetaDataStruct
     public function getId(): string
     {
         return $this->id;
+    }
+
+    private function getTypeFromMetaData(\stdClass $metaData, string $default): string
+    {
+        if (property_exists($metaData, 'type') === false) {
+            return $default;
+        }
+
+        return (string) $metaData->type;
     }
 }

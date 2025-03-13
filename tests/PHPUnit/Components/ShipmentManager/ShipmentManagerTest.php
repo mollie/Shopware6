@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\ShipmentManager;
 
@@ -42,10 +43,6 @@ class ShipmentManagerTest extends TestCase
      */
     private $context;
 
-
-    /**
-     * @return void
-     */
     public function setUp(): void
     {
         $this->fakeShipmentService = new FakeShipment();
@@ -69,7 +66,6 @@ class ShipmentManagerTest extends TestCase
         $this->context = $this->getMockBuilder(Context::class)->disableOriginalConstructor()->getMock();
     }
 
-
     /**
      * This test verifies that our shipOrderRest works correctly.
      * This is defined by passing an empty line item array to our shipment service.
@@ -77,22 +73,20 @@ class ShipmentManagerTest extends TestCase
      * read from the order, which is also empty in this test.
      *
      * @throws \Exception
-     * @return void
      */
     public function testShipOrderRestWithoutTracking(): void
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
 
         $this->shipmentManager->shipOrderRest($order, null, $this->context);
 
-
         $this->assertTrue($this->fakeShipmentService->isShipOrderCalled());
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertEquals('ord_123', $this->fakeShipmentService->getShippedMollieOrderId());
-        # no items should be passed on to do a "shipAll" call
+        // no items should be passed on to do a "shipAll" call
         $this->assertCount(0, $this->fakeShipmentService->getShippedItems());
-        # no tracking data should be passed on
+        // no tracking data should be passed on
         $this->assertNull($this->fakeShipmentService->getShippedTracking());
     }
 
@@ -103,11 +97,10 @@ class ShipmentManagerTest extends TestCase
      * so it should be passed on correctly to Mollie.
      *
      * @throws \Exception
-     * @return void
      */
     public function testShipOrderRestWithTrackingFromDelivery(): void
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
 
         /** @var OrderDeliveryEntity $delivery */
@@ -116,13 +109,12 @@ class ShipmentManagerTest extends TestCase
 
         $this->shipmentManager->shipOrderRest($order, null, $this->context);
 
-
         $this->assertTrue($this->fakeShipmentService->isShipOrderCalled());
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertEquals('ord_123', $this->fakeShipmentService->getShippedMollieOrderId());
-        # no items should be passed on to do a "shipAll" call
+        // no items should be passed on to do a "shipAll" call
         $this->assertCount(0, $this->fakeShipmentService->getShippedItems());
-        # delivery tracking data should be passed on
+        // delivery tracking data should be passed on
         $this->assertEquals('code-123', $this->fakeShipmentService->getShippedTracking()->getCode());
     }
 
@@ -132,11 +124,10 @@ class ShipmentManagerTest extends TestCase
      * We also provide custom tracking data that needs to be used.
      *
      * @throws \Exception
-     * @return void
      */
     public function testShipOrderRestWithCustomTracking(): void
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
 
         $trackingData = new TrackingData(
@@ -147,13 +138,12 @@ class ShipmentManagerTest extends TestCase
 
         $this->shipmentManager->shipOrderRest($order, $trackingData, $this->context);
 
-
         $this->assertTrue($this->fakeShipmentService->isShipOrderCalled());
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertEquals('ord_123', $this->fakeShipmentService->getShippedMollieOrderId());
-        # no items should be passed on to do a "shipAll" call
+        // no items should be passed on to do a "shipAll" call
         $this->assertCount(0, $this->fakeShipmentService->getShippedItems());
-        # custom tracking data should be passed on
+        // custom tracking data should be passed on
         $this->assertEquals('code-abc', $this->fakeShipmentService->getShippedTracking()->getCode());
         $this->assertEquals('DHL Standard', $this->fakeShipmentService->getShippedTracking()->getCarrier());
         $this->assertEquals('https://www.mollie.com?code=code-abc', $this->fakeShipmentService->getShippedTracking()->getUrl());
@@ -164,16 +154,17 @@ class ShipmentManagerTest extends TestCase
      * if our order in Shopware somehow has no deliveries.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipOrderRestFailsWithoutDeliveries()
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
         $lineItem1 = $this->buildLineItemEntity('SKU-1');
         $order->setLineItems(new OrderLineItemCollection([$lineItem1]));
 
-        # overwrite deliveries
+        // overwrite deliveries
         $order->setDeliveries(new OrderDeliveryCollection([]));
 
         $this->expectException(NoDeliveriesFoundException::class);
@@ -184,7 +175,7 @@ class ShipmentManagerTest extends TestCase
             $this->context
         );
 
-        # make sure we don't call the Mollie API
+        // make sure we don't call the Mollie API
         $this->assertFalse($this->fakeShipmentService->isShipOrderCalled());
     }
 
@@ -193,18 +184,19 @@ class ShipmentManagerTest extends TestCase
      * if no line items have been provided.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipOrderWithoutTrackingNoLineItems()
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
 
         $this->expectException(NoLineItemsProvidedException::class);
 
         $this->shipmentManager->shipOrder($order, null, [], $this->context);
 
-        # make sure we don't call the Mollie API
+        // make sure we don't call the Mollie API
         $this->assertFalse($this->fakeShipmentService->isShipOrderCalled());
     }
 
@@ -215,6 +207,7 @@ class ShipmentManagerTest extends TestCase
      * custom request, nor in the order delivery itself, so nothing should be tracked.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipOrderWithoutTracking()
@@ -234,11 +227,11 @@ class ShipmentManagerTest extends TestCase
         );
 
         $this->assertTrue($this->fakeShipmentService->isShipOrderCalled());
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertEquals('ord_123', $this->fakeShipmentService->getShippedMollieOrderId());
-        # 1 line item should be passed
+        // 1 line item should be passed
         $this->assertCount(1, $this->fakeShipmentService->getShippedItems());
-        # no tracking is sent
+        // no tracking is sent
         $this->assertNull($this->fakeShipmentService->getShippedTracking());
     }
 
@@ -249,6 +242,7 @@ class ShipmentManagerTest extends TestCase
      * but the order already has one, so it should be used.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipOrderWithTrackingFromDelivery()
@@ -272,11 +266,11 @@ class ShipmentManagerTest extends TestCase
         );
 
         $this->assertTrue($this->fakeShipmentService->isShipOrderCalled());
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertEquals('ord_123', $this->fakeShipmentService->getShippedMollieOrderId());
-        # 1 line item should be passed
+        // 1 line item should be passed
         $this->assertCount(1, $this->fakeShipmentService->getShippedItems());
-        # delivery tracking data should be passed on
+        // delivery tracking data should be passed on
         $this->assertEquals('code-123', $this->fakeShipmentService->getShippedTracking()->getCode());
     }
 
@@ -287,6 +281,7 @@ class ShipmentManagerTest extends TestCase
      * which should be used.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipOrderWithCustomTracking()
@@ -312,11 +307,11 @@ class ShipmentManagerTest extends TestCase
         );
 
         $this->assertTrue($this->fakeShipmentService->isShipOrderCalled());
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertEquals('ord_123', $this->fakeShipmentService->getShippedMollieOrderId());
-        # 1 line item should be passed
+        // 1 line item should be passed
         $this->assertCount(1, $this->fakeShipmentService->getShippedItems());
-        # custom tracking data should be passed on
+        // custom tracking data should be passed on
         $this->assertEquals('code-abc', $this->fakeShipmentService->getShippedTracking()->getCode());
         $this->assertEquals('DHL Standard', $this->fakeShipmentService->getShippedTracking()->getCarrier());
         $this->assertEquals('https://www.mollie.com?code=code-abc', $this->fakeShipmentService->getShippedTracking()->getUrl());
@@ -327,16 +322,17 @@ class ShipmentManagerTest extends TestCase
      * if our order in Shopware somehow has no deliveries.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipOrderFailsWithoutDeliveries()
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
         $lineItem1 = $this->buildLineItemEntity('SKU-1');
         $order->setLineItems(new OrderLineItemCollection([$lineItem1]));
 
-        # overwrite deliveries
+        // overwrite deliveries
         $order->setDeliveries(new OrderDeliveryCollection([]));
 
         $this->expectException(NoDeliveriesFoundException::class);
@@ -345,12 +341,12 @@ class ShipmentManagerTest extends TestCase
             $order,
             null,
             [
-                new ShipmentLineItem($lineItem1->getId(), 1)
+                new ShipmentLineItem($lineItem1->getId(), 1),
             ],
             $this->context
         );
 
-        # make sure we don't call the Mollie API
+        // make sure we don't call the Mollie API
         $this->assertFalse($this->fakeShipmentService->isShipOrderCalled());
     }
 
@@ -359,6 +355,7 @@ class ShipmentManagerTest extends TestCase
      * We do not provide any tracking information, neither in the custom request, nor in the order delivery itself.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipItemWithoutTracking()
@@ -376,12 +373,12 @@ class ShipmentManagerTest extends TestCase
             $this->context
         );
 
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertTrue($this->fakeShipmentService->isShipItemCalled());
-        # 1 line item should be passed
+        // 1 line item should be passed
         $this->assertCount(1, $this->fakeShipmentService->getShippedItems());
         $this->assertEquals(2, $this->fakeShipmentService->getShippedItemQty());
-        # no tracking is sent
+        // no tracking is sent
         $this->assertNull($this->fakeShipmentService->getShippedTracking());
     }
 
@@ -390,6 +387,7 @@ class ShipmentManagerTest extends TestCase
      * We do not provide custom tracking data, but our order delivery has data which should be used.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipItemWithTrackingFromDelivery()
@@ -411,9 +409,9 @@ class ShipmentManagerTest extends TestCase
             $this->context
         );
 
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertTrue($this->fakeShipmentService->isShipItemCalled());
-        # delivery tracking data should be passed on
+        // delivery tracking data should be passed on
         $this->assertEquals('code-123', $this->fakeShipmentService->getShippedTracking()->getCode());
     }
 
@@ -422,6 +420,7 @@ class ShipmentManagerTest extends TestCase
      * We do provide custom tracking data that should be used
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipItemWithCustomTracking()
@@ -443,9 +442,9 @@ class ShipmentManagerTest extends TestCase
             $this->context
         );
 
-        # make sure that the correct order ID is passed on
+        // make sure that the correct order ID is passed on
         $this->assertTrue($this->fakeShipmentService->isShipItemCalled());
-        # delivery tracking data should be passed on
+        // delivery tracking data should be passed on
         $this->assertEquals('code-abc', $this->fakeShipmentService->getShippedTracking()->getCode());
     }
 
@@ -454,16 +453,17 @@ class ShipmentManagerTest extends TestCase
      * if our order in Shopware somehow has no deliveries.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShipItemFailsWithoutDeliveries()
     {
-        # we build an order without a delivery that contains tracking information
+        // we build an order without a delivery that contains tracking information
         $order = $this->buildMollieOrder('ord_123');
         $lineItem1 = $this->buildLineItemEntity('SKU-1');
         $order->setLineItems(new OrderLineItemCollection([$lineItem1]));
 
-        # overwrite deliveries
+        // overwrite deliveries
         $order->setDeliveries(new OrderDeliveryCollection([]));
 
         $this->expectException(NoDeliveriesFoundException::class);
@@ -476,7 +476,7 @@ class ShipmentManagerTest extends TestCase
             $this->context
         );
 
-        # make sure we don't call the Mollie API
+        // make sure we don't call the Mollie API
         $this->assertFalse($this->fakeShipmentService->isShipOrderCalled());
     }
 }

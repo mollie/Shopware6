@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation;
 
@@ -8,11 +9,7 @@ use DateTimeInterface;
 class CancellationValidator
 {
     /**
-     * @param null|DateTimeInterface $nextRenewal
-     * @param int $maxCancellationDays
-     * @param DateTimeInterface $today
      * @throws \Exception
-     * @return bool
      */
     public function isCancellationAllowed(?DateTimeInterface $nextRenewal, int $maxCancellationDays, DateTimeInterface $today): bool
     {
@@ -21,7 +18,7 @@ class CancellationValidator
         }
 
         $latestCancellation = new DateTime($nextRenewal->format('Y-m-d H:i:s'));
-        $latestCancellation->modify("-" . $maxCancellationDays . " day");
+        $latestCancellation->modify('-' . $maxCancellationDays . ' day');
 
         return $today <= $latestCancellation;
     }

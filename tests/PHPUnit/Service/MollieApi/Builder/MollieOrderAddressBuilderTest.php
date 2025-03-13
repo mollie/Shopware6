@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
@@ -16,25 +17,16 @@ class MollieOrderAddressBuilderTest extends TestCase
      */
     private $builder;
 
-    /**
-     *
-     */
     protected function setUp(): void
     {
         $this->builder = new MollieOrderAddressBuilder();
     }
 
-    /**
-     *
-     */
     public function testConstants(): void
     {
         self::assertSame('NL', MollieOrderAddressBuilder::MOLLIE_DEFAULT_COUNTRY_ISO);
     }
 
-    /**
-     *
-     */
     public function testBuildWithNullAddress(): void
     {
         self::assertSame([], $this->builder->build('foo', null));
@@ -131,12 +123,6 @@ class MollieOrderAddressBuilderTest extends TestCase
         self::assertArrayNotHasKey('streetAdditional', $addressData);
     }
 
-    /**
-     * @param null|string $salutation
-     * @param null|string $countryISO
-     * @param null|string $additional
-     * @return CustomerAddressEntity
-     */
     private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): CustomerAddressEntity
     {
         $firstName = 'Mollie';

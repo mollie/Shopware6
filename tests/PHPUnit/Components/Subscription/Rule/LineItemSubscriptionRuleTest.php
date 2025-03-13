@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\Rule;
 
@@ -16,26 +17,16 @@ class LineItemSubscriptionRuleTest extends TestCase
      */
     private $rule;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->rule = new LineItemSubscriptionRule();
     }
 
-    /**
-     * @return void
-     */
     public function testGetName(): void
     {
         static::assertSame('mollie_lineitem_subscription_rule', $this->rule->getName());
     }
 
-    /**
-     * @return void
-     */
     public function testGetConstraints(): void
     {
         $ruleConstraints = $this->rule->getConstraints();
@@ -50,14 +41,13 @@ class LineItemSubscriptionRuleTest extends TestCase
      *
      * @testWith        [true, false]
      *                  [false, true]
-     * @return void
      */
     public function testNonSubscriptionCart(bool $expected, bool $lookingForSubscription): void
     {
         $lineItem = new LineItem('', 'product');
 
         $this->rule->assign([
-            'isSubscription' => $lookingForSubscription
+            'isSubscription' => $lookingForSubscription,
         ]);
 
         $match = $this->rule->match(
@@ -77,7 +67,6 @@ class LineItemSubscriptionRuleTest extends TestCase
      *
      * @testWith        [true, true]
      *                  [false, false]
-     * @return void
      */
     public function testSubscriptionCart(bool $expected, bool $lookingForSubscription): void
     {
@@ -89,12 +78,12 @@ class LineItemSubscriptionRuleTest extends TestCase
             'customFields' => $lineItemAttributes->toArray(),
         ]);
 
-        # just verify it's really a subscription now
+        // just verify it's really a subscription now
         $lineItemAttributes = new LineItemAttributes($lineItem);
         static::assertSame(true, $lineItemAttributes->isSubscriptionProduct(), 'item is not a subscription item');
 
         $this->rule->assign([
-            'isSubscription' => $lookingForSubscription
+            'isSubscription' => $lookingForSubscription,
         ]);
 
         $match = $this->rule->match(

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Command\DAL;
 
@@ -18,7 +19,6 @@ class DALCleanupCommand extends Command
 {
     public static $defaultName = 'mollie:dal:cleanup';
 
-
     /**
      * @var EntityRepository
      */
@@ -34,12 +34,6 @@ class DALCleanupCommand extends Command
      */
     private $logger;
 
-
-    /**
-     * @param EntityRepository $repoProducts
-     * @param Connection $connection
-     * @param LoggerInterface $logger
-     */
     public function __construct(EntityRepository $repoProducts, Connection $connection, LoggerInterface $logger)
     {
         $this->repoProducts = $repoProducts;
@@ -49,37 +43,28 @@ class DALCleanupCommand extends Command
         parent::__construct();
     }
 
-
-    /**
-     * @return void
-     */
     protected function configure(): void
     {
         $this
-            ->setName((string)self::$defaultName)
-            ->setDescription('Cleaning and compressing unused Mollie data in your database. Please create a backup before');
+            ->setName((string) self::$defaultName)
+            ->setDescription('Cleaning and compressing unused Mollie data in your database. Please create a backup before')
+        ;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Mollie DAL Data Cleanup');
 
-
         $answer = $io->ask('I have created a backup of the database (yes/no)');
 
         if ($answer !== 'yes') {
             $io->error('Please create a backup first');
+
             return 1;
         }
 
         $io->text('starting to clean unused Mollie data');
-
 
         try {
             $context = Context::createDefaultContext();
@@ -87,7 +72,6 @@ class DALCleanupCommand extends Command
             $criteria = new Criteria();
 
             $products = $this->repoProducts->search($criteria, $context);
-
 
             /** @var ProductEntity $product */
             foreach ($products->getEntities() as $product) {

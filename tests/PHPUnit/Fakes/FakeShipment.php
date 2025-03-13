@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -11,7 +12,6 @@ use Mollie\Api\Resources\ShipmentCollection;
 
 class FakeShipment implements ShipmentInterface
 {
-
     /**
      * @var string
      */
@@ -42,10 +42,6 @@ class FakeShipment implements ShipmentInterface
      */
     private $shippedItemQty;
 
-
-    /**
-     * @return string
-     */
     public function getShippedMollieOrderId(): string
     {
         return $this->shippedMollieOrderId;
@@ -59,41 +55,27 @@ class FakeShipment implements ShipmentInterface
         return $this->shippedItems;
     }
 
-    /**
-     * @return bool
-     */
     public function isShipItemCalled(): bool
     {
         return $this->shipItemCalled;
     }
 
-    /**
-     * @return bool
-     */
     public function isShipOrderCalled(): bool
     {
         return $this->shipOrderCalled;
     }
 
-    /**
-     * @return null|ShipmentTrackingInfoStruct
-     */
     public function getShippedTracking(): ?ShipmentTrackingInfoStruct
     {
         return $this->shippedTracking;
     }
 
-    /**
-     * @return int
-     */
     public function getShippedItemQty(): int
     {
         return $this->shippedItemQty;
     }
 
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @return array|mixed[]
      */
     public function getTotals(string $mollieOrderId, string $salesChannelId): array
@@ -102,8 +84,6 @@ class FakeShipment implements ShipmentInterface
     }
 
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @return array|mixed[]
      */
     public function getStatus(string $mollieOrderId, string $salesChannelId): array
@@ -111,23 +91,11 @@ class FakeShipment implements ShipmentInterface
         // TODO: Implement getStatus() method.
     }
 
-    /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
-     * @return ShipmentCollection
-     */
     public function getShipments(string $mollieOrderId, string $salesChannelId): ShipmentCollection
     {
         // TODO: Implement getShipments() method.
     }
 
-    /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
-     * @param array $items
-     * @param null|ShipmentTrackingInfoStruct $tracking
-     * @return MollieShipment
-     */
     public function shipOrder(string $mollieOrderId, string $salesChannelId, array $items, ?ShipmentTrackingInfoStruct $tracking = null): MollieShipment
     {
         $this->shipOrderCalled = true;
@@ -138,14 +106,6 @@ class FakeShipment implements ShipmentInterface
         return new Shipment(new MollieApiClient());
     }
 
-    /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
-     * @param string $mollieOrderLineId
-     * @param int $quantity
-     * @param null|ShipmentTrackingInfoStruct $tracking
-     * @return MollieShipment
-     */
     public function shipItem(string $mollieOrderId, string $salesChannelId, string $mollieOrderLineId, int $quantity, ?ShipmentTrackingInfoStruct $tracking = null): MollieShipment
     {
         $this->shipItemCalled = true;

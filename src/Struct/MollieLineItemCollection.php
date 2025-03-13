@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct;
 
@@ -7,6 +8,7 @@ use Shopware\Core\Framework\Struct\StructCollection;
 
 /**
  * @extends StructCollection<MollieLineItem>
+ *
  * @method void                add(MollieLineItem $entity)
  * @method void                set(string $key, MollieLineItem $entity)
  * @method MollieLineItem[]    getIterator()
@@ -17,11 +19,6 @@ use Shopware\Core\Framework\Struct\StructCollection;
  */
 class MollieLineItemCollection extends StructCollection
 {
-    protected function getExpectedClass(): string
-    {
-        return MollieLineItem::class;
-    }
-
     public function filterByRoundingRest(): self
     {
         return $this->filter(function (MollieLineItem $lineItem) {
@@ -49,9 +46,6 @@ class MollieLineItemCollection extends StructCollection
         return $roundingSum;
     }
 
-    /**
-     * @return float
-     */
     public function getCartTotalAmount(): float
     {
         $sum = 0;
@@ -61,5 +55,10 @@ class MollieLineItemCollection extends StructCollection
         }
 
         return $sum;
+    }
+
+    protected function getExpectedClass(): string
+    {
+        return MollieLineItem::class;
     }
 }

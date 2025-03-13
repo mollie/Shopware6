@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Hydrator;
 
@@ -12,8 +13,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 class RefundHydrator
 {
     /**
-     * @param Refund $refund
-     * @param OrderEntity $order
      * @return array<string, mixed>
      */
     public function hydrate(Refund $refund, OrderEntity $order): array
@@ -44,7 +43,6 @@ class RefundHydrator
             }
         }
 
-
         $internalDescription = null;
 
         /** @var RefundCollection $shopwareRefunds */
@@ -67,19 +65,16 @@ class RefundHydrator
                     $metaData->type = $shopwareRefund->getType();
 
                     $metaData->composition[] = [
-                        'swLineId' => (string)$refundLineItem->getOrderLineItemId(),
-                        'swLineVersionId' => (string)$refundLineItem->getOrderLineItemVersionId(),
+                        'swLineId' => (string) $refundLineItem->getOrderLineItemId(),
+                        'swLineVersionId' => (string) $refundLineItem->getOrderLineItemVersionId(),
                         'mollieLineId' => $refundLineItem->getMollieLineId(),
                         'swReference' => $refundLineItem->getLabel(),
                         'quantity' => $refundLineItem->getQuantity(),
-                        'amount' => $refundLineItem->getAmount()
+                        'amount' => $refundLineItem->getAmount(),
                     ];
                 }
             }
         }
-
-
-
 
         return [
             'id' => $refund->id,

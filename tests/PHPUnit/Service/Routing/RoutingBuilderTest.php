@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\Routing;
 
@@ -12,17 +13,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RoutingBuilderTest extends TestCase
 {
-    /**
-     *
-     */
     public function setUp(): void
     {
         putenv('MOLLIE_SHOP_DOMAIN=');
     }
 
-    /**
-     *
-     */
     public function tearDown(): void
     {
         putenv('MOLLIE_SHOP_DOMAIN=');
@@ -49,9 +44,9 @@ class RoutingBuilderTest extends TestCase
      */
     public function testWebhookUrlWithCustomDomain(): void
     {
-        # prepare our fake server data
-        # assign a current domain to replace.
-        # also configure our environment variable
+        // prepare our fake server data
+        // assign a current domain to replace.
+        // also configure our environment variable
         $builder = $this->createBuilder('https://local.mollie.shop/notify/123', 'https://123.eu.ngrok.io');
 
         $url = $builder->buildWebhookURL('-');
@@ -62,8 +57,6 @@ class RoutingBuilderTest extends TestCase
     /**
      * This test verifies that our router is correctly used when building
      * the webhook url for subscriptions.
-     *
-     * @return void
      */
     public function testSubscriptionWebhookUrlUsesRouter(): void
     {
@@ -77,8 +70,6 @@ class RoutingBuilderTest extends TestCase
     /**
      * This test verifies that our router is correctly used when building the
      * return URL of subscription payment updates.
-     *
-     * @return void
      */
     public function testSubscriptionPaymentUpdateReturnUrlUsesRouter(): void
     {
@@ -92,8 +83,6 @@ class RoutingBuilderTest extends TestCase
     /**
      * This test verifies that there is NO webhook url for mandate updates on subscriptions for the Storefront.
      * This works only using async redirects of the requesting customer in the Storefront!
-     *
-     * @return void
      */
     public function testSubscriptionPaymentUpdateWebhookUrlIsEmptyInStorefront(): void
     {
@@ -104,12 +93,6 @@ class RoutingBuilderTest extends TestCase
         $this->assertEquals('', $url);
     }
 
-
-    /**
-     * @param string $fakeURL
-     * @param string $fakeEnvDomain
-     * @return RoutingBuilder
-     */
     private function createBuilder(string $fakeURL, string $fakeEnvDomain): RoutingBuilder
     {
         $fakeRouter = new FakeRouter($fakeURL);

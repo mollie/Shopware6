@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -15,10 +16,6 @@ class MollieOrderCustomerEnricher
      */
     private $customerService;
 
-
-    /**
-     * @param CustomerService $customerService
-     */
     public function __construct(CustomerService $customerService)
     {
         $this->customerService = $customerService;
@@ -26,16 +23,15 @@ class MollieOrderCustomerEnricher
 
     /**
      * @param array<mixed> $orderData
-     * @param CustomerEntity $customer
-     * @param MollieSettingStruct $settings
-     * @param SalesChannelContext $salesChannelContext
+     *
      * @throws CustomerCouldNotBeFoundExceptionAlias
+     *
      * @return array<mixed>
      */
     public function enrich(array $orderData, CustomerEntity $customer, MollieSettingStruct $settings, SalesChannelContext $salesChannelContext): array
     {
         $customerStruct = $this->customerService->getCustomerStruct($customer->getId(), $salesChannelContext->getContext());
-        $customerId = $customerStruct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+        $customerId = $customerStruct->getCustomerId((string) $settings->getProfileId(), $settings->isTestMode());
 
         if (empty($customerId)) {
             return $orderData;

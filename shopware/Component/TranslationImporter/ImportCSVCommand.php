@@ -41,7 +41,6 @@ final class ImportCSVCommand extends Command
         $this->addArgument('code', InputArgument::REQUIRED, 'Language to import e.g. "it-IT"');
     }
 
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
@@ -49,20 +48,21 @@ final class ImportCSVCommand extends Command
 
         if (! $this->fileSystem->fileExists($path)) {
             $output->writeln('<error>File not found: ' . $path . '</error>');
+
             return Command::FAILURE;
         }
-
 
         $pathToConfigXml = realpath($this->plugin->getPath() . '/Resources/config/config.xml');
         if ($pathToConfigXml === false) {
             $output->writeln('<error>Config file not found: ' . $path . '</error>');
+
             return Command::FAILURE;
         }
 
         $stream = $this->fileSystem->readStream($path);
         $domDocument = new \DOMDocument();
         $domDocument->loadXML(file_get_contents($pathToConfigXml));
-        $row = fgetcsv($stream, null, ';');//skip header
+        $row = fgetcsv($stream, null, ';'); //skip header
         while ($row = fgetcsv($stream, null, ';')) {
             $key = $row[0];
             $key = $this->keyMappings[$key] ?? $key;
@@ -71,7 +71,6 @@ final class ImportCSVCommand extends Command
             $output->writeln('<' . $result->getStatus() . '>' . $result->getMessage() . '</' . $result->getStatus() . '>');
         }
         $domDocument->save($pathToConfigXml);
-
 
         return Command::SUCCESS;
     }

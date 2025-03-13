@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions;
 
@@ -29,12 +30,6 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
      */
     private $shipment;
 
-
-    /**
-     * @param OrderServiceInterface $orderService
-     * @param ShipmentManagerInterface $shipment
-     * @param LoggerInterface $logger
-     */
     public function __construct(OrderServiceInterface $orderService, ShipmentManagerInterface $shipment, LoggerInterface $logger)
     {
         $this->orderService = $orderService;
@@ -42,9 +37,6 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    /**
-     * @return string
-     */
     public static function getName(): string
     {
         return 'action.mollie.order.ship';
@@ -69,9 +61,7 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
     }
 
     /**
-     * @param StorableFlow $flow
      * @throws \Exception
-     * @return void
      */
     public function handleFlow(StorableFlow $flow): void
     {
@@ -81,7 +71,6 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
     }
 
     /**
-     * @param FlowEvent $event
      * @throws \Exception
      */
     public function handle(FlowEvent $event): void
@@ -94,7 +83,7 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
 
         $baseEvent = $event->getEvent();
 
-        if (!$baseEvent instanceof OrderAware) {
+        if (! $baseEvent instanceof OrderAware) {
             return;
         }
 
@@ -104,10 +93,7 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
     }
 
     /**
-     * @param string $orderId
-     * @param Context $context
      * @throws \Exception
-     * @return void
      */
     private function shipOrder(string $orderId, Context $context): void
     {
@@ -120,8 +106,8 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
 
             $this->logger->info('Starting Shipment through Flow Builder Action for order: ' . $orderNumber);
 
-            # ship (all or) the rest of the order without providing any specific tracking information.
-            # this will ensure tracking data is automatically taken from the order
+            // ship (all or) the rest of the order without providing any specific tracking information.
+            // this will ensure tracking data is automatically taken from the order
             $this->shipment->shipOrderRest($order, null, $context);
         } catch (\Exception $ex) {
             $this->logger->error(

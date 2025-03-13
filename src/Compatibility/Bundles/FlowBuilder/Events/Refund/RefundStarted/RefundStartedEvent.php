@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted;
 
@@ -33,12 +34,6 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
      */
     protected $context;
 
-
-    /**
-     * @param OrderEntity $orderEntity
-     * @param float $amount
-     * @param Context $context
-     */
     public function __construct(OrderEntity $orderEntity, float $amount, Context $context)
     {
         $this->order = $orderEntity;
@@ -46,64 +41,44 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
         $this->context = $context;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'mollie.refund.started';
     }
 
-    /**
-     * @return EventDataCollection
-     */
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
             ->add('amount', new ScalarValueType(ScalarValueType::TYPE_FLOAT))
-            ->add('order', new EntityType(OrderDefinition::class));
+            ->add('order', new EntityType(OrderDefinition::class))
+        ;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderId(): string
     {
         return $this->order->getId();
     }
 
-    /**
-     * @return OrderEntity
-     */
     public function getOrder(): OrderEntity
     {
         return $this->order;
     }
 
-    /**
-     * @return float
-     */
     public function getAmount(): float
     {
         return $this->amount;
     }
 
-    /**
-     * @return Context
-     */
     public function getContext(): Context
     {
         return $this->context;
     }
 
-    /**
-     * @return MailRecipientStruct
-     */
     public function getMailStruct(): MailRecipientStruct
     {
         $customer = $this->order->getOrderCustomer();
 
-        if (!$customer instanceof OrderCustomerEntity) {
+        if (! $customer instanceof OrderCustomerEntity) {
             return new MailRecipientStruct([]);
         }
 
@@ -112,9 +87,6 @@ class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesCh
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function getSalesChannelId(): string
     {
         return $this->order->getSalesChannelId();

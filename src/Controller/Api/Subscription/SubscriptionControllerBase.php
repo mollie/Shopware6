@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Subscription;
 
@@ -13,27 +14,16 @@ class SubscriptionControllerBase extends AbstractController
 {
     use ApiTrait;
 
-
     /**
      * @var SubscriptionManager
      */
     private $subscriptionManager;
 
-
-    /**
-     * @param SubscriptionManager $subscriptionManager
-     */
     public function __construct(SubscriptionManager $subscriptionManager)
     {
         $this->subscriptionManager = $subscriptionManager;
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
@@ -48,23 +38,11 @@ class SubscriptionControllerBase extends AbstractController
         }
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function cancelLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->cancel($data, $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function pause(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
@@ -79,23 +57,11 @@ class SubscriptionControllerBase extends AbstractController
         }
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function pauseLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->pause($data, $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function resume(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
@@ -110,23 +76,11 @@ class SubscriptionControllerBase extends AbstractController
         }
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function resumeLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->resume($data, $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function skip(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
@@ -142,12 +96,6 @@ class SubscriptionControllerBase extends AbstractController
         }
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function skipLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->skip($data, $context);

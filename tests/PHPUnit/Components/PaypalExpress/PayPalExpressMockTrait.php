@@ -36,6 +36,7 @@ trait PayPalExpressMockTrait
             $settings->setRequireDataProtectionCheckbox(true);
         }
         $settingsService->method('getSettings')->willReturn($settings);
+
         return $settingsService;
     }
 
@@ -57,8 +58,8 @@ trait PayPalExpressMockTrait
             if ($withFakeSessionId) {
                 $fakeCart->addExtensions([
                     CustomFieldsInterface::MOLLIE_KEY => new ArrayStruct([
-                        CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY => 'fakeLoadedSessionId'
-                    ])
+                        CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY => 'fakeLoadedSessionId',
+                    ]),
                 ]);
             }
 
@@ -95,6 +96,7 @@ trait PayPalExpressMockTrait
         if ($withLoadSession) {
             $paypalExpress->expects($this->once())->method('loadSession')->willReturn($fakeSession);
         }
+
         return $paypalExpress;
     }
 
@@ -105,6 +107,7 @@ trait PayPalExpressMockTrait
          */
         $context = $this->createMock(SalesChannelContext::class);
         $context->method('getSalesChannelId')->willReturn('fakeSalesChannelId');
+
         return $context;
     }
 }

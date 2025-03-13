@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\ScheduledTask;
 
@@ -14,19 +15,11 @@ class ScheduledTaskFactory
      */
     private $pluginSetting;
 
-
-    /**
-     * @param PluginSettingsServiceInterface $pluginSetting
-     */
     public function __construct(PluginSettingsServiceInterface $pluginSetting)
     {
         $this->pluginSetting = $pluginSetting;
     }
 
-
-    /**
-     * @return ScheduledTask
-     */
     public function createRenewalReminderTask(): ScheduledTask
     {
         if ($this->pluginSetting->getEnvMollieDevMode()) {

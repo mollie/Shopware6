@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -60,7 +61,16 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     /**
      * @var ?string
      */
-    private $profileId = null;
+    private $profileId;
+
+    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, MollieLocaleService $mollieLocaleService)
+    {
+        $this->apiFactory = $apiFactory;
+        $this->settingsService = $settingsService;
+        $this->mandateService = $mandateService;
+        $this->mollieGateway = $mollieGateway;
+        $this->mollieLocaleService = $mollieLocaleService;
+    }
 
     /**
      * @return array<mixed>>
@@ -76,24 +86,8 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param MollieApiFactory $apiFactory
-     * @param SettingsService $settingsService
-     * @param MandateServiceInterface $mandateService
-     * @param MollieGatewayInterface $mollieGateway
-     * @param MollieLocaleService $mollieLocaleService
-     */
-    public function __construct(MollieApiFactory $apiFactory, SettingsService $settingsService, MandateServiceInterface $mandateService, MollieGatewayInterface $mollieGateway, MollieLocaleService $mollieLocaleService)
-    {
-        $this->apiFactory = $apiFactory;
-        $this->settingsService = $settingsService;
-        $this->mandateService = $mandateService;
-        $this->mollieGateway = $mollieGateway;
-        $this->mollieLocaleService = $mollieLocaleService;
-    }
-
-
-    /**
      * @param AccountEditOrderPageLoadedEvent|CheckoutConfirmPageLoadedEvent $args
+     *
      * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
      */
     public function addDataToPage($args): void
@@ -103,17 +97,17 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $currentSelectedPaymentMethod = $args->getSalesChannelContext()->getPaymentMethod();
         $mollieAttributes = new PaymentMethodAttributes($currentSelectedPaymentMethod);
 
-        # load additional data only for mollie payment methods
-        if (!$mollieAttributes->isMolliePayment()) {
+        // load additional data only for mollie payment methods
+        if (! $mollieAttributes->isMolliePayment()) {
             return;
         }
 
-        # load our settings for the
-        # current request
+        // load our settings for the
+        // current request
         $this->settings = $this->settingsService->getSettings($scId);
 
-        # now use our factory to get the correct
-        # client with the correct sales channel settings
+        // now use our factory to get the correct
+        // client with the correct sales channel settings
         $this->apiClient = $this->apiFactory->getClient($scId);
 
         $this->mollieGateway->switchClient($scId);
@@ -175,7 +169,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         }
         $mollieProfileId = '';
 
-        /**
+        /*
          * Fetches the profile id from Mollie's API for the current key.
          */
         try {
@@ -189,7 +183,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                 $mollieProfileId = $mollieProfile->id;
             }
         } catch (ApiException $e) {
-            //
         }
         $this->profileId = $mollieProfileId;
 
@@ -208,7 +201,6 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             'enable_one_click_payments_compact_view' => $this->settings->isOneClickPaymentsCompactView(),
         ]);
     }
-
 
     /**
      * Adds ideal issuers variable to the storefront.
@@ -236,7 +228,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 
             $args->getPage()->assign(
                 [
-                    'mollie_terminals' => $terminalsArray
+                    'mollie_terminals' => $terminalsArray,
                 ]
             );
         } catch (Exception $e) {
@@ -259,14 +251,14 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             'enable_one_click_payments' => $this->settings->isOneClickPaymentsEnabled(),
         ]);
 
-        if (!$this->settings->isOneClickPaymentsEnabled()) {
+        if (! $this->settings->isOneClickPaymentsEnabled()) {
             return;
         }
 
         try {
             $salesChannelContext = $args->getSalesChannelContext();
             $loggedInCustomer = $salesChannelContext->getCustomer();
-            if (!$loggedInCustomer instanceof CustomerEntity) {
+            if (! $loggedInCustomer instanceof CustomerEntity) {
                 return;
             }
 
@@ -278,10 +270,9 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             $mandates = $this->mandateService->getCreditCardMandatesByCustomerId($loggedInCustomer->getId(), $salesChannelContext);
 
             $args->getPage()->setExtensions([
-                'MollieCreditCardMandateCollection' => $mandates
+                'MollieCreditCardMandateCollection' => $mandates,
             ]);
         } catch (Exception $e) {
-            //
         }
     }
 }

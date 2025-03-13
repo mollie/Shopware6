@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Subscriber;
 
@@ -18,7 +19,7 @@ class CancelMollieOrderSubscriberTest extends TestCase
         $expected = [
             OrderStatus::STATUS_CREATED,
             OrderStatus::STATUS_AUTHORIZED,
-            OrderStatus::STATUS_SHIPPING
+            OrderStatus::STATUS_SHIPPING,
         ];
 
         self::assertSame($expected, CancelOrderSubscriber::ALLOWED_CANCELLABLE_MOLLIE_STATES);

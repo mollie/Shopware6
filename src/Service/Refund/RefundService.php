@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Refund;
 
@@ -50,13 +51,6 @@ class RefundService implements RefundServiceInterface
      */
     private $compositionRepairService;
 
-
-    /**
-     * @param Order $mollie
-     * @param OrderService $orders
-     * @param RefundHydrator $refundHydrator
-     * @param MollieGatewayInterface $gwMollie
-     */
     public function __construct(Order $mollie, OrderService $orders, RefundHydrator $refundHydrator, MollieGatewayInterface $gwMollie, CompositionMigrationServiceInterface $compositionRepairService)
     {
         $this->mollie = $mollie;
@@ -66,15 +60,10 @@ class RefundService implements RefundServiceInterface
         $this->compositionRepairService = $compositionRepairService;
     }
 
-
     /**
-     * @param OrderEntity $order
-     * @param string $description
-     * @param string $internalDescription
      * @param RefundItem[] $refundItems
-     * @param Context $context
+     *
      * @throws ApiException
-     * @return Refund
      */
     public function refundFull(OrderEntity $order, string $description, string $internalDescription, array $refundItems, Context $context): Refund
     {
@@ -88,20 +77,20 @@ class RefundService implements RefundServiceInterface
             throw new \Exception('No remaining amount to refund for order ' . $order->getOrderNumber());
         }
 
-        # now check if our remaining amount is not the total amount already
-        # because then we need to do a partial refund if its a "full refund of the REST of the order".
+        // now check if our remaining amount is not the total amount already
+        // because then we need to do a partial refund if its a "full refund of the REST of the order".
         $allRefunds = $this->getRefunds($order, $context);
 
         $refundedAmount = $this->getRefundedAmount($order);
         $pendingRefundAmount = $this->getPendingRefundAmount($allRefunds);
 
-        # let's just see what has been basically processed or triggered
+        // let's just see what has been basically processed or triggered
         $processedAmount = $refundedAmount + $pendingRefundAmount;
 
-        # if we have already refunded something, but still want to refund the full rest of the order
-        # then we just do a partial refund with the difference
+        // if we have already refunded something, but still want to refund the full rest of the order
+        // then we just do a partial refund with the difference
         if ($processedAmount > 0) {
-            # do a partial refund (but always without items, because we never really know)
+            // do a partial refund (but always without items, because we never really know)
             return $this->refundPartial($order, $description, $internalDescription, $remainingAmount, [], $context);
         }
 
@@ -112,12 +101,11 @@ class RefundService implements RefundServiceInterface
             'metadata' => $metadata->toMolliePayload(),
         ];
 
-
         if (count($refundItems) > 0) {
             $lines = [];
 
             foreach ($refundItems as $item) {
-                # quantities of 0 do not work with the Mollie API
+                // quantities of 0 do not work with the Mollie API
                 if ($item->getQuantity() <= 0) {
                     continue;
                 }
@@ -131,26 +119,21 @@ class RefundService implements RefundServiceInterface
             $params['lines'] = $lines;
         }
 
-        # REFUND WITH MOLLIE
-        # ---------------------------------------------------------------------------------------------
+        // REFUND WITH MOLLIE
+        // ---------------------------------------------------------------------------------------------
         $refund = $mollieOrder->refund($params);
 
-        if (!$refund instanceof Refund) {
-            throw new CouldNotCreateMollieRefundException($mollieOrderId, (string)$order->getOrderNumber());
+        if (! $refund instanceof Refund) {
+            throw new CouldNotCreateMollieRefundException($mollieOrderId, (string) $order->getOrderNumber());
         }
 
         return $refund;
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $description
-     * @param string $internalDescription
-     * @param float $amount
      * @param RefundItem[] $lineItems
-     * @param Context $context
+     *
      * @throws ApiException
-     * @return Refund
      */
     public function refundPartial(OrderEntity $order, string $description, string $internalDescription, float $amount, array $lineItems, Context $context): Refund
     {
@@ -167,21 +150,18 @@ class RefundService implements RefundServiceInterface
             'metadata' => $metadata->toMolliePayload(),
         ]);
 
-        if (!$refund instanceof Refund) {
-            throw new CouldNotCreateMollieRefundException('', (string)$order->getOrderNumber());
+        if (! $refund instanceof Refund) {
+            throw new CouldNotCreateMollieRefundException('', (string) $order->getOrderNumber());
         }
 
         return $refund;
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $refundId
      * @throws PaymentNotFoundException
      * @throws CouldNotCancelMollieRefundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
-     * @return bool
      */
     public function cancel(OrderEntity $order, string $refundId): bool
     {
@@ -192,33 +172,34 @@ class RefundService implements RefundServiceInterface
             // It is possible for it to throw an ApiException here if $refundId is incorrect.
             $refund = $payment->getRefund($refundId);
         } catch (ApiException $e) { // Invalid resource id
-            throw new CouldNotCancelMollieRefundException('', (string)$order->getOrderNumber(), $refundId, $e);
+            throw new CouldNotCancelMollieRefundException('', (string) $order->getOrderNumber(), $refundId, $e);
         }
 
         // This payment does not have a refund with $refundId, so we cannot cancel it.
-        if (!($refund instanceof Refund)) {
+        if (! ($refund instanceof Refund)) {
             return false;
         }
 
         // Refunds can only be cancelled when they're still queued or pending.
-        if (!$refund->isQueued() && !$refund->isPending()) {
+        if (! $refund->isQueued() && ! $refund->isPending()) {
             return false;
         }
 
         try {
             $refund->cancel();
+
             return true;
         } catch (ApiException $e) {
-            throw new CouldNotCancelMollieRefundException('', (string)$order->getOrderNumber(), $refundId, $e);
+            throw new CouldNotCancelMollieRefundException('', (string) $order->getOrderNumber(), $refundId, $e);
         }
     }
 
     /**
-     * @param OrderEntity $order
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
      * @throws CouldNotFetchMollieOrderException
      * @throws CouldNotFetchMollieRefundsException
+     *
      * @return array<mixed>
      */
     public function getRefunds(OrderEntity $order, Context $context): array
@@ -232,7 +213,7 @@ class RefundService implements RefundServiceInterface
 
             /** @var Refund $refund */
             foreach ($payment->refunds()->getArrayCopy() as $refund) {
-                /**
+                /*
                  * TODO: for now we skip the canceled refunds since it is not implemented yet
                  * use RefundStatus canceled when available
                  */
@@ -240,8 +221,8 @@ class RefundService implements RefundServiceInterface
                     continue;
                 }
 
-                # if we have a metadata entry, then make sure to
-                # migrate those compositions (if existing) to our database storage (for legacy refunds)
+                // if we have a metadata entry, then make sure to
+                // migrate those compositions (if existing) to our database storage (for legacy refunds)
                 if (property_exists($refund, 'metadata')) {
                     /** @var \stdClass|string $metadata */
                     $metadata = $refund->metadata;
@@ -255,26 +236,20 @@ class RefundService implements RefundServiceInterface
 
             return $refundsArray;
         } catch (ApiException $e) {
-            throw new CouldNotFetchMollieRefundsException($orderAttributes->getMollieOrderId(), (string)$order->getOrderNumber(), $e);
+            throw new CouldNotFetchMollieRefundsException($orderAttributes->getMollieOrderId(), (string) $order->getOrderNumber(), $e);
         }
     }
 
     /**
-     * @param OrderEntity $order
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
-     * @return float
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
         return $this->getPayment($order)->getAmountRemaining();
     }
 
-    /**
-     * @param OrderEntity $order
-     * @return float
-     */
     public function getVoucherPaidAmount(OrderEntity $order): float
     {
         $payment = $this->getPayment($order);
@@ -283,7 +258,7 @@ class RefundService implements RefundServiceInterface
             return 0;
         }
 
-        if (!property_exists($payment->details, 'vouchers')) {
+        if (! property_exists($payment->details, 'vouchers')) {
             return 0;
         }
 
@@ -291,18 +266,16 @@ class RefundService implements RefundServiceInterface
 
         /** @var \stdClass $voucher */
         foreach ($payment->details->vouchers as $voucher) {
-            $voucherAmount += (float)$voucher->amount->value;
+            $voucherAmount += (float) $voucher->amount->value;
         }
 
         return $voucherAmount;
     }
 
     /**
-     * @param OrderEntity $order
      * @throws CouldNotFetchMollieOrderException
      * @throws PaymentNotFoundException
      * @throws CouldNotExtractMollieOrderIdException
-     * @return float
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
@@ -311,7 +284,6 @@ class RefundService implements RefundServiceInterface
 
     /**
      * @param array<mixed> $refunds
-     * @return float
      */
     public function getPendingRefundAmount(array $refunds): float
     {
@@ -320,24 +292,19 @@ class RefundService implements RefundServiceInterface
         /** @var array<mixed> $refund */
         foreach ($refunds as $refund) {
             if ($refund['status'] === 'pending') {
-                $pendingRefundAmount += (float)$refund['amount']['value'];
+                $pendingRefundAmount += (float) $refund['amount']['value'];
             }
         }
 
         return $pendingRefundAmount;
     }
 
-
-    /**
-     * @param OrderEntity $order
-     * @return Payment
-     */
     private function getPayment(OrderEntity $order): Payment
     {
         $orderAttributes = new OrderAttributes($order);
 
         if ($orderAttributes->isTypeSubscription()) {
-            # subscriptions do not have a mollie order
+            // subscriptions do not have a mollie order
             $this->gwMollie->switchClient($order->getSalesChannelId());
 
             return $this->gwMollie->getPayment($orderAttributes->getMolliePaymentId());

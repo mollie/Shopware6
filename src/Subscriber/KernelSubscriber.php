@@ -17,26 +17,20 @@ class KernelSubscriber implements EventSubscriberInterface
      */
     private $versionCompare;
 
-    /**
-     * @param VersionCompare $versionCompare
-     */
     public function __construct(VersionCompare $versionCompare)
     {
         $this->versionCompare = $versionCompare;
     }
 
-
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => 'onModifyRouteScope'
+            KernelEvents::CONTROLLER => 'onModifyRouteScope',
         ];
     }
 
     /**
      * the route scopes are added as array to routes.xml in SW 6.4 those are inside RouteScope class. so we convert our array to class
-     * @param ControllerEvent $event
-     * @return void
      */
     public function onModifyRouteScope(ControllerEvent $event): void
     {

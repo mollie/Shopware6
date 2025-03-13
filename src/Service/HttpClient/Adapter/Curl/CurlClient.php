@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\HttpClient\Adapter\Curl;
 
@@ -12,46 +13,34 @@ class CurlClient implements HttpClientInterface
      */
     private $timeoutSeconds;
 
-
-    /**
-     * @param int $timeoutSeconds
-     */
     public function __construct(int $timeoutSeconds)
     {
         $this->timeoutSeconds = $timeoutSeconds;
     }
 
-
-    /**
-     * @param string $method
-     * @param string $url
-     * @param string $content
-     * @return HttpResponse
-     */
     public function sendRequest(string $method, string $url, string $content = ''): HttpResponse
     {
         $handle = curl_init($url);
 
         assert($handle !== false);
 
-        # required to follow any redirects and to get the response
+        // required to follow any redirects and to get the response
         curl_setopt($handle, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
-        # turn on SSL verification
+        // turn on SSL verification
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
 
-        # connect timeout needs to be as short as possible
-        # this is just a ping if the server is reachable
+        // connect timeout needs to be as short as possible
+        // this is just a ping if the server is reachable
         curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 1);
 
-        # this is our real timeout for the request
+        // this is our real timeout for the request
         curl_setopt($handle, CURLOPT_TIMEOUT, $this->timeoutSeconds);
 
-        # set additional data
+        // set additional data
         curl_setopt($handle, CURLOPT_HTTPHEADER, []);
-        curl_setopt($handle, CURLOPT_HEADER, 1); # gets the header in the response
-
+        curl_setopt($handle, CURLOPT_HEADER, 1); // gets the header in the response
 
         curl_setopt($handle, CURLOPT_CUSTOMREQUEST, $method);
 
@@ -66,16 +55,14 @@ class CurlClient implements HttpClientInterface
         return $response;
     }
 
-
     /**
      * @param mixed $handle
-     * @return HttpResponse
      */
     private function execute($handle): HttpResponse
     {
         assert($handle !== false);
 
-        $response = (string)curl_exec($handle);
+        $response = (string) curl_exec($handle);
 
         $header_size = curl_getinfo($handle, CURLINFO_HEADER_SIZE);
 

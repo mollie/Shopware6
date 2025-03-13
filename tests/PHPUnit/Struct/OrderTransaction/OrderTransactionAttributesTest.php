@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct\OrderTransaction;
 
@@ -31,7 +32,7 @@ class OrderTransactionAttributesTest extends TestCase
             'mollie_payments' => [
                 'order_id' => 'order_id',
                 'payment_id' => 'payment_id',
-                'third_party_payment_id' => 'third_party_payment_id'
+                'third_party_payment_id' => 'third_party_payment_id',
             ],
         ]);
 
@@ -39,7 +40,7 @@ class OrderTransactionAttributesTest extends TestCase
             [
                 'order_id' => 'order_id',
                 'payment_id' => 'payment_id',
-                'third_party_payment_id' => 'third_party_payment_id'
+                'third_party_payment_id' => 'third_party_payment_id',
             ],
             $struct->toArray()
         );

@@ -55,6 +55,7 @@ class OrderLineItemStruct extends Struct
     public function setOrderedQuantity(int $orderedQuantity): OrderLineItemStruct
     {
         $this->orderedQuantity = $orderedQuantity;
+
         return $this;
     }
 
@@ -71,12 +72,14 @@ class OrderLineItemStruct extends Struct
     public function setHasPendingRefund(bool $hasPendingRefund): OrderLineItemStruct
     {
         $this->hasPendingRefund = $hasPendingRefund;
+
         return $this;
     }
 
     public function setRefundedCount(int $refundedCount): OrderLineItemStruct
     {
         $this->refundedCount = $refundedCount;
+
         return $this;
     }
 
@@ -88,6 +91,7 @@ class OrderLineItemStruct extends Struct
     public function setRefundableQuantity(int $refundableQuantity): OrderLineItemStruct
     {
         $this->refundableQuantity = $refundableQuantity;
+
         return $this;
     }
 }

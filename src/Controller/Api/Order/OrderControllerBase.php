@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
@@ -19,19 +20,12 @@ class OrderControllerBase extends AbstractController
     /** @var Order */
     private $mollieOrderService;
 
-
     public function __construct(OrderService $orderService, Order $mollieOrderService)
     {
         $this->orderService = $orderService;
         $this->mollieOrderService = $mollieOrderService;
     }
 
-    /**
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     public function paymentUrl(Request $request, Context $context): JsonResponse
     {
         $orderId = $request->get('orderId');
@@ -39,12 +33,6 @@ class OrderControllerBase extends AbstractController
         return $this->paymentUrlResponse($orderId, $context);
     }
 
-    /**
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     public function paymentUrlLegacy(Request $request, Context $context): JsonResponse
     {
         $orderId = $request->get('orderId');

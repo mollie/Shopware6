@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Rule;
 
@@ -16,9 +17,6 @@ class LineItemSubscriptionRule extends Rule
      */
     protected $isSubscription;
 
-
-    /**
-     */
     public function __construct()
     {
         parent::__construct();
@@ -26,21 +24,14 @@ class LineItemSubscriptionRule extends Rule
         $this->isSubscription = false;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'mollie_lineitem_subscription_rule';
     }
 
-    /**
-     * @param RuleScope $scope
-     * @return bool
-     */
     public function match(RuleScope $scope): bool
     {
-        if (!$scope instanceof LineItemScope) {
+        if (! $scope instanceof LineItemScope) {
             return false;
         }
 
@@ -50,7 +41,7 @@ class LineItemSubscriptionRule extends Rule
             return $isItemSubscription;
         }
 
-        return !$isItemSubscription;
+        return ! $isItemSubscription;
     }
 
     /**
@@ -59,14 +50,10 @@ class LineItemSubscriptionRule extends Rule
     public function getConstraints(): array
     {
         return [
-            'isSubscription' => [new Type('bool')]
+            'isSubscription' => [new Type('bool')],
         ];
     }
 
-    /**
-     * @param LineItem $lineItem
-     * @return bool
-     */
     private function isItemSubscription(LineItem $lineItem): bool
     {
         try {

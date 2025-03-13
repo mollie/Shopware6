@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace PHPUnit\Components\Subscription\Services\Builder;
 
@@ -11,7 +12,6 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 class MollieDataBuilderTest extends TestCase
 {
     use BuilderTestTrait;
-
 
     /**
      * This test verifies that our builder creates a correct

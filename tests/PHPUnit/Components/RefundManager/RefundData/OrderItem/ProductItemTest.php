@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\RefundManager\RefundData\OrderItem;
 
@@ -16,10 +17,6 @@ class ProductItemTest extends TestCase
      */
     private $lineItem;
 
-
-    /**
-     * @return void
-     */
     public function setUp(): void
     {
         $this->lineItem = $this->getOrderLineItem(
@@ -37,12 +34,9 @@ class ProductItemTest extends TestCase
         );
     }
 
-
     /**
      * This test verifies that the payload array is
      * correctly built from our ProductItem object.
-     *
-     * @return void
      */
     public function testToArray(): void
     {

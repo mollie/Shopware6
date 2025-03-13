@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
@@ -15,21 +16,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RegularPaymentRemover extends PaymentMethodRemover
 {
-    /**
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
-     * @param OrderItemsExtractor $orderDataExtractor
-     * @param LoggerInterface $logger
-     */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -40,18 +33,18 @@ class RegularPaymentRemover extends PaymentMethodRemover
         foreach ($originalData->getPaymentMethods() as $key => $paymentMethod) {
             $attributes = new PaymentMethodAttributes($paymentMethod);
 
-            # SEPA Direct Debit is only allowed when the customer updates a running subscription.
-            # this means, in our plugin, it's not allowed anymore
+            // SEPA Direct Debit is only allowed when the customer updates a running subscription.
+            // this means, in our plugin, it's not allowed anymore
             if ($attributes->getMollieIdentifier() === PaymentMethod::DIRECTDEBIT) {
                 $originalData->getPaymentMethods()->remove($key);
             }
 
-            # ING HomePay is deprecated
+            // ING HomePay is deprecated
             if ($attributes->getMollieIdentifier() === PaymentMethod::INGHOMEPAY) {
                 $originalData->getPaymentMethods()->remove($key);
             }
 
-            # hiding billie for none business customers
+            // hiding billie for none business customers
             if ($attributes->getMollieIdentifier() === PaymentMethod::BILLIE && $this->companyNameExists($context) === false) {
                 $originalData->getPaymentMethods()->remove($key);
             }
@@ -67,12 +60,13 @@ class RegularPaymentRemover extends PaymentMethodRemover
         if ($customer === null) {
             return false;
         }
-        
+
         $billingAddress = $customer->getActiveBillingAddress();
 
         if ($billingAddress === null) {
             $billingAddress = $customer->getDefaultBillingAddress();
         }
+
         return $billingAddress && ! empty($billingAddress->getCompany());
     }
 }

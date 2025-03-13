@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 class ApplePayDirectDomainSanitizerTest extends TestCase
 {
     private ApplePayDirectDomainSanitizer $sanitizer;
+
     protected function setUp(): void
     {
         $this->sanitizer = new ApplePayDirectDomainSanitizer();

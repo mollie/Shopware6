@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
@@ -44,7 +45,8 @@ class KbcOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
-            ->format('Y-m-d');
+            ->format('Y-m-d')
+        ;
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
@@ -52,14 +54,14 @@ class KbcOrderBuilderTest extends AbstractMollieOrderBuilder
             'method' => $paymentMethod,
             'orderNumber' => $orderNumber,
             'payment' => [
-                'webhookUrl' => $redirectWebhookUrl
+                'webhookUrl' => $redirectWebhookUrl,
             ],
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $expectedOrderLifeTime,
         ];
 
         self::assertSame($expected, $actual);

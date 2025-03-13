@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -18,6 +19,7 @@ class LineItemDataExtractor
      * @var UrlParsingService
      */
     private $urlParsingService;
+
     public function __construct(UrlParsingService $urlParsingService)
     {
         $this->urlParsingService = $urlParsingService;
@@ -28,7 +30,7 @@ class LineItemDataExtractor
         $product = $lineItem->getProduct();
 
         // extra data is not needed for successful orders
-        if (!$product instanceof ProductEntity) {
+        if (! $product instanceof ProductEntity) {
             return new LineItemExtraData($lineItem->getId(), null, null);
         }
 

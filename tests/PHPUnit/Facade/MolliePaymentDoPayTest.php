@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Facade;
 
@@ -57,7 +58,7 @@ class MolliePaymentDoPayTest extends TestCase
             'getId' => 'foo',
         ]);
         $this->customerService = $this->createConfiguredMock(CustomerService::class, [
-            'getCustomer' => $this->customer
+            'getCustomer' => $this->customer,
         ]);
 
         $orderCustomer = $this->createConfiguredMock(OrderCustomerEntity::class, [
@@ -80,7 +81,7 @@ class MolliePaymentDoPayTest extends TestCase
 
         $this->salesChannelContext = $this->createConfiguredMock(SalesChannelContext::class, [
             'getSalesChannel' => $salesChannel,
-            'getContext' => $context
+            'getContext' => $context,
         ]);
 
         $this->payFacade = new MolliePaymentDoPay(
@@ -99,9 +100,6 @@ class MolliePaymentDoPayTest extends TestCase
     }
 
     /**
-     * @param bool $customerIsGuest
-     * @param bool $createCustomersAtMollie
-     * @param bool $shouldCreateMollieCustomer
      * @throws CouldNotCreateMollieCustomerException
      * @throws CustomerCouldNotBeFoundException
      * @dataProvider createMollieCustomerIsCalledTestData
@@ -118,11 +116,13 @@ class MolliePaymentDoPayTest extends TestCase
             $this->customerService
                 ->expects($this->once())
                 ->method('createMollieCustomer')
-                ->with('foo', 'bar', $this->salesChannelContext->getContext());
+                ->with('foo', 'bar', $this->salesChannelContext->getContext())
+            ;
         } else {
             $this->customerService
                 ->expects($this->never())
-                ->method('createMollieCustomer');
+                ->method('createMollieCustomer')
+            ;
         }
 
         $this->payFacade->createCustomerAtMollie($this->order, $this->salesChannelContext);
@@ -132,17 +132,17 @@ class MolliePaymentDoPayTest extends TestCase
     {
         return [
             'customer is not a guest, create customers on => create customer' => [
-                false, true, true
+                false, true, true,
             ],
             'customer is guest, create customers on => do not create customer' => [
-                true, true, false
+                true, true, false,
             ],
             'customer is not a guest, create customers off => do not create customer' => [
-                false, false, false
+                false, false, false,
             ],
             'customer is guest, create customers off => do not create customer' => [
-                true, false, false
-            ]
+                true, false, false,
+            ],
         ];
     }
 }

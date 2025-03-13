@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
@@ -27,9 +28,9 @@ class CustomerTest extends TestCase
             function ($arg) {
                 if ($arg == 'bar') {
                     throw new ApiException();
-                } else {
-                    return $this->createMock(Customer::class);
                 }
+
+                return $this->createMock(Customer::class);
             }
         );
         $customerEndpoint->method('create')->willReturnCallback(
@@ -95,8 +96,6 @@ class CustomerTest extends TestCase
     }
 
     /**
-     * @param null|string $mollieCustomerId
-     * @param bool $expectedValue
      * @dataProvider isLegacyCustomerValidTestData
      */
     public function testIsLegacyCustomerValid(

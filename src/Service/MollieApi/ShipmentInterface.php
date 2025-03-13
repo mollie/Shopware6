@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -9,44 +10,22 @@ use Mollie\Api\Resources\ShipmentCollection;
 
 interface ShipmentInterface
 {
-
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @return array<mixed>
      */
     public function getTotals(string $mollieOrderId, string $salesChannelId): array;
 
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @return array<mixed>
      */
     public function getStatus(string $mollieOrderId, string $salesChannelId): array;
 
-    /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
-     * @return ShipmentCollection
-     */
     public function getShipments(string $mollieOrderId, string $salesChannelId): ShipmentCollection;
 
     /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
      * @param MollieShippingItem[] $items
-     * @param null|ShipmentTrackingInfoStruct $tracking
-     * @return MollieShipment
      */
     public function shipOrder(string $mollieOrderId, string $salesChannelId, array $items, ?ShipmentTrackingInfoStruct $tracking): MollieShipment;
 
-    /**
-     * @param string $mollieOrderId
-     * @param string $salesChannelId
-     * @param string $mollieOrderLineId
-     * @param int $quantity
-     * @param null|ShipmentTrackingInfoStruct $tracking
-     * @return MollieShipment
-     */
     public function shipItem(string $mollieOrderId, string $salesChannelId, string $mollieOrderLineId, int $quantity, ?ShipmentTrackingInfoStruct $tracking): MollieShipment;
 }

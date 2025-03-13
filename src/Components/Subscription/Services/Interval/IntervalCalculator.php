@@ -1,20 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Interval;
 
 class IntervalCalculator
 {
-    /**
-     * @param \DateTimeInterface $baseDateTime
-     * @param int $interval
-     * @param string $intervalUnit
-     * @return string
-     */
     public function getNextIntervalDate(\DateTimeInterface $baseDateTime, int $interval, string $intervalUnit): string
     {
-        # cloning does not really work
-        # even though Shopware sends DateTimeImmutable, we need to ensure
-        # that we don't touch the original one by its reference
+        // cloning does not really work
+        // even though Shopware sends DateTimeImmutable, we need to ensure
+        // that we don't touch the original one by its reference
         $startDateTS = $baseDateTime->getTimestamp();
         $startDate = new \DateTimeImmutable();
         $startDate = $startDate->setTimestamp($startDateTS);

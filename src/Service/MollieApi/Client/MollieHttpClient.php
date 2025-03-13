@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Client;
 
@@ -20,7 +21,6 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      */
     private $responseTimeout;
 
-
     /**
      * @param int $connnectTimeout
      * @param int $responseTimeout
@@ -31,13 +31,14 @@ class MollieHttpClient implements MollieHttpAdapterInterface
         $this->responseTimeout = $responseTimeout;
     }
 
-
     /**
      * @param string $httpMethod
      * @param string $url
      * @param array<mixed> $headers
      * @param string $httpBody
+     *
      * @throws ApiException
+     *
      * @return null|\stdClass
      */
     public function send($httpMethod, $url, $headers, $httpBody)
@@ -46,7 +47,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
         assert($curl !== false);
 
-        $headers["Content-Type"] = "application/json";
+        $headers['Content-Type'] = 'application/json';
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $this->parseHeaders($headers));
@@ -74,13 +75,13 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
                 break;
             default:
-                throw new \InvalidArgumentException("Invalid http method: " . $httpMethod);
+                throw new \InvalidArgumentException('Invalid http method: ' . $httpMethod);
         }
 
         $response = curl_exec($curl);
 
         if ($response === false) {
-            throw new ApiException("Curl error: " . curl_error($curl));
+            throw new ApiException('Curl error: ' . curl_error($curl));
         }
 
         $statusCode = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
@@ -93,9 +94,10 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
     /**
      * The version number for the underlying http client, if available.
-     * @return null|string
-     * @example Guzzle/6.3
      *
+     * @return null|string
+     *
+     * @example Guzzle/6.3
      */
     public function versionString()
     {
@@ -106,7 +108,9 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      * @param string $response
      * @param int $statusCode
      * @param string $httpBody
+     *
      * @throws \Mollie\Api\Exceptions\ApiException
+     *
      * @return null|\stdClass
      */
     protected function parseResponseBody($response, $statusCode, $httpBody)
@@ -116,7 +120,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
                 return null;
             }
 
-            throw new ApiException("No response body found.");
+            throw new ApiException('No response body found.');
         }
 
         $body = @json_decode($response);
@@ -135,14 +139,14 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
             $field = null;
 
-            if (!empty($body->field)) {
+            if (! empty($body->field)) {
                 $field = $body->field;
             }
 
             if (isset($body->_links, $body->_links->documentation)) {
                 $message .= ". Documentation: {$body->_links->documentation->href}";
             }
-            
+
             throw new ApiException($message, $statusCode, $field);
         }
 
@@ -151,6 +155,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
 
     /**
      * @param array<mixed> $headers
+     *
      * @return array<mixed>
      */
     protected function parseHeaders($headers)

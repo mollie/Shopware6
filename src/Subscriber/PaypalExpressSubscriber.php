@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -49,14 +50,6 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
      */
     private $cartBackupService;
 
-    /**
-     * @param SettingsService $settingsService
-     * @param PayPalExpress $paypal
-     * @param CartBackupService $cartBackupService
-     * @param CartService $cartService
-     * @param CartServiceInterface $mollieCartService
-     * @param CartBackupService $cartBackupService
-     */
     public function __construct(SettingsService $settingsService, PayPalExpress $paypal, CartBackupService $cartBackupService, CartService $cartService, CartServiceInterface $mollieCartService)
     {
         $this->settingsService = $settingsService;
@@ -66,9 +59,8 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
         $this->mollieCartService = $mollieCartService;
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
@@ -80,9 +72,7 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param StorefrontRenderEvent $event
      * @throws \Exception
-     * @return void
      */
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {
@@ -105,8 +95,6 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
     /**
      * If our apple pay direct payment is done, we want to restore the original cart
      * just in case if the customer had some items in there.
-     * @param CheckoutFinishPageLoadedEvent $event
-     * @return void
      */
     public function onCheckoutSuccess(CheckoutFinishPageLoadedEvent $event): void
     {
@@ -114,13 +102,13 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
 
         $latestTransaction = $mollieShopwareOrder->getLatestTransaction();
 
-        if (!$latestTransaction instanceof OrderTransactionEntity) {
+        if (! $latestTransaction instanceof OrderTransactionEntity) {
             return;
         }
 
         $paymentMethod = $latestTransaction->getPaymentMethod();
 
-        if (!$paymentMethod instanceof PaymentMethodEntity) {
+        if (! $paymentMethod instanceof PaymentMethodEntity) {
             return;
         }
 
@@ -141,59 +129,56 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
      * If the user is on the PayPal page during the express checkout
      * but somehow gets back to the shop outside of our success/cancel controller actions
      * we need to check if we need to cancel PPE. otherwise the user would be stuck in that process.
-     * @param ResponseEvent $event
-     * @return void
      */
     public function onResetPaypalExpress(ResponseEvent $event): void
     {
         $salesChannelContext = $event->getRequest()->attributes->get('sw-sales-channel-context');
 
-        if (!$salesChannelContext instanceof SalesChannelContext) {
+        if (! $salesChannelContext instanceof SalesChannelContext) {
             return;
         }
 
         $pathInfo = $event->getRequest()->getPathInfo();
 
-        # we must not clear things in our controlled PayPal express process
+        // we must not clear things in our controlled PayPal express process
         if ($this->stringContains($pathInfo, '/mollie/paypal-express')) {
             return;
         }
 
         $paymentEnabled = $this->isPPEActive($salesChannelContext);
 
-        # now we need to figure out if the user came back from PayPal express before finalizing the authentication.
-        # If so, we need to reset PayPal express, otherwise the user would be stuck in using it
-        if (!$paymentEnabled) {
+        // now we need to figure out if the user came back from PayPal express before finalizing the authentication.
+        // If so, we need to reset PayPal express, otherwise the user would be stuck in using it
+        if (! $paymentEnabled) {
             return;
         }
-
 
         $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
 
         $mollieShopwareCart = new MollieShopwareCart($cart);
 
-        # if paypal is either not started or confirmed, then do nothing
-        # incomplete means, we have started it, but authorization was not finished
-        if (!$mollieShopwareCart->isPayPalExpressIncomplete()) {
+        // if paypal is either not started or confirmed, then do nothing
+        // incomplete means, we have started it, but authorization was not finished
+        if (! $mollieShopwareCart->isPayPalExpressIncomplete()) {
             return;
         }
 
         if ($mollieShopwareCart->isSingleProductExpressCheckout()) {
-            # we want to restore our original cart
+            // we want to restore our original cart
             $cart = $this->cartBackupService->restoreCart($salesChannelContext);
             $this->cartBackupService->clearBackup($salesChannelContext);
 
             $mollieShopwareCart = new MollieShopwareCart($cart);
         }
 
-        # always make sure that paypal express data is really cleaned
+        // always make sure that paypal express data is really cleaned
         $mollieShopwareCart->clearPayPalExpress();
         $cart = $mollieShopwareCart->getCart();
 
         $this->mollieCartService->persistCart($cart, $salesChannelContext);
 
-        # we have to do a refresh of our page, so
-        # that the restored cart + the updated payment method options are updated
+        // we have to do a refresh of our page, so
+        // that the restored cart + the updated payment method options are updated
         $request = $event->getRequest();
         $response = new RedirectResponse($request->getUri());
         $response->send();
@@ -203,7 +188,7 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
     {
         $settings = $this->settingsService->getSettings($context->getSalesChannel()->getId());
 
-        if (!$settings->isPaypalExpressEnabled()) {
+        if (! $settings->isPaypalExpressEnabled()) {
             return false;
         }
 

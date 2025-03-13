@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Webhook;
 
@@ -43,14 +44,6 @@ class WebhookControllerBase extends AbstractController
      */
     private $repoOrderTransactions;
 
-
-    /**
-     * @param NotificationFacade $notificationFacade
-     * @param SubscriptionManager $subscriptions
-     * @param OrderRepository $repoOrders
-     * @param OrderTransactionRepository $repoOrderTransactions
-     * @param LoggerInterface $logger
-     */
     public function __construct(NotificationFacade $notificationFacade, SubscriptionManager $subscriptions, OrderRepository $repoOrders, OrderTransactionRepository $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->notificationFacade = $notificationFacade;
@@ -60,30 +53,23 @@ class WebhookControllerBase extends AbstractController
         $this->logger = $logger;
     }
 
-
-    /**
-     *
-     * @param string $swTransactionId
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookAction(string $swTransactionId, Request $request, Context $context): JsonResponse
     {
         try {
             $this->notificationFacade->onNotify($swTransactionId, $context);
 
             return new JsonResponse([
-                'success' => true
+                'success' => true,
             ]);
         } catch (WebhookIsTooEarlyException $exception) {
             $this->logger->debug('Webhook too early', [
-                ['message' => $exception->getMessage()]
+                ['message' => $exception->getMessage()],
             ]);
+
             return new JsonResponse(
                 [
                     'success' => false,
-                    'error' => $exception->getMessage()
+                    'error' => $exception->getMessage(),
                 ],
                 Response::HTTP_TOO_EARLY
             );
@@ -91,60 +77,44 @@ class WebhookControllerBase extends AbstractController
             $this->logger->error(
                 'Error in Mollie Webhook for Transaction ' . $swTransactionId,
                 [
-                    'error' => $ex->getMessage()
+                    'error' => $ex->getMessage(),
                 ]
             );
 
             return new JsonResponse(
                 [
                     'success' => false,
-                    'error' => $ex->getMessage()
+                    'error' => $ex->getMessage(),
                 ],
                 422
             );
         }
     }
 
-    /**
-     *
-     * @param string $swTransactionId
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookLegacyAction(string $swTransactionId, Request $request, Context $context): JsonResponse
     {
         return $this->webhookAction($swTransactionId, $request, $context);
     }
 
-
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param Request $request
-     * @param RequestDataBag $requestData
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookSubscriptionAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
-        # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
+        // just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
         $swSubscriptionId = strtolower($swSubscriptionId);
 
-        # Mollie automatically sends the new payment id and the subscription id.
-        # we do not know that payment yet, because it has just been made by Mollie.
-        $molliePaymentId = (string)$requestData->get('id');
-        $mollieSubscriptionId = (string)$requestData->get('subscriptionId');
+        // Mollie automatically sends the new payment id and the subscription id.
+        // we do not know that payment yet, because it has just been made by Mollie.
+        $molliePaymentId = (string) $requestData->get('id');
+        $mollieSubscriptionId = (string) $requestData->get('subscriptionId');
 
         try {
             $allParams = $request->query->all();
 
             if (empty($molliePaymentId) && isset($allParams['id'])) {
-                $molliePaymentId = (string)$allParams['id'];
+                $molliePaymentId = (string) $allParams['id'];
             }
 
             if (empty($mollieSubscriptionId) && isset($allParams['subscriptionId'])) {
-                $mollieSubscriptionId = (string)$allParams['subscriptionId'];
+                $mollieSubscriptionId = (string) $allParams['subscriptionId'];
             }
 
             if (empty($molliePaymentId)) {
@@ -153,9 +123,9 @@ class WebhookControllerBase extends AbstractController
 
             $subscription = $this->subscriptions->findSubscription($swSubscriptionId, $context);
 
-            # first search if we already have an existing order
-            # with our Mollie ID. If we have one, then this is only an update webhook
-            # for that order. If we do not have one, then create a new Shopware order
+            // first search if we already have an existing order
+            // with our Mollie ID. If we have one, then this is only an update webhook
+            // for that order. If we do not have one, then create a new Shopware order
             $existingOrders = $this->repoOrders->findByMollieId($subscription->getCustomerId(), $molliePaymentId, $context);
 
             if ($existingOrders->count() <= 0) {
@@ -164,21 +134,22 @@ class WebhookControllerBase extends AbstractController
                 $swOrder = $existingOrders->last();
             }
 
-            # now lets grab the latest order transaction of our new order
+            // now lets grab the latest order transaction of our new order
             $latestTransaction = $this->repoOrderTransactions->getLatestOrderTransaction($swOrder->getId(), $context);
 
-            # now simply redirect to the official webhook
-            # that handles the full order, validates the payment and
-            # starts to trigger things.
+            // now simply redirect to the official webhook
+            // that handles the full order, validates the payment and
+            // starts to trigger things.
             return $this->webhookAction($latestTransaction->getId(), $request, $context);
         } catch (SubscriptionSkippedException $ex) {
-            # if we skip a new subscription, then we need to respond with
-            # 200 OK so that Mollie will not try it again.
+            // if we skip a new subscription, then we need to respond with
+            // 200 OK so that Mollie will not try it again.
             $this->logger->info($ex->getMessage());
+
             return new JsonResponse(
                 [
                     'success' => true,
-                    'message' => $ex->getMessage()
+                    'message' => $ex->getMessage(),
                 ],
                 200
             );
@@ -190,77 +161,44 @@ class WebhookControllerBase extends AbstractController
                     'request' => [
                         'paymentId' => $molliePaymentId,
                         'subscriptionId' => $mollieSubscriptionId,
-                    ]
+                    ],
                 ]
             );
 
             return new JsonResponse(
                 [
                     'success' => false,
-                    'error' => $ex->getMessage()
+                    'error' => $ex->getMessage(),
                 ],
                 422
             );
         }
     }
 
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param Request $request
-     * @param RequestDataBag $requestData
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookSubscriptionLegacyAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
         return $this->webhookSubscriptionAction($swSubscriptionId, $request, $requestData, $context);
     }
 
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param Request $request
-     * @param RequestDataBag $requestData
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookSubscriptionRenewAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
         return $this->webhookSubscriptionAction($swSubscriptionId, $request, $requestData, $context);
     }
 
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param Request $request
-     * @param RequestDataBag $requestData
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookSubscriptionRenewLegacyAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
         return $this->webhookSubscriptionAction($swSubscriptionId, $request, $requestData, $context);
     }
 
-
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param Request $request
-     * @param RequestDataBag $requestData
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookSubscriptionMandateUpdatedAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
-        # just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
+        // just to improve testing and manual calls, make it is lower case (requirement for entity repositories)
         $swSubscriptionId = strtolower($swSubscriptionId);
 
         try {
             $this->subscriptions->updatePaymentMethodConfirm($swSubscriptionId, $context);
 
-            return new JsonResponse(['success' => true,], 200);
+            return new JsonResponse(['success' => true], 200);
         } catch (\Throwable $ex) {
             $this->logger->error(
                 'Error in Mollie Webhook for Subscription payment method update ' . $swSubscriptionId,
@@ -273,14 +211,6 @@ class WebhookControllerBase extends AbstractController
         }
     }
 
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param Request $request
-     * @param RequestDataBag $requestData
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function webhookSubscriptionMandateUpdatedLegacyAction(string $swSubscriptionId, Request $request, RequestDataBag $requestData, Context $context): JsonResponse
     {
         return $this->webhookSubscriptionMandateUpdatedAction($swSubscriptionId, $request, $requestData, $context);

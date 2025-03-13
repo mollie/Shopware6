@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -25,11 +26,6 @@ class OrderDataExtractor
      */
     private $customerService;
 
-
-    /**
-     * @param LoggerInterface $loggerService
-     * @param CustomerService $customerService
-     */
     public function __construct(LoggerInterface $loggerService, CustomerService $customerService)
     {
         $this->logger = $loggerService;
@@ -40,7 +36,7 @@ class OrderDataExtractor
     {
         $orderCustomer = $order->getOrderCustomer();
 
-        if (!$orderCustomer instanceof OrderCustomerEntity) {
+        if (! $orderCustomer instanceof OrderCustomerEntity) {
             $this->logger->critical(
                 sprintf('Could not fetch customer from order with id %s', $order->getId())
             );
@@ -49,11 +45,11 @@ class OrderDataExtractor
         }
 
         $enrichedCustomer = $this->customerService->getCustomer(
-            (string)$orderCustomer->getCustomerId(),
+            (string) $orderCustomer->getCustomerId(),
             $salesChannelContext->getContext()
         );
 
-        if (!$enrichedCustomer instanceof CustomerEntity) {
+        if (! $enrichedCustomer instanceof CustomerEntity) {
             $this->logger->critical(
                 sprintf('Could not find customer with id %s in database', $order->getId())
             );
@@ -68,7 +64,7 @@ class OrderDataExtractor
     {
         $currency = $orderEntity->getCurrency();
 
-        if (!$currency instanceof CurrencyEntity) {
+        if (! $currency instanceof CurrencyEntity) {
             $this->logger->critical(
                 sprintf('Could not fetch currency from order with id %s', $orderEntity->getId())
             );
@@ -90,7 +86,7 @@ class OrderDataExtractor
         // try to fetch locale information from saleschannel
         $salesChannelLanguage = $salesChannelContext->getSalesChannel()->getLanguage();
 
-        if (!$salesChannelLanguage instanceof LanguageEntity) {
+        if (! $salesChannelLanguage instanceof LanguageEntity) {
             return null;
         }
 

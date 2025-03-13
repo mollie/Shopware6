@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\POS\Response;
 
@@ -11,7 +12,6 @@ class TerminalsResponse extends StoreApiResponse
      * @var ArrayStruct<mixed, mixed>
      */
     protected $object;
-
 
     /**
      * @param array<mixed> $terminals

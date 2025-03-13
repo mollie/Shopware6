@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder;
 
@@ -21,15 +22,9 @@ abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
      */
     private $logger;
 
-
-    /**
-     * @param EntityRepository $scheduledTaskRepository
-     * @param SubscriptionManager $subscriptionManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(EntityRepository $scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
-        /** @phpstan-ignore-next-line  */
+        /* @phpstan-ignore-next-line  */
         parent::__construct($scheduledTaskRepository, $logger);
 
         $this->subscriptionManager = $subscriptionManager;
@@ -47,9 +42,6 @@ abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
         ];
     }
 
-    /**
-     *
-     */
     public function run(): void
     {
         try {

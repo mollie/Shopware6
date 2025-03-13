@@ -24,7 +24,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AccountOrderPageLoadedEvent::class => 'accountOrderDetailPageLoaded'
+            AccountOrderPageLoadedEvent::class => 'accountOrderDetailPageLoaded',
         ];
     }
 

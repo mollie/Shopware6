@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs;
 
@@ -16,36 +17,22 @@ class SuccessStruct extends Struct
      */
     private $apiAlias;
 
-
-    /**
-     * @param bool $enabled
-     * @param string $apiAlias
-     */
     public function __construct(bool $enabled, string $apiAlias)
     {
         $this->success = $enabled;
         $this->apiAlias = $apiAlias;
     }
 
-    /**
-     * @return bool
-     */
     public function isSuccess(): bool
     {
         return $this->success;
     }
 
-    /**
-     * @param bool $success
-     */
     public function setSuccess(bool $success): void
     {
         $this->success = $success;
     }
 
-    /**
-     * @return string
-     */
     public function getApiAlias(): string
     {
         return $this->apiAlias;

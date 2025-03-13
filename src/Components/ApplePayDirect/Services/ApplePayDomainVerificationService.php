@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
@@ -20,7 +21,6 @@ class ApplePayDomainVerificationService
      */
     public const LOCAL_FILE = '/.well-known/apple-developer-merchantid-domain-association';
 
-
     /**
      * @var Filesystem
      */
@@ -31,11 +31,6 @@ class ApplePayDomainVerificationService
      */
     private $httpClient;
 
-
-    /**
-     * @param Filesystem $filesystem
-     * @param HttpClientInterface $httpClient
-     */
     public function __construct(Filesystem $filesystem, HttpClientInterface $httpClient)
     {
         $this->filesystem = $filesystem;

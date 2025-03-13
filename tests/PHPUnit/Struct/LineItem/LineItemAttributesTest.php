@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct\LineItem;
 
@@ -58,7 +59,6 @@ class LineItemAttributesTest extends TestCase
         $this->assertEquals('', $attributes->getProductNumber());
     }
 
-
     /**
      * This test verifies that nothing breaks if we
      * have NULL instead of a payload array.
@@ -79,7 +79,7 @@ class LineItemAttributesTest extends TestCase
     {
         $item = new LineItem('', '');
         $item->setPayload([
-            'customFields' => []
+            'customFields' => [],
         ]);
 
         $attributes = new LineItemAttributes($item);
@@ -95,7 +95,7 @@ class LineItemAttributesTest extends TestCase
     {
         $item = new LineItem('', '');
         $item->setPayload([
-            'customFields' => null
+            'customFields' => null,
         ]);
 
         $attributes = new LineItemAttributes($item);
@@ -113,7 +113,7 @@ class LineItemAttributesTest extends TestCase
         $item->setPayload([
             'customFields' => [
                 'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
-            ]
+            ],
         ]);
 
         $attributes = new LineItemAttributes($item);
@@ -131,13 +131,13 @@ class LineItemAttributesTest extends TestCase
         $item->setPayload([
             'customFields' => [
                 'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
-            ]
+            ],
         ]);
 
         $attributes = new LineItemAttributes($item);
 
         $expected = [
-            'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL
+            'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
         ];
 
         $this->assertEquals($expected, $attributes->toArray());

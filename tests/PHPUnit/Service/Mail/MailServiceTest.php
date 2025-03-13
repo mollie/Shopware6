@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\Mail;
 
@@ -18,7 +19,6 @@ class MailServiceTest extends TestCase
     private const RECIPIENT_DE = 'Mollie Support DE <meinsupport@mollie.com>';
     private const RECIPIENT_INTL = 'Mollie Support <info@mollie.com>';
 
-
     /**
      * @var MailFactory
      */
@@ -29,20 +29,16 @@ class MailServiceTest extends TestCase
      */
     private $dataValidator;
 
-
-    /**
-     * @return void
-     */
     public function setUp(): void
     {
         $this->dataValidator = $this->createMock(DataValidator::class);
 
         $validator = $this->createConfiguredMock(ValidatorInterface::class, [
-            'validate' => (new ConstraintViolationList())
+            'validate' => (new ConstraintViolationList()),
         ]);
 
         $fileSystem = $this->createConfiguredMock(FilesystemInterface::class, [
-            'getMimetype' => 'application/fake'
+            'getMimetype' => 'application/fake',
         ]);
 
         $fileSystem->method('read')->willReturnCallback(function ($url) {
@@ -51,7 +47,6 @@ class MailServiceTest extends TestCase
 
         $this->mailFactory = new MailFactory($validator, $fileSystem);
     }
-
 
     /**
      * This test verifies that we send the correct mail data
@@ -62,6 +57,7 @@ class MailServiceTest extends TestCase
      * @param $expectedData
      * @param $mailData
      * @param $attachments
+     *
      * @return void
      */
     public function testMailSenderGetsCorrectData($expectedData, $mailData, $attachments)
@@ -91,10 +87,9 @@ class MailServiceTest extends TestCase
                 $this->assertInstanceOf(DataPart::class, $actualAttachment, 'No attachment found in actual mail');
                 $this->assertEquals($expectedAttachment->getBody(), $actualAttachment->getBody(), 'attachment body is wrong');
 
-                $index++;
+                ++$index;
             }
         });
-
 
         $mailService = new MailService(
             $this->dataValidator,
@@ -105,10 +100,6 @@ class MailServiceTest extends TestCase
         $mailService->send($mailData, $attachments);
     }
 
-
-    /**
-     * @return array
-     */
     public function getMailData(): array
     {
         return [
@@ -143,8 +134,8 @@ class MailServiceTest extends TestCase
                         'content' => 'foo',
                         'fileName' => 'bar.txt',
                         'mimeType' => 'text/plain',
-                    ]
-                ]
+                    ],
+                ],
             ],
             '4. International support, no attachments' => [
                 [
@@ -157,13 +148,12 @@ class MailServiceTest extends TestCase
                     'Hello world',
                     'Max Mustermann',
                     'maxmustermann@localhost'
-                )
-                ,
+                ),
                 [],
             ],
             '5. International support without passing locale, no attachments' => [
                 [
-                    'expectedTo' => self::RECIPIENT_INTL
+                    'expectedTo' => self::RECIPIENT_INTL,
                 ],
                 $this->buildMailArrayData(
                     'Help needed',
@@ -179,12 +169,6 @@ class MailServiceTest extends TestCase
     }
 
     /**
-     * @param string $subject
-     * @param string $host
-     * @param string $locale
-     * @param string $html
-     * @param string $replyName
-     * @param string $replyMail
      * @return string[]
      */
     private function buildMailArrayData(string $subject, string $host, string $locale, string $html, string $replyName, string $replyMail)
@@ -200,9 +184,6 @@ class MailServiceTest extends TestCase
     }
 
     /**
-     * @param array $data
-     * @param array $attachments
-     * @param array $expectedData
      * @return Email
      */
     private function buildExpectedMailObject(array $data, array $attachments, array $expectedData)
@@ -216,7 +197,6 @@ class MailServiceTest extends TestCase
         $email->returnPath(sprintf('%s <%s>', $data['replyToName'], $data['replyToEmail']));
         $email->replyTo(sprintf('%s <%s>', $data['replyToName'], $data['replyToEmail']));
 
-
         $html = sprintf('<div style="font-family:arial; font-size:12px;">%s</div>', $data['contentHtml']);
         $text = strip_tags(str_replace(['</p>', '<br>', '<br/>'], "\r\n", $html));
 
@@ -225,7 +205,7 @@ class MailServiceTest extends TestCase
 
         foreach ($attachments as $attachment) {
             if (is_string($attachment)) {
-                # embed our file if we have a filename
+                // embed our file if we have a filename
                 // TODO Daniel: This has changed in 6.4.20ish, file attachments work differently. Probably disallow adding filepath attachments and redo removed test.
                 //$email->embedFromPath($attachment, basename($attachment), 'application/fake');
                 continue;

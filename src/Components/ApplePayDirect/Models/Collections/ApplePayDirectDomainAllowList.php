@@ -27,6 +27,7 @@ class ApplePayDirectDomainAllowList implements Countable
      * Create a new ApplePayDirectDomainAllowList
      *
      * @param ApplePayDirectDomainAllowListItem ...$items
+     *
      * @return ApplePayDirectDomainAllowList
      */
     public static function create(ApplePayDirectDomainAllowListItem ...$items): self
@@ -36,9 +37,6 @@ class ApplePayDirectDomainAllowList implements Countable
 
     /**
      * Check if the given value is in the allow list
-     *
-     * @param string $value
-     * @return bool
      */
     public function contains(string $value): bool
     {
@@ -51,16 +49,13 @@ class ApplePayDirectDomainAllowList implements Countable
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isEmpty(): bool
     {
         return count($this) === 0;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function count(): int
     {

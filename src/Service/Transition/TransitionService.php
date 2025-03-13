@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Transition;
 
@@ -14,18 +15,13 @@ class TransitionService implements TransitionServiceInterface
      */
     private $stateMachineRegistry;
 
-    /**
-     * @param StateMachineRegistry $stateMachineRegistry
-     */
     public function __construct(StateMachineRegistry $stateMachineRegistry)
     {
         $this->stateMachineRegistry = $stateMachineRegistry;
     }
 
     /**
-     * @param string $transition
      * @param array<mixed> $availableTransitions
-     * @return bool
      */
     public function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {

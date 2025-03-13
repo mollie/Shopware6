@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail;
 
@@ -15,7 +16,7 @@ abstract class AbstractMailService
         'de-DE' => [
             // email => name
             'meinsupport@mollie.com' => 'Mollie Support DE',
-        ]
+        ],
     ];
 
     private const INT_RECIPIENTS = [
@@ -26,18 +27,19 @@ abstract class AbstractMailService
     /**
      * @param array<string, mixed> $data
      * @param array<array<string, mixed>> $attachments
+     *
      * @throws ConstraintViolationException
-     * @return void
      */
     abstract public function send(array $data, array $attachments = []): void;
 
     /**
      * @param array<mixed> $data
+     *
      * @return string[]
      */
     protected function getNoReplyAddress(array $data): array
     {
-        if (!array_key_exists('noReplyHost', $data)) {
+        if (! array_key_exists('noReplyHost', $data)) {
             $request = Request::createFromGlobals();
             $data['noReplyHost'] = $request->getHost();
         }
@@ -48,12 +50,11 @@ abstract class AbstractMailService
     }
 
     /**
-     * @param null|string $locale
      * @return string[]
      */
     protected function getRecipients(?string $locale = null): array
     {
-        if (!empty($locale) && array_key_exists($locale, self::RECIPIENTS)) {
+        if (! empty($locale) && array_key_exists($locale, self::RECIPIENTS)) {
             return self::RECIPIENTS[$locale];
         }
 
@@ -62,6 +63,7 @@ abstract class AbstractMailService
 
     /**
      * @param array<mixed> $data
+     *
      * @return array<mixed>
      */
     protected function buildContents(array $data): array
@@ -76,7 +78,9 @@ abstract class AbstractMailService
 
     /**
      * @param array<mixed> $attachments
+     *
      * @return array<mixed>
+     *
      * @deprecated
      */
     protected function filterFileAttachments(array $attachments = []): array
@@ -89,6 +93,7 @@ abstract class AbstractMailService
 
     /**
      * @param array<mixed> $attachments
+     *
      * @return array<mixed>
      */
     protected function filterBinaryAttachments(array $attachments = []): array
@@ -101,9 +106,6 @@ abstract class AbstractMailService
         });
     }
 
-    /**
-     * @return DataValidationDefinition
-     */
     protected function getValidationDefinition(): DataValidationDefinition
     {
         $definition = new DataValidationDefinition('mail_service.send');

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Helper;
 
@@ -10,10 +10,8 @@ class ModeHelper
 {
     /**
      * @param array<mixed> $data
-     * @param MollieApiClient $apiClient
-     * @param MollieSettingStruct $settings
      */
-    public static function addModeToData(array &$data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
+    public static function addModeToData(array & $data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
     {
         if ($apiClient->usesOAuth() === true && $settings->isTestMode() === true) {
             $data['testmode'] = true;

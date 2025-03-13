@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Subscriber;
 
@@ -56,11 +57,6 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
      */
     private $businessEventCollector;
 
-
-    /**
-     * @param string $shopwareVersion
-     * @param BusinessEventCollector $businessEventCollector
-     */
     public function __construct(string $shopwareVersion, BusinessEventCollector $businessEventCollector)
     {
         $this->versionCompare = new VersionCompare($shopwareVersion);
@@ -78,16 +74,11 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param BusinessEventCollectorEvent $event
-     * @return void
-     */
     public function onAddEvent(BusinessEventCollectorEvent $event): void
     {
         $collection = $event->getCollection();
 
         $events = [
-
             WebhookReceivedPaidEvent::class,
             WebhookReceivedFailedEvent::class,
             WebhookReceivedExpiredEvent::class,
@@ -101,15 +92,15 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
         ];
 
         if ($this->versionCompare->gte('6.5.1.0')) {
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = WebhookReceivedEvent651::class;
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = OrderSuccessEvent651::class;
             $events[] = OrderFailedEvent651::class;
             $events[] = OrderCanceledEvent651::class;
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = RefundStartedEvent651::class;
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = SubscriptionRemindedEvent651::class;
             $events[] = SubscriptionStartedEvent651::class;
             $events[] = SubscriptionPausedEvent651::class;
@@ -119,15 +110,15 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
             $events[] = SubscriptionCancelledEvent651::class;
             $events[] = SubscriptionRenewedEvent651::class;
         } else {
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = WebhookReceivedEvent::class;
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = OrderSuccessEvent::class;
             $events[] = OrderFailedEvent::class;
             $events[] = OrderCanceledEvent::class;
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = RefundStartedEvent::class;
-            # --------------------------------------------
+            // --------------------------------------------
             $events[] = SubscriptionRemindedEvent::class;
             $events[] = SubscriptionStartedEvent::class;
             $events[] = SubscriptionPausedEvent::class;

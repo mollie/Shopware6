@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events;
 
@@ -33,12 +34,6 @@ class WebhookReceivedEvent extends Event implements OrderAware, MailAware, Sales
      */
     protected $context;
 
-
-    /**
-     * @param OrderEntity $orderEntity
-     * @param string $status
-     * @param Context $context
-     */
     public function __construct(OrderEntity $orderEntity, string $status, Context $context)
     {
         $this->order = $orderEntity;
@@ -46,64 +41,44 @@ class WebhookReceivedEvent extends Event implements OrderAware, MailAware, Sales
         $this->context = $context;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'mollie.webhook_received.All';
     }
 
-    /**
-     * @return EventDataCollection
-     */
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
             ->add('order', new EntityType(OrderDefinition::class))
-            ->add('mollieStatus', new ScalarValueType('string'));
+            ->add('mollieStatus', new ScalarValueType('string'))
+        ;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderId(): string
     {
         return $this->order->getId();
     }
 
-    /**
-     * @return OrderEntity
-     */
     public function getOrder(): OrderEntity
     {
         return $this->order;
     }
 
-    /**
-     * @return string
-     */
     public function getMollieStatus(): string
     {
         return $this->status;
     }
 
-    /**
-     * @return Context
-     */
     public function getContext(): Context
     {
         return $this->context;
     }
 
-    /**
-     * @return MailRecipientStruct
-     */
     public function getMailStruct(): MailRecipientStruct
     {
         $customer = $this->order->getOrderCustomer();
 
-        if (!$customer instanceof OrderCustomerEntity) {
+        if (! $customer instanceof OrderCustomerEntity) {
             return new MailRecipientStruct([]);
         }
 
@@ -112,9 +87,6 @@ class WebhookReceivedEvent extends Event implements OrderAware, MailAware, Sales
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function getSalesChannelId(): string
     {
         return $this->order->getSalesChannelId();

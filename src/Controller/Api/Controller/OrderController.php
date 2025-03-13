@@ -48,14 +48,6 @@ class OrderController extends AbstractController
      */
     private $orderRepository;
 
-    /**
-     * @param RequestBagFactory $requestBagFactory
-     * @param ConfigControllerBase $baseController
-     * @param ShippingControllerBase $shippingController
-     * @param OrderControllerBase $orderController
-     * @param CancelLineController $cancelLineController
-     * @param EntityRepository $orderRepository
-     */
     public function __construct(
         RequestBagFactory $requestBagFactory,
         ConfigControllerBase $baseController,
@@ -102,7 +94,7 @@ class OrderController extends AbstractController
             }
         }
 
-        return new JsonResponse(array_merge(['success' => true,], $result));
+        return new JsonResponse(array_merge(['success' => true], $result));
     }
 
     private function getSalesChannelId(string $orderId, Context $context): string
@@ -127,7 +119,8 @@ class OrderController extends AbstractController
          * @var OrderEntity $order
          */
         $order = $orders->first();
-        $customFields =  $order->getCustomFields();
-        return $customFields[CustomFieldsInterface::MOLLIE_KEY]['order_id']??'';
+        $customFields = $order->getCustomFields();
+
+        return $customFields[CustomFieldsInterface::MOLLIE_KEY]['order_id'] ?? '';
     }
 }

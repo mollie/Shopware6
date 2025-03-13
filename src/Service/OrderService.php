@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -33,6 +34,11 @@ class OrderService implements OrderServiceInterface
     protected $orderRepository;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var ShopwareOrderService
      */
     private $swOrderService;
@@ -57,20 +63,6 @@ class OrderService implements OrderServiceInterface
      */
     private $orderDeliveryService;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @param EntityRepository $orderRepository
-     * @param ShopwareOrderService $swOrderService
-     * @param Order $mollieOrderService
-     * @param UpdateOrderCustomFields $updateOrderCustomFields
-     * @param UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields
-     * @param OrderDeliveryService $orderDeliveryService
-     * @param LoggerInterface $logger
-     */
     public function __construct(EntityRepository $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
@@ -82,20 +74,14 @@ class OrderService implements OrderServiceInterface
         $this->logger = $logger;
     }
 
-
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return OrderEntity
-     */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
         $criteria = new Criteria([$orderId]);
 
         $criteria->addAssociation('currency');
         $criteria->addAssociation('addresses');
-        $criteria->addAssociation('addresses.country');     # required for FlowBuilder -> send confirm email option
-        $criteria->addAssociation('billingAddress');    # important for subscription creation
+        $criteria->addAssociation('addresses.country');     // required for FlowBuilder -> send confirm email option
+        $criteria->addAssociation('billingAddress');    // important for subscription creation
         $criteria->addAssociation('billingAddress.country');
         $criteria->addAssociation('orderCustomer');
         $criteria->addAssociation('stateMachineState');
@@ -113,8 +99,7 @@ class OrderService implements OrderServiceInterface
         $criteria->addAssociation('transactions.paymentMethod');
         $criteria->addAssociation('transactions.paymentMethod.appPaymentMethod.app');
         $criteria->addAssociation('transactions.stateMachineState');
-        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME . '.refundItems'); # for refund manager
-
+        $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME . '.refundItems'); // for refund manager
 
         $order = $this->orderRepository->search($criteria, $context)->first();
 
@@ -129,11 +114,6 @@ class OrderService implements OrderServiceInterface
         throw CartException::orderNotFound($orderId);
     }
 
-    /**
-     * @param string $orderNumber
-     * @param Context $context
-     * @return OrderEntity
-     */
     public function getOrderByNumber(string $orderNumber, Context $context): OrderEntity
     {
         $criteria = new Criteria();
@@ -153,22 +133,19 @@ class OrderService implements OrderServiceInterface
     }
 
     /**
-     * @param string $deliveryId
-     * @param Context $context
      * @throws \Exception
-     * @return OrderEntity
      */
     public function getOrderByDeliveryId(string $deliveryId, Context $context): OrderEntity
     {
         $delivery = $this->orderDeliveryService->getDelivery($deliveryId, $context);
 
-        if (!$delivery instanceof OrderDeliveryEntity) {
+        if (! $delivery instanceof OrderDeliveryEntity) {
             throw new \Exception('Delivery with id ' . $deliveryId . ' not found');
         }
 
         $order = $delivery->getOrder();
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             throw new \Exception('Order with id ' . $delivery->getOrderId() . ' not found');
         }
 
@@ -176,9 +153,7 @@ class OrderService implements OrderServiceInterface
     }
 
     /**
-     * @param OrderEntity $order
      * @throws CouldNotExtractMollieOrderIdException
-     * @return string
      */
     public function getMollieOrderId(OrderEntity $order): string
     {
@@ -191,16 +166,12 @@ class OrderService implements OrderServiceInterface
         }
 
         if (empty($mollieOrderId)) {
-            throw new CouldNotExtractMollieOrderIdException((string)$order->getOrderNumber());
+            throw new CouldNotExtractMollieOrderIdException((string) $order->getOrderNumber());
         }
 
         return $mollieOrderId;
     }
 
-    /**
-     * @param OrderLineItemEntity $lineItem
-     * @return string
-     */
     public function getMollieOrderLineId(OrderLineItemEntity $lineItem): string
     {
         $customFields = $lineItem->getCustomFields();
@@ -218,38 +189,23 @@ class OrderService implements OrderServiceInterface
         return $mollieOrderLineId;
     }
 
-    /**
-     * @param DataBag $data
-     * @param SalesChannelContext $context
-     * @return OrderEntity
-     */
     public function createOrder(DataBag $data, SalesChannelContext $context): OrderEntity
     {
         $orderId = $this->swOrderService->createOrder($data, $context);
 
         $order = $this->getOrder($orderId, $context->getContext());
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             throw CartException::orderNotFound($orderId);
         }
 
         return $order;
     }
 
-
-    /**
-     * @param OrderEntity $order
-     * @param string $mollieOrderID
-     * @param string $molliePaymentId
-     * @param string $orderTransactionId
-     * @param Context $context
-     * @return void
-     */
     public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $molliePaymentId, string $orderTransactionId, Context $context): void
     {
         $customFieldsStruct = new OrderAttributes($order);
-        $customFieldsStruct->setMollieOrderId($mollieOrderID); # TODO i dont like that this is an optional SETTER in here!
-
+        $customFieldsStruct->setMollieOrderId($mollieOrderID); // TODO i dont like that this is an optional SETTER in here!
 
         $thirdPartyPaymentId = '';
         $molliePaymentID = '';
@@ -262,30 +218,29 @@ class OrderService implements OrderServiceInterface
 
             $molliePaymentID = $molliePayment->id;
 
-            # check if we have a PayPal reference
+            // check if we have a PayPal reference
             if (isset($molliePayment->details, $molliePayment->details->paypalReference)) {
                 $thirdPartyPaymentId = $molliePayment->details->paypalReference;
             }
 
-            # check if we have a Bank Transfer reference
+            // check if we have a Bank Transfer reference
             if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
                 $thirdPartyPaymentId = $molliePayment->details->transferReference;
                 $bankTransferDetails = $molliePayment->details;
             }
 
-            # check for creditcard
+            // check for creditcard
             if (isset($molliePayment->method, $molliePayment->details) && $molliePayment->method === PaymentMethod::CREDITCARD) {
                 $creditCardDetails = $molliePayment->details;
             }
         } catch (PaymentNotFoundException $ex) {
-            # some orders like OPEN bank transfer have no completed payments
-            # so this is a usual case, where we just need to skip this process
-            # but we still want to update the basic data below
+            // some orders like OPEN bank transfer have no completed payments
+            // so this is a usual case, where we just need to skip this process
+            // but we still want to update the basic data below
         }
 
-
-        # ----------------------------------
-        # Update Order Custom Fields
+        // ----------------------------------
+        // Update Order Custom Fields
 
         $customFieldsStruct->setMolliePaymentId($molliePaymentID);
         $customFieldsStruct->setThirdPartyPaymentId($thirdPartyPaymentId);
@@ -298,8 +253,8 @@ class OrderService implements OrderServiceInterface
             $context
         );
 
-        # ----------------------------------
-        # Update Order Transaction Custom Fields
+        // ----------------------------------
+        // Update Order Transaction Custom Fields
 
         // Add the transaction and order IDs to the order's transaction custom fields
         $orderTransactionCustomFields = new OrderTransactionAttributes();
@@ -314,31 +269,23 @@ class OrderService implements OrderServiceInterface
         );
     }
 
-
     /**
-     * @param OrderEntity $order
-     * @param string $orderTransactionId
-     * @param string $mollieOrderID
-     * @param string $swSubscriptionId
-     * @param string $mollieSubscriptionId
-     * @param Payment $molliePayment
-     * @param Context $context
      * @return void
      */
     public function updateMollieData(OrderEntity $order, string $orderTransactionId, string $mollieOrderID, string $swSubscriptionId, string $mollieSubscriptionId, Payment $molliePayment, Context $context)
     {
         $thirdPartyPaymentId = '';
 
-        # check if we have a PayPal reference
+        // check if we have a PayPal reference
         if (isset($molliePayment->details, $molliePayment->details->paypalReference)) {
             $thirdPartyPaymentId = $molliePayment->details->paypalReference;
         }
-        # check if we have a Bank Transfer reference
+        // check if we have a Bank Transfer reference
         if (isset($molliePayment->details, $molliePayment->details->transferReference)) {
             $thirdPartyPaymentId = $molliePayment->details->transferReference;
         }
 
-        # --------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------
 
         $orderAttributes = new OrderAttributes($order);
         $orderAttributes->setMollieOrderId($mollieOrderID);
@@ -352,7 +299,7 @@ class OrderService implements OrderServiceInterface
             $context
         );
 
-        # --------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------
 
         // Add the transaction and order IDs to the order's transaction custom fields
         $orderTransactionCustomFields = new OrderTransactionAttributes();
@@ -368,7 +315,6 @@ class OrderService implements OrderServiceInterface
     }
 
     /**
-     * @param OrderEntity $order
      * @return array<string,array<string,mixed>>
      */
     public function getStatus(OrderEntity $order): array

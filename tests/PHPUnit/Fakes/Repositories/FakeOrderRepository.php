@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
@@ -28,31 +29,20 @@ class FakeOrderRepository extends EntityRepository
      */
     private $criteriaSearchIDs;
 
-
-    /**
-     * @param OrderEntity $order
-     */
     public function __construct(OrderEntity $order)
     {
         $this->order = $order;
     }
 
-    /**
-     * @return Criteria
-     */
     public function getCriteriaSearch(): Criteria
     {
         return $this->criteriaSearch;
     }
 
-    /**
-     * @return Criteria
-     */
     public function getCriteriaSearchIDs(): Criteria
     {
         return $this->criteriaSearchIDs;
     }
-
 
     public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
@@ -64,11 +54,6 @@ class FakeOrderRepository extends EntityRepository
         // TODO: Implement create() method.
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param Context $context
-     * @return EntitySearchResult
-     */
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
         $this->criteriaSearch = $criteria;
@@ -83,11 +68,6 @@ class FakeOrderRepository extends EntityRepository
         );
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param Context $context
-     * @return IdSearchResult
-     */
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
         $this->criteriaSearchIDs = $criteria;
@@ -97,7 +77,7 @@ class FakeOrderRepository extends EntityRepository
             [
                 [
                     'primaryKey' => $this->order->getId(),
-                    'data' => []
+                    'data' => [],
                 ],
             ],
             $criteria,

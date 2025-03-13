@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -13,17 +14,13 @@ class ApplePaySubscriber implements EventSubscriberInterface
      */
     private $applePay;
 
-
-    /**
-     * @param ApplePayDirect $applePay
-     */
     public function __construct(ApplePayDirect $applePay)
     {
         $this->applePay = $applePay;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
@@ -33,9 +30,7 @@ class ApplePaySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param StorefrontRenderEvent $event
      * @throws \Exception
-     * @return void
      */
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {

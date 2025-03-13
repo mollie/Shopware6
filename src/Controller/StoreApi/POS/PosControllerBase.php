@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\POS;
 
@@ -12,7 +13,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class PosControllerBase
 {
-
     /**
      * @var CustomerService
      */
@@ -23,23 +23,12 @@ class PosControllerBase
      */
     private $mollieGateway;
 
-
-    /**
-     * @param CustomerService $customerService
-     * @param MollieGatewayInterface $mollieGateway
-     */
     public function __construct(CustomerService $customerService, MollieGatewayInterface $mollieGateway)
     {
         $this->customerService = $customerService;
         $this->mollieGateway = $mollieGateway;
     }
 
-
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @return StoreApiResponse
-     */
     public function getIssuers(SalesChannelContext $context): StoreApiResponse
     {
         $this->mollieGateway->switchClient($context->getSalesChannelId());
@@ -59,18 +48,13 @@ class PosControllerBase
     }
 
     /**
-     *
-     * @param string $customerId
-     * @param string $terminalID
-     * @param SalesChannelContext $context
      * @throws \Exception
-     * @return StoreApiResponse
      */
     public function saveTerminalId(string $customerId, string $terminalID, SalesChannelContext $context): StoreApiResponse
     {
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
-        if (!$customer instanceof CustomerEntity) {
+        if (! $customer instanceof CustomerEntity) {
             throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
         }
 

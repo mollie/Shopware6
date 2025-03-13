@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 
@@ -14,9 +15,7 @@ class SubscriptionStatus
     public const RESUMED = 'resumed';
     public const SKIPPED = 'skipped';
 
-
     /**
-     * @param string $status
      * @return string
      */
     public static function fromMollieStatus(string $status)

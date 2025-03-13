@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
@@ -48,7 +49,8 @@ class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
-            ->format('Y-m-d');
+            ->format('Y-m-d')
+        ;
 
         $expectedBillingAddress = $this->getExpectedTestAddress($this->address, $this->email);
         $expectedBillingAddress['phone'] = $phoneNumber;
@@ -64,7 +66,7 @@ class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $expectedBillingAddress,
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $expectedOrderLifeTime,
         ];
 
         self::assertSame($expected, $actual);

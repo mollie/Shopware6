@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -19,8 +20,6 @@ class ShopService
      * Returns the shop url without http(s):// and/or trailing slash.
      *
      * @param bool $stripHttp
-     *
-     * @return string
      */
     public function getShopUrl($stripHttp = true): string
     {

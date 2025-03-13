@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Gateway;
 
@@ -20,29 +21,18 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
      */
     private $contextService;
 
-
-    /**
-     * @param string $swVersion
-     * @param SalesChannelContextServiceInterface $contextService
-     */
     public function __construct(string $swVersion, SalesChannelContextServiceInterface $contextService)
     {
         $this->swVersion = $swVersion;
         $this->contextService = $contextService;
     }
 
-
-    /**
-     * @param SalesChannelContext $context
-     * @return string
-     */
     public function getSalesChannelID(SalesChannelContext $context): string
     {
         return $context->getSalesChannel()->getId();
     }
 
     /**
-     * @param SalesChannelContext $context
      * @return string
      */
     public function getDomainId(SalesChannelContext $context): ?string
@@ -51,27 +41,20 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
     }
 
     /**
-     * @param string $salesChannelID
      * @param ?string $domainID
-     * @param string $token
-     * @return SalesChannelContext
      */
     public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext
     {
         if ($this->versionGTE('6.4')) {
             $params = new SalesChannelContextServiceParameters($salesChannelID, $token, null, null, $domainID, null, null);
+
             return $this->contextService->get($params);
         }
 
         /* @phpstan-ignore-next-line */
-        $context = $this->contextService->get($salesChannelID, $token, null);
-
-        return $context;
+        return $this->contextService->get($salesChannelID, $token, null);
     }
 
-    /**
-     * @return string
-     */
     public function getLineItemPromotionType(): string
     {
         if (defined('Shopware\Core\Checkout\Cart\LineItem::PROMOTION_LINE_ITEM_TYPE')) {
@@ -81,9 +64,6 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         return 'promotion';
     }
 
-    /**
-     * @return string
-     */
     public function getChargebackOrderTransactionState(): string
     {
         // In progress state did not exist before 6.2, so set to open instead.
@@ -105,10 +85,6 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         return 'chargeback';
     }
 
-    /**
-     * @param string $version
-     * @return bool
-     */
     private function versionGTE(string $version): bool
     {
         return version_compare($this->swVersion, $version, '>=');

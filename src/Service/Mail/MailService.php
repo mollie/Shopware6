@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail;
 
@@ -24,12 +25,6 @@ class MailService extends AbstractMailService
      */
     private $mailSender;
 
-
-    /**
-     * @param DataValidator $dataValidator
-     * @param AbstractMailFactory $mailFactory
-     * @param AbstractMailSender $mailSender
-     */
     public function __construct(DataValidator $dataValidator, AbstractMailFactory $mailFactory, AbstractMailSender $mailSender)
     {
         $this->dataValidator = $dataValidator;
@@ -38,7 +33,8 @@ class MailService extends AbstractMailService
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws MailTransportFailedException
      */
     public function send(array $data, array $attachments = []): void
@@ -64,7 +60,9 @@ class MailService extends AbstractMailService
 
     /**
      * Copied from MailFactory
+     *
      * @param array<mixed> $addresses
+     *
      * @return array<mixed>
      */
     private function formatMailAddresses(array $addresses): array

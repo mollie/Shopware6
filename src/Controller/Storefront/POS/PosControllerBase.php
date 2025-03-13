@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\POS;
 
@@ -51,14 +52,6 @@ class PosControllerBase extends AbstractStoreFrontController
      */
     private $repoTransactions;
 
-    /**
-     * @param CustomerService $customerService
-     * @param MollieGatewayInterface $mollieGateway
-     * @param RouterInterface $router
-     * @param OrderStatusUpdater $orderStatusUpdater
-     * @param OrderStatusConverter $statusConverter
-     * @param OrderTransactionRepository $repoTransactions
-     */
     public function __construct(CustomerService $customerService, MollieGatewayInterface $mollieGateway, RouterInterface $router, OrderStatusUpdater $orderStatusUpdater, OrderStatusConverter $statusConverter, OrderTransactionRepository $repoTransactions)
     {
         $this->customerService = $customerService;
@@ -69,13 +62,6 @@ class PosControllerBase extends AbstractStoreFrontController
         $this->repoTransactions = $repoTransactions;
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param string $customerId
-     * @param string $terminalId
-     * @return JsonResponse
-     */
     public function storeTerminal(SalesChannelContext $context, string $customerId, string $terminalId): JsonResponse
     {
         $result = null;
@@ -93,43 +79,30 @@ class PosControllerBase extends AbstractStoreFrontController
         }
 
         return new JsonResponse([
-            'success' => (bool)$result,
+            'success' => (bool) $result,
             'customerId' => $customerId,
             'result' => $result,
         ]);
     }
 
-    /**
-     *
-     * @param Request $request
-     * @param SalesChannelContext $salesChannelContext
-     * @return Response
-     */
     public function checkoutAction(Request $request, SalesChannelContext $salesChannelContext): Response
     {
         $orderId = $request->get('sw');
         $mollieId = $request->get('mo');
-        $changeStatusUrl = (string)$request->get('cs');
+        $changeStatusUrl = (string) $request->get('cs');
 
         $params = [
             'swOrderId' => $orderId,
             'molliePaymentId' => $mollieId,
         ];
 
-        if (!empty($changeStatusUrl)) {
+        if (! empty($changeStatusUrl)) {
             $params['changeStatusUrl'] = $changeStatusUrl;
         }
 
         return $this->renderStorefront('@Storefront/mollie/pos/checkout.html.twig', $params);
     }
 
-    /**
-     *
-     * @param SalesChannelContext $context
-     * @param string $orderId
-     * @param string $molliePaymentId
-     * @return JsonResponse
-     */
     public function statusAction(SalesChannelContext $context, string $orderId, string $molliePaymentId): JsonResponse
     {
         $this->mollieGateway->switchClient($context->getSalesChannelId());
@@ -167,7 +140,7 @@ class PosControllerBase extends AbstractStoreFrontController
         return new JsonResponse([
             'ready' => $ready,
             'redirectUrl' => $url,
-            'success' => $isSuccess
+            'success' => $isSuccess,
         ]);
     }
 }

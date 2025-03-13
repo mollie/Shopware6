@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
 
@@ -31,15 +32,11 @@ class SubscriptionStatusTest extends TestCase
      * touched without recognizing it.
      *
      * @dataProvider getStatusStrings
-     * @param string $expected
-     * @param string $status
-     * @return void
      */
     public function testStatusValues(string $expected, string $status): void
     {
         static::assertSame($expected, $status);
     }
-
 
     /**
      * @return array[]
@@ -60,9 +57,6 @@ class SubscriptionStatusTest extends TestCase
      * correctly converted into our advanced plugin status enum.
      *
      * @dataProvider getMollieStatus
-     * @param string $expected
-     * @param string $mollieStatus
-     * @return void
      */
     public function testFromMollieStatus(string $expected, string $mollieStatus): void
     {
@@ -74,8 +68,6 @@ class SubscriptionStatusTest extends TestCase
     /**
      * This test verifies that we use PENDING if somehow Mollie tells
      * us an unknown status.
-     *
-     * @return void
      */
     public function testUnknownMollieStatusLeadsToPending(): void
     {

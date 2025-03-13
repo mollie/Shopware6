@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Storefront\Struct;
 
@@ -21,12 +22,6 @@ class SubscriptionDataExtensionStruct extends Struct
      */
     protected $showIndicator = false;
 
-
-    /**
-     * @param bool $subscriptionProduct
-     * @param string $translatedInterval
-     * @param bool $showIndicator
-     */
     public function __construct(bool $subscriptionProduct, string $translatedInterval, bool $showIndicator)
     {
         $this->subscriptionProduct = $subscriptionProduct;
@@ -34,26 +29,16 @@ class SubscriptionDataExtensionStruct extends Struct
         $this->showIndicator = $showIndicator;
     }
 
-
-    /**
-     * @return bool
-     */
     public function isSubscriptionProduct(): bool
     {
         return $this->subscriptionProduct;
     }
 
-    /**
-     * @return string
-     */
     public function getTranslatedInterval(): string
     {
         return $this->translatedInterval;
     }
 
-    /**
-     * @return bool
-     */
     public function isShowIndicator(): bool
     {
         return $this->showIndicator;

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ShipmentManager;
 
@@ -31,7 +32,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 
 class ShipmentManager implements ShipmentManagerInterface
 {
-
     /**
      * @var DeliveryTransitionServiceInterface
      */
@@ -46,7 +46,6 @@ class ShipmentManager implements ShipmentManagerInterface
      * @var ShipmentInterface
      */
     private $shipmentService;
-
 
     /**
      * @var OrderService
@@ -73,15 +72,6 @@ class ShipmentManager implements ShipmentManagerInterface
      */
     private $logger;
 
-    /**
-     * @param DeliveryTransitionServiceInterface $deliveryTransitionService
-     * @param Order $mollieApiOrderService
-     * @param ShipmentInterface $shipmentService
-     * @param OrderService $orderService
-     * @param OrderDeliveryExtractor $orderDataExtractor
-     * @param OrderItemsExtractor $orderItemsExtractor
-     * @param TrackingInfoStructFactory $trackingFactory
-     */
     public function __construct(DeliveryTransitionServiceInterface $deliveryTransitionService, Order $mollieApiOrderService, ShipmentInterface $shipmentService, OrderService $orderService, OrderDeliveryExtractor $orderDataExtractor, OrderItemsExtractor $orderItemsExtractor, TrackingInfoStructFactory $trackingFactory, LoggerInterface $logger)
     {
         $this->deliveryTransitionService = $deliveryTransitionService;
@@ -94,10 +84,7 @@ class ShipmentManager implements ShipmentManagerInterface
         $this->logger = $logger;
     }
 
-
     /**
-     * @param string $orderId
-     * @param Context $context
      * @return array<mixed>
      */
     public function getStatus(string $orderId, Context $context): array
@@ -109,8 +96,6 @@ class ShipmentManager implements ShipmentManagerInterface
     }
 
     /**
-     * @param string $orderId
-     * @param Context $context
      * @return array<mixed>
      */
     public function getShopwareStatus(string $orderId, Context $context): array
@@ -121,8 +106,6 @@ class ShipmentManager implements ShipmentManagerInterface
     }
 
     /**
-     * @param string $orderId
-     * @param Context $context
      * @return array<string, numeric>
      */
     public function getTotals(string $orderId, Context $context): array
@@ -134,13 +117,10 @@ class ShipmentManager implements ShipmentManagerInterface
     }
 
     /**
-     * @param OrderEntity $order
-     * @param null|TrackingData $tracking
      * @param array<mixed> $shippingItems
-     * @param Context $context
+     *
      * @throws NoLineItemsProvidedException
      * @throws NoDeliveriesFoundException
-     * @return \Mollie\Api\Resources\Shipment
      */
     public function shipOrder(OrderEntity $order, ?TrackingData $tracking, array $shippingItems, Context $context): \Mollie\Api\Resources\Shipment
     {
@@ -148,9 +128,7 @@ class ShipmentManager implements ShipmentManagerInterface
             throw new NoLineItemsProvidedException('Please provide a valid list of line items that should be shipped!');
         }
 
-
         $trackingData = $this->getTrackingInfoStruct($tracking, $order);
-
 
         $orderAttr = new OrderAttributes($order);
 
@@ -158,17 +136,16 @@ class ShipmentManager implements ShipmentManagerInterface
 
         $mollieShippingItems = [];
 
-        # we have to look up our Mollie LineItem IDs from the order line items.
-        # so we iterate through both of our lists and search it
+        // we have to look up our Mollie LineItem IDs from the order line items.
+        // so we iterate through both of our lists and search it
         $orderLineItems = $order->getLineItems();
 
         if ($orderLineItems instanceof OrderLineItemCollection) {
             foreach ($shippingItems as $shippingItem) {
                 foreach ($orderLineItems as $orderLineItem) {
-                    # now search the order line item by our provided shopware ID
+                    // now search the order line item by our provided shopware ID
                     if ($orderLineItem->getId() === $shippingItem->getShopwareId()) {
-
-                        # extract the Mollie order line ID from our custom fields
+                        // extract the Mollie order line ID from our custom fields
                         $attr = new OrderLineItemEntityAttributes($orderLineItem);
                         $mollieID = $attr->getMollieOrderLineID();
 
@@ -190,21 +167,16 @@ class ShipmentManager implements ShipmentManagerInterface
             $trackingData
         );
 
-        # --------------------------------------------------------------------------------------
-        # post-shipping processing
+        // --------------------------------------------------------------------------------------
+        // post-shipping processing
 
         $this->transitionOrder($order, $mollieOrderId, $context);
-
 
         return $shipment;
     }
 
     /**
-     * @param OrderEntity $order
-     * @param null|TrackingData $tracking
-     * @param Context $context
      * @throws \Exception
-     * @return \Mollie\Api\Resources\Shipment
      */
     public function shipOrderRest(OrderEntity $order, ?TrackingData $tracking, Context $context): \Mollie\Api\Resources\Shipment
     {
@@ -214,9 +186,9 @@ class ShipmentManager implements ShipmentManagerInterface
 
         $mollieOrderId = $orderAttr->getMollieOrderId();
 
-        # ship order with empty array
-        # so that the Mollie shipAll is being triggered
-        # which always ships everything or just the rest
+        // ship order with empty array
+        // so that the Mollie shipAll is being triggered
+        // which always ships everything or just the rest
         $shipment = $this->shipmentService->shipOrder(
             $mollieOrderId,
             $order->getSalesChannelId(),
@@ -224,8 +196,8 @@ class ShipmentManager implements ShipmentManagerInterface
             $trackingData
         );
 
-        # --------------------------------------------------------------------------------------
-        # post-shipping processing
+        // --------------------------------------------------------------------------------------
+        // post-shipping processing
 
         $this->transitionOrder($order, $mollieOrderId, $context);
 
@@ -233,13 +205,7 @@ class ShipmentManager implements ShipmentManagerInterface
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $itemIdentifier
-     * @param int $quantity
-     * @param null|TrackingData $tracking
-     * @param Context $context
      * @throws \Exception
-     * @return \Mollie\Api\Resources\Shipment
      */
     public function shipItem(OrderEntity $order, string $itemIdentifier, int $quantity, ?TrackingData $tracking, Context $context): \Mollie\Api\Resources\Shipment
     {
@@ -258,13 +224,12 @@ class ShipmentManager implements ShipmentManagerInterface
             throw new OrderLineItemNotFoundException($itemIdentifier);
         }
 
-
         $mollieTracking = $this->getTrackingInfoStruct($tracking, $order);
 
         $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItem);
 
-        # if we did not provide a quantity
-        # we ship everything that is left and shippable
+        // if we did not provide a quantity
+        // we ship everything that is left and shippable
         if ($quantity === 0) {
             $quantity = $this->mollieApiOrderService->getMollieOrderLine(
                 $mollieOrderId,
@@ -281,28 +246,21 @@ class ShipmentManager implements ShipmentManagerInterface
             $mollieTracking
         );
 
-        # --------------------------------------------------------------------------------------
-        # post-shipping processing
+        // --------------------------------------------------------------------------------------
+        // post-shipping processing
 
         $this->transitionOrder($order, $mollieOrderId, $context);
-
 
         return $shipment;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param string $mollieOrderId
-     * @param Context $context
-     * @return void
-     */
     private function transitionOrder(OrderEntity $order, string $mollieOrderId, Context $context): void
     {
         $delivery = $this->orderDataExtractor->extractDelivery($order, $context);
 
-        # we need to see if our order is now "complete"
-        # if its complete it can be marked as fully shipped
-        # if not, then its only partially shipped
+        // we need to see if our order is now "complete"
+        // if its complete it can be marked as fully shipped
+        // if not, then its only partially shipped
         $mollieOrder = $this->mollieApiOrderService->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
 
         if ($mollieOrder->status === MollieStatus::COMPLETED) {
@@ -315,11 +273,6 @@ class ShipmentManager implements ShipmentManagerInterface
     /**
      * Try to find lineItems matching the $itemIdentifier. Shopware does not have a unique human-readable identifier for
      * order line items, so we have to check for several fields, like product number or the mollie order line id.
-     *
-     * @param OrderEntity $order
-     * @param string $itemIdentifier
-     * @param Context $context
-     * @return OrderLineItemCollection
      */
     private function findMatchingLineItems(OrderEntity $order, string $itemIdentifier, Context $context): OrderLineItemCollection
     {
@@ -328,17 +281,17 @@ class ShipmentManager implements ShipmentManagerInterface
 
             // Default Shopware: If the lineItem is of type "product" and has an associated ProductEntity,
             // check if the itemIdentifier matches the product's product number.
-            if ($lineItem->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE &&
-                $lineItem->getProduct() instanceof ProductEntity &&
-                $lineItem->getProduct()->getProductNumber() === $itemIdentifier) {
+            if ($lineItem->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE
+                && $lineItem->getProduct() instanceof ProductEntity
+                && $lineItem->getProduct()->getProductNumber() === $itemIdentifier) {
                 return true;
             }
 
             // If it's not a "product" type lineItem, for example if it's a completely custom lineItem type,
             // check if the payload has a productNumber in it that matches the itemIdentifier.
-            if (! empty($lineItem->getPayload()) &&
-                array_key_exists('productNumber', $lineItem->getPayload()) &&
-                $lineItem->getPayload()['productNumber'] === $itemIdentifier) {
+            if (! empty($lineItem->getPayload())
+                && array_key_exists('productNumber', $lineItem->getPayload())
+                && $lineItem->getPayload()['productNumber'] === $itemIdentifier) {
                 return true;
             }
 
@@ -366,10 +319,7 @@ class ShipmentManager implements ShipmentManagerInterface
     }
 
     /**
-     * @param null|TrackingData $tracking
-     * @param OrderEntity $order
      * @throws NoDeliveriesFoundException
-     * @return null|ShipmentTrackingInfoStruct
      */
     private function getTrackingInfoStruct(?TrackingData $tracking, OrderEntity $order): ?ShipmentTrackingInfoStruct
     {
@@ -383,6 +333,7 @@ class ShipmentManager implements ShipmentManagerInterface
             } else {
                 $trackingData = $this->trackingFactory->trackingFromOrder($order);
             }
+
             return $trackingData;
         } catch (\InvalidArgumentException $exception) {
             $loggerData = ['exception' => $exception->getMessage(), 'order' => $order->getOrderNumber()];
@@ -391,6 +342,7 @@ class ShipmentManager implements ShipmentManagerInterface
             }
 
             $this->logger->warning('Failed to get tracking information', $loggerData);
+
             return null;
         }
     }

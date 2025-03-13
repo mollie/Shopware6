@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -18,7 +19,7 @@ class FakeOrderTransitionService implements OrderTransitionServiceInterface
     public $returns = [];
 
     /** @var null|Exception */
-    public $exception = null;
+    public $exception;
 
     public function getAvailableTransitions(OrderEntity $order, Context $context): array
     {

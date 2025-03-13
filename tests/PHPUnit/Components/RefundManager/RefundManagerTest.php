@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\RefundManager;
 
@@ -32,7 +32,6 @@ class RefundManagerTest extends TestCase
 {
     use MockTrait;
 
-
     /**
      * @var RefundManager
      */
@@ -60,12 +59,10 @@ class RefundManagerTest extends TestCase
 
     /**
      * @throws \Exception
-     * @return void
      */
     protected function setUp(): void
     {
         parent::setUp();
-
 
         $order = new OrderEntity();
         $order->setId('O1');
@@ -79,9 +76,8 @@ class RefundManagerTest extends TestCase
         $fakeOrder = $this->createDummyMock(Order::class, $this);
         $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)));
 
-
         $this->fakeFlowBuilderDispatcher = new FakeFlowBuilderDispatcher();
-        $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); # use any higher version so that we get real events
+        $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); // use any higher version so that we get real events
 
         $this->fakeRefundRespository = new FakeRefundRepository();
         $fakeRefundCreditNotesService = $this->createMock(RefundCreditNoteService::class);
@@ -106,6 +102,7 @@ class RefundManagerTest extends TestCase
      * event is fired with all required data.
      *
      * @throws \Mollie\Api\Exceptions\ApiException
+     *
      * @return void
      */
     public function testFlowBuilderDispatching()
@@ -119,7 +116,6 @@ class RefundManagerTest extends TestCase
         /** @var Context $fakeContext */
         $fakeContext = $this->createDummyMock(Context::class, $this);
 
-
         $refundRequest = new RefundRequest('', '', '', null);
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
@@ -127,11 +123,10 @@ class RefundManagerTest extends TestCase
         /** @var RefundStartedEvent $firedEvent */
         $firedEvent = $this->fakeFlowBuilderDispatcher->getDispatchedEvent();
 
-
-        # assert that our correct event was fired
+        // assert that our correct event was fired
         $this->assertEquals(RefundStartedEvent::class, get_class($firedEvent));
         $this->assertEquals('mollie.refund.started', $firedEvent->getName());
-        # now also check for the values
+        // now also check for the values
         $this->assertEquals('O1', $firedEvent->getOrderId());
         $this->assertEquals(9999, $firedEvent->getAmount());
     }
@@ -144,6 +139,7 @@ class RefundManagerTest extends TestCase
      * This will be passed on with the quantity for the stock reset.
      *
      * @throws \Mollie\Api\Exceptions\ApiException
+     *
      * @return void
      */
     public function testStockReset()
@@ -159,23 +155,21 @@ class RefundManagerTest extends TestCase
         $item1->setUnitPrice(19.99);
         $item1->setReferencedId('product-id-1');
 
-
         $order->setLineItems(new OrderLineItemCollection([$item1]));
 
         /** @var Context $fakeContext */
         $fakeContext = $this->createDummyMock(Context::class, $this);
 
-        # build a request object
-        # so that we refund line-1 and make sure the stock is reset
+        // build a request object
+        // so that we refund line-1 and make sure the stock is reset
         $refundRequest = new RefundRequest('', '', '', null);
         $refundRequest->addItem(new RefundRequestItem('line-1', 19.99, 1, 1));
 
         $refund = $this->manager->refund($order, $refundRequest, $fakeContext);
 
-
-        # first verify if it was called
+        // first verify if it was called
         $this->assertEquals(true, $this->fakeStockUpdater->isCalled(), 'Stock Updater was not called');
-        # and now verify the passed data
+        // and now verify the passed data
         $this->assertEquals('Product T-Shirt', $this->fakeStockUpdater->getLineItemLabel());
         $this->assertEquals('product-id-1', $this->fakeStockUpdater->getProductID());
         $this->assertEquals(1, $this->fakeStockUpdater->getQuantity());
@@ -192,10 +186,7 @@ class RefundManagerTest extends TestCase
      *            [ 1, 0 ]
      *            [ 0, -5 ]
      *
-     * @param int $qty
-     * @param float $itemPrice
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return void
      */
     public function testValidItemsAreAdded(int $qty, float $itemPrice): void
     {
@@ -210,13 +201,13 @@ class RefundManagerTest extends TestCase
 
         $expectedItems = [
             [
-                "mollieLineId" => "odl_123",
-                "label" => "product-id-1",
-                "quantity" => max($qty, 1),
-                "amount" => $itemPrice,
-                "orderLineItemId" => "line-1",
+                'mollieLineId' => 'odl_123',
+                'label' => 'product-id-1',
+                'quantity' => max($qty, 1),
+                'amount' => $itemPrice,
+                'orderLineItemId' => 'line-1',
                 'orderLineItemVersionId' => null,
-            ]
+            ],
         ];
 
         $this->assertEquals($expectedItems, $dalCreateData[0]['refundItems'], 'Make sure that valid items are being added to the DAL payload.');
@@ -230,13 +221,9 @@ class RefundManagerTest extends TestCase
      * @testWith [ 0, 0 ]
      *           [ -1, 20 ]
      *
-     * @param int $qty
-     * @param float $itemPrice
      * @throws \Mollie\Api\Exceptions\ApiException
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @return void
-     * @return void
-     * /
+     *                                             /
      */
     public function testInvalidItemsAreNotAdded(int $qty, float $itemPrice): void
     {
@@ -252,10 +239,6 @@ class RefundManagerTest extends TestCase
         $this->assertArrayNotHasKey('refundItems', $dalCreateData[0], 'Make sure that invalid items are not added to the DAL payload');
     }
 
-
-    /**
-     * @return OrderEntity
-     */
     private function buildValidOrder(): OrderEntity
     {
         $order = new OrderEntity();
@@ -269,11 +252,11 @@ class RefundManagerTest extends TestCase
         $item1->setLabel('Product T-Shirt');
         $item1->setReferencedId('product-id-1');
 
-        # required to mark as mollie line item so that its even found
+        // required to mark as mollie line item so that its even found
         $item1->setPayload([
             'customFields' => [
-                'mollie_payments_product_order_line_id' => 'odl_123'
-            ]
+                'mollie_payments_product_order_line_id' => 'odl_123',
+            ],
         ]);
 
         $order->setLineItems(new OrderLineItemCollection([$item1]));
