@@ -1,0 +1,8 @@
+# Ignore artifacts:
+polyfill
+shopware
+node_modules
+tests
+vendor
+vendor_manual
+modules
