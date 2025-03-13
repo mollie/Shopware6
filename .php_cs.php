@@ -46,6 +46,7 @@ return $config->setRules(
         'phpdoc_add_missing_param_annotation' => true,
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'phpdoc_types_order' => true,
+        'phpdoc_to_comment' => false,
     ]
 )
     ->setRiskyAllowed(true)
