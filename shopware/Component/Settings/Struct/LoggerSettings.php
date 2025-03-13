@@ -9,8 +9,8 @@ final class LoggerSettings extends Struct
 {
     public const KEY_LOG_FILE_DAYS = 'logFileDays';
     public const KEY_DEBUG_MODE = 'debugMode';
-    private bool $isDebugMode = false;
-    private int $logFileDays = 0;
+    private bool $isDebugMode;
+    private int $logFileDays;
 
 
     /**

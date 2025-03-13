@@ -44,7 +44,7 @@ class ApplePayDownloadCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName((string)self::$defaultName)
+            ->setName(self::$defaultName)
             ->setDescription('Download the latest Apple Pay Domain Verification File of Mollie.');
     }
 

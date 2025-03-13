@@ -29,10 +29,10 @@ class ExpireAction
 
     public function __construct(
         EntityRepository        $orderRepository,
-        EntityRepository $salesChannelRepository,
-        OrderExpireService              $orderExpireService,
-        SettingsService                 $settingsService,
-        LoggerInterface                 $logger
+        EntityRepository        $salesChannelRepository,
+        OrderExpireService      $orderExpireService,
+        SettingsService         $settingsService,
+        LoggerInterface         $logger
     ) {
         $this->orderRepository = $orderRepository;
         $this->salesChannelRepository = $salesChannelRepository;

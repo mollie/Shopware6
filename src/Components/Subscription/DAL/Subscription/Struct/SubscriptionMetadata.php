@@ -57,7 +57,7 @@ class SubscriptionMetadata
         $startDate = (array_key_exists('start_date', $metadata)) ? (string)$metadata['start_date'] : '';
         $intervalValue = (array_key_exists('interval_value', $metadata)) ? (int)$metadata['interval_value'] : 0;
         $intervalUnit = (array_key_exists('interval_unit', $metadata)) ? (string)$metadata['interval_unit'] : '';
-        $times = (array_key_exists('times', $metadata)) ? $metadata['times'] : null;
+        $times = $metadata['times'] ?? null;
         $tmpTransactionId = (array_key_exists('tmp_transaction', $metadata)) ? (string)$metadata['tmp_transaction'] : '';
 
         return new SubscriptionMetadata(

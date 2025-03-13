@@ -136,7 +136,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
             foreach ($availableMolliePayments as $mollieMethod) {
                 # if we have found it in the list of available mollie methods
                 # then just keep it
-                if ($mollieMethod->id == $mollieAttributes->getMollieIdentifier()) {
+                if ($mollieMethod->id === $mollieAttributes->getMollieIdentifier()) {
                     $found = true;
                     break;
                 }

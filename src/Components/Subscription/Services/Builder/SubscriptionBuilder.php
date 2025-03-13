@@ -107,7 +107,7 @@ class SubscriptionBuilder
 
         # calculate our first start date.
         # this is our current date (now) + 1x the planned interval.
-        # we already charge now, so we start the recurrency in 1 interval.
+        # we already charge now, so we start the re-currency in 1 interval.
         $firstStartDate = $this->intervalCalculator->getNextIntervalDate(
             $order->getOrderDateTime(),
             $interval,

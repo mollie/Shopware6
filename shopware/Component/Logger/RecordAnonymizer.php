@@ -17,7 +17,7 @@ final class RecordAnonymizer implements ProcessorInterface
     private function anonymize(string $url): string
     {
         # we do not want to save the used tokens in our log file
-        # also, those one time tokens are soooooo long. it's just annoying and fills disk space ;)
+        # also, those one time tokens are pretty long. it's just annoying and fills disk space ;)
         if (strpos($url, self::URL_SLUG) !== false) {
             $parts = explode(self::URL_SLUG, $url);
 

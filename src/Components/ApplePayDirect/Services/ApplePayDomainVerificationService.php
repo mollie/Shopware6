@@ -4,6 +4,7 @@ namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use League\Flysystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApplePayDomainVerificationService
 {
@@ -49,7 +50,7 @@ class ApplePayDomainVerificationService
     {
         $response = $this->httpClient->sendRequest('GET', self::URL_FILE);
 
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+        if ($response->getStatusCode() < Response::HTTP_OK || $response->getStatusCode() >= Response::HTTP_MULTIPLE_CHOICES) {
             return;
         }
 

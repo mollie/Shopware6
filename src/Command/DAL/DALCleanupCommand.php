@@ -56,7 +56,7 @@ class DALCleanupCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName((string)self::$defaultName)
+            ->setName(self::$defaultName)
             ->setDescription('Cleaning and compressing unused Mollie data in your database. Please create a backup before');
     }
 

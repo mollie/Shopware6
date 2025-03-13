@@ -81,7 +81,7 @@ class RefundRequest
     {
         # i dont know why, but swagger only sends "," if nothing is provided
         # this must not happen in production anyway, so lets just skip that :)
-        if (strlen(trim($this->description)) === 0 || $this->description === ',') {
+        if ($this->description === ',' || trim($this->description) === '') {
             return "Refunded through Shopware. Order number: " . $this->orderNumber;
         }
 
@@ -182,11 +182,7 @@ class RefundRequest
         if (!$itemsDifferToCartAmount) {
             # now also check if we might have full item values
             # but a different total amount
-            if ($this->amount > 0 && $this->amount !== $order->getAmountTotal()) {
-                return true;
-            }
-
-            return false;
+            return $this->amount > 0 && $this->amount !== $order->getAmountTotal();
         }
 
         return true;
@@ -208,22 +204,18 @@ class RefundRequest
 
             if ($order->getLineItems() !== null) {
                 foreach ($order->getLineItems() as $orderItem) {
-                    if ($orderItem->getId() === $item->getLineId()) {
-                        if ($orderItem->getUnitPrice() !== $item->getAmount()) {
-                            $isDifferentAmount = true;
-                            break;
-                        }
+                    if (($orderItem->getId() === $item->getLineId()) && $orderItem->getUnitPrice() !== $item->getAmount()) {
+                        $isDifferentAmount = true;
+                        break;
                     }
                 }
             }
 
             if ($order->getDeliveries() !== null) {
                 foreach ($order->getDeliveries() as $deliveryItem) {
-                    if ($deliveryItem->getId() === $item->getLineId()) {
-                        if ($deliveryItem->getShippingCosts()->getTotalPrice() !== $item->getAmount()) {
-                            $isDifferentAmount = true;
-                            break;
-                        }
+                    if (($deliveryItem->getId() === $item->getLineId()) && $deliveryItem->getShippingCosts()->getTotalPrice() !== $item->getAmount()) {
+                        $isDifferentAmount = true;
+                        break;
                     }
                 }
             }

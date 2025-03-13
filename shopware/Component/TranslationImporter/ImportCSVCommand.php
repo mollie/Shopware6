@@ -18,10 +18,10 @@ final class ImportCSVCommand extends Command
     private array $keyMappings = [
         'card.payments.shopwareFailedPayments.label' => 'card.payments.shopwareFailedPayment.label',
         'card.payments.shopwareFailedPayments.helpText' => 'card.payments.shopwareFailedPayment.helpText',
-        'card.orderManagement.automaticCancelation.label' => 'card.orderManagement.automaticCancellation.label',
-        'card.orderManagement.automaticCancelation.helpText' => 'card.orderManagement.automaticCancellation.helpText',
-        'card.orderStateAutomation.ordeStateFinalState.label' => 'card.orderStateAutomation.orderStateFinalState.label',
-        'card.orderStateAutomation.ordeStateFinalState.helpText' => 'card.orderStateAutomation.orderStateFinalState.helpText',
+        'card.orderManagement.automaticCancellation.label' => 'card.orderManagement.automaticCancellation.label',
+        'card.orderManagement.automaticCancellation.helpText' => 'card.orderManagement.automaticCancellation.helpText',
+        'card.orderStateAutomation.orderStateFinalState.label' => 'card.orderStateAutomation.orderStateFinalState.label',
+        'card.orderStateAutomation.orderStateFinalState.helpText' => 'card.orderStateAutomation.orderStateFinalState.helpText',
         'card.subscriptions.subscriptionsSkipRenewalsOnFailedPayments.label' => 'card.subscriptions.subscriptionSkipRenewalsOnFailedPayments.label',
         'card.subscriptions.subscriptionsSkipRenewalsOnFailedPayments.helpText' => 'card.subscriptions.subscriptionSkipRenewalsOnFailedPayments.helpText',
     ];

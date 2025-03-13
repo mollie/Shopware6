@@ -23,10 +23,6 @@ class CancellationValidator
         $latestCancellation = new DateTime($nextRenewal->format('Y-m-d H:i:s'));
         $latestCancellation->modify("-" . $maxCancellationDays . " day");
 
-        if ($today <= $latestCancellation) {
-            return true;
-        }
-
-        return false;
+        return $today <= $latestCancellation;
     }
 }

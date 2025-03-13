@@ -15,6 +15,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
@@ -106,7 +107,7 @@ class SubscriptionRepository
         if (! $includedPending) {
             $criteria->addFilter(
                 new NotFilter(
-                    NotFilter::CONNECTION_AND,
+                    MultiFilter::CONNECTION_AND,
                     [new EqualsFilter('mollieId', null),]
                 )
             );

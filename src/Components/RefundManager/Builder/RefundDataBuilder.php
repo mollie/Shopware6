@@ -116,7 +116,7 @@ class RefundDataBuilder
                 # subscriptions have no order, so no quantity is available
                 $alreadyRefundedQty = 0;
 
-                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
+                if ($mollieOrder instanceof \Mollie\Api\Resources\Order && !$orderAttributes->isTypeSubscription()) {
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
                 }
 
@@ -147,7 +147,7 @@ class RefundDataBuilder
                 $alreadyRefundedQty = 0;
 
                 # remember, subscriptions have no order
-                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
+                if ($mollieOrder instanceof \Mollie\Api\Resources\Order && !$orderAttributes->isTypeSubscription()) {
                     # search the mollie line id for the order
                     # because we don't have this in our order items.
                     $mollieLineID = '';
@@ -333,7 +333,7 @@ class RefundDataBuilder
             $metadata = RefundMetadata::fromArray($meta);
 
             # if we do have a FULL item refund then
-            # we must NOT substract our item again.
+            # we must NOT subtract our item again.
             # a full refund on the item means, that we do not have a custom amount
             # and that means that Mollie will already decrease the quantity in their data
             # which means that this is already included in our step above where we

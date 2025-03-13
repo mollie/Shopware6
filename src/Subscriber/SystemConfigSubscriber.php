@@ -203,7 +203,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             );
 
             $this->settingsService->setProfileId($this->profileIdStorage[$salesChannelId . $key], $salesChannelId, $testMode);
-        } else if ($value) {
+        } elseif ($value) {
             $this->logger->debug(
                 "Removing profile ID",
                 [

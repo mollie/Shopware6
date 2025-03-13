@@ -93,7 +93,7 @@ class MollieShopwareCart
      */
     public function isPayPalExpressIncomplete(): bool
     {
-        return (mb_strlen($this->getPayPalExpressSessionID()) > 0 && $this->getPayPalExpressAuthId() === '');
+        return ($this->getPayPalExpressSessionID() !== '' && $this->getPayPalExpressAuthId() === '');
     }
 
     public function clearPayPalExpress(): void

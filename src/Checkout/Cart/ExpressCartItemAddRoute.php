@@ -71,7 +71,7 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
 
         # we mark the cart as single product express checkout
         # because this helps us to decide whether express checkout is done or
-        # a checkout of an existing cart is started (offcanvas, cart...)
+        # a checkout of an existing cart is started (off canvas, cart...)
         $mollieCart->setSingleProductExpressCheckout(true);
 
         $cart = $mollieCart->getCart();

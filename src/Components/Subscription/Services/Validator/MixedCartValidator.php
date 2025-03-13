@@ -38,10 +38,6 @@ class MixedCartValidator
             }
         }
 
-        if ($subscriptionItemsCount >= 1 && $isMixedCart) {
-            return true;
-        }
-
-        return false;
+        return $subscriptionItemsCount >= 1 && $isMixedCart;
     }
 }

@@ -15,13 +15,7 @@ class VersionCompare
      */
     public function __construct(string $swVersion)
     {
-        $this->swVersion = $swVersion;
-
-        # no words...make it work :D
-        $this->swVersion = str_replace('-RC2', '', $this->swVersion);
-        $this->swVersion = str_replace('-RC1', '', $this->swVersion);
-        $this->swVersion = str_replace('-RC3', '', $this->swVersion);
-        $this->swVersion = str_replace('-RC4', '', $this->swVersion);
+        $this->swVersion = str_replace(['-RC1', '-RC2', '-RC3', '-RC4'], '', $swVersion);
     }
 
 

@@ -485,7 +485,7 @@ class RefundManager implements RefundManagerInterface
                 }
             } else {
                 # yeah i know complexity...but for now lets keep it compact :)
-                if ($order->getDeliveries() instanceof OrderDeliveryCollection && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
+                if ($mollieOrder instanceof \Mollie\Api\Resources\Order && $order->getDeliveries() instanceof OrderDeliveryCollection) {
                     # if we do not have an item
                     # then it might be a delivery in Shopware
                     foreach ($order->getDeliveries() as $delivery) {
