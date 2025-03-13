@@ -24,7 +24,7 @@ class FakeStockManager implements StockManagerInterface
     private $lineItemLabel;
 
     /**
-     * @var string
+     * @var int
      */
     private $quantity;
 
@@ -53,7 +53,7 @@ class FakeStockManager implements StockManagerInterface
         return $this->productID;
     }
 
-    public function getQuantity(): string
+    public function getQuantity(): int
     {
         return $this->quantity;
     }

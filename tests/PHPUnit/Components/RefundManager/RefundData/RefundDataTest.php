@@ -56,7 +56,7 @@ class RefundDataTest extends TestCase
         $lineItem->setReferencedId('product-id-1');
         $lineItem->setPayload(['productNumber' => 'P123']);
 
-        $items[] = new ProductItem($lineItem, [], 2, '1.233', '2.343', '3.453');
+        $items[] = new ProductItem($lineItem, [], 2, 1.233, 2.343, 3.453);
 
         $data = new RefundData($items, [], 0, 0, 0, 0, 0, 'gross');
 

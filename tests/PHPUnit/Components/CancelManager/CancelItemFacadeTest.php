@@ -116,6 +116,6 @@ class CancelItemFacadeTest extends TestCase
         $this->assertTrue($response->isSuccessful());
         $this->assertSame($expectedData, $response->getData());
         $this->assertTrue($stockManager->isCalled());
-        $this->assertSame($expectedData['quantity'], (int) $stockManager->getQuantity());
+        $this->assertSame($expectedData['quantity'], $stockManager->getQuantity());
     }
 }
