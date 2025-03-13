@@ -45,7 +45,7 @@ class RenewalReminderCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName(self::$defaultName)
+            ->setName((string)self::$defaultName)
             ->setDescription('Processes Subscription renewal reminders of upcoming renewals');
     }
 

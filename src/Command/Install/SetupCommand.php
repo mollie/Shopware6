@@ -45,7 +45,7 @@ class SetupCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName(self::$defaultName)
+            ->setName((string)self::$defaultName)
             ->setDescription('Installs and configures the plugin without the need to disable and activate it again.');
     }
 
