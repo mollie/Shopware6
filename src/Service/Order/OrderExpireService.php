@@ -66,7 +66,7 @@ class OrderExpireService
 
             $orderAttributes = new OrderAttributes($order);
 
-            if (strlen($orderAttributes->getMollieOrderId()) === 0) {
+            if ($orderAttributes->getMollieOrderId() === '') {
                 continue;
             }
 

@@ -113,9 +113,7 @@ class OrderController extends AbstractController
             throw new \RuntimeException('Order not found');
         }
 
-        $order = $orders->first();
-
-        return $order->getSalesChannelId();
+        return $orders->first()->getSalesChannelId();
     }
 
     private function getMollieOrderId(string $orderId, Context $context): string

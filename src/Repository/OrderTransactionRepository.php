@@ -33,9 +33,6 @@ class OrderTransactionRepository
         $criteria->addAssociation('paymentMethod');
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
 
-
-        $result = $this->repository->search($criteria, $context);
-
-        return $result->first();
+        return $this->repository->search($criteria, $context)->first();
     }
 }

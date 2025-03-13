@@ -58,7 +58,7 @@ class CreditCardControllerBase
             $customer,
             $cardToken,
             $context,
-            $data->getBoolean('shouldSaveCardDetail', false)
+            $data->getBoolean('shouldSaveCardDetail')
         );
 
         return new StoreCardTokenResponse($result !== null);

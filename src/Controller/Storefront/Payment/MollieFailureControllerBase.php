@@ -166,12 +166,9 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
             ]
         );
 
-
-        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
-        $customFieldArray = $order->getCustomFields() ?? [];
-
         $customFields = new OrderAttributes($order);
 
+        // TODO: Possibly refactor to use Service/OrderService::getMollieOrderId
         $mollieOrderId = $customFields->getMollieOrderId();
 
         if (empty($mollieOrderId)) {

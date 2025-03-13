@@ -81,7 +81,7 @@ abstract class AbstractMailService
      */
     protected function filterFileAttachments(array $attachments = []): array
     {
-        return array_filter($attachments, function ($attachment) {
+        return array_filter($attachments, static function ($attachment) {
             return is_string($attachment)
                 && file_exists($attachment);
         });
@@ -93,7 +93,7 @@ abstract class AbstractMailService
      */
     protected function filterBinaryAttachments(array $attachments = []): array
     {
-        return array_filter($attachments, function ($attachment) {
+        return array_filter($attachments, static function ($attachment) {
             return is_array($attachment)
                 && array_key_exists('content', $attachment)
                 && array_key_exists('fileName', $attachment)

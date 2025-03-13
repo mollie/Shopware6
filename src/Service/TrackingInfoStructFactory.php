@@ -154,7 +154,7 @@ class TrackingInfoStructFactory
             }
         }
 
-        if (mb_strlen($trackingCode) === 0) {
+        if ($trackingCode === '') {
             $this->logger->warning('Tracking Code is empty');
             return null;
         }

@@ -268,9 +268,7 @@ class RefundService implements RefundServiceInterface
      */
     public function getRemainingAmount(OrderEntity $order): float
     {
-        $payment = $this->getPayment($order);
-
-        return $payment->getAmountRemaining();
+        return $this->getPayment($order)->getAmountRemaining();
     }
 
     /**
@@ -308,9 +306,7 @@ class RefundService implements RefundServiceInterface
      */
     public function getRefundedAmount(OrderEntity $order): float
     {
-        $payment = $this->getPayment($order);
-
-        return $payment->getAmountRefunded();
+        return $this->getPayment($order)->getAmountRefunded();
     }
 
     /**

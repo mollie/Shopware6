@@ -67,9 +67,9 @@ class LineItemAttributes
 
         $this->subscriptionProduct = (bool)$this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int)$this->getCustomFieldValue($lineItem, 'subscription_interval');
-        $this->subscriptionIntervalUnit = (string)$this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
-        $this->subscriptionRepetition = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition');
-        $this->subscriptionRepetitionType = (string)$this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
+        $this->subscriptionIntervalUnit = $this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
+        $this->subscriptionRepetition = $this->getCustomFieldValue($lineItem, 'subscription_repetition');
+        $this->subscriptionRepetitionType = $this->getCustomFieldValue($lineItem, 'subscription_repetition_type');
     }
 
     /**

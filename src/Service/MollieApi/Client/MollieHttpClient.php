@@ -6,6 +6,7 @@ use Composer\CaBundle\CaBundle;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\HttpAdapter\MollieHttpAdapterInterface;
 use Mollie\Api\MollieApiClient;
+use Symfony\Component\HttpFoundation\Response;
 
 class MollieHttpClient implements MollieHttpAdapterInterface
 {
@@ -18,11 +19,6 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      * @var int in seconds
      */
     private $responseTimeout;
-
-    /**
-     * HTTP status code for an empty ok response.
-     */
-    const HTTP_NO_CONTENT = 204;
 
 
     /**
@@ -116,7 +112,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
     protected function parseResponseBody($response, $statusCode, $httpBody)
     {
         if (empty($response)) {
-            if ($statusCode === self::HTTP_NO_CONTENT) {
+            if ($statusCode === Response::HTTP_NO_CONTENT) {
                 return null;
             }
 
@@ -134,7 +130,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
             throw new ApiException($body->error->message);
         }
 
-        if ($statusCode >= 400) {
+        if ($statusCode >= Response::HTTP_BAD_REQUEST) {
             $message = "Error executing API call ({$body->status}: {$body->title}): {$body->detail}";
 
             $field = null;

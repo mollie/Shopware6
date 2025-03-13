@@ -42,7 +42,7 @@ class TransitionService implements TransitionServiceInterface
             $context
         );
 
-        return array_map(function (StateMachineTransitionEntity $transition) {
+        return array_map(static function (StateMachineTransitionEntity $transition) {
             return $transition->getActionName();
         }, $availableTransitions);
     }

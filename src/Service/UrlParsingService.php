@@ -50,17 +50,17 @@ class UrlParsingService
 
         $scheme = isset($urlParts['scheme']) ? $urlParts['scheme'] . '://' : '';
 
-        $host = isset($urlParts['host']) ? $urlParts['host'] : '';
+        $host = $urlParts['host'] ?? '';
 
         $port = isset($urlParts['port']) ? ':' . $urlParts['port'] : '';
 
-        $user = isset($urlParts['user']) ? $urlParts['user'] : '';
+        $user = $urlParts['user'] ?? '';
 
         $pass = isset($urlParts['pass']) ? ':' . $urlParts['pass'] : '';
 
         $pass = ($user || $pass) ? "$pass@" : '';
 
-        $path = isset($urlParts['path']) ? $urlParts['path'] : '';
+        $path = $urlParts['path'] ?? '';
 
         if (mb_strlen($path) > 0) {
             $pathParts = explode('/', $path);

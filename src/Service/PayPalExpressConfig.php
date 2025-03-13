@@ -25,7 +25,7 @@ class PayPalExpressConfig
         $this->buttonShape = $buttonShape ?? 1;
         $restrictions = $restrictions ?? '';
 
-        if (strlen($restrictions) > 0) {
+        if ($restrictions !== '') {
             $this->restrictions = explode(' ', $restrictions);
         }
     }

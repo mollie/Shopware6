@@ -35,6 +35,6 @@ class OrderEditSubscriber implements EventSubscriberInterface
 
         $context = $event->getContext();
 
-        $rested = $this->orderExpireService->cancelExpiredOrders($orders, $context);
+        $this->orderExpireService->cancelExpiredOrders($orders, $context);
     }
 }

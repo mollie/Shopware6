@@ -504,16 +504,15 @@ class Order
             }
 
             throw new PaymentNotFoundException($mollieOrderId);
-        } else {
-            # TRANSACTION_ID,.... tr_abc
-
-            $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);
-
-            if (in_array($payment->status, $allowed)) {
-                return $payment;
-            }
-
-            throw new PaymentNotFoundException($molliePaymentId);
         }
+        # TRANSACTION_ID,.... tr_abc
+
+        $payment = $this->getMolliePayment($molliePaymentId, (string)$salesChannelId);
+
+        if (in_array($payment->status, $allowed)) {
+            return $payment;
+        }
+
+        throw new PaymentNotFoundException($molliePaymentId);
     }
 }

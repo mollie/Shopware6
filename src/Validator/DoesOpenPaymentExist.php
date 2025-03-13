@@ -17,7 +17,7 @@ class DoesOpenPaymentExist
             return false;
         }
 
-        $filteredPayments = array_filter($payments, function (Payment $payment) {
+        $filteredPayments = array_filter($payments, static function (Payment $payment) {
             return $payment->status === PaymentStatus::STATUS_OPEN;
         });
 

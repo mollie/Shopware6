@@ -703,7 +703,7 @@ class CustomerService implements CustomerServiceInterface
         //customer have addresses, might be from old PPE orders, might be from shopware, lets find them and select them
         $addresses = [];
 
-        // we havent found a default adress, create a new one
+        // we haven't found a default address, create a new one
         if ($defaultShippingAddressId === null) {
             $defaultShippingAddressId = Uuid::randomHex();
             $addresses[] = $this->createShopwareAddressArray($defaultShippingAddressId, $customer->getId(), $customer->getSalutationId(), $shippingAddress, $context);
@@ -715,7 +715,7 @@ class CustomerService implements CustomerServiceInterface
             $addresses[] = $this->createShopwareAddressArray($defaultBillingAddressId, $customer->getId(), $customer->getSalutationId(), $billingAddress, $context);
         }
 
-        //we dont have a billing adress, we use the shipping adress as billing
+        //we dont have a billing address, we use the shipping address as billing
         if ($billingAddress === null && $defaultBillingAddressId === null) {
             $defaultBillingAddressId = $defaultShippingAddressId;
         }
@@ -786,8 +786,7 @@ class CustomerService implements CustomerServiceInterface
 
         try {
             $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
-            $response = $abstractRegisterRoute->register($data, $context, false);
-            return $response->getCustomer();
+            return $abstractRegisterRoute->register($data, $context, false)->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
             /** we have to store the errors in an array because getErrors returns a generator */

@@ -66,7 +66,7 @@ class RefundHydrator
                 foreach ($refundLineItems as $refundLineItem) {
                     $metaData->type = $shopwareRefund->getType();
 
-                    $metaData->composition[]=[
+                    $metaData->composition[] = [
                         'swLineId' => (string)$refundLineItem->getOrderLineItemId(),
                         'swLineVersionId' => (string)$refundLineItem->getOrderLineItemVersionId(),
                         'mollieLineId' => $refundLineItem->getMollieLineId(),

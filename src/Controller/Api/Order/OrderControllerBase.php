@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderControllerBase extends AbstractController
 {
@@ -60,7 +61,7 @@ class OrderControllerBase extends AbstractController
         $mollieOrderId = ($customFields !== null && isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) ? $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] : null;
 
         if (is_null($mollieOrderId)) {
-            return $this->json([], 404);
+            return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse([

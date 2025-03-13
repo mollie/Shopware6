@@ -162,10 +162,10 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
         $this->loadServices();
 
         $orderAttributes = new OrderAttributes($transaction->getOrder());
-        $molliedID = $orderAttributes->getMollieOrderId();
+        $mollieID = $orderAttributes->getMollieOrderId();
 
         $this->logger->info(
-            'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod . ' and Mollie ID' . $molliedID,
+            'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $this->paymentMethod . ' and Mollie ID' . $mollieID,
             [
                 'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
             ]
@@ -175,7 +175,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             $this->finalizeFacade->finalize($transaction, $salesChannelContext);
         } catch (AsyncPaymentFinalizeException|CustomerCanceledAsyncPaymentException|PaymentException $ex) {
             $this->logger->error(
-                'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
+                'Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $mollieID . ', ' . $ex->getMessage()
             );
 
             # these are already correct exceptions
@@ -188,7 +188,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             # Only the 2 exceptions above, lead to a correct failure-behaviour in Shopware.
             # All other exceptions would lead to a 500 exception in the storefront.
             $this->logger->error(
-                'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $molliedID . ', ' . $ex->getMessage()
+                'Unknown Error when finalizing order ' . $transaction->getOrder()->getOrderNumber() . ', Mollie ID: ' . $mollieID . ', ' . $ex->getMessage()
             );
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransaction()->getId(), 'An unknown error happened when finalizing the order. Please see the Shopware logs for more. It can be that the payment in Mollie was succesful and the Shopware order is now cancelled or failed!');
         }

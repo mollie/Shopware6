@@ -232,7 +232,7 @@ class PaymentMethodService
                 ];
             }
 
-            if (mb_strlen($technicalName) === 0) {
+            if ($technicalName === '') {
                 $technicalName = self::TECHNICAL_NAME_PREFIX . $paymentMethod['name'];
             }
 

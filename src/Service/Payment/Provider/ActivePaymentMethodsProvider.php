@@ -62,7 +62,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             ],
         ];
 
-        if (mb_strlen($billingCountryCode) > 0) {
+        if ($billingCountryCode !== '') {
             $params['billingCountry'] = $billingCountryCode;
         }
 

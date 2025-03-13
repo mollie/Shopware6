@@ -7,7 +7,7 @@ return [
     'ide' => 'phpstorm',
     'exclude' => [
         './.git',
-        './github',
+        './.github',
         './vendor',
     ],
     'add' => [

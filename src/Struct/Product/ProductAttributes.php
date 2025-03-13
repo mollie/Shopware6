@@ -146,7 +146,7 @@ class ProductAttributes
         # search in new structure
         if ($customFields !== null) {
             $fullKey = 'mollie_payments_product_' . $keyName;
-            $foundValue = (array_key_exists($fullKey, $customFields)) ? $customFields[$fullKey] : null;
+            $foundValue = $customFields[$fullKey] ?? null;
         }
 
         return $foundValue;

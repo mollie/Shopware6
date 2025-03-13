@@ -27,10 +27,10 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
     ];
 
     public function __construct(
-        ConfigurationService            $configurationService,
+        ConfigurationService $configurationService,
         EntityRepository $salesChannelRepository,
-        SettingsService                 $settingsService,
-        ApiKeyValidator                 $apiKeyValidator
+        SettingsService $settingsService,
+        ApiKeyValidator $apiKeyValidator
     ) {
         $this->apiKeyValidator = $apiKeyValidator;
 

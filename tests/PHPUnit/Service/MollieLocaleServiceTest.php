@@ -42,7 +42,7 @@ class MollieLocaleServiceTest extends TestCase
         # our data provider has no flat list of values, but we still want to reuse it.
         # so lets just extract the first internal value of each item to get a flat list
         # of expected locales.
-        $expected = array_map(function ($list) {
+        $expected = array_map(static function ($list) {
             return $list[0];
         }, $this->getAvailableLocales());
 

@@ -188,6 +188,7 @@ class OrderLineItemEntityAttributes
     private function getCustomFieldValue(OrderLineItemEntity $lineItem, string $keyName): string
     {
         $foundValue = '';
+        $fullKey = 'mollie_payments_product_' . $keyName;
 
         # ---------------------------------------------------------------------------
         # search in payload
@@ -201,7 +202,6 @@ class OrderLineItemEntityAttributes
                 if (is_array($customFields)) {
                     # ---------------------------------------------------------------------------
                     # search in new structure
-                    $fullKey = 'mollie_payments_product_' . $keyName;
                     $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
 
                     # old structure
@@ -226,7 +226,6 @@ class OrderLineItemEntityAttributes
             if ($customFields !== null) {
                 # ---------------------------------------------------------------------------
                 # search in new structure
-                $fullKey = 'mollie_payments_product_' . $keyName;
                 $foundValue = (array_key_exists($fullKey, $customFields)) ? (string)$customFields[$fullKey] : '';
 
                 # old structure

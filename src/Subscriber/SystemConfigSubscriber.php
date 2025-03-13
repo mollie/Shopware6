@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Subscriber;
 use Kiener\MolliePayments\Helper\ProfileHelper;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\CustomerStruct;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Profile;
 use Psr\Log\LoggerInterface;
@@ -121,7 +122,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 "API key has been removed, removing associated profile ID",
                 [
                     'salesChannelId' => $salesChannelId ?? 'null',
-                    'mode' => $testMode ? 'test' : 'live',
+                    'mode' => $testMode ? CustomerStruct::TEST_MODE : CustomerStruct::LIVE_MODE,
                 ]
             );
 
@@ -135,7 +136,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             "Fetching profile ID",
             [
                 'salesChannelId' => $salesChannelId ?? 'null',
-                'mode' => $testMode ? 'test' : 'live',
+                'mode' => $testMode ? CustomerStruct::TEST_MODE : CustomerStruct::LIVE_MODE,
             ]
         );
 
@@ -149,7 +150,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 'Could not get profile using these settings',
                 [
                     'salesChannelId' => $salesChannelId ?? 'null',
-                    'mode' => $testMode ? 'test' : 'live',
+                    'mode' => $testMode ? CustomerStruct::TEST_MODE : CustomerStruct::LIVE_MODE,
                 ]
             );
             return;
@@ -161,7 +162,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             "Saving profile ID",
             [
                 'salesChannelId' => $salesChannelId ?? 'null',
-                'mode' => $testMode ? 'test' : 'live',
+                'mode' => $testMode ? CustomerStruct::TEST_MODE : CustomerStruct::LIVE_MODE,
                 'profileId' => $profile->id
             ]
         );
@@ -196,26 +197,22 @@ class SystemConfigSubscriber implements EventSubscriberInterface
                 "A new profile ID was fetched, but the admin saved the old one again, correcting mistake.",
                 [
                     'salesChannelId' => $salesChannelId ?? 'null',
-                    'mode' => $testMode ? 'test' : 'live',
+                    'mode' => $testMode ? CustomerStruct::TEST_MODE : CustomerStruct::LIVE_MODE,
                     'profileId' => $value
                 ]
             );
 
             $this->settingsService->setProfileId($this->profileIdStorage[$salesChannelId . $key], $salesChannelId, $testMode);
-        } else {
-            // If we haven't stored the profile ID from Mollie, but we are getting a value here from the admin,
-            // then we no longer need to store this key, so delete it.
-            if ($value) {
-                $this->logger->debug(
-                    "Removing profile ID",
-                    [
-                        'salesChannelId' => $salesChannelId ?? 'null',
-                        'mode' => $testMode ? 'test' : 'live',
-                    ]
-                );
+        } else if ($value) {
+            $this->logger->debug(
+                "Removing profile ID",
+                [
+                    'salesChannelId' => $salesChannelId ?? 'null',
+                    'mode' => $testMode ? CustomerStruct::TEST_MODE : CustomerStruct::LIVE_MODE,
+                ]
+            );
 
-                $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
-            }
+            $this->settingsService->setProfileId(null, $salesChannelId, $testMode);
         }
     }
 }
