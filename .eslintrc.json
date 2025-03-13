@@ -5,8 +5,12 @@
     "node": true,
     "es6": true
   },
+  "globals": {
+    "Shopware": "readonly"
+  },
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "prettier"
   ],
   "ignorePatterns": [
     "src/Resources/app/storefront/dist"
