@@ -158,10 +158,10 @@ endif
 
 prettier: ##3 Starts the Prettier
 ifndef mode
-	./node_modules/.bin/prettier ./src/Resources/ --config=./.prettierrc  --check
+	./node_modules/.bin/prettier ./src/Resources/app/ --config=./.prettierrc  --check
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/prettier ./src/Resources/ --config=./.prettierrc  --write
+	./node_modules/.bin/prettier ./src/Resources/app/ --config=./.prettierrc  --write
 endif
 
 configcheck: ##3 Tests and verifies the plugin configuration file
