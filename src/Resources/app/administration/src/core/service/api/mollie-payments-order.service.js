@@ -6,17 +6,13 @@ class MolliePaymentsOrderService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    getPaymentUrl(data = {orderId: null}) {
+    getPaymentUrl(data = { orderId: null }) {
         const headers = this.getBasicHeaders();
 
         return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/order/payment-url`,
-                JSON.stringify(data),
-                {
-                    headers: headers,
-                }
-            )
+            .post(`_action/${this.getApiBasePath()}/order/payment-url`, JSON.stringify(data), {
+                headers: headers,
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             });

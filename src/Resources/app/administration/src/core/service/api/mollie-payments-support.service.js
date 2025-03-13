@@ -8,13 +8,9 @@ export default class MolliePaymentsSupportService extends ApiService {
 
     __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/support${endpoint}`,
-                JSON.stringify(data),
-                {
-                    headers: this.getBasicHeaders(headers),
-                }
-            )
+            .post(`_action/${this.getApiBasePath()}/support${endpoint}`, JSON.stringify(data), {
+                headers: this.getBasicHeaders(headers),
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             });

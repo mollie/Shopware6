@@ -199,6 +199,9 @@ make eslint
 
 ## Starts the Stylelint Analyzer for SCSS
 make stylelint
+
+## Starts the Prettier Analyzer for JavaScript and JSON files
+make prettier
 ```
 
 ## Testing

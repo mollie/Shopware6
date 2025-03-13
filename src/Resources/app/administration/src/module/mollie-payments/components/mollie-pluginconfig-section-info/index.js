@@ -4,14 +4,12 @@ import './mollie-pluginconfig-section-info.scss';
 const VersionCompare = require('../../../../core/service/utils/version-compare.utils').default;
 
 // eslint-disable-next-line no-undef
-const {Component, Context, Mixin} = Shopware;
+const { Component, Context, Mixin } = Shopware;
 
 Component.register('mollie-pluginconfig-section-info', {
     template,
 
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
     data() {
         return {

@@ -5,29 +5,16 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
     key: 'mollie_refund_manager',
     roles: {
         viewer: {
-            privileges: [
-                'mollie_refund_manager:read',
-                'mollie_refund:read',
-            ],
+            privileges: ['mollie_refund_manager:read', 'mollie_refund:read'],
             dependencies: [],
         },
         creator: {
-            privileges: [
-                'mollie_refund_manager:create',
-                'mollie_refund:create',
-            ],
-            dependencies: [
-                'mollie_refund_manager.viewer',
-            ],
+            privileges: ['mollie_refund_manager:create', 'mollie_refund:create'],
+            dependencies: ['mollie_refund_manager.viewer'],
         },
         deleter: {
-            privileges: [
-                'mollie_refund_manager:delete',
-                'mollie_refund:delete',
-            ],
-            dependencies: [
-                'mollie_refund_manager.creator',
-            ],
+            privileges: ['mollie_refund_manager:delete', 'mollie_refund:delete'],
+            dependencies: ['mollie_refund_manager.creator'],
         },
     },
 });
@@ -58,9 +45,7 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
                 'mollie_subscription_history:create',
                 'mollie_subscription_history:update',
             ],
-            dependencies: [
-                'mollie_subscription.viewer',
-            ],
+            dependencies: ['mollie_subscription.viewer'],
         },
         deleter: {
             privileges: [

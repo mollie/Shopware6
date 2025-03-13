@@ -4,24 +4,22 @@ import './mollie-pluginconfig-support-modal.scss';
 const VersionCompare = require('../../../../core/service/utils/version-compare.utils').default;
 
 // eslint-disable-next-line no-undef
-const {Application, Component, Context, Mixin, State} = Shopware;
+const { Application, Component, Context, Mixin, State } = Shopware;
 // eslint-disable-next-line no-undef
-const {Criteria} = Shopware.Data;
+const { Criteria } = Shopware.Data;
 // eslint-disable-next-line no-undef
-const {string} = Shopware.Utils;
+const { string } = Shopware.Utils;
 
 Component.register('mollie-pluginconfig-support-modal', {
     template,
 
     inject: {
-        shopwareExtensionService: {default: null}, // This did not exist before 6.4, so default to null to avoid errors.
+        shopwareExtensionService: { default: null }, // This did not exist before 6.4, so default to null to avoid errors.
         MolliePaymentsSupportService: {},
         repositoryFactory: {},
     },
 
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
     data() {
         return {
@@ -44,8 +42,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                     value: 'de-DE',
                 },
             ],
-
-        }
+        };
     },
 
     computed: {
@@ -58,17 +55,17 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         canSubmit() {
-            return !string.isEmptyOrSpaces(this.contactName)
-                && !string.isEmptyOrSpaces(this.contactEmail)
-                && !string.isEmptyOrSpaces(this.subject)
-                && !string.isEmptyOrSpaces(this.message)
+            return (
+                !string.isEmptyOrSpaces(this.contactName) &&
+                !string.isEmptyOrSpaces(this.contactEmail) &&
+                !string.isEmptyOrSpaces(this.subject) &&
+                !string.isEmptyOrSpaces(this.message)
+            );
         },
 
         contactName: {
             get() {
-                return !string.isEmptyOrSpaces(name)
-                    ? this.name
-                    : this.userName;
+                return !string.isEmptyOrSpaces(name) ? this.name : this.userName;
             },
             set(value) {
                 this.name = value;
@@ -77,9 +74,7 @@ Component.register('mollie-pluginconfig-support-modal', {
 
         contactEmail: {
             get() {
-                return !string.isEmptyOrSpaces(this.email)
-                    ? this.email
-                    : this.user.email;
+                return !string.isEmptyOrSpaces(this.email) ? this.email : this.user.email;
             },
             set(value) {
                 this.email = value;
@@ -118,13 +113,11 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         molliePlugin() {
-            return this.plugins.find(plugin => plugin.name === 'MolliePayments');
+            return this.plugins.find((plugin) => plugin.name === 'MolliePayments');
         },
 
         mollieVersion() {
-            return this.molliePlugin
-                ? VersionCompare.getHumanReadableVersion(this.molliePlugin.version)
-                : '';
+            return this.molliePlugin ? VersionCompare.getHumanReadableVersion(this.molliePlugin.version) : '';
         },
 
         shopwareVersion() {
@@ -150,7 +143,7 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         determineDefaultSupportDesk() {
-            this.recipientLocale = this.recipientOptions.some(option => option.value === this.locale)
+            this.recipientLocale = this.recipientOptions.some((option) => option.value === this.locale)
                 ? this.locale
                 : null;
         },
@@ -165,27 +158,24 @@ Component.register('mollie-pluginconfig-support-modal', {
                 criteria: criteria,
                 repository: this.repositoryFactory.create('plugin'),
                 context: Context.api,
-            }
+            };
 
-            State.dispatch('swPlugin/updatePluginList', searchData)
-                .finally(() => {
-                    this.isLoadingPlugins = false;
-                });
+            State.dispatch('swPlugin/updatePluginList', searchData).finally(() => {
+                this.isLoadingPlugins = false;
+            });
         },
 
         onRequestSupport() {
             this.isSubmitting = true;
 
-            this.MolliePaymentsSupportService
-                .request(
-                    this.contactName,
-                    this.contactEmail,
-                    this.recipientLocale,
-                    this.subject,
-                    this.message,
-                )
+            this.MolliePaymentsSupportService.request(
+                this.contactName,
+                this.contactEmail,
+                this.recipientLocale,
+                this.subject,
+                this.message,
+            )
                 .then((response) => {
-
                     if (!response.success) {
                         this._showNotificationError(this.$tc('mollie-payments.config.support.error'));
                         this.mailSent = false;
@@ -198,7 +188,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                 .catch((response) => {
                     this._showNotificationError(response);
                 })
-                .finally(() => this.isSubmitting = false)
+                .finally(() => (this.isSubmitting = false));
         },
 
         /**
@@ -222,6 +212,5 @@ Component.register('mollie-pluginconfig-support-modal', {
                 message: text,
             });
         },
-
     },
 });

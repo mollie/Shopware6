@@ -1,10 +1,9 @@
 import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
 import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
-import {PrivacyNoteElement} from '../repository/PrivacyNoteElement';
-import {MOLLIE_BIND_EXPRESS_EVENTS} from './mollie-express-actions.plugin';
+import { PrivacyNoteElement } from '../repository/PrivacyNoteElement';
+import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
 
 export default class PayPalExpressPlugin extends Plugin {
-
     init() {
         const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
         if (pluginOffCanvasInstances.length > 0) {
@@ -25,7 +24,7 @@ export default class PayPalExpressPlugin extends Plugin {
             return;
         }
 
-        document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, {detail: expressButtons}));
+        document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, { detail: expressButtons }));
 
         window.addEventListener('pageshow', this.onPageShow);
 
@@ -35,7 +34,6 @@ export default class PayPalExpressPlugin extends Plugin {
     }
 
     onPageShow() {
-
         const expressButtonsRepository = new ExpressButtonsRepository();
 
         const expressButtons = expressButtonsRepository.findAll('.mollie-paypal-button');
@@ -56,7 +54,6 @@ export default class PayPalExpressPlugin extends Plugin {
     }
 
     onExpressCheckout(event) {
-
         const clickedButton = event.target;
         if (!clickedButton.classList.contains('processed')) {
             return;
@@ -80,5 +77,4 @@ export default class PayPalExpressPlugin extends Plugin {
 
         form.submit();
     }
-
 }

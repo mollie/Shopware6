@@ -2,10 +2,7 @@ const REFUND_MODE_NONE = 'none';
 const REFUND_MODE_QTY = 'quantity';
 const REFUND_MODE_AMOUNT = 'amount';
 
-
 export default class RefundItemService {
-
-
     // ---------------------------------------------------------------------------------------------------------
     // <editor-fold desc="GETTERS">
     // ---------------------------------------------------------------------------------------------------------
@@ -47,7 +44,6 @@ export default class RefundItemService {
      * @returns {boolean}
      */
     isRefundable(item) {
-
         if (item.shopware.unitPrice === 0) {
             return false;
         }
@@ -65,7 +61,6 @@ export default class RefundItemService {
     // </editor-fold>
     // ---------------------------------------------------------------------------------------------------------
 
-
     // ---------------------------------------------------------------------------------------------------------
     // <editor-fold desc="FUNCTIONS">
     // ---------------------------------------------------------------------------------------------------------
@@ -77,7 +72,6 @@ export default class RefundItemService {
      * @param value
      */
     setStockReset(item, value) {
-
         // only do this, if not yet configured
         if (item.resetStock > 0) {
             return;
@@ -115,7 +109,6 @@ export default class RefundItemService {
     // </editor-fold>
     // ---------------------------------------------------------------------------------------------------------
 
-
     // ---------------------------------------------------------------------------------------------------------
     // <editor-fold desc="EVENTS">
     // ---------------------------------------------------------------------------------------------------------
@@ -126,7 +119,6 @@ export default class RefundItemService {
      * @param item
      */
     onQuantityChanged(item) {
-
         // do only update if our
         // amount has not yet been adjusted
         if (item.refundMode === REFUND_MODE_AMOUNT) {
@@ -167,7 +159,6 @@ export default class RefundItemService {
      * @param item
      */
     onRefundTaxChanged(item) {
-
         // do nothing in "amount" mode
         // because we have a custom amount here
         if (item.refundMode === REFUND_MODE_AMOUNT) {
@@ -183,7 +174,6 @@ export default class RefundItemService {
      * @param item
      */
     onPromotionDeductionChanged(item) {
-
         // do nothing in "amount" mode
         // because we have a custom amount here
         if (item.refundMode === REFUND_MODE_AMOUNT) {
@@ -197,15 +187,13 @@ export default class RefundItemService {
     // </editor-fold>
     // ---------------------------------------------------------------------------------------------------------
 
-
     /**
      * This recalculates the refund amount property
      * depending on the current state of the item.
      * @param item
      */
     _calculateItemAmount(item) {
-
-        const newRefundAmount = (item.shopware.unitPrice * item.refundQuantity);
+        const newRefundAmount = item.shopware.unitPrice * item.refundQuantity;
 
         let refundTaxAmount = 0;
         if (item.refundTax) {
@@ -228,12 +216,11 @@ export default class RefundItemService {
             // we have to calculate the amount of a single item, because
             // the promotion discount is the full discount on all of these items.
             const discountPerQty = item.shopware.promotion.discount / item.shopware.promotion.quantity;
-            const discount = (item.refundQuantity * discountPerQty);
+            const discount = item.refundQuantity * discountPerQty;
 
             item.refundAmount = newRefundAmount + refundTaxAmount - discount;
         } else {
             item.refundAmount = newRefundAmount + refundTaxAmount;
         }
     }
-
 }

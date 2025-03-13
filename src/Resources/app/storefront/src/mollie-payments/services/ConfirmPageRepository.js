@@ -1,5 +1,4 @@
 export default class ConfirmPageRepository {
-
     /**
      *
      * @param document
@@ -37,5 +36,4 @@ export default class ConfirmPageRepository {
 
         return button;
     }
-
 }

@@ -10,12 +10,9 @@ class MolliePaymentsPaymentMethodService extends ApiService {
         const headers = this.getBasicHeaders();
 
         return this.httpClient
-            .get(
-                `_action/${this.getApiBasePath()}/payment-method/update-methods`,
-                {
-                    headers: headers,
-                }
-            )
+            .get(`_action/${this.getApiBasePath()}/payment-method/update-methods`, {
+                headers: headers,
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             });

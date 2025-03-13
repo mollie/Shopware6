@@ -2,7 +2,7 @@ import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 
 export default class MollieCreditCardComponents extends MollieCreditCardMandate {
-    static options =  deepmerge(MollieCreditCardMandate.options, {
+    static options = deepmerge(MollieCreditCardMandate.options, {
         customerId: null,
         locale: null,
         profileId: null,
@@ -31,10 +31,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         const submitButton = document.querySelector(this.getSelectors().submitButton);
 
         // Initialize Mollie Components instance
-        if (
-            !!componentsContainer
-            && !!cardHolder
-        ) {
+        if (!!componentsContainer && !!cardHolder) {
             // eslint-disable-next-line no-undef
             componentsObject = Mollie(this.options.profileId, {
                 locale: this.options.locale,
@@ -43,15 +40,12 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         }
 
         // Create components inputs
-        this.createComponentsInputs(
-            componentsObject,
-            [
-                this.getInputFields().cardHolder,
-                this.getInputFields().cardNumber,
-                this.getInputFields().expiryDate,
-                this.getInputFields().verificationCode,
-            ]
-        );
+        this.createComponentsInputs(componentsObject, [
+            this.getInputFields().cardHolder,
+            this.getInputFields().cardNumber,
+            this.getInputFields().expiryDate,
+            this.getInputFields().verificationCode,
+        ]);
 
         // Show/hide the components form based on the selected radio input
         radioInputs.forEach((element) => {
@@ -132,10 +126,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
 
         if (componentsContainer) {
-            if (
-                creditCardRadioInput === undefined
-                || creditCardRadioInput.checked === false
-            ) {
+            if (creditCardRadioInput === undefined || creditCardRadioInput.checked === false) {
                 componentsContainer.classList.add('d-none');
             } else {
                 componentsContainer.classList.remove('d-none');
@@ -152,7 +143,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             arr[index][element.name] = component;
 
             // Handle errors
-            component.addEventListener('change', event => {
+            component.addEventListener('change', (event) => {
                 const componentContainer = document.getElementById(`${element.name}`);
                 const componentError = document.getElementById(`${element.errors}`);
 
@@ -204,34 +195,33 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         const creditCardRadioInput = document.querySelector(this.getSelectors().creditCardRadioInput);
 
         if (
-            (
-                creditCardRadioInput === undefined
-                || creditCardRadioInput === null
-                || creditCardRadioInput.checked === false
-            )
-            && !!paymentForm
+            (creditCardRadioInput === undefined ||
+                creditCardRadioInput === null ||
+                creditCardRadioInput.checked === false) &&
+            !!paymentForm
         ) {
             paymentForm.submit();
         }
 
-        if (
-            !!creditCardRadioInput
-            && creditCardRadioInput.checked === true
-        ) {
+        if (!!creditCardRadioInput && creditCardRadioInput.checked === true) {
             const mandateId = this.getMandateCheckedValue();
             // If the mandateId is valid, that means there is a mandate already selected,
             // so we have to call the API to save it
             // and then we continue by submitting our original payment form.
             if (this.isValidSelectedMandate(mandateId)) {
                 this.client.get(
-                    me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
+                    me.options.shopUrl +
+                        '/mollie/components/store-mandate-id/' +
+                        me.options.customerId +
+                        '/' +
+                        mandateId,
                     () => {
                         paymentForm.submit();
                     },
                     () => {
                         paymentForm.submit();
                     },
-                    'application/json; charset=utf-8'
+                    'application/json; charset=utf-8',
                 );
 
                 return;
@@ -242,7 +232,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             verificationErrors.textContent = '';
 
             // Get a payment token
-            const {token, error} = await componentsObject.createToken();
+            const { token, error } = await componentsObject.createToken();
 
             if (error) {
                 this.enableForm();
@@ -253,11 +243,11 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             if (!error) {
                 // Build query params
                 const queryParams = new URLSearchParams({
-                    'shouldSaveCardDetail': this.shouldSaveCardDetail(),
+                    shouldSaveCardDetail: this.shouldSaveCardDetail(),
                 });
 
                 let queryString = queryParams.toString();
-                if (queryString){
+                if (queryString) {
                     queryString = `?${queryString}`;
                 }
 
@@ -265,7 +255,12 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                 // the credit card token for the user and the current checkout
                 // and then we continue by submitting our original payment form.
                 this.client.get(
-                    me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token + queryString,
+                    me.options.shopUrl +
+                        '/mollie/components/store-card-token/' +
+                        me.options.customerId +
+                        '/' +
+                        token +
+                        queryString,
                     () => {
                         const tokenInput = document.getElementById('cardToken');
                         tokenInput.setAttribute('value', token);
@@ -274,7 +269,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                     () => {
                         paymentForm.submit();
                     },
-                    'application/json; charset=utf-8'
+                    'application/json; charset=utf-8',
                 );
             }
         }

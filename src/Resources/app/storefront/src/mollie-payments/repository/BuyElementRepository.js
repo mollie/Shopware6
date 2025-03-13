@@ -5,14 +5,14 @@ export default class BuyElementRepository {
         if (buyElementContainer === null) {
             buyElementContainer = target.closest('.product-detail-form-container');
         }
-        if(buyElementContainer === null){
+        if (buyElementContainer === null) {
             buyElementContainer = target.closest('.offcanvas-cart-actions');
         }
 
-        if(buyElementContainer === null){
+        if (buyElementContainer === null) {
             buyElementContainer = target.closest('.checkout-aside-container');
         }
-        if(buyElementContainer === null){
+        if (buyElementContainer === null) {
             buyElementContainer = target.closest('.checkout-main');
         }
 

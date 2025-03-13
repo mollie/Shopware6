@@ -9,7 +9,6 @@ export default (() => {
             name: `${prefix}${componentName}`,
             functional: true,
             render(createElement, elementContext) {
-
                 const data = elementContext.data;
 
                 return createElement('span', {

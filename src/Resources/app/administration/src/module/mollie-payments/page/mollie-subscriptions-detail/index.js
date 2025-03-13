@@ -3,25 +3,17 @@ import './mollie-subscriptions-detail.scss';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Application, ApiService, Filter} = Shopware;
+const { Component, Mixin, Application, ApiService, Filter } = Shopware;
 
 // eslint-disable-next-line no-undef
-const {Criteria} = Shopware.Data;
-
+const { Criteria } = Shopware.Data;
 
 Component.register('mollie-subscriptions-detail', {
     template,
 
-    inject: [
-        'MolliePaymentsSubscriptionService',
-        'repositoryFactory',
-        'acl',
-    ],
+    inject: ['MolliePaymentsSubscriptionService', 'repositoryFactory', 'acl'],
 
-    mixins: [
-        Mixin.getByName('notification'),
-        Mixin.getByName('placeholder'),
-    ],
+    mixins: [Mixin.getByName('notification'), Mixin.getByName('placeholder')],
 
     data() {
         return {
@@ -43,7 +35,7 @@ Component.register('mollie-subscriptions-detail', {
             formattedNextPaymentAt: '',
             formattedLastRemindedAt: '',
             formattedCanceledAt: '',
-        }
+        };
     },
 
     metaInfo() {
@@ -52,9 +44,7 @@ Component.register('mollie-subscriptions-detail', {
         };
     },
 
-
     computed: {
-
         repoSubscriptions() {
             return this.repositoryFactory.create('mollie_subscription');
         },
@@ -121,9 +111,10 @@ Component.register('mollie-subscriptions-detail', {
          * @returns {*}
          */
         cardTitleHistory() {
-            return this.$tc('mollie-payments.subscriptions.detail.history.cardTitle') + ' (' + this.history.length + ')';
+            return (
+                this.$tc('mollie-payments.subscriptions.detail.history.cardTitle') + ' (' + this.history.length + ')'
+            );
         },
-
 
         dateFilter() {
             return Filter.getByName('date');
@@ -135,7 +126,6 @@ Component.register('mollie-subscriptions-detail', {
     },
 
     methods: {
-
         /**
          *
          */
@@ -160,13 +150,14 @@ Component.register('mollie-subscriptions-detail', {
             this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result) => {
                 this.subscription = result[0];
 
-                this.customerFullName = this.subscription.customer.firstName + ' ' + this.subscription.customer.lastName;
+                this.customerFullName =
+                    this.subscription.customer.firstName + ' ' + this.subscription.customer.lastName;
                 this.translatedStatus = this.statusTranslation(this.subscription.status);
 
-                this.formattedCreateAt = this.getFormattedDate(this.subscription.createdAt)
-                this.formattedNextPaymentAt = this.getFormattedDate(this.subscription.nextPaymentAt)
-                this.formattedLastRemindedAt = this.getFormattedDate(this.subscription.lastRemindedAt)
-                this.formattedCanceledAt = this.getFormattedDate(this.subscription.canceledAt)
+                this.formattedCreateAt = this.getFormattedDate(this.subscription.createdAt);
+                this.formattedNextPaymentAt = this.getFormattedDate(this.subscription.nextPaymentAt);
+                this.formattedLastRemindedAt = this.getFormattedDate(this.subscription.lastRemindedAt);
+                this.formattedCanceledAt = this.getFormattedDate(this.subscription.canceledAt);
 
                 this.history = this.subscription.historyEntries;
                 this.history.sort(function (a, b) {
@@ -177,13 +168,13 @@ Component.register('mollie-subscriptions-detail', {
                 this.history.forEach((entry) => {
                     entry.statusFromTranslated = this.subscriptionService.getStatusTranslation(entry.statusFrom);
                     entry.statusToTranslated = this.subscriptionService.getStatusTranslation(entry.statusTo);
-                })
+                });
 
                 this.isLoading = false;
             });
 
-            const systemConfig = ApiService.getByName('systemConfigApiService')
-            systemConfig.getValues('MolliePayments').then(config => {
+            const systemConfig = ApiService.getByName('systemConfigApiService');
+            systemConfig.getValues('MolliePayments').then((config) => {
                 this.allowPauseResume = config['MolliePayments.config.subscriptionsAllowPauseResume'];
                 this.allowSkip = config['MolliePayments.config.subscriptionsAllowSkip'];
             });
@@ -238,7 +229,6 @@ Component.register('mollie-subscriptions-detail', {
          *
          */
         btnCancel_Click() {
-
             if (!this.isAclCancelAllowed) {
                 return;
             }
@@ -281,25 +271,24 @@ Component.register('mollie-subscriptions-detail', {
          *
          */
         btnConfirmCancel_Click() {
-
             this.showConfirmCancel = false;
 
             if (!this.isAclCancelAllowed) {
                 return;
             }
 
-            this.MolliePaymentsSubscriptionService
-                .cancel({
-                    id: this.subscription.id,
-                })
-                .then((response) => {
-                    if (response.success) {
-                        this.loadDetails();
-                        this.createNotificationSuccess({message: this.$tc('mollie-payments.subscriptions.alerts.cancelSuccess')});
-                    } else {
-                        this.createNotificationError({message: response.errors[0]});
-                    }
-                });
+            this.MolliePaymentsSubscriptionService.cancel({
+                id: this.subscription.id,
+            }).then((response) => {
+                if (response.success) {
+                    this.loadDetails();
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.subscriptions.alerts.cancelSuccess'),
+                    });
+                } else {
+                    this.createNotificationError({ message: response.errors[0] });
+                }
+            });
         },
 
         /**
@@ -308,18 +297,18 @@ Component.register('mollie-subscriptions-detail', {
         btnConfirmPause_Click() {
             this.showConfirmPause = false;
 
-            this.MolliePaymentsSubscriptionService
-                .pause({
-                    id: this.subscription.id,
-                })
-                .then((response) => {
-                    if (response.success) {
-                        this.loadDetails();
-                        this.createNotificationSuccess({message: this.$tc('mollie-payments.subscriptions.alerts.pauseSuccess')});
-                    } else {
-                        this.createNotificationError({message: response.errors[0]});
-                    }
-                });
+            this.MolliePaymentsSubscriptionService.pause({
+                id: this.subscription.id,
+            }).then((response) => {
+                if (response.success) {
+                    this.loadDetails();
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.subscriptions.alerts.pauseSuccess'),
+                    });
+                } else {
+                    this.createNotificationError({ message: response.errors[0] });
+                }
+            });
         },
 
         /**
@@ -328,45 +317,42 @@ Component.register('mollie-subscriptions-detail', {
         btnConfirmResume_Click() {
             this.showConfirmResume = false;
 
-            this.MolliePaymentsSubscriptionService
-                .resume({
-                    id: this.subscription.id,
-                })
-                .then((response) => {
-                    if (response.success) {
-                        this.loadDetails();
-                        this.createNotificationSuccess({message: this.$tc('mollie-payments.subscriptions.alerts.resumeSuccess')});
-                    } else {
-                        this.createNotificationError({message: response.errors[0]});
-                    }
-                });
+            this.MolliePaymentsSubscriptionService.resume({
+                id: this.subscription.id,
+            }).then((response) => {
+                if (response.success) {
+                    this.loadDetails();
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.subscriptions.alerts.resumeSuccess'),
+                    });
+                } else {
+                    this.createNotificationError({ message: response.errors[0] });
+                }
+            });
         },
 
         /**
          *
          */
         btnConfirmSkip_Click() {
-
             this.showConfirmSkip = false;
 
-            this.MolliePaymentsSubscriptionService
-                .skip({
-                    id: this.subscription.id,
-                })
-                .then((response) => {
-                    if (response.success) {
-                        this.loadDetails();
-                        this.createNotificationSuccess({message: this.$tc('mollie-payments.subscriptions.alerts.skipSuccess')});
-                    } else {
-                        this.createNotificationError({message: response.errors[0]});
-                    }
-                });
+            this.MolliePaymentsSubscriptionService.skip({
+                id: this.subscription.id,
+            }).then((response) => {
+                if (response.success) {
+                    this.loadDetails();
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.subscriptions.alerts.skipSuccess'),
+                    });
+                } else {
+                    this.createNotificationError({ message: response.errors[0] });
+                }
+            });
         },
 
         // ---------------------------------------------------------------------------------------------------------
         // </editor-fold>
         // ---------------------------------------------------------------------------------------------------------
-
     },
-
 });

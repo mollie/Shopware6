@@ -1,13 +1,11 @@
 import CreditcardAttributes from './CreditcardAttributes';
 
 export default class OrderAttributes {
-
     /**
      *
      * @param orderEntity
      */
     constructor(orderEntity) {
-
         this._orderId = '';
         this._paymentId = '';
         this._swSubscriptionId = '';
@@ -42,7 +40,7 @@ export default class OrderAttributes {
      * @returns {boolean}
      */
     isMollieOrder() {
-        return (this.customFields !== null && 'mollie_payments' in this.customFields);
+        return this.customFields !== null && 'mollie_payments' in this.customFields;
     }
 
     /**
@@ -90,7 +88,7 @@ export default class OrderAttributes {
      * @returns {boolean}
      */
     isSubscription() {
-        return (this.getSwSubscriptionId() !== '');
+        return this.getSwSubscriptionId() !== '';
     }
 
     /**
@@ -122,5 +120,4 @@ export default class OrderAttributes {
 
         return String(value);
     }
-
 }

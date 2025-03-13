@@ -3,13 +3,12 @@ import './mollie-pluginconfig-section-payments-format.scss';
 import StringUtils from '../../../../core/service/utils/string-utils.service';
 
 // eslint-disable-next-line no-undef
-const {Component} = Shopware;
+const { Component } = Shopware;
 
 Component.register('mollie-pluginconfig-section-payments-format', {
     template,
-    inject:['actualConfigData','currentSalesChannelId'],
+    inject: ['actualConfigData', 'currentSalesChannelId'],
     computed: {
-
         /**
          *
          * @returns {string}
@@ -25,7 +24,6 @@ Component.register('mollie-pluginconfig-section-payments-format', {
         sample2() {
             return this.getFormat('5023', '2525');
         },
-
     },
 
     methods: {
@@ -36,8 +34,8 @@ Component.register('mollie-pluginconfig-section-payments-format', {
          * @returns {*}
          */
         getFormat(ordernumber, customerNumber) {
-
-            const template = this.actualConfigData?.[this.currentSalesChannelId]?.['MolliePayments.config.formatOrderNumber'] || '';
+            const template =
+                this.actualConfigData?.[this.currentSalesChannelId]?.['MolliePayments.config.formatOrderNumber'] || '';
             const stringUtils = new StringUtils();
 
             let text = stringUtils.replace('{ordernumber}', ordernumber, template);
@@ -47,5 +45,4 @@ Component.register('mollie-pluginconfig-section-payments-format', {
             return text;
         },
     },
-
 });

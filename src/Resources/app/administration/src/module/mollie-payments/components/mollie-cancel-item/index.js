@@ -1,7 +1,7 @@
 import template from './mollie-cancel-item.html.twig';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
 
 Component.register('mollie-cancel-item', {
     template,
@@ -19,13 +19,9 @@ Component.register('mollie-cancel-item', {
             isLoading: false,
         };
     },
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
-    inject: [
-        'MolliePaymentsItemCancelService',
-    ],
+    inject: ['MolliePaymentsItemCancelService'],
 
     methods: {
         submit() {
@@ -37,30 +33,32 @@ Component.register('mollie-cancel-item', {
                 shopwareLineId: this.item.shopwareItemId,
                 canceledQuantity: this.canceledQuantity,
                 resetStock: this.resetStock,
-            }).then((response) => {
-                this.isLoading = false;
-
-                if(response.success){
-                    this.createNotificationSuccess({
-                        message: this.$tc('mollie-payments.modals.cancel.item.success'),
-                    });
-                }else{
-                    this.createNotificationError({
-                        message: this.$tc('mollie-payments.modals.cancel.item.failed.'+response.message),
-                    });
-                }
-                this.$emit('update-cancel-status');
-                this.$emit('close');
-            }).catch(error => {
-                this.isLoading = false;
-                this.createNotificationError({
-                    message: error.response.data.message,
-                });
-                this.$emit('close');
             })
+                .then((response) => {
+                    this.isLoading = false;
+
+                    if (response.success) {
+                        this.createNotificationSuccess({
+                            message: this.$tc('mollie-payments.modals.cancel.item.success'),
+                        });
+                    } else {
+                        this.createNotificationError({
+                            message: this.$tc('mollie-payments.modals.cancel.item.failed.' + response.message),
+                        });
+                    }
+                    this.$emit('update-cancel-status');
+                    this.$emit('close');
+                })
+                .catch((error) => {
+                    this.isLoading = false;
+                    this.createNotificationError({
+                        message: error.response.data.message,
+                    });
+                    this.$emit('close');
+                });
         },
         close() {
             this.$emit('close');
         },
     },
-})
+});

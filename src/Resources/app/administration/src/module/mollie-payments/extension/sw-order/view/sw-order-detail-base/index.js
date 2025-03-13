@@ -3,20 +3,14 @@ import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Filter} = Shopware;
+const { Component, Mixin, Filter } = Shopware;
 
 Component.override('sw-order-detail-base', {
     template,
 
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
-    inject: [
-        'MolliePaymentsRefundService',
-        'MolliePaymentsShippingService',
-    ],
-
+    inject: ['MolliePaymentsRefundService', 'MolliePaymentsShippingService'],
 
     data() {
         return {
@@ -27,12 +21,10 @@ Component.override('sw-order-detail-base', {
             existingRefunds: [],
             shippedAmount: 0,
             shippedQuantity: 0,
-        }
+        };
     },
 
-
     computed: {
-
         /**
          *
          * @returns {boolean}
@@ -53,15 +45,11 @@ Component.override('sw-order-detail-base', {
         },
     },
 
-
-
     methods: {
-
         /**
          *
          */
         createdComponent() {
-
             this.$super('createdComponent');
 
             this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
@@ -75,15 +63,13 @@ Component.override('sw-order-detail-base', {
          *
          */
         loadMollieData() {
-
             if (!this.isMollieOrder) {
                 return;
             }
 
-            this.MolliePaymentsRefundService.getRefundManagerData(
-                {
-                    orderId: this.order.id,
-                })
+            this.MolliePaymentsRefundService.getRefundManagerData({
+                orderId: this.order.id,
+            })
                 .then((response) => {
                     this.remainingAmount = response.totals.remaining;
                     this.refundedAmount = response.totals.refunded;
@@ -97,12 +83,10 @@ Component.override('sw-order-detail-base', {
                     });
                 });
 
-            this.MolliePaymentsShippingService
-                .total({orderId: this.order.id})
-                .then((response) => {
-                    this.shippedAmount = Math.round(response.amount * 100) / 100;
-                    this.shippedQuantity = response.quantity;
-                });
+            this.MolliePaymentsShippingService.total({ orderId: this.order.id }).then((response) => {
+                this.shippedAmount = Math.round(response.amount * 100) / 100;
+                this.shippedQuantity = response.quantity;
+            });
         },
     },
 });

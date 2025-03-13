@@ -1,12 +1,10 @@
 export default class StringUtils {
-
     /**
      *
      * @param value
      * @returns {boolean}
      */
     isNullOrEmpty(value) {
-
         if (value === undefined) {
             return true;
         }
@@ -30,12 +28,10 @@ export default class StringUtils {
      * @returns {*}
      */
     replace(search, replaceWith, text) {
-
         if (!text) {
             return '';
         }
-        const regex = new RegExp(search,'g');
+        const regex = new RegExp(search, 'g');
         return text.replace(regex, replaceWith);
     }
-
 }

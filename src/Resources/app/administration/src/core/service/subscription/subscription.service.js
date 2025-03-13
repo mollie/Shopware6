@@ -1,5 +1,4 @@
 export default class SubscriptionService {
-
     /**
      *
      * @param shopwareApp
@@ -8,19 +7,19 @@ export default class SubscriptionService {
         this._app = shopwareApp;
     }
 
-
     /**
      *
      * @param status
      * @returns {string|*}
      */
     getStatusTranslation(status) {
-
         if (status === '' || status === null) {
             status = '';
         }
 
-        if (['pending', 'active', 'canceled', 'suspended', 'completed', 'paused', 'resumed', 'skipped'].includes(status)) {
+        if (
+            ['pending', 'active', 'canceled', 'suspended', 'completed', 'paused', 'resumed', 'skipped'].includes(status)
+        ) {
             return this._app.$tc('mollie-payments.subscriptions.status.' + status);
         }
 
@@ -33,7 +32,6 @@ export default class SubscriptionService {
      * @returns {string}
      */
     getStatusColor(status) {
-
         if (status === '' || status === null) {
             return 'neutral';
         }
@@ -63,7 +61,7 @@ export default class SubscriptionService {
      * @returns {boolean}
      */
     isCancellationAllowed(status) {
-        return (status !== 'canceled' && status !== 'pending');
+        return status !== 'canceled' && status !== 'pending';
     }
 
     /**
@@ -72,7 +70,7 @@ export default class SubscriptionService {
      * @returns {boolean}
      */
     isSkipAllowed(status) {
-        return (status === 'active' || status === 'resumed');
+        return status === 'active' || status === 'resumed';
     }
 
     /**
@@ -81,7 +79,7 @@ export default class SubscriptionService {
      * @returns {boolean}
      */
     isPauseAllowed(status) {
-        return (status === 'active' || status === 'resumed');
+        return status === 'active' || status === 'resumed';
     }
 
     /**
@@ -90,7 +88,6 @@ export default class SubscriptionService {
      * @returns {boolean}
      */
     isResumeAllowed(status) {
-        return (status === 'paused' || status === 'canceled');
+        return status === 'paused' || status === 'canceled';
     }
-
 }

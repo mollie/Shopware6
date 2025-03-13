@@ -1,4 +1,4 @@
-import creditCardComponents from '../assets'
+import creditCardComponents from '../assets';
 
 creditCardComponents.forEach((creditCardComponent) => {
     // eslint-disable-next-line no-undef

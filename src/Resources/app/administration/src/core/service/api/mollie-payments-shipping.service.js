@@ -2,7 +2,6 @@
 const ApiService = Shopware.Classes.ApiService;
 
 class MolliePaymentsShippingService extends ApiService {
-
     /**
      *
      * @param httpClient
@@ -23,14 +22,13 @@ class MolliePaymentsShippingService extends ApiService {
      * @returns {*}
      */
     shipOrder(orderId, trackingCarrier, trackingCode, trackingUrl, items) {
-
         const data = {
             orderId: orderId,
             trackingCarrier: trackingCarrier,
             trackingCode: trackingCode,
             trackingUrl: trackingUrl,
             items: items,
-        }
+        };
 
         return this.__post('', data);
     }
@@ -40,14 +38,16 @@ class MolliePaymentsShippingService extends ApiService {
      * @param data
      * @returns {*}
      */
-    shipItem(data = {
-        orderId: null,
-        itemId: null,
-        quantity: null,
-        trackingCarrier: null,
-        trackingCode: null,
-        trackingUrl: null,
-    }) {
+    shipItem(
+        data = {
+            orderId: null,
+            itemId: null,
+            quantity: null,
+            trackingCarrier: null,
+            trackingCode: null,
+            trackingUrl: null,
+        },
+    ) {
         return this.__post('/item', data);
     }
 
@@ -56,7 +56,7 @@ class MolliePaymentsShippingService extends ApiService {
      * @param data
      * @returns {*}
      */
-    status(data = {orderId: null}) {
+    status(data = { orderId: null }) {
         return this.__post('/status', data);
     }
 
@@ -65,7 +65,7 @@ class MolliePaymentsShippingService extends ApiService {
      * @param data
      * @returns {*}
      */
-    total(data = {orderId: null}) {
+    total(data = { orderId: null }) {
         return this.__post('/total', data);
     }
 
@@ -79,18 +79,13 @@ class MolliePaymentsShippingService extends ApiService {
      */
     __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/ship${endpoint}`,
-                JSON.stringify(data),
-                {
-                    headers: this.getBasicHeaders(headers),
-                }
-            )
+            .post(`_action/${this.getApiBasePath()}/ship${endpoint}`, JSON.stringify(data), {
+                headers: this.getBasicHeaders(headers),
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             });
     }
-
 }
 
 export default MolliePaymentsShippingService;

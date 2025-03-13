@@ -2,13 +2,12 @@
  * @package storefront
  */
 export default class DeviceDetection {
-
     /**
      * Returns whether the current device is a touch device
      * @returns {boolean}
      */
     static isTouchDevice() {
-        return ('ontouchstart' in document.documentElement);
+        return 'ontouchstart' in document.documentElement;
     }
 
     /**
@@ -16,7 +15,7 @@ export default class DeviceDetection {
      * @returns {boolean}
      */
     static isIOSDevice() {
-        return (DeviceDetection.isIPhoneDevice() || DeviceDetection.isIPadDevice());
+        return DeviceDetection.isIPhoneDevice() || DeviceDetection.isIPadDevice();
     }
 
     /**
@@ -24,7 +23,7 @@ export default class DeviceDetection {
      * @returns {boolean}
      */
     static isNativeWindowsBrowser() {
-        return (DeviceDetection.isIEBrowser() || DeviceDetection.isEdgeBrowser());
+        return DeviceDetection.isIEBrowser() || DeviceDetection.isEdgeBrowser();
     }
 
     /**
@@ -71,7 +70,7 @@ export default class DeviceDetection {
         return {
             'is-touch': DeviceDetection.isTouchDevice(),
             'is-ios': DeviceDetection.isIOSDevice(),
-            'is-native-windows':  DeviceDetection.isNativeWindowsBrowser(),
+            'is-native-windows': DeviceDetection.isNativeWindowsBrowser(),
             'is-iphone': DeviceDetection.isIPhoneDevice(),
             'is-ipad': DeviceDetection.isIPadDevice(),
             'is-ie': DeviceDetection.isIEBrowser(),

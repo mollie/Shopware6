@@ -1,5 +1,4 @@
 export default class RefundManager {
-
     /**
      *
      * @param configService
@@ -15,7 +14,6 @@ export default class RefundManager {
      * @returns Promise<boolean>
      */
     async isRefundManagerAvailable(salesChannelId, orderId) {
-
         const aclAllowed = this._acl.can('mollie_refund_manager:read');
 
         if (!aclAllowed) {
@@ -30,5 +28,4 @@ export default class RefundManager {
 
         return refundManagerPossible;
     }
-
 }

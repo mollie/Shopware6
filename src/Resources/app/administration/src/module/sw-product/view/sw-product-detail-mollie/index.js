@@ -1,12 +1,11 @@
 import template from './sw-product-detail-mollie.html.twig';
-import './sw-product-detail-mollie.scss'
+import './sw-product-detail-mollie.scss';
 
 // eslint-disable-next-line no-undef
-const {mapState, mapGetters} = Shopware.Component.getComponentHelper();
+const { mapState, mapGetters } = Shopware.Component.getComponentHelper();
 
 // eslint-disable-next-line no-undef
 Shopware.Component.register('sw-product-detail-mollie', {
-
     template,
 
     inject: ['repositoryFactory'],
@@ -18,7 +17,7 @@ Shopware.Component.register('sw-product-detail-mollie', {
     },
 
     data() {
-        return {}
+        return {};
     },
 
     watch: {
@@ -35,22 +34,15 @@ Shopware.Component.register('sw-product-detail-mollie', {
     },
 
     computed: {
-        ...mapState('swProductDetail', [
-            'product',
-            'parentProduct',
-        ]),
+        ...mapState('swProductDetail', ['product', 'parentProduct']),
 
-        ...mapGetters('swProductDetail', [
-            'isLoading',
-        ]),
+        ...mapGetters('swProductDetail', ['isLoading']),
 
-        ...mapGetters('context', [
-            'isSystemDefaultLanguage',
-        ]),
+        ...mapGetters('context', ['isSystemDefaultLanguage']),
 
         ...mapState('context', {
-            languageId: state => state.api.languageId,
-            systemLanguageId: state => state.api.systemLanguageId,
+            languageId: (state) => state.api.languageId,
+            systemLanguageId: (state) => state.api.systemLanguageId,
         }),
 
         productId() {
@@ -63,10 +55,10 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         voucherTypes() {
             return [
-                {key: 0, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_NONE')},
-                {key: 1, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO')},
-                {key: 2, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL')},
-                {key: 3, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER')},
+                { key: 0, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_NONE') },
+                { key: 1, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO') },
+                { key: 2, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL') },
+                { key: 3, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER') },
             ];
         },
 
@@ -84,9 +76,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         subscriptionIntervalTypes() {
             return [
-                {value: 'days', label: this.$tc('mollie-payments.subscriptions.TYPE_DAYS')},
-                {value: 'weeks', label: this.$tc('mollie-payments.subscriptions.TYPE_WEEKS')},
-                {value: 'months', label: this.$tc('mollie-payments.subscriptions.TYPE_MONTHS')},
+                { value: 'days', label: this.$tc('mollie-payments.subscriptions.TYPE_DAYS') },
+                { value: 'weeks', label: this.$tc('mollie-payments.subscriptions.TYPE_WEEKS') },
+                { value: 'months', label: this.$tc('mollie-payments.subscriptions.TYPE_MONTHS') },
             ];
         },
 
@@ -97,12 +89,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
         isDefaultLanguage() {
             return this.languageId === this.systemLanguageId;
         },
-
     },
 
-
     methods: {
-
         initFields() {
             if (this.product) {
                 if (!this.product.customFields) {
@@ -115,6 +104,5 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 }
             }
         },
-
     },
 });

@@ -2,16 +2,13 @@ import Plugin from '../Plugin';
 import ApplePaySessionFactory from '../services/ApplePaySessionFactory';
 import ExpressButtonsRepository from '../repository/ExpressButtonsRepository';
 import BuyElementRepository from '../repository/BuyElementRepository';
-import {MOLLIE_BIND_EXPRESS_EVENTS} from './mollie-express-actions.plugin';
+import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
 
 export default class MollieApplePayDirect extends Plugin {
-
-
     /**
      *
      */
     init() {
-
         const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
         if (pluginOffCanvasInstances.length > 0) {
             pluginOffCanvasInstances.forEach((pluginOffCanvas) => {
@@ -23,7 +20,6 @@ export default class MollieApplePayDirect extends Plugin {
     }
 
     bindEvents() {
-
         if (!window.ApplePaySession || !window.ApplePaySession.canMakePayments()) {
             return;
         }
@@ -35,15 +31,15 @@ export default class MollieApplePayDirect extends Plugin {
             return;
         }
 
-        document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, {detail: expressButtons}));
+        document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, { detail: expressButtons }));
 
         applePayContainers.forEach((container) => {
             container.classList.remove('d-none');
-        })
+        });
 
         expressButtons.forEach((button) => {
             button.classList.remove('d-none');
-            button.addEventListener('click', this.onExpressCheckout)
+            button.addEventListener('click', this.onExpressCheckout);
         });
     }
 
@@ -54,11 +50,8 @@ export default class MollieApplePayDirect extends Plugin {
             return;
         }
 
-
-
         const buyElementRepository = new BuyElementRepository();
         const buyElement = buyElementRepository.find(clickedButton);
-
 
         const countryCode = buyElement.querySelector('input[name="countryCode"]').value;
         const currency = buyElement.querySelector('input[name="currency"]').value;
@@ -74,8 +67,15 @@ export default class MollieApplePayDirect extends Plugin {
         }
 
         const applePaySessionFactory = new ApplePaySessionFactory();
-        const session = applePaySessionFactory.create(isProductMode, countryCode, currency, withPhone, shopSlug, dataProtection,clickedButton);
+        const session = applePaySessionFactory.create(
+            isProductMode,
+            countryCode,
+            currency,
+            withPhone,
+            shopSlug,
+            dataProtection,
+            clickedButton,
+        );
         session.begin();
-
     }
 }

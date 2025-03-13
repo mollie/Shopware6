@@ -2,13 +2,12 @@ import template from './sw-order-list.html.twig';
 import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 // eslint-disable-next-line no-undef
-const {Component} = Shopware;
+const { Component } = Shopware;
 
 Component.override('sw-order-list', {
     template,
 
     methods: {
-
         /**
          *
          */
@@ -71,8 +70,7 @@ Component.override('sw-order-list', {
          */
         isMollieSubscription(order) {
             const attributes = new OrderAttributes(order);
-            return (attributes.getSwSubscriptionId() !== '');
+            return attributes.getSwSubscriptionId() !== '';
         },
     },
-
 });

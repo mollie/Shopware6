@@ -4,20 +4,14 @@ import MollieShippingEvents from './MollieShippingEvents';
 import MollieShipping from './MollieShipping';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
 
 Component.register('mollie-ship-order', {
     template,
 
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
-    inject: [
-        'MolliePaymentsShippingService',
-        'MolliePaymentsConfigService',
-        'acl',
-    ],
+    inject: ['MolliePaymentsShippingService', 'MolliePaymentsConfigService', 'acl'],
 
     props: {
         order: {
@@ -39,7 +33,6 @@ Component.register('mollie-ship-order', {
         };
     },
 
-
     /**
      *
      */
@@ -47,9 +40,7 @@ Component.register('mollie-ship-order', {
         this.createdComponent();
     },
 
-
     computed: {
-
         getShipOrderColumns() {
             return [
                 {
@@ -72,16 +63,13 @@ Component.register('mollie-ship-order', {
                 },
             ];
         },
-
     },
 
     methods: {
-
         /**
          *
          */
         async createdComponent() {
-
             this.showTrackingInfo = false;
 
             this.tracking = {
@@ -90,22 +78,17 @@ Component.register('mollie-ship-order', {
                 url: '',
             };
 
-
             // load the already shipped items
             // so that we can calculate what is left to be shipped
-            await this.MolliePaymentsShippingService
-                .status({
-                    orderId: this.order.id,
-                })
-                .then((response) => {
-                    this.shippedLineItems = response;
-                });
-
+            await this.MolliePaymentsShippingService.status({
+                orderId: this.order.id,
+            }).then((response) => {
+                this.shippedLineItems = response;
+            });
 
             const shipping = new MollieShipping(this.MolliePaymentsShippingService);
 
             shipping.getShippableItems(this.order).then((items) => {
-
                 // this is required to make sure the "select all" works
                 // because we need to have a default value
                 for (let i = 0; i < items.length; i++) {
@@ -122,7 +105,7 @@ Component.register('mollie-ship-order', {
             // also automatically enable the tracking data (it can be turned off again by the merchant)
             if (this.order.deliveries.length) {
                 const delivery = this.order.deliveries.first();
-                this.showTrackingInfo = (delivery.trackingCodes.length >= 1);
+                this.showTrackingInfo = delivery.trackingCodes.length >= 1;
             }
         },
 
@@ -153,7 +136,6 @@ Component.register('mollie-ship-order', {
          *
          */
         onShipOrder() {
-
             var shippingItems = [];
 
             for (let i = 0; i < this.shippableLineItems.length; i++) {
@@ -161,9 +143,9 @@ Component.register('mollie-ship-order', {
 
                 if (item.selected) {
                     shippingItems.push({
-                        'id': item.id,
-                        'quantity': item.quantity,
-                    })
+                        id: item.id,
+                        quantity: item.quantity,
+                    });
                 }
             }
 
@@ -175,7 +157,6 @@ Component.register('mollie-ship-order', {
                 shippingItems,
             )
                 .then(() => {
-
                     // send global event
                     this.$root.$emit(MollieShippingEvents.EventShippedOrder);
 
@@ -184,13 +165,13 @@ Component.register('mollie-ship-order', {
                     });
                 })
                 .catch((response) => {
-                    const msg = (response.response.data.message) ? response.response.data.message : response.response.data.errors[0];
+                    const msg = response.response.data.message
+                        ? response.response.data.message
+                        : response.response.data.errors[0];
                     this.createNotificationError({
                         message: msg,
                     });
                 });
         },
-
     },
-
 });

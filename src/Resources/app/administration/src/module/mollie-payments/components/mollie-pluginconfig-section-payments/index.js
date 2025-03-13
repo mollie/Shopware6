@@ -1,20 +1,15 @@
 import template from './mollie-pluginconfig-section-payments.html.twig';
 import './mollie-pluginconfig-section-payments.scss';
 
-
 // eslint-disable-next-line no-undef
-const {Component, Mixin} = Shopware;
+const { Component, Mixin } = Shopware;
 
 Component.register('mollie-pluginconfig-section-payments', {
     template,
 
-    inject: [
-        'MolliePaymentsPaymentMethodService',
-    ],
+    inject: ['MolliePaymentsPaymentMethodService'],
 
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
     data() {
         return {
@@ -23,7 +18,6 @@ Component.register('mollie-pluginconfig-section-payments', {
     },
 
     methods: {
-
         /**
          *
          */
@@ -42,12 +36,16 @@ Component.register('mollie-pluginconfig-section-payments', {
                     if (response.success === true) {
                         me.createNotificationSuccess(messageData);
                     } else {
-                        messageData.message = me.$tc('mollie-payments.config.payments.updatePaymentMethods.failed') + '\n\nException:\n' + response.message;
+                        messageData.message =
+                            me.$tc('mollie-payments.config.payments.updatePaymentMethods.failed') +
+                            '\n\nException:\n' +
+                            response.message;
                         me.createNotificationError(messageData);
                     }
 
                     this.updatePaymentMethodsIsDone();
-                }).catch(() => {
+                })
+                .catch(() => {
                     this.updatePaymentMethodsIsDone();
                 });
         },
