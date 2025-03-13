@@ -1,13 +1,10 @@
 import Plugin from '../Plugin';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
-
     /**
      *
      */
     init() {
-
-
         const hideAlways = this.options.hideAlways;
 
         // if we don't want to always hide it,
@@ -21,7 +18,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         this.hideApplePay('.payment-method-input.applepay');
 
         // support for >= Shopware 6.4
-        this.hideApplePay('#paymentMethod' + this.options.applePayId)
+        this.hideApplePay('#paymentMethod' + this.options.applePayId);
 
         // hide cart apple pay select option
         if (this.options.hideApplePayOption) {
@@ -92,8 +89,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
                     const matches = (this.document || this.ownerDocument).querySelectorAll(s);
                     let i = matches.length;
                     // eslint-disable-next-line no-empty
-                    while (--i >= 0 && matches.item(i) !== this) {
-                    }
+                    while (--i >= 0 && matches.item(i) !== this) {}
                     return i > -1;
                 };
         }
@@ -107,5 +103,4 @@ export default class MollieApplePayPaymentMethod extends Plugin {
 
         return null;
     }
-
 }

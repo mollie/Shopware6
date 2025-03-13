@@ -19,19 +19,19 @@ Component.register('mollie-credit-card-logo', {
         getImageNameForCreditcard(creditcard) {
             switch (creditcard) {
                 case 'American Express':
-                    return 'amex'
+                    return 'amex';
                 case 'Carta Si':
-                    return 'cartasi'
+                    return 'cartasi';
                 case 'Carte Bleue':
-                    return 'cartebancaire'
+                    return 'cartebancaire';
                 case 'Maestro':
-                    return 'maestro'
+                    return 'maestro';
                 case 'Mastercard':
-                    return 'mastercard'
+                    return 'mastercard';
                 case 'Visa':
-                    return 'visa'
+                    return 'visa';
                 default:
-                    return 'creditcard'
+                    return 'creditcard';
             }
         },
     },

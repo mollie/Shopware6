@@ -1,5 +1,4 @@
 export default class ArrayUtilsService {
-
     /**
      *
      * @param array
@@ -7,7 +6,6 @@ export default class ArrayUtilsService {
      * @param key
      */
     addUniqueItem(array, item, key) {
-
         const identifier = item[key];
 
         // check if we already have this item
@@ -35,5 +33,4 @@ export default class ArrayUtilsService {
             }
         }
     }
-
 }

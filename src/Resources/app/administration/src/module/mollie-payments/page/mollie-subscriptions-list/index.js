@@ -4,27 +4,17 @@ import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Application, Filter} = Shopware;
+const { Component, Mixin, Application, Filter } = Shopware;
 
 // eslint-disable-next-line no-undef
-const {Criteria} = Shopware.Data;
-
+const { Criteria } = Shopware.Data;
 
 Component.register('mollie-subscriptions-list', {
     template,
 
-    inject: [
-        'systemConfigApiService',
-        'MolliePaymentsSubscriptionService',
-        'repositoryFactory',
-        'acl',
-    ],
+    inject: ['systemConfigApiService', 'MolliePaymentsSubscriptionService', 'repositoryFactory', 'acl'],
 
-    mixins: [
-        Mixin.getByName('notification'),
-        Mixin.getByName('listing'),
-        Mixin.getByName('placeholder'),
-    ],
+    mixins: [Mixin.getByName('notification'), Mixin.getByName('listing'), Mixin.getByName('placeholder')],
 
     data() {
         return {
@@ -39,7 +29,7 @@ Component.register('mollie-subscriptions-list', {
             naturalSorting: true,
             showHelp: false,
             searchConfigEntity: 'mollie_subscription',
-        }
+        };
     },
 
     metaInfo() {
@@ -49,7 +39,6 @@ Component.register('mollie-subscriptions-list', {
     },
 
     computed: {
-
         /**
          *
          * @returns {mollie_subscription}
@@ -106,14 +95,12 @@ Component.register('mollie-subscriptions-list', {
             return Filter.getByName('currency');
         },
 
-
         dateFilter() {
             return Filter.getByName('date');
         },
     },
 
     methods: {
-
         /**
          *
          * @returns {[{allowResize: boolean, dataIndex: string, property: string, label},{allowResize: boolean, dataIndex: string, property: string, label},{allowResize: boolean, property: string, label},{allowResize: boolean, property: string, label},{allowResize: boolean, property: string, label},null,null,null]|*}
@@ -133,7 +120,7 @@ Component.register('mollie-subscriptions-list', {
             let criteria = new Criteria();
 
             // Compatibility for 6.4.4, as admin search was improved in 6.4.5
-            if('addQueryScores' in this) {
+            if ('addQueryScores' in this) {
                 criteria = await this.addQueryScores(this.term, criteria);
             } else {
                 criteria.setTerm(this.term);
@@ -175,7 +162,5 @@ Component.register('mollie-subscriptions-list', {
         // ---------------------------------------------------------------------------------------------------------
         // </editor-fold>
         // ---------------------------------------------------------------------------------------------------------
-
-
     },
 });

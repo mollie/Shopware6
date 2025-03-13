@@ -10,10 +10,8 @@ import MolliePaymentsItemCancelService from '../core/service/api/mollie-payments
 import '../module/mollie-payments/rules/mollie-lineitem-subscription-rule';
 import '../module/mollie-payments/rules/mollie-cart-subscription-rule';
 
-
-
 // eslint-disable-next-line no-undef
-const {Application} = Shopware;
+const { Application } = Shopware;
 
 Application.addServiceProvider('MolliePaymentsConfigService', (container) => {
     const initContainer = Application.getContainer('init');
@@ -67,7 +65,6 @@ Application.addServiceProvider('MolliePaymentsItemCancelService', (container) =>
     return new MolliePaymentsItemCancelService(initContainer.httpClient, container.loginService);
 });
 
-
 Application.addServiceProviderDecorator('ruleConditionDataProviderService', (ruleConditionService) => {
     ruleConditionService.addCondition('mollie_lineitem_subscription_rule', {
         component: 'mollie-lineitem-subscription-rule',
@@ -86,7 +83,7 @@ Application.addServiceProviderDecorator('ruleConditionDataProviderService', (rul
     return ruleConditionService;
 });
 
-Application.addServiceProviderDecorator('searchTypeService', searchTypeService => {
+Application.addServiceProviderDecorator('searchTypeService', (searchTypeService) => {
     searchTypeService.upsertType('mollie_subscription', {
         entityName: 'mollie_subscription',
         placeholderSnippet: 'mollie-payments.searchPlaceholder',
@@ -95,4 +92,3 @@ Application.addServiceProviderDecorator('searchTypeService', searchTypeService =
 
     return searchTypeService;
 });
-

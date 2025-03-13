@@ -6,4 +6,3 @@ export const ACTION = Object.freeze({
 export default {
     ACTION,
 };
-

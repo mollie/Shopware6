@@ -1,9 +1,9 @@
 {
-  "name": "mollie-shopware6-storefront",
-  "version": "1.0.0",
-  "description": "",
-  "author": "Mollie B.V.",
-  "devDependencies": {
-    "webpack-cli": "^6.0.1"
-  }
+    "name": "mollie-shopware6-storefront",
+    "version": "1.0.0",
+    "description": "",
+    "author": "Mollie B.V.",
+    "devDependencies": {
+        "webpack-cli": "^6.0.1"
+    }
 }

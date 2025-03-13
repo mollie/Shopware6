@@ -22,20 +22,15 @@ export default class ApplePaySessionFactory {
      * @param clickedButton
      * @returns ApplePaySession
      */
-    create(isProductMode, country, currency, withPhone, shopSlug, dataProtection,clickedButton) {
-
+    create(isProductMode, country, currency, withPhone, shopSlug, dataProtection, clickedButton) {
         const me = this;
-        var shippingFields = [
-            'name',
-            'email',
-            'postalAddress',
-        ];
+        var shippingFields = ['name', 'email', 'postalAddress'];
 
         if (withPhone === 1) {
             shippingFields.push('phone');
         }
         let dataProtectionValue = false;
-        if(dataProtection !== null){
+        if (dataProtection !== null) {
             dataProtectionValue = dataProtection.value;
         }
 
@@ -43,13 +38,7 @@ export default class ApplePaySessionFactory {
             countryCode: country,
             currencyCode: currency,
             requiredShippingContactFields: shippingFields,
-            supportedNetworks: [
-                'amex',
-                'maestro',
-                'masterCard',
-                'visa',
-                'vPay',
-            ],
+            supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
             merchantCapabilities: ['supports3DS'],
             total: {
                 label: '',
@@ -75,12 +64,11 @@ export default class ApplePaySessionFactory {
                 },
                 () => {
                     session.abort();
-                }
+                },
             );
         };
 
         session.onshippingcontactselected = function (event) {
-
             var countryCode = '';
 
             if (event.shippingContact.countryCode !== undefined) {
@@ -99,7 +87,7 @@ export default class ApplePaySessionFactory {
                             ApplePaySession.STATUS_SUCCESS,
                             data.shippingmethods,
                             data.cart.total,
-                            data.cart.items
+                            data.cart.items,
                         );
                     } else {
                         session.completeShippingContactSelection(
@@ -111,18 +99,17 @@ export default class ApplePaySessionFactory {
                                 amount: 0,
                                 pending: true,
                             },
-                            []
+                            [],
                         );
                     }
                 },
                 () => {
                     session.abort();
-                }
+                },
             );
         };
 
         session.onshippingmethodselected = function (event) {
-
             me.client.post(
                 shopSlug + '/mollie/apple-pay/set-shipping',
                 JSON.stringify({
@@ -134,7 +121,7 @@ export default class ApplePaySessionFactory {
                             // eslint-disable-next-line no-undef
                             ApplePaySession.STATUS_SUCCESS,
                             data.cart.total,
-                            data.cart.items
+                            data.cart.items,
                         );
                     } else {
                         session.completeShippingMethodSelection(
@@ -145,13 +132,13 @@ export default class ApplePaySessionFactory {
                                 amount: 0,
                                 pending: true,
                             },
-                            []
+                            [],
                         );
                     }
                 },
                 () => {
                     session.abort();
-                }
+                },
             );
         };
 
@@ -166,12 +153,16 @@ export default class ApplePaySessionFactory {
 
             // now finish our payment by filling a form
             // and submitting it along with our payment token
-            me.finishPayment(shopSlug + '/mollie/apple-pay/start-payment', paymentToken, event.payment,dataProtectionValue);
+            me.finishPayment(
+                shopSlug + '/mollie/apple-pay/start-payment',
+                paymentToken,
+                event.payment,
+                dataProtectionValue,
+            );
             clickedButton.classList.remove('processed');
         };
 
         session.oncancel = function () {
-
             // if we are in product mode
             // we should restore our original cart
             if (isProductMode) {
@@ -189,7 +180,7 @@ export default class ApplePaySessionFactory {
      * @param paymentToken
      * @param payment
      */
-    finishPayment(checkoutURL, paymentToken, payment,dataProtectionValue) {
+    finishPayment(checkoutURL, paymentToken, payment, dataProtectionValue) {
         const createInput = function (name, val) {
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -197,7 +188,7 @@ export default class ApplePaySessionFactory {
             input.value = val;
 
             return input;
-        }
+        };
 
         const form = document.createElement('form');
         form.action = checkoutURL;

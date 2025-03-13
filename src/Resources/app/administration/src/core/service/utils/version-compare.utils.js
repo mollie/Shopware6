@@ -29,71 +29,75 @@ export default {
         const partsA = this.matchVersion(versionA);
         const partsB = this.matchVersion(versionB);
 
-        if(partsA === null || partsB === null) {
+        if (partsA === null || partsB === null) {
             return false;
         }
 
-        switch(comparator) {
+        switch (comparator) {
             case '=':
             case '==':
             case '===':
             case 'eq':
-                return partsA.major === partsB.major
-                    && partsA.minor === partsB.minor
-                    && partsA.patch === partsB.patch
-                    && partsA.build === partsB.build
+                return (
+                    partsA.major === partsB.major &&
+                    partsA.minor === partsB.minor &&
+                    partsA.patch === partsB.patch &&
+                    partsA.build === partsB.build
+                );
             case '!=':
             case '!==':
             case 'neq':
-                return !(partsA.major === partsB.major
-                    && partsA.minor === partsB.minor
-                    && partsA.patch === partsB.patch
-                    && partsA.build === partsB.build)
+                return !(
+                    partsA.major === partsB.major &&
+                    partsA.minor === partsB.minor &&
+                    partsA.patch === partsB.patch &&
+                    partsA.build === partsB.build
+                );
             case '>':
             case 'gt':
-                if(partsA.major > partsB.major) {
+                if (partsA.major > partsB.major) {
                     return true;
                 }
-                if(partsA.minor > partsB.minor) {
+                if (partsA.minor > partsB.minor) {
                     return true;
                 }
-                if(partsA.patch > partsB.patch) {
+                if (partsA.patch > partsB.patch) {
                     return true;
                 }
                 return partsA.build > partsB.build;
             case '>=':
             case 'gte':
-                if(partsA.major < partsB.major) {
+                if (partsA.major < partsB.major) {
                     return false;
                 }
-                if(partsA.minor < partsB.minor) {
+                if (partsA.minor < partsB.minor) {
                     return false;
                 }
-                if(partsA.patch < partsB.patch) {
+                if (partsA.patch < partsB.patch) {
                     return false;
                 }
                 return partsA.build >= partsB.build;
             case '<':
             case 'lt':
-                if(partsA.major < partsB.major) {
+                if (partsA.major < partsB.major) {
                     return true;
                 }
-                if(partsA.minor < partsB.minor) {
+                if (partsA.minor < partsB.minor) {
                     return true;
                 }
-                if(partsA.patch < partsB.patch) {
+                if (partsA.patch < partsB.patch) {
                     return true;
                 }
                 return partsA.build < partsB.build;
             case '<=':
             case 'lte':
-                if(partsB.major > partsA.major) {
+                if (partsB.major > partsA.major) {
                     return true;
                 }
-                if(partsB.minor > partsA.minor) {
+                if (partsB.minor > partsA.minor) {
                     return true;
                 }
-                if(partsB.patch > partsA.patch) {
+                if (partsB.patch > partsA.patch) {
                     return true;
                 }
                 return partsB.build >= partsA.build;
@@ -103,18 +107,20 @@ export default {
     },
 
     matchVersion(version) {
-        const match = version.match(/(?<version>(?<major>\d+)\.?(?<minor>\d+)\.?(?<patch>\d+)\.?(?<build>\d*))-?(?<prerelease>[a-z]+)?\.?(?<prereleaseDigits>\d+(?:.\d+)*)?/i);
+        const match = version.match(
+            /(?<version>(?<major>\d+)\.?(?<minor>\d+)\.?(?<patch>\d+)\.?(?<build>\d*))-?(?<prerelease>[a-z]+)?\.?(?<prereleaseDigits>\d+(?:.\d+)*)?/i,
+        );
 
-        if(match === null) {
+        if (match === null) {
             console.warn(`${version} is not a valid version string.`);
             return null;
         }
 
         const groups = match.groups;
 
-        ['major', 'minor', 'patch', 'build'].forEach(part => {
+        ['major', 'minor', 'patch', 'build'].forEach((part) => {
             groups[part] = parseInt(groups[part]) || 0;
-        })
+        });
 
         return groups;
     },
@@ -155,4 +161,4 @@ export default {
                 return text;
         }
     },
-}
+};

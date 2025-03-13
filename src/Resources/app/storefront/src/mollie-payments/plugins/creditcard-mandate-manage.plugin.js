@@ -17,10 +17,7 @@ export default class MollieCreditCardMandateManage extends Plugin {
     };
 
     init() {
-        const {
-            shopUrl,
-            customerId,
-        } = this.options;
+        const { shopUrl, customerId } = this.options;
         if (!shopUrl) {
             throw new Error(`The "shopUrl" option for the plugin "${this._pluginName}" is not defined.`);
         }
@@ -44,7 +41,6 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     registerEvents() {
-
         const removeButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove');
         if (!removeButtons || removeButtons.length === 0) {
             return;
@@ -73,10 +69,7 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     onRemoveButtonClick(removeButton) {
-        const {
-            mollieMandateContainerClass,
-            mollieMandateDataId,
-        } = this.options;
+        const { mollieMandateContainerClass, mollieMandateDataId } = this.options;
 
         this.currentContainerEl = removeButton.closest(mollieMandateContainerClass);
         if (!this.currentContainerEl) {
@@ -87,41 +80,37 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     onConfirmRemoveButtonClick() {
-        const {
-            currentContainerEl,
-            currentMandateId,
-        } = this;
+        const { currentContainerEl, currentMandateId } = this;
 
         if (!currentContainerEl || !currentMandateId) {
-            return
+            return;
         }
 
-        this.deleteMandate(currentMandateId).then(({success}) => {
-
+        this.deleteMandate(currentMandateId).then(({ success }) => {
             if (success) {
-                this.mollieMandateDeleteAlertErrorEl.classList.add('d-none')
-                this.mollieMandateDeleteAlertEl.classList.remove('d-none')
+                this.mollieMandateDeleteAlertErrorEl.classList.add('d-none');
+                this.mollieMandateDeleteAlertEl.classList.remove('d-none');
                 currentContainerEl.remove();
             } else {
-                this.mollieMandateDeleteAlertEl.classList.add('d-none')
-                this.mollieMandateDeleteAlertErrorEl.classList.remove('d-none')
+                this.mollieMandateDeleteAlertEl.classList.add('d-none');
+                this.mollieMandateDeleteAlertErrorEl.classList.remove('d-none');
             }
         });
     }
 
     deleteMandate(mandateId) {
-        const {shopUrl, customerId} = this.options
+        const { shopUrl, customerId } = this.options;
 
         return new Promise((resolve) => {
             this.client.get(
                 shopUrl + '/mollie/components/revoke-mandate/' + customerId + '/' + mandateId,
                 (res) => {
-                    resolve({success: res && res.success})
+                    resolve({ success: res && res.success });
                 },
                 () => {
-                    resolve({success: false})
+                    resolve({ success: false });
                 },
-                'application/json; charset=utf-8'
+                'application/json; charset=utf-8',
             );
         });
     }

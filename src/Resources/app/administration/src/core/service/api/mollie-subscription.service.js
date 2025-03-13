@@ -2,7 +2,6 @@
 const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsSubscriptionService extends ApiService {
-
     /**
      *
      * @param httpClient
@@ -13,13 +12,12 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-
     /**
      *
      * @param data
      * @returns {*}
      */
-    cancel(data = {id: null, customerId: null, salesChannelId: null}) {
+    cancel(data = { id: null, customerId: null, salesChannelId: null }) {
         return this.__post('/cancel', data);
     }
 
@@ -28,7 +26,7 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
      * @param data
      * @returns {*}
      */
-    pause(data = {id: null, customerId: null, salesChannelId: null}) {
+    pause(data = { id: null, customerId: null, salesChannelId: null }) {
         return this.__post('/pause', data);
     }
 
@@ -37,7 +35,7 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
      * @param data
      * @returns {*}
      */
-    resume(data = {id: null, customerId: null, salesChannelId: null}) {
+    resume(data = { id: null, customerId: null, salesChannelId: null }) {
         return this.__post('/resume', data);
     }
 
@@ -46,10 +44,9 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
      * @param data
      * @returns {*}
      */
-    skip(data = {id: null, customerId: null, salesChannelId: null}) {
+    skip(data = { id: null, customerId: null, salesChannelId: null }) {
         return this.__post('/skip', data);
     }
-
 
     /**
      *
@@ -59,12 +56,9 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
      */
     __get(endpoint = '') {
         return this.httpClient
-            .get(
-                `_action/${this.getApiBasePath()}/subscriptions${endpoint}`,
-                {
-                    headers: this.getBasicHeaders({}),
-                }
-            )
+            .get(`_action/${this.getApiBasePath()}/subscriptions${endpoint}`, {
+                headers: this.getBasicHeaders({}),
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             })
@@ -83,13 +77,9 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
      */
     __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/subscriptions${endpoint}`,
-                JSON.stringify(data),
-                {
-                    headers: this.getBasicHeaders(headers),
-                }
-            )
+            .post(`_action/${this.getApiBasePath()}/subscriptions${endpoint}`, JSON.stringify(data), {
+                headers: this.getBasicHeaders(headers),
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             })
@@ -97,5 +87,4 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
                 return ApiService.handleResponse(error.response);
             });
     }
-
 }

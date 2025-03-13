@@ -2,7 +2,6 @@
 const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsItemCancelService extends ApiService {
-
     /**
      *
      * @param httpClient
@@ -18,17 +17,19 @@ export default class MolliePaymentsItemCancelService extends ApiService {
      * @param data
      * @returns {*}
      */
-    status(data = {mollieOrderId: null}) {
+    status(data = { mollieOrderId: null }) {
         return this.__post('/status', data);
     }
 
-    cancel(data = {
-        mollieOrderId: null,
-        mollieLineId: null,
-        shopwareLineId: null,
-        canceledQuantity: 0,
-        resetStock: false,
-    }) {
+    cancel(
+        data = {
+            mollieOrderId: null,
+            mollieLineId: null,
+            shopwareLineId: null,
+            canceledQuantity: 0,
+            resetStock: false,
+        },
+    ) {
         return this.__post('/cancel', data);
     }
 
@@ -42,13 +43,9 @@ export default class MolliePaymentsItemCancelService extends ApiService {
      */
     __post(endpoint = '', data = {}, headers = {}) {
         return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/cancel-item${endpoint}`,
-                JSON.stringify(data),
-                {
-                    headers: this.getBasicHeaders(headers),
-                }
-            )
+            .post(`_action/${this.getApiBasePath()}/cancel-item${endpoint}`, JSON.stringify(data), {
+                headers: this.getBasicHeaders(headers),
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             })
@@ -56,5 +53,4 @@ export default class MolliePaymentsItemCancelService extends ApiService {
                 return ApiService.handleResponse(error.response);
             });
     }
-
 }

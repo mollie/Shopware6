@@ -2,9 +2,9 @@ import template from './mollie-tracking-info.html.twig';
 import './mollie-tracking-info.scss';
 
 // eslint-disable-next-line no-undef
-const {Component} = Shopware;
+const { Component } = Shopware;
 // eslint-disable-next-line no-undef
-const {string} = Shopware.Utils;
+const { string } = Shopware.Utils;
 
 Component.register('mollie-tracking-info', {
     template,
@@ -14,7 +14,7 @@ Component.register('mollie-tracking-info', {
             type: Object,
             required: true,
             default() {
-                return null
+                return null;
             },
         },
 
@@ -26,7 +26,7 @@ Component.register('mollie-tracking-info', {
                     carrier: '',
                     code: '',
                     url: '',
-                }
+                };
             },
         },
     },
@@ -37,7 +37,7 @@ Component.register('mollie-tracking-info', {
 
     methods: {
         createdComponent() {
-            if(this.delivery.trackingCodes.length === 1) {
+            if (this.delivery.trackingCodes.length === 1) {
                 this.prefillTrackingInfo(this.delivery.trackingCodes[0], this.delivery.shippingMethod);
             }
         },
@@ -46,7 +46,7 @@ Component.register('mollie-tracking-info', {
             this.tracking.carrier = shippingMethod.name;
             this.tracking.code = trackingCode;
 
-            if(!string.isEmptyOrSpaces(shippingMethod.trackingUrl)) {
+            if (!string.isEmptyOrSpaces(shippingMethod.trackingUrl)) {
                 this.tracking.url = this.renderTrackingUrl(trackingCode, shippingMethod);
             }
         },

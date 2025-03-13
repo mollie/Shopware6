@@ -6,16 +6,13 @@ import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
 import PayPalExpressPlugin from './mollie-payments/plugins/paypal-express.plugin';
 import MollieBancomatPlugin from './mollie-payments/plugins/bancomat-plugin';
-import {MollieExpressActions} from './mollie-payments/plugins/mollie-express-actions.plugin';
-
+import { MollieExpressActions } from './mollie-payments/plugins/mollie-express-actions.plugin';
 
 export default class MollieRegistration {
-
     /**
      *
      */
     register() {
-
         const pluginManager = window.PluginManager;
 
         // global plugins
@@ -29,18 +26,38 @@ export default class MollieRegistration {
 
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------
-        pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]');
-        pluginManager.register('MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]');
+        pluginManager.register(
+            'MollieApplePayPaymentMethod',
+            MollieApplePayPaymentMethod,
+            '[data-mollie-template-applepay-account]',
+        );
+        pluginManager.register(
+            'MollieApplePayPaymentMethod',
+            MollieApplePayPaymentMethod,
+            '[data-mollie-template-applepay-checkout]',
+        );
 
         // showing credit card components in the checkout
         // we have 2 versions for < Shopware 6.4 and >= Shopware 6.4
         // -----------------------------------------------------------------------------
-        pluginManager.register('MollieCreditCardComponents', MollieCreditCardComponents, '[data-mollie-template-creditcard-components]');
-        pluginManager.register('MollieCreditCardComponentsSw64', MollieCreditCardComponentsSw64, '[data-mollie-template-creditcard-components-sw64]');
+        pluginManager.register(
+            'MollieCreditCardComponents',
+            MollieCreditCardComponents,
+            '[data-mollie-template-creditcard-components]',
+        );
+        pluginManager.register(
+            'MollieCreditCardComponentsSw64',
+            MollieCreditCardComponentsSw64,
+            '[data-mollie-template-creditcard-components-sw64]',
+        );
 
         // manage credit card mandate
         // -----------------------------------------------------------------------------
-        pluginManager.register('MollieCreditCardMandateManage', MollieCreditCardMandateManage, '[data-mollie-credit-card-mandate-manage]');
+        pluginManager.register(
+            'MollieCreditCardMandateManage',
+            MollieCreditCardMandateManage,
+            '[data-mollie-credit-card-mandate-manage]',
+        );
 
         // POS Terminal
         // -----------------------------------------------------------------------------
@@ -48,9 +65,5 @@ export default class MollieRegistration {
 
         // BANCOMAT PAY
         pluginManager.register('MollieBancomatPlugin', MollieBancomatPlugin);
-
-
     }
-
 }
-

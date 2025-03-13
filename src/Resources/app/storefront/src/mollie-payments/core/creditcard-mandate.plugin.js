@@ -14,7 +14,7 @@ export default class MollieCreditCardMandate extends Plugin {
 
     init() {
         this.client = new HttpClient();
-        this._fixShopUrl()
+        this._fixShopUrl();
     }
 
     /**
@@ -22,9 +22,7 @@ export default class MollieCreditCardMandate extends Plugin {
      * Call this function to listen to all events relative to the mandate feature
      */
     registerMandateEvents() {
-        const {
-            newCardMandateOption,
-        } = this.options;
+        const { newCardMandateOption } = this.options;
 
         if (!newCardMandateOption) {
             return;
@@ -34,7 +32,7 @@ export default class MollieCreditCardMandate extends Plugin {
         this.mollieCreditCardMandateEls = document.querySelectorAll('input[name="mollieCreditCardMandate"]');
 
         if (!this.mollieCreditCarfFormEl || !this.mollieCreditCardMandateEls) {
-            return
+            return;
         }
 
         this._registerRadioButtonsEvent();
@@ -54,7 +52,7 @@ export default class MollieCreditCardMandate extends Plugin {
         // Init the mandate change before listen its event
         this.onMandateInputChange(this.getMandateCheckedValue());
 
-        this.mollieCreditCardMandateEls.forEach(el => {
+        this.mollieCreditCardMandateEls.forEach((el) => {
             el.addEventListener('change', () => {
                 this.onMandateInputChange(this.getMandateCheckedValue());
             });
@@ -65,7 +63,7 @@ export default class MollieCreditCardMandate extends Plugin {
      * Get value of `mollieCreditCardMandate` checked radio input
      */
     getMandateCheckedValue() {
-        const {mollieCreditCardMandateInput} = this.options;
+        const { mollieCreditCardMandateInput } = this.options;
 
         const mandateInput = document.querySelector(`${mollieCreditCardMandateInput}:checked`);
         if (!mandateInput || !mandateInput.value) {
@@ -92,7 +90,7 @@ export default class MollieCreditCardMandate extends Plugin {
     }
 
     onMandateInputChange(mandateValue) {
-        const {newCardMandateOption} = this.options
+        const { newCardMandateOption } = this.options;
         if (mandateValue === newCardMandateOption) {
             this.mollieCreditCarfFormEl.classList.remove('d-none');
             return;

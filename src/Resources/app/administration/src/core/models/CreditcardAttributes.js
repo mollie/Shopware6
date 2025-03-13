@@ -1,11 +1,9 @@
 export default class CreditcardAttributes {
-
     /**
      *
      * @param mollieData
      */
     constructor(mollieData) {
-
         this._audience = '';
         this._countryCode = '';
         this._feeRegion = '';
@@ -17,7 +15,6 @@ export default class CreditcardAttributes {
         if (mollieData === null) {
             return;
         }
-
 
         this._audience = this._convertString(mollieData['creditCardAudience']);
         this._countryCode = this._convertString(mollieData['creditCardCountryCode']);
@@ -36,12 +33,12 @@ export default class CreditcardAttributes {
      */
     hasCreditCardData() {
         return (
-            !!this._audience&&
-            !!this._countryCode&&
-            !!this._feeRegion&&
-            !!this._holder&&
-            !!this._label&&
-            !!this._number&&
+            !!this._audience &&
+            !!this._countryCode &&
+            !!this._feeRegion &&
+            !!this._holder &&
+            !!this._label &&
+            !!this._number &&
             !!this._security
         );
     }
@@ -102,7 +99,6 @@ export default class CreditcardAttributes {
         return this._security;
     }
 
-
     /**
      *
      * @param value
@@ -116,5 +112,4 @@ export default class CreditcardAttributes {
 
         return String(value);
     }
-
 }

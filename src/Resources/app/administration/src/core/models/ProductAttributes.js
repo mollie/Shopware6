@@ -1,17 +1,14 @@
 export default class ProductAttributes {
-
     /**
      *
      * @param productEntity
      */
     constructor(productEntity) {
-
         this._voucherType = '';
         this._subscriptionProduct = '';
         this._subscriptionInterval = '';
         this._subscriptionIntervalUnit = '';
         this._subscriptionRepetition = '';
-
 
         if (productEntity === null) {
             return;
@@ -31,13 +28,11 @@ export default class ProductAttributes {
         this._subscriptionRepetition = customFields['mollie_payments_product_subscription_repetition'];
     }
 
-
     /**
      *
      * @returns {*}
      */
     getVoucherType() {
-
         const stringType = this._voucherType + '';
 
         // we only allow values 1, 2, and 3
@@ -53,7 +48,6 @@ export default class ProductAttributes {
      * @returns {*}
      */
     isSubscriptionProduct() {
-
         const boolType = this._subscriptionProduct;
 
         if (!boolType) {
@@ -74,7 +68,6 @@ export default class ProductAttributes {
      * @returns {*}
      */
     getSubscriptionIntervalUnit() {
-
         const stringType = this._subscriptionIntervalUnit + '';
 
         if (stringType !== 'days' && stringType !== 'weeks' && stringType !== 'months') {
@@ -91,7 +84,6 @@ export default class ProductAttributes {
         return this._subscriptionRepetition;
     }
 
-
     /**
      *
      * @param originalFields
@@ -106,7 +98,6 @@ export default class ProductAttributes {
      * @returns {boolean}
      */
     hasData() {
-
         if (this._voucherType !== '') {
             return true;
         }
@@ -117,5 +108,4 @@ export default class ProductAttributes {
 
         return false;
     }
-
 }
