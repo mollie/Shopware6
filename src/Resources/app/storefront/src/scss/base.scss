@@ -1,9 +1,9 @@
-@import '../mollie-payments/plugins/creditcard-components.plugin';
-@import '../mollie-payments/plugins/apple-pay-direct.plugin';
-@import './checkout/payment-selection';
-@import './account/payment-selection';
-@import './account/subscriptions';
+@import './account/order';
+@import './component/apple-pay-direct';
+@import './component/credit-card-components';
 @import './component/credit-card-mandate';
-@import './component/paypal-express-button';
 @import './component/express-button';
+@import './component/payment-selection';
+@import './component/paypal-express-button';
+@import './component/subscriptions';
 @import './display';
