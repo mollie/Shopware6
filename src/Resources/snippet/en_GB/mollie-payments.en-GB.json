@@ -119,6 +119,10 @@
                 "information": "Subscription product"
             }
         },
+        "order": {
+          "refundedLabel": "Refunded:",
+          "refundPendingLabel": "Refund pending:"
+        },
         "testMode": {
             "label": "Test mode"
         }
