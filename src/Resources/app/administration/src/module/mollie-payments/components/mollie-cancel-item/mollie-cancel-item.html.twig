@@ -6,11 +6,12 @@
     <sw-container columns="30% 1fr" gap="16px">
         <div class="cy-cancel-item-quantity">
             <sw-number-field
+                    {% if VUE3 %}
                     v-model:value="canceledQuantity"
+                    {% else %}
                     v-model="canceledQuantity"
+                    {% endif %}
                     numberType="int"
-
-                    :value="canceledQuantity"
                     :step="1"
                     :min="1"
                     :max="item.cancelableQuantity"
@@ -35,11 +36,16 @@
         </div>
     </sw-container>
 
-    <sw-switch-field v-model:value="resetStock" v-model="resetStock"
-                     :label="$tc('mollie-payments.modals.cancel.resetStock')"
-                     :noMarginTop="true"
-                     class="cy-cancel-item-stock"
-                     size="small">
+    <sw-switch-field
+            {% if VUE3 %}
+            v-model:value="resetStock"
+            {% else %}
+            v-model="resetStock"
+            {% endif %}
+            :label="$tc('mollie-payments.modals.cancel.resetStock')"
+            :noMarginTop="true"
+            class="cy-cancel-item-stock"
+            size="small">
     </sw-switch-field>
     <template #modal-footer>
         <sw-button size="small" @click="close">
