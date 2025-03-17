@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Fixed the error "Call to a member function info() on null"
+
 
 ## [4.15.0] - 2025-04-03
 
