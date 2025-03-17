@@ -6,14 +6,12 @@ import MollieShipping from '../../../../components/mollie-ship-order/MollieShipp
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 
 // eslint-disable-next-line no-undef
-const {Component, Mixin, Filter} = Shopware;
+const { Component, Mixin, Filter } = Shopware;
 
 Component.override('sw-order-detail-general', {
     template,
 
-    mixins: [
-        Mixin.getByName('notification'),
-    ],
+    mixins: [Mixin.getByName('notification')],
 
     inject: [
         'MolliePaymentsRefundService',
@@ -45,11 +43,10 @@ Component.override('sw-order-detail-general', {
             refundAmountPending: 0.0,
             shippedAmount: 0,
             shippedQuantity: 0,
-        }
+        };
     },
 
     computed: {
-
         /**
          *
          * @returns {boolean}
@@ -72,7 +69,7 @@ Component.override('sw-order-detail-general', {
          * @returns {string|*}
          */
         creditCardLabel() {
-            return this._creditCardData().getLabel()
+            return this._creditCardData().getLabel();
         },
 
         /**
@@ -80,7 +77,7 @@ Component.override('sw-order-detail-general', {
          * @returns {string|*}
          */
         creditCardNumber() {
-            return '**** **** **** ' + this._creditCardData().getNumber()
+            return '**** **** **** ' + this._creditCardData().getNumber();
         },
 
         /**
@@ -88,7 +85,7 @@ Component.override('sw-order-detail-general', {
          * @returns {string|*}
          */
         creditCardHolder() {
-            return this._creditCardData().getHolder()
+            return this._creditCardData().getHolder();
         },
 
         /**
@@ -138,18 +135,15 @@ Component.override('sw-order-detail-general', {
         currencyFilter() {
             return Filter.getByName('currency');
         },
-
     },
 
     watch: {
-
         /**
          *
          */
         order() {
             this.getMollieData();
         },
-
     },
 
     created() {
@@ -157,12 +151,10 @@ Component.override('sw-order-detail-general', {
     },
 
     methods: {
-
         /**
          *
          */
         createdComponent() {
-
             this.molliePaymentUrl = '';
             this.isShippingPossible = false;
             this.isRefundManagerPossible = false;
@@ -222,18 +214,19 @@ Component.override('sw-order-detail-general', {
             return orderAttributes.getCreditCardAttributes();
         },
 
-
-
         /**
          *
          */
         copyPaymentUrlToClipboard() {
-            const fallback = async function(e) {
-                await navigator.clipboard.writeText(e)
+            const fallback = async function (e) {
+                await navigator.clipboard.writeText(e);
             };
 
             // eslint-disable-next-line no-undef
-            const clipboard = typeof Shopware.Utils.dom.copyToClipboard === 'function' ? Shopware.Utils.dom.copyToClipboard : fallback;
+            const clipboard =
+                typeof Shopware.Utils.dom.copyToClipboard === 'function'
+                    ? Shopware.Utils.dom.copyToClipboard
+                    : fallback;
             // eslint-disable-next-line no-undef
             clipboard(this.molliePaymentUrl);
             this.molliePaymentUrlCopied = true;
@@ -252,14 +245,14 @@ Component.override('sw-order-detail-general', {
          */
         getMollieData() {
             if (!this.isMollieOrder) {
-                return
+                return;
             }
 
-            this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.order.id}).then(response => {
-                this.molliePaymentUrl = (response.url !== null) ? response.url : '';
+            this.MolliePaymentsOrderService.getPaymentUrl({ orderId: this.order.id }).then((response) => {
+                this.molliePaymentUrl = response.url !== null ? response.url : '';
             });
 
-            if(!this.shippingManagerService){
+            if (!this.shippingManagerService) {
                 this.shippingManagerService = new MollieShipping(this.MolliePaymentsShippingService);
             }
 
@@ -267,19 +260,18 @@ Component.override('sw-order-detail-general', {
                 this.isShippingPossible = enabled;
             });
 
-            if(!this.refundedManagerService){
+            if (!this.refundedManagerService) {
                 this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
             }
-            this.refundedManagerService.isRefundManagerAvailable(this.order.salesChannelId, this.order.id).then((possible)=>{
-                this.isRefundManagerPossible = possible;
-            });
+            this.refundedManagerService
+                .isRefundManagerAvailable(this.order.salesChannelId, this.order.id)
+                .then((possible) => {
+                    this.isRefundManagerPossible = possible;
+                });
 
-
-
-            this.MolliePaymentsRefundService.getRefundManagerData(
-                {
-                    orderId: this.order.id,
-                })
+            this.MolliePaymentsRefundService.getRefundManagerData({
+                orderId: this.order.id,
+            })
                 .then((response) => {
                     this.remainingAmount = response.totals.remaining;
                     this.refundedAmount = response.totals.refunded;
@@ -292,13 +284,10 @@ Component.override('sw-order-detail-general', {
                     });
                 });
 
-            this.MolliePaymentsShippingService
-                .total({orderId: this.order.id})
-                .then((response) => {
-                    this.shippedAmount = Math.round(response.amount * 100) / 100;
-                    this.shippedQuantity = response.quantity;
-                });
+            this.MolliePaymentsShippingService.total({ orderId: this.order.id }).then((response) => {
+                this.shippedAmount = Math.round(response.amount * 100) / 100;
+                this.shippedQuantity = response.quantity;
+            });
         },
-
     },
 });

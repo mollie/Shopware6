@@ -1,5 +1,4 @@
 export default class ProductService {
-
     /**
      *
      * @param product
@@ -18,5 +17,4 @@ export default class ProductService {
         // so we make sure to at least have a valid but maybe "empty" structure in it
         product.customFields = mollieAttributes.toArray(product.customFields);
     }
-
 }

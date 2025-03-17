@@ -1,0 +1,10 @@
+# Ignore artifacts:
+polyfill
+shopware
+node_modules
+tests
+vendor
+vendor_manual
+modules
+src_vendor
+package-lock.json

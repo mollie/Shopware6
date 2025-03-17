@@ -1,5 +1,4 @@
 export default class OrderLifeTimeLimitsDetector {
-
     /**
      *
      */
@@ -25,5 +24,4 @@ export default class OrderLifeTimeLimitsDetector {
     isKlarnaOrderLifeTimeReached(orderLifeTime) {
         return orderLifeTime > this.maximumOrderLifeTimeKlarna && orderLifeTime <= this.maximumOrderLifeTime;
     }
-
 }

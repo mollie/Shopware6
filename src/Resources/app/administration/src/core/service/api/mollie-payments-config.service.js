@@ -2,8 +2,6 @@
 const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsConfigService extends ApiService {
-
-
     /**
      *
      * @param httpClient
@@ -21,17 +19,13 @@ export default class MolliePaymentsConfigService extends ApiService {
      * @param data
      * @returns {*}
      */
-    testApiKeys(data = {liveApiKey: null, testApiKey: null}) {
+    testApiKeys(data = { liveApiKey: null, testApiKey: null }) {
         const headers = this.getBasicHeaders();
 
         return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/config/test-api-keys`,
-                JSON.stringify(data),
-                {
-                    headers: headers,
-                }
-            )
+            .post(`_action/${this.getApiBasePath()}/config/test-api-keys`, JSON.stringify(data), {
+                headers: headers,
+            })
             .then((response) => {
                 return ApiService.handleResponse(response);
             });
@@ -50,13 +44,14 @@ export default class MolliePaymentsConfigService extends ApiService {
                 },
                 {
                     headers: this.getBasicHeaders(),
-                }
-            ).then((response) => {
+                },
+            )
+            .then((response) => {
                 return ApiService.handleResponse(response);
             });
     }
 
-    getSubscriptionConfig(){
+    getSubscriptionConfig() {
         return this.httpClient
             .post(
                 `_action/${this.getApiBasePath()}/config/subscription`,
@@ -65,8 +60,9 @@ export default class MolliePaymentsConfigService extends ApiService {
                 },
                 {
                     headers: this.getBasicHeaders(),
-                }
-            ).then((response) => {
+                },
+            )
+            .then((response) => {
                 return ApiService.handleResponse(response);
             });
     }
@@ -82,15 +78,15 @@ export default class MolliePaymentsConfigService extends ApiService {
             .post(
                 `_action/${this.getApiBasePath()}/config/refund-manager`,
                 {
-                    'salesChannelId': salesChannelId,
-                    'orderId': orderId,
+                    salesChannelId: salesChannelId,
+                    orderId: orderId,
                 },
                 {
                     headers: this.getBasicHeaders(),
-                }
-            ).then((response) => {
+                },
+            )
+            .then((response) => {
                 return ApiService.handleResponse(response);
             });
     }
-
 }

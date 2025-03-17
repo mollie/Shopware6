@@ -1,15 +1,13 @@
-import template from './action-order-refund-modal.twig'
-import './action-order-refund-modal.scss'
+import template from './action-order-refund-modal.twig';
+import './action-order-refund-modal.scss';
 
 // eslint-disable-next-line no-undef
-const {Component} = Shopware;
+const { Component } = Shopware;
 
 Component.register('mollie-payments-flowsequence-action-order-refund-modal', {
     template,
 
-    inject: [
-        'MolliePaymentsConfigService',
-    ],
+    inject: ['MolliePaymentsConfigService'],
 
     props: {
         sequence: {

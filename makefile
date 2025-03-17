@@ -88,6 +88,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make csfix mode=fix -B
 	@make eslint mode=fix -B
 	@make stylelint mode=fix -B
+	@make prettier mode=fix -B
 	# -----------------------------------------------------------------
 	# VALIDATORS
 	@make phpcheck -B
@@ -98,6 +99,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make vitest -B
 	@make eslint -B
 	@make stylelint -B
+	@make prettier -B
 	@make configcheck -B
 	@make phpunuhi -B
 
@@ -152,6 +154,14 @@ ifndef mode
 endif
 ifeq ($(mode), fix)
 	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix
+endif
+
+prettier: ##3 Starts the Prettier
+ifndef mode
+	./node_modules/.bin/prettier ./src/Resources/app/ --config=./.prettierrc  --check
+endif
+ifeq ($(mode), fix)
+	./node_modules/.bin/prettier ./src/Resources/app/ --config=./.prettierrc  --write
 endif
 
 configcheck: ##3 Tests and verifies the plugin configuration file

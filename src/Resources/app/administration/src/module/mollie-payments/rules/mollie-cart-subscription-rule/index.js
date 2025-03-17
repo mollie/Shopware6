@@ -5,7 +5,6 @@ Shopware.Component.extend('mollie-cart-subscription-rule', 'sw-condition-base', 
     template,
 
     computed: {
-
         selectValues() {
             return [
                 {
@@ -20,7 +19,6 @@ Shopware.Component.extend('mollie-cart-subscription-rule', 'sw-condition-base', 
         },
 
         isSubscription: {
-
             get() {
                 this.ensureValueExist();
 
@@ -33,7 +31,7 @@ Shopware.Component.extend('mollie-cart-subscription-rule', 'sw-condition-base', 
 
             set(isSubscription) {
                 this.ensureValueExist();
-                this.condition.value = {...this.condition.value, isSubscription};
+                this.condition.value = { ...this.condition.value, isSubscription };
             },
         },
     },

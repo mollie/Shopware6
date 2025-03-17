@@ -21,7 +21,6 @@ export class PrivacyNoteElement {
     }
 
     validate(privacyNote) {
-
         const dataProtection = this.getCheckbox(privacyNote);
 
         const dataProtectionValue = dataProtection.checked ? 1 : 0;
@@ -35,52 +34,38 @@ export class PrivacyNoteElement {
     }
 
     observeButtons() {
-
         const privacyNotes = document.querySelectorAll('.mollie-privacy-note:not(.observed)');
         const buyElementRepository = new BuyElementRepository();
 
         privacyNotes.forEach((privacyNote) => {
-
             privacyNote.classList.add('observed');
 
             const buyElement = buyElementRepository.find(privacyNote);
             const expressButtonsRepository = new ExpressButtonsRepository(buyElement);
             const expressButtons = expressButtonsRepository.findAll();
 
-
-            if(expressButtons.length === 0){
+            if (expressButtons.length === 0) {
                 privacyNote.classList.add('d-none');
             }
 
-
             expressButtons.forEach((expressButton) => {
-
                 const observer = new MutationObserver((mutations) => {
                     let visibleExpressButtons = expressButtons.length;
                     privacyNote.classList.remove('d-none');
 
                     mutations.forEach((mutation) => {
-
-                        if(mutation.target.classList.contains('d-none')){
+                        if (mutation.target.classList.contains('d-none')) {
                             visibleExpressButtons--;
                         }
-
                     });
 
-
-                    if(visibleExpressButtons <= 0){
+                    if (visibleExpressButtons <= 0) {
                         privacyNote.classList.add('d-none');
                     }
-
                 });
 
-                observer.observe(expressButton, {attributes: true, attributeFilter: ['class']});
-            })
-
-
-        })
-
-
+                observer.observe(expressButton, { attributes: true, attributeFilter: ['class'] });
+            });
+        });
     }
-
 }

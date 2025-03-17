@@ -1,9 +1,8 @@
-import './page/sw-product-detail'
-import './view/sw-product-detail-mollie'
-
+import './page/sw-product-detail';
+import './view/sw-product-detail-mollie';
 
 // eslint-disable-next-line no-undef
-const {Module} = Shopware;
+const { Module } = Shopware;
 
 Module.register('mollie-sw-product-detail', {
     type: 'plugin',

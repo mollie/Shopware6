@@ -1,15 +1,13 @@
-import template from './action-order-ship-modal.twig'
-import './action-order-ship-modal.scss'
+import template from './action-order-ship-modal.twig';
+import './action-order-ship-modal.scss';
 
 // eslint-disable-next-line no-undef
-const {Component} = Shopware;
+const { Component } = Shopware;
 
 Component.register('mollie-payments-flowsequence-action-order-ship-modal', {
     template,
 
-    inject: [
-        'MolliePaymentsConfigService',
-    ],
+    inject: ['MolliePaymentsConfigService'],
 
     props: {
         sequence: {

@@ -1,12 +1,9 @@
-import HttpClient from '../services/HttpClient'
+import HttpClient from '../services/HttpClient';
 import Plugin from '../Plugin';
 
-
 export default class MolliePosTerminalPlugin extends Plugin {
-
     _shopUrl = '';
     _customerId = '';
-
 
     _dropdownTerminals = null;
 
@@ -17,12 +14,10 @@ export default class MolliePosTerminalPlugin extends Plugin {
     _radioInputs = null;
     _posRadioInput = null;
 
-
     /**
      *
      */
     init() {
-
         this._container = document.querySelector('div.mollie-pos-terminals');
 
         if (this._container === undefined || this._container === null) {
@@ -46,15 +41,14 @@ export default class MolliePosTerminalPlugin extends Plugin {
         this.registerEvents();
 
         // update the visibility of our issuer dropdown list
-        this.updateDropdownVisibility(this._posRadioInput, this._container, this._dropdownTerminals)
+        this.updateDropdownVisibility(this._posRadioInput, this._container, this._dropdownTerminals);
 
         this.updateTerminal(
             this._shopUrl,
             this._customerId,
             this._posRadioInput,
             this._dropdownTerminals,
-            function () {
-            }
+            function () {},
         );
     }
 
@@ -85,7 +79,6 @@ export default class MolliePosTerminalPlugin extends Plugin {
      *
      */
     registerEvents() {
-
         if (this._paymentForm === null) {
             return;
         }
@@ -99,18 +92,16 @@ export default class MolliePosTerminalPlugin extends Plugin {
         const posRadioInput = this._posRadioInput;
         const terminalsDropdown = this._dropdownTerminals;
 
-
         // add event to toggle the dropdown visibility
         // when switching payment methods
         allRadioInputs.forEach((element) => {
             element.addEventListener('change', () => {
-                this.updateDropdownVisibility(posRadioInput, container, terminalsDropdown)
+                this.updateDropdownVisibility(posRadioInput, container, terminalsDropdown);
             });
         });
 
         terminalsDropdown.addEventListener('change', async () => {
-            this.updateTerminal(shopUrl, customerId, posRadioInput, terminalsDropdown, function () {
-            });
+            this.updateTerminal(shopUrl, customerId, posRadioInput, terminalsDropdown, function () {});
         });
     }
 
@@ -121,7 +112,6 @@ export default class MolliePosTerminalPlugin extends Plugin {
      * @param dropdown
      */
     updateDropdownVisibility(posRadio, container, dropdown) {
-
         let terminalRequired = false;
 
         if (posRadio === undefined || posRadio.checked === false) {
@@ -145,7 +135,6 @@ export default class MolliePosTerminalPlugin extends Plugin {
      * @param onCompleted
      */
     updateTerminal(shopUrl, customerId, posRadio, terminalsDropdown, onCompleted) {
-
         if (posRadio === undefined) {
             onCompleted('POS Radio Input not defined');
             return;
@@ -186,8 +175,7 @@ export default class MolliePosTerminalPlugin extends Plugin {
             function () {
                 onCompleted('error when updating terminal');
             },
-            'application/json; charset=utf-8'
+            'application/json; charset=utf-8',
         );
     }
-
 }
