@@ -135,7 +135,7 @@ context("Checkout Tests", () => {
 
                     mollieSandbox.initSandboxCookie();
 
-                    if (payment.key === 'billie' || payment.key === 'klarna') {
+                    if (payment.key === 'billie' || payment.key === 'klarna' || payment.key === 'riverty') {
 
                         molliePayment.selectAuthorized();
 
