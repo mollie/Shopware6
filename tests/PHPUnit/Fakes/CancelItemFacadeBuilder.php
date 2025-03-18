@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -79,6 +80,11 @@ class CancelItemFacadeBuilder
         $fakeShopwareOrderLine = new OrderLineItemEntity();
         $fakeShopwareOrderLine->setId('validLineId');
         $fakeShopwareOrderLine->setLabel('Valid orderline');
+
+        $fakeShopwareOrder = new OrderEntity();
+        $fakeShopwareOrder->setId('validOrderId');
+        $fakeShopwareOrder->setSalesChannelId('testSalesChannelId');
+        $fakeShopwareOrderLine->setOrder($fakeShopwareOrder);
         $this->itemCollection->add($fakeShopwareOrderLine);
 
         return $this;
