@@ -52,6 +52,7 @@ class CancelItemFacade
             $searchResult = $this->orderLineItemRepository->search($criteria, $context);
             if ($searchResult->count() === 0) {
                 $this->logger->error('Cancelling item failed, shopware line item not found', $logArguments);
+
                 return $response->failedWithMessage('invalidShopwareLineId');
             }
             /** @var OrderLineItemEntity $shopwareLineItem */
