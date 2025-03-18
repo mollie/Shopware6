@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Payment\Remover;
 
@@ -46,23 +47,15 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     protected $settingsService;
 
     /**
-     * @var OrderItemsExtractor
-     */
-    private $orderDataExtractor;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
-     * @param OrderItemsExtractor $orderDataExtractor
-     * @param LoggerInterface $logger
+     * @var OrderItemsExtractor
      */
+    private $orderDataExtractor;
+
     public function __construct(ContainerInterface $container, RequestStack $requestStack, OrderService $orderService, SettingsService $settingsService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         $this->container = $container;
@@ -73,17 +66,55 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
         $this->logger = $logger;
     }
 
+    /**
+     * @throws MissingRequestException
+     * @throws MissingRouteException
+     */
+    public function isCartRoute(): bool
+    {
+        $route = $this->getRouteFromRequest();
+
+        return in_array($route, CartAwareRouteInterface::CART_ROUTES);
+    }
 
     /**
-     * @return bool
+     * @throws MissingCartServiceException
      */
+    public function getCart(SalesChannelContext $context): Cart
+    {
+        return $this->getCartServiceLazy()->getCart($context->getToken(), $context);
+    }
+
+    /**
+     * @throws MissingRequestException
+     * @throws MissingRouteException
+     */
+    public function isOrderRoute(): bool
+    {
+        $route = $this->getRouteFromRequest();
+
+        return in_array($route, OrderAwareRouteInterface::ORDER_ROUTES);
+    }
+
+    public function getOrder(Context $context): OrderEntity
+    {
+        $request = $this->getRequestFromStack();
+        $orderId = $request->attributes->get('orderId');
+
+        if (! $orderId) {
+            throw new BadRequestException();
+        }
+
+        return $this->orderService->getOrder($orderId, $context);
+    }
+
     protected function isAllowedRoute(): bool
     {
         try {
             $request = $this->getRequestFromStack();
 
-            # we also need to allow removing for store-api calls
-            # this is for the headless approach
+            // we also need to allow removing for store-api calls
+            // this is for the headless approach
             if (strpos($request->getPathInfo(), '/store-api') === 0) {
                 return true;
             }
@@ -100,7 +131,8 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
                 ->error('Could not determine if the current route is allowed to remove payment methods', [
                     'exception' => $e,
                     'request' => $request ?? null,
-                ]);
+                ])
+            ;
 
             // Make sure Shopware will behave normally in the case of an error.
             return false;
@@ -110,111 +142,22 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
     }
 
     /**
-     * @throws MissingRequestException
-     * @throws MissingRouteException
-     * @return bool
-     */
-    public function isCartRoute(): bool
-    {
-        $route = $this->getRouteFromRequest();
-
-        return in_array($route, CartAwareRouteInterface::CART_ROUTES);
-    }
-
-    /**
-     * @param SalesChannelContext $context
-     * @throws MissingCartServiceException
-     * @return Cart
-     */
-    public function getCart(SalesChannelContext $context): Cart
-    {
-        return $this->getCartServiceLazy()->getCart($context->getToken(), $context);
-    }
-
-    /**
      * We have to use lazy loading for this. Otherwise, there are plugin compatibilities
      * with a circular reference...even though XML looks fine.
      *
      * @throws MissingCartServiceException
-     * @return CartService
      */
     protected function getCartServiceLazy(): CartService
     {
         $service = $this->container->get('Shopware\Core\Checkout\Cart\SalesChannel\CartService');
 
-        if (!$service instanceof CartService) {
+        if (! $service instanceof CartService) {
             throw new MissingCartServiceException();
         }
 
         return $service;
     }
 
-    /**
-     * @throws MissingRequestException
-     * @throws MissingRouteException
-     * @return bool
-     */
-    public function isOrderRoute(): bool
-    {
-        $route = $this->getRouteFromRequest();
-
-        return in_array($route, OrderAwareRouteInterface::ORDER_ROUTES);
-    }
-
-    /**
-     * @param Context $context
-     * @return OrderEntity
-     */
-    public function getOrder(Context $context): OrderEntity
-    {
-        $request = $this->getRequestFromStack();
-        $orderId = $request->attributes->get('orderId');
-
-        if (!$orderId) {
-            throw new BadRequestException();
-        }
-
-        return $this->orderService->getOrder($orderId, $context);
-    }
-
-    /**
-     * @throws MissingRequestException
-     * @return Request
-     */
-    private function getRequestFromStack(): Request
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($request instanceof Request) {
-            return $request;
-        }
-
-        throw new MissingRequestException();
-    }
-
-    /**
-     * @throws MissingRequestException
-     * @throws MissingRouteException
-     * @return string
-     */
-    private function getRouteFromRequest(): string
-    {
-        $request = $this->getRequestFromStack();
-
-        $route = (string)$request->attributes->get('_route');
-
-        if (!empty($route)) {
-            return $route;
-        }
-
-        return '';
-    }
-
-
-    /**
-     * @param Cart $cart
-     * @return bool
-     */
     protected function isSubscriptionCart(Cart $cart): bool
     {
         foreach ($cart->getLineItems() as $lineItem) {
@@ -228,11 +171,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
         return false;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return bool
-     */
     protected function isSubscriptionOrder(OrderEntity $order, Context $context): bool
     {
         $lineItems = $this->orderDataExtractor->extractLineItems($order);
@@ -249,11 +187,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
         return false;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return bool
-     */
     protected function isVoucherOrder(OrderEntity $order, Context $context): bool
     {
         $lineItems = $this->orderDataExtractor->extractLineItems($order);
@@ -268,5 +201,36 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
         }
 
         return false;
+    }
+
+    /**
+     * @throws MissingRequestException
+     */
+    private function getRequestFromStack(): Request
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request instanceof Request) {
+            return $request;
+        }
+
+        throw new MissingRequestException();
+    }
+
+    /**
+     * @throws MissingRequestException
+     * @throws MissingRouteException
+     */
+    private function getRouteFromRequest(): string
+    {
+        $request = $this->getRequestFromStack();
+
+        $route = (string) $request->attributes->get('_route');
+
+        if (! empty($route)) {
+            return $route;
+        }
+
+        return '';
     }
 }

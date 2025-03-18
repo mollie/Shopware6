@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi;
 
@@ -22,10 +23,7 @@ class Customer
     }
 
     /**
-     * @param string $customerId
-     * @param string $salesChannelId
      * @throws CouldNotFetchMollieCustomerException
-     * @return MollieCustomer
      */
     public function getMollieCustomerById(string $customerId, string $salesChannelId): MollieCustomer
     {
@@ -39,9 +37,7 @@ class Customer
     }
 
     /**
-     * @param CustomerEntity $customer
      * @throws CouldNotCreateMollieCustomerException
-     * @return MollieCustomer
      */
     public function createCustomerAtMollie(CustomerEntity $customer, string $salesChannelId): MollieCustomer
     {
@@ -52,15 +48,11 @@ class Customer
                 'name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
                 'email' => $customer->getEmail(),
                 'metadata' => [
-                    'id' => $customer->getId()
-                ]
+                    'id' => $customer->getId(),
+                ],
             ]);
         } catch (ApiException $e) {
-            throw new CouldNotCreateMollieCustomerException(
-                $customer->getCustomerNumber(),
-                $customer->getFirstName() . ' ' . $customer->getLastName(),
-                $e
-            );
+            throw new CouldNotCreateMollieCustomerException($customer->getCustomerNumber(), $customer->getFirstName() . ' ' . $customer->getLastName(), $e);
         }
     }
 

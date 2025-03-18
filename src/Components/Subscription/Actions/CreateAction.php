@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
@@ -64,46 +65,42 @@ class CreateAction extends BaseAction
     }
 
     /**
-     * @param OrderEntity $order
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return string
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
-        if (!$this->isSubscriptionFeatureEnabled($order)) {
+        if (! $this->isSubscriptionFeatureEnabled($order)) {
             return '';
         }
 
-        # -------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------
 
         if ($order->getLineItems() === null) {
-            # empty carts are not allowed for subscriptions
+            // empty carts are not allowed for subscriptions
             return '';
         }
 
         $mixedOrderValidator = new MixedOrderValidator();
 
         if ($mixedOrderValidator->isMixedCart($order)) {
-            # Mixed orders are not allowed for subscriptions
+            // Mixed orders are not allowed for subscriptions
             return '';
         }
 
-
         $item = $order->getLineItems()->first();
 
-        if (!$item instanceof OrderLineItemEntity) {
+        if (! $item instanceof OrderLineItemEntity) {
             throw new Exception('No line item entity found for order ' . $order->getOrderNumber());
         }
 
-        # ------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------
 
         $attributes = new OrderLineItemEntityAttributes($item);
 
-        if (!$attributes->isSubscriptionProduct()) {
-            # this is no subscription product (regular checkout), so return an empty string.
-            # return an empty string that will be saved as "reference".
-            # so our order will not be a subscription
+        if (! $attributes->isSubscriptionProduct()) {
+            // this is no subscription product (regular checkout), so return an empty string.
+            // return an empty string that will be saved as "reference".
+            // so our order will not be a subscription
             return '';
         }
 
@@ -115,7 +112,7 @@ class CreateAction extends BaseAction
             throw new Exception('Invalid subscription interval unit');
         }
 
-        # ------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------
 
         $this->getLogger()->debug('Creating subscription entry for order: ' . $order->getOrderNumber());
 
@@ -123,10 +120,8 @@ class CreateAction extends BaseAction
 
         $this->getRepository()->insertSubscription($subscription, self::INITIAL_STATUS, $context->getContext());
 
-
-        # fetch subscription again, to have correct data like createAt and more
+        // fetch subscription again, to have correct data like createAt and more
         $subscription = $this->getRepository()->findById($subscription->getId(), $context->getContext());
-
 
         $this->getStatusHistory()->markCreated($subscription, self::INITIAL_STATUS, $context->getContext());
 

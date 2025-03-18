@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Struct;
 
@@ -47,7 +48,6 @@ class MollieOrderCustomFieldsStructTest extends TestCase
 
         $struct = new OrderAttributes($order);
 
-
         $this->assertEquals([
             'mollie_payments' => [
                 'order_id' => 'order_id',
@@ -57,7 +57,7 @@ class MollieOrderCustomFieldsStructTest extends TestCase
                 'molliePaymentUrl' => 'molliePaymentUrl',
                 'swSubscriptionId' => '12345',
                 'mollieSubscriptionId' => 'sub_123',
-            ]
+            ],
         ], $struct->toArray());
         $this->assertEquals('order_id', $struct->getMollieOrderId());
         $this->assertEquals('payment_id', $struct->getMolliePaymentId());

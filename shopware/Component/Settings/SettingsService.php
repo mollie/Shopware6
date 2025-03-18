@@ -14,11 +14,10 @@ final class SettingsService extends AbstractSettingsService
     private const CACHE_KEY_LOGGER = 'logger';
     private const CACHE_KEY_SHOPWARE = 'shopware';
 
-    private ?SystemConfigService $systemConfigService  = null;
+    private ?SystemConfigService $systemConfigService = null;
 
     private array $settingsCache = [];
     private ContainerInterface $container;
-
 
     public function __construct(ContainerInterface $container)
     {
@@ -38,7 +37,6 @@ final class SettingsService extends AbstractSettingsService
             return $this->settingsCache[$cacheKey];
         }
 
-
         $shopwareSettings = $this->getShopwareSettings($salesChannelId);
         $loggerSettings = LoggerSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $loggerSettings;
@@ -53,14 +51,15 @@ final class SettingsService extends AbstractSettingsService
         if (isset($this->settingsCache[$cacheKey])) {
             return $this->settingsCache[$cacheKey];
         }
-        /**
+        /*
          * Attention, we have to use service locator here, because in Shopware 6.4 there is an issue with system config service.
          */
         if ($this->systemConfigService === null) {
-            $this->systemConfigService =  $this->container->get(SystemConfigService::class);
+            $this->systemConfigService = $this->container->get(SystemConfigService::class);
         }
         $shopwareSettingsArray = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
         $this->settingsCache[$cacheKey] = $shopwareSettingsArray;
+
         return $shopwareSettingsArray;
     }
 }

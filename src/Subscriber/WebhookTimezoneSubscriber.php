@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -16,15 +17,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class WebhookTimezoneSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
-    {
-        return [
-            # Route gets matched in a subscriber with priority 32, so we need to have a lower priority than that.
-            # But priority needs to be higher than 0 as Shopware's timezone listener will run at that priority.
-            KernelEvents::REQUEST => ['fixWebhookTimezone', 31],
-        ];
-    }
-
     /**
      * @var TransactionService
      */
@@ -40,11 +32,6 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
      */
     private $logger;
 
-    /**
-     * @param TransactionService $transactionService
-     * @param RoutingDetector $routeDetector
-     * @param LoggerInterface $logger
-     */
     public function __construct(TransactionService $transactionService, RoutingDetector $routeDetector, LoggerInterface $logger)
     {
         $this->transactionService = $transactionService;
@@ -52,16 +39,20 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
+    public static function getSubscribedEvents()
+    {
+        return [
+            // Route gets matched in a subscriber with priority 32, so we need to have a lower priority than that.
+            // But priority needs to be higher than 0 as Shopware's timezone listener will run at that priority.
+            KernelEvents::REQUEST => ['fixWebhookTimezone', 31],
+        ];
+    }
 
-    /**
-     * @param RequestEvent $event
-     * @return void
-     */
     public function fixWebhookTimezone(RequestEvent $event): void
     {
-        # we only fix the timezone when being called from the
-        # Storefront Webhook Route or API Webhook Route (headless).
-        if (!$this->routeDetector->isStorefrontWebhookRoute() && !$this->routeDetector->isApiWebhookRoute()) {
+        // we only fix the timezone when being called from the
+        // Storefront Webhook Route or API Webhook Route (headless).
+        if (! $this->routeDetector->isStorefrontWebhookRoute() && ! $this->routeDetector->isApiWebhookRoute()) {
             return;
         }
 
@@ -70,24 +61,27 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
 
         $transactionId = $routeParams['swTransactionId'] ?? '';
 
-        if (!Uuid::isValid($transactionId)) {
+        if (! Uuid::isValid($transactionId)) {
             $this->logger->warning(sprintf('Webhook Timezone Fixer: TransactionId %s is not valid', $transactionId), [
                 'transactionId' => $transactionId,
             ]);
+
             return;
         }
 
         $transaction = $this->transactionService->getTransactionById($transactionId);
 
-        if (!$transaction instanceof OrderTransactionEntity) {
+        if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->error(sprintf('Transaction for id %s does not exist', $transactionId));
+
             return;
         }
 
         $order = $transaction->getOrder();
 
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             $this->logger->error(sprintf('Could not get order from transaction %s', $transactionId));
+
             return;
         }
 

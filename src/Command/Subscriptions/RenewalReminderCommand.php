@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Command\Subscriptions;
 
@@ -14,7 +15,6 @@ class RenewalReminderCommand extends Command
 {
     public static $defaultName = 'mollie:subscriptions:renewal-reminder';
 
-
     /**
      * @var SubscriptionManager
      */
@@ -25,11 +25,6 @@ class RenewalReminderCommand extends Command
      */
     private $logger;
 
-
-    /**
-     * @param SubscriptionManager $subscriptionManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         $this->subscriptionManager = $subscriptionManager;
@@ -38,22 +33,14 @@ class RenewalReminderCommand extends Command
         parent::__construct();
     }
 
-
-    /**
-     * @return void
-     */
     protected function configure(): void
     {
         $this
-            ->setName((string)self::$defaultName)
-            ->setDescription('Processes Subscription renewal reminders of upcoming renewals');
+            ->setName((string) self::$defaultName)
+            ->setDescription('Processes Subscription renewal reminders of upcoming renewals')
+        ;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

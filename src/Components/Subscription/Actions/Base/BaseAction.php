@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions\Base;
 
@@ -78,19 +79,7 @@ class BaseAction
      */
     private $logger;
 
-
     /**
-     * @param SettingsService $pluginSettings
-     * @param SubscriptionRepository $repoSubscriptions
-     * @param SubscriptionBuilder $subscriptionBuilder
-     * @param MollieDataBuilder $mollieRequestBuilder
-     * @param CustomerService $customers
-     * @param MollieGatewayInterface $gwMollie
-     * @param CancellationValidator $cancellationValidator
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param SubscriptionHistoryHandler $subscriptionHistory
-     * @param LoggerInterface $logger
      * @throws Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger)
@@ -109,68 +98,41 @@ class BaseAction
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
-
-    /**
-     * @return LoggerInterface
-     */
     protected function getLogger(): LoggerInterface
     {
         return $this->logger;
     }
 
-    /**
-     * @return SubscriptionHistoryHandler
-     */
     protected function getStatusHistory(): SubscriptionHistoryHandler
     {
         return $this->subscriptionHistory;
     }
 
-    /**
-     * @return SubscriptionRepository
-     */
     protected function getRepository(): SubscriptionRepository
     {
         return $this->repoSubscriptions;
     }
 
-    /**
-     * @param string $salesChannelId
-     * @return MollieSettingStruct
-     */
     protected function getPluginSettings(string $salesChannelId): MollieSettingStruct
     {
         return $this->pluginSettings->getSettings($salesChannelId);
     }
 
-    /**
-     * @return MollieDataBuilder
-     */
     protected function getPayloadBuilder(): MollieDataBuilder
     {
         return $this->mollieRequestBuilder;
     }
 
-    /**
-     * @return SubscriptionBuilder
-     */
     protected function getSubscriptionBuilder(): SubscriptionBuilder
     {
         return $this->subscriptionBuilder;
     }
 
-    /**
-     * @return CustomerService
-     */
     protected function getCustomers(): CustomerService
     {
         return $this->customers;
     }
 
-    /**
-     * @param SubscriptionEntity $subscription
-     * @return MollieGatewayInterface
-     */
     protected function getMollieGateway(SubscriptionEntity $subscription): MollieGatewayInterface
     {
         $this->gwMollie->switchClient($subscription->getSalesChannelId());
@@ -178,37 +140,23 @@ class BaseAction
         return $this->gwMollie;
     }
 
-    /**
-     * @return FlowBuilderEventFactory
-     */
     protected function getFlowBuilderEventFactory(): FlowBuilderEventFactory
     {
         return $this->flowBuilderEventFactory;
     }
 
-    /**
-     * @return FlowBuilderDispatcherAdapterInterface
-     */
     protected function getFlowBuilderDispatcher(): FlowBuilderDispatcherAdapterInterface
     {
         return $this->flowBuilderDispatcher;
     }
 
-
-    /**
-     * @param OrderEntity $order
-     * @return bool
-     */
     protected function isSubscriptionFeatureEnabled(OrderEntity $order): bool
     {
         return $this->getPluginSettings($order->getSalesChannelId())->isSubscriptionsEnabled();
     }
 
     /**
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @throws Exception
-     * @return bool
      */
     protected function isCancellationPeriodValid(SubscriptionEntity $subscription, Context $context): bool
     {
@@ -216,15 +164,12 @@ class BaseAction
 
         $cancellationDays = $settings->getSubscriptionsCancellationDays();
 
-        # now verify if we are in a valid range to cancel the subscription
-        # depending on the plugin configuration it might only be possible
-        # up until a few days before the renewal
+        // now verify if we are in a valid range to cancel the subscription
+        // depending on the plugin configuration it might only be possible
+        // up until a few days before the renewal
         return $this->cancellationValidator->isCancellationAllowed($subscription->getNextPaymentAt(), $cancellationDays, new DateTime());
     }
 
-    /**
-     * @return bool
-     */
     protected function isMollieDevMode(): bool
     {
         return $this->pluginSettings->getEnvMollieDevMode();

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache;
 
@@ -23,17 +24,11 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     private $pluginSettings;
 
-
-    /**
-     * @param SettingsService $pluginSettings
-     * @param CartService $cartService
-     */
     public function __construct(SettingsService $pluginSettings, CartService $cartService)
     {
         $this->pluginSettings = $pluginSettings;
         $this->cartService = $cartService;
     }
-
 
     /**
      * @return string[]
@@ -50,7 +45,6 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      * situations that could occur.
      * So we need to determine if we have a voucher product in it, or not...otherwise the dynamic display
      * of these payment methods (in other route handlers) would not work.
-     * @param PaymentMethodRouteCacheKeyEvent $event
      */
     public function onGenerateCacheKey(PaymentMethodRouteCacheKeyEvent $event): void
     {
@@ -63,7 +57,7 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
          */
         $cart = $this->cartService->getCart($event->getContext()->getToken(), $event->getContext());
 
-        /** we have to collect the original rules before cart service is called and set them again */
+        /* we have to collect the original rules before cart service is called and set them again */
         $event->getContext()->setRuleIds($originalRuleIds);
 
         $parts = $event->getParts();
@@ -80,14 +74,13 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     }
 
     /**
-     * @param Cart $cart
      * @param array<mixed> $parts
      *
      * @return array<mixed>
      */
     private function addVoucherKey(Cart $cart, array $parts): array
     {
-        $voucherPermitted = (bool)$cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
+        $voucherPermitted = (bool) $cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
 
         if ($voucherPermitted) {
             $parts[] = 'with-voucher';
@@ -100,6 +93,7 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 
     /**
      * @param array<mixed> $parts
+     *
      * @return array<mixed>
      */
     private function addMollieLimitsKey(array $parts): array
@@ -116,7 +110,6 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     }
 
     /**
-     * @param Cart $cart
      * @param array<mixed> $parts
      *
      * @return array<mixed>
@@ -134,10 +127,6 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         return $parts;
     }
 
-    /**
-     * @param Cart $cart
-     * @return bool
-     */
     private function isSubscriptionCart(Cart $cart): bool
     {
         foreach ($cart->getLineItems() as $lineItem) {
@@ -152,33 +141,35 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
     }
 
     /**
-     * @param Cart $cart
      * @param array<mixed> $cacheParts
+     *
      * @return array<mixed>
      */
     private function addCartAmountKey(Cart $cart, array $cacheParts): array
     {
         $cacheParts[] = $cart->getPrice()->getTotalPrice();
+
         return $cacheParts;
     }
 
     /**
-     * @param SalesChannelContext $context
      * @param array<mixed> $cacheParts
+     *
      * @return array<mixed>
      */
-    private function addCurrencyCodeKey(SalesChannelContext $context, array $cacheParts):array
+    private function addCurrencyCodeKey(SalesChannelContext $context, array $cacheParts): array
     {
         $cacheParts[] = $context->getCurrency()->getIsoCode();
+
         return $cacheParts;
     }
 
     /**
-     * @param SalesChannelContext $context
      * @param array<mixed> $cacheParts
+     *
      * @return array<mixed>
      */
-    private function addBillingAddressKey(SalesChannelContext $context, array $cacheParts):array
+    private function addBillingAddressKey(SalesChannelContext $context, array $cacheParts): array
     {
         $customer = $context->getCustomer();
 
@@ -192,7 +183,7 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
             return $cacheParts;
         }
 
-        $cacheParts[]=$billingAddress->getId();
+        $cacheParts[] = $billingAddress->getId();
 
         return $cacheParts;
     }

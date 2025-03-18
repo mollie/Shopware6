@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Payment;
 
@@ -15,22 +16,13 @@ class ReturnControllerBase extends AbstractController
      */
     private $returnFacade;
 
-
-    /**
-     * @param PaymentReturnFacade $returnFacade
-     */
     public function __construct(PaymentReturnFacade $returnFacade)
     {
         $this->returnFacade = $returnFacade;
     }
 
-
     /**
-     *
-     * @param string $swTransactionId
-     * @param Context $context
      * @throws ApiException
-     * @return null|Response
      */
     public function returnAction(string $swTransactionId, Context $context): ?Response
     {
@@ -38,11 +30,7 @@ class ReturnControllerBase extends AbstractController
     }
 
     /**
-     *
-     * @param string $swTransactionId
-     * @param Context $context
      * @throws ApiException
-     * @return null|Response
      */
     public function returnActionLegacy(string $swTransactionId, Context $context): ?Response
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Router;
 
@@ -16,25 +17,16 @@ class RoutingDetector
      */
     private const ROUTE_ID_API_WEBHOOK = 'api.mollie.webhook';
 
-
     /**
      * @var RequestStack
      */
     private $requestStack;
 
-
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-
-    /**
-     * @return bool
-     */
     public function isAdminApiRoute(): bool
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -48,9 +40,6 @@ class RoutingDetector
         return $isStoreApi;
     }
 
-    /**
-     * @return bool
-     */
     public function isStoreApiRoute(): bool
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -64,17 +53,11 @@ class RoutingDetector
         return $isStoreApi;
     }
 
-    /**
-     * @return bool
-     */
     public function isStorefrontRoute(): bool
     {
-        return (!$this->isAdminApiRoute() && !$this->isStoreApiRoute());
+        return ! $this->isAdminApiRoute() && ! $this->isStoreApiRoute();
     }
 
-    /**
-     * @return bool
-     */
     public function isStorefrontWebhookRoute(): bool
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -83,14 +66,11 @@ class RoutingDetector
             return false;
         }
 
-        $route = (string)$request->get('_route');
+        $route = (string) $request->get('_route');
 
-        return ($route === self::ROUTE_ID_STOREFRONT_WEBHOOK);
+        return $route === self::ROUTE_ID_STOREFRONT_WEBHOOK;
     }
 
-    /**
-     * @return bool
-     */
     public function isApiWebhookRoute(): bool
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -99,8 +79,8 @@ class RoutingDetector
             return false;
         }
 
-        $route = (string)$request->get('_route');
+        $route = (string) $request->get('_route');
 
-        return ($route === self::ROUTE_ID_API_WEBHOOK);
+        return $route === self::ROUTE_ID_API_WEBHOOK;
     }
 }

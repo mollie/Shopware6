@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes\Repositories;
 
@@ -13,6 +14,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class FakeProductRepository extends EntityRepository
 {
+    public bool $throwExceptions = false;
     /**
      * @var ?ProductEntity
      */
@@ -23,11 +25,6 @@ class FakeProductRepository extends EntityRepository
      */
     private $searchResultNumber;
 
-    public bool $throwExceptions = false;
-    /**
-     * @param null|ProductEntity $resultID
-     * @param null|ProductEntity $resultNumber
-     */
     public function __construct(?ProductEntity $resultID, ?ProductEntity $resultNumber)
     {
         $this->searchResultID = $resultID;
@@ -35,8 +32,6 @@ class FakeProductRepository extends EntityRepository
     }
 
     /**
-     * @param string $productId
-     * @param SalesChannelContext $context
      * @return array<ProductEntity>
      */
     public function findByID(string $productId, SalesChannelContext $context): array
@@ -49,8 +44,6 @@ class FakeProductRepository extends EntityRepository
     }
 
     /**
-     * @param string $productNumber
-     * @param SalesChannelContext $context
      * @return array<ProductEntity>
      */
     public function findByNumber(string $productNumber, SalesChannelContext $context): array
@@ -62,11 +55,6 @@ class FakeProductRepository extends EntityRepository
         return [$this->searchResultNumber];
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param Context $context
-     * @return EntitySearchResult
-     */
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
         if ($this->throwExceptions) {
@@ -82,9 +70,6 @@ class FakeProductRepository extends EntityRepository
         if ($this->searchResultID !== null) {
             $entities->add($this->searchResultID);
         }
-
-
-
 
         return new EntitySearchResult(ProductEntity::class, $entities->count(), $entities, null, $criteria, $context);
     }

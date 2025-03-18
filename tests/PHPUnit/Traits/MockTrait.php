@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Traits;
 
@@ -7,11 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 trait MockTrait
 {
-    /**
-     * @param string $originalClassName
-     * @param TestCase $testCase
-     * @return MockObject
-     */
     protected function createDummyMock(string $originalClassName, TestCase $testCase): MockObject
     {
         return $testCase->getMockBuilder($originalClassName)
@@ -19,6 +15,7 @@ trait MockTrait
             ->disableOriginalClone()
             ->disableArgumentCloning()
             ->disallowMockingUnknownTypes()
-            ->getMock();
+            ->getMock()
+        ;
     }
 }

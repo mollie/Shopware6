@@ -28,11 +28,11 @@ class ExpireAction
     private LoggerInterface $logger;
 
     public function __construct(
-        EntityRepository        $orderRepository,
+        EntityRepository $orderRepository,
         EntityRepository $salesChannelRepository,
-        OrderExpireService              $orderExpireService,
-        SettingsService                 $settingsService,
-        LoggerInterface                 $logger
+        OrderExpireService $orderExpireService,
+        SettingsService $settingsService,
+        LoggerInterface $logger
     ) {
         $this->orderRepository = $orderRepository;
         $this->salesChannelRepository = $salesChannelRepository;
@@ -52,6 +52,7 @@ class ExpireAction
 
         if ($salesChannels->count() === 0) {
             $this->logger->debug('No sales channels found');
+
             return;
         }
 
@@ -69,6 +70,7 @@ class ExpireAction
 
         if ($settings->isAutomaticOrderExpire() === false) {
             $this->logger->debug('Automatic order expire is disabled for this saleschannel', ['salesChannel' => $salesChannelEntity->getName()]);
+
             return;
         }
 
@@ -76,7 +78,6 @@ class ExpireAction
 
         $date = new \DateTime();
         $date->modify(sprintf('-%d days', (BankTransferPayment::DUE_DATE_MAX_DAYS + 1)));
-
 
         $orFilterArray = [
             new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
@@ -102,6 +103,7 @@ class ExpireAction
         $searchResult = $this->orderRepository->search($criteria, $context);
         if ($searchResult->count() === 0) {
             $this->logger->debug('No orders found with payment status in progress');
+
             return;
         }
 

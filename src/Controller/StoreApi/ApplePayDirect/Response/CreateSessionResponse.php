@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
@@ -12,10 +13,6 @@ class CreateSessionResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param string $session
-     */
     public function __construct(string $session)
     {
         $this->object = new StringStruct(

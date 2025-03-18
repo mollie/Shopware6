@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -17,11 +18,8 @@ class TransactionService
      */
     private $orderTransactionRepository;
 
-
     /**
      * Creates a new instance of the transaction service.
-     *
-     * @param EntityRepository $orderTransactionRepository
      */
     public function __construct(EntityRepository $orderTransactionRepository)
     {
@@ -31,8 +29,6 @@ class TransactionService
     /**
      * @param string $transactionId
      * @param null|string $versionId
-     * @param null|Context $context
-     * @return null|OrderTransactionEntity
      */
     public function getTransactionById($transactionId, $versionId = null, Context $context = null): ?OrderTransactionEntity
     {
@@ -62,10 +58,6 @@ class TransactionService
 
     /**
      * Updates a transaction in the database.
-     *
-     * @param OrderTransactionEntity $transaction
-     * @param null|Context $context
-     * @return EntityWrittenContainerEvent
      */
     public function updateTransaction(OrderTransactionEntity $transaction, Context $context = null): EntityWrittenContainerEvent
     {

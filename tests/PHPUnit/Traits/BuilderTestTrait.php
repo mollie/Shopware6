@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Traits;
 
@@ -12,11 +13,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 trait BuilderTestTrait
 {
-    /**
-     * @param TestCase $testCase
-     * @param string $generatedURL
-     * @return RoutingBuilder
-     */
     public function buildRoutingBuilder(TestCase $testCase, string $generatedURL): RoutingBuilder
     {
         $fakeRouter = new FakeRouter($generatedURL);

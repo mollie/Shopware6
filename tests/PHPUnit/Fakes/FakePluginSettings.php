@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -11,27 +12,16 @@ class FakePluginSettings implements PluginSettingsServiceInterface
      */
     private $fakeEnvDomain;
 
-
-    /**
-     * @param string $fakeEnvDomain
-     */
     public function __construct(string $fakeEnvDomain)
     {
         $this->fakeEnvDomain = $fakeEnvDomain;
     }
 
-
-    /**
-     * @return string
-     */
     public function getEnvMollieShopDomain(): string
     {
         return $this->fakeEnvDomain;
     }
 
-    /**
-     * @return bool
-     */
     public function getEnvMollieDevMode(): bool
     {
         return false;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription\Struct;
 
@@ -11,8 +12,6 @@ class SubscriptionMetadataTest extends TestCase
     /**
      * This test verifies that our properties can be
      * accessed correctly.
-     *
-     * @return void
      */
     public function testProperties(): void
     {
@@ -28,8 +27,6 @@ class SubscriptionMetadataTest extends TestCase
     /**
      * This test verifies that the array structure
      * for the JSON in the database is correctly built
-     *
-     * @return void
      */
     public function testArrayStructure(): void
     {
@@ -49,8 +46,6 @@ class SubscriptionMetadataTest extends TestCase
      * This test verifies that our temporary transaction ID
      * is skipped if its empty. This is really only a temporary data object,
      * that should not even exist in the JSON if empty.
-     *
-     * @return void
      */
     public function testSkipTmpTransactionInArrayStructure(): void
     {
@@ -62,8 +57,6 @@ class SubscriptionMetadataTest extends TestCase
     /**
      * This test verifies that our times key is created even
      * if the value is NULL.
-     *
-     * @return void
      */
     public function testTimesWithNullInArrayStructure(): void
     {
@@ -75,8 +68,6 @@ class SubscriptionMetadataTest extends TestCase
 
     /**
      * This test verifies that our property can be used correclty.
-     *
-     * @return void
      */
     public function testTmpTransactionId(): void
     {

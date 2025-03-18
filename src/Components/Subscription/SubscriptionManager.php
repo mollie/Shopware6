@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription;
 
@@ -78,20 +79,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     private $repoSubscriptions;
 
-
-    /**
-     * @param CreateAction $actionCreate
-     * @param ConfirmAction $actionConfirm
-     * @param UpdateAddressAction $actionUpdateAddress
-     * @param UpdatePaymentAction $actionUpdatePayment
-     * @param RenewAction $actionRenew
-     * @param PauseAction $actionPause
-     * @param ResumeAction $actionResume
-     * @param SkipAction $actionSkip
-     * @param CancelAction $actionCancel
-     * @param RemindAction $actionRemind
-     * @param SubscriptionRepository $repoSubscriptions
-     */
     public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdateAddressAction $actionUpdateAddress, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, RemindAction $actionRemind, SubscriptionRepository $repoSubscriptions)
     {
         $this->actionCreate = $actionCreate;
@@ -107,12 +94,8 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->repoSubscriptions = $repoSubscriptions;
     }
 
-
     /**
-     * @param string $id
-     * @param Context $context
      * @throws Exception
-     * @return SubscriptionEntity
      */
     public function findSubscription(string $id, Context $context): SubscriptionEntity
     {
@@ -124,11 +107,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $customerId
-     * @param string $mandateId
-     * @param Context $context
      * @throws Exception
-     * @return SubscriptionCollection
      */
     public function findSubscriptionByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
     {
@@ -140,10 +119,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param OrderEntity $order
-     * @param SalesChannelContext $context
      * @throws Exception
-     * @return string
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
@@ -151,11 +127,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $mandateId
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
-     * @return void
      */
     public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
     {
@@ -163,9 +135,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param Context $context
      * @throws Exception
-     * @return int
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
@@ -173,11 +143,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $swSubscriptionId
-     * @param string $molliePaymentId
-     * @param Context $context
      * @throws Exception
-     * @return OrderEntity
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
     {
@@ -185,21 +151,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $salutationId
-     * @param string $title
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $company
-     * @param string $department
-     * @param string $additional1
-     * @param string $additional2
-     * @param string $phoneNumber
-     * @param string $street
-     * @param string $zipcode
-     * @param string $city
-     * @param string $countryStateId
-     * @param Context $context
      * @throws Exception
      */
     public function updateBillingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
@@ -224,21 +175,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $salutationId
-     * @param string $title
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $company
-     * @param string $department
-     * @param string $additional1
-     * @param string $additional2
-     * @param string $phoneNumber
-     * @param string $street
-     * @param string $zipcode
-     * @param string $city
-     * @param string $countryStateId
-     * @param Context $context
      * @throws Exception
      */
     public function updateShippingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
@@ -263,11 +199,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $redirectUrl
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
-     * @return string
      */
     public function updatePaymentMethodStart(string $subscriptionId, string $redirectUrl, Context $context): string
     {
@@ -275,34 +207,23 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
         $this->actionUpdatePayment->updatePaymentMethodConfirm($subscriptionId, $context);
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return void
-     */
     public function cancelPendingSubscriptions(OrderEntity $order, Context $context): void
     {
-        # does nothing for now, not necessary
-        # because it is not even confirmed yet.
-        # but maybe we should add an even in here....
-        # let's keep this for now to have it (speaking of the wrapper) fully implemented...
+        // does nothing for now, not necessary
+        // because it is not even confirmed yet.
+        // but maybe we should add an even in here....
+        // let's keep this for now to have it (speaking of the wrapper) fully implemented...
     }
 
     /**
-     * @param string $subscriptionId
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function pauseSubscription(string $subscriptionId, Context $context): void
     {
@@ -310,10 +231,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function resumeSubscription(string $subscriptionId, Context $context): void
     {
@@ -321,11 +239,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param int $skipCount
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function skipSubscription(string $subscriptionId, int $skipCount, Context $context): void
     {
@@ -333,10 +247,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param string $subscriptionId
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
@@ -344,10 +255,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @param SubscriptionEntity $subscription
-     * @param Context $context
      * @throws Exception
-     * @return bool
      */
     public function isCancelable(SubscriptionEntity $subscription, Context $context): bool
     {

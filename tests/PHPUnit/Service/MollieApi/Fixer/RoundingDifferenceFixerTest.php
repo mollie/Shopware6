@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Fixer;
 
@@ -26,16 +27,11 @@ class RoundingDifferenceFixerTest extends TestCase
      */
     private $cartItems;
 
-
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $this->fixer = new RoundingDifferenceFixer();
 
         $this->orderTotal = 14.81;
-
 
         $this->cartItems = new MollieLineItemCollection([
             new MollieLineItem(
@@ -84,8 +80,6 @@ class RoundingDifferenceFixerTest extends TestCase
     /**
      * This test verifies that no item is added, if we
      * tell the fixer that the order amount is "correct".
-     *
-     * @return void
      */
     public function testNoItemAddedIfNoDiff(): void
     {
@@ -97,8 +91,6 @@ class RoundingDifferenceFixerTest extends TestCase
     /**
      * This test verifies that a new item is added if we
      * have found a difference in the values.
-     *
-     * @return void
      */
     public function testItemAddedIfDiff(): void
     {
@@ -116,7 +108,6 @@ class RoundingDifferenceFixerTest extends TestCase
      *                 [ -0.50 ]
      *                 [  0.01 ]
      *                 [ -0.01 ]
-     * @return void
      */
     public function testDiffItemLeadsToCorrectItemSum(float $diff): void
     {
@@ -128,8 +119,6 @@ class RoundingDifferenceFixerTest extends TestCase
     /**
      * This test verifies the basic properties and structure of
      * our diff-line-item that is built.
-     *
-     * @return void
      */
     public function testDiffItemProperties(): void
     {
@@ -155,15 +144,13 @@ class RoundingDifferenceFixerTest extends TestCase
         $this->assertEquals('', $diffItem->getProductUrl());
         $this->assertEquals('', $diffItem->getLineItemId());
 
-        # we need a custom type to verify this type of item later in the refund manager
+        // we need a custom type to verify this type of item later in the refund manager
         $this->assertEquals(['type' => 'rounding'], $diffItem->getMetaData());
     }
 
     /**
      * This test verifies that we get the correct default name of
      * our diff line item, if we didn't provide a specific one.
-     *
-     * @return void
      */
     public function testDiffItemDefaultName(): void
     {
@@ -177,8 +164,6 @@ class RoundingDifferenceFixerTest extends TestCase
     /**
      * This test verifies that we get the correct default sku of
      * our diff line item, if we didn't provide a specific one.
-     *
-     * @return void
      */
     public function testDiffItemDefaultSKU(): void
     {

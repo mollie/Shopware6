@@ -20,39 +20,27 @@ class RefundDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_refund';
 
-    /**
-     * @return string
-     */
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return RefundEntity::class;
     }
 
-    /**
-     * @return string
-     */
     public function getCollectionClass(): string
     {
         return RefundCollection::class;
     }
 
-    /**
-     * @return FieldCollection
-     */
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             (new FkField('order_id', 'orderId', OrderDefinition::class)),
             new ReferenceVersionField(OrderDefinition::class, 'order_version_id'),
@@ -63,7 +51,7 @@ class RefundDefinition extends EntityDefinition
 
             new LongTextField('public_description', 'publicDescription'),
             new LongTextField('internal_description', 'internalDescription'),
-            new OneToManyAssociationField('refundItems', RefundItemDefinition::class, 'refund_id')
+            new OneToManyAssociationField('refundItems', RefundItemDefinition::class, 'refund_id'),
         ]);
     }
 }

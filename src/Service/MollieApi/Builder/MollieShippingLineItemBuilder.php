@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
@@ -16,22 +17,11 @@ class MollieShippingLineItemBuilder
      */
     private $priceCalculator;
 
-
-    /**
-     * @param PriceCalculator $priceCalculator
-     */
     public function __construct(PriceCalculator $priceCalculator)
     {
         $this->priceCalculator = $priceCalculator;
     }
 
-
-    /**
-     * @param string $taxStatus
-     * @param OrderDeliveryCollection $deliveries
-     * @param bool $isVerticalTaxCalculation
-     * @return MollieLineItemCollection
-     */
     public function buildShippingLineItems(string $taxStatus, OrderDeliveryCollection $deliveries, bool $isVerticalTaxCalculation = false): MollieLineItemCollection
     {
         $lines = new MollieLineItemCollection();
@@ -40,7 +30,7 @@ class MollieShippingLineItemBuilder
 
         /** @var OrderDeliveryEntity $delivery */
         foreach ($deliveries as $delivery) {
-            $i++;
+            ++$i;
             $shippingPrice = $delivery->getShippingCosts();
             $qty = $shippingPrice->getQuantity();
             $totalPrice = $shippingPrice->getTotalPrice();

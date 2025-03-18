@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
@@ -12,11 +13,6 @@ class GetIDResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param bool $success
-     * @param string $id
-     */
     public function __construct(bool $success, string $id)
     {
         $this->object = new ArrayStruct(

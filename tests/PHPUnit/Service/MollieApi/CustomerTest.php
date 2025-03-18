@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
@@ -23,23 +24,23 @@ class CustomerTest extends TestCase
     public function setUp(): void
     {
         $customerEndpoint = $this->createMock(CustomerEndpoint::class);
-        $customerEndpoint->method('get')->will(
-            $this->returnCallback(function ($arg) {
+        $customerEndpoint->method('get')->willReturnCallback(
+            function ($arg) {
                 if ($arg == 'bar') {
                     throw new ApiException();
-                } else {
-                    return $this->createMock(Customer::class);
                 }
-            })
+
+                return $this->createMock(Customer::class);
+            }
         );
-        $customerEndpoint->method('create')->will(
-            $this->returnCallback(function ($arg) {
+        $customerEndpoint->method('create')->willReturnCallback(
+            function ($arg) {
                 if ($arg['email'] == 'existing.email@ddress.com') {
                     throw new ApiException();
-                } else {
-                    return $this->createMock(Customer::class);
                 }
-            })
+
+                return $this->createMock(Customer::class);
+            }
         );
 
         $apiClient = $this->createMock(MollieApiClient::class);
@@ -95,8 +96,6 @@ class CustomerTest extends TestCase
     }
 
     /**
-     * @param null|string $mollieCustomerId
-     * @param bool $expectedValue
      * @dataProvider isLegacyCustomerValidTestData
      */
     public function testIsLegacyCustomerValid(

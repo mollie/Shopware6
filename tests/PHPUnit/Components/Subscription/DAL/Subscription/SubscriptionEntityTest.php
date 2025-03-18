@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
 
@@ -15,8 +16,6 @@ class SubscriptionEntityTest extends TestCase
      * This test verifies that our default value
      * of the Mollie status is a correct empty string, if
      * it has not been set yet.
-     *
-     * @return void
      */
     public function testStatusDefaultEmpty(): void
     {
@@ -28,8 +27,6 @@ class SubscriptionEntityTest extends TestCase
     /**
      * This test verifies that our custom Status
      * can be set and returned correctly.
-     *
-     * @return void
      */
     public function testStatus(): void
     {
@@ -42,8 +39,6 @@ class SubscriptionEntityTest extends TestCase
     /**
      * This test verifies that our isConfirmed property is only returning TRUE
      * if we have a MollieID set in the entity.
-     *
-     * @return void
      */
     public function testIsConfirmed(): void
     {
@@ -59,8 +54,6 @@ class SubscriptionEntityTest extends TestCase
     /**
      * This test verifies that our isActive property is only returning TRUE
      * if we have a status "active" set in the entity.
-     *
-     * @return void
      */
     public function testIsActive(): void
     {
@@ -85,8 +78,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isPaused works correctly.
-     *
-     * @return void
      */
     public function testIsPaused(): void
     {
@@ -101,8 +92,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isPaused works correctly.
-     *
-     * @return void
      */
     public function testIsSkipped(): void
     {
@@ -117,8 +106,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isUpdatePaymentAllowed works correctly.
-     *
-     * @return void
      */
     public function testIsUpdatePaymentAllowed(): void
     {
@@ -136,8 +123,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isCancellationAllowed works correctly.
-     *
-     * @return void
      */
     public function testIsCancellationAllowed(): void
     {
@@ -161,8 +146,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isPauseAllowed works correctly.
-     *
-     * @return void
      */
     public function testIsPauseAllowed(): void
     {
@@ -183,8 +166,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isRenewingAllowed works correctly.
-     *
-     * @return void
      */
     public function testIsRenewingAllowed(): void
     {
@@ -202,7 +183,6 @@ class SubscriptionEntityTest extends TestCase
         $subscription->setStatus(SubscriptionStatus::RESUMED);
         static::assertSame(true, $subscription->isRenewingAllowed());
 
-
         $subscription->setStatus(SubscriptionStatus::PAUSED);
         static::assertSame(false, $subscription->isRenewingAllowed());
 
@@ -213,11 +193,8 @@ class SubscriptionEntityTest extends TestCase
         static::assertSame(false, $subscription->isRenewingAllowed());
     }
 
-
     /**
      * This test verifies that our isResumeAllowed works correctly.
-     *
-     * @return void
      */
     public function testIsResumeAllowed(): void
     {
@@ -238,8 +215,6 @@ class SubscriptionEntityTest extends TestCase
 
     /**
      * This test verifies that our isSkipAllowed works correctly.
-     *
-     * @return void
      */
     public function testIsSkipAllowed(): void
     {
@@ -264,8 +239,6 @@ class SubscriptionEntityTest extends TestCase
      * It will require and return a custom class, but internally it's just
      * stored as a plain array structure.
      * So in the end this test verifies that the conversion works correctly.
-     *
-     * @return void
      */
     public function testMetadataCorrectlyConverted(): void
     {

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Account;
 
@@ -31,12 +32,6 @@ class AccountControllerBase extends AbstractStoreFrontController
      */
     private $logger;
 
-
-    /**
-     * @param SubscriptionPageLoader $pageLoader
-     * @param SubscriptionManager $subscriptionManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(SubscriptionPageLoader $pageLoader, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         $this->pageLoader = $pageLoader;
@@ -44,10 +39,9 @@ class AccountControllerBase extends AbstractStoreFrontController
         $this->logger = $logger;
     }
 
-
     public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
     {
-        if (!$this->isLoggedIn($salesChannelContext)) {
+        if (! $this->isLoggedIn($salesChannelContext)) {
             return $this->redirectToLoginPage();
         }
 
@@ -56,28 +50,21 @@ class AccountControllerBase extends AbstractStoreFrontController
         return $this->renderStorefront(
             '@Storefront/storefront/page/account/subscriptions/index.html.twig',
             [
-                'page' => $page
+                'page' => $page,
             ]
         );
     }
 
-    /**
-     *
-     * @param string $subscriptionId
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $salesChannelContext
-     * @return Response
-     */
     public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
-        if (!$this->isLoggedIn($salesChannelContext)) {
+        if (! $this->isLoggedIn($salesChannelContext)) {
             return $this->redirectToLoginPage();
         }
 
         try {
             $address = $data->get('address', null);
 
-            if (!$address instanceof RequestDataBag) {
+            if (! $address instanceof RequestDataBag) {
                 throw new \Exception('Missing address data in request');
             }
 
@@ -93,7 +80,7 @@ class AccountControllerBase extends AbstractStoreFrontController
             $street = $address->get('street', '');
             $zipcode = $address->get('zipcode', '');
             $city = $address->get('city', '');
-            # COUNTRY change not allowed for billing
+            // COUNTRY change not allowed for billing
             $countryStateId = $address->get('countryStateId', '');
 
             $this->subscriptionManager->updateBillingAddress(
@@ -125,23 +112,16 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param string $subscriptionId
-     * @param RequestDataBag $data
-     * @param SalesChannelContext $salesChannelContext
-     * @return Response
-     */
     public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
-        if (!$this->isLoggedIn($salesChannelContext)) {
+        if (! $this->isLoggedIn($salesChannelContext)) {
             return $this->redirectToLoginPage();
         }
 
         try {
             $address = $data->get('address', null);
 
-            if (!$address instanceof RequestDataBag) {
+            if (! $address instanceof RequestDataBag) {
                 throw new \Exception('Missing address data in request');
             }
 
@@ -157,7 +137,7 @@ class AccountControllerBase extends AbstractStoreFrontController
             $street = $address->get('street', '');
             $zipcode = $address->get('zipcode', '');
             $city = $address->get('city', '');
-            # COUNTRY change not allowed for billing
+            // COUNTRY change not allowed for billing
             $countryStateId = $address->get('countryStateId', '');
 
             $this->subscriptionManager->updateShippingAddress(
@@ -189,15 +169,9 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param SalesChannelContext $salesChannelContext
-     * @return Response
-     */
     public function updatePaymentStart(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
-        if (!$this->isLoggedIn($salesChannelContext)) {
+        if (! $this->isLoggedIn($salesChannelContext)) {
             return $this->redirectToLoginPage();
         }
 
@@ -205,7 +179,7 @@ class AccountControllerBase extends AbstractStoreFrontController
             $redirectUrl = $this->generateUrl(
                 'frontend.account.mollie.subscriptions.payment.update-success',
                 [
-                    'swSubscriptionId' => $swSubscriptionId
+                    'swSubscriptionId' => $swSubscriptionId,
                 ],
                 UrlGenerator::ABSOLUTE_URL
             );
@@ -221,15 +195,9 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     *
-     * @param string $swSubscriptionId
-     * @param SalesChannelContext $salesChannelContext
-     * @return Response
-     */
     public function updatePaymentFinish(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
-        if (!$this->isLoggedIn($salesChannelContext)) {
+        if (! $this->isLoggedIn($salesChannelContext)) {
             return $this->redirectToLoginPage();
         }
 
@@ -247,12 +215,9 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     * @param string $swSubscriptionId
-     */
     public function pauseSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
-        if (!$this->isLoggedIn($context)) {
+        if (! $this->isLoggedIn($context)) {
             return $this->redirectToLoginPage();
         }
 
@@ -270,12 +235,9 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     * @param string $swSubscriptionId
-     */
     public function skipSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
-        if (!$this->isLoggedIn($context)) {
+        if (! $this->isLoggedIn($context)) {
             return $this->redirectToLoginPage();
         }
 
@@ -293,12 +255,9 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     * @param string $swSubscriptionId
-     */
     public function resumeSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
-        if (!$this->isLoggedIn($context)) {
+        if (! $this->isLoggedIn($context)) {
             return $this->redirectToLoginPage();
         }
 
@@ -321,7 +280,7 @@ class AccountControllerBase extends AbstractStoreFrontController
      */
     public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response
     {
-        if (!$this->isLoggedIn($context)) {
+        if (! $this->isLoggedIn($context)) {
             return $this->redirectToLoginPage();
         }
 
@@ -339,11 +298,6 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     * @param string $errorSnippetKey
-     * @param string $logMessage
-     * @return RedirectResponse
-     */
     private function routeToErrorPage(string $errorSnippetKey, string $logMessage): RedirectResponse
     {
         $this->logger->error($logMessage);
@@ -353,20 +307,13 @@ class AccountControllerBase extends AbstractStoreFrontController
         return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
     }
 
-    /**
-     * @return RedirectResponse
-     */
     private function redirectToLoginPage(): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('frontend.account.login'), 302);
     }
 
-    /**
-     * @param SalesChannelContext $context
-     * @return bool
-     */
     private function isLoggedIn(SalesChannelContext $context): bool
     {
-        return ($context->getCustomer() instanceof CustomerEntity);
+        return $context->getCustomer() instanceof CustomerEntity;
     }
 }

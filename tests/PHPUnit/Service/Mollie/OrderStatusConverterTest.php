@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\Mollie;
 
@@ -34,7 +35,7 @@ class OrderStatusConverterTest extends TestCase
         $paymentCollection->append($fakePayment);
 
         $this->order = $this->createConfiguredMock(Order::class, [
-            'payments' => $paymentCollection
+            'payments' => $paymentCollection,
         ]);
 
         $this->statusConverter = new OrderStatusConverter();
@@ -42,9 +43,9 @@ class OrderStatusConverterTest extends TestCase
 
     public function testChargebackStatus()
     {
-        $this->payment->amountChargedBack = (object)[
+        $this->payment->amountChargedBack = (object) [
             'value' => 9.99,
-            'currency' => 'EUR'
+            'currency' => 'EUR',
         ];
 
         $actualOrderStatus = $this->statusConverter->getMollieOrderStatus($this->order);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -41,11 +42,7 @@ class CartService implements CartServiceInterface
      */
     private $shippingAddressFaker;
 
-
     /**
-     * @param SalesChannelCartService $swCartService
-     * @param SalesChannelContextSwitcher $contextSwitcher
-     * @param ProductLineItemFactory $productItemFactory
      * @param CompatibilityGateway $compatibilityGateway
      */
     public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, CompatibilityGatewayInterface $compatibilityGateway, ApplePayShippingAddressFaker $shippingAddressFaker)
@@ -57,30 +54,19 @@ class CartService implements CartServiceInterface
         $this->shippingAddressFaker = $shippingAddressFaker;
     }
 
-
-    /**
-     * @param string $productId
-     * @param int $quantity
-     * @param SalesChannelContext $context
-     * @return Cart
-     */
     public function addProduct(string $productId, int $quantity, SalesChannelContext $context): Cart
     {
         $cart = $this->getCalculatedMainCart($context);
         $data = [
             'id' => $productId,
             'referencedId' => $productId,
-            'quantity' => $quantity
+            'quantity' => $quantity,
         ];
         $productItem = $this->productItemFactory->create($data, $context);
 
         return $this->swCartService->add($cart, $productItem, $context);
     }
 
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     * @return Cart
-     */
     public function getCalculatedMainCart(SalesChannelContext $salesChannelContext): Cart
     {
         $cart = $this->swCartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
@@ -88,35 +74,21 @@ class CartService implements CartServiceInterface
         return $this->swCartService->recalculate($cart, $salesChannelContext);
     }
 
-    /**
-     * @param Cart $cart
-     */
     public function updateCart(Cart $cart): void
     {
         $this->swCartService->setCart($cart);
     }
 
-
-    /**
-     * @param Cart $cart
-     * @return float
-     */
     public function getShippingCosts(Cart $cart): float
     {
         return $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
     }
 
-
-    /**
-     * @param SalesChannelContext $context
-     * @param string $countryID
-     * @return SalesChannelContext
-     */
     public function updateCountry(SalesChannelContext $context, string $countryID): SalesChannelContext
     {
         $dataBag = new DataBag();
         $dataBagData = [
-            SalesChannelContextService::COUNTRY_ID => $countryID
+            SalesChannelContextService::COUNTRY_ID => $countryID,
         ];
         $customer = $context->getCustomer();
 
@@ -135,17 +107,12 @@ class CartService implements CartServiceInterface
         return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
     }
 
-    /**
-     * @param SalesChannelContext $context
-     * @param string $shippingMethodID
-     * @return SalesChannelContext
-     */
     public function updateShippingMethod(SalesChannelContext $context, string $shippingMethodID): SalesChannelContext
     {
         $dataBag = new DataBag();
 
         $dataBag->add([
-            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodID
+            SalesChannelContextService::SHIPPING_METHOD_ID => $shippingMethodID,
         ]);
 
         $this->contextSwitcher->update($dataBag, $context);
@@ -156,18 +123,12 @@ class CartService implements CartServiceInterface
         return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
     }
 
-
-    /**
-     * @param SalesChannelContext $context
-     * @param string $paymentMethodID
-     * @return SalesChannelContext
-     */
     public function updatePaymentMethod(SalesChannelContext $context, string $paymentMethodID): SalesChannelContext
     {
         $dataBag = new DataBag();
 
         $dataBag->add([
-            SalesChannelContextService::PAYMENT_METHOD_ID => $paymentMethodID
+            SalesChannelContextService::PAYMENT_METHOD_ID => $paymentMethodID,
         ]);
 
         $this->contextSwitcher->update($dataBag, $context);
@@ -188,7 +149,7 @@ class CartService implements CartServiceInterface
         $this->shippingAddressFaker->deleteFakeShippingAddress($customer, $context->getContext());
     }
 
-    public function persistCart(Cart $cart, SalesChannelContext $context):Cart
+    public function persistCart(Cart $cart, SalesChannelContext $context): Cart
     {
         return $this->swCartService->recalculate($cart, $context);
     }

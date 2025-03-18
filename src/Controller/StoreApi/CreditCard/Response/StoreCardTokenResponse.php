@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response;
 
@@ -12,10 +13,6 @@ class StoreCardTokenResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param bool $success
-     */
     public function __construct(bool $success)
     {
         $this->object = new SuccessStruct(

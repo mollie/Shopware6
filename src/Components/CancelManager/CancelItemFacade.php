@@ -37,12 +37,13 @@ class CancelItemFacade
     public function cancelItem(string $mollieOrderId, string $mollieLineId, string $shopwareLineId, int $quantity, bool $resetStock, Context $context): CancelItemResponse
     {
         $response = new CancelItemResponse();
-        $logArguments = ['mollieOrderId' => $mollieOrderId, 'mollieLineId' => $mollieLineId, 'shopwareLineId' => $shopwareLineId, 'quantity' => $quantity, 'resetStock' => (string)$resetStock];
+        $logArguments = ['mollieOrderId' => $mollieOrderId, 'mollieLineId' => $mollieLineId, 'shopwareLineId' => $shopwareLineId, 'quantity' => $quantity, 'resetStock' => (string) $resetStock];
         try {
             $this->logger->info('Initiated cancelling an item', $logArguments);
 
             if ($quantity === 0) {
                 $this->logger->error('Cancelling item failed, quantity is 0', $logArguments);
+
                 return $response->failedWithMessage('quantityZero');
             }
 
@@ -67,12 +68,14 @@ class CancelItemFacade
 
             if ($orderLine === null) {
                 $this->logger->error('Cancelling item failed, lineItem does not exists in order', $logArguments);
+
                 return $response->failedWithMessage('invalidLine');
             }
             if ($quantity > $orderLine->cancelableQuantity) {
                 $logArguments['cancelableQuantity'] = $orderLine->cancelableQuantity;
 
                 $this->logger->error('Cancelling item failed, cancelableQuantity is too high', $logArguments);
+
                 return $response->failedWithMessage('quantityTooHigh');
             }
 
@@ -85,10 +88,9 @@ class CancelItemFacade
                 $this->logger->info('Stock rested', $logArguments);
             }
 
-
             $lines = [
                 'id' => $orderLine->id,
-                'quantity' => $quantity
+                'quantity' => $quantity,
             ];
 
             $mollieOrder->cancelLines(['lines' => [$lines]]);

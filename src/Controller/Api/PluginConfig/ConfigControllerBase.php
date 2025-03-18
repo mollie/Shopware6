@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\PluginConfig;
 
@@ -18,6 +19,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class ConfigControllerBase extends AbstractController
 {
     /**
+     * @var ApiKeyValidator
+     */
+    protected $apiKeyValidator;
+    /**
      * @var SettingsService
      */
     private $settings;
@@ -28,20 +33,10 @@ class ConfigControllerBase extends AbstractController
     private $snippetFinder;
 
     /**
-     * @var ApiKeyValidator
-     */
-    protected $apiKeyValidator;
-
-    /**
      * @var MollieRefundConfigService
      */
     private $configMollieRefundService;
 
-    /**
-     * @param SettingsService $settings
-     * @param SnippetFinderInterface $snippetFinder
-     * @param ApiKeyValidator $apiKeyValidator
-     */
     public function __construct(
         SettingsService $settings,
         SnippetFinderInterface $snippetFinder,
@@ -54,11 +49,6 @@ class ConfigControllerBase extends AbstractController
         $this->configMollieRefundService = $configMollieRefundService;
     }
 
-    /**
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function testApiKeys(Request $request): JsonResponse
     {
         $liveApiKey = $request->get('liveApiKey');
@@ -67,11 +57,6 @@ class ConfigControllerBase extends AbstractController
         return $this->testApiKeysAction($liveApiKey, $testApiKey);
     }
 
-    /**
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function testApiKeys64(Request $request): JsonResponse
     {
         $liveApiKey = $request->get('liveApiKey');
@@ -84,18 +69,14 @@ class ConfigControllerBase extends AbstractController
      * This route can be used to verify if there might be any warnings when using the flow builder.
      * Some automation settings might interfere with the flow builder and thus we try to
      * at least let the merchant know about it.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function validateFlowBuilder(Request $request, Context $context): JsonResponse
     {
-        $locale = (string)$request->get('locale');
+        $locale = (string) $request->get('locale');
 
         if (empty($locale)) {
             $locale = 'en-GB';
         }
-
 
         $automaticShippingFound = false;
 
@@ -111,7 +92,6 @@ class ConfigControllerBase extends AbstractController
             }
         }
 
-
         $warnings = [];
 
         if ($automaticShippingFound) {
@@ -122,18 +102,53 @@ class ConfigControllerBase extends AbstractController
             'locale' => $locale,
             'actions' => [
                 'shipping' => [
-                    'warnings' => $warnings
+                    'warnings' => $warnings,
                 ],
             ],
         ]);
     }
 
-
     /**
-     * @param string $liveApiKey
-     * @param string $testApiKey
-     * @return JsonResponse
+     * This route can be used to get the configuration for the refund manager from the plugin configuration.
+     * Depending on these settings, the merchant might have configured a different behaviour
+     * for fields, flows and actions.
      */
+    public function getRefundManagerConfig(Request $request, Context $context): JsonResponse
+    {
+        // it's important to get the sales channel.
+        // because different sales channels might have different configured behaviours for the
+        // employees of the merchant.
+        // so depending on the order, we grab the matching sales channel configuration.
+        $salesChannelID = (string) $request->get('salesChannelId');
+        $orderId = (string) $request->get('orderId');
+
+        if (empty($salesChannelID)) {
+            $config = $this->settings->getSettings('');
+        } else {
+            $config = $this->settings->getSettings($salesChannelID);
+        }
+
+        try {
+            return $this->configMollieRefundService->createConfigControllerResponse($orderId, $config, $salesChannelID, $context);
+        } catch (MollieRefundConfigException $exception) {
+            return ConfigControllerResponse::createFromMollieSettingStruct($config);
+        }
+    }
+
+    public function getRefundManagerConfigLegacy(Request $request, Context $context): JsonResponse
+    {
+        return $this->getRefundManagerConfig($request, $context);
+    }
+
+    public function getSubscriptionConfig(): JsonResponse
+    {
+        $config = $this->settings->getSettings();
+
+        return new JsonResponse([
+            'enabled' => $config->isSubscriptionsEnabled(),
+        ]);
+    }
+
     private function testApiKeysAction(string $liveApiKey, string $testApiKey): JsonResponse
     {
         $keys = [
@@ -144,7 +159,7 @@ class ConfigControllerBase extends AbstractController
             [
                 'key' => $testApiKey,
                 'mode' => 'test',
-            ]
+            ],
         ];
 
         $results = [];
@@ -166,68 +181,10 @@ class ConfigControllerBase extends AbstractController
         }
 
         return new JsonResponse([
-            'results' => $results
+            'results' => $results,
         ]);
     }
 
-    /**
-     * This route can be used to get the configuration for the refund manager from the plugin configuration.
-     * Depending on these settings, the merchant might have configured a different behaviour
-     * for fields, flows and actions.
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
-     */
-    public function getRefundManagerConfig(Request $request, Context $context): JsonResponse
-    {
-        // it's important to get the sales channel.
-        // because different sales channels might have different configured behaviours for the
-        // employees of the merchant.
-        // so depending on the order, we grab the matching sales channel configuration.
-        $salesChannelID = (string)$request->get('salesChannelId');
-        $orderId = (string)$request->get('orderId');
-
-        if (empty($salesChannelID)) {
-            $config = $this->settings->getSettings('');
-        } else {
-            $config = $this->settings->getSettings($salesChannelID);
-        }
-
-        try {
-            return $this->configMollieRefundService->createConfigControllerResponse($orderId, $config, $salesChannelID, $context);
-        } catch (MollieRefundConfigException $exception) {
-            return ConfigControllerResponse::createFromMollieSettingStruct($config);
-        }
-    }
-
-    /**
-     *
-     * @param Request $request
-     * @param Context $context
-     * @return JsonResponse
-     */
-    public function getRefundManagerConfigLegacy(Request $request, Context $context): JsonResponse
-    {
-        return $this->getRefundManagerConfig($request, $context);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    public function getSubscriptionConfig(): JsonResponse
-    {
-        $config = $this->settings->getSettings();
-        return new JsonResponse([
-            'enabled' => $config->isSubscriptionsEnabled()
-        ]);
-    }
-
-    /**
-     * @param string $snippetName
-     * @param string $locale
-     * @return string
-     */
     private function getAdminSnippet(string $snippetName, string $locale): string
     {
         $path = explode('.', $snippetName);
@@ -237,7 +194,7 @@ class ConfigControllerBase extends AbstractController
         foreach ($path as $elem) {
             $snippets = $snippets[$elem];
 
-            if (!is_array($snippets)) {
+            if (! is_array($snippets)) {
                 return $snippets;
             }
         }

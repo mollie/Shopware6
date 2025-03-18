@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover;
 
@@ -35,7 +36,7 @@ class SubscriptionRemover extends PaymentMethodRemover
         CreditCardPayment::PAYMENT_METHOD_NAME,
         PaypalPayment::PAYMENT_METHOD_NAME,
         DirectDebitPayment::PAYMENT_METHOD_NAME,
-        TrustlyPayment::PAYMENT_METHOD_NAME
+        TrustlyPayment::PAYMENT_METHOD_NAME,
     ];
 
     /**
@@ -43,16 +44,6 @@ class SubscriptionRemover extends PaymentMethodRemover
      */
     private $pluginSettings;
 
-
-    /**
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param SettingsService $pluginSettings
-     * @param OrderService $orderService
-     * @param SettingsService $settingsService
-     * @param OrderItemsExtractor $orderDataExtractor
-     * @param LoggerInterface $logger
-     */
     public function __construct(ContainerInterface $container, RequestStack $requestStack, SettingsService $pluginSettings, OrderService $orderService, SettingsService $settingsService, OrderItemsExtractor $orderDataExtractor, LoggerInterface $logger)
     {
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
@@ -61,23 +52,19 @@ class SubscriptionRemover extends PaymentMethodRemover
     }
 
     /**
-     * @param PaymentMethodRouteResponse $originalData
-     * @param SalesChannelContext $context
      * @throws \Exception
-     * @return PaymentMethodRouteResponse
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
-        if (!$this->isAllowedRoute()) {
+        if (! $this->isAllowedRoute()) {
             return $originalData;
         }
 
         $settings = $this->pluginSettings->getSettings($context->getSalesChannelId());
 
-        if (!$settings->isSubscriptionsEnabled()) {
+        if (! $settings->isSubscriptionsEnabled()) {
             return $originalData;
         }
-
 
         if ($this->isOrderRoute()) {
             $order = $this->getOrder($context->getContext());
@@ -87,8 +74,7 @@ class SubscriptionRemover extends PaymentMethodRemover
             $isSubscription = $this->isSubscriptionCart($cart);
         }
 
-
-        if (!$isSubscription) {
+        if (! $isSubscription) {
             return $originalData;
         }
 
@@ -97,7 +83,7 @@ class SubscriptionRemover extends PaymentMethodRemover
 
             $paymentMethodName = $attributes->getMollieIdentifier();
 
-            if (!in_array($paymentMethodName, self::ALLOWED_METHODS)) {
+            if (! in_array($paymentMethodName, self::ALLOWED_METHODS)) {
                 $originalData->getPaymentMethods()->remove($key);
             }
         }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
@@ -71,23 +72,23 @@ class MollieShippingLineItemBuilderTest extends TestCase
             'quantity' => 1,
             'unitPrice' => [
                 'currency' => $isoCode,
-                'value' => '15.00'
+                'value' => '15.00',
             ],
             'totalAmount' => [
                 'currency' => $isoCode,
-                'value' => '15.00'
+                'value' => '15.00',
             ],
             'vatRate' => '50.00',
             'vatAmount' => [
                 'currency' => $isoCode,
-                'value' => '5.00'
+                'value' => '5.00',
             ],
             'sku' => 'mol-delivery-1',
             'imageUrl' => '',
             'productUrl' => '',
             'metadata' => [
-                'orderLineItemId' => $deliveryId
-            ]
+                'orderLineItemId' => $deliveryId,
+            ],
         ]];
 
         $hydrator = new MollieLineItemHydrator(new MollieOrderPriceBuilder());

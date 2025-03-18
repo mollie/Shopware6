@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -16,59 +17,31 @@ class FakeOrderService implements OrderServiceInterface
      */
     private $orderEntity;
 
-
-    /**
-     * @param OrderEntity $orderEntity
-     */
     public function __construct(OrderEntity $orderEntity)
     {
         $this->orderEntity = $orderEntity;
     }
 
-
-    /**
-     * @param DataBag $data
-     * @param SalesChannelContext $context
-     * @return OrderEntity
-     */
     public function createOrder(DataBag $data, SalesChannelContext $context): OrderEntity
     {
         return $this->orderEntity;
     }
 
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return OrderEntity
-     */
     public function getOrder(string $orderId, Context $context): OrderEntity
     {
         return $this->orderEntity;
     }
 
-    /**
-     * @param string $orderNumber
-     * @param Context $context
-     * @return OrderEntity
-     */
     public function getOrderByNumber(string $orderNumber, Context $context): OrderEntity
     {
         return $this->orderEntity;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @return string
-     */
     public function getMollieOrderId(OrderEntity $order): string
     {
         return $this->orderEntity->getId();
     }
 
-    /**
-     * @param OrderLineItemEntity $lineItem
-     * @return string
-     */
     public function getMollieOrderLineId(OrderLineItemEntity $lineItem): string
     {
         return '';

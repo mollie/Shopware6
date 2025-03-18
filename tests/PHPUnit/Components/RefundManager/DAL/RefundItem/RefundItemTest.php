@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\RefundManager\DAL\RefundItem;
 
@@ -7,11 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class RefundItemTest extends TestCase
 {
-
     /**
      * This test verifies that our DAL payload is correct.
      * It covers the case where we don't provide an additional refundId as foreign key.
-     * @return void
      */
     public function testDalPayloadWithoutRefundId(): void
     {
@@ -40,7 +39,6 @@ class RefundItemTest extends TestCase
     /**
      * This test verifies that our DAL payload is correct.
      * It covers the case where we also provide an additional refundId as foreign key.
-     * @return void
      */
     public function testDalPayloadWithRefundId(): void
     {
@@ -60,7 +58,6 @@ class RefundItemTest extends TestCase
     /**
      * This test verifies that our DAL payload is correct.
      * It covers the case where we provide an empty string as refund ID and it should not be added in that case.
-     * @return void
      */
     public function testDALPayloadNoRefundIfEmpty(): void
     {
@@ -79,7 +76,6 @@ class RefundItemTest extends TestCase
 
     /**
      * This test verifies that no errors is thrown if the label have a null value from the database
-     * @return void
      */
     public function testLabelHaveEmptyValueOnNUll(): void
     {

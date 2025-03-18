@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
@@ -41,22 +42,7 @@ class UpdatePaymentAction extends BaseAction
      */
     private $statusConverter;
 
-
     /**
-     * @param SettingsService $pluginSettings
-     * @param SubscriptionRepository $repoSubscriptions
-     * @param SubscriptionBuilder $subscriptionBuilder
-     * @param MollieDataBuilder $mollieRequestBuilder
-     * @param CustomerService $customers
-     * @param MollieGatewayInterface $gwMollie
-     * @param CancellationValidator $cancellationValidator
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param SubscriptionHistoryHandler $subscriptionHistory
-     * @param LoggerInterface $logger
-     * @param MollieOrderPriceBuilder $priceBuilder
-     * @param RoutingBuilder $routingBuilder
-     * @param OrderStatusConverter $orderStatusConverter
      * @throws Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $routingBuilder, OrderStatusConverter $orderStatusConverter)
@@ -81,11 +67,7 @@ class UpdatePaymentAction extends BaseAction
     }
 
     /**
-     * @param string $subscriptionId
-     * @param string $redirectUrl
-     * @param Context $context
      * @throws CustomerCouldNotBeFoundException
-     * @return string
      */
     public function updatePaymentMethodStart(string $subscriptionId, string $redirectUrl, Context $context): string
     {
@@ -93,36 +75,35 @@ class UpdatePaymentAction extends BaseAction
 
         $settings = $this->getPluginSettings($subscription->getSalesChannelId());
 
-        # --------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------
 
-        if (!$settings->isSubscriptionsEnabled()) {
+        if (! $settings->isSubscriptionsEnabled()) {
             throw new Exception('Subscription Payment Method cannot be updated. Subscriptions are disabled for this Sales Channel');
         }
 
-        if (!$subscription->isUpdatePaymentAllowed()) {
+        if (! $subscription->isUpdatePaymentAllowed()) {
             throw new Exception('Updating the payment method of the subscription is not possible because of its current status!');
         }
 
-        # --------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------
 
-        # first load our customer ID
-        # every subscription customer should have already a Mollie customer ID
+        // first load our customer ID
+        // every subscription customer should have already a Mollie customer ID
         $customerStruct = $this->getCustomers()->getCustomerStruct($subscription->getCustomerId(), $context);
-        $customerId = $customerStruct->getCustomerId((string)$settings->getProfileId(), $settings->isTestMode());
+        $customerId = $customerStruct->getCustomerId((string) $settings->getProfileId(), $settings->isTestMode());
 
-        # now create our payment.
-        # it's important to use a sequenceType first to allow 0,00 amount payment.
-        # this will be used to process the payment and get/create a new mandate inside the Mollie API systems.
+        // now create our payment.
+        // it's important to use a sequenceType first to allow 0,00 amount payment.
+        // this will be used to process the payment and get/create a new mandate inside the Mollie API systems.
         $gateway = $this->getMollieGateway($subscription);
 
-        # for headless, we might provide a separate return URL
-        # for the storefront, we build our correct one
+        // for headless, we might provide a separate return URL
+        // for the storefront, we build our correct one
         if (empty($redirectUrl)) {
             $redirectUrl = $this->routingBuilder->buildSubscriptionPaymentUpdatedReturnUrl($subscriptionId);
         }
 
         $webhookUrl = $this->routingBuilder->buildSubscriptionPaymentUpdatedWebhook($subscriptionId);
-
 
         $payload = [
             'sequenceType' => 'first',
@@ -133,32 +114,27 @@ class UpdatePaymentAction extends BaseAction
             'redirectUrl' => $redirectUrl,
         ];
 
-        # storefront does not have a webhook
-        # it's done immediately on sync
-        if (!empty($webhookUrl)) {
+        // storefront does not have a webhook
+        // it's done immediately on sync
+        if (! empty($webhookUrl)) {
             $payload['webhookUrl'] = $webhookUrl;
         }
 
-
         $payment = $gateway->createPayment($payload);
 
-
-        # now update our metadata and set the temporary transaction ID.
-        # we need this in the redirectURL to verify if this
-        # payment was successful or if it failed.
+        // now update our metadata and set the temporary transaction ID.
+        // we need this in the redirectURL to verify if this
+        // payment was successful or if it failed.
         $meta = $subscription->getMetadata();
         $meta->setTmpTransaction($payment->id);
         $this->getRepository()->updateSubscriptionMetadata($subscription->getId(), $meta, $context);
 
-        # simply return the checkoutURL to redirect the customer
-        return (string)$payment->getCheckoutUrl();
+        // simply return the checkoutURL to redirect the customer
+        return (string) $payment->getCheckoutUrl();
     }
 
     /**
-     * @param string $subscriptionId
-     * @param Context $context
      * @throws Exception
-     * @return void
      */
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
@@ -168,50 +144,48 @@ class UpdatePaymentAction extends BaseAction
             throw new Exception('Subscription is not active and cannot be edited');
         }
 
-        # load our latest tmp_transaction ID that was used
-        # to initialize the payment of the update.
-        # we have to verify if it was indeed successful
+        // load our latest tmp_transaction ID that was used
+        // to initialize the payment of the update.
+        // we have to verify if it was indeed successful
         $latestTransactionId = $subscription->getMetadata()->getTmpTransaction();
 
         if (empty($latestTransactionId)) {
             throw new Exception('No temporary transaction existing for this subscription');
         }
 
-        # load our Mollie Payment with this
-        # temporary transaction ID
+        // load our Mollie Payment with this
+        // temporary transaction ID
         $gateway = $this->getMollieGateway($subscription);
-
 
         $payment = $gateway->getPayment($latestTransactionId);
 
-        # now verify if the payment was indeed
-        # successful and that our subscription mandate can be updated
-        # based on the mandateId in this payment
+        // now verify if the payment was indeed
+        // successful and that our subscription mandate can be updated
+        // based on the mandateId in this payment
         $status = $this->statusConverter->getMolliePaymentStatus($payment);
-        if (!MolliePaymentStatus::isApprovedStatus($status)) {
+        if (! MolliePaymentStatus::isApprovedStatus($status)) {
             throw new Exception('Payment failed when updating subscription mandate. Payment ' . $payment->id . ' for new mandate was not successful!');
         }
 
-        # now update our Mollie subscription
-        # with the new mandateId of the approved payment
+        // now update our Mollie subscription
+        // with the new mandateId of the approved payment
         $gateway->updateSubscription(
             $subscription->getMollieId(),
             $subscription->getMollieCustomerId(),
-            (string)$payment->mandateId
+            (string) $payment->mandateId
         );
 
-        $mandateId = (string)$payment->mandateId;
+        $mandateId = (string) $payment->mandateId;
 
-        # after updating our mandate ID,
-        # make sure to remove our temporary transaction ID again
+        // after updating our mandate ID,
+        // make sure to remove our temporary transaction ID again
         $meta = $subscription->getMetadata();
         $meta->setTmpTransaction('');
         $this->getRepository()->updateSubscriptionMetadata($subscription->getId(), $meta, $context);
 
         $this->getRepository()->updateMandate($subscriptionId, $mandateId, $context);
 
-
-        # also add a history entry for this subscription
+        // also add a history entry for this subscription
         $this->getStatusHistory()->markPaymentUpdated($subscription, $mandateId, $context);
     }
 }

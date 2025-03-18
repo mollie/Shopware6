@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
@@ -9,6 +10,7 @@ use Shopware\Core\Framework\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderControllerBase extends AbstractController
 {
@@ -18,19 +20,12 @@ class OrderControllerBase extends AbstractController
     /** @var Order */
     private $mollieOrderService;
 
-
     public function __construct(OrderService $orderService, Order $mollieOrderService)
     {
         $this->orderService = $orderService;
         $this->mollieOrderService = $mollieOrderService;
     }
 
-    /**
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     public function paymentUrl(Request $request, Context $context): JsonResponse
     {
         $orderId = $request->get('orderId');
@@ -38,12 +33,6 @@ class OrderControllerBase extends AbstractController
         return $this->paymentUrlResponse($orderId, $context);
     }
 
-    /**
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     public function paymentUrlLegacy(Request $request, Context $context): JsonResponse
     {
         $orderId = $request->get('orderId');
@@ -60,7 +49,7 @@ class OrderControllerBase extends AbstractController
         $mollieOrderId = ($customFields !== null && isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY])) ? $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::ORDER_KEY] : null;
 
         if (is_null($mollieOrderId)) {
-            return $this->json([], 404);
+            return $this->json([], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse([

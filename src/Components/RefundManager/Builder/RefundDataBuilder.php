@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\Builder;
 
@@ -43,11 +44,8 @@ class RefundDataBuilder
      */
     private $mollie;
 
-
     /**
-     * @param OrderServiceInterface $orderService
      * @param RefundService $refundService
-     * @param Order $mollieOrder
      */
     public function __construct(OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder)
     {
@@ -56,11 +54,6 @@ class RefundDataBuilder
         $this->refundService = $refundService;
     }
 
-    /**
-     * @param OrderEntity $order
-     * @param Context $context
-     * @return RefundData
-     */
     public function buildRefundData(OrderEntity $order, Context $context): RefundData
     {
         $orderAttributes = new OrderAttributes($order);
@@ -69,33 +62,29 @@ class RefundDataBuilder
         $mollieOrder = null;
 
         if ($orderAttributes->isTypeSubscription()) {
-            # pure subscription orders do not
-            # have a real mollie order
+            // pure subscription orders do not
+            // have a real mollie order
         } else {
-            # first thing is, we have to fetch the matching Mollie order for this Shopware order
+            // first thing is, we have to fetch the matching Mollie order for this Shopware order
             $mollieOrderId = $this->orderService->getMollieOrderId($order);
             $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
         }
 
-
         try {
-
-            # **********************************************************************************
-            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #
-            # ATTENTION, this will load the refunds from Mollie, but also from the database
-            # we will add our database data to the Mollie metadata.composition and therefore "fake" a response of Mollie,
-            # so that we can reuse the old code from below, even though Mollie does not really have a metadata.composition.
+            // **********************************************************************************
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //
+            // ATTENTION, this will load the refunds from Mollie, but also from the database
+            // we will add our database data to the Mollie metadata.composition and therefore "fake" a response of Mollie,
+            // so that we can reuse the old code from below, even though Mollie does not really have a metadata.composition.
             $refunds = $this->refundService->getRefunds($order, $context);
         } catch (PaymentNotFoundException $ex) {
-            # if we dont have a payment, then theres also no refunds
-            # we still need our data, only with an empty list of refunds
+            // if we dont have a payment, then theres also no refunds
+            // we still need our data, only with an empty list of refunds
             $refunds = [];
         }
 
-
         $promotionCompositions = $this->getAllPromotionCompositions($order);
-
 
         $refundItems = [];
         $refundPromotionItems = [];
@@ -111,12 +100,12 @@ class RefundDataBuilder
                 $lineItemAttribute = new OrderLineItemEntityAttributes($item);
                 $mollieOrderLineId = $lineItemAttribute->getMollieOrderLineID();
 
-                # extract how many of this item have already been refunded
-                # form all kinds of sources we have within Mollie.
-                # subscriptions have no order, so no quantity is available
+                // extract how many of this item have already been refunded
+                // form all kinds of sources we have within Mollie.
+                // subscriptions have no order, so no quantity is available
                 $alreadyRefundedQty = 0;
 
-                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
+                if ($mollieOrder instanceof \Mollie\Api\Resources\Order && ! $orderAttributes->isTypeSubscription()) {
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
                 }
 
@@ -124,9 +113,9 @@ class RefundDataBuilder
                 $taxPerItem = floor($taxTotal / $item->getQuantity() * 100) / 100;
                 $taxDiff = round($taxTotal - ($taxPerItem * $item->getQuantity()), 2);
 
-                # this is just a way to move the promotions to the last positions of our array.
-                # also, shipping-free promotions have their discount item in the deliveries,...so here would just
-                # be a 0,00 value line item, that we want to skip.
+                // this is just a way to move the promotions to the last positions of our array.
+                // also, shipping-free promotions have their discount item in the deliveries,...so here would just
+                // be a 0,00 value line item, that we want to skip.
                 if ($lineItemAttribute->isPromotion()) {
                     if ($item->getTotalPrice() !== 0.0) {
                         $refundPromotionItems[] = PromotionItem::fromOrderLineItem($item, $alreadyRefundedQty, $taxTotal, $taxPerItem, $taxDiff);
@@ -137,19 +126,18 @@ class RefundDataBuilder
             }
         }
 
-
-        # now also add our delivery lines
-        # these are unfortunately no line items.
-        # they are saved in a separate delivery collection
+        // now also add our delivery lines
+        // these are unfortunately no line items.
+        // they are saved in a separate delivery collection
         if ($order->getDeliveries() !== null) {
             /** @var OrderDeliveryEntity $delivery */
             foreach ($order->getDeliveries() as $delivery) {
                 $alreadyRefundedQty = 0;
 
-                # remember, subscriptions have no order
-                if (!$orderAttributes->isTypeSubscription() && $mollieOrder instanceof \Mollie\Api\Resources\Order) {
-                    # search the mollie line id for the order
-                    # because we don't have this in our order items.
+                // remember, subscriptions have no order
+                if ($mollieOrder instanceof \Mollie\Api\Resources\Order && ! $orderAttributes->isTypeSubscription()) {
+                    // search the mollie line id for the order
+                    // because we don't have this in our order items.
                     $mollieLineID = '';
 
                     /** @var OrderLine $line */
@@ -175,7 +163,6 @@ class RefundDataBuilder
             }
         }
 
-
         $roundingDiffTotal = 0;
 
         // now search all line items in Mollie that are not recognized in Shopware yet
@@ -190,31 +177,30 @@ class RefundDataBuilder
             }
         }
 
-        # now merge all line items
-        # we first need products, then promotions and as last type we add the deliveries
+        // now merge all line items
+        // we first need products, then promotions and as last type we add the deliveries
         $refundItems = array_merge($refundItems, $refundPromotionItems, $refundDeliveryItems);
 
         // get the tax status of the order
         $taxStatus = $order->getTaxStatus();
 
-        # now fetch some basic values from the API
-        # TODO: these API calls should be removed one day, once I have more time (this refund manager is indeed huge) for now it's fine
-        # ----------------------------------------------------------------------------
+        // now fetch some basic values from the API
+        // TODO: these API calls should be removed one day, once I have more time (this refund manager is indeed huge) for now it's fine
+        // ----------------------------------------------------------------------------
         try {
             $remaining = $this->refundService->getRemainingAmount($order);
             $refundedTotal = $this->refundService->getRefundedAmount($order);
             $voucherAmount = $this->refundService->getVoucherPaidAmount($order);
-            # ----------------------------------------------------------------------------
+            // ----------------------------------------------------------------------------
             $pendingRefundAmount = $this->refundService->getPendingRefundAmount($refunds);
         } catch (PaymentNotFoundException $ex) {
-            # if we don't have a payment,
-            # then there are no values
+            // if we don't have a payment,
+            // then there are no values
             $remaining = 0;
             $refundedTotal = 0;
             $voucherAmount = 0;
             $pendingRefundAmount = 0;
         }
-
 
         return new RefundData(
             $refundItems,
@@ -229,7 +215,6 @@ class RefundDataBuilder
     }
 
     /**
-     * @param OrderEntity $order
      * @return array<mixed>
      */
     private function getAllPromotionCompositions(OrderEntity $order): array
@@ -254,8 +239,8 @@ class RefundDataBuilder
     }
 
     /**
-     * @param OrderLineItemEntity $item
      * @param array<int, mixed> $promotionComposition
+     *
      * @return array<int, mixed>
      */
     private function calculatePromotionCompositionTax(OrderLineItemEntity $item, array $promotionComposition): array
@@ -284,19 +269,16 @@ class RefundDataBuilder
     }
 
     /**
-     * @param string $mollieLineItemId
-     * @param \Mollie\Api\Resources\Order $mollieOrder
      * @param Refund[] $refunds
-     * @return int
      */
     private function getRefundedQuantity(string $mollieLineItemId, \Mollie\Api\Resources\Order $mollieOrder, array $refunds): int
     {
         $refundedQty = 0;
 
-        # -----------------------------------------------------------------------------------------
-        # try to find the refund in the Mollie Order itself (in the line items).
-        # if someone refunds items directly in the Mollie Dashboard,
-        # then this information might usually be in here.
+        // -----------------------------------------------------------------------------------------
+        // try to find the refund in the Mollie Order itself (in the line items).
+        // if someone refunds items directly in the Mollie Dashboard,
+        // then this information might usually be in here.
         /** @var OrderLine $mollieLine */
         foreach ($mollieOrder->lines as $mollieLine) {
             if ($mollieLine->id === $mollieLineItemId) {
@@ -305,14 +287,14 @@ class RefundDataBuilder
             }
         }
 
-        # -----------------------------------------------------------------------------------------
-        # all other refunds (partial refunds with quantities) do only work from Shopware.
-        # so this is only stored because of our plugin in the metadata of the refunds.
-        # we search for our item in the metadata composition of all refunds
+        // -----------------------------------------------------------------------------------------
+        // all other refunds (partial refunds with quantities) do only work from Shopware.
+        // so this is only stored because of our plugin in the metadata of the refunds.
+        // we search for our item in the metadata composition of all refunds
 
         /** @var array<mixed> $refund */
         foreach ($refunds as $refund) {
-            if (!isset($refund['metadata'])) {
+            if (! isset($refund['metadata'])) {
                 continue;
             }
 
@@ -328,23 +310,21 @@ class RefundDataBuilder
                 $meta = json_decode($meta, true);
             }
 
-
-
             $metadata = RefundMetadata::fromArray($meta);
 
-            # if we do have a FULL item refund then
-            # we must NOT substract our item again.
-            # a full refund on the item means, that we do not have a custom amount
-            # and that means that Mollie will already decrease the quantity in their data
-            # which means that this is already included in our step above where we
-            # count the number of refunded quantities from the order directly
+            // if we do have a FULL item refund then
+            // we must NOT subtract our item again.
+            // a full refund on the item means, that we do not have a custom amount
+            // and that means that Mollie will already decrease the quantity in their data
+            // which means that this is already included in our step above where we
+            // count the number of refunded quantities from the order directly
             if ($metadata->getType() === RefundItemType::FULL) {
                 continue;
             }
 
             /** @var RefundItem $item */
             foreach ($metadata->getComposition() as $item) {
-                # now search for our current item
+                // now search for our current item
                 if ($item->getMollieLineID() === $mollieLineItemId) {
                     $refundedQty += $item->getQuantity();
                     break;
@@ -355,27 +335,19 @@ class RefundDataBuilder
         return $refundedQty;
     }
 
-    /**
-     * @param OrderLineItemEntity $item
-     * @return float
-     */
     private function calculateLineItemTaxTotal(OrderLineItemEntity $item): float
     {
         $taxTotal = 0;
 
         $price = $item->getPrice();
 
-        if (!$price instanceof CalculatedPrice) {
+        if (! $price instanceof CalculatedPrice) {
             return $taxTotal;
         }
 
         return $this->calculateTax($price);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @return float
-     */
     private function calculateDeliveryEntityTaxTotal(OrderDeliveryEntity $delivery): float
     {
         $shippingCosts = $delivery->getShippingCosts();
@@ -383,10 +355,6 @@ class RefundDataBuilder
         return $this->calculateTax($shippingCosts);
     }
 
-    /**
-     * @param CalculatedPrice $price
-     * @return float
-     */
     private function calculateTax(CalculatedPrice $price): float
     {
         $calculatedTaxes = $price->getCalculatedTaxes();

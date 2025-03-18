@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Dispatchers;
 
@@ -13,10 +14,10 @@ class ShopwareFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInter
     /** @phpstan-ignore-next-line */
     private $dispatcher;
 
-
     /**
      * @param BusinessEventDispatcher $dispatcher
      */
+
     /** @phpstan-ignore-next-line */
     public function __construct($dispatcher)
     {
@@ -25,6 +26,7 @@ class ShopwareFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInter
 
     /**
      * @param mixed $event
+     *
      * @return void
      */
     public function dispatch($event)

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Subscriber;
 
@@ -37,10 +38,6 @@ class WebhookTimezoneSubscriberTest extends TestCase
      */
     protected $request;
 
-
-    /**
-     * @return void
-     */
     public function setUp(): void
     {
         $this->transactionService = $this->createMock(TransactionService::class);
@@ -90,6 +87,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Tests that the timezone cookie is not set by us when we're not on the mollie webhook route.
+     *
      * @return void
      */
     public function testThatTimezoneIsNotSetWithIncorrectRoute()
@@ -109,6 +107,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Test that the timezone cookie is not set if we don't have a transaction id
+     *
      * @return void
      */
     public function testThatTimezoneIsNotSetWithNoTransactionId()
@@ -128,6 +127,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Tests that the timezone cookie is not set if we have an invalid transaction id
+     *
      * @return void
      */
     public function testThatTimezoneIsNotSetWithIncorrectTransactionId()
@@ -147,6 +147,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Tests that the timezone cookie is not set if we don't have a transaction entity
+     *
      * @return void
      */
     public function testThatTimezoneIsNotSetWithoutATransaction()
@@ -164,6 +165,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Tests that the timezone cookie is not set if we don't have an order entity
+     *
      * @return void
      */
     public function testThatTimezoneIsNotSetWithoutAnOrder()
@@ -181,6 +183,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Tests that the timezone cookie is not set if there's no timezone set on the order
+     *
      * @return void
      */
     public function testThatTimezoneIsNotSetWithoutATimezoneCustomField()
@@ -196,11 +199,10 @@ class WebhookTimezoneSubscriberTest extends TestCase
         $this->assertNull($this->request->cookies->get(TwigDateRequestListener::TIMEZONE_COOKIE));
     }
 
-
     /**
      * Set up the transaction service with the provided transaction
+     *
      * @param $transaction
-     * @return void
      */
     private function setUpTransactionService($transaction): void
     {
@@ -209,17 +211,15 @@ class WebhookTimezoneSubscriberTest extends TestCase
 
     /**
      * Returns a transaction entity containing an order entity with the specified timezone set.
-     * @param string $timezoneOnOrder
-     * @return OrderTransactionEntity
      */
     private function createTransactionWithOrder(string $timezoneOnOrder = ''): OrderTransactionEntity
     {
         $order = $this->createMock(OrderEntity::class);
-        if (!empty($timezoneOnOrder)) {
+        if (! empty($timezoneOnOrder)) {
             $order->method('getCustomFields')->willReturn([
                 'mollie_payments' => [
-                    'timezone' => $timezoneOnOrder
-                ]
+                    'timezone' => $timezoneOnOrder,
+                ],
             ]);
         }
 
@@ -228,19 +228,14 @@ class WebhookTimezoneSubscriberTest extends TestCase
         ]);
     }
 
-    /**
-     * @param string $route
-     * @param string $transactionId
-     * @return RequestEvent
-     */
     private function initSubscriberRequests(string $route, string $transactionId = ''): RequestEvent
     {
         $this->request = new Request();
         $this->request->attributes->set('_route', $route);
 
-        if (!empty($transactionId)) {
+        if (! empty($transactionId)) {
             $this->request->attributes->set('_route_params', [
-                'swTransactionId' => $transactionId
+                'swTransactionId' => $transactionId,
             ]);
         }
 

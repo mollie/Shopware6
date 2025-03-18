@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -18,22 +19,12 @@ class FakeCartService implements CartServiceInterface
      */
     private $salesChannelContext;
 
-
-    /**
-     * @param Cart $cart
-     * @param SalesChannelContext $salesChannelContext
-     */
     public function __construct(Cart $cart, SalesChannelContext $salesChannelContext)
     {
         $this->cart = $cart;
         $this->salesChannelContext = $salesChannelContext;
     }
 
-
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     * @return Cart
-     */
     public function getCalculatedMainCart(SalesChannelContext $salesChannelContext): Cart
     {
         return $this->cart;

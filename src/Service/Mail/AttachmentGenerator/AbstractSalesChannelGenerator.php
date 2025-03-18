@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -14,17 +15,13 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
      */
     protected $salesChannelRepository;
 
-    /**
-     * @param EntityRepository $salesChannelRepository
-     */
     public function __construct(EntityRepository $salesChannelRepository)
     {
         $this->salesChannelRepository = $salesChannelRepository;
     }
 
     /**
-     * @param Context $context
-     * @return array<mixed>
+     * @return string[]
      */
     protected function getSalesChannelIds(Context $context): array
     {
@@ -33,17 +30,12 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
         });
     }
 
-    /**
-     * @param Context $context
-     * @return SalesChannelCollection
-     */
     protected function getSalesChannels(Context $context): SalesChannelCollection
     {
-        /** @var SalesChannelCollection $salesChannels */
-        $salesChannels = $this->salesChannelRepository->search(
+        /** @var SalesChannelCollection */
+        return $this->salesChannelRepository->search(
             (new Criteria())->addAssociation('paymentMethods.availabilityRule'),
             $context
         )->getEntities();
-        return $salesChannels;
     }
 }

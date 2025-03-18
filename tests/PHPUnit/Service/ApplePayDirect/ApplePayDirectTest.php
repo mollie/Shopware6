@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
 
@@ -93,7 +94,7 @@ class ApplePayDirectTest extends TestCase
         /** @var CartBackupService $cartBackupService */
         $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);
 
-        /** @var MollieApiFactory $apiFactory */
+        /* @var MollieApiFactory $apiFactory */
         $this->apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);
 
         /** @var ShopService $shopService */
@@ -155,7 +156,8 @@ class ApplePayDirectTest extends TestCase
     {
         $this->validationUrlAllowListGateway->expects($this->once())
             ->method('getAllowList')
-            ->willReturn(ApplePayDirectDomainAllowList::create());
+            ->willReturn(ApplePayDirectDomainAllowList::create())
+        ;
 
         $this->expectException(ApplePayDirectDomainAllowListCanNotBeEmptyException::class);
         $this->expectExceptionMessage('The Apple Pay Direct domain allow list can not be empty. Please check the configuration.');
@@ -170,7 +172,8 @@ class ApplePayDirectTest extends TestCase
         );
         $this->validationUrlAllowListGateway->expects($this->once())
             ->method('getAllowList')
-            ->willReturn($allowList);
+            ->willReturn($allowList)
+        ;
 
         $testDomain = 'example.org';
 
@@ -188,25 +191,25 @@ class ApplePayDirectTest extends TestCase
 
         $this->validationUrlAllowListGateway->expects($this->once())
             ->method('getAllowList')
-            ->willReturn($allowList);
+            ->willReturn($allowList)
+        ;
 
         $client = $this->createMock(MollieApiClient::class);
         $client->wallets = $this->createMock(WalletEndpoint::class);
         $this->apiFactory->expects($this->once())
             ->method('getLiveClient')
-            ->willReturn($client);
+            ->willReturn($client)
+        ;
 
         $client->wallets->expects($this->once())->method('requestApplePayPaymentSession')
-            ->willReturn($expected = random_bytes(16));
+            ->willReturn($expected = random_bytes(16))
+        ;
 
         $actual = $this->applePay->createPaymentSession('https://example.com', $domain, $this->scContext);
 
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @return Cart
-     */
     private function buildShopwareCart(): Cart
     {
         $unitPrice = 10;
@@ -218,28 +221,27 @@ class ApplePayDirectTest extends TestCase
 
         $cartTotal = $productTotal + $shippingCosts;
 
-
         $swCart = new Cart('Dummy Cart', 'dummy');
 
-        # creat our fake calculated taxes
-        # we only need the tax value in here
+        // creat our fake calculated taxes
+        // we only need the tax value in here
         $taxes = new CalculatedTaxCollection([new CalculatedTax($taxValue, 0, 0)]);
 
-        # now create a real price with real calculation
-        # for our product
+        // now create a real price with real calculation
+        // for our product
         $price = new CalculatedPrice($unitPrice, $unitPrice * $quantity, $taxes, new TaxRuleCollection());
 
-        # create our product and assign
-        # our price to it
+        // create our product and assign
+        // our price to it
         $product = new LineItem('123', 'product', 'ref-123', $quantity);
         $product->setLabel('T-Shirt');
         $product->setPrice($price);
 
-        # add the product to our cart
+        // add the product to our cart
         $swCart->setLineItems(new LineItemCollection([$product]));
 
-        # add a delivery
-        # create a price and add it to our cart
+        // add a delivery
+        // create a price and add it to our cart
         $deliveryPrice = new CalculatedPrice($shippingCosts, $shippingCosts, new CalculatedTaxCollection(), new TaxRuleCollection());
 
         $shippingMethod = new ShippingMethodEntity();
@@ -255,8 +257,8 @@ class ApplePayDirectTest extends TestCase
 
         $swCart->setDeliveries(new DeliveryCollection([$delivery]));
 
-        # manually fake a calculation and assign
-        # the correct price values for our cart
+        // manually fake a calculation and assign
+        // the correct price values for our cart
         $swCart->setPrice(new CartPrice($cartTotal, $cartTotal, $cartTotal, $taxes, new TaxRuleCollection(), ''));
 
         return $swCart;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory;
 
@@ -19,41 +20,28 @@ class SubscriptionHistoryDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription_history';
 
-    /**
-     * @return string
-     */
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return SubscriptionHistoryEntity::class;
     }
 
-    /**
-     * @return string
-     */
     public function getCollectionClass(): string
     {
         return SubscriptionHistoryCollection::class;
     }
 
-    /**
-     * @return FieldCollection
-     */
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
             (new FkField('subscription_id', 'subscriptionId', SubscriptionDefinition::class))->addFlags(new ApiAware()),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             (new StringField('comment', 'comment')),
 
@@ -65,10 +53,9 @@ class SubscriptionHistoryDefinition extends EntityDefinition
             new CreatedAtField(),
             new UpdatedAtField(),
 
-            # --------------------------------------------------------------------------------------------------------------------------
+            // --------------------------------------------------------------------------------------------------------------------------
 
             new ManyToOneAssociationField('subscription', 'subscription_id', SubscriptionDefinition::class, 'id', false),
-
         ]);
     }
 }

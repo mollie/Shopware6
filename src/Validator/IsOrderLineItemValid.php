@@ -1,5 +1,5 @@
-<?php declare(strict_types=1);
-
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Validator;
 
@@ -10,7 +10,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 class IsOrderLineItemValid
 {
     /**
-     * @param OrderLineItemEntity $lineItemEntity
      * @throws MissingPriceLineItemException
      */
     public function validate(OrderLineItemEntity $lineItemEntity): void

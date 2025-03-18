@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Order;
 
@@ -32,7 +33,6 @@ class OrderStatusUpdater
      */
     private $transactionTransitionService;
 
-
     /**
      * @var LoggerInterface
      */
@@ -43,13 +43,6 @@ class OrderStatusUpdater
      */
     private $stateMachineStateRepository;
 
-
-    /**
-     * @param OrderStateService $orderHandler
-     * @param EntityRepository $repoOrders
-     * @param TransactionTransitionServiceInterface $transactionTransitionService
-     * @param LoggerInterface $logger
-     */
     public function __construct(OrderStateService $orderHandler, EntityRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, EntityRepository $stateMachineStateRepository, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
@@ -60,18 +53,12 @@ class OrderStatusUpdater
         $this->stateMachineStateRepository = $stateMachineStateRepository;
     }
 
-
     /**
-     * @param OrderTransactionEntity $transaction
-     * @param string $targetShopwareStatusKey
-     * @param Context $context
      * @throws \Exception
-     * @return void
      */
     public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
         $currentShopwareState = $transaction->getStateMachineState();
-
 
         if (! $currentShopwareState instanceof StateMachineStateEntity) {
             $criteria = new Criteria([$transaction->getStateId()]);
@@ -93,9 +80,8 @@ class OrderStatusUpdater
 
         $currentShopwareStatusKey = $currentShopwareState->getTechnicalName();
 
-
-        # if we already have the target status then
-        # skip this progress and don't do anything
+        // if we already have the target status then
+        // skip this progress and don't do anything
         if ($currentShopwareStatusKey === $targetShopwareStatusKey) {
             return;
         }
@@ -104,18 +90,17 @@ class OrderStatusUpdater
 
         switch ($targetShopwareStatusKey) {
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
-                {
                     $states = [OrderTransactionStates::STATE_IN_PROGRESS];
                     if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
-                        $states[] =  OrderTransactionStates::STATE_UNCONFIRMED;
+                        $states[] = OrderTransactionStates::STATE_UNCONFIRMED;
                     }
-                    # if we are already in_progress...then don't switch to OPEN again
-                    # otherwise SEPA bank transfer would switch back to OPEN
+                    // if we are already in_progress...then don't switch to OPEN again
+                    // otherwise SEPA bank transfer would switch back to OPEN
                     if (! in_array($currentShopwareStatusKey, $states) || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
                         $addLog = true;
                         $this->transactionTransitionService->reOpenTransaction($transaction, $context);
                     }
-                }
+
                 break;
 
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
@@ -162,7 +147,6 @@ class OrderStatusUpdater
                 throw new \Exception('Updating Payment Status of Order not possible for status: ' . $targetShopwareStatusKey);
         }
 
-
         if ($addLog) {
             $this->logger->debug(
                 'Payment status transition of order ' . $order->getOrderNumber() . ' from "' . $currentShopwareStatusKey . '" to "' . $targetShopwareStatusKey . '"',
@@ -174,36 +158,32 @@ class OrderStatusUpdater
             );
         }
 
-        # last but not least,
-        # also update the lastUpdated of the order itself
-        # this is required for ERP systems and more (so they know something has changed).
+        // last but not least,
+        // also update the lastUpdated of the order itself
+        // this is required for ERP systems and more (so they know something has changed).
 
         $this->repoOrders->update([
             [
                 'id' => $order->getId(),
                 'updatedAt' => new \DateTime(),
-            ]
+            ],
         ], $context);
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $statusTo
-     * @param MollieSettingStruct $settings
-     * @param Context $context
      * @throws \Exception
      */
     public function updateOrderStatus(OrderEntity $order, string $statusTo, MollieSettingStruct $settings, Context $context): void
     {
         $stateMachine = $order->getStateMachineState();
 
-        # let's check if we have configured a final order state.
-        # if so, we need to verify, if a transition is even allowed
+        // let's check if we have configured a final order state.
+        // if so, we need to verify, if a transition is even allowed
         if (! empty($settings->getOrderStateFinalState())) {
             $currentId = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getId() : $order->getStateId();
 
-            # test if our current order does already have
-            # our configured final order state
+            // test if our current order does already have
+            // our configured final order state
             if ($currentId === $settings->getOrderStateFinalState()) {
                 $allowedList = [
                     MolliePaymentStatus::MOLLIE_PAYMENT_REFUNDED,
@@ -211,15 +191,14 @@ class OrderStatusUpdater
                     MolliePaymentStatus::MOLLIE_PAYMENT_CHARGEBACK,
                 ];
 
-                # once our final state is reached, we only allow transitions
-                # to chargebacks and refunds.
-                # all other transitions will not happen.
+                // once our final state is reached, we only allow transitions
+                // to chargebacks and refunds.
+                // all other transitions will not happen.
                 if (! in_array($statusTo, $allowedList)) {
                     return;
                 }
             }
         }
-
 
         $statusFrom = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getTechnicalName() : '';
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility;
 
@@ -21,7 +22,6 @@ class DependencyLoader
      */
     private $versionCompare;
 
-
     /**
      * @param Container $container
      */
@@ -36,15 +36,12 @@ class DependencyLoader
      */
     public function loadServices(): void
     {
-
-
         /** @var ContainerBuilder $containerBuilder */
         $containerBuilder = $this->container;
 
         $loader = new XmlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../Resources/config'));
 
-
-        # load Flow Builder
+        // load Flow Builder
         $loader->load('compatibility/flowbuilder/all_versions.xml');
 
         if ($this->versionCompare->gte('6.4.6.0')) {
@@ -66,43 +63,13 @@ class DependencyLoader
         $classLoader->register();
     }
 
-    private function registerPolyfillsAutoloader(ClassLoader $classLoader): void
-    {
-        $classLoader->addPsr4("Shopware\\Core\\", __DIR__ . '/../../polyfill/Shopware/Core', true);
-    }
-
-    private function registerFixturesAutoloader(ClassLoader $classLoader): void
-    {
-        if ($this->shouldLoadFixtures() === false) {
-            return;
-        }
-
-        $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
-        # we need to tell Shopware to load our custom fixtures
-        # from our TEST autoload-dev area....
-        $classLoader->addPsr4("MolliePayments\\Fixtures\\", $dirFixtures, true);
-    }
-
-    private function shouldLoadFixtures(): bool
-    {
-        $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
-        if ($composerDevReqsInstalled === false) {
-            return false;
-        }
-        $dirFixtures = (string)realpath(__DIR__ . '/../../tests/Fixtures/');
-        return is_dir($dirFixtures);
-    }
-
-    /**
-     * @return void
-     */
     public function prepareStorefrontBuild(): void
     {
         $pluginRoot = __DIR__ . '/../..';
 
         $distFileFolder = $pluginRoot . '/src/Resources/app/storefront/dist/storefront/js';
 
-        if (!file_exists($distFileFolder)) {
+        if (! file_exists($distFileFolder)) {
             mkdir($distFileFolder, 0777, true);
         }
 
@@ -114,11 +81,39 @@ class DependencyLoader
             $target = $distFileFolder . '/mollie-payments.js';
         }
 
-        if (file_exists($file) && !file_exists($target)) {
-            # while we use our current webpack approach
-            # we must not use this.
-            # also it's not perfectly working somehow
-            # copy($file, $target);
+        if (file_exists($file) && ! file_exists($target)) {
+            // while we use our current webpack approach
+            // we must not use this.
+            // also it's not perfectly working somehow
+            // copy($file, $target);
         }
+    }
+
+    private function registerPolyfillsAutoloader(ClassLoader $classLoader): void
+    {
+        $classLoader->addPsr4('Shopware\\Core\\', __DIR__ . '/../../polyfill/Shopware/Core', true);
+    }
+
+    private function registerFixturesAutoloader(ClassLoader $classLoader): void
+    {
+        if ($this->shouldLoadFixtures() === false) {
+            return;
+        }
+
+        $dirFixtures = (string) realpath(__DIR__ . '/../../tests/Fixtures/');
+        // we need to tell Shopware to load our custom fixtures
+        // from our TEST autoload-dev area....
+        $classLoader->addPsr4('MolliePayments\\Fixtures\\', $dirFixtures, true);
+    }
+
+    private function shouldLoadFixtures(): bool
+    {
+        $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
+        if ($composerDevReqsInstalled === false) {
+            return false;
+        }
+        $dirFixtures = (string) realpath(__DIR__ . '/../../tests/Fixtures/');
+
+        return is_dir($dirFixtures);
     }
 }

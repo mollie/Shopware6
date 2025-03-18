@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\Request;
 
@@ -24,13 +25,6 @@ class RefundRequestItem
      */
     private $stockQty;
 
-
-    /**
-     * @param string $lineId
-     * @param float $amount
-     * @param int $quantity
-     * @param int $stockQty
-     */
     public function __construct(string $lineId, float $amount, int $quantity, int $stockQty)
     {
         $this->lineId = $lineId;
@@ -39,34 +33,21 @@ class RefundRequestItem
         $this->stockQty = $stockQty;
     }
 
-
-    /**
-     * @return string
-     */
     public function getLineId(): string
     {
         return $this->lineId;
     }
 
-    /**
-     * @return float
-     */
     public function getAmount(): float
     {
         return $this->amount;
     }
 
-    /**
-     * @return int
-     */
     public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    /**
-     * @return int
-     */
     public function getStockIncreaseQty(): int
     {
         return $this->stockQty;

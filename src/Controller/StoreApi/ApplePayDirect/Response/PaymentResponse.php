@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
@@ -12,12 +13,6 @@ class PaymentResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param bool $success
-     * @param string $redirectUrl
-     * @param string $message
-     */
     public function __construct(bool $success, string $redirectUrl, string $message)
     {
         $this->object = new ArrayStruct(

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
@@ -17,29 +18,16 @@ class FakeEventDispatcher implements EventDispatcherInterface
      */
     private $dispatchedEventName;
 
-
-    /**
-     * @return object
-     */
     public function getDispatchedEvent(): object
     {
         return $this->dispatchedEvent;
     }
 
-    /**
-     * @return string
-     */
     public function getDispatchedEventName(): string
     {
         return $this->dispatchedEventName;
     }
 
-
-    /**
-     * @param object $event
-     * @param null|string $eventName
-     * @return object
-     */
     public function dispatch(object $event, string $eventName = null): object
     {
         $this->dispatchedEvent = $event;

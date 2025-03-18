@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
@@ -28,6 +29,10 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 class RemindAction extends BaseAction
 {
     /**
+     * @var LoggerInterface
+     */
+    protected $log;
+    /**
      * @var EntityRepository
      */
     private $repoSalesChannel;
@@ -37,21 +42,7 @@ class RemindAction extends BaseAction
      */
     private $reminderValidator;
 
-
     /**
-     * @param SettingsService $pluginSettings
-     * @param SubscriptionRepository $repoSubscriptions
-     * @param SubscriptionBuilder $subscriptionBuilder
-     * @param MollieDataBuilder $mollieRequestBuilder
-     * @param CustomerService $customers
-     * @param MollieGatewayInterface $gwMollie
-     * @param CancellationValidator $cancellationValidator
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param SubscriptionHistoryHandler $subscriptionHistory
-     * @param LoggerInterface $logger
-     * @param EntityRepository $repoSalesChannel
-     * @param ReminderValidator $reminderValidator
      * @throws Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, EntityRepository $repoSalesChannel, ReminderValidator $reminderValidator)
@@ -75,9 +66,7 @@ class RemindAction extends BaseAction
     }
 
     /**
-     * @param Context $context
      * @throws Exception
-     * @return int
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
@@ -87,12 +76,11 @@ class RemindAction extends BaseAction
 
         $salesChannels = $this->repoSalesChannel->search(new Criteria(), $context);
 
-
         /** @var SalesChannelEntity $salesChannel */
         foreach ($salesChannels as $salesChannel) {
             $settings = $this->getPluginSettings($salesChannel->getId());
 
-            if (!$settings->isSubscriptionsEnabled()) {
+            if (! $settings->isSubscriptionsEnabled()) {
                 continue;
             }
 
@@ -107,12 +95,12 @@ class RemindAction extends BaseAction
 
             /** @var SubscriptionEntity $subscription */
             foreach ($availableSubscriptions->getElements() as $subscription) {
-                # if it's not active in Mollie, then don't do anything
+                // if it's not active in Mollie, then don't do anything
                 if ($subscription->getStatus() !== SubscriptionStatus::ACTIVE && $subscription->getStatus() !== SubscriptionStatus::RESUMED) {
                     continue;
                 }
 
-                # now check if we are allowed to remind or if it was already done
+                // now check if we are allowed to remind or if it was already done
                 $shouldRemind = $this->reminderValidator->shouldRemind(
                     $subscription->getNextPaymentAt(),
                     $today,
@@ -120,30 +108,29 @@ class RemindAction extends BaseAction
                     $subscription->getLastRemindedAt()
                 );
 
-                if (!$shouldRemind) {
+                if (! $shouldRemind) {
                     continue;
                 }
 
                 $customer = $this->getCustomers()->getCustomer($subscription->getCustomerId(), $context);
 
-                if (!$customer instanceof CustomerEntity) {
+                if (! $customer instanceof CustomerEntity) {
                     throw new Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
                 }
 
-                # --------------------------------------------------------------------------------------------------
-                # FLOW BUILDER / BUSINESS EVENTS
+                // --------------------------------------------------------------------------------------------------
+                // FLOW BUILDER / BUSINESS EVENTS
 
                 $event = $this->getFlowBuilderEventFactory()->buildSubscriptionRemindedEvent($customer, $subscription, $salesChannel, $context);
                 $this->getFlowBuilderDispatcher()->dispatch($event);
 
-                # --------------------------------------------------------------------------------------------------
+                // --------------------------------------------------------------------------------------------------
 
                 $this->getRepository()->markReminded($subscription->getId(), $context);
 
                 $this->getStatusHistory()->markReminded($subscription, $context);
 
-
-                $remindedCount++;
+                ++$remindedCount;
             }
         }
 

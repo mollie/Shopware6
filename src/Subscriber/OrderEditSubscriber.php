@@ -24,7 +24,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AccountOrderPageLoadedEvent::class => 'accountOrderDetailPageLoaded'
+            AccountOrderPageLoadedEvent::class => 'accountOrderDetailPageLoaded',
         ];
     }
 
@@ -35,6 +35,6 @@ class OrderEditSubscriber implements EventSubscriberInterface
 
         $context = $event->getContext();
 
-        $rested = $this->orderExpireService->cancelExpiredOrders($orders, $context);
+        $this->orderExpireService->cancelExpiredOrders($orders, $context);
     }
 }

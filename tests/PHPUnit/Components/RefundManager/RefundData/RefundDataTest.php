@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\RefundManager\RefundData;
 
@@ -26,11 +27,11 @@ class RefundDataTest extends TestCase
                 'voucherAmount' => 5.0,
                 'pendingRefunds' => 2.0,
                 'refunded' => 6.0,
-                'roundingDiff' => 1.45
+                'roundingDiff' => 1.45,
             ],
             'cart' => [],
             'refunds' => [],
-            'taxStatus' => 'gross'
+            'taxStatus' => 'gross',
         ];
 
         $this->assertEquals($expected, $data->toArray());
@@ -55,7 +56,7 @@ class RefundDataTest extends TestCase
         $lineItem->setReferencedId('product-id-1');
         $lineItem->setPayload(['productNumber' => 'P123']);
 
-        $items[] = new ProductItem($lineItem, [], 2, '1.233', '2.343', '3.453');
+        $items[] = new ProductItem($lineItem, [], 2, 1.233, 2.343, 3.453);
 
         $data = new RefundData($items, [], 0, 0, 0, 0, 0, 'gross');
 
@@ -83,7 +84,7 @@ class RefundDataTest extends TestCase
                         'totalToPerItemRoundingDiff' => 3.45,
                     ],
                 ],
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $data->toArray()['cart']);

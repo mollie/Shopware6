@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription\Enricher;
 
@@ -11,8 +12,6 @@ class LiveDataEnricherTest extends TestCase
     /**
      * This test verifies that our correct list of
      * events is used to subscribe.
-     *
-     * @return void
      */
     public function testSubscribedEvents(): void
     {

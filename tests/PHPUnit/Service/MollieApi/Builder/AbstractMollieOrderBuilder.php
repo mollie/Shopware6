@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
@@ -134,34 +135,32 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         $locale->setId(Uuid::randomHex());
         $locale->setCode($this->localeCode);
 
-        /** @var OrderDataExtractor customerService */
+        /* @var OrderDataExtractor customerService */
         $this->orderDataExtractor = $this->getMockBuilder(OrderDataExtractor::class)->disableOriginalConstructor()->getMock();
         $this->orderDataExtractor->method('extractCustomer')->willReturn($this->customer);
         $this->orderDataExtractor->method('extractLocale')->willReturn($locale);
 
-        /** @var SettingsService settingsService */
+        /* @var SettingsService settingsService */
         $this->settingsService = $this->getMockBuilder(SettingsService::class)->disableOriginalConstructor()->getMock();
         $this->settingStruct = new MollieSettingStruct();
         $this->settingStruct->assign([
             'createCustomersAtMollie' => false,
-            'orderLifetimeDays' => $this->expiresAt
+            'orderLifetimeDays' => $this->expiresAt,
         ]);
         $this->settingsService->method('getSettings')->willReturn($this->settingStruct);
 
-
         $this->loggerService = new NullLogger();
 
-        /** @var SalesChannelContext salesChannelContext */
+        /* @var SalesChannelContext salesChannelContext */
         $this->salesChannelContext = $this->getMockBuilder(SalesChannelContext::class)->disableOriginalConstructor()->getMock();
-        /** @var Router router */
+        /* @var Router router */
         $this->router = $this->getMockBuilder(RouterInterface::class)->disableOriginalConstructor()->getMock();
-        /** @var MolliePaymentDoPay $mollieDoPaymentFacade */
+        /* @var MolliePaymentDoPay $mollieDoPaymentFacade */
         $this->mollieDoPaymentFacade = $this->getMockBuilder(MolliePaymentDoPay::class)->disableOriginalConstructor()->getMock();
-        /** @var MolliePaymentFinalize $molliePaymentFianlize */
+        /* @var MolliePaymentFinalize $molliePaymentFianlize */
         $this->molliePaymentFinalize = $this->getMockBuilder(MolliePaymentFinalize::class)->disableOriginalConstructor()->getMock();
-        /** @var TransactionTransitionServiceInterface $transitionService */
+        /* @var TransactionTransitionServiceInterface $transitionService */
         $this->transitionService = $this->getMockBuilder(TransactionTransitionServiceInterface::class)->disableOriginalConstructor()->getMock();
-
 
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
         $routingBuilder = new RoutingBuilder(
@@ -170,7 +169,6 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new FakePluginSettings(''),
             ''
         );
-        ;
 
         $this->mollieLocaleService = new MollieLocaleService($this->createMock(EntityRepository::class));
 

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -14,7 +15,7 @@ class ConfigService
     public const EMAIL_TEMPLATE = 'emailTemplate';
     public const DAYS_BEFORE_REMINDER = 'daysBeforeReminder';
 
-    /** @var SystemConfigService $systemConfigService */
+    /** @var SystemConfigService */
     private $systemConfigService;
 
     /** @var null|string */
@@ -30,13 +31,6 @@ class ConfigService
      */
     private $settingsService;
 
-
-    /**
-     * @param SystemConfigService $systemConfigService
-     * @param MollieGatewayInterface $mollieGateway
-     * @param SettingsService $settingsService
-     * @param null|string $salesChannelId
-     */
     public function __construct(SystemConfigService $systemConfigService, MollieGatewayInterface $mollieGateway, SettingsService $settingsService, ?string $salesChannelId = null)
     {
         $this->systemConfigService = $systemConfigService;
@@ -47,8 +41,6 @@ class ConfigService
 
     /**
      * Returns the system config service.
-     *
-     * @return SystemConfigService
      */
     public function getSystemConfigService(): SystemConfigService
     {
@@ -57,9 +49,6 @@ class ConfigService
 
     /**
      * Gets a variable from the system config service.
-     *
-     * @param string $name
-     * @param null|string $salesChannelId
      *
      * @return null|array|mixed
      */
@@ -73,10 +62,6 @@ class ConfigService
 
     /**
      * Sets a variable in the system config service.
-     *
-     * @param string $name
-     * @param string $value
-     * @param null|string $salesChannelId
      */
     public function set(string $name, string $value, ?string $salesChannelId = null): void
     {
@@ -89,9 +74,6 @@ class ConfigService
 
     /**
      * Deletes a variable in the system config service.
-     *
-     * @param string $name
-     * @param null|string $salesChannelId
      */
     public function delete(string $name, ?string $salesChannelId = null): void
     {
@@ -103,18 +85,12 @@ class ConfigService
 
     /**
      * Sets the sales channel to get the configuration for.
-     *
-     * @param string $salesChannelId
      */
     public function setSalesChannelId(string $salesChannelId): void
     {
         $this->salesChannelId = $salesChannelId;
     }
 
-    /**
-     * @param string $salesChannelId
-     * @return void
-     */
     public function fetchProfileId(string $salesChannelId): void
     {
         $this->gatewayMollie->switchClient($salesChannelId);

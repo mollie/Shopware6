@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -7,9 +8,7 @@ use Shopware\Core\Framework\ShopwareHttpException;
 class SalesChannelPaymentMethodsException extends ShopwareHttpException
 {
     /**
-     * @param string $salesChannelName
      * @param array<mixed> $parameters
-     * @param null|\Throwable $previous
      */
     public function __construct(string $salesChannelName, array $parameters = [], ?\Throwable $previous = null)
     {

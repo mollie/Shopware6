@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Storefront\Struct;
 
@@ -11,25 +12,16 @@ class SubscriptionCartExtensionStruct extends Struct
      */
     protected $hasSubscription = false;
 
-    /**
-     * @param bool $hasSubscription
-     */
     public function __construct(bool $hasSubscription)
     {
         $this->hasSubscription = $hasSubscription;
     }
 
-    /**
-     * @return bool
-     */
     public function isHasSubscription(): bool
     {
         return $this->hasSubscription;
     }
 
-    /**
-     * @param bool $hasSubscription
-     */
     public function setHasSubscription(bool $hasSubscription): void
     {
         $this->hasSubscription = $hasSubscription;

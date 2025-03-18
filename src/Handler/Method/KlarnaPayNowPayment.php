@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Handler\Method;
 
@@ -10,14 +11,8 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class KlarnaPayNowPayment extends PaymentHandler
 {
-    /**
-     *
-     */
     public const PAYMENT_METHOD_NAME = PaymentMethod::KLARNA_PAY_NOW;
 
-    /**
-     *
-     */
     public const PAYMENT_METHOD_DESCRIPTION = 'Pay now.';
 
     /**
@@ -27,9 +22,7 @@ class KlarnaPayNowPayment extends PaymentHandler
 
     /**
      * @param array<mixed> $orderData
-     * @param OrderEntity $orderEntity
-     * @param SalesChannelContext $salesChannelContext
-     * @param CustomerEntity $customer
+     *
      * @return array<mixed>
      */
     public function processPaymentMethodSpecificParameters(array $orderData, OrderEntity $orderEntity, SalesChannelContext $salesChannelContext, CustomerEntity $customer): array

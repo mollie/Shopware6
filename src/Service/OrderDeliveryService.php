@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -14,10 +15,6 @@ class OrderDeliveryService
      */
     private $orderDeliveryRepository;
 
-
-    /**
-     * @param EntityRepository $orderDeliveryRepository
-     */
     public function __construct(EntityRepository $orderDeliveryRepository)
     {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
@@ -30,15 +27,12 @@ class OrderDeliveryService
         $criteria->addAssociation('order.deliveries.shippingMethod');
         $criteria->addAssociation('order.deliveries.stateMachineState');
         $criteria->addAssociation('shippingMethod');
-        $result = $this->orderDeliveryRepository->search($criteria, $context);
 
-        return $result->first();
+        return $this->orderDeliveryRepository->search($criteria, $context)->first();
     }
 
     /**
-     * @param OrderDeliveryEntity $delivery
      * @param array<mixed> $values
-     * @param Context $context
      */
     public function updateCustomFields(OrderDeliveryEntity $delivery, array $values, Context $context): void
     {

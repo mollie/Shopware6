@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\Voucher;
 
@@ -10,11 +11,6 @@ class VoucherType
     public const TYPE_MEAL = '2';
     public const TYPE_GIFT = '3';
 
-
-    /**
-     * @param string $type
-     * @return bool
-     */
     public static function isVoucherProduct(string $type): bool
     {
         if ($type === self::TYPE_ECO) {

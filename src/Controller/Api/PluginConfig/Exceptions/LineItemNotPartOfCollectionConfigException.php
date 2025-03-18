@@ -8,6 +8,7 @@ class LineItemNotPartOfCollectionConfigException extends MollieRefundConfigExcep
     public static function create(string $id): self
     {
         $message = sprintf('The line item with ID "%s" is not part of the collection.', $id);
+
         return new self($message);
     }
 }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
@@ -40,19 +41,11 @@ class RefundControllerBase extends AbstractController
      */
     private $logger;
 
-
-
-    /**
-     * @param OrderService $orderService
-     * @param RefundManagerInterface $refundManager
-     * @param RefundService $refundService
-     * @param LoggerInterface $logger
-     */
     public function __construct(
-        OrderService            $orderService,
-        RefundManagerInterface  $refundManager,
-        RefundService           $refundService,
-        LoggerInterface         $logger
+        OrderService $orderService,
+        RefundManagerInterface $refundManager,
+        RefundService $refundService,
+        LoggerInterface $logger
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;
@@ -60,32 +53,25 @@ class RefundControllerBase extends AbstractController
         $this->logger = $logger;
     }
 
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // OPERATIONAL APIs
 
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # OPERATIONAL APIs
-
-    /**
-     *
-     * @param QueryDataBag $query
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function refundOrderNumber(QueryDataBag $query, Context $context): JsonResponse
     {
-        $orderNumber = (string)$query->get('number');
+        $orderNumber = (string) $query->get('number');
         $description = $query->get('description', '');
         $internalDescription = $query->get('internalDescription', '');
-        $amount = $query->get('amount', null); # we need NULL as full refund option
-        # we don't allow items here
-        # because this is a non-technical call, and
-        # those items would (at the moment) require order line item IDs
+        $amount = $query->get('amount', null); // we need NULL as full refund option
+        // we don't allow items here
+        // because this is a non-technical call, and
+        // those items would (at the moment) require order line item IDs
         $items = [];
 
-        # we have to convert to float ;)
+        // we have to convert to float ;)
         if ($amount !== null) {
-            $amount = (float)$amount;
+            $amount = (float) $amount;
         }
 
         return $this->refundAction(
@@ -99,17 +85,11 @@ class RefundControllerBase extends AbstractController
         );
     }
 
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # TECHNICAL ADMIN APIs
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // TECHNICAL ADMIN APIs
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function refundManagerData(RequestDataBag $data, Context $context): JsonResponse
     {
         try {
@@ -127,38 +107,21 @@ class RefundControllerBase extends AbstractController
                     'error' => $e,
                 ]
             );
+
             return $this->buildErrorResponse($e->getMessage());
         }
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function list(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->listRefundsAction($data->getAlnum('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function total(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->listTotalAction($data->getAlnum('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function refundOrderID(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId', '');
@@ -184,83 +147,43 @@ class RefundControllerBase extends AbstractController
         );
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
     {
         $orderId = $data->getAlnum('orderId');
         $refundId = $data->get('refundId');
+
         return $this->cancelRefundAction($orderId, $refundId, $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function refundManagerDataLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->refundManagerData($data, $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function listLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->listRefundsAction($data->getAlnum('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function totalLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->listTotalAction($data->getAlnum('orderId'), $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function refundLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->refundOrderID($data, $context);
     }
 
-    /**
-     *
-     * @param RequestDataBag $data
-     * @param Context $context
-     * @return JsonResponse
-     */
     public function cancelLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->cancelRefundAction($data->getAlnum('orderId'), $data->get('refundId'), $context);
     }
 
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------------------------------
 
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function listRefundsAction(string $orderId, Context $context): JsonResponse
     {
         try {
@@ -271,15 +194,11 @@ class RefundControllerBase extends AbstractController
             return $this->json($refunds);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
+
             return $this->buildErrorResponse($e->getMessage());
         }
     }
 
-    /**
-     * @param string $orderId
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function listTotalAction(string $orderId, Context $context): JsonResponse
     {
         try {
@@ -296,7 +215,7 @@ class RefundControllerBase extends AbstractController
 
             return $this->json($json);
         } catch (PaymentNotFoundException $e) {
-            # This indicates there is no completed payment for this order, so there are no refunds yet.
+            // This indicates there is no completed payment for this order, so there are no refunds yet.
             $totals = [
                 'remaining' => 0,
                 'refunded' => 0,
@@ -307,19 +226,13 @@ class RefundControllerBase extends AbstractController
             return $this->json($totals);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
+
             return $this->buildErrorResponse($e->getMessage());
         }
     }
 
     /**
-     * @param string $orderId
-     * @param string $orderNumber
-     * @param string $description
-     * @param string $internalDescription
-     * @param null|float $amount
      * @param array<mixed> $items
-     * @param Context $context
-     * @return JsonResponse
      */
     private function refundAction(string $orderId, string $orderNumber, string $description, string $internalDescription, ?float $amount, array $items, Context $context): JsonResponse
     {
@@ -334,9 +247,8 @@ class RefundControllerBase extends AbstractController
                 $order = $this->orderService->getOrderByNumber($orderNumber, $context);
             }
 
-
             $refundRequest = new RefundRequest(
-                (string)$order->getOrderNumber(),
+                (string) $order->getOrderNumber(),
                 $description,
                 $internalDescription,
                 $amount
@@ -344,10 +256,10 @@ class RefundControllerBase extends AbstractController
 
             foreach ($items as $item) {
                 $refundRequest->addItem(new RefundRequestItem(
-                    (string)$item['id'],
+                    (string) $item['id'],
                     $item['amount'],
-                    (int)$item['quantity'],
-                    (int)$item['resetStock']
+                    (int) $item['quantity'],
+                    (int) $item['resetStock']
                 ));
             }
 
@@ -357,10 +269,9 @@ class RefundControllerBase extends AbstractController
                 $context
             );
 
-
             return $this->json([
                 'success' => true,
-                'refundId' => $refund->id
+                'refundId' => $refund->id,
             ]);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
@@ -369,24 +280,17 @@ class RefundControllerBase extends AbstractController
         }
     }
 
-    /**
-     * @param string $orderId
-     * @param string $refundId
-     * @param Context $context
-     * @return JsonResponse
-     */
     private function cancelRefundAction(string $orderId, string $refundId, Context $context): JsonResponse
     {
         try {
             $success = $this->refundManager->cancelRefund($orderId, $refundId, $context);
 
-
-
             return $this->json([
-                'success' => $success
+                'success' => $success,
             ]);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
+
             return $this->buildErrorResponse($e->getMessage());
         }
     }

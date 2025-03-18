@@ -8,5 +8,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 abstract class AbstractCancelCheckoutRoute
 {
     abstract public function getDecorated(): AbstractStartCheckoutRoute;
+
     abstract public function cancelCheckout(SalesChannelContext $context): CancelCheckoutResponse;
 }

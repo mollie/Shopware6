@@ -30,10 +30,10 @@ class OrderTimeService
     /**
      * Checks if the age of the last transaction of the order is greater than the specified number of hours.
      *
-     * @param OrderEntity $order The order entity to check.
-     * @param int $minutes The number of minutes to compare against.
+     * @param OrderEntity $order the order entity to check
+     * @param int $minutes the number of minutes to compare against
      *
-     * @return bool Returns true if the order is older than the specified number of hours, false otherwise.
+     * @return bool returns true if the order is older than the specified number of hours, false otherwise
      */
     public function isOrderAgeGreaterThan(OrderEntity $order, int $minutes): bool
     {
@@ -64,7 +64,7 @@ class OrderTimeService
             'lastTransactionTime' => $transitionDate->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'now' => $this->now->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             'diffInMinutes' => $diffInMinutes,
-            'minutes'=>$minutes
+            'minutes' => $minutes,
         ]);
 
         return $diffInMinutes > $minutes;

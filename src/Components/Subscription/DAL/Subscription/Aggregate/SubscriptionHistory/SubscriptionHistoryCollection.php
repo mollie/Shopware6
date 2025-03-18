@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory;
 
@@ -6,6 +7,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 
 /**
  * @extends EntityCollection<SubscriptionHistoryEntity>
+ *
  * @method void add(SubscriptionHistoryEntity $entity)
  * @method void set(string $key, SubscriptionHistoryEntity $entity)
  * @method SubscriptionHistoryEntity[]     getIterator()
@@ -16,9 +18,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
  */
 class SubscriptionHistoryCollection extends EntityCollection
 {
-    /**
-     * @return string
-     */
     protected function getExpectedClass(): string
     {
         return SubscriptionHistoryEntity::class;

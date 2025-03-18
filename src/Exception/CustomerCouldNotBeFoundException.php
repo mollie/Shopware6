@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
@@ -10,7 +10,7 @@ class CustomerCouldNotBeFoundException extends \Exception
         ?\Throwable $previous = null
     ) {
         $message = sprintf(
-            "Could not find a customer with id %s",
+            'Could not find a customer with id %s',
             $customerId
         );
 

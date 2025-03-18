@@ -20,7 +20,7 @@ final class FakeMandateService implements MandateServiceInterface
 
     public function revokeMandateByCustomerId(string $customerId, string $mandateId, SalesChannelContext $context): void
     {
-        if (!$this->throwException) {
+        if (! $this->throwException) {
             return;
         }
 

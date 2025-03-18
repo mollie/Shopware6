@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Checkout\OrderCanceled;
 
@@ -22,7 +23,6 @@ class OrderCanceledEvent extends Event implements CustomerAware, OrderAware, Mai
 {
     use JsonSerializableTrait;
 
-
     /**
      * @var OrderEntity
      */
@@ -38,12 +38,6 @@ class OrderCanceledEvent extends Event implements CustomerAware, OrderAware, Mai
      */
     protected $context;
 
-
-    /**
-     * @param OrderEntity $order
-     * @param CustomerEntity $customer
-     * @param Context $context
-     */
     public function __construct(OrderEntity $order, CustomerEntity $customer, Context $context)
     {
         $this->order = $order;
@@ -51,68 +45,44 @@ class OrderCanceledEvent extends Event implements CustomerAware, OrderAware, Mai
         $this->context = $context;
     }
 
-
-    /**
-     * @return EventDataCollection
-     */
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
             ->add('order', new EntityType(OrderDefinition::class))
-            ->add('customer', new EntityType(CustomerDefinition::class));
+            ->add('customer', new EntityType(CustomerDefinition::class))
+        ;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'mollie.checkout.order_canceled';
     }
 
-    /**
-     * @return Context
-     */
     public function getContext(): Context
     {
         return $this->context;
     }
 
-    /**
-     * @return OrderEntity
-     */
     public function getOrder(): OrderEntity
     {
         return $this->order;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderId(): string
     {
         return $this->order->getId();
     }
 
-    /**
-     * @return string
-     */
     public function getCustomerId(): string
     {
         return $this->customer->getId();
     }
 
-    /**
-     * @return CustomerEntity
-     */
     public function getCustomer(): CustomerEntity
     {
         return $this->customer;
     }
 
-    /**
-     * @return MailRecipientStruct
-     */
     public function getMailStruct(): MailRecipientStruct
     {
         return new MailRecipientStruct([
@@ -120,9 +90,6 @@ class OrderCanceledEvent extends Event implements CustomerAware, OrderAware, Mai
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function getSalesChannelId(): string
     {
         return $this->customer->getSalesChannelId();

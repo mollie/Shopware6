@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi;
 
@@ -175,6 +176,7 @@ class PriceCalculatorTest extends TestCase
 
     /**
      * @param array<int,CalculatedTax> $taxes
+     *
      * @return TaxCollection
      */
     private function getTaxCollection(array $taxes): CalculatedTaxCollection

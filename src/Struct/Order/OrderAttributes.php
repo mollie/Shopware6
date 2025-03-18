@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\Order;
 
@@ -115,9 +116,6 @@ class OrderAttributes
      */
     private $bancomatPayPhoneNumber;
 
-    /**
-     * @param OrderEntity $order
-     */
     public function __construct(OrderEntity $order)
     {
         $this->order = $order;
@@ -143,276 +141,173 @@ class OrderAttributes
         $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order, CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
     }
 
-    /**
-     * @return string
-     */
     public function getMollieOrderId(): string
     {
-        return (string)$this->mollieOrderId;
+        return (string) $this->mollieOrderId;
     }
 
-    /**
-     * @param null|string $mollieOrderId
-     */
     public function setMollieOrderId(?string $mollieOrderId): void
     {
         $this->mollieOrderId = $mollieOrderId;
     }
 
-    /**
-     * @return string
-     */
     public function getMolliePaymentId(): string
     {
-        return (string)$this->molliePaymentId;
+        return (string) $this->molliePaymentId;
     }
 
-    /**
-     * @param null|string $molliePaymentId
-     */
     public function setMolliePaymentId(?string $molliePaymentId): void
     {
         $this->molliePaymentId = $molliePaymentId;
     }
 
-    /**
-     * @return null|string
-     */
     public function getThirdPartyPaymentId(): ?string
     {
         return $this->thirdPartyPaymentId;
     }
 
-    /**
-     * @param null|string $thirdPartyPaymentId
-     */
     public function setThirdPartyPaymentId(?string $thirdPartyPaymentId): void
     {
         $this->thirdPartyPaymentId = $thirdPartyPaymentId;
     }
 
-    /**
-     * @return null|string
-     */
     public function getTransactionReturnUrl(): ?string
     {
         return $this->transactionReturnUrl;
     }
 
-    /**
-     * @param null|string $transactionReturnUrl
-     */
     public function setTransactionReturnUrl(?string $transactionReturnUrl): void
     {
         $this->transactionReturnUrl = $transactionReturnUrl;
     }
 
-    /**
-     * @param string $swSubscriptionId
-     * @param string $mollieSubscriptionId
-     */
     public function setSubscriptionData(string $swSubscriptionId, string $mollieSubscriptionId): void
     {
         $this->swSubscriptionId = $swSubscriptionId;
         $this->mollieSubscriptionId = $mollieSubscriptionId;
     }
 
-    /**
-     * @return null|string
-     */
     public function getMolliePaymentUrl(): ?string
     {
         return $this->molliePaymentUrl;
     }
 
-    /**
-     * @param null|string $molliePaymentUrl
-     */
     public function setMolliePaymentUrl(?string $molliePaymentUrl): void
     {
         $this->molliePaymentUrl = $molliePaymentUrl;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardNumber(): string
     {
         return $this->creditCardNumber;
     }
 
-    /**
-     * @param string $creditCardNumber
-     */
     public function setCreditCardNumber(string $creditCardNumber): void
     {
         $this->creditCardNumber = $creditCardNumber;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardHolder(): string
     {
         return $this->creditCardHolder;
     }
 
-    /**
-     * @param string $creditCardHolder
-     */
     public function setCreditCardHolder(string $creditCardHolder): void
     {
         $this->creditCardHolder = $creditCardHolder;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardAudience(): string
     {
         return $this->creditCardAudience;
     }
 
-    /**
-     * @param string $creditCardAudience
-     */
     public function setCreditCardAudience(string $creditCardAudience): void
     {
         $this->creditCardAudience = $creditCardAudience;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardLabel(): string
     {
         return $this->creditCardLabel;
     }
 
-    /**
-     * @param string $creditCardLabel
-     */
     public function setCreditCardLabel(string $creditCardLabel): void
     {
         $this->creditCardLabel = $creditCardLabel;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardCountryCode(): string
     {
         return $this->creditCardCountryCode;
     }
 
-    /**
-     * @param string $creditCardCountryCode
-     */
     public function setCreditCardCountryCode(string $creditCardCountryCode): void
     {
         $this->creditCardCountryCode = $creditCardCountryCode;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardSecurity(): string
     {
         return $this->creditCardSecurity;
     }
 
-    /**
-     * @param string $creditCardSecurity
-     */
     public function setCreditCardSecurity(string $creditCardSecurity): void
     {
         $this->creditCardSecurity = $creditCardSecurity;
     }
 
-    /**
-     * @return string
-     */
     public function getCreditCardFeeRegion(): string
     {
         return $this->creditCardFeeRegion;
     }
 
-    /**
-     * @param string $creditCardFeeRegion
-     */
     public function setCreditCardFeeRegion(string $creditCardFeeRegion): void
     {
         $this->creditCardFeeRegion = $creditCardFeeRegion;
     }
 
-    /**
-     * @return string
-     */
     public function getBankName(): string
     {
         return $this->bankName;
     }
 
-    /**
-     * @param string $bankName
-     */
     public function setBankName(string $bankName): void
     {
         $this->bankName = $bankName;
     }
 
-    /**
-     * @return string
-     */
     public function getBankAccount(): string
     {
         return $this->bankAccount;
     }
 
-    /**
-     * @param string $bankAccount
-     */
     public function setBankAccount(string $bankAccount): void
     {
         $this->bankAccount = $bankAccount;
     }
 
-    /**
-     * @return string
-     */
     public function getBankBic(): string
     {
         return $this->bankBic;
     }
 
-    /**
-     * @param string $bankBic
-     */
     public function setBankBic(string $bankBic): void
     {
         $this->bankBic = $bankBic;
     }
 
-
-
-    /**
-     * @return string
-     */
     public function getTimezone(): string
     {
         return $this->timezone;
     }
 
-    /**
-     * @param string $timezone
-     */
     public function setTimezone(string $timezone): void
     {
         $this->timezone = $timezone;
     }
 
     /**
-     * @param null|stdClass $details
      * @return void
      */
     public function setCreditCardDetails(?stdClass $details)
@@ -441,7 +336,6 @@ class OrderAttributes
     }
 
     /**
-     * @param null|stdClass $details
      * @return void
      */
     public function setBankTransferDetails(?stdClass $details)
@@ -467,25 +361,15 @@ class OrderAttributes
         $this->payPalExpressAuthenticateId = $payPalExpressAuthenticateId;
     }
 
-
-
-    /**
-     * @return string
-     */
     public function getBancomatPayPhoneNumber(): string
     {
         return $this->bancomatPayPhoneNumber;
     }
 
-    /**
-     * @param string $bancomatPayPhoneNumber
-     * @return void
-     */
     public function setBancomatPayPhoneNumber(string $bancomatPayPhoneNumber): void
     {
         $this->bancomatPayPhoneNumber = $bancomatPayPhoneNumber;
     }
-
 
     /**
      * @return array<string,mixed>
@@ -494,87 +378,87 @@ class OrderAttributes
     {
         $mollieData = [];
 
-        # lets save some space and only store
-        # what is existing
-        if ((string)$this->mollieOrderId !== '') {
+        // lets save some space and only store
+        // what is existing
+        if ((string) $this->mollieOrderId !== '') {
             $mollieData['order_id'] = $this->mollieOrderId;
         }
 
-        if ((string)$this->molliePaymentId !== '') {
+        if ((string) $this->molliePaymentId !== '') {
             $mollieData['payment_id'] = $this->molliePaymentId;
         }
 
-        if ((string)$this->swSubscriptionId !== '') {
+        if ((string) $this->swSubscriptionId !== '') {
             $mollieData['swSubscriptionId'] = $this->swSubscriptionId;
         }
 
-        if ((string)$this->mollieSubscriptionId !== '') {
+        if ((string) $this->mollieSubscriptionId !== '') {
             $mollieData['mollieSubscriptionId'] = $this->mollieSubscriptionId;
         }
 
-        if ((string)$this->mollieOrderId !== '') {
+        if ((string) $this->mollieOrderId !== '') {
             $mollieData['third_party_payment_id'] = $this->thirdPartyPaymentId;
         }
 
-        # used by the Mollie Failure-Mode within this plugin
-        if ((string)$this->transactionReturnUrl !== '') {
+        // used by the Mollie Failure-Mode within this plugin
+        if ((string) $this->transactionReturnUrl !== '') {
             $mollieData['transactionReturnUrl'] = $this->transactionReturnUrl;
         }
 
-        # used for the API to read the checkout-URL
-        # within 3rd party systems
-        if ((string)$this->molliePaymentUrl !== '') {
+        // used for the API to read the checkout-URL
+        // within 3rd party systems
+        if ((string) $this->molliePaymentUrl !== '') {
             $mollieData['molliePaymentUrl'] = $this->molliePaymentUrl;
         }
 
-        if ((string)$this->creditCardNumber !== '') {
+        if ((string) $this->creditCardNumber !== '') {
             $mollieData['creditCardNumber'] = $this->creditCardNumber;
         }
 
-        if ((string)$this->creditCardHolder !== '') {
+        if ((string) $this->creditCardHolder !== '') {
             $mollieData['creditCardHolder'] = $this->creditCardHolder;
         }
 
-        if ((string)$this->creditCardAudience !== '') {
+        if ((string) $this->creditCardAudience !== '') {
             $mollieData['creditCardAudience'] = $this->creditCardAudience;
         }
 
-        if ((string)$this->creditCardLabel !== '') {
+        if ((string) $this->creditCardLabel !== '') {
             $mollieData['creditCardLabel'] = $this->creditCardLabel;
         }
 
-        if ((string)$this->creditCardCountryCode !== '') {
+        if ((string) $this->creditCardCountryCode !== '') {
             $mollieData['creditCardCountryCode'] = $this->creditCardCountryCode;
         }
 
-        if ((string)$this->creditCardSecurity !== '') {
+        if ((string) $this->creditCardSecurity !== '') {
             $mollieData['creditCardSecurity'] = $this->creditCardSecurity;
         }
 
-        if ((string)$this->creditCardFeeRegion !== '') {
+        if ((string) $this->creditCardFeeRegion !== '') {
             $mollieData['creditCardFeeRegion'] = $this->creditCardFeeRegion;
         }
 
-        if ((string)$this->timezone !== '') {
+        if ((string) $this->timezone !== '') {
             $mollieData['timezone'] = $this->timezone;
         }
 
-        if ((string)$this->bankName !== '') {
+        if ((string) $this->bankName !== '') {
             $mollieData['bankName'] = $this->bankName;
         }
 
-        if ((string)$this->bankAccount !== '') {
+        if ((string) $this->bankAccount !== '') {
             $mollieData['bankAccount'] = $this->bankAccount;
         }
 
-        if ((string)$this->bankBic !== '') {
+        if ((string) $this->bankBic !== '') {
             $mollieData['bankBic'] = $this->bankBic;
         }
 
         if ($this->bancomatPayPhoneNumber !== '') {
             $mollieData['bancomatPayPhoneNumber'] = $this->bancomatPayPhoneNumber;
         }
-        if ((string)$this->payPalExpressAuthenticateId !== '') {
+        if ((string) $this->payPalExpressAuthenticateId !== '') {
             $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;
         }
 
@@ -583,23 +467,20 @@ class OrderAttributes
         ];
     }
 
-    /**
-     * @return bool
-     */
     public function isTypeSubscription(): bool
     {
-        # if we already have a mollie subscription ID
-        # then we KNOW it's a subscription
+        // if we already have a mollie subscription ID
+        // then we KNOW it's a subscription
         if (! empty($this->mollieSubscriptionId)) {
             return true;
         }
 
-        # also a shopware subscription id reference, means we have one
+        // also a shopware subscription id reference, means we have one
         if (! empty($this->swSubscriptionId)) {
             return true;
         }
 
-        # otherwise, verify if we have subscription items
+        // otherwise, verify if we have subscription items
         if ($this->order->getLineItems() instanceof OrderLineItemCollection) {
             foreach ($this->order->getLineItems() as $lineItem) {
                 $attribute = new OrderLineItemEntityAttributes($lineItem);
@@ -612,24 +493,18 @@ class OrderAttributes
         return false;
     }
 
-
-    /**
-     * @param OrderEntity $order
-     * @param string $keyName
-     * @return string
-     */
     private function getCustomFieldValue(OrderEntity $order, string $keyName): string
     {
         $foundValue = '';
 
         $customFields = $order->getCustomFields();
 
-        # check if we have a mollie entry
+        // check if we have a mollie entry
         if ($customFields !== null && array_key_exists(CustomFieldsInterface::MOLLIE_KEY, $customFields)) {
-            # load the mollie entry
+            // load the mollie entry
             $mollieData = $customFields[CustomFieldsInterface::MOLLIE_KEY];
-            # assign our value if we have it
-            $foundValue = (array_key_exists($keyName, $mollieData)) ? (string)$mollieData[$keyName] : '';
+            // assign our value if we have it
+            $foundValue = (array_key_exists($keyName, $mollieData)) ? (string) $mollieData[$keyName] : '';
         }
 
         return $foundValue;

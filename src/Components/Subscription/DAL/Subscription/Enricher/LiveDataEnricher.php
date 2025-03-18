@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher;
 
@@ -35,12 +36,6 @@ class LiveDataEnricher implements EventSubscriberInterface
      */
     private $logger;
 
-    /**
-     * @param SettingsService $pluginSettings
-     * @param MollieGatewayInterface $gwMollie
-     * @param SubscriptionRepository $repoSubscriptions
-     * @param LoggerInterface $logger
-     */
     public function __construct(SettingsService $pluginSettings, MollieGatewayInterface $gwMollie, SubscriptionRepository $repoSubscriptions, LoggerInterface $logger)
     {
         $this->pluginSettings = $pluginSettings;
@@ -49,37 +44,33 @@ class LiveDataEnricher implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-
     /**
      * @return string[]
      */
     public static function getSubscribedEvents(): array
     {
         return [
-            SubscriptionEvents::SUBSCRIPTIONS_LOADED_EVENT => 'onSubscriptionsLoaded'
+            SubscriptionEvents::SUBSCRIPTIONS_LOADED_EVENT => 'onSubscriptionsLoaded',
         ];
     }
 
-    /**
-     * @param EntityLoadedEvent $event
-     */
     public function onSubscriptionsLoaded(EntityLoadedEvent $event): void
     {
         /** @var SubscriptionEntity $subscription */
         foreach ($event->getEntities() as $subscription) {
             try {
-                # ----------------------------------------------------------------------------------------------------
-                # set the cancellation until-date depending on our plugin configuration
+                // ----------------------------------------------------------------------------------------------------
+                // set the cancellation until-date depending on our plugin configuration
 
                 $settings = $this->pluginSettings->getSettings($subscription->getSalesChannelId());
 
                 $cancellationDays = $settings->getSubscriptionsCancellationDays();
 
                 if ($cancellationDays <= 0) {
-                    # use the next payment date
+                    // use the next payment date
                     $subscription->setCancelUntil($subscription->getNextPaymentAt());
                 } else {
-                    # remove x days from the next renewal date (if existing)
+                    // remove x days from the next renewal date (if existing)
                     $nextPayment = $subscription->getNextPaymentAt();
                     $lastPossibleDate = null;
 
@@ -90,16 +81,15 @@ class LiveDataEnricher implements EventSubscriberInterface
                     $subscription->setCancelUntil($lastPossibleDate);
                 }
 
-
-                # ----------------------------------------------------------------------------------------------------
-                # now get the mollie status if we don't have one in our subscription
-                # this is for backward compatibility, because our local status is new
+                // ----------------------------------------------------------------------------------------------------
+                // now get the mollie status if we don't have one in our subscription
+                // this is for backward compatibility, because our local status is new
                 if ($subscription->getStatus() === '') {
                     $this->gwMollie->switchClient($subscription->getSalesChannelId());
                     $mollieSubscription = $this->gwMollie->getSubscription($subscription->getMollieId(), $subscription->getMollieCustomerId());
 
-                    # convert into our internal one
-                    # and update in our database
+                    // convert into our internal one
+                    // and update in our database
                     $internalStatus = SubscriptionStatus::fromMollieStatus($mollieSubscription->status);
                     $subscription->setStatus($internalStatus);
 

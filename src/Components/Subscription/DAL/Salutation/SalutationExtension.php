@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Salutation;
 
@@ -11,17 +12,11 @@ use Shopware\Core\System\Salutation\SalutationDefinition;
 
 class SalutationExtension extends EntityExtension
 {
-    /**
-     * @return string
-     */
     public function getDefinitionClass(): string
     {
         return SalutationDefinition::class;
     }
 
-    /**
-     * @param FieldCollection $collection
-     */
     public function extendFields(FieldCollection $collection): void
     {
         $collection->add((new OneToManyAssociationField('subscriptionAddress', SubscriptionAddressDefinition::class, 'salutation_id'))->addFlags(new CascadeDelete()));

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
@@ -33,6 +34,7 @@ class ShipOrderActionTest extends TestCase
      * as well as the correct order number.
      *
      * @throws \Exception
+     *
      * @return void
      */
     public function testShippingAction()
@@ -46,13 +48,13 @@ class ShipOrderActionTest extends TestCase
 
         $flowEvent = $this->buildOrderStateFlowEvent($order, 'action.mollie.order.ship');
 
-        # build our action and
-        # start the handling process with our prepared data
+        // build our action and
+        // start the handling process with our prepared data
         $action = new ShipOrderAction($fakeOrderService, $fakeShipment, new NullLogger());
         $action->handle($flowEvent);
 
-        # let's see if our shipment service did receive
-        # the correct calls and data
+        // let's see if our shipment service did receive
+        // the correct calls and data
         $this->assertEquals(true, $fakeShipment->isFullyShipped());
         $this->assertEquals('ord-123', $fakeShipment->getShippedOrderNumber());
     }

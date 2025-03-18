@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
@@ -12,10 +13,6 @@ class IsApplePayEnabledResponse extends StoreApiResponse
      */
     protected $object;
 
-
-    /**
-     * @param bool $isEnabled
-     */
     public function __construct(bool $isEnabled)
     {
         $this->object = new EnabledStruct(

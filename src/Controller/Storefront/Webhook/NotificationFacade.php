@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 
@@ -94,19 +95,7 @@ class NotificationFacade
      */
     private $settingsService;
 
-
     /**
-     * @param MollieGatewayInterface $gatewayMollie
-     * @param OrderStatusConverter $statusConverter
-     * @param OrderStatusUpdater $statusUpdater
-     * @param PaymentMethodRepository $repoPaymentMethods
-     * @param OrderTransactionRepository $repoOrderTransactions
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param SettingsService $serviceService
-     * @param SubscriptionManager $subscription
-     * @param OrderService $orderService
-     * @param LoggerInterface $logger
      * @throws \Exception
      */
     public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepository $repoPaymentMethods, OrderTransactionRepository $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
@@ -127,25 +116,21 @@ class NotificationFacade
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
 
-
     /**
-     * @param string $swTransactionId
-     * @param Context $context
      * @throws WebhookIsTooEarlyException
      * @throws CustomerCouldNotBeFoundException
-     * @return void
      */
     public function onNotify(string $swTransactionId, Context $context): void
     {
-        # -----------------------------------------------------------------------------------------------------
-        # LOAD TRANSACTION
+        // -----------------------------------------------------------------------------------------------------
+        // LOAD TRANSACTION
         $swTransaction = $this->getTransaction($swTransactionId, $context);
 
         if (! $swTransaction instanceof OrderTransactionEntity) {
             throw new \Exception('Transaction ' . $swTransactionId . ' not found in Shopware');
         }
 
-        # -----------------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------------
 
         $swOrder = $swTransaction->getOrder();
 
@@ -163,31 +148,29 @@ class NotificationFacade
             $createdAt->modify('+2 minutes');
 
             if ($now < $createdAt) {
-                throw new WebhookIsTooEarlyException((string)$swOrder->getOrderNumber(), $now, $createdAt);
+                throw new WebhookIsTooEarlyException((string) $swOrder->getOrderNumber(), $now, $createdAt);
             }
         }
 
+        // --------------------------------------------------------------------------------------------
 
-        # --------------------------------------------------------------------------------------------
-
-        # now get the correct settings from the sales channel of that order.
-        # our order might be from a different sales channel, or even a headless sales channel
+        // now get the correct settings from the sales channel of that order.
+        // our order might be from a different sales channel, or even a headless sales channel
         $settings = $this->settingsService->getSettings($swOrder->getSalesChannelId());
 
-        # also set the gateway to our correct sales channel API key
+        // also set the gateway to our correct sales channel API key
         $this->gatewayMollie->switchClient($swOrder->getSalesChannelId());
 
-        # --------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------
 
-        # now get the latest transaction of that order
-        # we always need to make sure to use the latest one, because this
-        # is the one, that is really visible in the administration.
-        # if we don't add to that one, then the previous one is suddenly visible again
-        # which causes confusion and troubles in the end
+        // now get the latest transaction of that order
+        // we always need to make sure to use the latest one, because this
+        // is the one, that is really visible in the administration.
+        // if we don't add to that one, then the previous one is suddenly visible again
+        // which causes confusion and troubles in the end
         $swTransaction = $this->repoOrderTransactions->getLatestOrderTransaction($swOrder->getId(), $context);
 
-
-        # verify if the customer really paid with Mollie in the end
+        // verify if the customer really paid with Mollie in the end
         $paymentMethod = $swTransaction->getPaymentMethod();
 
         if (! $paymentMethod instanceof PaymentMethodEntity) {
@@ -197,14 +180,13 @@ class NotificationFacade
         $paymentMethodAttributes = new PaymentMethodAttributes($paymentMethod);
 
         if (! $paymentMethodAttributes->isMolliePayment()) {
-            # just skip it if it has been paid
-            # with another payment provider
-            # do NOT throw an error
+            // just skip it if it has been paid
+            // with another payment provider
+            // do NOT throw an error
             return;
         }
 
-
-        # --------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------
 
         $orderAttributes = new OrderAttributes($swOrder);
 
@@ -217,55 +199,53 @@ class NotificationFacade
         $mollieOrder = null;
 
         if (! empty($orderAttributes->getMollieOrderId())) {
-            # fetch the order of our mollie ID
-            # from our sales channel mollie profile
+            // fetch the order of our mollie ID
+            // from our sales channel mollie profile
             $mollieOrder = $this->gatewayMollie->getOrder($mollieOrderId);
             $molliePayment = $this->statusConverter->getLatestPayment($mollieOrder);
             $status = $this->statusConverter->getMollieOrderStatus($mollieOrder);
         } elseif ($orderAttributes->isTypeSubscription()) {
-            # subscriptions are automatically charged using a payment ID
-            # so we do not have an order, but a payment instead
+            // subscriptions are automatically charged using a payment ID
+            // so we do not have an order, but a payment instead
             $molliePayment = $this->gatewayMollie->getPayment($molliePaymentId);
             $status = $this->statusConverter->getMolliePaymentStatus($molliePayment);
         } else {
             throw new \Exception('Order is neither a Mollie order nor a subscription order: ' . $swOrder->getOrderNumber());
         }
 
-        # --------------------------------------------------------------------------------------------
-
+        // --------------------------------------------------------------------------------------------
 
         $logId = (! empty($mollieOrderId)) ? $mollieOrderId : $molliePaymentId;
         $this->logger->info('Webhook for order ' . $swOrder->getOrderNumber() . ' and Mollie ID: ' . $logId . ' has been received with Status: ' . $status);
-
 
         $this->statusUpdater->updatePaymentStatus($swTransaction, $status, $context);
 
         $this->statusUpdater->updateOrderStatus($swOrder, $status, $settings, $context);
 
-        # --------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------
 
-        # let's check what payment method has been used
-        # if somehow the user switched to a different one
-        # then we want to update the one inside Shopware
-        # If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
-        # we want to keep Apple Pay as payment method
+        // let's check what payment method has been used
+        // if somehow the user switched to a different one
+        // then we want to update the one inside Shopware
+        // If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
+        // we want to keep Apple Pay as payment method
         if ($swTransaction->getPaymentMethod() instanceof PaymentMethodEntity && $mollieOrder instanceof Order && $swTransaction->getPaymentMethod() instanceof PaymentMethodEntity && $swTransaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
             $this->updatePaymentMethod($swTransaction, $mollieOrder, $context);
         }
 
-        # --------------------------------------------------------------------------------------------
-        # SUBSCRIPTION
-        # this will confirm our created subscriptions in all cases of successful payments.
-        # that path will create the actual subscription inside Mollie which will be used for recurring.
-        # if our payment expired, then we can also expire our local subscription in the database.
+        // --------------------------------------------------------------------------------------------
+        // SUBSCRIPTION
+        // this will confirm our created subscriptions in all cases of successful payments.
+        // that path will create the actual subscription inside Mollie which will be used for recurring.
+        // if our payment expired, then we can also expire our local subscription in the database.
 
         switch ($status) {
             case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
             case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
             case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
-                # it is very important that we use the mandate from this payment
-                # for the subscription, because a customer could have different mandates!
-                # keep in mind, this might be empty here...our confirm endpoint does the final checks
+                // it is very important that we use the mandate from this payment
+                // for the subscription, because a customer could have different mandates!
+                // keep in mind, this might be empty here...our confirm endpoint does the final checks
                 $mandateId = $this->molliePaymentDetails->getMandateId($molliePayment);
                 $this->subscriptionManager->confirmSubscription($swOrder, $mandateId, $context);
                 break;
@@ -275,9 +255,9 @@ class NotificationFacade
                 break;
         }
 
-        # now update the custom fields of the order
-        # we want to have as much information as possible in the shopware order
-        # this includes the Mollie Payment ID and maybe additional references
+        // now update the custom fields of the order
+        // we want to have as much information as possible in the shopware order
+        // this includes the Mollie Payment ID and maybe additional references
         $this->orderService->updateMollieDataCustomFields(
             $swOrder,
             $mollieOrderId,
@@ -286,20 +266,14 @@ class NotificationFacade
             $context
         );
 
-        # --------------------------------------------------------------------------------------------
-        # FIRE FLOW BUILDER TRIGGER EVENT
-        # we have an adapter setup anyway here, so if flow builder is
-        # not yet supported in this shopware version, then
-        # this only triggers a dummy dispatcher ;)
+        // --------------------------------------------------------------------------------------------
+        // FIRE FLOW BUILDER TRIGGER EVENT
+        // we have an adapter setup anyway here, so if flow builder is
+        // not yet supported in this shopware version, then
+        // this only triggers a dummy dispatcher ;)
         $this->fireFlowBuilderEvents($swOrder, $status, $context);
     }
 
-
-    /**
-     * @param string $transactionId
-     * @param Context $context
-     * @return null|OrderTransactionEntity
-     */
     private function getTransaction(string $transactionId, Context $context): ?OrderTransactionEntity
     {
         $criteria = new Criteria([$transactionId]);
@@ -315,11 +289,6 @@ class NotificationFacade
         return $this->repoOrderTransactions->getRepository()->search($criteria, $context)->first();
     }
 
-    /**
-     * @param OrderTransactionEntity $transaction
-     * @param Order $mollieOrder
-     * @param Context $context
-     */
     private function updatePaymentMethod(OrderTransactionEntity $transaction, Order $mollieOrder, Context $context): void
     {
         $criteria = new Criteria();
@@ -329,7 +298,7 @@ class NotificationFacade
                 [
                     new ContainsFilter('handlerIdentifier', 'Kiener\MolliePayments\Handler\Method'),
                     new EqualsFilter('customFields.mollie_payment_method_name', $mollieOrder->method),
-                    new EqualsFilter('active', true)
+                    new EqualsFilter('active', true),
                 ]
             )
         );
@@ -337,9 +306,9 @@ class NotificationFacade
         $shopwarePaymentId = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context)->firstId();
 
         if (is_null($shopwarePaymentId)) {
-            # if the payment method is not available locally in shopware
-            # then we just skip the update process
-            # we do not want to fail our notification because of this
+            // if the payment method is not available locally in shopware
+            // then we just skip the update process
+            // we do not want to fail our notification because of this
             return;
         }
 
@@ -349,19 +318,13 @@ class NotificationFacade
             [
                 [
                     'id' => $transaction->getUniqueIdentifier(),
-                    'paymentMethodId' => $shopwarePaymentId
-                ]
+                    'paymentMethodId' => $shopwarePaymentId,
+                ],
             ],
             $context
         );
     }
 
-    /**
-     * @param OrderEntity $swOrder
-     * @param string $status
-     * @param Context $context
-     * @return void
-     */
     private function fireFlowBuilderEvents(OrderEntity $swOrder, string $status, Context $context): void
     {
         $this->flowBuilderDispatcher->dispatch(

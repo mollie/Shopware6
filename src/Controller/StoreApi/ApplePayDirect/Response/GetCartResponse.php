@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 
@@ -11,7 +12,6 @@ class GetCartResponse extends StoreApiResponse
      * @var ApplePayCartStruct
      */
     protected $object;
-
 
     /**
      * @param array<mixed> $formattedCart

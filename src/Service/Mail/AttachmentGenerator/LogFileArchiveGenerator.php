@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Mail\AttachmentGenerator;
 
@@ -16,11 +17,6 @@ class LogFileArchiveGenerator implements GeneratorInterface
      */
     protected $logFilePrefix;
 
-
-    /**
-     * @param string $logDirectory
-     * @param string $logFilePrefix
-     */
     public function __construct(string $logDirectory, string $logFilePrefix = '')
     {
         $this->logDirectory = $logDirectory;
@@ -28,7 +24,6 @@ class LogFileArchiveGenerator implements GeneratorInterface
     }
 
     /**
-     * @param Context $context
      * @return array<mixed>
      */
     public function generate(Context $context): array
@@ -39,16 +34,15 @@ class LogFileArchiveGenerator implements GeneratorInterface
         $archive = new \ZipArchive();
         $archive->open($fullPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         $archive->addPattern('/^' . $this->logFilePrefix . '.*?\.log$/', $this->logDirectory, [
-            'remove_all_path' => true
+            'remove_all_path' => true,
         ]);
         $archive->close();
-
 
         $content = '';
         $mimeType = '';
 
-        # it can be that no log file exists
-        # in that case just skip it
+        // it can be that no log file exists
+        // in that case just skip it
         if (file_exists($fullPath)) {
             $content = \file_get_contents($fullPath);
             $mimeType = \mime_content_type($fullPath);

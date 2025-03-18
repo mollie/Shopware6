@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
@@ -15,10 +16,8 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 {
-
     /**
      * @throws \Exception
-     * @return void
      */
     public function testOrderBuild(): void
     {
@@ -28,20 +27,18 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $paymentMethod = PaymentMethod::BANKTRANSFER;
 
-
         $this->paymentHandler = new BankTransferPayment(
             $this->loggerService,
             new FakeContainer(),
             $this->settingsService
         );
 
-
         $bankDueDays = 2;
         $expiresDays = 10;
 
         $this->settingStruct->assign([
             'orderLifetimeDays' => $expiresDays,
-            'paymentMethodBankTransferDueDateDays' => $bankDueDays
+            'paymentMethodBankTransferDueDateDays' => $bankDueDays,
         ]);
 
         $transactionId = Uuid::randomHex();
@@ -63,8 +60,8 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
         $bankDueDatetime = (new DateTime())
             ->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $bankDueDays))
-            ->format('Y-m-d');
-
+            ->format('Y-m-d')
+        ;
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
@@ -79,7 +76,7 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $bankDueDatetime
+            'expiresAt' => $bankDueDatetime,
         ];
 
         self::assertSame($expected, $actual);

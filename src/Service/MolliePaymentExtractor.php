@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
@@ -12,13 +13,10 @@ class MolliePaymentExtractor
 
     /**
      * method extracts last created transaction if it is a mollie payment transaction.
-     *
-     * @param null|OrderTransactionCollection $collection
-     * @return null|OrderTransactionEntity
      */
     public function extractLastMolliePayment(?OrderTransactionCollection $collection): ?OrderTransactionEntity
     {
-        if (!$collection instanceof OrderTransactionCollection) {
+        if (! $collection instanceof OrderTransactionCollection) {
             return null;
         }
 
@@ -28,7 +26,7 @@ class MolliePaymentExtractor
 
         // only transactions with a payment method
         $collection->filter(static function (OrderTransactionEntity $transaction) {
-            return ($transaction->getPaymentMethod() instanceof PaymentMethodEntity);
+            return $transaction->getPaymentMethod() instanceof PaymentMethodEntity;
         });
 
         // sort all transactions chronological

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct;
 
@@ -22,6 +23,7 @@ class SubscriptionMetadata
     /**
      * Total number of charges for the subscription to complete.
      * Leave empty for an ongoing subscription.
+     *
      * @var null|int
      */
     private $times;
@@ -31,14 +33,6 @@ class SubscriptionMetadata
      */
     private $tmpTransaction;
 
-
-    /**
-     * @param string $startDate
-     * @param int $interval
-     * @param string $intervalUnit
-     * @param null|int $times
-     * @param string $tmpTransactionId
-     */
     public function __construct(string $startDate, int $interval, string $intervalUnit, ?int $times, string $tmpTransactionId)
     {
         $this->startDate = $startDate;
@@ -50,15 +44,14 @@ class SubscriptionMetadata
 
     /**
      * @param array<mixed> $metadata
-     * @return SubscriptionMetadata
      */
     public static function fromArray(array $metadata): SubscriptionMetadata
     {
-        $startDate = (array_key_exists('start_date', $metadata)) ? (string)$metadata['start_date'] : '';
-        $intervalValue = (array_key_exists('interval_value', $metadata)) ? (int)$metadata['interval_value'] : 0;
-        $intervalUnit = (array_key_exists('interval_unit', $metadata)) ? (string)$metadata['interval_unit'] : '';
-        $times = (array_key_exists('times', $metadata)) ? $metadata['times'] : null;
-        $tmpTransactionId = (array_key_exists('tmp_transaction', $metadata)) ? (string)$metadata['tmp_transaction'] : '';
+        $startDate = (array_key_exists('start_date', $metadata)) ? (string) $metadata['start_date'] : '';
+        $intervalValue = (array_key_exists('interval_value', $metadata)) ? (int) $metadata['interval_value'] : 0;
+        $intervalUnit = (array_key_exists('interval_unit', $metadata)) ? (string) $metadata['interval_unit'] : '';
+        $times = $metadata['times'] ?? null;
+        $tmpTransactionId = (array_key_exists('tmp_transaction', $metadata)) ? (string) $metadata['tmp_transaction'] : '';
 
         return new SubscriptionMetadata(
             $startDate,
@@ -81,56 +74,38 @@ class SubscriptionMetadata
             'times' => $this->times,
         ];
 
-        if (!empty($this->tmpTransaction)) {
+        if (! empty($this->tmpTransaction)) {
             $data['tmp_transaction'] = $this->tmpTransaction;
         }
 
         return $data;
     }
 
-    /**
-     * @return string
-     */
     public function getStartDate(): string
     {
         return $this->startDate;
     }
 
-    /**
-     * @return int
-     */
     public function getInterval(): int
     {
         return $this->interval;
     }
 
-    /**
-     * @return string
-     */
     public function getIntervalUnit(): string
     {
         return $this->intervalUnit;
     }
 
-    /**
-     * @return null|int
-     */
     public function getTimes(): ?int
     {
         return $this->times;
     }
 
-    /**
-     * @return string
-     */
     public function getTmpTransaction(): string
     {
         return $this->tmpTransaction;
     }
 
-    /**
-     * @param string $tmpTransaction
-     */
     public function setTmpTransaction(string $tmpTransaction): void
     {
         $this->tmpTransaction = $tmpTransaction;

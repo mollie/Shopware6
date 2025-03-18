@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 
 /**
  * @coversDefaultClass \Kiener\MolliePayments\Components\CancelManager\CancelItemFacade
- *
  */
 class CancelItemFacadeTest extends TestCase
 {
@@ -81,7 +80,7 @@ class CancelItemFacadeTest extends TestCase
 
         $expectedData = [
             'id' => 'valid',
-            'quantity' => 1
+            'quantity' => 1,
         ];
 
         $this->assertTrue($response->isSuccessful());
@@ -96,7 +95,6 @@ class CancelItemFacadeTest extends TestCase
         $context = Context::createDefaultContext();
 
         $response = $cancelManager->cancelItem('test', 'valid', 'invalidLineId', 1, true, $context);
-
 
         $this->assertFalse($response->isSuccessful());
         $this->assertSame('invalidShopwareLineId', $response->getMessage());
@@ -116,12 +114,12 @@ class CancelItemFacadeTest extends TestCase
 
         $expectedData = [
             'id' => 'valid',
-            'quantity' => 1
+            'quantity' => 1,
         ];
 
         $this->assertTrue($response->isSuccessful());
         $this->assertSame($expectedData, $response->getData());
         $this->assertTrue($stockManager->isCalled());
-        $this->assertSame($expectedData['quantity'], (int)$stockManager->getQuantity());
+        $this->assertSame($expectedData['quantity'], $stockManager->getQuantity());
     }
 }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
@@ -18,7 +19,7 @@ class In3OrderBuilderTest extends AbstractMollieOrderBuilder
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
-        $paymentMethod = 'in3'; # TODO constant not yet availablePaymentMethod::EPS;
+        $paymentMethod = 'in3'; // TODO constant not yet availablePaymentMethod::EPS;
 
         $this->paymentHandler = new In3Payment(
             $this->loggerService,
@@ -50,7 +51,8 @@ class In3OrderBuilderTest extends AbstractMollieOrderBuilder
 
         $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
-            ->format('Y-m-d');
+            ->format('Y-m-d')
+        ;
 
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
@@ -63,7 +65,7 @@ class In3OrderBuilderTest extends AbstractMollieOrderBuilder
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
             'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
-            'expiresAt' => $expectedOrderLifeTime
+            'expiresAt' => $expectedOrderLifeTime,
         ];
 
         self::assertSame($expected, $actual);

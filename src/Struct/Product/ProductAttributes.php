@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\Product;
 
@@ -32,10 +33,6 @@ class ProductAttributes
      */
     private $subscriptionRepetitionCount;
 
-
-    /**
-     * @param ProductEntity $product
-     */
     public function __construct(ProductEntity $product)
     {
         $this->voucherType = $this->getCustomFieldValue($product, 'voucher_type');
@@ -55,22 +52,19 @@ class ProductAttributes
             VoucherType::TYPE_NONE,
             VoucherType::TYPE_ECO,
             VoucherType::TYPE_MEAL,
-            VoucherType::TYPE_GIFT
+            VoucherType::TYPE_GIFT,
         ];
 
-        if (!in_array($this->voucherType, $availableTypes)) {
+        if (! in_array($this->voucherType, $availableTypes)) {
             return VoucherType::TYPE_NOTSET;
         }
 
-        return (string)$this->voucherType;
+        return (string) $this->voucherType;
     }
 
-    /**
-     * @return bool
-     */
     public function isSubscriptionProduct(): bool
     {
-        return (bool)$this->subscriptionProduct;
+        return (bool) $this->subscriptionProduct;
     }
 
     /**
@@ -97,10 +91,10 @@ class ProductAttributes
         return $this->subscriptionRepetitionCount;
     }
 
-
     /**
      * Gets a list of Mollie fields that can be removed from the
      * customFields because their value is NULL
+     *
      * @return array<mixed>
      */
     public function getRemovableFields(): array
@@ -131,22 +125,19 @@ class ProductAttributes
     }
 
     /**
-     * @param ProductEntity $product
-     * @param string $keyName
      * @return mixed
      */
     private function getCustomFieldValue(ProductEntity $product, string $keyName)
     {
         $foundValue = '';
 
-
         $customFields = $product->getTranslated()['customFields'];
 
-        # ---------------------------------------------------------------------------
-        # search in new structure
+        // ---------------------------------------------------------------------------
+        // search in new structure
         if ($customFields !== null) {
             $fullKey = 'mollie_payments_product_' . $keyName;
-            $foundValue = (array_key_exists($fullKey, $customFields)) ? $customFields[$fullKey] : null;
+            $foundValue = $customFields[$fullKey] ?? null;
         }
 
         return $foundValue;

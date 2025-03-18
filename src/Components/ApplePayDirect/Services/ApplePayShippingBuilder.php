@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Services;
 
@@ -26,12 +27,6 @@ class ApplePayShippingBuilder
      */
     private $formatter;
 
-
-    /**
-     * @param CartService $cartService
-     * @param ShippingMethodService $shippingMethodService
-     * @param ApplePayFormatter $applePayFormatter
-     */
     public function __construct(CartService $cartService, ShippingMethodService $shippingMethodService, ApplePayFormatter $applePayFormatter)
     {
         $this->cartService = $cartService;
@@ -39,11 +34,6 @@ class ApplePayShippingBuilder
         $this->formatter = $applePayFormatter;
     }
 
-
-    /**
-     * @param Cart $cart
-     * @return ApplePayCart
-     */
     public function buildApplePayCart(Cart $cart): ApplePayCart
     {
         $appleCart = new ApplePayCart();
@@ -51,8 +41,8 @@ class ApplePayShippingBuilder
         foreach ($cart->getLineItems() as $item) {
             if ($item->getPrice() instanceof CalculatedPrice) {
                 $appleCart->addItem(
-                    (string)$item->getReferencedId(),
-                    (string)$item->getLabel(),
+                    (string) $item->getReferencedId(),
+                    (string) $item->getLabel(),
                     $item->getQuantity(),
                     $item->getPrice()->getUnitPrice()
                 );
@@ -64,7 +54,7 @@ class ApplePayShippingBuilder
 
             if ($grossPrice > 0) {
                 $appleCart->addShipping(
-                    (string)$delivery->getShippingMethod()->getName(),
+                    (string) $delivery->getShippingMethod()->getName(),
                     $grossPrice
                 );
             }
@@ -80,16 +70,13 @@ class ApplePayShippingBuilder
     }
 
     /**
-     * @param string $countryID
-     * @param SalesChannelContext $context
      * @return array<mixed>
      */
     public function getShippingMethods(string $countryID, SalesChannelContext $context): array
     {
         $currentMethodID = $context->getShippingMethod()->getId();
 
-
-        # switch to the correct country of the apple pay user
+        // switch to the correct country of the apple pay user
         $context = $this->cartService->updateCountry($context, $countryID);
 
         $selectedMethod = null;
@@ -100,20 +87,20 @@ class ApplePayShippingBuilder
         $this->cartService->clearFakeAddressIfExists($context);
 
         foreach ($availableShippingMethods as $method) {
-            # temporary switch to our shipping method.
-            # we will then load the cart for this shipping method
-            # in order to get the calculated shipping costs for this.
+            // temporary switch to our shipping method.
+            // we will then load the cart for this shipping method
+            // in order to get the calculated shipping costs for this.
             $tempContext = $this->cartService->updateShippingMethod($context, $method->getId());
             $tempCart = $this->cartService->getCalculatedMainCart($tempContext);
 
             $shippingCosts = $this->cartService->getShippingCosts($tempCart);
 
-            # format it for apple pay
+            // format it for apple pay
             $formattedMethod = $this->formatter->formatShippingMethod($method, $shippingCosts);
 
-            # either assign to our "selected" method which needs to be shown
-            # first in the apple pay list, or to the rest which is
-            # then appended after our default selection.
+            // either assign to our "selected" method which needs to be shown
+            // first in the apple pay list, or to the rest which is
+            // then appended after our default selection.
             if ($method->getId() === $currentMethodID) {
                 $selectedMethod = $formattedMethod;
             } else {
@@ -123,8 +110,8 @@ class ApplePayShippingBuilder
 
         $finalMethods = [];
 
-        # our pre-selected method always needs
-        # to be the first item in the list
+        // our pre-selected method always needs
+        // to be the first item in the list
         if ($selectedMethod !== null) {
             $finalMethods[] = $selectedMethod;
         }
@@ -137,9 +124,6 @@ class ApplePayShippingBuilder
     }
 
     /**
-     * @param ApplePayCart $cart
-     * @param bool $isTestMode
-     * @param SalesChannelContext $context
      * @return array<mixed>
      */
     public function format(ApplePayCart $cart, bool $isTestMode, SalesChannelContext $context): array

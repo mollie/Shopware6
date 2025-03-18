@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Transition;
 
@@ -22,21 +23,12 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
      */
     private $loggerService;
 
-
-    /**
-     * @param TransitionServiceInterface $transitionService
-     * @param LoggerInterface $loggerService
-     */
     public function __construct(TransitionServiceInterface $transitionService, LoggerInterface $loggerService)
     {
         $this->transitionService = $transitionService;
         $this->loggerService = $loggerService;
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
-     */
     public function reOpenDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
@@ -48,7 +40,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_REOPEN, $availableTransitions)) {
             $this->loggerService->error(
                 sprintf(
                     'It is not allowed to change status to open from %s. Aborting reopen transition',
@@ -62,10 +54,6 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
-     */
     public function cancelDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
@@ -76,17 +64,13 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_CANCEL, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_CANCEL, $context);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
-     */
     public function shipDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
@@ -97,17 +81,13 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_SHIP, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_SHIP, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP, $context);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
-     */
     public function partialShipDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
@@ -118,17 +98,13 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_SHIP_PARTIALLY, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_SHIP_PARTIALLY, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
         }
 
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP_PARTIALLY, $context);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
-     */
     public function returnDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
@@ -139,7 +115,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP, $context);
         }
@@ -147,10 +123,6 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         $this->performTransition($delivery, StateMachineTransitionActions::ACTION_RETOUR, $context);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
-     */
     public function partialReturnDelivery(OrderDeliveryEntity $delivery, Context $context): void
     {
         $statusTechnical = $this->getStatusTechnicalName($delivery);
@@ -161,7 +133,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
         $availableTransitions = $this->getAvailableTransitions($delivery, $context);
 
-        if (!$this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY, $availableTransitions)) {
+        if (! $this->transitionIsAllowed(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY, $availableTransitions)) {
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_REOPEN, $context);
             $this->performTransition($delivery, StateMachineTransitionActions::ACTION_SHIP, $context);
         }
@@ -172,8 +144,6 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
     /**
      * Gets the currently available transitions for the delivery entity
      *
-     * @param OrderDeliveryEntity $delivery
-     * @param Context $context
      * @return array<string>
      */
     private function getAvailableTransitions(OrderDeliveryEntity $delivery, Context $context): array
@@ -183,10 +153,6 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
     /**
      * Performs the delivery transition
-     *
-     * @param OrderDeliveryEntity $delivery
-     * @param string $transitionName
-     * @param Context $context
      */
     private function performTransition(OrderDeliveryEntity $delivery, string $transitionName, Context $context): void
     {
@@ -207,7 +173,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
                     'method' => 'delivery-transition-perform-transition',
                     'delivery.id' => $delivery->getId(),
                     'delivery.payload' => $delivery->jsonSerialize(),
-                    'transition' => $transitionName
+                    'transition' => $transitionName,
                 ]
             );
         }
@@ -216,19 +182,13 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
     /**
      * Checks if the requested transition is allowed for the current delivery state
      *
-     * @param string $transition
      * @param array<mixed> $availableTransitions
-     * @return bool
      */
     private function transitionIsAllowed(string $transition, array $availableTransitions): bool
     {
         return $this->transitionService->transitionIsAllowed($transition, $availableTransitions);
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @return string
-     */
     private function getStatusName(OrderDeliveryEntity $delivery): string
     {
         if ($delivery->getStateMachineState() instanceof StateMachineStateEntity) {
@@ -238,10 +198,6 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
         return '';
     }
 
-    /**
-     * @param OrderDeliveryEntity $delivery
-     * @return string
-     */
     private function getStatusTechnicalName(OrderDeliveryEntity $delivery): string
     {
         if ($delivery->getStateMachineState() instanceof StateMachineStateEntity) {

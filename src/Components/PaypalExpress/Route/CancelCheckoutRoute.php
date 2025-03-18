@@ -21,9 +21,9 @@ class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
     private CartServiceInterface $cartService;
 
     public function __construct(
-        SettingsService      $settingsService,
+        SettingsService $settingsService,
         CartServiceInterface $cartService,
-        PayPalExpress        $paypalExpress
+        PayPalExpress $paypalExpress
     ) {
         $this->settingsService = $settingsService;
         $this->paypalExpress = $paypalExpress;
@@ -46,11 +46,11 @@ class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
         $cart = $this->cartService->getCalculatedMainCart($context);
         $mollieShopwareCart = new MollieShopwareCart($cart);
 
-        # get the existing session ID
+        // get the existing session ID
         $sessionId = $mollieShopwareCart->getPayPalExpressSessionID();
 
-        # clear the Auth-ID and save the cart
-        # this is important, the rest of the handling is done in the PaypalExpressSubscriber
+        // clear the Auth-ID and save the cart
+        // this is important, the rest of the handling is done in the PaypalExpressSubscriber
         $mollieShopwareCart->setPayPalExpressAuthenticateId('');
         $cart = $mollieShopwareCart->getCart();
         $this->cartService->persistCart($cart, $context);
@@ -64,6 +64,7 @@ class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
         } catch (\Throwable $e) {
             //todo: remove try catch once cancel is possible from mollie
         }
+
         return new CancelCheckoutResponse($sessionId);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Helper;
 
@@ -12,25 +12,18 @@ class ProfileHelper
 {
     /**
      * @param array<mixed> $data
-     * @param MollieApiClient $apiClient
-     * @param MollieSettingStruct $settings
      */
-    public static function addProfileToData(array &$data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
+    public static function addProfileToData(array & $data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
     {
         $profile = self::getProfile($apiClient, $settings);
 
         if ($profile instanceof Profile) {
-            $data['profileId'] = (string)$profile->id;
+            $data['profileId'] = (string) $profile->id;
         }
     }
 
     /**
      * Returns the current profile for Mollie's API.
-     *
-     * @param MollieApiClient $apiClient
-     * @param MollieSettingStruct $settings
-     *
-     * @return null|Profile
      */
     public static function getProfile(MollieApiClient $apiClient, MollieSettingStruct $settings): ?Profile
     {
@@ -62,7 +55,6 @@ class ProfileHelper
                 }
             }
         } catch (ApiException $e) {
-            //
         }
 
         return $profile;

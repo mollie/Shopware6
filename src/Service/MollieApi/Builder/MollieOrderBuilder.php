@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
@@ -78,19 +79,6 @@ class MollieOrderBuilder
      */
     private $logger;
 
-
-    /**
-     * @param SettingsService $settingsService
-     * @param OrderDataExtractor $extractor
-     * @param MollieOrderPriceBuilder $priceBuilder
-     * @param MollieLineItemBuilder $lineItemBuilder
-     * @param MollieOrderAddressBuilder $addressBuilder
-     * @param MollieOrderCustomerEnricher $customerEnricher
-     * @param RoutingBuilder $urlBuilder
-     * @param MollieLocaleService $mollieLocaleService
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface $logger
-     */
     public function __construct(SettingsService $settingsService, OrderDataExtractor $extractor, MollieOrderPriceBuilder $priceBuilder, MollieLineItemBuilder $lineItemBuilder, MollieOrderAddressBuilder $addressBuilder, MollieOrderCustomerEnricher $customerEnricher, RoutingBuilder $urlBuilder, MollieLocaleService $mollieLocaleService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->settingsService = $settingsService;
@@ -105,15 +93,11 @@ class MollieOrderBuilder
         $this->logger = $logger;
     }
 
-
     /**
-     * @param OrderEntity $order
-     * @param string $transactionId
-     * @param string $paymentMethod
-     * @param SalesChannelContext $salesChannelContext
-     * @param null|PaymentHandler $handler
      * @param array<mixed> $paymentData
+     *
      * @throws \Exception
+     *
      * @return array<mixed>
      */
     public function buildPaymentsPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
@@ -131,13 +115,10 @@ class MollieOrderBuilder
     }
 
     /**
-     * @param OrderEntity $order
-     * @param string $transactionId
-     * @param string $paymentMethod
-     * @param SalesChannelContext $salesChannelContext
-     * @param null|PaymentHandler $handler
      * @param array<mixed> $paymentData
+     *
      * @throws CustomerCouldNotBeFoundException
+     *
      * @return array<mixed>
      */
     public function buildOrderPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
@@ -155,22 +136,21 @@ class MollieOrderBuilder
 
         $orderData = [];
 
-
         if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountNet(), $currency->getIsoCode());
         } else {
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         }
 
-        # build custom format
-        # TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
-        if (!empty(trim($settings->getFormatOrderNumber()))) {
+        // build custom format
+        // TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
+        if (! empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
-            $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
+            $orderNumberFormatted = str_replace('{ordernumber}', (string) $order->getOrderNumber(), (string) $orderNumberFormatted);
 
             $orderCustomer = $order->getOrderCustomer();
             if ($orderCustomer instanceof OrderCustomerEntity) {
-                $orderNumberFormatted = str_replace('{customernumber}', (string)$orderCustomer->getCustomerNumber(), (string)$orderNumberFormatted);
+                $orderNumberFormatted = str_replace('{customernumber}', (string) $orderCustomer->getCustomerNumber(), (string) $orderNumberFormatted);
             }
         } else {
             $orderNumberFormatted = $order->getOrderNumber();
@@ -181,7 +161,6 @@ class MollieOrderBuilder
         $orderData['orderNumber'] = $orderNumberFormatted;
         $orderData['payment'] = $paymentData;
 
-
         $redirectUrl = $this->urlBuilder->buildReturnUrl($transactionId);
         $webhookUrl = $this->urlBuilder->buildWebhookURL($transactionId);
 
@@ -189,12 +168,11 @@ class MollieOrderBuilder
         $orderData['webhookUrl'] = $webhookUrl;
         $orderData['payment']['webhookUrl'] = $webhookUrl;
 
-
-        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection && $this->isSubscriptions($lineItems->getElements())) {
+        if ($lineItems instanceof OrderLineItemCollection && $settings->isSubscriptionsEnabled() && $this->isSubscriptions($lineItems->getElements())) {
             $orderData['payment']['sequenceType'] = 'first';
         }
 
-        # ----------------------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------
 
         $orderData['lines'] = $this->lineItemBuilder->buildLineItemPayload(
             $order,
@@ -203,7 +181,7 @@ class MollieOrderBuilder
             $isVerticalTaxCalculation
         );
 
-        # ----------------------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------
 
         $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
@@ -215,9 +193,9 @@ class MollieOrderBuilder
             $orderData['expiresAt'] = $dueDate;
         }
 
-        # add payment specific data
+        // add payment specific data
         if ($handler instanceof PaymentHandler) {
-            # set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
+            // set CreditCardPayment singleClickPayment true if Single click payment feature is enabled
             if ($handler instanceof CreditCardPayment && $settings->isOneClickPaymentsEnabled()) {
                 $handler->setEnableSingleClickPayment(true);
             }
@@ -230,7 +208,7 @@ class MollieOrderBuilder
             );
         }
 
-        # ----------------------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------
 
         // enrich data with create customer at mollie
         $orderAttributes = new OrderAttributes($order);
@@ -239,7 +217,7 @@ class MollieOrderBuilder
             $orderData = $this->customerEnricher->enrich($orderData, $customer, $settings, $salesChannelContext);
         }
 
-        # ----------------------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------
 
         $this->logger->debug(
             sprintf('Preparing Shopware Order %s to be sent to Mollie', $order->getOrderNumber()),
@@ -251,37 +229,32 @@ class MollieOrderBuilder
             ]
         );
 
-
-        # we want to give people the chance to adjust the
-        # amounts that will be used when building the order.
-        # we do not guarantee anything if this event is consumed by another plugin!
-        # but valid use cases might be the injection of custom metadata for example.
-        # please do not use this unless you know what you are doing!
+        // we want to give people the chance to adjust the
+        // amounts that will be used when building the order.
+        // we do not guarantee anything if this event is consumed by another plugin!
+        // but valid use cases might be the injection of custom metadata for example.
+        // please do not use this unless you know what you are doing!
         $event = new MollieOrderBuildEvent($orderData, $order, $transactionId, $salesChannelContext);
         $event = $this->eventDispatcher->dispatch($event);
 
-        if (!$event instanceof MollieOrderBuildEvent) {
+        if (! $event instanceof MollieOrderBuildEvent) {
             throw new \Exception('Event Dispatcher did not return a MollieOrderBuilder event. No mollie order data is available');
         }
 
-        # now check if we have metadata
-        # and add it to our order if existing
-        if (!empty($event->getMetadata())) {
-            $orderData['metadata'] = (string)json_encode($event->getMetadata());
+        // now check if we have metadata
+        // and add it to our order if existing
+        if (! empty($event->getMetadata())) {
+            $orderData['metadata'] = (string) json_encode($event->getMetadata());
         }
 
         return $orderData;
     }
 
-    /**
-     * @param SalesChannelContext $salesChannelContext
-     * @return bool
-     */
     private function isVerticalTaxCalculation(SalesChannelContext $salesChannelContext): bool
     {
         $salesChannel = $salesChannelContext->getSalesChannel();
 
-        if (!method_exists($salesChannel, 'getTaxCalculationType')) {
+        if (! method_exists($salesChannel, 'getTaxCalculationType')) {
             return false;
         }
 
@@ -290,7 +263,6 @@ class MollieOrderBuilder
 
     /**
      * @param array<mixed> $lines
-     * @return bool
      */
     private function isSubscriptions($lines): bool
     {

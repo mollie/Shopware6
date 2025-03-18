@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
@@ -36,21 +37,7 @@ class RenewAction extends BaseAction
      */
     private $statusConverter;
 
-
     /**
-     * @param SettingsService $pluginSettings
-     * @param SubscriptionRepository $repoSubscriptions
-     * @param SubscriptionBuilder $subscriptionBuilder
-     * @param MollieDataBuilder $mollieRequestBuilder
-     * @param CustomerService $customers
-     * @param MollieGatewayInterface $gwMollie
-     * @param CancellationValidator $cancellationValidator
-     * @param FlowBuilderFactory $flowBuilderFactory
-     * @param FlowBuilderEventFactory $flowBuilderEventFactory
-     * @param SubscriptionHistoryHandler $subscriptionHistory
-     * @param LoggerInterface $logger
-     * @param SubscriptionRenewing $renewingService
-     * @param OrderStatusConverter $statusConverter
      * @throws Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, SubscriptionRenewing $renewingService, OrderStatusConverter $statusConverter)
@@ -73,18 +60,13 @@ class RenewAction extends BaseAction
         $this->statusConverter = $statusConverter;
     }
 
-
     /**
-     * @param string $swSubscriptionId
-     * @param string $molliePaymentId
-     * @param Context $context
      * @throws Exception
-     * @return OrderEntity
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
     {
-        # we need a custom exception here
-        # to avoid errors like "Return value of...not instance of SubscriptionEntity
+        // we need a custom exception here
+        // to avoid errors like "Return value of...not instance of SubscriptionEntity
         try {
             $swSubscription = $this->getRepository()->findById($swSubscriptionId, $context);
         } catch (\Throwable $ex) {
@@ -93,94 +75,90 @@ class RenewAction extends BaseAction
 
         $settings = $this->getPluginSettings($swSubscription->getSalesChannelId());
 
-        if (!$settings->isSubscriptionsEnabled()) {
+        if (! $settings->isSubscriptionsEnabled()) {
             throw new Exception('Subscription with ID ' . $swSubscriptionId . ' not renewed. Subscriptions are disabled for this Sales Channel');
         }
 
-        # only renew active subscriptions
-        # however, if it's the last time, then it's unfortunately already "completed"
-        # so we also need to allow this.
-        if (!$swSubscription->isRenewingAllowed()) {
+        // only renew active subscriptions
+        // however, if it's the last time, then it's unfortunately already "completed"
+        // so we also need to allow this.
+        if (! $swSubscription->isRenewingAllowed()) {
             throw new Exception('Subscription is not active and cannot be edited');
         }
 
         $gateway = $this->getMollieGateway($swSubscription);
 
-
-        # grab our mollie payment and also the mollie subscription
+        // grab our mollie payment and also the mollie subscription
         $payment = $gateway->getPayment($molliePaymentId);
         $mollieSubscription = $gateway->getSubscription($swSubscription->getMollieId(), $swSubscription->getMollieCustomerId());
 
-        # if this transaction id is somehow NOT from our subscription
-        # then do not proceed and throw an error.
-        # in DEV mode, we allow this, otherwise we cannot test this!
-        if (!$this->isMollieDevMode() && (string)$payment->subscriptionId !== $swSubscription->getMollieId()) {
+        // if this transaction id is somehow NOT from our subscription
+        // then do not proceed and throw an error.
+        // in DEV mode, we allow this, otherwise we cannot test this!
+        if (! $this->isMollieDevMode() && (string) $payment->subscriptionId !== $swSubscription->getMollieId()) {
             throw new \Exception('Warning, trying to renew subscription based on a payment that does not belong to this subscription!');
         }
 
-        # verify if the amount is higher than 0,00
-        # we just want to ensure that a "payment method update" does not lead to this webhook (it felt as if it was in 1 case)
-        if ((float)$payment->amount->value <= 0) {
+        // verify if the amount is higher than 0,00
+        // we just want to ensure that a "payment method update" does not lead to this webhook (it felt as if it was in 1 case)
+        if ((float) $payment->amount->value <= 0) {
             throw new \Exception('Warning, trying to renew subscription based on a 0,00 payment. Mollie should actually not call the renew-webhook for this!');
         }
 
-
         $salesChannelSettings = $this->getPluginSettings($swSubscription->getSalesChannelId());
 
-        # It's possible to automatically skip failed payments and avoid that new orders are created. This is a plugin configuration.
-        # If skipping is enabled, and the payment status is not approved, then we throw an error and skip the renewal (for this payment attempt).
+        // It's possible to automatically skip failed payments and avoid that new orders are created. This is a plugin configuration.
+        // If skipping is enabled, and the payment status is not approved, then we throw an error and skip the renewal (for this payment attempt).
         if ($salesChannelSettings->isSubscriptionSkipRenewalsOnFailedPayments()) {
             $status = $this->statusConverter->getMolliePaymentStatus($payment);
 
-            if (!MolliePaymentStatus::isApprovedStatus($status)) {
-                # let's throw a specific exception, because we need to
-                # handle the response for Mollie with 200 OK
+            if (! MolliePaymentStatus::isApprovedStatus($status)) {
+                // let's throw a specific exception, because we need to
+                // handle the response for Mollie with 200 OK
                 throw new SubscriptionSkippedException($swSubscriptionId, $payment->id);
             }
         }
 
-        # first thing is, we have to update our new paymentAt of our local subscription.
-        # we do this immediately because we get the correct data from Mollie anyway
+        // first thing is, we have to update our new paymentAt of our local subscription.
+        // we do this immediately because we get the correct data from Mollie anyway
         $this->getRepository()->updateNextPaymentAt(
             $swSubscriptionId,
-            (string)$mollieSubscription->nextPaymentDate,
+            (string) $mollieSubscription->nextPaymentDate,
             $context
         );
 
-        # now that we know that we have to renew something,
-        # we also need to make sure, that a skipped subscription is "resumed" again.
-        # we use skip to show that it's not happening that nothing happens in this interval, but
-        # once it's renewed, we make sure its resumed again
+        // now that we know that we have to renew something,
+        // we also need to make sure, that a skipped subscription is "resumed" again.
+        // we use skip to show that it's not happening that nothing happens in this interval, but
+        // once it's renewed, we make sure its resumed again
         if ($swSubscription->getStatus() === SubscriptionStatus::SKIPPED) {
             $this->getRepository()->updateStatus($swSubscriptionId, SubscriptionStatus::RESUMED, $context);
         }
 
-
         $newOrder = $this->renewingService->renewSubscription($swSubscription, $payment, $context);
 
-        # also add a history entry for this subscription
+        // also add a history entry for this subscription
         $this->getStatusHistory()->markRenewed($swSubscription, $context);
 
+        // --------------------------------------------------------------------------------------------------
+        // FLOW BUILDER / BUSINESS EVENTS
 
-        # --------------------------------------------------------------------------------------------------
-        # FLOW BUILDER / BUSINESS EVENTS
-
-        # send renewed command
+        // send renewed command
         $event = $this->getFlowBuilderEventFactory()->buildSubscriptionRenewedEvent($swSubscription->getCustomer(), $swSubscription, $context);
         $this->getFlowBuilderDispatcher()->dispatch($event);
 
-        # send original checkout-order-placed of shopware
+        // send original checkout-order-placed of shopware
         $event = new CheckoutOrderPlacedEvent($context, $newOrder, $newOrder->getSalesChannelId());
         $this->getFlowBuilderDispatcher()->dispatch($event);
 
-        # if this was our last renewal, then send out
-        # a new event that the subscription has now ended
+        // if this was our last renewal, then send out
+        // a new event that the subscription has now ended
         if ($mollieSubscription->timesRemaining !== null && $mollieSubscription->timesRemaining <= 0) {
             $event = $this->getFlowBuilderEventFactory()->buildSubscriptionEndedEvent($swSubscription->getCustomer(), $swSubscription, $context);
             $this->getFlowBuilderDispatcher()->dispatch($event);
         }
 
-        # --------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------
 
         return $newOrder;
     }

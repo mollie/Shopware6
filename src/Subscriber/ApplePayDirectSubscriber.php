@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
@@ -24,11 +25,6 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
      */
     private $applePay;
 
-
-    /**
-     * @param SettingsService $settingsService
-     * @param ApplePayDirect $applePay
-     */
     public function __construct(SettingsService $settingsService, ApplePayDirect $applePay)
     {
         $this->settingsService = $settingsService;
@@ -36,7 +32,7 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
@@ -47,9 +43,7 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param StorefrontRenderEvent $event
      * @throws \Exception
-     * @return void
      */
     public function onStorefrontRender(StorefrontRenderEvent $event): void
     {
@@ -59,25 +53,23 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
 
         $shoPhoneNumberField = $settings->isPhoneNumberFieldRequired() || $settings->isPhoneNumberFieldShown();
 
-        $applePayPaymentMethodId = "";
+        $applePayPaymentMethodId = '';
 
         try {
             $applePayPaymentMethodId = $this->applePay->getActiveApplePayID($event->getSalesChannelContext());
         } catch (\Exception $exception) {
         }
 
-        $event->setParameter('mollie_applepaydirect_phonenumber_required', (int)$shoPhoneNumberField);
+        $event->setParameter('mollie_applepaydirect_phonenumber_required', (int) $shoPhoneNumberField);
         $event->setParameter('mollie_applepaydirect_enabled', $applePayDirectEnabled);
         $event->setParameter('mollie_applepaydirect_restrictions', $settings->getRestrictApplePayDirect());
-        $event->setParameter('mollie_express_required_data_protection', $settings->isRequireDataProtectionCheckbox() && $event->getSalesChannelContext()->getCustomer() == null);
+        $event->setParameter('mollie_express_required_data_protection', $settings->isRequireDataProtectionCheckbox() && $event->getSalesChannelContext()->getCustomer() === null);
         $event->setParameter('apple_pay_payment_method_id', $applePayPaymentMethodId);
     }
 
     /**
      * If our apple pay direct payment is done, we want to restore the original cart
      * just in case if the customer had some items in there.
-     * @param CheckoutFinishPageLoadedEvent $event
-     * @return void
      */
     public function onRestoreBackup(CheckoutFinishPageLoadedEvent $event): void
     {
@@ -87,21 +79,21 @@ class ApplePayDirectSubscriber implements EventSubscriberInterface
 
         $latestTransaction = $mollieShopwareOrder->getLatestTransaction();
 
-        if (!$latestTransaction instanceof OrderTransactionEntity) {
+        if (! $latestTransaction instanceof OrderTransactionEntity) {
             return;
         }
 
         $paymentMethod = $latestTransaction->getPaymentMethod();
 
-        if (!$paymentMethod instanceof PaymentMethodEntity) {
+        if (! $paymentMethod instanceof PaymentMethodEntity) {
             return;
         }
 
         $paymentIdentifier = $paymentMethod->getHandlerIdentifier();
 
-        # Apple Pay direct will automatically restore a previous cart once the checkout is done
-        # the user does not really work in the shopware checkout, and therefore it's good
-        # if the cart remains the same as before the Apple Pay direct checkout
+        // Apple Pay direct will automatically restore a previous cart once the checkout is done
+        // the user does not really work in the shopware checkout, and therefore it's good
+        // if the cart remains the same as before the Apple Pay direct checkout
         if ($paymentIdentifier === ApplePayPayment::class) {
             $this->applePay->restoreCart($context);
         }

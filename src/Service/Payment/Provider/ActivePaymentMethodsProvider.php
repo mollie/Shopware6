@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Payment\Provider;
 
@@ -26,12 +27,6 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      */
     private $logger;
 
-
-    /**
-     * @param MollieApiFactory $mollieApiFactory
-     * @param MollieOrderPriceBuilder $priceFormatter
-     * @param LoggerInterface $logger
-     */
     public function __construct(MollieApiFactory $mollieApiFactory, MollieOrderPriceBuilder $priceFormatter, LoggerInterface $logger)
     {
         $this->mollieApiFactory = $mollieApiFactory;
@@ -39,14 +34,11 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
         $this->logger = $logger;
     }
 
-
     /**
      * Returns an array of active payment methods for a given amount in a specific sales channel.
      *
-     * @param float $price
-     * @param string $currency
-     * @param string $billingCountryCode
      * @param array<mixed> $salesChannelIDs
+     *
      * @return Method[]
      */
     public function getActivePaymentMethodsForAmount(float $price, string $currency, string $billingCountryCode, array $salesChannelIDs): array
@@ -62,7 +54,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
             ],
         ];
 
-        if (mb_strlen($billingCountryCode) > 0) {
+        if ($billingCountryCode !== '') {
             $params['billingCountry'] = $billingCountryCode;
         }
 
@@ -74,6 +66,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
      *
      * @param array<mixed> $parameters
      * @param array<string> $salesChannelIDs
+     *
      * @return array<Method>
      */
     private function getActivePaymentMethods(array $parameters, array $salesChannelIDs): array
@@ -99,7 +92,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
                         }
                     }
 
-                    if (!$found) {
+                    if (! $found) {
                         $allFoundMethods[] = $shopMethod;
                     }
                 }
@@ -119,25 +112,27 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
     /**
      * Returns an array of active payment methods for a specific sales channel.
      *
-     * @param string $salesChannelId
      * @param array<mixed> $parameters
+     *
      * @throws ApiException
+     *
      * @return array<Method>
      */
     private function requestMollieMethods(string $salesChannelId, array $parameters): array
     {
         $mollieApiClient = $this->mollieApiFactory->getClient($salesChannelId);
 
-        if (!in_array('resource', $parameters, true)) {
+        if (! in_array('resource', $parameters, true)) {
             $parameters['resource'] = 'orders';
         }
 
-        if (!in_array('includeWallets', $parameters, true)) {
+        if (! in_array('includeWallets', $parameters, true)) {
             $parameters['includeWallets'] = 'applepay';
         }
 
         return $mollieApiClient->methods
             ->allActive($parameters)
-            ->getArrayCopy();
+            ->getArrayCopy()
+        ;
     }
 }
