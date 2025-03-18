@@ -12,6 +12,4 @@ export default class BuyButtonRepository {
         }
         return buyElementContainer.querySelector('.btn-buy');
     }
-
-
 }

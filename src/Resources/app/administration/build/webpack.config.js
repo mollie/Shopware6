@@ -7,19 +7,17 @@ module.exports = ({ config }) => {
     });
 
     // Add our svg logos
-    urlLoaderRule.exclude.push(
-        resolve(join(__dirname, '../src/assets/creditcard_logos')),
-    );
+    urlLoaderRule.exclude.push(resolve(join(__dirname, '../src/assets/creditcard_logos')));
 
     return {
         module: {
-            rules: [{
-                test: /\.svg$/,
-                include: [
-                    resolve(join(__dirname, '../src/assets/creditcard_logos')),
-                ],
-                loader: resolve(join(__dirname, '..', 'node_modules', 'raw-loader')),
-            }],
+            rules: [
+                {
+                    test: /\.svg$/,
+                    include: [resolve(join(__dirname, '../src/assets/creditcard_logos'))],
+                    loader: resolve(join(__dirname, '..', 'node_modules', 'raw-loader')),
+                },
+            ],
         },
     };
 };

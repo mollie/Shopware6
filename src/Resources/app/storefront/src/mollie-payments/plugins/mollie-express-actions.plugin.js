@@ -1,15 +1,12 @@
 import Plugin from '../Plugin';
-import {PrivacyNoteElement} from '../repository/PrivacyNoteElement';
+import { PrivacyNoteElement } from '../repository/PrivacyNoteElement';
 import BuyButtonRepository from '../repository/BuyButtonRepository';
 import ExpressAddToCart from '../services/ExpressAddToCart';
 
 export const MOLLIE_BIND_EXPRESS_EVENTS = 'BindExpressEvents';
 
 export class MollieExpressActions extends Plugin {
-
-
     init() {
-
         const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
         if (pluginOffCanvasInstances.length > 0) {
             pluginOffCanvasInstances.forEach((pluginOffCanvas) => {
@@ -18,11 +15,9 @@ export class MollieExpressActions extends Plugin {
         }
 
         this.bindEvents();
-
     }
 
     bindEvents() {
-
         const privacyNote = new PrivacyNoteElement();
         privacyNote.observeButtons();
 
@@ -33,14 +28,11 @@ export class MollieExpressActions extends Plugin {
                 return;
             }
 
-
             const buyButtonRepository = new BuyButtonRepository();
 
             expressButtons.forEach((button) => {
-
-
                 button.classList.remove('d-none');
-                button.addEventListener('click', this.onButtonClick)
+                button.addEventListener('click', this.onButtonClick);
 
                 const buyButton = buyButtonRepository.find(button);
                 if (!(buyButton instanceof HTMLButtonElement)) {
@@ -49,7 +41,7 @@ export class MollieExpressActions extends Plugin {
 
                 if (buyButton.hasAttribute('disabled')) {
                     button.classList.add('d-none');
-                    button.removeEventListener('click', this.onButtonClick)
+                    button.removeEventListener('click', this.onButtonClick);
                 }
 
                 const buyButtonForm = buyButton.closest('form');
@@ -58,25 +50,19 @@ export class MollieExpressActions extends Plugin {
                 }
 
                 buyButtonForm.addEventListener('change', () => {
-
                     button.classList.remove('d-none');
-                    button.addEventListener('click', this.onButtonClick)
+                    button.addEventListener('click', this.onButtonClick);
 
                     if (buyButton.hasAttribute('disabled')) {
-
                         button.classList.add('d-none');
-                        button.removeEventListener('click', this.onButtonClick)
+                        button.removeEventListener('click', this.onButtonClick);
                     }
-
-                })
-
+                });
             });
-
         });
     }
 
     onButtonClick(event) {
-
         let target = event.target;
         if (!(target instanceof HTMLButtonElement)) {
             target = target.closest('button');

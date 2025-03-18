@@ -1,15 +1,12 @@
 // eslint-disable-next-line no-undef
-const {Application} = Shopware;
+const { Application } = Shopware;
 
 export default class ShopwareOrderGrid {
-
-
     /**
      *
      * @returns {[{property: string, label: string, align: string},{property: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},null,null,null,null,null]}
      */
     buildColumns() {
-
         const app = Application.getApplicationRoot();
 
         return [
@@ -77,5 +74,4 @@ export default class ShopwareOrderGrid {
             },
         ];
     }
-
 }

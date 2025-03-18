@@ -1,14 +1,12 @@
 // eslint-disable-next-line no-undef
-const {Application} = Shopware;
+const { Application } = Shopware;
 
 export default class MollieSubscriptionGrid {
-
     /**
      *
      * @returns {[{property: string, label: string, align: string},{property: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},{property: string, width: string, label: string, align: string},null,null,null,null,null]}
      */
     buildColumns() {
-
         const app = Application.getApplicationRoot();
 
         if (!app) {
@@ -61,5 +59,4 @@ export default class MollieSubscriptionGrid {
             },
         ];
     }
-
 }

@@ -1,11 +1,8 @@
 import BuyButtonRepository from '../repository/BuyButtonRepository';
 
 export default class ExpressAddToCart {
-
     addItemToCartOrSkip(button) {
-
         return new Promise((resolve, reject) => {
-
             const buyButtonRepository = new BuyButtonRepository();
             const buyButton = buyButtonRepository.find(button);
 
@@ -28,10 +25,9 @@ export default class ExpressAddToCart {
                 body: formData,
             })
                 .then(() => {
-                    resolve()
+                    resolve();
                 })
-                .catch(error => reject(error));
+                .catch((error) => reject(error));
         });
     }
-
 }

@@ -87,7 +87,7 @@ class RemindAction extends BaseAction
             $message = 'Starting Subscription Renewal Reminder from Scheduled Tasks for SalesChannel "%s".';
             $message = sprintf($message, $salesChannel->getName());
 
-            $this->log->info($message);
+            $this->getLogger()->info($message);
 
             $daysOffset = $settings->getSubscriptionsReminderDays();
 

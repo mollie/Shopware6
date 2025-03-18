@@ -8,6 +8,5 @@
         "raw-loader": "^4.0.2",
         "regenerator-runtime": "^0.14.1"
     },
-    "devDependencies": {
-    }
+    "devDependencies": {}
 }

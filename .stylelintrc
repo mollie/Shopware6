@@ -9,6 +9,7 @@
         "color-hex-case": "lower",
         "no-missing-end-of-source-newline": true,
         "selector-class-pattern": "",
+        "string-quotes": "single",
         "property-no-unknown": [
             true,
             {

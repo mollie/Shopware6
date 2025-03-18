@@ -33,21 +33,20 @@ export default class HttpClient {
      * @param {function} callbackError
      * @param {string} contentType
      */
-    send(type, url, data = null, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE)
-    {
+    send(type, url, data = null, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
         const xhr = new XMLHttpRequest();
         xhr.open(type, url);
         xhr.setRequestHeader('Content-Type', contentType);
 
         xhr.onload = function () {
-            if(!callbackSuccess || typeof callbackSuccess !== 'function') {
+            if (!callbackSuccess || typeof callbackSuccess !== 'function') {
                 return;
             }
 
             const responseType = xhr.getResponseHeader('content-type');
-            const body = 'response' in xhr ? xhr.response : xhr.responseText
+            const body = 'response' in xhr ? xhr.response : xhr.responseText;
 
-            if(responseType.indexOf('application/json') > -1) {
+            if (responseType.indexOf('application/json') > -1) {
                 callbackSuccess(JSON.parse(body));
             } else {
                 callbackSuccess(body);
@@ -55,7 +54,7 @@ export default class HttpClient {
         };
 
         xhr.onerror = function () {
-            if(!callbackError || typeof callbackSuccess !== 'function') {
+            if (!callbackError || typeof callbackSuccess !== 'function') {
                 return;
             }
 

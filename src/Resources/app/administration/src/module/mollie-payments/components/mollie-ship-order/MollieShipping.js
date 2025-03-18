@@ -1,8 +1,6 @@
 import OrderAttributes from '../../../../core/models/OrderAttributes';
 
 export default class MollieShipping {
-
-
     /**
      *
      * @param shippingService
@@ -17,7 +15,6 @@ export default class MollieShipping {
      * @returns {boolean}
      */
     async isShippingPossible(order) {
-
         const orderAttributes = new OrderAttributes(order);
 
         // this can happen on subscription renewals...they have no order id
@@ -78,7 +75,6 @@ export default class MollieShipping {
      * @private
      */
     _shippableQuantity(item) {
-
         if (this.shippedLineItems === null || this.shippedLineItems === undefined) {
             return 0;
         }
@@ -91,5 +87,4 @@ export default class MollieShipping {
 
         return itemShippingStatus.quantityShippable;
     }
-
 }

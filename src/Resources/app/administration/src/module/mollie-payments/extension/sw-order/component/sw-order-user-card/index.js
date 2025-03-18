@@ -3,7 +3,7 @@ import './sw-order-user-card.scss';
 import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 // eslint-disable-next-line no-undef
-const {Component} = Shopware;
+const { Component } = Shopware;
 
 Component.override('sw-order-user-card', {
     template,
@@ -19,7 +19,6 @@ Component.override('sw-order-user-card', {
     },
 
     computed: {
-
         /**
          *
          * @returns {boolean}
@@ -42,7 +41,7 @@ Component.override('sw-order-user-card', {
          * @returns {string|*}
          */
         creditCardLabel() {
-            return this._creditCardData().getLabel()
+            return this._creditCardData().getLabel();
         },
 
         /**
@@ -50,7 +49,7 @@ Component.override('sw-order-user-card', {
          * @returns {string|*}
          */
         creditCardNumber() {
-            return '**** **** **** ' + this._creditCardData().getNumber()
+            return '**** **** **** ' + this._creditCardData().getNumber();
         },
 
         /**
@@ -58,7 +57,7 @@ Component.override('sw-order-user-card', {
          * @returns {string|*}
          */
         creditCardHolder() {
-            return this._creditCardData().getHolder()
+            return this._creditCardData().getHolder();
         },
 
         /**
@@ -104,7 +103,6 @@ Component.override('sw-order-user-card', {
         hasPaymentLink() {
             return this.molliePaymentUrl !== '';
         },
-
     },
 
     created() {
@@ -126,9 +124,9 @@ Component.override('sw-order-user-card', {
 
             this.isMolliePaymentUrlLoading = true;
 
-            this.MolliePaymentsOrderService.getPaymentUrl({orderId: this.currentOrder.id})
-                .then(response => {
-                    this.molliePaymentUrl = (response.url !== null) ? response.url : '';
+            this.MolliePaymentsOrderService.getPaymentUrl({ orderId: this.currentOrder.id })
+                .then((response) => {
+                    this.molliePaymentUrl = response.url !== null ? response.url : '';
                 })
                 .finally(() => {
                     this.isMolliePaymentUrlLoading = false;
@@ -160,6 +158,5 @@ Component.override('sw-order-user-card', {
         onMolliePaymentUrlProcessFinished(value) {
             this.molliePaymentUrlCopied = value;
         },
-
     },
 });
