@@ -11,7 +11,7 @@ class ModeHelper
     /**
      * @param array<mixed> $data
      */
-    public static function addModeToData(array & $data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
+    public static function addModeToData(array &$data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
     {
         if ($apiClient->usesOAuth() === true && $settings->isTestMode() === true) {
             $data['testmode'] = true;

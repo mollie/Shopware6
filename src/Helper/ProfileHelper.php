@@ -13,7 +13,7 @@ class ProfileHelper
     /**
      * @param array<mixed> $data
      */
-    public static function addProfileToData(array & $data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
+    public static function addProfileToData(array &$data, MollieApiClient $apiClient, MollieSettingStruct $settings): void
     {
         $profile = self::getProfile($apiClient, $settings);
 
