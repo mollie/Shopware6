@@ -66,10 +66,12 @@ class UrlParsingService
 
         if (mb_strlen($path) > 0) {
             $pathParts = explode('/', $path);
-            array_walk($pathParts, function (&$pathPart) {
-                $pathPart = rawurlencode($pathPart);
-            });
-            $path = implode('/', $pathParts);
+            $newPathParts = [];
+            foreach ($pathParts as $pathPart) {
+                $newPathParts[] = rawurlencode($pathPart);
+            }
+
+            $path = implode('/', $newPathParts);
         }
 
         $query = '';
