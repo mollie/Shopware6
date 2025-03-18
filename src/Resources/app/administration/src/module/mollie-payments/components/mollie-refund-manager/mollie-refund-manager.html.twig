@@ -59,29 +59,36 @@
                     {{ item.refunded }} {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
                 </template>
                 <template #column-inputQuantity="{ item }">
-                    <sw-number-field numberType="float"
-                                     v-model="item.refundQuantity"
-                                     v-model:value="item.refundQuantity"
-                                     v-if="isItemRefundable(item)"
-                                     :allowEmpty="true"
-                                     :class="{ 'cy-input-quantity':true,'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }"
-                                     @change="onItemQtyChanged(item)"
-                                     @update:value="onItemQtyChanged(item)"
-                    >
+                    <sw-number-field
+                            v-if="isItemRefundable(item)"
+                            numberType="float"
+                            {% if VUE3 %}
+                            v-model:value="item.refundQuantity"
+                            @update:value="onItemQtyChanged(item)"
+                            {% else %}
+                            v-model="item.refundQuantity"
+                            @change="onItemQtyChanged(item)"
+                            {% endif %}
+                            :allowEmpty="true"
+                            :class="{ 'cy-input-quantity':true,'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'quantity', 'input-mode-inactive' : item.refundMode == 'amount' }">
                         <template #suffix>
                             {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
                         </template>
                     </sw-number-field>
                 </template>
                 <template #column-inputAmount="{ item }">
-                    <sw-number-field numberType="float"
-                                     v-model="item.refundAmount"
-                                     v-model:value="item.refundAmount"
-                                     v-if="isItemRefundable(item) && !isItemPromotion(item)"
-                                     :allowEmpty="true"
-                                     :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}"
-                                     @change="onItemAmountChanged(item)"
-                                     @update:value="onItemAmountChanged(item)">
+                    <sw-number-field
+                            v-if="isItemRefundable(item) && !isItemPromotion(item)"
+                            numberType="float"
+                            {% if VUE3 %}
+                            v-model:value="item.refundAmount"
+                            @update:value="onItemAmountChanged(item)"
+                            {% else %}
+                            v-model="item.refundAmount"
+                            @change="onItemAmountChanged(item)"
+                            {% endif %}
+                            :allowEmpty="true"
+                            :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}">
                         <template #suffix>
                             {{ order.currency.symbol }}
                         </template>
@@ -92,37 +99,47 @@
                 </template>
                 <template #column-inputConsiderTax="{ item }">
                     <div v-if="isItemRefundable(item) && !isTaxStatusGross()">
-                        <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkRefundTax')"
-                                           v-model="item.refundTax"
-                                           v-model:value="item.refundTax"
-                                           class="check-refund-tax"
-                                           :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
-                                           @change="onItemRefundTaxChanged(item)"
-                                           @update:value="onItemRefundTaxChanged(item)"
-                                        >
+                        <sw-checkbox-field
+                                {% if VUE3 %}
+                                v-model:value="item.refundTax"
+                                @update:value="onItemRefundTaxChanged(item)"
+                                {% else %}
+                                v-model="item.refundTax"
+                                @change="onItemRefundTaxChanged(item)"
+                                {% endif %}
+                                :label="$tc('mollie-payments.refund-manager.cart.grid.checkRefundTax')"
+                                class="check-refund-tax"
+                                :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }">
                         </sw-checkbox-field>
                     </div>
                 </template>
                 <template #column-inputConsiderPromotion="{ item }">
                     <div v-if="isItemRefundable(item) && !isItemPromotion(item) && isItemDiscounted(item)">
-                        <sw-checkbox-field :label="$tc('mollie-payments.refund-manager.cart.grid.checkDeductPromotion')"
-                                           v-model="item.refundPromotion"
-                                           v-model:value="item.refundPromotion"
-                                           class="check-deduct-promotion"
-                                           :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }"
-                                           @change="onItemPromotionDeductionChanged(item)"
-                                           @update:value="onItemPromotionDeductionChanged(item)"
-                        >
+                        <sw-checkbox-field
+                                {% if VUE3 %}
+                                v-model:value="item.refundPromotion"
+                                @update:value="onItemPromotionDeductionChanged(item)"
+                                {% else %}
+                                v-model="item.refundPromotion"
+                                @change="onItemPromotionDeductionChanged(item)"
+                                {% endif %}
+                                :label="$tc('mollie-payments.refund-manager.cart.grid.checkDeductPromotion')"
+                                class="check-deduct-promotion"
+                                :class="{ 'tutorial-active': tutorialPartialPromotionsVisible }">
                         </sw-checkbox-field>
                     </div>
                 </template>
                 <template #column-inputStock=" { item }">
-                    <sw-number-field numberType="float"
-                                     v-model="item.resetStock"
-                                     v-model:value="item.resetStock"
-                                     v-if="isItemRefundable(item) && !isItemPromotion(item) && !isItemDelivery(item)"
-                                     :class="{ 'tutorial-active' : tutorialResetStock }"
-                                     :allowEmpty="true">
+                    <sw-number-field
+                            v-if="isItemRefundable(item) && !isItemPromotion(item) && !isItemDelivery(item)"
+                            numberType="float"
+                            {% if VUE3 %}
+                            v-model:value="item.resetStock"
+                            {% else %}
+                            v-model="item.resetStock"
+                            {% endif %}
+                            :class="{ 'tutorial-active' : tutorialResetStock }"
+                            :allowEmpty="true">
                         <template #suffix>
                             {{ $tc('mollie-payments.refund-manager.general.unitQuantity') }}
                         </template>
@@ -337,15 +354,18 @@
                     </sw-description-list>
                     {# --------------------------------------------------------------------------------------------- #}
                     <sw-container gap="2px">
-                        <sw-number-field v-if="isAclRefundAllowed"
-                                         numberType="float"
-                                         size="medium"
-                                         v-model="refundAmount"
-                                         v-model:value="refundAmount"
-                                         :min="0"
-                                         :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }"
-                                         class="refund-amount"
-                        >
+                        <sw-number-field
+                                v-if="isAclRefundAllowed"
+                                {% if VUE3 %}
+                                v-model:value="refundAmount"
+                                {% else %}
+                                v-model="refundAmount"
+                                {% endif %}
+                                numberType="float"
+                                size="medium"
+                                :min="0"
+                                :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialRefundShipping }"
+                                class="refund-amount">
                             <template #suffix>
                                 {{ order.currency.symbol }}
                             </template>
@@ -358,31 +378,43 @@
                         </sw-button>
                     </sw-container>
                     {# --------------------------------------------------------------------------------------------- #}
-                    <sw-textarea-field v-if="isAclRefundAllowed"
-                                       type="textarea"
-                                       v-model="refundDescription"
-                                       v-model:value="refundDescription"
-                                       class="field-description refund-description"
-                                       :label="descriptionCharacterCountingTitle"
-                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')"
-                                       :helpText="$tc('mollie-payments.refund-manager.summary.descriptionHelp')">
+                    <sw-textarea-field
+                            v-if="isAclRefundAllowed"
+                            type="textarea"
+                            {% if VUE3 %}
+                            v-model:value="refundDescription"
+                            {% else %}
+                            v-model="refundDescription"
+                            {% endif %}
+                            class="field-description refund-description"
+                            :label="descriptionCharacterCountingTitle"
+                            :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderDescription')"
+                            :helpText="$tc('mollie-payments.refund-manager.summary.descriptionHelp')">
                     </sw-textarea-field>
                     {# --------------------------------------------------------------------------------------------- #}
-                    <sw-textarea-field v-if="isAclRefundAllowed"
-                                       type="textarea"
-                                       v-model="refundInternalDescription"
-                                       v-model:value="refundInternalDescription"
-                                       class="field-description refund-internal-description"
-                                       :label="$tc('mollie-payments.refund-manager.summary.lblInternalDescription')"
-                                       :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')"
-                                       :helpText="$tc('mollie-payments.refund-manager.summary.internalDescriptionHelp')">
+                    <sw-textarea-field
+                            v-if="isAclRefundAllowed"
+                            type="textarea"
+                            {% if VUE3 %}
+                            v-model:value="refundInternalDescription"
+                            {% else %}
+                            v-model="refundInternalDescription"
+                            {% endif %}
+                            class="field-description refund-internal-description"
+                            :label="$tc('mollie-payments.refund-manager.summary.lblInternalDescription')"
+                            :placeholder="$tc('mollie-payments.refund-manager.summary.placeholderInternalDescription')"
+                            :helpText="$tc('mollie-payments.refund-manager.summary.internalDescriptionHelp')">
                     </sw-textarea-field>
                     {# --------------------------------------------------------------------------------------------- #}
-                    <sw-checkbox-field v-if="isAclRefundAllowed && configVerifyRefund"
-                                       v-model="checkVerifyRefund"
-                                       v-model:value="checkVerifyRefund"
-                                       :label="$tc('mollie-payments.refund-manager.summary.checkVerification')"
-                                       :bordered="true">
+                    <sw-checkbox-field
+                            v-if="isAclRefundAllowed && configVerifyRefund"
+                            {% if VUE3 %}
+                            v-model:value="checkVerifyRefund"
+                            {% else %}
+                            v-model="checkVerifyRefund"
+                            {% endif %}
+                            :label="$tc('mollie-payments.refund-manager.summary.checkVerification')"
+                            :bordered="true">
                     </sw-checkbox-field>
                     {# --------------------------------------------------------,------------------------------------- #}
                     <sw-alert v-if="!isAclRefundAllowed" variant="warning">

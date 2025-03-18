@@ -152,14 +152,18 @@ SHOPWARE 6.4
                 {% endblock %}
 
                 {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_quantity %}
-                    <sw-number-field numberType="int"
-                                     size="medium"
-                                     :step="1"
-                                     :min="0"
-                                     :max="shippableQuantity(item)"
-                                     v-model:value="shipQuantity"
-                                     v-model="shipQuantity"
-                                     class="cy-ship-quantity"
+                    <sw-number-field
+                            numberType="int"
+                            size="medium"
+                            :step="1"
+                            :min="0"
+                            :max="shippableQuantity(item)"
+                            {% if VUE3 %}
+                            v-model:value="shipQuantity"
+                            {% else %}
+                            v-model="shipQuantity"
+                            {% endif %}
+                            class="cy-ship-quantity"
                     >
                         <template #prefix>
                             {{ $tc('mollie-payments.modals.shipping.item.summary.quantity') }}
@@ -175,10 +179,15 @@ SHOPWARE 6.4
                 {% endblock %}
 
                 {% block sw_order_line_items_grid_grid_mollie_ship_item_modal_tracking %}
-                    <sw-switch-field v-model:value="showTrackingInfo"  v-model="showTrackingInfo"
-                                     :label="$tc('mollie-payments.modals.shipping.showTracking')"
-                                     :noMarginTop="true"
-                                     size="small">
+                    <sw-switch-field
+                            {% if VUE3 %}
+                            v-model:value="showTrackingInfo"
+                            {% else %}
+                            v-model="showTrackingInfo"
+                            {% endif %}
+                            :label="$tc('mollie-payments.modals.shipping.showTracking')"
+                            :noMarginTop="true"
+                            size="small">
                     </sw-switch-field>
                     <mollie-tracking-info v-if="showTrackingInfo"
                                           :delivery="order.deliveries.first()"
