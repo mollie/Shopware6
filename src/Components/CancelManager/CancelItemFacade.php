@@ -6,9 +6,9 @@ namespace Kiener\MolliePayments\Components\CancelManager;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Event\OrderLinesUpdatedEvent;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
-use Mollie\Api\MollieApiClient;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -19,9 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class CancelItemFacade
 {
-    private MollieApiClient $client;
-
-
+    private MollieApiFactory $clientFactory;
     private LoggerInterface $logger;
     private EntityRepository $orderLineItemRepository;
     private StockManagerInterface $stockManager;
@@ -29,7 +27,7 @@ class CancelItemFacade
 
     public function __construct(MollieApiFactory $clientFactory, EntityRepository $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
-        $this->client = $clientFactory->getClient();
+        $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->orderLineItemRepository = $orderLineItemRepository;
         $this->stockManager = $stockManager;
@@ -48,7 +46,22 @@ class CancelItemFacade
                 return $response->failedWithMessage('quantityZero');
             }
 
-            $mollieOrder = $this->client->orders->get($mollieOrderId);
+            $criteria = new Criteria([$shopwareLineId]);
+            $criteria->addAssociation('order');
+            $searchResult = $this->orderLineItemRepository->search($criteria, $context);
+            if ($searchResult->count() === 0) {
+                $this->logger->error('Cancelling item failed, shopware line item not found', $logArguments);
+                return $response->failedWithMessage('invalidShopwareLineId');
+            }
+            /** @var OrderLineItemEntity $shopwareLineItem */
+            $shopwareLineItem = $searchResult->first();
+
+            /** @var OrderEntity $shopwareOrder */
+            $shopwareOrder = $shopwareLineItem->getOrder();
+
+            $client = $this->clientFactory->getClient($shopwareOrder->getSalesChannelId());
+
+            $mollieOrder = $client->orders->get($mollieOrderId);
 
             $orderLine = $mollieOrder->lines()->get($mollieLineId);
 
@@ -66,15 +79,6 @@ class CancelItemFacade
             //First we reset the stocks, just in case something went wrong the customer still have the chance to cancel the item on mollie page
             if ($resetStock) {
                 $this->logger->info('Start to reset stocks', $logArguments);
-                $criteria = new Criteria([$shopwareLineId]);
-                $searchResult = $this->orderLineItemRepository->search($criteria, $context);
-                if ($searchResult->count() === 0) {
-                    $this->logger->error('Failed to reset stocks in cancel process, shopware line item not found', $logArguments);
-                    return $response->failedWithMessage('invalidShopwareLineId');
-                }
-
-                /** @var OrderLineItemEntity $shopwareLineItem */
-                $shopwareLineItem = $searchResult->first();
 
                 $this->stockManager->increaseStock($shopwareLineItem, $quantity);
 
