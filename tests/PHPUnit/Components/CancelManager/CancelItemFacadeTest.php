@@ -34,6 +34,7 @@ class CancelItemFacadeTest extends TestCase
     public function testLineItemNotExistsInOrder(): void
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
+        $cancelManagerBuilder = $cancelManagerBuilder->withValidOrderLine();
         $cancelManager = $cancelManagerBuilder->bild();
         $context = Context::createDefaultContext();
 
@@ -46,6 +47,7 @@ class CancelItemFacadeTest extends TestCase
     public function testQuantityTooHigh(): void
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
+        $cancelManagerBuilder = $cancelManagerBuilder->withValidOrderLine();
         $cancelManager = $cancelManagerBuilder->bild();
         $context = Context::createDefaultContext();
 
@@ -58,6 +60,7 @@ class CancelItemFacadeTest extends TestCase
     public function testApiExceptionInMessage(): void
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withInvalidOrder();
+        $cancelManagerBuilder = $cancelManagerBuilder->withValidOrderLine();
         $cancelManager = $cancelManagerBuilder->bild();
         $context = Context::createDefaultContext();
 
@@ -70,6 +73,7 @@ class CancelItemFacadeTest extends TestCase
     public function testCancelSuccessful(): void
     {
         $cancelManagerBuilder = $this->cancelManagerBuilder->withDefaultOrder();
+        $cancelManagerBuilder = $cancelManagerBuilder->withValidOrderLine();
         $cancelManager = $cancelManagerBuilder->bild();
         $context = Context::createDefaultContext();
 
