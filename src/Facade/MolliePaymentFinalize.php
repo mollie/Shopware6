@@ -74,7 +74,10 @@ class MolliePaymentFinalize
      */
     private $flowBuilderEventFactory;
 
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, EntityRepository $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    /**
+     * @param EntityRepository $repoCustomer
+     */
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

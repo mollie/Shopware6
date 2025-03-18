@@ -20,9 +20,12 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
      */
     protected $settingsService;
 
+    /**
+     * @param EntityRepository $salesChannelRepository
+     */
     public function __construct(
         ConfigurationService $configurationService,
-        EntityRepository $salesChannelRepository,
+        $salesChannelRepository,
         SettingsService $settingsService
     ) {
         parent::__construct($salesChannelRepository);

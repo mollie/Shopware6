@@ -46,7 +46,10 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
      */
     private $logger;
 
-    public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, EntityRepository $repoOrderTransactions, LoggerInterface $logger)
+    /**
+     * @param EntityRepository $repoOrderTransactions
+     */
+    public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, $repoOrderTransactions, LoggerInterface $logger)
     {
         $this->settings = $settings;
         $this->mollieShipment = $mollieShipment;

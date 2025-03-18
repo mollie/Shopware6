@@ -37,7 +37,10 @@ class MollieLocaleService
      */
     private $repoLanguages;
 
-    public function __construct(EntityRepository $repoLanguages)
+    /**
+     * @param EntityRepository $repoLanguages
+     */
+    public function __construct($repoLanguages)
     {
         $this->repoLanguages = $repoLanguages;
     }

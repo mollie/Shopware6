@@ -21,15 +21,21 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ExpireAction
 {
-    private EntityRepository $orderRepository;
-    private EntityRepository $salesChannelRepository;
+    /** @var EntityRepository */
+    private $orderRepository;
+    /** @var EntityRepository */
+    private $salesChannelRepository;
     private OrderExpireService $orderExpireService;
     private SettingsService $settingsService;
     private LoggerInterface $logger;
 
+    /**
+     * @param EntityRepository $orderRepository
+     * @param EntityRepository $salesChannelRepository
+     */
     public function __construct(
-        EntityRepository $orderRepository,
-        EntityRepository $salesChannelRepository,
+         $orderRepository,
+         $salesChannelRepository,
         OrderExpireService $orderExpireService,
         SettingsService $settingsService,
         LoggerInterface $logger

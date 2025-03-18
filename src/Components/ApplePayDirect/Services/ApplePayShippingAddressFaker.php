@@ -16,12 +16,18 @@ use Shopware\Core\Framework\Uuid\Uuid;
 class ApplePayShippingAddressFaker
 {
     private const ID_SUFFIX = 'applePayAddressId';
-    private EntityRepository $customerRepository;
-    private EntityRepository $customerAddressRepository;
+    /** @var EntityRepository */
+    private $customerRepository;
+    /** @var EntityRepository */
+    private $customerAddressRepository;
 
+    /**
+     * @param EntityRepository $customerRepository
+     * @param EntityRepository $customerAddressRepository
+     */
     public function __construct(
-        EntityRepository $customerRepository,
-        EntityRepository $customerAddressRepository
+         $customerRepository,
+         $customerAddressRepository
     ) {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;

@@ -63,7 +63,10 @@ class SubscriptionPageLoader
      */
     private $container;
 
-    public function __construct(GenericPageLoaderInterface $genericLoader, EntityRepository $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
+    /**
+     * @param EntityRepository $repoSubscriptions
+     */
+    public function __construct(GenericPageLoaderInterface $genericLoader, $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
         $this->genericLoader = $genericLoader;
         $this->repoSubscriptions = $repoSubscriptions;

@@ -15,7 +15,10 @@ class OrderDeliveryService
      */
     private $orderDeliveryRepository;
 
-    public function __construct(EntityRepository $orderDeliveryRepository)
+    /**
+     * @param EntityRepository $orderDeliveryRepository
+     */
+    public function __construct($orderDeliveryRepository)
     {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }

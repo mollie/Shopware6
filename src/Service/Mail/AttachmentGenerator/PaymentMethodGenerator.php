@@ -35,7 +35,10 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
      */
     protected $salesChannelDataExtractor;
 
-    public function __construct(EntityRepository $salesChannelRepository, MollieApiFactory $apiFactory, PaymentMethodRepository $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
+    /**
+     * @param EntityRepository $salesChannelRepository
+     */
+    public function __construct($salesChannelRepository, MollieApiFactory $apiFactory, PaymentMethodRepository $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
     {
         parent::__construct($salesChannelRepository);
 

@@ -48,13 +48,16 @@ class OrderController extends AbstractController
      */
     private $orderRepository;
 
+    /**
+     * @param EntityRepository $orderRepository
+     */
     public function __construct(
         RequestBagFactory $requestBagFactory,
         ConfigControllerBase $baseController,
         ShippingControllerBase $shippingController,
         OrderControllerBase $orderController,
         CancelLineController $cancelLineController,
-        EntityRepository $orderRepository
+        $orderRepository
     ) {
         $this->baseController = $baseController;
         $this->shippingController = $shippingController;

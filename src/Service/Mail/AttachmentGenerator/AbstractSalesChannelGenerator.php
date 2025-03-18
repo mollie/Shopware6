@@ -15,7 +15,10 @@ abstract class AbstractSalesChannelGenerator implements GeneratorInterface
      */
     protected $salesChannelRepository;
 
-    public function __construct(EntityRepository $salesChannelRepository)
+    /**
+     * @param EntityRepository $salesChannelRepository
+     */
+    public function __construct($salesChannelRepository)
     {
         $this->salesChannelRepository = $salesChannelRepository;
     }

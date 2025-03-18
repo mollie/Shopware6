@@ -14,7 +14,10 @@ class UpdateOrderTransactionCustomFields
      */
     private $repoTransactions;
 
-    public function __construct(EntityRepository $repoTransactions)
+    /**
+     * @param EntityRepository $repoTransactions
+     */
+    public function __construct($repoTransactions)
     {
         $this->repoTransactions = $repoTransactions;
     }

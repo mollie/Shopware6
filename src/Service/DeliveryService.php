@@ -22,8 +22,10 @@ class DeliveryService
 
     /**
      * Creates a new instance of the transaction service.
+     *
+     * @param mixed $orderDeliveryRepository
      */
-    public function __construct(EntityRepository $orderDeliveryRepository)
+    public function __construct($orderDeliveryRepository)
     {
         $this->orderDeliveryRepository = $orderDeliveryRepository;
     }

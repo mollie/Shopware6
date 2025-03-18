@@ -19,7 +19,10 @@ class UpdateOrderLineItems
      */
     private $orderLineRepository;
 
-    public function __construct(EntityRepository $orderLineRepository)
+    /**
+     * @param EntityRepository $orderLineRepository
+     */
+    public function __construct($orderLineRepository)
     {
         $this->orderLineRepository = $orderLineRepository;
     }

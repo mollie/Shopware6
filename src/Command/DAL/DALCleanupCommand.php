@@ -34,7 +34,10 @@ class DALCleanupCommand extends Command
      */
     private $logger;
 
-    public function __construct(EntityRepository $repoProducts, Connection $connection, LoggerInterface $logger)
+    /**
+     * @param EntityRepository $repoProducts
+     */
+    public function __construct($repoProducts, Connection $connection, LoggerInterface $logger)
     {
         $this->repoProducts = $repoProducts;
         $this->connection = $connection;

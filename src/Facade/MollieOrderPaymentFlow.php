@@ -39,7 +39,10 @@ class MollieOrderPaymentFlow
     /** @var EntityRepository */
     private $orderTransactionRepository;
 
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, EntityRepository $orderTransactionRepository)
+    /**
+     * @param EntityRepository $orderTransactionRepository
+     */
+    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, $orderTransactionRepository)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->orderStatusUpdater = $orderStatusUpdater;

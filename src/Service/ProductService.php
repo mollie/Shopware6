@@ -16,7 +16,10 @@ class ProductService
      */
     private $productRepository;
 
-    public function __construct(EntityRepository $productRepository)
+    /**
+     * @param EntityRepository $productRepository
+     */
+    public function __construct($productRepository)
     {
         $this->productRepository = $productRepository;
     }
