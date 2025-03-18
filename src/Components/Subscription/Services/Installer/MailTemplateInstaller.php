@@ -38,7 +38,12 @@ class MailTemplateInstaller
      */
     private $repoSalesChannels;
 
-    public function __construct(Connection $connection, EntityRepository $repoMailTypes, EntityRepository $repoMailTemplates, EntityRepository $repoSalesChannels)
+    /**
+     * @param EntityRepository $repoMailTypes
+     * @param EntityRepository $repoMailTemplates
+     * @param EntityRepository $repoSalesChannels
+     */
+    public function __construct(Connection $connection, $repoMailTypes, $repoMailTemplates, $repoSalesChannels)
     {
         $this->connection = $connection;
         $this->repoMailTypes = $repoMailTypes;

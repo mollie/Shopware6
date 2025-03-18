@@ -33,7 +33,10 @@ class OrderCloneService
      */
     private $processor;
 
-    public function __construct(EntityRepository $repoOrders, OrderConverter $orderConverter, Processor $processor)
+    /**
+     * @param EntityRepository $repoOrders
+     */
+    public function __construct($repoOrders, OrderConverter $orderConverter, Processor $processor)
     {
         $this->repoOrders = $repoOrders;
         $this->orderConverter = $orderConverter;

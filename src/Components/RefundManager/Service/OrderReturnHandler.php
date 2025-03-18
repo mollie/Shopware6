@@ -21,9 +21,9 @@ class OrderReturnHandler
     private RefundManagerInterface $refundManager;
 
     /**
-     * @var EntityRepository
+     * @var ?EntityRepository
      */
-    private ?EntityRepository $orderReturnRepository;
+    private $orderReturnRepository;
     private LoggerInterface $logger;
     private OrderService $orderService;
 
@@ -34,7 +34,7 @@ class OrderReturnHandler
      */
     public function __construct(
         RefundManagerInterface $refundManager,
-        ?EntityRepository $orderReturnRepository,
+        $orderReturnRepository,
         OrderService $orderService,
         LoggerInterface $logger
     ) {

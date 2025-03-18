@@ -63,7 +63,10 @@ class OrderService implements OrderServiceInterface
      */
     private $orderDeliveryService;
 
-    public function __construct(EntityRepository $orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, LoggerInterface $logger)
+    /**
+     * @param EntityRepository $orderRepository
+     */
+    public function __construct($orderRepository, ShopwareOrderService $swOrderService, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
         $this->swOrderService = $swOrderService;

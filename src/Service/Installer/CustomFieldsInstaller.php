@@ -26,7 +26,10 @@ class CustomFieldsInstaller
      */
     private $repoCustomFields;
 
-    public function __construct(EntityRepository $repoCustomFields)
+    /**
+     * @param EntityRepository $repoCustomFields
+     */
+    public function __construct($repoCustomFields)
     {
         $this->repoCustomFields = $repoCustomFields;
     }

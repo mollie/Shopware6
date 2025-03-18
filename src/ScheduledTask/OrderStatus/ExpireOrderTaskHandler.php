@@ -15,8 +15,11 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
 {
     private ExpireAction $expireAction;
 
+    /**
+     * @param EntityRepository $scheduledTaskRepository
+     */
     public function __construct(
-        EntityRepository $scheduledTaskRepository,
+        $scheduledTaskRepository,
         ExpireAction $expireAction,
         LoggerInterface $logger
     ) {

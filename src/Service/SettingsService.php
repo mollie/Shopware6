@@ -62,8 +62,9 @@ class SettingsService implements PluginSettingsServiceInterface
      * @param ?string $envShopDomain
      * @param ?string $envDevMode
      * @param ?string $envCypressMode
+     * @param mixed $repoSalesChannels
      */
-    public function __construct(SystemConfigService $systemConfigService, EntityRepository $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
+    public function __construct(SystemConfigService $systemConfigService, $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;

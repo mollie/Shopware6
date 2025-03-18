@@ -30,7 +30,10 @@ class VoucherService
      */
     private $logger;
 
-    public function __construct(EntityRepository $repoProducts, LoggerInterface $logger)
+    /**
+     * @param EntityRepository $repoProducts
+     */
+    public function __construct($repoProducts, LoggerInterface $logger)
     {
         $this->repoProducts = $repoProducts;
         $this->logger = $logger;

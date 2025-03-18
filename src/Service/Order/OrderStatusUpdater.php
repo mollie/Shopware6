@@ -43,7 +43,11 @@ class OrderStatusUpdater
      */
     private $stateMachineStateRepository;
 
-    public function __construct(OrderStateService $orderHandler, EntityRepository $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, EntityRepository $stateMachineStateRepository, LoggerInterface $logger)
+    /**
+     * @param EntityRepository $repoOrders
+     * @param EntityRepository $stateMachineStateRepository
+     */
+    public function __construct(OrderStateService $orderHandler, $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, $stateMachineStateRepository, LoggerInterface $logger)
     {
         $this->orderHandler = $orderHandler;
         $this->repoOrders = $repoOrders;

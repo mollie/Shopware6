@@ -84,6 +84,9 @@ class RefundManager implements RefundManagerInterface
     private $logger;
     private RefundCreditNoteService $creditNoteService;
 
+    /**
+     * @param EntityRepository $refundRepository
+     */
     public function __construct(
         RefundDataBuilder $refundDataBuilder,
         OrderServiceInterface $orderService,
@@ -92,7 +95,7 @@ class RefundManager implements RefundManagerInterface
         FlowBuilderFactoryInterface $flowBuilderFactory,
         FlowBuilderEventFactory $flowBuilderEventFactory,
         StockManagerInterface $stockUpdater,
-        EntityRepository $refundRepository,
+        $refundRepository,
         RefundCreditNoteService $creditNoteService,
         LoggerInterface $logger
     ) {

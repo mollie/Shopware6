@@ -22,16 +22,23 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
 class SubscriptionRepository
 {
-    private EntityRepository $repository;
-    private EntityRepository $addressRepository;
+    /** @var EntityRepository */
+    private $repository;
+    /** @var EntityRepository */
+    private $addressRepository;
 
-    public function __construct(EntityRepository $repository, EntityRepository $addressRepository)
+    /**
+     * @param EntityRepository $repository
+     * @param EntityRepository $addressRepository
+     */
+    public function __construct($repository, $addressRepository)
     {
         $this->repository = $repository;
         $this->addressRepository = $addressRepository;
     }
 
-    public function getRepository(): EntityRepository
+    /** @return EntityRepository */
+    public function getRepository()
     {
         return $this->repository;
     }

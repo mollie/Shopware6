@@ -38,7 +38,10 @@ class SubscriptionRenewing
      */
     private $orderCloneService;
 
-    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, EntityRepository $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
+    /**
+     * @param EntityRepository $repoOrderAddress
+     */
+    public function __construct(NumberRangeValueGeneratorInterface $numberRanges, $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
     {
         $this->numberRanges = $numberRanges;
         $this->repoOrderAddress = $repoOrderAddress;

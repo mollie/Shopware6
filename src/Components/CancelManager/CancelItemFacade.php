@@ -21,11 +21,15 @@ class CancelItemFacade
 {
     private MollieApiFactory $clientFactory;
     private LoggerInterface $logger;
-    private EntityRepository $orderLineItemRepository;
+    /** @var EntityRepository */
+    private $orderLineItemRepository;
     private StockManagerInterface $stockManager;
     private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(MollieApiFactory $clientFactory, EntityRepository $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
+    /**
+     * @param EntityRepository $orderLineItemRepository
+     */
+    public function __construct(MollieApiFactory $clientFactory, $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->clientFactory = $clientFactory;
         $this->logger = $logger;

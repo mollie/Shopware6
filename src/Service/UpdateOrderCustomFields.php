@@ -14,7 +14,10 @@ class UpdateOrderCustomFields
      */
     private $orderRepository;
 
-    public function __construct(EntityRepository $orderRepository)
+    /**
+     * @param EntityRepository $orderRepository
+     */
+    public function __construct($orderRepository)
     {
         $this->orderRepository = $orderRepository;
     }

@@ -12,14 +12,21 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 class OrderTransactionRepository
 {
-    private EntityRepository $repository;
+    /**
+     * @var EntityRepository
+     */
+    private $repository;
 
-    public function __construct(EntityRepository $repository)
+    /**
+     * @param EntityRepository $repository
+     */
+    public function __construct($repository)
     {
         $this->repository = $repository;
     }
 
-    public function getRepository(): EntityRepository
+    /** @return EntityRepository */
+    public function getRepository()
     {
         return $this->repository;
     }

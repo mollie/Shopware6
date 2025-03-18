@@ -27,9 +27,12 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
         'testProfileId',
     ];
 
+    /**
+     * @param EntityRepository $salesChannelRepository
+     */
     public function __construct(
         ConfigurationService $configurationService,
-        EntityRepository $salesChannelRepository,
+        $salesChannelRepository,
         SettingsService $settingsService,
         ApiKeyValidator $apiKeyValidator
     ) {

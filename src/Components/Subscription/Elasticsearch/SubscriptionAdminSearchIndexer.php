@@ -25,14 +25,17 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
     private const TYPE_BINARY = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
     private Connection $connection;
     private IteratorFactory $factory;
-
-    private EntityRepository $repository;
+    /** @var EntityRepository */
+    private $repository;
     private int $indexingBatchSize;
 
+    /**
+     * @param EntityRepository $repository
+     */
     public function __construct(
         Connection $connection,
         IteratorFactory $factory,
-        EntityRepository $repository,
+        $repository,
         int $indexingBatchSize
     ) {
         $this->connection = $connection;

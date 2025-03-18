@@ -5,8 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Removed typehints for EntityRepository in order to allow repository decoration in Shopware 6.4
+
 ### Fixed
 - Fixed the error "Call to a member function info() on null"
+- Fixed the issue, that a wrong API Key was used when lineitems were cancelled in administration
 
 
 ## [4.15.0] - 2025-04-03
