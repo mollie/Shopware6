@@ -104,8 +104,8 @@ runs:
     - name: Upload ZIP File to Docker
       shell: bash
       run: |
-        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
-        docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
+        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/MolliePayments.zip
+        docker exec shop bash -c 'php bin/console plugin:zip-import /var/www/html/MolliePayments.zip --delete'
 
     - name: Configure Shopware
       shell: bash
