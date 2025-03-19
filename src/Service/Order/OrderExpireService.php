@@ -40,7 +40,7 @@ class OrderExpireService
         OrderStatusUpdater $orderStatusUpdater,
         OrderTimeService $orderTimeService,
         SettingsService $settingsService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         $this->orderStatusUpdater = $orderStatusUpdater;
         $this->orderTimeService = $orderTimeService;

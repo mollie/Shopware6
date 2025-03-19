@@ -157,7 +157,7 @@ class MolliePaymentDoPay
         $bancomatPayPhoneNumber = $dataBag->get('mollieBancomatPayPhone');
 
         if ($bancomatPayPhoneNumber !== null) {
-            //# we need to pass the custom fields now, so we can use them in create order and display the number on failed orders
+            // # we need to pass the custom fields now, so we can use them in create order and display the number on failed orders
             $orderCustomFields->setBancomatPayPhoneNumber($bancomatPayPhoneNumber);
             $order->setCustomFields($orderCustomFields->toArray());
             $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());

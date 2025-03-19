@@ -11,7 +11,7 @@ class PaymentCouldNotBeCancelledException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $molliePaymentId, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $molliePaymentId, array $parameters = [], ?\Throwable $previous = null)
     {
         parent::__construct(
             sprintf('Mollie payment (%s) could not be cancelled.', $molliePaymentId),

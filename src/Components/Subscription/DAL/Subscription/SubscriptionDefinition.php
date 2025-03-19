@@ -63,14 +63,14 @@ class SubscriptionDefinition extends EntityDefinition
             (new FloatField('amount', 'amount'))->addFlags(new ApiAware()),
             (new IntField('quantity', 'quantity'))->addFlags(new ApiAware()),
             (new FkField('currency_id', 'currencyId', CurrencyDefinition::class))->addFlags(new ApiAware(), new Required()),
-            (new JsonField('metadata', 'metadata')),
+            new JsonField('metadata', 'metadata'),
 
             // --------------------------------------------------------------------------------------------------------------------------
 
             // do not show in API!!!!!!
-            (new StringField('mollie_id', 'mollieId')),
-            (new StringField('mollie_customer_id', 'mollieCustomerId')),
-            (new StringField('mandate_id', 'mandateId')),
+            new StringField('mollie_id', 'mollieId'),
+            new StringField('mollie_customer_id', 'mollieCustomerId'),
+            new StringField('mandate_id', 'mandateId'),
 
             // --------------------------------------------------------------------------------------------------------------------------
 

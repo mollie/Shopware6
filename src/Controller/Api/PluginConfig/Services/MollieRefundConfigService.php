@@ -36,7 +36,7 @@ class MollieRefundConfigService
     public function __construct(
         OrderService $orderService,
         RefundManagerInterface $refundManager,
-        MollieOrderService $mollieOrderService
+        MollieOrderService $mollieOrderService,
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;

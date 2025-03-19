@@ -22,7 +22,7 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
      * Creates a new instance of PaymentMethodSubscriber.
      */
     public function __construct(
-        SettingsService $settingsService
+        SettingsService $settingsService,
     ) {
         $this->settingsService = $settingsService;
     }

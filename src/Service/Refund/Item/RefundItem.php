@@ -34,9 +34,6 @@ class RefundItem
      */
     private $shopwareLineVersionId;
 
-    /**
-     * @param string $shopwareLineID
-     */
     public function __construct(string $mollieLineID, string $shopwareReference, int $quantity, float $amount, ?string $shopwareLineID, ?string $shopwareLineVersionId)
     {
         $this->shopwareLineID = $shopwareLineID;
@@ -47,9 +44,6 @@ class RefundItem
         $this->shopwareLineVersionId = $shopwareLineVersionId;
     }
 
-    /**
-     * @return string
-     */
     public function getShopwareLineID(): ?string
     {
         return $this->shopwareLineID;

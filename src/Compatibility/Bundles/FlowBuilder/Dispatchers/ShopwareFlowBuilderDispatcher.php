@@ -25,8 +25,6 @@ class ShopwareFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInter
     }
 
     /**
-     * @param mixed $event
-     *
      * @return void
      */
     public function dispatch($event)

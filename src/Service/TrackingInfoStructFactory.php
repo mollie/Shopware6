@@ -17,7 +17,7 @@ class TrackingInfoStructFactory
     /**
      * Mollie throws an error with length >= 100
      */
-    const MAX_TRACKING_CODE_LENGTH = 99;
+    public const MAX_TRACKING_CODE_LENGTH = 99;
 
     /**
      * @var UrlParsingService
@@ -31,7 +31,7 @@ class TrackingInfoStructFactory
 
     public function __construct(
         UrlParsingService $urlParsingService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         $this->urlParsingService = $urlParsingService;
         $this->logger = $logger;

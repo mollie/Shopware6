@@ -8,7 +8,7 @@ class CouldNotFetchMollieRefundsException extends \RuntimeException
     public function __construct(
         string $mollieOrderId,
         string $orderNumber,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         $message = sprintf(
             'Could not fetch refunds for the Mollie Order with ID %s (Order number %s)',

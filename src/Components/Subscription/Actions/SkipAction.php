@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
@@ -12,7 +11,7 @@ use Shopware\Core\Framework\Context;
 class SkipAction extends BaseAction
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function skipSubscription(string $subscriptionId, int $skipCount, Context $context): void
     {
@@ -23,15 +22,15 @@ class SkipAction extends BaseAction
         // -------------------------------------------------------------------------------------
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription cannot be skipped. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription cannot be skipped. Subscriptions are disabled for this Sales Channel');
         }
 
         if (! $settings->isSubscriptionsAllowPauseResume()) {
-            throw new Exception('Subscriptions cannot be skipped in this sales channel. Please adjust the plugin configuration.');
+            throw new \Exception('Subscriptions cannot be skipped in this sales channel. Please adjust the plugin configuration.');
         }
 
         if (! $subscription->isSkipAllowed()) {
-            throw new Exception('Skipping of the subscription is not possible because of its current status!');
+            throw new \Exception('Skipping of the subscription is not possible because of its current status!');
         }
 
         // now verify if we are in a valid range to cancel the subscription
@@ -40,13 +39,13 @@ class SkipAction extends BaseAction
         $allowPausing = $this->isCancellationPeriodValid($subscription, $context);
 
         if (! $allowPausing) {
-            throw new Exception('Skipping of the subscription is not possible anymore.This can only be done before the notice period!');
+            throw new \Exception('Skipping of the subscription is not possible anymore.This can only be done before the notice period!');
         }
 
         $currentSubscriptionNextPaymentAt = $subscription->getNextPaymentAt();
 
         if ($currentSubscriptionNextPaymentAt === null) {
-            throw new Exception('Cannot skip subscription ' . $subscription->getId() . '. We dont know when the next payment is, and therefore we cannot create a new subscription after this date');
+            throw new \Exception('Cannot skip subscription ' . $subscription->getId() . '. We dont know when the next payment is, and therefore we cannot create a new subscription after this date');
         }
 
         // -------------------------------------------------------------------------------------

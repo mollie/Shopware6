@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Throwable;
 
 class ApplePayDirectControllerBase
 {
@@ -57,7 +56,7 @@ class ApplePayDirectControllerBase
 
         try {
             $id = $this->applePay->getActiveApplePayID($context);
-        } catch (Throwable $ex) {
+        } catch (\Throwable $ex) {
             $success = false;
 
             $this->logger->warning('Error when fetching Apple Pay ID in Store API. ' . $ex->getMessage());
@@ -212,7 +211,7 @@ class ApplePayDirectControllerBase
             );
 
             return new PaymentResponse(true, $finishUrl, '');
-        } catch (Throwable $ex) {
+        } catch (\Throwable $ex) {
             return new PaymentResponse(false, $errorUrl, $ex->getMessage());
         }
     }

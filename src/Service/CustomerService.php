@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Exception;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
@@ -100,7 +99,7 @@ class CustomerService implements CustomerServiceInterface
         SettingsService $settingsService,
         string $shopwareVersion,
         ConfigService $configService,
-        ContainerInterface $container //we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
+        ContainerInterface $container, // we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -424,7 +423,7 @@ class CustomerService implements CustomerServiceInterface
             $countries = $this->countryRepository->searchIds($criteria, $context)->getIds();
 
             return ! empty($countries) ? (string) $countries[0] : null;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -443,7 +442,7 @@ class CustomerService implements CustomerServiceInterface
             $salutations = $this->salutationRepository->searchIds($criteria, $context)->getIds();
 
             return ! empty($salutations) ? (string) $salutations[0] : null;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -615,7 +614,7 @@ class CustomerService implements CustomerServiceInterface
             }
         }
 
-        //customer have addresses, might be from old PPE orders, might be from shopware, lets find them and select them
+        // customer have addresses, might be from old PPE orders, might be from shopware, lets find them and select them
         $addresses = [];
 
         // we haven't found a default address, create a new one
@@ -624,13 +623,13 @@ class CustomerService implements CustomerServiceInterface
             $addresses[] = $this->createShopwareAddressArray($defaultShippingAddressId, $customer->getId(), $customer->getSalutationId(), $shippingAddress, $context);
         }
 
-        //we have a billing address but we didnt found them in saved addresses, create new one
+        // we have a billing address but we didnt found them in saved addresses, create new one
         if ($billingAddress !== null && $defaultBillingAddressId === null) {
             $defaultBillingAddressId = Uuid::randomHex();
             $addresses[] = $this->createShopwareAddressArray($defaultBillingAddressId, $customer->getId(), $customer->getSalutationId(), $billingAddress, $context);
         }
 
-        //we dont have a billing address, we use the shipping address as billing
+        // we dont have a billing address, we use the shipping address as billing
         if ($billingAddress === null && $defaultBillingAddressId === null) {
             $defaultBillingAddressId = $defaultShippingAddressId;
         }

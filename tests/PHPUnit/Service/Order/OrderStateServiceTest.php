@@ -116,6 +116,16 @@ class OrderStateServiceTest extends TestCase
         $this->assertEquals([$orderState], $this->orderTransitionService->states);
     }
 
+    public function provideOrderState(): array
+    {
+        return [
+            [OrderStates::STATE_OPEN],
+            [OrderStates::STATE_IN_PROGRESS],
+            [OrderStates::STATE_COMPLETED],
+            [OrderStates::STATE_CANCELLED],
+        ];
+    }
+
     /**
      * Tests if log entry is written if an exception is thrown at
      * performing the transition
@@ -132,19 +142,9 @@ class OrderStateServiceTest extends TestCase
 
         $context = $this->createMock(Context::class);
 
-        $exception = new Exception();
+        $exception = new \Exception();
         $this->orderTransitionService->exception = $exception;
 
         $this->assertFalse($this->orderStateHelper->setOrderState($order, OrderStates::STATE_OPEN, $context));
-    }
-
-    public function provideOrderState(): array
-    {
-        return [
-            [OrderStates::STATE_OPEN],
-            [OrderStates::STATE_IN_PROGRESS],
-            [OrderStates::STATE_COMPLETED],
-            [OrderStates::STATE_CANCELLED],
-        ];
     }
 }

@@ -27,16 +27,13 @@ class MailService63 extends AbstractMailService
     public function __construct(
         DataValidator $dataValidator,
         MessageFactory $mailFactory, // @phpstan-ignore-line
-        MailSender $mailSender // @phpstan-ignore-line
+        MailSender $mailSender, // @phpstan-ignore-line
     ) {
         $this->dataValidator = $dataValidator;
         $this->mailFactory = $mailFactory;
         $this->mailSender = $mailSender;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function send(array $data, array $attachments = []): void
     {
         $definition = $this->getValidationDefinition();

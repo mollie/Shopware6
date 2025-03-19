@@ -93,9 +93,6 @@ class PaymentMethodService
     private $versionCompare;
     private PayPalExpressConfig $payPalExpressConfig;
 
-    /**
-     * @param MediaRepository$mediaRepository
-     */
     public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;
@@ -330,8 +327,6 @@ class PaymentMethodService
      * @param string $id
      *
      * @throws InconsistentCriteriaIdsException
-     *
-     * @return PaymentMethodEntity
      */
     public function getPaymentMethodById($id): ?PaymentMethodEntity
     {
@@ -467,8 +462,6 @@ class PaymentMethodService
      * Retrieve the icon from the database, or add it.
      *
      * @param array<mixed> $paymentMethod
-     *
-     * @return string
      */
     private function getMediaId(array $paymentMethod, Context $context): ?string
     {

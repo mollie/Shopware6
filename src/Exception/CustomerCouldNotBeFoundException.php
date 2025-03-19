@@ -7,7 +7,7 @@ class CustomerCouldNotBeFoundException extends \Exception
 {
     public function __construct(
         string $customerId,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         $message = sprintf(
             'Could not find a customer with id %s',

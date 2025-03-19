@@ -8,7 +8,7 @@ class CouldNotFetchMollieCustomerException extends \Exception
     public function __construct(
         string $mollieCustomerId,
         string $salesChannelId,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         $message = sprintf(
             'Could not fetch the Mollie customer ID %s for sales channel %s',

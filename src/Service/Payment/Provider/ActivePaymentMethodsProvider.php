@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Payment\Provider;
 
-use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Exceptions\ApiException;
@@ -96,7 +95,7 @@ class ActivePaymentMethodsProvider implements ActivePaymentMethodsProviderInterf
                         $allFoundMethods[] = $shopMethod;
                     }
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->error(
                     'Error when loading active payment methods from Mollie for storefront: ' . $channelId,
                     [

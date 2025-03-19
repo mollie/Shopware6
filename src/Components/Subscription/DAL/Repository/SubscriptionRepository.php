@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
-use DateTime;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
@@ -43,7 +42,7 @@ class SubscriptionRepository
         return $this->repository;
     }
 
-    //region READ
+    // region READ
 
     /**
      * @throws SubscriptionNotFoundException
@@ -134,7 +133,7 @@ class SubscriptionRepository
         return $this->repository->search($criteria, $context);
     }
 
-    //endregion
+    // endregion
 
     public function insertSubscription(SubscriptionEntity $subscription, string $status, Context $context): void
     {
@@ -270,7 +269,7 @@ class SubscriptionRepository
             [
                 [
                     'id' => $id,
-                    'lastRemindedAt' => new DateTime(),
+                    'lastRemindedAt' => new \DateTime(),
                 ],
             ],
             $context
@@ -285,7 +284,7 @@ class SubscriptionRepository
                     'id' => $id,
                     'status' => $status,
                     'nextPaymentAt' => null,
-                    'canceledAt' => new DateTime(),
+                    'canceledAt' => new \DateTime(),
                 ],
             ],
             $context
@@ -300,7 +299,7 @@ class SubscriptionRepository
                     'id' => $id,
                     'status' => $status,
                     'nextPaymentAt' => null,
-                    'canceledAt' => new DateTime(),
+                    'canceledAt' => new \DateTime(),
                 ],
             ],
             $context
@@ -387,5 +386,5 @@ class SubscriptionRepository
         );
     }
 
-    //endregion
+    // endregion
 }

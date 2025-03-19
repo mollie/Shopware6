@@ -11,7 +11,7 @@ class OrderDeliveriesNotFoundException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $id, array $parameters = [], ?\Throwable $previous = null)
     {
         $message = sprintf('Deliveries of order %s could not be fetched', $id);
         parent::__construct($message, $parameters, $previous);

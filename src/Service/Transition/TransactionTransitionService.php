@@ -32,7 +32,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     public function __construct(
         TransitionServiceInterface $transitionService,
         CompatibilityFactory $compatibilityFactory,
-        LoggerInterface $loggerService
+        LoggerInterface $loggerService,
     ) {
         $this->transitionService = $transitionService;
         $this->compatibilityFactory = $compatibilityFactory;

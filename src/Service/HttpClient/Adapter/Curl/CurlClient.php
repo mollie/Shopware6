@@ -55,9 +55,6 @@ class CurlClient implements HttpClientInterface
         return $response;
     }
 
-    /**
-     * @param mixed $handle
-     */
     private function execute($handle): HttpResponse
     {
         assert($handle !== false);

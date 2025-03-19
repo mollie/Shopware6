@@ -40,7 +40,7 @@ class Migration1725347559MollieTags extends MigrationStep
     private function createTag(
         Connection $connection,
         string $id,
-        string $name
+        string $name,
     ): void {
         // migration must be able to run multiple times in succession
         // with every install of the mollie plugin all migrations are run

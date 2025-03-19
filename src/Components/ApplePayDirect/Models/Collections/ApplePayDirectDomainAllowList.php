@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\ApplePayDirect\Models\Collections;
 
-use Countable;
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayDirectDomainAllowListItem;
 
-class ApplePayDirectDomainAllowList implements Countable
+class ApplePayDirectDomainAllowList implements \Countable
 {
     /**
      * @var ApplePayDirectDomainAllowListItem[]
@@ -25,10 +24,6 @@ class ApplePayDirectDomainAllowList implements Countable
 
     /**
      * Create a new ApplePayDirectDomainAllowList
-     *
-     * @param ApplePayDirectDomainAllowListItem ...$items
-     *
-     * @return ApplePayDirectDomainAllowList
      */
     public static function create(ApplePayDirectDomainAllowListItem ...$items): self
     {
@@ -54,9 +49,6 @@ class ApplePayDirectDomainAllowList implements Countable
         return count($this) === 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function count(): int
     {
         return count($this->allowList);

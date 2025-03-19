@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 
-use DateTimeZone;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
@@ -138,7 +137,7 @@ class NotificationFacade
             throw new \Exception('Shopware Order not found for transaction: ' . $swTransactionId);
         }
 
-        $now = new \DateTime('now', new DateTimeZone('UTC'));
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
         /** @var ?\DateTimeImmutable $transactionCreatedAt */
         $transactionCreatedAt = $swTransaction->getCreatedAt();

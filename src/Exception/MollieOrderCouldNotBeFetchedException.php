@@ -11,7 +11,7 @@ class MollieOrderCouldNotBeFetchedException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $mollieOrderID, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $mollieOrderID, array $parameters = [], ?\Throwable $previous = null)
     {
         $message = sprintf('Mollie order (%s) could not be fetched', $mollieOrderID);
         parent::__construct($message, $parameters, $previous);

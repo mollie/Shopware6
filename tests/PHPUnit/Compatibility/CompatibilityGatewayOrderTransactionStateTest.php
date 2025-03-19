@@ -17,8 +17,6 @@ class CompatibilityGatewayOrderTransactionStateTest extends TestCase
     }
 
     /**
-     * @param $swVersion
-     * @param $expectedState
      * @dataProvider getChargebackStateTestData
      */
     public function testGetChargebackState($swVersion, $expectedState)

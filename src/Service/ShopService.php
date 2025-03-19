@@ -11,7 +11,7 @@ class ShopService
     private $router;
 
     public function __construct(
-        RouterInterface $router
+        RouterInterface $router,
     ) {
         $this->router = $router;
     }

@@ -124,9 +124,6 @@ class ProductAttributes
         return $fields;
     }
 
-    /**
-     * @return mixed
-     */
     private function getCustomFieldValue(ProductEntity $product, string $keyName)
     {
         $foundValue = '';

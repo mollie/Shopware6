@@ -9,6 +9,21 @@ use PHPUnit\Framework\TestCase;
 class MolliePaymentStatusTest extends TestCase
 {
     /**
+     * This test verifies that our approved verification has the
+     * correct list of valid payment status entry in it.
+     * It is used to define what payment status entries are valid and
+     * thus can be continued to finish a successful order in Shopware.
+     *
+     * @dataProvider getIsApprovedData
+     */
+    public function testApprovedStatus(bool $expected, string $status): void
+    {
+        $isApproved = MolliePaymentStatus::isApprovedStatus($status);
+
+        $this->assertEquals($expected, $isApproved);
+    }
+
+    /**
      * @return array[]
      */
     public function getIsApprovedData()
@@ -29,16 +44,15 @@ class MolliePaymentStatusTest extends TestCase
     }
 
     /**
-     * This test verifies that our approved verification has the
-     * correct list of valid payment status entry in it.
-     * It is used to define what payment status entries are valid and
-     * thus can be continued to finish a successful order in Shopware.
+     * This test verifies that our failed payment can be successfully recognized.
+     * Failed means, that no valid order has been created, and the whole
+     * process should get aborted or cancelled.
      *
-     * @dataProvider getIsApprovedData
+     * @dataProvider getIsFailedData
      */
-    public function testApprovedStatus(bool $expected, string $status): void
+    public function testFailedStatus(bool $expected, string $status): void
     {
-        $isApproved = MolliePaymentStatus::isApprovedStatus($status);
+        $isApproved = MolliePaymentStatus::isFailedStatus('', $status);
 
         $this->assertEquals($expected, $isApproved);
     }
@@ -61,20 +75,6 @@ class MolliePaymentStatusTest extends TestCase
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_PARTIALLY_REFUNDED],
             [false, MolliePaymentStatus::MOLLIE_PAYMENT_UNKNOWN],
         ];
-    }
-
-    /**
-     * This test verifies that our failed payment can be successfully recognized.
-     * Failed means, that no valid order has been created, and the whole
-     * process should get aborted or cancelled.
-     *
-     * @dataProvider getIsFailedData
-     */
-    public function testFailedStatus(bool $expected, string $status): void
-    {
-        $isApproved = MolliePaymentStatus::isFailedStatus('', $status);
-
-        $this->assertEquals($expected, $isApproved);
     }
 
     /**

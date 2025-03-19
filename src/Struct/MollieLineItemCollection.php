@@ -9,10 +9,10 @@ use Shopware\Core\Framework\Struct\StructCollection;
 /**
  * @extends StructCollection<MollieLineItem>
  *
- * @method void                add(MollieLineItem $entity)
- * @method void                set(string $key, MollieLineItem $entity)
- * @method MollieLineItem[]    getIterator()
- * @method MollieLineItem[]    getElements()
+ * @method void add(MollieLineItem $entity)
+ * @method void set(string $key, MollieLineItem $entity)
+ * @method MollieLineItem[] getIterator()
+ * @method MollieLineItem[] getElements()
  * @method null|MollieLineItem get(string $key)
  * @method null|MollieLineItem first()
  * @method null|MollieLineItem last()

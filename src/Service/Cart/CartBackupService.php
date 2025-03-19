@@ -101,7 +101,7 @@ class CartBackupService
 
     public function replaceToken(string $oldToken, string $currentToken, SalesChannelContext $context): void
     {
-        //only cart persister has replace method, so it wont work in shopware 6.4.1.0
+        // only cart persister has replace method, so it wont work in shopware 6.4.1.0
         if ($this->cartPersister instanceof AbstractCartPersister) {
             $oldToken = $this->getToken($oldToken);
             $currentToken = $this->getToken($currentToken);

@@ -75,9 +75,6 @@ class RefundRequest
         return $this->internalDescription;
     }
 
-    /**
-     * @return ?float
-     */
     public function getAmount(): ?float
     {
         return $this->amount;

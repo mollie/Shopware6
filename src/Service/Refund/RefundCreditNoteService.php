@@ -61,7 +61,7 @@ class RefundCreditNoteService
         $orderRepository,
         $orderLineItemRepository,
         SettingsService $settingsService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
@@ -144,7 +144,7 @@ class RefundCreditNoteService
 
     public function cancelCreditNotes(string $orderId, Context $context): void
     {
-        //do not check for enabled, because credit notes could be created before and you still want to delete them, even if the feature is disabled now
+        // do not check for enabled, because credit notes could be created before and you still want to delete them, even if the feature is disabled now
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
@@ -202,8 +202,8 @@ class RefundCreditNoteService
         $label = trim(sprintf('%s%s%s', $this->prefix, $label, $this->suffix));
 
         return [
-            'id' => Uuid::fromBytesToHex(md5($id, true)), //@todo remove once 6.4 reached end of life
-            'identifier' => Uuid::fromBytesToHex(md5($id, true)), //@todo remove once 6.4 reached end of life
+            'id' => Uuid::fromBytesToHex(md5($id, true)), // @todo remove once 6.4 reached end of life
+            'identifier' => Uuid::fromBytesToHex(md5($id, true)), // @todo remove once 6.4 reached end of life
             'quantity' => $quantity,
             'label' => $label,
             'type' => LineItem::CREDIT_LINE_ITEM_TYPE,

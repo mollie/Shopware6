@@ -34,7 +34,7 @@ class ReadablePluginConfigurationGenerator extends AbstractPluginConfigurationGe
         ConfigurationService $configurationService,
         $salesChannelRepository,
         SettingsService $settingsService,
-        ApiKeyValidator $apiKeyValidator
+        ApiKeyValidator $apiKeyValidator,
     ) {
         $this->apiKeyValidator = $apiKeyValidator;
 

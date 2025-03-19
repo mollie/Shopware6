@@ -100,7 +100,7 @@ class CustomerTest extends TestCase
      */
     public function testIsLegacyCustomerValid(
         ?string $mollieCustomerId,
-        bool $expectedValue
+        bool $expectedValue,
     ) {
         $actualValue = $this->customerApiService->isLegacyCustomerValid($mollieCustomerId, '');
 

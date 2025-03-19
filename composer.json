@@ -37,19 +37,20 @@
         "optimize-autoloader": true,
         "allow-plugins": {
             "infection/extension-installer": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "symfony/runtime": true
         }
     },
     "autoload": {
         "psr-4": {
             "Mollie\\Shopware\\": "shopware/",
-            "Kiener\\MolliePayments\\": "src/",
-            "Mollie\\Api\\": "vendor_manual/mollie/mollie-api-php/src/"
+            "Kiener\\MolliePayments\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Mollie\\Unit\\": "tests/Unit/",
+            "Mollie\\Behat\\": "tests/Behat/contexts/",
             "Mollie\\Integration\\": "tests/Integration/",
             "MolliePayments\\Tests\\": "tests/PHPUnit/",
             "MolliePayments\\PHPStan\\": "tests/PHPStan/",
@@ -66,17 +67,18 @@
         "shopware/core": "6.4.5.0 - 6.7.0.0",
         "shopware/administration": "6.4.5.0 - 6.7.0.0",
         "shopware/storefront": "6.4.5.0 - 6.7.0.0",
-        "shopware/elasticsearch": "6.4.5.0 - 6.7.0.0"
+        "shopware/elasticsearch": "6.4.5.0 - 6.7.0.0",
+        "mollie/mollie-api-php": "^2"
     },
     "require-dev": {
+        "behat/behat": "^3.15",
         "phpunit/phpunit": "^9",
-        "phpstan/phpstan": "1.10.0",
-        "friendsofphp/php-cs-fixer": "^2.18",
+        "phpstan/phpstan": "^2",
+        "friendsofphp/php-cs-fixer": "^3",
         "phpcompatibility/php-compatibility": "^9.3",
-        "squizlabs/php_codesniffer": "^3.6",
-        "infection/infection": "^0.25.4",
+        "squizlabs/php_codesniffer": "^3",
         "boxblinkracer/phpunuhi": "dev-main",
-        "spaze/phpstan-disallowed-calls": "^2.16"
+        "spaze/phpstan-disallowed-calls": "^4"
     },
     "scripts": {
         "post-install-cmd": [

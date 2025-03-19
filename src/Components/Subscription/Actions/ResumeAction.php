@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Shopware\Core\Framework\Context;
@@ -11,7 +10,7 @@ use Shopware\Core\Framework\Context;
 class ResumeAction extends BaseAction
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function resumeSubscription(string $subscriptionId, Context $context): void
     {
@@ -22,15 +21,15 @@ class ResumeAction extends BaseAction
         // -------------------------------------------------------------------------------------
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription cannot be resumed. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription cannot be resumed. Subscriptions are disabled for this Sales Channel');
         }
 
         if (! $settings->isSubscriptionsAllowPauseResume()) {
-            throw new Exception('Subscriptions cannot be resumed in this sales channel. Please adjust the plugin configuration.');
+            throw new \Exception('Subscriptions cannot be resumed in this sales channel. Please adjust the plugin configuration.');
         }
 
         if (! $subscription->isResumeAllowed()) {
-            throw new Exception('Resuming of the subscription is not possible because of its current status!');
+            throw new \Exception('Resuming of the subscription is not possible because of its current status!');
         }
 
         // -------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ class PayPalExpressConfig
         ?int $enabled = null,
         ?int $buttonStyle = null,
         ?int $buttonShape = null,
-        ?string $restrictions = ''
+        ?string $restrictions = '',
     ) {
         $this->enabled = $enabled ?? 0;
         $this->buttonStyle = $buttonStyle ?? 1;

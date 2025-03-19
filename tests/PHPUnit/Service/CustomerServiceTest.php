@@ -87,7 +87,7 @@ class CustomerServiceTest extends TestCase
         string $profileId,
         bool $testMode,
         array $existingCustomFields,
-        array $expectedCustomFields
+        array $expectedCustomFields,
     ) {
         $customer = $this->createConfiguredMock(CustomerEntity::class, [
             'getCustomFields' => $existingCustomFields,

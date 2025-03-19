@@ -36,7 +36,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
         Connection $connection,
         IteratorFactory $factory,
         $repository,
-        int $indexingBatchSize
+        int $indexingBatchSize,
     ) {
         $this->connection = $connection;
         $this->factory = $factory;

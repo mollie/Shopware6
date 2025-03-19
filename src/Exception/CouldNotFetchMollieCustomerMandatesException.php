@@ -8,7 +8,7 @@ class CouldNotFetchMollieCustomerMandatesException extends \Exception
     public function __construct(
         string $mollieCustomerId,
         string $salesChannelId,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         $message = sprintf(
             'Could not fetch the mandates of the Mollie customer ID %s for sales channel %s',

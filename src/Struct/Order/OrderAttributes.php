@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use stdClass;
 
 class OrderAttributes
 {
@@ -310,7 +309,7 @@ class OrderAttributes
     /**
      * @return void
      */
-    public function setCreditCardDetails(?stdClass $details)
+    public function setCreditCardDetails(?\stdClass $details)
     {
         if (! empty($details->cardNumber)) {
             $this->creditCardNumber = $details->cardNumber;
@@ -338,7 +337,7 @@ class OrderAttributes
     /**
      * @return void
      */
-    public function setBankTransferDetails(?stdClass $details)
+    public function setBankTransferDetails(?\stdClass $details)
     {
         if (! empty($details->bankName)) {
             $this->bankName = $details->bankName;

@@ -45,7 +45,7 @@ class RefundControllerBase extends AbstractController
         OrderService $orderService,
         RefundManagerInterface $refundManager,
         RefundService $refundService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;

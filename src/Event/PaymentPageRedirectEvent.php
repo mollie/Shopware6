@@ -42,7 +42,7 @@ class PaymentPageRedirectEvent extends Event
         ?OrderEntity $shopwareOrder = null,
         ?Order $mollieOrder = null,
         ?string $salesChannelId = null,
-        ?string $redirectUrl = null
+        ?string $redirectUrl = null,
     ) {
         $this->context = $context;
         $this->shopwareOrder = $shopwareOrder;

@@ -10,11 +10,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
  *
  * @method void add(RefundEntity $entity)
  * @method void set(string $key, RefundEntity $entity)
- * @method RefundEntity[]     getIterator()
- * @method RefundEntity[]     getElements()
- * @method null|RefundEntity  get(string $key)
- * @method null|RefundEntity  first()
- * @method null|RefundEntity  last()
+ * @method RefundEntity[] getIterator()
+ * @method RefundEntity[] getElements()
+ * @method null|RefundEntity get(string $key)
+ * @method null|RefundEntity first()
+ * @method null|RefundEntity last()
  */
 class RefundCollection extends EntityCollection
 {

@@ -34,7 +34,7 @@ class CreditCardPayment extends PaymentHandler
     public function __construct(
         LoggerInterface $logger,
         ContainerInterface $container,
-        CustomerService $customerService
+        CustomerService $customerService,
     ) {
         parent::__construct($logger, $container);
         $this->customerService = $customerService;

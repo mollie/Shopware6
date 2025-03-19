@@ -29,9 +29,6 @@ class VoucherRemover extends PaymentMethodRemover
         $this->voucherService = $voucherService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
         if (! $this->isAllowedRoute()) {

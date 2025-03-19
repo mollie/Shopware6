@@ -26,7 +26,7 @@ abstract class AbstractPluginConfigurationGenerator extends AbstractSalesChannel
     public function __construct(
         ConfigurationService $configurationService,
         $salesChannelRepository,
-        SettingsService $settingsService
+        SettingsService $settingsService,
     ) {
         parent::__construct($salesChannelRepository);
 

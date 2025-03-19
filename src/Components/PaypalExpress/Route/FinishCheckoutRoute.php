@@ -24,7 +24,7 @@ class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
     public function __construct(
         SettingsService $settingsService,
         CartServiceInterface $cartService,
-        PayPalExpress $paypalExpress
+        PayPalExpress $paypalExpress,
     ) {
         $this->settingsService = $settingsService;
         $this->cartService = $cartService;

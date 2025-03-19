@@ -9,7 +9,7 @@ class CouldNotRevokeMollieCustomerMandateException extends \Exception
         string $mandateId,
         string $mollieCustomerId,
         string $salesChannelId,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         $message = sprintf(
             'Error while revoking the mandate ID %s of the Mollie customer ID %s for sales channel %s. The mandate does not exist or is no longer available.',

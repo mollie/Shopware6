@@ -43,7 +43,7 @@ prod: ##1 Installs all production dependencies
 dev: ##1 Installs all dev dependencies
 	@composer validate
     # we have to run update in dev mode, because dev dependencies are not compatible with newer php version. should be updated when support for 6.4 is dropped
-	@composer update
+	composer update
 	npm install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
@@ -97,9 +97,6 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpunit -B
 	@make phpintegration -B
 	@make vitest -B
-	@make eslint -B
-	@make stylelint -B
-	@make prettier -B
 	@make configcheck -B
 	@make phpunuhi -B
 

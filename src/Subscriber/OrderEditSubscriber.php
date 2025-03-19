@@ -16,7 +16,7 @@ class OrderEditSubscriber implements EventSubscriberInterface
     private $orderExpireService;
 
     public function __construct(
-        OrderExpireService $orderExpireService
+        OrderExpireService $orderExpireService,
     ) {
         $this->orderExpireService = $orderExpireService;
     }

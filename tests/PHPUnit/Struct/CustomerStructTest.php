@@ -23,14 +23,13 @@ class CustomerStructTest extends TestCase
     }
 
     /**
-     * @param $testData
      * @dataProvider mollieCustomerIdsTestData
      */
     public function testGetCustomerId(
         $testData,
         string $profileId,
         bool $testMode,
-        string $expectedCustomerId
+        string $expectedCustomerId,
     ) {
         $struct = new CustomerStruct();
         $struct->assign($testData);

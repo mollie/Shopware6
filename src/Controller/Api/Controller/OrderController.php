@@ -57,7 +57,7 @@ class OrderController extends AbstractController
         ShippingControllerBase $shippingController,
         OrderControllerBase $orderController,
         CancelLineController $cancelLineController,
-        $orderRepository
+        $orderRepository,
     ) {
         $this->baseController = $baseController;
         $this->shippingController = $shippingController;

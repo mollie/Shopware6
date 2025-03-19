@@ -102,12 +102,13 @@ class MolliePaymentDoPayTest extends TestCase
     /**
      * @throws CouldNotCreateMollieCustomerException
      * @throws CustomerCouldNotBeFoundException
+     *
      * @dataProvider createMollieCustomerIsCalledTestData
      */
     public function testIfCreateMollieCustomerIsCalled(
         bool $customerIsGuest,
         bool $createCustomersAtMollie,
-        bool $shouldCreateMollieCustomer
+        bool $shouldCreateMollieCustomer,
     ) {
         $this->customer->method('getGuest')->willReturn($customerIsGuest);
         $this->settings->setCreateCustomersAtMollie($createCustomersAtMollie);

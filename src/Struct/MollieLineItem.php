@@ -60,7 +60,7 @@ class MollieLineItem extends Struct
         string $lineItemId,
         string $sku,
         string $imageUrl,
-        string $productUrl
+        string $productUrl,
     ) {
         $this->type = $type;
         $this->name = $name;

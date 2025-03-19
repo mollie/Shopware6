@@ -9,14 +9,8 @@ interface CompatibilityGatewayInterface
 {
     public function getSalesChannelID(SalesChannelContext $context): string;
 
-    /**
-     * @param ?string $domainID
-     */
     public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext;
 
-    /**
-     * @return ?string
-     */
     public function getDomainId(SalesChannelContext $context): ?string;
 
     public function getLineItemPromotionType(): string;

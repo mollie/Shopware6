@@ -19,7 +19,7 @@ class ShipmentTrackingInfoStruct extends Struct
     public function __construct(
         string $carrier,
         string $code,
-        string $url = ''
+        string $url = '',
     ) {
         $this->carrier = $carrier;
         $this->code = $code;

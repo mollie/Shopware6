@@ -8,7 +8,7 @@ class CouldNotCreateMollieRefundException extends \RuntimeException
     public function __construct(
         string $mollieOrderId,
         string $orderNumber,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         $message = sprintf(
             'Could not create a refund for order %s (Order number %s)',

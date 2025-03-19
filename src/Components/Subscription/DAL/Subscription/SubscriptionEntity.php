@@ -241,9 +241,6 @@ class SubscriptionEntity extends Entity
         $this->quantity = $quantity;
     }
 
-    /**
-     * @return ?CurrencyEntity
-     */
     public function getCurrency(): ?CurrencyEntity
     {
         return $this->currency;

@@ -19,9 +19,6 @@ class ApplePaySubscriber implements EventSubscriberInterface
         $this->applePay = $applePay;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

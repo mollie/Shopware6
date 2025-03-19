@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
-use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
@@ -181,20 +180,20 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function retry(SalesChannelContext $context, string $transactionId): RedirectResponse
     {
         $transaction = $this->transactionService->getTransactionById($transactionId, null, $context->getContext());
 
         if ($transaction === null) {
-            throw new Exception('Transaction with ID ' . $transactionId . ' not found');
+            throw new \Exception('Transaction with ID ' . $transactionId . ' not found');
         }
 
         $order = $transaction->getOrder();
 
         if (! $order instanceof OrderEntity) {
-            throw new Exception('Order for transaction with ID ' . $transaction->getOrderId() . ' not found');
+            throw new \Exception('Order for transaction with ID ' . $transaction->getOrderId() . ' not found');
         }
 
         $orderAttributes = new OrderAttributes($order);
@@ -255,7 +254,7 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
         $redirectUrl = (string) $orderAttributes->getMolliePaymentUrl();
 
         if (! filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception('The redirect URL is invalid.');
+            throw new \Exception('The redirect URL is invalid.');
         }
 
         return new RedirectResponse($redirectUrl);

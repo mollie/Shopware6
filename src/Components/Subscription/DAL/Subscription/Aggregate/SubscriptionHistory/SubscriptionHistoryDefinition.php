@@ -43,12 +43,12 @@ class SubscriptionHistoryDefinition extends EntityDefinition
 
             // --------------------------------------------------------------------------------------------------------------------------
 
-            (new StringField('comment', 'comment')),
+            new StringField('comment', 'comment'),
 
-            (new StringField('status_from', 'statusFrom')),
-            (new StringField('status_to', 'statusTo')),
+            new StringField('status_from', 'statusFrom'),
+            new StringField('status_to', 'statusTo'),
 
-            (new StringField('mollie_id', 'mollieId')),
+            new StringField('mollie_id', 'mollieId'),
 
             new CreatedAtField(),
             new UpdatedAtField(),

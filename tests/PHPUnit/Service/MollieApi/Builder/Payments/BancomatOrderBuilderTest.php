@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
-use DateTime;
-use DateTimeZone;
 use Kiener\MolliePayments\Handler\Method\BancomatPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -47,7 +45,7 @@ class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $actual = $this->builder->buildOrderPayload($order, $transactionId, $this->paymentHandler::PAYMENT_METHOD_NAME, $this->salesChannelContext, $this->paymentHandler, []);
 
-        $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
+        $expectedOrderLifeTime = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
             ->format('Y-m-d')
         ;

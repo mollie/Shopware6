@@ -34,7 +34,7 @@ class KernelSubscriber implements EventSubscriberInterface
      */
     public function onModifyRouteScope(ControllerEvent $event): void
     {
-        //there are cases where the class RouteScope still exists even in SW 6.5
+        // there are cases where the class RouteScope still exists even in SW 6.5
         if ($this->versionCompare->gte('6.5.0.0')) {
             return;
         }
