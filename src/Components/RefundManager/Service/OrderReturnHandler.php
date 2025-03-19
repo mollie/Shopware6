@@ -71,7 +71,6 @@ class OrderReturnHandler
         $this->refundManager->cancelAllOrderRefunds($order, $context);
     }
 
-    // @phpstan-ignore argument.type
     private function createRequestFromOrder(string $orderNumber, OrderReturnEntity $orderReturn): RefundRequest
     {
         $request = new RefundRequest(
@@ -88,8 +87,7 @@ class OrderReturnHandler
 
         return $request;
     }
-
-    // @phpstan-ignore return.type
+    
     private function findReturnByOrder(OrderEntity $order, Context $context): ?OrderReturnEntity
     {
         if ($this->orderReturnRepository === null) {
