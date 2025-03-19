@@ -100,11 +100,6 @@ class MollieShopwareCart
 
     // </editor-fold>
 
-    /**
-     * @param mixed $defaultValue
-     *
-     * @return mixed
-     */
     private function getExtensionKey(string $key, $defaultValue)
     {
         if (! $this->cartExtension instanceof Struct) {

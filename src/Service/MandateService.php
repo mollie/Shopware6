@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerMandatesException;
 use Kiener\MolliePayments\Exception\CouldNotRevokeMollieCustomerMandateException;
@@ -46,7 +45,7 @@ class MandateService implements MandateServiceInterface
 
         foreach ($subscriptions->getElements() as $subscription) {
             if ($subscription->isActive() || $subscription->isSkipped()) {
-                throw new Exception('Active subscription found for this mandate');
+                throw new \Exception('Active subscription found for this mandate');
             }
         }
 
@@ -59,7 +58,7 @@ class MandateService implements MandateServiceInterface
 
     /**
      * @throws CouldNotFetchMollieCustomerMandatesException
-     * @throws Exception
+     * @throws \Exception
      */
     public function getCreditCardMandatesByCustomerId(string $customerId, SalesChannelContext $context): MandateCollection
     {
@@ -79,7 +78,7 @@ class MandateService implements MandateServiceInterface
      *
      * @param array<Mandate> $mandates
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function parseCreditCardMandateToStruct(array $mandates, string $customerId, Context $context): MandateCollection
     {

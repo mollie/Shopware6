@@ -15,7 +15,7 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function update(Connection $connection): void
     {

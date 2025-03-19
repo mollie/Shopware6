@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
@@ -32,7 +31,7 @@ class UpdateAddressAction extends BaseAction
     private $orderService;
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, OrderService $orderService)
     {
@@ -54,7 +53,7 @@ class UpdateAddressAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function updateBillingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
     {
@@ -63,11 +62,11 @@ class UpdateAddressAction extends BaseAction
         $settings = $this->getPluginSettings($subscription->getSalesChannelId());
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription Billing Address cannot be updated. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription Billing Address cannot be updated. Subscriptions are disabled for this Sales Channel');
         }
 
         if (! $settings->isSubscriptionsAllowAddressEditing()) {
-            throw new Exception('Editing of the billing address on running subscriptions is not allowed in the plugin configuration');
+            throw new \Exception('Editing of the billing address on running subscriptions is not allowed in the plugin configuration');
         }
 
         $address = $subscription->getBillingAddress();
@@ -101,7 +100,7 @@ class UpdateAddressAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function updateShippingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
     {
@@ -110,11 +109,11 @@ class UpdateAddressAction extends BaseAction
         $settings = $this->getPluginSettings($subscription->getSalesChannelId());
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription Shipping Address cannot be updated. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription Shipping Address cannot be updated. Subscriptions are disabled for this Sales Channel');
         }
 
         if (! $settings->isSubscriptionsAllowAddressEditing()) {
-            throw new Exception('Editing of the shipping address on running subscriptions is not allowed in the plugin configuration');
+            throw new \Exception('Editing of the shipping address on running subscriptions is not allowed in the plugin configuration');
         }
 
         $address = $subscription->getShippingAddress();
@@ -148,20 +147,20 @@ class UpdateAddressAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function createNewAddress(SubscriptionEntity $subscription, Context $context): SubscriptionAddressEntity
     {
         $initialOrder = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
         if (! $initialOrder instanceof OrderEntity) {
-            throw new Exception('No initial order found for subscription: ' . $subscription->getId());
+            throw new \Exception('No initial order found for subscription: ' . $subscription->getId());
         }
 
         $initialAddress = $initialOrder->getBillingAddress();
 
         if (! $initialAddress instanceof OrderAddressEntity) {
-            throw new Exception('No address found for initial order');
+            throw new \Exception('No address found for initial order');
         }
 
         $address = new SubscriptionAddressEntity();

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use DateTime;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -12,7 +11,7 @@ use Shopware\Core\Defaults;
 class OrderTimeService
 {
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     private $now;
 
@@ -21,9 +20,9 @@ class OrderTimeService
      */
     private $logger;
 
-    public function __construct(LoggerInterface $logger, ?DateTime $now = null)
+    public function __construct(LoggerInterface $logger, ?\DateTime $now = null)
     {
-        $this->now = $now ?? new DateTime();
+        $this->now = $now ?? new \DateTime();
         $this->logger = $logger;
     }
 

@@ -11,7 +11,7 @@ class OrderLineItemFoundManyException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $identifier, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $identifier, array $parameters = [], ?\Throwable $previous = null)
     {
         $message = sprintf('Too many order line items with identifier %s were found. Please use a more unique identifier', $identifier);
         parent::__construct($message, $parameters, $previous);

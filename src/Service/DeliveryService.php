@@ -22,8 +22,6 @@ class DeliveryService
 
     /**
      * Creates a new instance of the transaction service.
-     *
-     * @param mixed $orderDeliveryRepository
      */
     public function __construct($orderDeliveryRepository)
     {
@@ -34,7 +32,7 @@ class DeliveryService
      * @param string $deliveryId
      * @param null|string $versionId
      */
-    public function getDeliveryById($deliveryId, $versionId = null, Context $context = null): ?OrderDeliveryEntity
+    public function getDeliveryById($deliveryId, $versionId = null, ?Context $context = null): ?OrderDeliveryEntity
     {
         $deliveryCriteria = new Criteria([$deliveryId]);
 
@@ -50,7 +48,7 @@ class DeliveryService
         return $result->get($deliveryId);
     }
 
-    public function getDeliveryByOrderId(string $orderId, string $orderVersionId = null, Context $context = null): ?OrderDeliveryEntity
+    public function getDeliveryByOrderId(string $orderId, ?string $orderVersionId = null, ?Context $context = null): ?OrderDeliveryEntity
     {
         $deliveryCriteria = new Criteria();
         $deliveryCriteria->addFilter(new EqualsFilter('orderId', $orderId));
@@ -62,7 +60,8 @@ class DeliveryService
         $deliveryCriteria->addAssociation('order');
 
         return $this->orderDeliveryRepository
-            ->search($deliveryCriteria, $context ?? Context::createDefaultContext())->first();
+            ->search($deliveryCriteria, $context ?? Context::createDefaultContext())->first()
+        ;
     }
 
     /**
@@ -86,7 +85,7 @@ class DeliveryService
      *
      * @param array<mixed> $data
      */
-    public function updateDelivery(array $data, Context $context = null): EntityWrittenContainerEvent
+    public function updateDelivery(array $data, ?Context $context = null): EntityWrittenContainerEvent
     {
         return $this->orderDeliveryRepository->update(
             [$data],

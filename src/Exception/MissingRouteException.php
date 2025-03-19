@@ -6,11 +6,10 @@ namespace Kiener\MolliePayments\Exception;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 class MissingRouteException extends ShopwareHttpException
 {
-    public function __construct(Request $request, Throwable $previous = null)
+    public function __construct(Request $request, ?\Throwable $previous = null)
     {
         $message = 'Could not determine the route';
         $parameters = [

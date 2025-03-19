@@ -44,6 +44,26 @@ class MollieLocaleServiceTest extends TestCase
     }
 
     /**
+     * This test verifies that a locale is correctly returned from a sales channel if available.
+     * We fake the repository that returns us a given locale for our sales channel.
+     * That locale is in the list of available locales and should therefore be correctly returned in our function.
+     *
+     * @dataProvider getAvailableLocales
+     */
+    public function testAvailableLocalesAreFound(string $locale): void
+    {
+        $scLanguage = $this->buildSalesChannelLanguage($locale);
+
+        $repoLanguages = new FakeLanguageRepository($scLanguage);
+
+        $service = new MollieLocaleService($repoLanguages);
+
+        $detectedLocale = $service->getLocale($this->fakeSalesChannelContext);
+
+        $this->assertEquals($locale, $detectedLocale);
+    }
+
+    /**
      * @return string[]
      */
     public function getAvailableLocales(): array
@@ -70,26 +90,6 @@ class MollieLocaleServiceTest extends TestCase
             ['lv_LV'],
             ['lt_LT'],
         ];
-    }
-
-    /**
-     * This test verifies that a locale is correctly returned from a sales channel if available.
-     * We fake the repository that returns us a given locale for our sales channel.
-     * That locale is in the list of available locales and should therefore be correctly returned in our function.
-     *
-     * @dataProvider getAvailableLocales
-     */
-    public function testAvailableLocalesAreFound(string $locale): void
-    {
-        $scLanguage = $this->buildSalesChannelLanguage($locale);
-
-        $repoLanguages = new FakeLanguageRepository($scLanguage);
-
-        $service = new MollieLocaleService($repoLanguages);
-
-        $detectedLocale = $service->getLocale($this->fakeSalesChannelContext);
-
-        $this->assertEquals($locale, $detectedLocale);
     }
 
     /**

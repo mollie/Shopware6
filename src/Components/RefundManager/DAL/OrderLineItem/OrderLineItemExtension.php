@@ -11,7 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 
 class OrderLineItemExtension extends EntityExtension
 {
-    const ORDER_LINE_ITEM_PROPERTY_NAME = 'mollieRefundLineItems';
+    public const ORDER_LINE_ITEM_PROPERTY_NAME = 'mollieRefundLineItems';
 
     public function getDefinitionClass(): string
     {

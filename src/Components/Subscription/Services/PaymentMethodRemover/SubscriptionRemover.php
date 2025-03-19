@@ -34,7 +34,7 @@ class SubscriptionRemover extends PaymentMethodRemover
         GiroPayPayment::PAYMENT_METHOD_NAME,
         BelfiusPayment::PAYMENT_METHOD_NAME,
         CreditCardPayment::PAYMENT_METHOD_NAME,
-        PaypalPayment::PAYMENT_METHOD_NAME,
+        PayPalPayment::PAYMENT_METHOD_NAME,
         DirectDebitPayment::PAYMENT_METHOD_NAME,
         TrustlyPayment::PAYMENT_METHOD_NAME,
     ];

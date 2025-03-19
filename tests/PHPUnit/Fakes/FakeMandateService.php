@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Fakes;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
@@ -24,7 +23,7 @@ final class FakeMandateService implements MandateServiceInterface
             return;
         }
 
-        throw new Exception('Error');
+        throw new \Exception('Error');
     }
 
     public function getCreditCardMandatesByCustomerId(string $customerId, SalesChannelContext $context): MandateCollection

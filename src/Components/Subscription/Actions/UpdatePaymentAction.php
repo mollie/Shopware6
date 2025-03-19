@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
@@ -43,7 +42,7 @@ class UpdatePaymentAction extends BaseAction
     private $statusConverter;
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $routingBuilder, OrderStatusConverter $orderStatusConverter)
     {
@@ -78,11 +77,11 @@ class UpdatePaymentAction extends BaseAction
         // --------------------------------------------------------------------------------------------------
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription Payment Method cannot be updated. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription Payment Method cannot be updated. Subscriptions are disabled for this Sales Channel');
         }
 
         if (! $subscription->isUpdatePaymentAllowed()) {
-            throw new Exception('Updating the payment method of the subscription is not possible because of its current status!');
+            throw new \Exception('Updating the payment method of the subscription is not possible because of its current status!');
         }
 
         // --------------------------------------------------------------------------------------------------
@@ -134,14 +133,14 @@ class UpdatePaymentAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
         $subscription = $this->getRepository()->findById($subscriptionId, $context);
 
         if ($subscription->getStatus() !== SubscriptionStatus::ACTIVE && $subscription->getStatus() !== SubscriptionStatus::RESUMED) {
-            throw new Exception('Subscription is not active and cannot be edited');
+            throw new \Exception('Subscription is not active and cannot be edited');
         }
 
         // load our latest tmp_transaction ID that was used
@@ -150,7 +149,7 @@ class UpdatePaymentAction extends BaseAction
         $latestTransactionId = $subscription->getMetadata()->getTmpTransaction();
 
         if (empty($latestTransactionId)) {
-            throw new Exception('No temporary transaction existing for this subscription');
+            throw new \Exception('No temporary transaction existing for this subscription');
         }
 
         // load our Mollie Payment with this
@@ -164,7 +163,7 @@ class UpdatePaymentAction extends BaseAction
         // based on the mandateId in this payment
         $status = $this->statusConverter->getMolliePaymentStatus($payment);
         if (! MolliePaymentStatus::isApprovedStatus($status)) {
-            throw new Exception('Payment failed when updating subscription mandate. Payment ' . $payment->id . ' for new mandate was not successful!');
+            throw new \Exception('Payment failed when updating subscription mandate. Payment ' . $payment->id . ' for new mandate was not successful!');
         }
 
         // now update our Mollie subscription

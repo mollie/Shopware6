@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
-use Exception;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\ShipmentLineItem;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\TrackingData;
 use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
@@ -208,7 +207,7 @@ class ShippingControllerBase extends AbstractController
             $orderItems = $order->getLineItems();
 
             if (! $orderItems instanceof OrderLineItemCollection) {
-                throw new Exception('Shopware order does not have any line requestItems!');
+                throw new \Exception('Shopware order does not have any line requestItems!');
             }
 
             $shipmentItems = [];
@@ -627,7 +626,7 @@ class ShippingControllerBase extends AbstractController
     /**
      * @param array<mixed> $additionalData
      */
-    private function exceptionToJson(Exception $e, array $additionalData = []): JsonResponse
+    private function exceptionToJson(\Exception $e, array $additionalData = []): JsonResponse
     {
         $this->logger->error(
             $e->getMessage(),

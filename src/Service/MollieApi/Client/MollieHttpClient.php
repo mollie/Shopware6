@@ -109,7 +109,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      * @param int $statusCode
      * @param string $httpBody
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      *
      * @return null|\stdClass
      */

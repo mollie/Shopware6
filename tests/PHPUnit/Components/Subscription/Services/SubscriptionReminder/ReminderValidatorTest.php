@@ -23,6 +23,7 @@ class ReminderValidatorTest extends TestCase
      * reminder would start. So no reminder for here
      *
      * @group subscriptions
+     *
      * @testWith        ["2021-12-31"]
      *                  [""]
      *
@@ -51,6 +52,7 @@ class ReminderValidatorTest extends TestCase
      * renewal where we want to start the renewal
      *
      * @group subscriptions
+     *
      * @testWith        ["2021-12-31"]
      *                  [""]
      *
@@ -100,6 +102,7 @@ class ReminderValidatorTest extends TestCase
      * embarassing and frustrating now.
      *
      * @group subscriptions
+     *
      * @testWith        ["2021-12-27"]
      *                  [""]
      *

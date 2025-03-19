@@ -161,29 +161,29 @@ class SubscriptionSubscriber implements EventSubscriberInterface
 
         switch ($unit) {
             case IntervalType::DAYS:
-                    if ($interval === 1) {
-                        $snippetKey = 'molliePayments.subscriptions.options.everyDay';
-                    } else {
-                        $snippetKey = 'molliePayments.subscriptions.options.everyDays';
-                    }
+                if ($interval === 1) {
+                    $snippetKey = 'molliePayments.subscriptions.options.everyDay';
+                } else {
+                    $snippetKey = 'molliePayments.subscriptions.options.everyDays';
+                }
 
                 break;
 
             case IntervalType::WEEKS:
-                    if ($interval === 1) {
-                        $snippetKey = 'molliePayments.subscriptions.options.everyWeek';
-                    } else {
-                        $snippetKey = 'molliePayments.subscriptions.options.everyWeeks';
-                    }
+                if ($interval === 1) {
+                    $snippetKey = 'molliePayments.subscriptions.options.everyWeek';
+                } else {
+                    $snippetKey = 'molliePayments.subscriptions.options.everyWeeks';
+                }
 
                 break;
 
             case IntervalType::MONTHS:
-                    if ($interval === 1) {
-                        $snippetKey = 'molliePayments.subscriptions.options.everyMonth';
-                    } else {
-                        $snippetKey = 'molliePayments.subscriptions.options.everyMonths';
-                    }
+                if ($interval === 1) {
+                    $snippetKey = 'molliePayments.subscriptions.options.everyMonth';
+                } else {
+                    $snippetKey = 'molliePayments.subscriptions.options.everyMonths';
+                }
 
                 break;
         }

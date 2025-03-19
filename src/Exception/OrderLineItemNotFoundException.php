@@ -11,7 +11,7 @@ class OrderLineItemNotFoundException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $identifier, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $identifier, array $parameters = [], ?\Throwable $previous = null)
     {
         if (empty($identifier)) {
             $message = 'Could not find an OrderLineItem. No identifier/productNumber provided';

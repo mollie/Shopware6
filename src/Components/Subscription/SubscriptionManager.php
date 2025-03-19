@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\Actions\CancelAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\CreateAction;
@@ -95,31 +94,31 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function findSubscription(string $id, Context $context): SubscriptionEntity
     {
         try {
             return $this->repoSubscriptions->findById($id, $context);
         } catch (\Throwable $ex) {
-            throw new Exception('Subscription with ID ' . $id . ' not found in Shopware');
+            throw new \Exception('Subscription with ID ' . $id . ' not found in Shopware');
         }
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function findSubscriptionByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
     {
         try {
             return $this->repoSubscriptions->findByMandateId($customerId, $mandateId, $context);
         } catch (\Throwable $ex) {
-            throw new Exception('Subscription with mandate ID ' . $mandateId . ' not found in Shopware');
+            throw new \Exception('Subscription with mandate ID ' . $mandateId . ' not found in Shopware');
         }
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
@@ -135,7 +134,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
@@ -143,7 +142,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
     {
@@ -151,7 +150,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function updateBillingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
     {
@@ -175,7 +174,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function updateShippingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
     {
@@ -207,7 +206,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
@@ -223,7 +222,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function pauseSubscription(string $subscriptionId, Context $context): void
     {
@@ -231,7 +230,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function resumeSubscription(string $subscriptionId, Context $context): void
     {
@@ -239,7 +238,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function skipSubscription(string $subscriptionId, int $skipCount, Context $context): void
     {
@@ -247,7 +246,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
@@ -255,7 +254,7 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function isCancelable(SubscriptionEntity $subscription, Context $context): bool
     {

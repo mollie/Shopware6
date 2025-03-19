@@ -59,9 +59,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param mixed $value
-     */
     private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context): void
     {
         if (in_array($key, [
@@ -91,8 +88,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param mixed $value
-     *
      * @throws \Mollie\Api\Exceptions\ApiException
      */
     private function fetchProfileIdForApiKey($value, ?string $salesChannelId, bool $testMode, Context $context): void
@@ -162,8 +157,6 @@ class SystemConfigSubscriber implements EventSubscriberInterface
      * when saving the configuration in the administration, Shopware will also save those keys.
      * We need to fix the profile ID, because we fetch the new profile ID from Mollie and save it to the system config,
      * and then Shopware overwrites it with the old one afterwards.
-     *
-     * @param mixed $value
      */
     private function fixProfileIdAfterChange(string $key, $value, ?string $salesChannelId, bool $testMode, Context $context): void
     {

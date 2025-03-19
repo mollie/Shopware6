@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\CreditCard;
 
-use Exception;
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Service\CustomerServiceInterface;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
@@ -101,7 +100,7 @@ class CreditCardControllerBase extends AbstractStoreFrontController
                 $this->logger->info('One-Click Payments customer ' . $customerId . ' removed stored mandate ' . $mandateId);
 
                 $success = true;
-            } catch (Exception $exception) {
+            } catch (\Exception $exception) {
                 $this->logger->error(
                     'One-Click Payments  error when removing mandate from customer',
                     [

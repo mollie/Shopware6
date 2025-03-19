@@ -65,7 +65,7 @@ class SubscriptionRenewing
 
         // if we have a separate shipping address
         // make sure that our cloned order also contains 2 addresses (1 for shipping)
-        $needsSeparateShippingAddress = ($subscription->getShippingAddress() instanceof SubscriptionAddressEntity);
+        $needsSeparateShippingAddress = $subscription->getShippingAddress() instanceof SubscriptionAddressEntity;
 
         // now let's clone our previous order and create a new one from it
         $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context);

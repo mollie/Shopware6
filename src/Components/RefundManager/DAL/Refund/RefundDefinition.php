@@ -42,12 +42,12 @@ class RefundDefinition extends EntityDefinition
 
             // --------------------------------------------------------------------------------------------------------------------------
 
-            (new FkField('order_id', 'orderId', OrderDefinition::class)),
+            new FkField('order_id', 'orderId', OrderDefinition::class),
             new ReferenceVersionField(OrderDefinition::class, 'order_version_id'),
 
-            (new StringField('mollie_refund_id', 'mollieRefundId')),
+            new StringField('mollie_refund_id', 'mollieRefundId'),
 
-            (new StringField('type', 'type')),
+            new StringField('type', 'type'),
 
             new LongTextField('public_description', 'publicDescription'),
             new LongTextField('internal_description', 'internalDescription'),

@@ -7,7 +7,6 @@ use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Level;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 
@@ -21,9 +20,6 @@ final class PluginSettingsHandler extends AbstractHandler
 
     private AbstractSettingsService $settingsService;
 
-    /**
-     * @param int|Level|string $level
-     */
     public function __construct(AbstractSettingsService $settingsService, Connection $connection, string $filePath, bool $bubble = true)
     {
         parent::__construct(LogLevel::DEBUG, $bubble);

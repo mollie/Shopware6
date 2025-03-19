@@ -4,6 +4,7 @@ $finder = \PhpCsFixer\Finder::create()->in([
     __DIR__ . '/src',
     __DIR__ . '/shopware',
     __DIR__.'/tests/PHPUnit',
+    __DIR__.'/tests/Integration',
 ]);
 
 $finder->exclude(
@@ -47,6 +48,7 @@ return $config->setRules(
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'phpdoc_types_order' => true,
         'phpdoc_to_comment' => false,
+        'trailing_comma_in_multiline' => false
     ]
 )
     ->setRiskyAllowed(true)

@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Setting;
 
-use DateTime;
-use DateTimeZone;
-use Exception;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Shopware\Core\Framework\Struct\Struct;
 
@@ -16,7 +13,7 @@ class MollieSettingStruct extends Struct
     public const ORDER_EXPIRES_AT_MIN_DAYS = 1;
     public const ORDER_EXPIRES_AT_MAX_DAYS = 100;
 
-    const APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST = 'applePayDirectDomainAllowList';
+    public const APPLE_PAY_DIRECT_DOMAIN_ALLOW_LIST = 'applePayDirectDomainAllowList';
 
     /**
      * @var string
@@ -342,9 +339,6 @@ class MollieSettingStruct extends Struct
         return $this->liveProfileId;
     }
 
-    /**
-     * @return MollieSettingStruct
-     */
     public function setProfileId(string $profileId): self
     {
         $this->profileId = $profileId;
@@ -474,9 +468,6 @@ class MollieSettingStruct extends Struct
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getPaymentMethodBankTransferDueDateDays(): ?int
     {
         if (! $this->paymentMethodBankTransferDueDateDays) {
@@ -495,7 +486,7 @@ class MollieSettingStruct extends Struct
     /**
      * returns bank transfer due date in YYYY-MM-DD format or null
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function getPaymentMethodBankTransferDueDate(): ?string
     {
@@ -504,16 +495,13 @@ class MollieSettingStruct extends Struct
             return null;
         }
 
-        return (new DateTime())
-            ->setTimezone(new DateTimeZone('UTC'))
+        return (new \DateTime())
+            ->setTimezone(new \DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $dueDate))
             ->format('Y-m-d')
         ;
     }
 
-    /**
-     * @return ?int
-     */
     public function getOrderLifetimeDays(): ?int
     {
         if (! $this->orderLifetimeDays) {
@@ -530,9 +518,7 @@ class MollieSettingStruct extends Struct
     }
 
     /**
-     * @throws Exception
-     *
-     * @return string
+     * @throws \Exception
      */
     public function getOrderLifetimeDate(): ?string
     {
@@ -541,8 +527,8 @@ class MollieSettingStruct extends Struct
             return null;
         }
 
-        return (new DateTime())
-            ->setTimezone(new DateTimeZone('UTC'))
+        return (new \DateTime())
+            ->setTimezone(new \DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $orderLifeTimeDays))
             ->format('Y-m-d')
         ;

@@ -49,7 +49,7 @@ class UpdateOrderLineItems
                 continue;
             }
 
-            //# we need some customFields for later when we edit an order, for example subscription information
+            // # we need some customFields for later when we edit an order, for example subscription information
             $originalCustomFields = $shopwareLine->getPayload()['customFields'] ?? [];
             $originalCustomFields['order_line_id'] = $orderLine->id;
 

@@ -3,24 +3,21 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder;
 
-use DateTime;
-use DateTimeInterface;
-
 class ReminderValidator
 {
     /**
      * @throws \Exception
      */
-    public function shouldRemind(?DateTimeInterface $nextRenewal, DateTimeInterface $today, int $daysDiff, ?DateTimeInterface $lastReminded): bool
+    public function shouldRemind(?\DateTimeInterface $nextRenewal, \DateTimeInterface $today, int $daysDiff, ?\DateTimeInterface $lastReminded): bool
     {
         if ($nextRenewal === null) {
             return false;
         }
 
-        $nextReminderDate = new DateTime($nextRenewal->format('Y-m-d H:i:s'));
+        $nextReminderDate = new \DateTime($nextRenewal->format('Y-m-d H:i:s'));
         $nextReminderDate->modify('-' . $daysDiff . ' day');
 
-        $nextRenewal = new DateTime($nextRenewal->format('Y-m-d H:i:s'));
+        $nextRenewal = new \DateTime($nextRenewal->format('Y-m-d H:i:s'));
 
         if ($nextRenewal <= $today) {
             // either the renewal is in the past

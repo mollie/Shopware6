@@ -27,7 +27,7 @@ abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
      */
     public function __construct($scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
-        /* @phpstan-ignore-next-line  */
+        /* @phpstan-ignore-next-line */
         parent::__construct($scheduledTaskRepository, $logger);
 
         $this->subscriptionManager = $subscriptionManager;

@@ -28,7 +28,7 @@ class FakeEventDispatcher implements EventDispatcherInterface
         return $this->dispatchedEventName;
     }
 
-    public function dispatch(object $event, string $eventName = null): object
+    public function dispatch(object $event, ?string $eventName = null): object
     {
         $this->dispatchedEvent = $event;
         $this->dispatchedEventName = $eventName;
@@ -56,7 +56,7 @@ class FakeEventDispatcher implements EventDispatcherInterface
         // TODO: Implement removeSubscriber() method.
     }
 
-    public function getListeners(string $eventName = null): array
+    public function getListeners(?string $eventName = null): array
     {
         // TODO: Implement getListeners() method.
     }
@@ -66,7 +66,7 @@ class FakeEventDispatcher implements EventDispatcherInterface
         // TODO: Implement getListenerPriority() method.
     }
 
-    public function hasListeners(string $eventName = null): bool
+    public function hasListeners(?string $eventName = null): bool
     {
         // TODO: Implement hasListeners() method.
     }

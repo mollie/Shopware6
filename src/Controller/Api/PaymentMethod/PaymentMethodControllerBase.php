@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Throwable;
 
 class PaymentMethodControllerBase extends AbstractController
 {
@@ -47,7 +46,7 @@ class PaymentMethodControllerBase extends AbstractController
             return $this->json([
                 'success' => true,
             ]);
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
             return $this->json(

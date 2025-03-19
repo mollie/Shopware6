@@ -9,8 +9,8 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 
 class CustomerStruct extends Struct
 {
-    const LIVE_MODE = 'live';
-    const TEST_MODE = 'test';
+    public const LIVE_MODE = 'live';
+    public const TEST_MODE = 'test';
 
     /**
      * @var ?string
@@ -34,8 +34,6 @@ class CustomerStruct extends Struct
 
     /**
      * TODO: we need to get rid off this one day, no magic -> we need to explicitly load the values from the MySQL JSON
-     *
-     * @param mixed $value
      */
     public function __set(string $key, $value): void
     {

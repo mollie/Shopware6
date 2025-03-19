@@ -55,7 +55,7 @@ class OrderReturnHandler
             return;
         }
         $request = $this->createRequestFromOrder((string) $order->getOrderNumber(), $orderReturn);
-        $order = $this->orderService->getOrder($order->getId(), $context); //need to load the order again because the line items are not loaded in the event
+        $order = $this->orderService->getOrder($order->getId(), $context); // need to load the order again because the line items are not loaded in the event
         try {
             $this->refundManager->refund($order, $request, $context);
         } catch (\Throwable $throwable) {

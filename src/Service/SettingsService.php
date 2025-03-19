@@ -12,10 +12,10 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 class SettingsService implements PluginSettingsServiceInterface
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
-    const LIVE_API_KEY = 'liveApiKey';
-    const TEST_API_KEY = 'testApiKey';
-    const LIVE_PROFILE_ID = 'liveProfileId';
-    const TEST_PROFILE_ID = 'testProfileId';
+    public const LIVE_API_KEY = 'liveApiKey';
+    public const TEST_API_KEY = 'testApiKey';
+    public const LIVE_PROFILE_ID = 'liveProfileId';
+    public const TEST_PROFILE_ID = 'testProfileId';
     private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
     private const SYSTEM_CORE_CART_CONFIG_DOMAIN = 'core.cart';
 
@@ -58,12 +58,6 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     private array $cachedStructs = [];
 
-    /**
-     * @param ?string $envShopDomain
-     * @param ?string $envDevMode
-     * @param ?string $envCypressMode
-     * @param mixed $repoSalesChannels
-     */
     public function __construct(SystemConfigService $systemConfigService, $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
@@ -143,9 +137,6 @@ class SettingsService implements PluginSettingsServiceInterface
         return $allConfigs;
     }
 
-    /**
-     * @param mixed $value
-     */
     public function set(string $key, $value, ?string $salesChannelId = null): void
     {
         $this->systemConfigService->set(self::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value, $salesChannelId);

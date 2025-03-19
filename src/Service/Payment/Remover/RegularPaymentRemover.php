@@ -21,9 +21,6 @@ class RegularPaymentRemover extends PaymentMethodRemover
         parent::__construct($container, $requestStack, $orderService, $settingsService, $orderDataExtractor, $logger);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
         if (! $this->isAllowedRoute()) {

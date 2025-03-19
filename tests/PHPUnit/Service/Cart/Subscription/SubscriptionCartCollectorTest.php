@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SubscriptionCartCollectorTest extends TestCase
 {
-    const SUBSCRIPTION_ENABLED = 'mollie_payments_product_subscription_enabled';
+    public const SUBSCRIPTION_ENABLED = 'mollie_payments_product_subscription_enabled';
     private $dispatcher;
     private $collector;
     private $data;

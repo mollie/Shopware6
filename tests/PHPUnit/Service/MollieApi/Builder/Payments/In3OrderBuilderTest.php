@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
-use DateTime;
-use DateTimeZone;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use MolliePayments\Tests\Fakes\FakeContainer;
@@ -49,7 +47,7 @@ class In3OrderBuilderTest extends AbstractMollieOrderBuilder
             []
         );
 
-        $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
+        $expectedOrderLifeTime = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
             ->format('Y-m-d')
         ;

@@ -154,13 +154,6 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
-    public function invalidShippingUrlPatterns(): array
-    {
-        return [
-            ['%s%'],
-        ];
-    }
-
     /**
      * @dataProvider invalidShippingUrlPatterns
      */
@@ -169,5 +162,12 @@ class TrackingInfoStructFactoryTest extends TestCase
         $trackingInfoStruct = $this->factory->create('test', 'valid-code', 'https://foo.bar/' . $invalidPattern);
 
         $this->assertSame('', $trackingInfoStruct->getUrl());
+    }
+
+    public function invalidShippingUrlPatterns(): array
+    {
+        return [
+            ['%s%'],
+        ];
     }
 }

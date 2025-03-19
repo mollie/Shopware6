@@ -5,16 +5,16 @@ namespace Kiener\MolliePayments\Service\Mollie;
 
 class MolliePaymentStatus
 {
-    const MOLLIE_PAYMENT_UNKNOWN = 'unknown';
+    public const MOLLIE_PAYMENT_UNKNOWN = 'unknown';
 
-    const MOLLIE_PAYMENT_COMPLETED = 'completed';
-    const MOLLIE_PAYMENT_PAID = 'paid';
-    const MOLLIE_PAYMENT_AUTHORIZED = 'authorized';
-    const MOLLIE_PAYMENT_PENDING = 'pending';
-    const MOLLIE_PAYMENT_OPEN = 'open';
-    const MOLLIE_PAYMENT_CANCELED = 'canceled';
-    const MOLLIE_PAYMENT_EXPIRED = 'expired';
-    const MOLLIE_PAYMENT_FAILED = 'failed';
+    public const MOLLIE_PAYMENT_COMPLETED = 'completed';
+    public const MOLLIE_PAYMENT_PAID = 'paid';
+    public const MOLLIE_PAYMENT_AUTHORIZED = 'authorized';
+    public const MOLLIE_PAYMENT_PENDING = 'pending';
+    public const MOLLIE_PAYMENT_OPEN = 'open';
+    public const MOLLIE_PAYMENT_CANCELED = 'canceled';
+    public const MOLLIE_PAYMENT_EXPIRED = 'expired';
+    public const MOLLIE_PAYMENT_FAILED = 'failed';
 
     /**
      * attention!
@@ -24,9 +24,9 @@ class MolliePaymentStatus
      * the plugin architecture. so we've added our fictional status entries here!
      * these will never come from the mollie API
      */
-    const MOLLIE_PAYMENT_REFUNDED = 'refunded';
-    const MOLLIE_PAYMENT_PARTIALLY_REFUNDED = 'partially_refunded';
-    const MOLLIE_PAYMENT_CHARGEBACK = 'chargeback';
+    public const MOLLIE_PAYMENT_REFUNDED = 'refunded';
+    public const MOLLIE_PAYMENT_PARTIALLY_REFUNDED = 'partially_refunded';
+    public const MOLLIE_PAYMENT_CHARGEBACK = 'chargeback';
 
     /**
      * Gets if the provided payment status means that
