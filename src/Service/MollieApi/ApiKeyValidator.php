@@ -25,7 +25,7 @@ class ApiKeyValidator
     {
         $apiClient = $this->apiFactory->buildClient($key);
 
-        /** @var Profile $profile */
+        /** @var ?Profile $profile */
         $profile = $apiClient->profiles->getCurrent();
 
         if (! $profile instanceof Profile) {

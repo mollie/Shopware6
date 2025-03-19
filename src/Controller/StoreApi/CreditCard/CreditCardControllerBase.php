@@ -37,6 +37,7 @@ class CreditCardControllerBase
      */
     public function saveCardToken(string $customerId, string $cardToken, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
+        /** @var ?CustomerEntity $customer */
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if (! $customer instanceof CustomerEntity) {
@@ -49,8 +50,9 @@ class CreditCardControllerBase
             $context,
             $data->getBoolean('shouldSaveCardDetail')
         );
+        $success = count($result->getErrors()) === 0;
 
-        return new StoreCardTokenResponse($result !== null);
+        return new StoreCardTokenResponse($success);
     }
 
     /**
@@ -68,8 +70,9 @@ class CreditCardControllerBase
             $mandateId,
             $context->getContext()
         );
+        $success = count($result->getErrors()) === 0;
 
-        return new StoreMandateIdResponse($result !== null);
+        return new StoreMandateIdResponse($success);
     }
 
     /**

@@ -43,7 +43,7 @@ class UpdateOrderLineItems
             if (empty($shopwareLineItemId)) {
                 continue;
             }
-            /** @var OrderLineItemEntity $shopwareLine */
+            /** @var ?OrderLineItemEntity $shopwareLine */
             $shopwareLine = $shopwareOrderLines->get($shopwareLineItemId);
             if (! $shopwareLine instanceof OrderLineItemEntity) {
                 continue;

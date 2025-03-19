@@ -153,9 +153,6 @@ class UpdateAddressAction extends BaseAction
     {
         $initialOrder = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
-        if (! $initialOrder instanceof OrderEntity) {
-            throw new \Exception('No initial order found for subscription: ' . $subscription->getId());
-        }
 
         $initialAddress = $initialOrder->getBillingAddress();
 

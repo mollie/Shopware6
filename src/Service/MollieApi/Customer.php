@@ -68,7 +68,7 @@ class Customer
                 $salesChannelId
             );
 
-            return $mollieCustomer instanceof MollieCustomer;
+            return true;
         } catch (CouldNotFetchMollieCustomerException $e) {
             return false;
         }

@@ -42,6 +42,7 @@ class MollieGateway implements MollieGatewayInterface
      */
     public function getProfileId(): string
     {
+        /** @var ?Profile $profile */
         $profile = $this->apiClient->profiles->get('me');
 
         if (! $profile instanceof Profile) {
@@ -56,6 +57,7 @@ class MollieGateway implements MollieGatewayInterface
      */
     public function getOrganizationId(): string
     {
+        /** @var ?Profile $profile */
         $profile = $this->apiClient->profiles->get('me');
 
         if (! $profile instanceof Profile) {

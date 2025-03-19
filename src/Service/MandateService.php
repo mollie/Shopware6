@@ -85,7 +85,7 @@ class MandateService implements MandateServiceInterface
         $mandateCollection = new MandateCollection();
         foreach ($mandates as $mandate) {
             // only get the mandate has method type creditcard
-            if (! $mandate instanceof Mandate || $mandate->method !== self::MANDATE_METHOD_CREDIT_CARD) {
+            if ($mandate->method !== self::MANDATE_METHOD_CREDIT_CARD) {
                 continue;
             }
 

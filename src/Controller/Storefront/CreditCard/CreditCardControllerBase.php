@@ -40,7 +40,7 @@ class CreditCardControllerBase extends AbstractStoreFrontController
     {
         $result = null;
         $success = false;
-        /** @var CustomerEntity $customer */
+        /** @var ?CustomerEntity $customer */
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if ($customer instanceof CustomerEntity) {

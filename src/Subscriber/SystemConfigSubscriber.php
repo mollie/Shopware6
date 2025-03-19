@@ -59,6 +59,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param mixed $value
+     */
     private function checkSystemConfigChange(string $key, $value, ?string $salesChannelId, Context $context): void
     {
         if (in_array($key, [

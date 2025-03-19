@@ -17,6 +17,7 @@ abstract class AbstractStoreFrontController extends StorefrontController
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
         $container = parent::setContainer($container);
+        /** @phpstan-ignore-next-line  */
         if ($container instanceof ContainerInterface && method_exists($this, 'setTwig')) {
             $this->setTwig($container->get('twig'));
         }

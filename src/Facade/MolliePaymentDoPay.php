@@ -131,11 +131,8 @@ class MolliePaymentDoPay
         $swOrderTransactionID = $transactionStruct->getOrderTransaction()->getId();
 
         // get order with all needed associations
-        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
 
-        if (! $order instanceof OrderEntity) {
-            throw new \Exception('Order in Shopware not existing when preparing Mollie payment');
-        }
+        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
 
         // build our custom fields
         // object for this order

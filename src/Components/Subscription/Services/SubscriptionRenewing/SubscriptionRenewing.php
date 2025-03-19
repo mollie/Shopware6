@@ -56,9 +56,6 @@ class SubscriptionRenewing
     {
         $order = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
-        if (! $order instanceof OrderEntity) {
-            throw new EntityNotFoundException('order', $subscription->getOrderId());
-        }
 
         // get the next order number
         $newOrderNumber = $this->numberRanges->getValue('order', $context, $subscription->getSalesChannelId());
@@ -72,9 +69,6 @@ class SubscriptionRenewing
 
         $order = $this->orderService->getOrder($orderId, $context);
 
-        if (! $order instanceof OrderEntity) {
-            throw new \Exception('Cannot renew subscription. Order with ID ' . $orderId . ' not found for subscription: ' . $subscription->getMollieId());
-        }
 
         if (! $order->getTransactions() instanceof OrderTransactionCollection) {
             throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a list of order transactions');

@@ -63,7 +63,8 @@ class PosControllerBase
             $terminalID,
             $context->getContext()
         );
+        $success = count($result->getErrors()) === 0;
 
-        return new StoreTerminalResponse($result !== null);
+        return new StoreTerminalResponse($success);
     }
 }

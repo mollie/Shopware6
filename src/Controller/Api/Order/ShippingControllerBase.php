@@ -529,9 +529,6 @@ class ShippingControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-            if (! $order instanceof OrderEntity) {
-                throw new \InvalidArgumentException('Order with ID: ' . $orderId . ' not found!');
-            }
 
             // hydrate to our real item struct
             $items = $this->hydrateShippingItems($lineItems);
@@ -564,9 +561,6 @@ class ShippingControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-            if (! $order instanceof OrderEntity) {
-                throw new \InvalidArgumentException('Order with id: ' . $orderId . ' not found!');
-            }
 
             $tracking = new TrackingData($trackingCarrier, $trackingCode, $trackingUrl);
 

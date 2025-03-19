@@ -36,7 +36,7 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array<mixed>>
+     * @return array<mixed>
      */
     public static function getSubscribedEvents(): array
     {
