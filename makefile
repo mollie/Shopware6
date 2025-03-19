@@ -7,7 +7,6 @@
 
 PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/composer.json"))->version;'`
 
-SW_CLI_VERSION:=$(shell shopware-cli --version 1>/dev/null)
 NODE_VERSION:=$(shell node -v)
 SW_VERSION := 6.4.5.0
 # split by dot and use 2nd word and append it to "6."
@@ -42,8 +41,7 @@ prod: ##1 Installs all production dependencies
 
 dev: ##1 Installs all dev dependencies
 	@composer validate
-    # we have to run update in dev mode, because dev dependencies are not compatible with newer php version. should be updated when support for 6.4 is dropped
-	composer update
+	@composer install
 	npm install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
