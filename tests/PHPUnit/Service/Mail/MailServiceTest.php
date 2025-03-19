@@ -54,6 +54,10 @@ class MailServiceTest extends TestCase
      *
      * @dataProvider getMailData
      *
+     * @param mixed $expectedData
+     * @param mixed $mailData
+     * @param mixed $attachments
+     *
      * @return void
      */
     public function testMailSenderGetsCorrectData($expectedData, $mailData, $attachments)

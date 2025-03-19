@@ -13,6 +13,8 @@ final class MollieSettingsStructTest extends TestCase
      * test to get a maximum range of order life time days
      *
      * @dataProvider orderLifeTimeDaysData
+     *
+     * @param mixed $lifeTimeDays
      */
     public function testGetOrderLifetimeDays($lifeTimeDays, ?int $realLifeTimeDays)
     {
@@ -29,6 +31,8 @@ final class MollieSettingsStructTest extends TestCase
      * test get the correct calculation based on oderLifetimeDays config
      *
      * @dataProvider orderLifeTimeDaysData
+     *
+     * @param mixed $lifeTimeDays
      *
      * @throws \Exception
      */
@@ -61,6 +65,8 @@ final class MollieSettingsStructTest extends TestCase
      * test get the correct calculation based on paymentMethodBankTransferDueDateDays config
      *
      * @dataProvider orderBankTransferDueDays
+     *
+     * @param mixed $lifeTimeDays
      */
     public function testBankTransferDueDays($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
@@ -77,6 +83,8 @@ final class MollieSettingsStructTest extends TestCase
      * test to get correct value range based on paymentMethodBankTransferDueDateDays config
      *
      * @dataProvider orderBankTransferDueDays
+     *
+     * @param mixed $lifeTimeDays
      *
      * @throws \Exception
      */

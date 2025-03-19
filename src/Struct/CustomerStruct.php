@@ -34,6 +34,8 @@ class CustomerStruct extends Struct
 
     /**
      * TODO: we need to get rid off this one day, no magic -> we need to explicitly load the values from the MySQL JSON
+     *
+     * @param mixed $value
      */
     public function __set(string $key, $value): void
     {

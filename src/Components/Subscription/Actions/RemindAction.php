@@ -41,6 +41,8 @@ class RemindAction extends BaseAction
     private $reminderValidator;
 
     /**
+     * @param mixed $repoSalesChannel
+     *
      * @throws \Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, $repoSalesChannel, ReminderValidator $reminderValidator)

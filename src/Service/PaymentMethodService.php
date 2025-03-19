@@ -93,9 +93,6 @@ class PaymentMethodService
     private $versionCompare;
     private PayPalExpressConfig $payPalExpressConfig;
 
-    /**
-     * @param MediaRepository $mediaRepository
-     */
     public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;

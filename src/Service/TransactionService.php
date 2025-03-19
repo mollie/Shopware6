@@ -20,6 +20,8 @@ class TransactionService
 
     /**
      * Creates a new instance of the transaction service.
+     *
+     * @param mixed $orderTransactionRepository
      */
     public function __construct($orderTransactionRepository)
     {
