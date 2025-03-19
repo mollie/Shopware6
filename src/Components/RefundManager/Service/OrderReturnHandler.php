@@ -87,7 +87,7 @@ class OrderReturnHandler
 
         return $request;
     }
-    
+
     private function findReturnByOrder(OrderEntity $order, Context $context): ?OrderReturnEntity
     {
         if ($this->orderReturnRepository === null) {
