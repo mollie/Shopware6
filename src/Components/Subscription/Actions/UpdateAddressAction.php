@@ -19,7 +19,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Uuid\Uuid;
 
@@ -152,7 +151,6 @@ class UpdateAddressAction extends BaseAction
     private function createNewAddress(SubscriptionEntity $subscription, Context $context): SubscriptionAddressEntity
     {
         $initialOrder = $this->orderService->getOrder($subscription->getOrderId(), $context);
-
 
         $initialAddress = $initialOrder->getBillingAddress();
 

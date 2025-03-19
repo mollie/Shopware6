@@ -7,6 +7,7 @@ interface FlowBuilderDispatcherAdapterInterface
 {
     /**
      * @param mixed $event
+     *
      * @return mixed
      */
     public function dispatch($event);

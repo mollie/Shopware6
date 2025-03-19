@@ -14,7 +14,6 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
@@ -529,7 +528,6 @@ class ShippingControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-
             // hydrate to our real item struct
             $items = $this->hydrateShippingItems($lineItems);
 
@@ -560,7 +558,6 @@ class ShippingControllerBase extends AbstractController
             }
 
             $order = $this->orderService->getOrder($orderId, $context);
-
 
             $tracking = new TrackingData($trackingCarrier, $trackingCode, $trackingUrl);
 

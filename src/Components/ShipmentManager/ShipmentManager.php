@@ -337,7 +337,7 @@ class ShipmentManager implements ShipmentManagerInterface
             return $trackingData;
         } catch (\InvalidArgumentException $exception) {
             $loggerData = ['exception' => $exception->getMessage(), 'order' => $order->getOrderNumber()];
-            if(count($tracking->toArray()) > 0){
+            if (count($tracking->toArray()) > 0) {
                 $loggerData['tracking'] = $tracking->toArray();
             }
 

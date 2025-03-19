@@ -125,7 +125,7 @@ class ProductAttributes
     }
 
     /**
-     * @return mixed|string|null
+     * @return null|mixed|string
      */
     private function getCustomFieldValue(ProductEntity $product, string $keyName)
     {

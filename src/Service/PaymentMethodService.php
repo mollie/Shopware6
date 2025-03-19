@@ -471,7 +471,6 @@ class PaymentMethodService
             $name = PayPalPayment::PAYMENT_METHOD_NAME;
         }
 
-
         $fileName = $name . '-icon';
 
         $criteria = new Criteria();

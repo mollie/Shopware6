@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Rule;
 
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleScope;
@@ -45,7 +44,6 @@ class CartSubscriptionRule extends Rule
                 break;
             }
         }
-
 
         $lookingForSubscription = $this->isSubscription;
 

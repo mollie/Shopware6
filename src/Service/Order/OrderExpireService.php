@@ -56,7 +56,6 @@ class OrderExpireService
         $resetted = 0;
         /** @var OrderEntity $order */
         foreach ($orders as $order) {
-
             $orderAttributes = new OrderAttributes($order);
 
             if ($orderAttributes->getMollieOrderId() === '') {

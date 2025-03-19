@@ -13,7 +13,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityNotFoundException;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 
 class SubscriptionRenewing
@@ -56,7 +55,6 @@ class SubscriptionRenewing
     {
         $order = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
-
         // get the next order number
         $newOrderNumber = $this->numberRanges->getValue('order', $context, $subscription->getSalesChannelId());
 
@@ -68,7 +66,6 @@ class SubscriptionRenewing
         $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context);
 
         $order = $this->orderService->getOrder($orderId, $context);
-
 
         if (! $order->getTransactions() instanceof OrderTransactionCollection) {
             throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a list of order transactions');
