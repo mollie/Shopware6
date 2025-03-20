@@ -20,6 +20,7 @@ parameters:
           message: 'might overwrite existing variables'
     scanDirectories:
       - ../polyfill/Shopware
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
 

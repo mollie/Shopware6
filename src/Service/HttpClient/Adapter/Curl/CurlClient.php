@@ -20,6 +20,7 @@ class CurlClient implements HttpClientInterface
 
     public function sendRequest(string $method, string $url, string $content = ''): HttpResponse
     {
+
         $handle = curl_init($url);
 
         assert($handle !== false);
@@ -48,7 +49,7 @@ class CurlClient implements HttpClientInterface
         if (strtoupper($method) === 'POST' || strtoupper($method) === 'PUT') {
             curl_setopt($handle, CURLOPT_POSTFIELDS, $content);
         }
-        /** @phpstan-ignore-next-line  */
+
         $response = $this->execute($handle);
 
         curl_close($handle);
@@ -56,13 +57,11 @@ class CurlClient implements HttpClientInterface
         return $response;
     }
 
-    /** @param false|resource $handle */
+    /** @phpstan-ignore-next-line */
     private function execute($handle): HttpResponse
     {
         assert($handle !== false);
-        /** @phpstan-ignore-next-line  */
         $response = (string) curl_exec($handle);
-        /** @phpstan-ignore-next-line  */
         $header_size = curl_getinfo($handle, CURLINFO_HEADER_SIZE);
 
         $responseHeaders = substr($response, 0, $header_size);
@@ -70,7 +69,6 @@ class CurlClient implements HttpClientInterface
 
         /**
          * @var ?int $statusCode
-         * @phpstan-ignore-next-line
          */
         $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
