@@ -93,7 +93,7 @@ class PaymentMethodService
     private $versionCompare;
     private PayPalExpressConfig $payPalExpressConfig;
 
-    public function __construct(string $shopwareVersion, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
+    public function __construct(VersionCompare $versionCompare, MediaService $mediaService, MediaRepository $mediaRepository, PaymentMethodRepository $paymentRepository, PluginIdProvider $pluginIdProvider, HttpClientInterface $httpClient, PayPalExpressConfig $payPalExpressConfig)
     {
         $this->mediaService = $mediaService;
         $this->mediaRepository = $mediaRepository;
@@ -101,7 +101,7 @@ class PaymentMethodService
         $this->pluginIdProvider = $pluginIdProvider;
         $this->httpClient = $httpClient;
 
-        $this->versionCompare = new VersionCompare($shopwareVersion);
+        $this->versionCompare = $versionCompare;
         $this->payPalExpressConfig = $payPalExpressConfig;
     }
 
