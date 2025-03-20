@@ -1,8 +1,8 @@
 import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import DeviceDetection from '../services/DeviceDetection';
-import CsrfAjaxMode from '../services/CsrfAjaxMode';
-import ConfirmPageRepository from '../services/ConfirmPageRepository';
+import DeviceDetection from '../services/device-detection';
+import CsrfAjaxMode from '../services/csrf-ajax-mode';
+import ConfirmPageRepository from '../repository/confirm-page-repository';
 
 export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
     static options = deepmerge(MollieCreditCardMandate.options, {

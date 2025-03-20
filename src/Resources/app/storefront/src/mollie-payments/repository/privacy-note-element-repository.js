@@ -1,9 +1,9 @@
-import BuyElementRepository from './BuyElementRepository';
-import ExpressButtonsRepository from './ExpressButtonsRepository';
+import BuyElementRepository from './buy-element-repository';
+import ExpressButtonsRepository from './express-buttons-repository';
 
 export const TOGGLE_PRIVACY_NOTE_EVENT = 'TogglePrivacyNote';
 
-export class PrivacyNoteElement {
+export class PrivacyNoteElementRepository {
     constructor() {
         this.buyElementRepository = new BuyElementRepository();
     }
