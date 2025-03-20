@@ -22,6 +22,7 @@
     }
 }
 
+// checkout
 .confirm-payment {
     .mollie-ideal-issuer {
         margin-top: 15px;
@@ -41,5 +42,12 @@
         .custom-select:invalid {
             border: 1px solid red;
         }
+    }
+}
+
+// account
+.account-payment {
+    .payment-method-description {
+        order: -1;
     }
 }

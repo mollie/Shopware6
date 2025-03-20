@@ -1,4 +1,4 @@
-import BuyElementRepository from './BuyElementRepository';
+import BuyElementRepository from './buy-element-repository';
 
 export default class BuyButtonRepository {
     constructor() {

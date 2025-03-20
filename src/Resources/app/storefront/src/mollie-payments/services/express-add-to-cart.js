@@ -1,4 +1,4 @@
-import BuyButtonRepository from '../repository/BuyButtonRepository';
+import BuyButtonRepository from '../repository/buy-button-repository';
 
 export default class ExpressAddToCart {
     addItemToCartOrSkip(button) {

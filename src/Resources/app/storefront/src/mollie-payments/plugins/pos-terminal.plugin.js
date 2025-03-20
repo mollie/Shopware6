@@ -1,5 +1,5 @@
-import HttpClient from '../services/HttpClient';
-import Plugin from '../Plugin';
+import HttpClient from '../services/http-client'
+import Plugin from '../plugin';
 
 export default class MolliePosTerminalPlugin extends Plugin {
     _shopUrl = '';

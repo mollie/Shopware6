@@ -5,6 +5,7 @@ export default class ExpressButtonsRepository {
             this.target = document;
         }
     }
+
     findAll(additionalSelector = null) {
         let selector = '.mollie-express-button';
         if (additionalSelector !== null) {
