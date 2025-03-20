@@ -116,8 +116,9 @@ runs:
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
-        docker exec shop -u root bash -c 'wget https://getcomposer.org/download/latest-stable/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
+        docker exec -u root shop bash -c 'wget https://getcomposer.org/download/latest-stable/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
+        docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
 
