@@ -7,21 +7,15 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 
 class FakeFlowBuilderDispatcher implements FlowBuilderDispatcherAdapterInterface
 {
-    /**
-     * @var mixed
-     */
     private $dispatchedEvent;
 
-    /**
-     * @return mixed
-     */
     public function getDispatchedEvent()
     {
         return $this->dispatchedEvent;
     }
 
     /**
-     * @param $event
+     * @param mixed $event
      *
      * @return mixed|void
      */

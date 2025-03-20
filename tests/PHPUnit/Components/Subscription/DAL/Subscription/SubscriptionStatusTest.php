@@ -10,6 +10,18 @@ use PHPUnit\Framework\TestCase;
 class SubscriptionStatusTest extends TestCase
 {
     /**
+     * This test verifies that our plugin status enum values
+     * have the correct string values and that these are not
+     * touched without recognizing it.
+     *
+     * @dataProvider getStatusStrings
+     */
+    public function testStatusValues(string $expected, string $status): void
+    {
+        static::assertSame($expected, $status);
+    }
+
+    /**
      * @return array[]
      */
     public function getStatusStrings(): array
@@ -27,15 +39,16 @@ class SubscriptionStatusTest extends TestCase
     }
 
     /**
-     * This test verifies that our plugin status enum values
-     * have the correct string values and that these are not
-     * touched without recognizing it.
+     * This test verifies that a status from the Mollie enum is
+     * correctly converted into our advanced plugin status enum.
      *
-     * @dataProvider getStatusStrings
+     * @dataProvider getMollieStatus
      */
-    public function testStatusValues(string $expected, string $status): void
+    public function testFromMollieStatus(string $expected, string $mollieStatus): void
     {
-        static::assertSame($expected, $status);
+        $convertedStatus = SubscriptionStatus::fromMollieStatus($mollieStatus);
+
+        static::assertSame($expected, $convertedStatus);
     }
 
     /**
@@ -50,19 +63,6 @@ class SubscriptionStatusTest extends TestCase
             [SubscriptionStatus::COMPLETED, MollieSubscriptionStatus::STATUS_COMPLETED],
             [SubscriptionStatus::CANCELED, MollieSubscriptionStatus::STATUS_CANCELED],
         ];
-    }
-
-    /**
-     * This test verifies that a status from the Mollie enum is
-     * correctly converted into our advanced plugin status enum.
-     *
-     * @dataProvider getMollieStatus
-     */
-    public function testFromMollieStatus(string $expected, string $mollieStatus): void
-    {
-        $convertedStatus = SubscriptionStatus::fromMollieStatus($mollieStatus);
-
-        static::assertSame($expected, $convertedStatus);
     }
 
     /**

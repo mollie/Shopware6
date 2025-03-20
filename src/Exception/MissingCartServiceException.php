@@ -5,11 +5,10 @@ namespace Kiener\MolliePayments\Exception;
 
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 class MissingCartServiceException extends ShopwareHttpException
 {
-    public function __construct(Throwable $previous = null)
+    public function __construct(?\Throwable $previous = null)
     {
         $message = 'CartService of Shopware not found!';
         $parameters = [];

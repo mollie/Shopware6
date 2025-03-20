@@ -148,7 +148,7 @@ class SubscriptionPageLoader
         return $this->repoSubscriptions->search($criteria, $context->getContext());
     }
 
-    private function createCriteria(Request $request, string $customerId = null): Criteria
+    private function createCriteria(Request $request, ?string $customerId = null): Criteria
     {
         $limit = $request->get('limit');
         $limit = $limit ? (int) $limit : 10;

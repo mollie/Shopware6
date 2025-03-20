@@ -5,13 +5,13 @@ namespace Kiener\MolliePayments\Service;
 
 class TokenAnonymizer
 {
-    const TOKEN_ANONYMIZER_PLACEHOLDER_SYMBOL = '*';
+    public const TOKEN_ANONYMIZER_PLACEHOLDER_SYMBOL = '*';
 
-    const TOKEN_ANONYMIZER_PLACEHOLDER_COUNT = 4;
+    public const TOKEN_ANONYMIZER_PLACEHOLDER_COUNT = 4;
 
-    const TOKEN_ANONYMIZER_COUNT_FIRST_CHARACTERS = 3;
+    public const TOKEN_ANONYMIZER_COUNT_FIRST_CHARACTERS = 3;
 
-    const TOKEN_ANONYMIZER_COUNT_LAST_CHARACTERS = 4;
+    public const TOKEN_ANONYMIZER_COUNT_LAST_CHARACTERS = 4;
 
     public function anonymize(string $value): string
     {

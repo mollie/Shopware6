@@ -94,16 +94,16 @@ class OrderStatusUpdater
 
         switch ($targetShopwareStatusKey) {
             case MolliePaymentStatus::MOLLIE_PAYMENT_OPEN:
-                    $states = [OrderTransactionStates::STATE_IN_PROGRESS];
-                    if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
-                        $states[] = OrderTransactionStates::STATE_UNCONFIRMED;
-                    }
-                    // if we are already in_progress...then don't switch to OPEN again
-                    // otherwise SEPA bank transfer would switch back to OPEN
-                    if (! in_array($currentShopwareStatusKey, $states) || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
-                        $addLog = true;
-                        $this->transactionTransitionService->reOpenTransaction($transaction, $context);
-                    }
+                $states = [OrderTransactionStates::STATE_IN_PROGRESS];
+                if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
+                    $states[] = OrderTransactionStates::STATE_UNCONFIRMED;
+                }
+                // if we are already in_progress...then don't switch to OPEN again
+                // otherwise SEPA bank transfer would switch back to OPEN
+                if (! in_array($currentShopwareStatusKey, $states) || $context->hasState(self::ORDER_STATE_FORCE_OPEN)) {
+                    $addLog = true;
+                    $this->transactionTransitionService->reOpenTransaction($transaction, $context);
+                }
 
                 break;
 

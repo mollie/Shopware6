@@ -32,17 +32,11 @@ class CompatibilityGateway implements CompatibilityGatewayInterface
         return $context->getSalesChannel()->getId();
     }
 
-    /**
-     * @return string
-     */
     public function getDomainId(SalesChannelContext $context): ?string
     {
         return $context->getDomainId();
     }
 
-    /**
-     * @param ?string $domainID
-     */
     public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext
     {
         if ($this->versionGTE('6.4')) {

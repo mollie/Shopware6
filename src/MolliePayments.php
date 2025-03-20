@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments;
 
-use Exception;
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Installer\PluginInstaller;
@@ -19,10 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-    const PLUGIN_VERSION = '4.15.0';
+    public const PLUGIN_VERSION = '4.15.0';
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function build(ContainerBuilder $container): void
     {
@@ -44,7 +43,7 @@ class MolliePayments extends Plugin
     {
         parent::install($context);
         if ($this->container === null) {
-            throw new Exception('Container is not initialized');
+            throw new \Exception('Container is not initialized');
         }
 
         $this->runDbMigrations($context->getMigrationCollection());
@@ -106,7 +105,7 @@ class MolliePayments extends Plugin
     private function preparePlugin(Context $context): void
     {
         if ($this->container === null) {
-            throw new Exception('Container is not initialized');
+            throw new \Exception('Container is not initialized');
         }
         /** @var PluginInstaller $pluginInstaller */
         $pluginInstaller = $this->container->get(PluginInstaller::class);

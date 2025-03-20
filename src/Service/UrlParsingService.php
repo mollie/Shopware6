@@ -28,8 +28,8 @@ class UrlParsingService
      * @param string $value the URL to be parsed
      *
      * @return array{0: string, 1: string} An array where:
-     *                  - Index 0 contains the parsed tracking code (if found), or an empty string if no code is found.
-     *                  - Index 1 contains the original URL.
+     *                                     - Index 0 contains the parsed tracking code (if found), or an empty string if no code is found.
+     *                                     - Index 1 contains the original URL.
      */
     public function parseTrackingCodeFromUrl(string $value): array
     {

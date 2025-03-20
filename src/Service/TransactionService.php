@@ -32,7 +32,7 @@ class TransactionService
      * @param string $transactionId
      * @param null|string $versionId
      */
-    public function getTransactionById($transactionId, $versionId = null, Context $context = null): ?OrderTransactionEntity
+    public function getTransactionById($transactionId, $versionId = null, ?Context $context = null): ?OrderTransactionEntity
     {
         $transactionCriteria = new Criteria();
         $transactionCriteria->addFilter(new EqualsFilter('id', $transactionId));
@@ -61,7 +61,7 @@ class TransactionService
     /**
      * Updates a transaction in the database.
      */
-    public function updateTransaction(OrderTransactionEntity $transaction, Context $context = null): EntityWrittenContainerEvent
+    public function updateTransaction(OrderTransactionEntity $transaction, ?Context $context = null): EntityWrittenContainerEvent
     {
         return $this->orderTransactionRepository->update(
             [$transaction->getVars()],

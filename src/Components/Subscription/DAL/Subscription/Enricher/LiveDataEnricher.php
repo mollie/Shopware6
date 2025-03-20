@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher;
 
-use DateInterval;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
@@ -75,7 +74,7 @@ class LiveDataEnricher implements EventSubscriberInterface
                     $lastPossibleDate = null;
 
                     if ($nextPayment instanceof \DateTimeImmutable) {
-                        $lastPossibleDate = $nextPayment->sub(new DateInterval('P' . $cancellationDays . 'D'));
+                        $lastPossibleDate = $nextPayment->sub(new \DateInterval('P' . $cancellationDays . 'D'));
                     }
 
                     $subscription->setCancelUntil($lastPossibleDate);

@@ -23,7 +23,6 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Throwable;
 
 class PaymentHandler implements AsynchronousPaymentHandlerInterface
 {
@@ -110,7 +109,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             );
 
             $paymentUrl = $paymentData->getCheckoutURL();
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->error(
                 'Error when starting Mollie payment: ' . $exception->getMessage(),
                 [
@@ -165,7 +164,7 @@ class PaymentHandler implements AsynchronousPaymentHandlerInterface
             // these are already correct exceptions
             // that cancel the Shopware order in a coordinated way by Shopware
             throw $ex;
-        } catch (Throwable $ex) {
+        } catch (\Throwable $ex) {
             // this processes all unhandled exceptions.
             // we need to log whatever happens in here, and then also
             // throw an exception that breaks the order in a coordinated way.

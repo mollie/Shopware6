@@ -62,7 +62,7 @@ final class ImportCSVCommand extends Command
         $stream = $this->fileSystem->readStream($path);
         $domDocument = new \DOMDocument();
         $domDocument->loadXML(file_get_contents($pathToConfigXml));
-        $row = fgetcsv($stream, null, ';'); //skip header
+        $row = fgetcsv($stream, null, ';'); // skip header
         while ($row = fgetcsv($stream, null, ';')) {
             $key = $row[0];
             $key = $this->keyMappings[$key] ?? $key;

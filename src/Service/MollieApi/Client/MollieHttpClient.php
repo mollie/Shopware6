@@ -54,6 +54,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $this->connnectTimeout);
         curl_setopt($curl, CURLOPT_TIMEOUT, $this->responseTimeout);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+        /** @phpstan-ignore-next-line  */
         curl_setopt($curl, CURLOPT_CAINFO, CaBundle::getBundledCaBundlePath());
 
         switch ($httpMethod) {
@@ -109,7 +110,7 @@ class MollieHttpClient implements MollieHttpAdapterInterface
      * @param int $statusCode
      * @param string $httpBody
      *
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      *
      * @return null|\stdClass
      */

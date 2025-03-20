@@ -196,13 +196,7 @@ class OrderService implements OrderServiceInterface
     {
         $orderId = $this->swOrderService->createOrder($data, $context);
 
-        $order = $this->getOrder($orderId, $context->getContext());
-
-        if (! $order instanceof OrderEntity) {
-            throw CartException::orderNotFound($orderId);
-        }
-
-        return $order;
+        return $this->getOrder($orderId, $context->getContext());
     }
 
     public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $molliePaymentId, string $orderTransactionId, Context $context): void

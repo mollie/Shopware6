@@ -91,19 +91,19 @@ class PromotionItem extends AbstractItem
         }
 
         return $this->buildArray(
-                $this->orderDeliveryItem->getId(),
-                $label,
-                'SHIPPING',
-                true,
-                false,
-                $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
-                $this->orderDeliveryItem->getShippingCosts()->getQuantity(),
-                $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
-                0,
-                0,
-                0,
-                $this->alreadyRefundedQty
-            );
+            $this->orderDeliveryItem->getId(),
+            $label,
+            'SHIPPING',
+            true,
+            false,
+            $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
+            $this->orderDeliveryItem->getShippingCosts()->getQuantity(),
+            $this->orderDeliveryItem->getShippingCosts()->getTotalPrice(),
+            0,
+            0,
+            0,
+            $this->alreadyRefundedQty
+        );
     }
 
     public function getProductNumber(): string

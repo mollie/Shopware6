@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions\Base;
 
-use DateTime;
-use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
@@ -80,7 +78,7 @@ class BaseAction
     private $logger;
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger)
     {
@@ -156,7 +154,7 @@ class BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function isCancellationPeriodValid(SubscriptionEntity $subscription, Context $context): bool
     {
@@ -167,7 +165,7 @@ class BaseAction
         // now verify if we are in a valid range to cancel the subscription
         // depending on the plugin configuration it might only be possible
         // up until a few days before the renewal
-        return $this->cancellationValidator->isCancellationAllowed($subscription->getNextPaymentAt(), $cancellationDays, new DateTime());
+        return $this->cancellationValidator->isCancellationAllowed($subscription->getNextPaymentAt(), $cancellationDays, new \DateTime());
     }
 
     protected function isMollieDevMode(): bool

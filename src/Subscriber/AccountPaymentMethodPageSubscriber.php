@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Exception;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -37,7 +36,7 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array<mixed>>
+     * @return array<mixed>
      */
     public static function getSubscribedEvents(): array
     {
@@ -80,7 +79,7 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
             $args->getPage()->setExtensions([
                 'MollieCreditCardMandateCollection' => $mandates,
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
     }
 }

@@ -33,8 +33,6 @@ class MailService extends AbstractMailService
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws MailTransportFailedException
      */
     public function send(array $data, array $attachments = []): void

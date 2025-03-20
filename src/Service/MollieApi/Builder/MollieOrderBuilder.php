@@ -253,7 +253,7 @@ class MollieOrderBuilder
     private function isVerticalTaxCalculation(SalesChannelContext $salesChannelContext): bool
     {
         $salesChannel = $salesChannelContext->getSalesChannel();
-
+        /** @phpstan-ignore-next-line  */
         if (! method_exists($salesChannel, 'getTaxCalculationType')) {
             return false;
         }

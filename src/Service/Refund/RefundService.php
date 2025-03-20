@@ -121,6 +121,7 @@ class RefundService implements RefundServiceInterface
 
         // REFUND WITH MOLLIE
         // ---------------------------------------------------------------------------------------------
+        /** @var ?Refund $refund */
         $refund = $mollieOrder->refund($params);
 
         if (! $refund instanceof Refund) {
@@ -141,6 +142,7 @@ class RefundService implements RefundServiceInterface
 
         $payment = $this->getPayment($order);
 
+        /** @var ?Refund $refund */
         $refund = $payment->refund([
             'amount' => [
                 'value' => number_format($amount, 2, '.', ''),
@@ -170,6 +172,7 @@ class RefundService implements RefundServiceInterface
         try {
             // getRefund doesn't contain all necessary @throws tags.
             // It is possible for it to throw an ApiException here if $refundId is incorrect.
+            /** @var ?Refund $refund */
             $refund = $payment->getRefund($refundId);
         } catch (ApiException $e) { // Invalid resource id
             throw new CouldNotCancelMollieRefundException('', (string) $order->getOrderNumber(), $refundId, $e);
@@ -223,6 +226,7 @@ class RefundService implements RefundServiceInterface
 
                 // if we have a metadata entry, then make sure to
                 // migrate those compositions (if existing) to our database storage (for legacy refunds)
+                /** @phpstan-ignore-next-line  */
                 if (property_exists($refund, 'metadata')) {
                     /** @var \stdClass|string $metadata */
                     $metadata = $refund->metadata;

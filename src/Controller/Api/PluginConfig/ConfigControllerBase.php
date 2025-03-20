@@ -173,7 +173,7 @@ class ConfigControllerBase extends AbstractController
 
             try {
                 $result['valid'] = $this->apiKeyValidator->validate($key['key']);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // No need to handle this exception
             }
 

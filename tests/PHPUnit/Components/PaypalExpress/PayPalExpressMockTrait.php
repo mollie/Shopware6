@@ -76,7 +76,7 @@ trait PayPalExpressMockTrait
             $methodDetails = new \stdClass();
         }
         /** @var PayPalExpress $paypalExpress */
-        $paypalExpress = $this->createMock(PaypalExpress::class);
+        $paypalExpress = $this->createMock(PayPalExpress::class);
         $fakeSession = $this->createMock(Session::class);
 
         if ($withSessionId) {

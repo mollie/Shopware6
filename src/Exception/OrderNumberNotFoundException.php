@@ -11,7 +11,7 @@ class OrderNumberNotFoundException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $orderNumber, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $orderNumber, array $parameters = [], ?\Throwable $previous = null)
     {
         $message = sprintf('Order with number %s could not be found', $orderNumber);
         parent::__construct($message, $parameters, $previous);

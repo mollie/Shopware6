@@ -11,7 +11,7 @@ class OrderLineItemsNotFoundException extends ShopwareHttpException
     /**
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $id, array $parameters = [], \Throwable $previous = null)
+    public function __construct(string $id, array $parameters = [], ?\Throwable $previous = null)
     {
         $message = sprintf('Line items of order %s could not be fetched', $id);
         parent::__construct($message, $parameters, $previous);

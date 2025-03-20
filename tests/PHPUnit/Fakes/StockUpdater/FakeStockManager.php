@@ -63,9 +63,6 @@ class FakeStockManager implements StockManagerInterface
         return $this->mollieRefundID;
     }
 
-    /**
-     * @param string $mollieRefundID
-     */
     public function increaseStock(OrderLineItemEntity $lineItem, int $quantity): void
     {
         $this->called = true;

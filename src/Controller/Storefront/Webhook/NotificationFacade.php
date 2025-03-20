@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 
-use DateTimeZone;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
@@ -138,7 +137,7 @@ class NotificationFacade
             throw new \Exception('Shopware Order not found for transaction: ' . $swTransactionId);
         }
 
-        $now = new \DateTime('now', new DateTimeZone('UTC'));
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
         /** @var ?\DateTimeImmutable $transactionCreatedAt */
         $transactionCreatedAt = $swTransaction->getCreatedAt();
@@ -229,7 +228,9 @@ class NotificationFacade
         // then we want to update the one inside Shopware
         // If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
         // we want to keep Apple Pay as payment method
-        if ($swTransaction->getPaymentMethod() instanceof PaymentMethodEntity && $mollieOrder instanceof Order && $swTransaction->getPaymentMethod() instanceof PaymentMethodEntity && $swTransaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
+        if ($swTransaction->getPaymentMethod() instanceof PaymentMethodEntity
+            && $mollieOrder instanceof Order
+            && $swTransaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
             $this->updatePaymentMethod($swTransaction, $mollieOrder, $context);
         }
 

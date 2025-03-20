@@ -38,7 +38,7 @@ class RenewAction extends BaseAction
     private $statusConverter;
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, SubscriptionRenewing $renewingService, OrderStatusConverter $statusConverter)
     {
@@ -61,7 +61,7 @@ class RenewAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
     {
@@ -70,20 +70,20 @@ class RenewAction extends BaseAction
         try {
             $swSubscription = $this->getRepository()->findById($swSubscriptionId, $context);
         } catch (\Throwable $ex) {
-            throw new Exception('Subscription with ID ' . $swSubscriptionId . ' not found in Shopware');
+            throw new \Exception('Subscription with ID ' . $swSubscriptionId . ' not found in Shopware');
         }
 
         $settings = $this->getPluginSettings($swSubscription->getSalesChannelId());
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription with ID ' . $swSubscriptionId . ' not renewed. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription with ID ' . $swSubscriptionId . ' not renewed. Subscriptions are disabled for this Sales Channel');
         }
 
         // only renew active subscriptions
         // however, if it's the last time, then it's unfortunately already "completed"
         // so we also need to allow this.
         if (! $swSubscription->isRenewingAllowed()) {
-            throw new Exception('Subscription is not active and cannot be edited');
+            throw new \Exception('Subscription is not active and cannot be edited');
         }
 
         $gateway = $this->getMollieGateway($swSubscription);

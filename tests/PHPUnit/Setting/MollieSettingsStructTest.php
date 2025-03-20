@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Setting;
 
-use DateTime;
-use DateTimeZone;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +14,7 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderLifeTimeDaysData
      *
-     * @param $lifeTimeDays
+     * @param mixed $lifeTimeDays
      */
     public function testGetOrderLifetimeDays($lifeTimeDays, ?int $realLifeTimeDays)
     {
@@ -34,7 +32,7 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderLifeTimeDaysData
      *
-     * @param $lifeTimeDays
+     * @param mixed $lifeTimeDays
      *
      * @throws \Exception
      */
@@ -49,12 +47,26 @@ final class MollieSettingsStructTest extends TestCase
         $this->assertSame($expectedDateString, $actualValue);
     }
 
+    public function orderLifeTimeDaysData()
+    {
+        $today = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'));
+
+        return [
+            'oderLifeTime cannot be smaller than minimum' => [-1, MollieSettingStruct::ORDER_EXPIRES_AT_MIN_DAYS, (clone $today)->modify('+1 day')->format('Y-m-d')],
+            'orderLifeTime cannot be bigger than maximum' => [1000, MollieSettingStruct::ORDER_EXPIRES_AT_MAX_DAYS, (clone $today)->modify('+100 day')->format('Y-m-d')],
+            'orderLifeTime can be set' => [10, 10, (clone $today)->modify('+10 day')->format('Y-m-d')],
+            'orderLifeTime can be null' => [null, null, null],
+            'orderLifeTime can be empty' => ['', null, null],
+            'orderLifeTime is zero, should be handled with null' => ['', null, null],
+        ];
+    }
+
     /**
      * test get the correct calculation based on paymentMethodBankTransferDueDateDays config
      *
      * @dataProvider orderBankTransferDueDays
      *
-     * @param $lifeTimeDays
+     * @param mixed $lifeTimeDays
      */
     public function testBankTransferDueDays($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
@@ -72,7 +84,7 @@ final class MollieSettingsStructTest extends TestCase
      *
      * @dataProvider orderBankTransferDueDays
      *
-     * @param $lifeTimeDays
+     * @param mixed $lifeTimeDays
      *
      * @throws \Exception
      */
@@ -88,23 +100,9 @@ final class MollieSettingsStructTest extends TestCase
         $this->assertSame($expectedDateString, $actualValue);
     }
 
-    public function orderLifeTimeDaysData()
-    {
-        $today = (new DateTime())->setTimezone(new DateTimeZone('UTC'));
-
-        return [
-            'oderLifeTime cannot be smaller than minimum' => [-1, MollieSettingStruct::ORDER_EXPIRES_AT_MIN_DAYS, (clone $today)->modify('+1 day')->format('Y-m-d')],
-            'orderLifeTime cannot be bigger than maximum' => [1000, MollieSettingStruct::ORDER_EXPIRES_AT_MAX_DAYS, (clone $today)->modify('+100 day')->format('Y-m-d')],
-            'orderLifeTime can be set' => [10, 10, (clone $today)->modify('+10 day')->format('Y-m-d')],
-            'orderLifeTime can be null' => [null, null, null],
-            'orderLifeTime can be empty' => ['', null, null],
-            'orderLifeTime is zero, should be handled with null' => ['', null, null],
-        ];
-    }
-
     public function orderBankTransferDueDays()
     {
-        $today = (new DateTime())->setTimezone(new DateTimeZone('UTC'));
+        $today = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'));
 
         return [
             'dueDateDays cannot be smaller than minimum' => [-1, BankTransferPayment::DUE_DATE_MIN_DAYS, (clone $today)->modify('+1 day')->format('Y-m-d')],

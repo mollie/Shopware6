@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Exception;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
@@ -73,7 +72,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array<mixed>>
+     * @return array<mixed>
      */
     public static function getSubscribedEvents(): array
     {
@@ -210,7 +209,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
      */
     private function addMolliePosTerminalsVariableToPage($args, $selectedPayment): void
     {
-        //do not load terminals if not required
+        // do not load terminals if not required
         if ($selectedPayment->getMollieIdentifier() !== PaymentMethod::POINT_OF_SALE) {
             return;
         }
@@ -231,7 +230,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
                     'mollie_terminals' => $terminalsArray,
                 ]
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
     }
 
@@ -272,7 +271,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
             $args->getPage()->setExtensions([
                 'MollieCreditCardMandateCollection' => $mandates,
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
     }
 }

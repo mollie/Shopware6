@@ -102,6 +102,7 @@ class MolliePaymentDoPayTest extends TestCase
     /**
      * @throws CouldNotCreateMollieCustomerException
      * @throws CustomerCouldNotBeFoundException
+     *
      * @dataProvider createMollieCustomerIsCalledTestData
      */
     public function testIfCreateMollieCustomerIsCalled(

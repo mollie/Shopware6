@@ -12,24 +12,6 @@ use Shopware\Core\Framework\Uuid\Uuid;
 class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     /**
-     * @return \string[][]
-     */
-    public function getFormatValues()
-    {
-        return
-            [
-                'no_custom_format' => ['10000', ''],
-                'white_space_is_no_custom_format' => ['10000', ' '],
-                'more_whitespaces_are_also_no_custom_format' => ['10000', '   '],
-                'just_ordernumber' => ['10000', '{ordernumber}'],
-                'custom_prefix' => ['R10000', 'R{ordernumber}'],
-                'custom_suffix' => ['10000-stage', '{ordernumber}-stage'],
-                'full_format' => ['R10000-stage', 'R{ordernumber}-stage'],
-                'with_customer_number' => ['R10000-5000', 'R{ordernumber}-{customernumber}'],
-            ];
-    }
-
-    /**
      * This test verifies that we can set a custom format for our order numbers.
      * Mollie should then have this being set in the order number
      * of the payload for our request.
@@ -64,5 +46,23 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
         );
 
         self::assertSame($expected, $data['orderNumber']);
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function getFormatValues()
+    {
+        return
+            [
+                'no_custom_format' => ['10000', ''],
+                'white_space_is_no_custom_format' => ['10000', ' '],
+                'more_whitespaces_are_also_no_custom_format' => ['10000', '   '],
+                'just_ordernumber' => ['10000', '{ordernumber}'],
+                'custom_prefix' => ['R10000', 'R{ordernumber}'],
+                'custom_suffix' => ['10000-stage', '{ordernumber}-stage'],
+                'full_format' => ['R10000-stage', 'R{ordernumber}-stage'],
+                'with_customer_number' => ['R10000-5000', 'R{ordernumber}-{customernumber}'],
+            ];
     }
 }

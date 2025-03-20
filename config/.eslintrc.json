@@ -1,0 +1,57 @@
+{
+  "env": {
+    "browser": true,
+    "jquery": true,
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "Shopware": "readonly"
+  },
+  "extends": [
+    "eslint:recommended",
+    "prettier"
+  ],
+  "ignorePatterns": [
+    "/src/Resources/app/storefront/dist"
+  ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "rules": {
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "one-var": [
+      "error",
+      "never"
+    ],
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "no-debugger": 2,
+    "prefer-const": "warn",
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    "indent": [
+      "warn",
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ]
+  }
+}
+
+

@@ -19,9 +19,6 @@ class CsrfSubscriber implements EventSubscriberInterface
         $this->versionCompare = new VersionCompare($shopwareVersion);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

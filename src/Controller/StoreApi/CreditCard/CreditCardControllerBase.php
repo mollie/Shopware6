@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\CreditCard;
 
-use Exception;
 use Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response\CreditCardMandatesResponse;
 use Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response\RevokeMandateResponse;
 use Kiener\MolliePayments\Controller\StoreApi\CreditCard\Response\StoreCardTokenResponse;
@@ -34,14 +33,15 @@ class CreditCardControllerBase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveCardToken(string $customerId, string $cardToken, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
+        /** @var ?CustomerEntity $customer */
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if (! $customer instanceof CustomerEntity) {
-            throw new Exception('Customer with ID ' . $customerId . ' not found in Shopware');
+            throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
         }
 
         $result = $this->customerService->setCardToken(
@@ -50,18 +50,19 @@ class CreditCardControllerBase
             $context,
             $data->getBoolean('shouldSaveCardDetail')
         );
+        $success = count($result->getErrors()) === 0;
 
-        return new StoreCardTokenResponse($result !== null);
+        return new StoreCardTokenResponse($success);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveMandateId(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
         if (! $customer instanceof CustomerEntity) {
-            throw new Exception('Customer with ID ' . $customerId . ' not found in Shopware');
+            throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
         }
 
         $result = $this->customerService->setMandateId(
@@ -69,12 +70,13 @@ class CreditCardControllerBase
             $mandateId,
             $context->getContext()
         );
+        $success = count($result->getErrors()) === 0;
 
-        return new StoreMandateIdResponse($result !== null);
+        return new StoreMandateIdResponse($success);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
@@ -84,7 +86,7 @@ class CreditCardControllerBase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getMandates(string $customerId, SalesChannelContext $context): StoreApiResponse
     {

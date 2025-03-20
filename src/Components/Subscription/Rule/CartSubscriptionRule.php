@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Components\Subscription\Rule;
 
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleScope;
@@ -38,13 +37,11 @@ class CartSubscriptionRule extends Rule
 
         $hasCartSubscription = false;
 
-        if ($scope->getCart()->getLineItems() instanceof LineItemCollection) {
-            foreach ($scope->getCart()->getLineItems() as $item) {
-                $tmpSubscription = $this->isItemSubscription($item);
-                if ($tmpSubscription) {
-                    $hasCartSubscription = true;
-                    break;
-                }
+        foreach ($scope->getCart()->getLineItems() as $item) {
+            $tmpSubscription = $this->isItemSubscription($item);
+            if ($tmpSubscription) {
+                $hasCartSubscription = true;
+                break;
             }
         }
 

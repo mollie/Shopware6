@@ -202,7 +202,7 @@ class WebhookTimezoneSubscriberTest extends TestCase
     /**
      * Set up the transaction service with the provided transaction
      *
-     * @param $transaction
+     * @param mixed $transaction
      */
     private function setUpTransactionService($transaction): void
     {

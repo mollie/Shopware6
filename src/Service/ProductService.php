@@ -31,7 +31,7 @@ class ProductService
      *
      * @throws InconsistentCriteriaIdsException
      */
-    public function getProductById($productId, Context $context = null): ?ProductEntity
+    public function getProductById($productId, ?Context $context = null): ?ProductEntity
     {
         $criteria = new Criteria([$productId]);
 

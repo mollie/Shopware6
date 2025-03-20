@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Tags;
 
-use Closure;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\Tags\Exceptions\CouldNotTagOrderException;
 use Kiener\MolliePayments\Struct\Tags\SubscriptionTag;
@@ -32,8 +31,8 @@ class OrderTagService
      * @param EntityRepository $tagRepository
      */
     public function __construct(
-         $orderRepository,
-         $tagRepository
+        $orderRepository,
+        $tagRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->tagRepository = $tagRepository;
@@ -79,7 +78,7 @@ class OrderTagService
             [
                 'id' => $orderId,
                 'tags' => array_map(
-                    Closure::fromCallable([$this, 'serializeTag']),
+                    \Closure::fromCallable([$this, 'serializeTag']),
                     $orderTags->getElements()
                 ),
             ],

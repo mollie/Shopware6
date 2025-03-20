@@ -34,8 +34,8 @@ class ExpireAction
      * @param EntityRepository $salesChannelRepository
      */
     public function __construct(
-         $orderRepository,
-         $salesChannelRepository,
+        $orderRepository,
+        $salesChannelRepository,
         OrderExpireService $orderExpireService,
         SettingsService $settingsService,
         LoggerInterface $logger
@@ -83,7 +83,7 @@ class ExpireAction
         $this->logger->info('Start expire orders for saleschannel', ['salesChannel' => $salesChannelEntity->getName()]);
 
         $date = new \DateTime();
-        $date->modify(sprintf('-%d days', (BankTransferPayment::DUE_DATE_MAX_DAYS + 1)));
+        $date->modify(sprintf('-%d days', BankTransferPayment::DUE_DATE_MAX_DAYS + 1));
 
         $orFilterArray = [
             new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),

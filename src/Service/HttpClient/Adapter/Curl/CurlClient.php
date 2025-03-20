@@ -25,7 +25,7 @@ class CurlClient implements HttpClientInterface
         assert($handle !== false);
 
         // required to follow any redirects and to get the response
-        curl_setopt($handle, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($handle, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
         // turn on SSL verification
@@ -40,8 +40,9 @@ class CurlClient implements HttpClientInterface
 
         // set additional data
         curl_setopt($handle, CURLOPT_HTTPHEADER, []);
-        curl_setopt($handle, CURLOPT_HEADER, 1); // gets the header in the response
+        curl_setopt($handle, CURLOPT_HEADER, true); // gets the header in the response
 
+        /** @phpstan-ignore-next-line  */
         curl_setopt($handle, CURLOPT_CUSTOMREQUEST, $method);
 
         if (strtoupper($method) === 'POST' || strtoupper($method) === 'PUT') {
@@ -55,21 +56,19 @@ class CurlClient implements HttpClientInterface
         return $response;
     }
 
-    /**
-     * @param mixed $handle
-     */
+    /** @phpstan-ignore-next-line */
     private function execute($handle): HttpResponse
     {
         assert($handle !== false);
-
         $response = (string) curl_exec($handle);
-
         $header_size = curl_getinfo($handle, CURLINFO_HEADER_SIZE);
 
         $responseHeaders = substr($response, 0, $header_size);
         $responseBody = substr($response, $header_size);
 
-        /** @var null|int $statusCode */
+        /**
+         * @var ?int $statusCode
+         */
         $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
         if ($statusCode === null) {

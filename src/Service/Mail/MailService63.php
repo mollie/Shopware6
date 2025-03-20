@@ -34,9 +34,6 @@ class MailService63 extends AbstractMailService
         $this->mailSender = $mailSender;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function send(array $data, array $attachments = []): void
     {
         $definition = $this->getValidationDefinition();

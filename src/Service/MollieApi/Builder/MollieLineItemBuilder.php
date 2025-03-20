@@ -154,7 +154,7 @@ class MollieLineItemBuilder
                         return $lineItemEntity->getType() !== self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS;
                     });
 
-                    if ($filteredItems instanceof OrderLineItemCollection && $filteredItems->count() === 1) {
+                    if ($filteredItems->count() === 1) {
                         $item = $filteredItems->first();
                     }
                 }

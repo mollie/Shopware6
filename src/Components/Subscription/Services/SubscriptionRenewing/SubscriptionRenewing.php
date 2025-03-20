@@ -13,7 +13,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\EntityNotFoundException;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 
 class SubscriptionRenewing
@@ -56,25 +55,17 @@ class SubscriptionRenewing
     {
         $order = $this->orderService->getOrder($subscription->getOrderId(), $context);
 
-        if (! $order instanceof OrderEntity) {
-            throw new EntityNotFoundException('order', $subscription->getOrderId());
-        }
-
         // get the next order number
         $newOrderNumber = $this->numberRanges->getValue('order', $context, $subscription->getSalesChannelId());
 
         // if we have a separate shipping address
         // make sure that our cloned order also contains 2 addresses (1 for shipping)
-        $needsSeparateShippingAddress = ($subscription->getShippingAddress() instanceof SubscriptionAddressEntity);
+        $needsSeparateShippingAddress = $subscription->getShippingAddress() instanceof SubscriptionAddressEntity;
 
         // now let's clone our previous order and create a new one from it
         $orderId = $this->orderCloneService->createNewOrder($order, $newOrderNumber, $needsSeparateShippingAddress, $context);
 
         $order = $this->orderService->getOrder($orderId, $context);
-
-        if (! $order instanceof OrderEntity) {
-            throw new \Exception('Cannot renew subscription. Order with ID ' . $orderId . ' not found for subscription: ' . $subscription->getMollieId());
-        }
 
         if (! $order->getTransactions() instanceof OrderTransactionCollection) {
             throw new \Exception('Order ' . $order->getOrderNumber() . ' does not have a list of order transactions');

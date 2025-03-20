@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
-use DateTime;
-use DateTimeZone;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
@@ -57,8 +55,8 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $actual = $this->builder->buildOrderPayload($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
 
-        $bankDueDatetime = (new DateTime())
-            ->setTimezone(new DateTimeZone('UTC'))
+        $bankDueDatetime = (new \DateTime())
+            ->setTimezone(new \DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $bankDueDays))
             ->format('Y-m-d')
         ;

@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
-use Throwable;
 
 class ApplePayDirectControllerBase extends AbstractStoreFrontController
 {
@@ -332,7 +331,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             }
 
             $order = $this->applePay->createOrder($context);
-        } catch (Throwable $ex) {
+        } catch (\Throwable $ex) {
             $this->logger->error(
                 'Apple Pay Direct error when finishing payment: ' . $ex->getMessage(),
                 [
@@ -371,7 +370,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
             $this->fireFlowBuilderStorefrontEvent(self::FLOWBUILDER_SUCCESS, $order, $context->getContext());
 
             return new RedirectResponse($returnUrl);
-        } catch (Throwable $ex) {
+        } catch (\Throwable $ex) {
             $this->logger->error(
                 'Apple Pay Direct error when finishing Mollie payment: ' . $ex->getMessage(),
                 [

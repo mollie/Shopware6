@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Shopware\Core\Framework\Context;
@@ -11,7 +10,7 @@ use Shopware\Core\Framework\Context;
 class PauseAction extends BaseAction
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function pauseSubscription(string $subscriptionId, Context $context): void
     {
@@ -22,19 +21,19 @@ class PauseAction extends BaseAction
         // -------------------------------------------------------------------------------------
 
         if (! $settings->isSubscriptionsEnabled()) {
-            throw new Exception('Subscription cannot be paused. Subscriptions are disabled for this Sales Channel');
+            throw new \Exception('Subscription cannot be paused. Subscriptions are disabled for this Sales Channel');
         }
 
         if (! $settings->isSubscriptionsAllowPauseResume()) {
-            throw new Exception('Subscriptions cannot be paused in this sales channel. Please adjust the plugin configuration.');
+            throw new \Exception('Subscriptions cannot be paused in this sales channel. Please adjust the plugin configuration.');
         }
 
         if (! $subscription->isPauseAllowed()) {
-            throw new Exception('Pausing of the subscription is not possible because of its current status!');
+            throw new \Exception('Pausing of the subscription is not possible because of its current status!');
         }
 
         if (! $this->isCancellationPeriodValid($subscription, $context)) {
-            throw new Exception('Pausing of the subscription is not possible anymore. This can only be done before the notice period!');
+            throw new \Exception('Pausing of the subscription is not possible anymore. This can only be done before the notice period!');
         }
 
         // -------------------------------------------------------------------------------------

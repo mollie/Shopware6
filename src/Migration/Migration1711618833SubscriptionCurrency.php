@@ -35,18 +35,18 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
                 ';
         $connection->executeStatement($sql);
 
-        //add foreign key
+        // add foreign key
         $sql = 'ALTER TABLE `mollie_subscription` ADD CONSTRAINT `fk.mollie_subscription.currency_id` FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`) ON DELETE SET NULL ON UPDATE CASCADE';
         $connection->executeStatement($sql);
 
-        //load used currencies
+        // load used currencies
         $sql = 'SELECT DISTINCT `currency` FROM `mollie_subscription`';
         $statement = $connection->executeQuery($sql);
         $currencies = [];
         while ($row = $statement->fetchAssociative()) {
             $currencies[] = $row['currency'];
         }
-        //get the data for each currency
+        // get the data for each currency
         $sql = 'SELECT HEX(`id`) as `id`,`iso_code`,`item_rounding`,`total_rounding` FROM `currency` WHERE `iso_code` IN(:currencies)';
         $statement = $connection->executeQuery($sql, [
             'currencies' => $currencies,
@@ -54,7 +54,7 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
             'currencies' => Connection::PARAM_STR_ARRAY,
         ]);
 
-        //update currency information
+        // update currency information
         $sql = 'UPDATE `mollie_subscription` SET `currency_id` = :currencyId, `item_rounding` = :itemRounding,`total_rounding` =:totalRounding  WHERE `currency` = :currencyIso';
 
         $updateStatement = $connection->prepare($sql);
@@ -68,7 +68,7 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
             ]);
         }
 
-        //delete unsused column
+        // delete unsused column
         $utils->deleteColumn('mollie_subscription', 'currency');
     }
 

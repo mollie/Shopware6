@@ -34,9 +34,9 @@ class MollieLineItemBuilderTest extends TestCase
     public function setUp(): void
     {
         $this->builder = new MollieLineItemBuilder(
-            (new IsOrderLineItemValid()),
-            (new PriceCalculator()),
-            (new LineItemDataExtractor(new UrlParsingService())),
+            new IsOrderLineItemValid(),
+            new PriceCalculator(),
+            new LineItemDataExtractor(new UrlParsingService()),
             new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
@@ -71,20 +71,6 @@ class MollieLineItemBuilderTest extends TestCase
         $lines = $this->builder->buildLineItemPayload($order, 'EUR', $settings, false);
 
         self::assertEquals([], $lines);
-    }
-
-    /**
-     * @return array<mixed>[]
-     */
-    public function getStructureData(): array
-    {
-        return [
-            'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::TYPE_PHYSICAL],
-            'CREDIT Line Item is PHYSICAL' => [LineItem::CREDIT_LINE_ITEM_TYPE, OrderLineType::TYPE_STORE_CREDIT],
-            'PROMOTION Line Item is PHYSICAL' => [LineItem::PROMOTION_LINE_ITEM_TYPE, OrderLineType::TYPE_DISCOUNT],
-            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS, OrderLineType::TYPE_PHYSICAL],
-            'Fallback Line Item is DIGITAL' => ['test', OrderLineType::TYPE_DIGITAL],
-        ];
     }
 
     /**
@@ -151,6 +137,20 @@ class MollieLineItemBuilderTest extends TestCase
     }
 
     /**
+     * @return array<mixed>[]
+     */
+    public function getStructureData(): array
+    {
+        return [
+            'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::TYPE_PHYSICAL],
+            'CREDIT Line Item is PHYSICAL' => [LineItem::CREDIT_LINE_ITEM_TYPE, OrderLineType::TYPE_STORE_CREDIT],
+            'PROMOTION Line Item is PHYSICAL' => [LineItem::PROMOTION_LINE_ITEM_TYPE, OrderLineType::TYPE_DISCOUNT],
+            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS, OrderLineType::TYPE_PHYSICAL],
+            'Fallback Line Item is DIGITAL' => ['test', OrderLineType::TYPE_DIGITAL],
+        ];
+    }
+
+    /**
      * This test verifies that line items with a higher precision do also work.
      * These need to be rounded to 2 decimals.
      * Usually there is a rounding difference. This is why we also have to fix the rounding so that the final sum is correct.
@@ -190,18 +190,6 @@ class MollieLineItemBuilderTest extends TestCase
         $this->assertEquals('0.01', $lineItems[4]['totalAmount']['value']);
 
         $this->assertEquals(14.82, $lineItemSum);
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getRoundingFixerData(): array
-    {
-        return [
-            'Enable Fixing, but not difference, items remain the same' => [true, 2.73, 2.73, 1, 2.73],
-            'Enable Fixing with difference, diff item is added' => [true, 2.73, 3.00, 2, 3.0],
-            'Disable Fixing with difference, items remain the same' => [false, 2.73, 3.00, 1, 2.73],
-        ];
     }
 
     /**
@@ -255,5 +243,17 @@ class MollieLineItemBuilderTest extends TestCase
         }
 
         $this->assertEquals($expectedOrderSum, $lineItemSum);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getRoundingFixerData(): array
+    {
+        return [
+            'Enable Fixing, but not difference, items remain the same' => [true, 2.73, 2.73, 1, 2.73],
+            'Enable Fixing with difference, diff item is added' => [true, 2.73, 3.00, 2, 3.0],
+            'Disable Fixing with difference, items remain the same' => [false, 2.73, 3.00, 1, 2.73],
+        ];
     }
 }

@@ -23,31 +23,27 @@ class PriceCalculatorTest extends TestCase
     /**
      * test lineItem tax calcualtion
      */
-//    public function testCalculateLineItemPrice(LineItemPriceStruct $expected, CalculatedPrice $price, float $totalPrice, string $orderTaxType): void
-//    {
-//        $calculator = new PriceCalculator();
-//        $actual = $calculator->calculateLineItemPrice($price, $totalPrice, $orderTaxType);
-//        self::assertSame($expected->getVatAmount(), $actual->getVatAmount());
-//        self::assertSame($expected->getVatRate(), $actual->getVatRate());
-//        self::assertSame($expected->getTotalAmount(), $actual->getTotalAmount());
-//        self::assertSame($expected->getUnitPrice(), $actual->getUnitPrice());
-//    }
+    //    public function testCalculateLineItemPrice(LineItemPriceStruct $expected, CalculatedPrice $price, float $totalPrice, string $orderTaxType): void
+    //    {
+    //        $calculator = new PriceCalculator();
+    //        $actual = $calculator->calculateLineItemPrice($price, $totalPrice, $orderTaxType);
+    //        self::assertSame($expected->getVatAmount(), $actual->getVatAmount());
+    //        self::assertSame($expected->getVatRate(), $actual->getVatRate());
+    //        self::assertSame($expected->getTotalAmount(), $actual->getTotalAmount());
+    //        self::assertSame($expected->getUnitPrice(), $actual->getUnitPrice());
+    //    }
 
     /**
      * test that taxAmount is calculated like mollie expects it in api
      *
-     * @param float $expected
-     * @param string $orderTaxType
-     * @param string $currencyCode
-     * @param OrderLineItemEntity $lineItem
      * @dataProvider getVatAmountTestData
      */
-//    public function testRecalculationTaxAmount(string $expected, string $orderTaxType, string $currencyCode, OrderLineItemEntity $lineItem): void
-//    {
-//        $mollieApiValues = $this->orderService->calculateLineItemPriceData($lineItem, $orderTaxType, $currencyCode);
-//        $actual = $mollieApiValues['vatAmount']['value'];
-//        $this->assertSame($expected, $actual);
-//    }
+    //    public function testRecalculationTaxAmount(string $expected, string $orderTaxType, string $currencyCode, OrderLineItemEntity $lineItem): void
+    //    {
+    //        $mollieApiValues = $this->orderService->calculateLineItemPriceData($lineItem, $orderTaxType, $currencyCode);
+    //        $actual = $mollieApiValues['vatAmount']['value'];
+    //        $this->assertSame($expected, $actual);
+    //    }
 
     /**
      * if a 3% off  promotion is added for a total sum of 69.90 there is a rounding
