@@ -32,7 +32,7 @@ class Shipment implements ShipmentInterface
     /**
      * @throws ApiException
      *
-     * @return ShipmentCollection<\Mollie\Api\Resources\Shipment>
+     * @return ShipmentCollection<MollieShipment>
      */
     public function getShipments(string $mollieOrderId, string $salesChannelId): ShipmentCollection
     {

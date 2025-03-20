@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Order;
 
-use Exception;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\ShipmentLineItem;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\TrackingData;
 use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
@@ -15,7 +14,6 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\QueryDataBag;
@@ -208,7 +206,7 @@ class ShippingControllerBase extends AbstractController
             $orderItems = $order->getLineItems();
 
             if (! $orderItems instanceof OrderLineItemCollection) {
-                throw new Exception('Shopware order does not have any line requestItems!');
+                throw new \Exception('Shopware order does not have any line requestItems!');
             }
 
             $shipmentItems = [];
@@ -530,10 +528,6 @@ class ShippingControllerBase extends AbstractController
 
             $order = $this->orderService->getOrder($orderId, $context);
 
-            if (! $order instanceof OrderEntity) {
-                throw new \InvalidArgumentException('Order with ID: ' . $orderId . ' not found!');
-            }
-
             // hydrate to our real item struct
             $items = $this->hydrateShippingItems($lineItems);
 
@@ -564,10 +558,6 @@ class ShippingControllerBase extends AbstractController
             }
 
             $order = $this->orderService->getOrder($orderId, $context);
-
-            if (! $order instanceof OrderEntity) {
-                throw new \InvalidArgumentException('Order with id: ' . $orderId . ' not found!');
-            }
 
             $tracking = new TrackingData($trackingCarrier, $trackingCode, $trackingUrl);
 
@@ -627,7 +617,7 @@ class ShippingControllerBase extends AbstractController
     /**
      * @param array<mixed> $additionalData
      */
-    private function exceptionToJson(Exception $e, array $additionalData = []): JsonResponse
+    private function exceptionToJson(\Exception $e, array $additionalData = []): JsonResponse
     {
         $this->logger->error(
             $e->getMessage(),

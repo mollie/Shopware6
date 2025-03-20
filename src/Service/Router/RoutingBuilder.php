@@ -52,9 +52,6 @@ class RoutingBuilder
      */
     private $pluginSettings;
 
-    /**
-     * @param ?string $envAppUrl
-     */
     public function __construct(RouterInterface $router, RoutingDetector $routingDetector, PluginSettingsServiceInterface $pluginSettings, ?string $envAppUrl)
     {
         $this->router = $router;

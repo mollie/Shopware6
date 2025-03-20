@@ -131,11 +131,8 @@ class MolliePaymentDoPay
         $swOrderTransactionID = $transactionStruct->getOrderTransaction()->getId();
 
         // get order with all needed associations
-        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
 
-        if (! $order instanceof OrderEntity) {
-            throw new \Exception('Order in Shopware not existing when preparing Mollie payment');
-        }
+        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
 
         // build our custom fields
         // object for this order
@@ -157,7 +154,7 @@ class MolliePaymentDoPay
         $bancomatPayPhoneNumber = $dataBag->get('mollieBancomatPayPhone');
 
         if ($bancomatPayPhoneNumber !== null) {
-            //# we need to pass the custom fields now, so we can use them in create order and display the number on failed orders
+            // # we need to pass the custom fields now, so we can use them in create order and display the number on failed orders
             $orderCustomFields->setBancomatPayPhoneNumber($bancomatPayPhoneNumber);
             $order->setCustomFields($orderCustomFields->toArray());
             $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());

@@ -5,11 +5,10 @@ namespace Kiener\MolliePayments\Exception;
 
 use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 class MissingRequestException extends ShopwareHttpException
 {
-    public function __construct(Throwable $previous = null)
+    public function __construct(?\Throwable $previous = null)
     {
         $message = 'No request available on the stack.';
         $parameters = [];

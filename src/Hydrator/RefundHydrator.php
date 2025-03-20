@@ -18,6 +18,7 @@ class RefundHydrator
     public function hydrate(Refund $refund, OrderEntity $order): array
     {
         $amount = null;
+        /** @phpstan-ignore-next-line  */
         if ($refund->amount instanceof \stdClass) {
             $amount = [
                 'value' => $refund->amount->value,
@@ -26,6 +27,7 @@ class RefundHydrator
         }
 
         $settlementAmount = null;
+        /** @phpstan-ignore-next-line  */
         if ($refund->settlementAmount instanceof \stdClass) {
             $settlementAmount = [
                 'value' => $refund->settlementAmount->value,
@@ -34,7 +36,7 @@ class RefundHydrator
         }
 
         $metaData = new \stdClass();
-
+        /** @phpstan-ignore-next-line  */
         if (property_exists($refund, 'metadata') && $refund->metadata !== null) {
             /** @var \stdClass|string $metaData */
             $metaData = $refund->metadata;
@@ -45,14 +47,14 @@ class RefundHydrator
 
         $internalDescription = null;
 
-        /** @var RefundCollection $shopwareRefunds */
+        /** @var ?RefundCollection $shopwareRefunds */
         $shopwareRefunds = $order->getExtension(OrderExtension::REFUND_PROPERTY_NAME);
 
         // Lookup the correct refund for the internal description
         if ($shopwareRefunds !== null) {
             $shopwareRefunds = $shopwareRefunds->filterByProperty('mollieRefundId', $refund->id);
 
-            /** @var RefundEntity $shopwareRefund */
+            /** @var ?RefundEntity $shopwareRefund */
             $shopwareRefund = $shopwareRefunds->first();
             if ($shopwareRefund !== null) {
                 $internalDescription = $shopwareRefund->getInternalDescription();

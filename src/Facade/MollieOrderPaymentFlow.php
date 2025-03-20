@@ -63,7 +63,7 @@ class MollieOrderPaymentFlow
         $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $context);
         $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
 
-        //now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
+        // now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
         if (! $this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {
             $currentCustomerSelectedPaymentMethod = $mollieOrder->method;
 

@@ -3,14 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\TranslationImporter;
 
-use DOMDocument;
-use DOMXPath;
-
 final class TranslationAppender implements AppenderInterface
 {
-    public function append(DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult
+    public function append(\DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult
     {
-        $domXpath = new DOMXPath($config);
+        $domXpath = new \DOMXPath($config);
 
         $keyParts = explode('.', $key);
         $lastKeyPart = array_pop($keyParts);
@@ -20,17 +17,17 @@ final class TranslationAppender implements AppenderInterface
             $keyPart = mb_strtolower($keyPart);
 
             $searchParts = [
-                'following-sibling::' . $keyPart, //search for the HTMLElement
-                'following::' . $keyPart, //search for the HTMLElement
-                "following::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the title which contains the key part,
-                "following::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the name which contains the key part,
-                'descendant::' . $keyPart, //search for the HTMLElement
-                "descendant::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the title which contains the key part,
-                "descendant::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", //search for the name which contains the key part,
+                'following-sibling::' . $keyPart, // search for the HTMLElement
+                'following::' . $keyPart, // search for the HTMLElement
+                "following::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the title which contains the key part,
+                "following::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the name which contains the key part,
+                'descendant::' . $keyPart, // search for the HTMLElement
+                "descendant::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the title which contains the key part,
+                "descendant::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the name which contains the key part,
             ];
 
             if (is_numeric($keyPart)) {
-                //convert options.0. to options/*[0]
+                // convert options.0. to options/*[0]
                 $searchParts = [
                     '*[' . $keyPart . ']',
                 ];
@@ -74,7 +71,7 @@ final class TranslationAppender implements AppenderInterface
 
         $domElement = $domXpath->query($path);
 
-        //we expect to find exactly one node, not multiple
+        // we expect to find exactly one node, not multiple
         if ($domElement->count() === 0) {
             return new AppenderResult(sprintf('Failed to find entry for key "%s" with the path "%s"', $key, $path), AppenderResult::STATUS_ERROR);
         }

@@ -347,9 +347,6 @@ class RefundManager implements RefundManagerInterface
         return true;
     }
 
-    /**
-     * @return OrderLineItemEntity
-     */
     private function getOrderItem(OrderEntity $orderEntity, string $lineID): ?OrderLineItemEntity
     {
         if ($orderEntity->getLineItems() === null) {
@@ -422,8 +419,6 @@ class RefundManager implements RefundManagerInterface
     }
 
     /**
-     * @param ?\Mollie\Api\Resources\Order $mollieOrder
-     *
      * @return RefundItem[]
      */
     private function convertToRefundItems(RefundRequest $request, OrderEntity $order, ?\Mollie\Api\Resources\Order $mollieOrder): array

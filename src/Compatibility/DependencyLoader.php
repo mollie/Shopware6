@@ -91,7 +91,7 @@ class DependencyLoader
 
     private function registerPolyfillsAutoloader(ClassLoader $classLoader): void
     {
-        $classLoader->addPsr4('Shopware\\Core\\', __DIR__ . '/../../polyfill/Shopware/Core', true);
+        $classLoader->addPsr4('Shopware\Core\\', __DIR__ . '/../../polyfill/Shopware/Core', true);
     }
 
     private function registerFixturesAutoloader(ClassLoader $classLoader): void
@@ -103,7 +103,7 @@ class DependencyLoader
         $dirFixtures = (string) realpath(__DIR__ . '/../../tests/Fixtures/');
         // we need to tell Shopware to load our custom fixtures
         // from our TEST autoload-dev area....
-        $classLoader->addPsr4('MolliePayments\\Fixtures\\', $dirFixtures, true);
+        $classLoader->addPsr4('MolliePayments\Fixtures\\', $dirFixtures, true);
     }
 
     private function shouldLoadFixtures(): bool

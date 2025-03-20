@@ -160,7 +160,7 @@ class ShipmentTest extends TestCase
     protected function setUpOrderLines()
     {
         $this->mollieOrder->method('lines')->willReturnCallback(function () {
-            $collection = new OrderLineCollection(4, \Safe\json_decode('{}'));
+            $collection = new OrderLineCollection(4, json_decode('{}'));
 
             // Total shipped: 5 items, amount € 175.00
 
@@ -168,44 +168,44 @@ class ShipmentTest extends TestCase
             $line1 = new OrderLine(new MollieApiClient());
             $line1->id = 'odl_1';
             $line1->type = OrderLineType::TYPE_PHYSICAL;
-            $line1->metadata = \Safe\json_decode(\Safe\json_encode(['orderLineItemId' => 'foo']));
+            $line1->metadata = json_decode(json_encode(['orderLineItemId' => 'foo']));
             $line1->quantity = 5;
             $line1->quantityShipped = 2;
             $line1->shippableQuantity = 3;
-            $line1->amountShipped = \Safe\json_decode(\Safe\json_encode(['value' => 100.00]));
+            $line1->amountShipped = json_decode(json_encode(['value' => 100.00]));
             $collection->append($line1);
 
             // Digital, ID: bar, 1 shipped, 1 shippable, 2 total. Amount shipped € 25.
             $line2 = new OrderLine(new MollieApiClient());
             $line2->id = 'odl_2';
             $line2->type = OrderLineType::TYPE_DIGITAL;
-            $line2->metadata = \Safe\json_decode(\Safe\json_encode(['orderLineItemId' => 'bar']));
+            $line2->metadata = json_decode(json_encode(['orderLineItemId' => 'bar']));
             $line2->quantity = 2;
             $line2->quantityShipped = 1;
             $line2->shippableQuantity = 1;
-            $line2->amountShipped = \Safe\json_decode(\Safe\json_encode(['value' => 25.00]));
+            $line2->amountShipped = json_decode(json_encode(['value' => 25.00]));
             $collection->append($line2);
 
             // Shipping Fee, ID: baz, 0 shipped, 1 shippable, 1 total. Amount shipped € 100.
             $line3 = new OrderLine(new MollieApiClient());
             $line3->id = 'odl_3';
             $line3->type = OrderLineType::TYPE_SHIPPING_FEE;
-            $line3->metadata = \Safe\json_decode(\Safe\json_encode(['orderLineItemId' => 'baz']));
+            $line3->metadata = json_decode(json_encode(['orderLineItemId' => 'baz']));
             $line3->quantity = 1;
             $line3->quantityShipped = 0;
             $line3->shippableQuantity = 1;
-            $line3->amountShipped = \Safe\json_decode(\Safe\json_encode(['value' => 6.95]));
+            $line3->amountShipped = json_decode(json_encode(['value' => 6.95]));
             $collection->append($line3);
 
             // Discount, ID: buzz, 2 shipped, 0 shippable, 2 total. Amount shipped € 100.
             $line4 = new OrderLine(new MollieApiClient());
             $line4->id = 'odl_4';
             $line4->type = OrderLineType::TYPE_DISCOUNT;
-            $line4->metadata = \Safe\json_decode(\Safe\json_encode(['orderLineItemId' => 'bax']));
+            $line4->metadata = json_decode(json_encode(['orderLineItemId' => 'bax']));
             $line4->quantity = 2;
             $line4->quantityShipped = 2;
             $line4->shippableQuantity = 0;
-            $line4->amountShipped = \Safe\json_decode(\Safe\json_encode(['value' => 50.00]));
+            $line4->amountShipped = json_decode(json_encode(['value' => 50.00]));
             $collection->append($line4);
 
             return $collection;

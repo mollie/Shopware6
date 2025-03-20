@@ -97,9 +97,6 @@ final class RefundItemEntity extends Entity
         $this->amount = $amount;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderLineItemId(): ?string
     {
         return $this->orderLineItemId;

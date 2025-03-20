@@ -23,8 +23,9 @@ class CustomerStructTest extends TestCase
     }
 
     /**
-     * @param $testData
      * @dataProvider mollieCustomerIdsTestData
+     *
+     * @param mixed $testData
      */
     public function testGetCustomerId(
         $testData,

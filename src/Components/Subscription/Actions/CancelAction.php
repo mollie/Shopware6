@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
@@ -12,7 +11,7 @@ use Shopware\Core\Framework\Context;
 class CancelAction extends BaseAction
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function cancelSubscription(string $subscriptionId, Context $context): void
     {
@@ -21,13 +20,13 @@ class CancelAction extends BaseAction
         // -------------------------------------------------------------------------------------
 
         if (! $subscription->isCancellationAllowed()) {
-            throw new Exception('Cancellation of the subscription is not possible because of its current status!');
+            throw new \Exception('Cancellation of the subscription is not possible because of its current status!');
         }
 
         $allowCancellation = $this->isCancellationPeriodValid($subscription, $context);
 
         if (! $allowCancellation) {
-            throw new Exception('Cancellation of the subscription is not possible anymore. This can only be done before the notice period!');
+            throw new \Exception('Cancellation of the subscription is not possible anymore. This can only be done before the notice period!');
         }
 
         // -------------------------------------------------------------------------------------
@@ -56,7 +55,7 @@ class CancelAction extends BaseAction
     /**
      * Check the subscription is cancelable or not
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function isCancelable(SubscriptionEntity $subscription, Context $context): bool
     {

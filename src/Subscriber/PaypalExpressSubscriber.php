@@ -59,9 +59,6 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
         $this->mollieCartService = $mollieCartService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

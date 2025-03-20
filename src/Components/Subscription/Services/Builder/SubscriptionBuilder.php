@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 
-use Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -31,34 +30,34 @@ class SubscriptionBuilder
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function buildSubscription(OrderEntity $order): SubscriptionEntity
     {
         if (! $order->getLineItems() instanceof OrderLineItemCollection) {
-            throw new Exception('Order does not have line items');
+            throw new \Exception('Order does not have line items');
         }
 
         $item = $order->getLineItems()->first();
 
         if (! $item instanceof OrderLineItemEntity) {
-            throw new Exception('Order does not have a valid line item');
+            throw new \Exception('Order does not have a valid line item');
         }
 
         return $this->buildItemSubscription($item, $order);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function buildItemSubscription(OrderLineItemEntity $lineItem, OrderEntity $order): SubscriptionEntity
     {
         if (! $order->getCurrency() instanceof CurrencyEntity) {
-            throw new Exception('Order does not have a currency');
+            throw new \Exception('Order does not have a currency');
         }
 
         if (! $order->getOrderCustomer() instanceof OrderCustomerEntity) {
-            throw new Exception('Order does not have an order customer entity');
+            throw new \Exception('Order does not have an order customer entity');
         }
 
         $attributes = new OrderLineItemEntityAttributes($lineItem);

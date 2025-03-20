@@ -84,7 +84,7 @@ class CancelItemFacade
                 return $response->failedWithMessage('quantityTooHigh');
             }
 
-            //First we reset the stocks, just in case something went wrong the customer still have the chance to cancel the item on mollie page
+            // First we reset the stocks, just in case something went wrong the customer still have the chance to cancel the item on mollie page
             if ($resetStock) {
                 $this->logger->info('Start to reset stocks', $logArguments);
 

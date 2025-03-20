@@ -187,7 +187,7 @@ class LineItemAttributes
     {
         $foundValue = '';
 
-        if ($lineItem->getPayload() !== null) {
+        if (count($lineItem->getPayload()) > 0) {
             // check if we have customFields in our payload
             if (array_key_exists('customFields', $lineItem->getPayload())) {
                 // load the custom fields

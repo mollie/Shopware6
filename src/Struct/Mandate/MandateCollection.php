@@ -8,10 +8,10 @@ use Shopware\Core\Framework\Struct\StructCollection;
 /**
  * @extends StructCollection<MandateStruct>
  *
- * @method void                add(MandateStruct $entity)
- * @method void                set(string $key, MandateStruct $entity)
- * @method MandateStruct[]    getIterator()
- * @method MandateStruct[]    getElements()
+ * @method void add(MandateStruct $entity)
+ * @method void set(string $key, MandateStruct $entity)
+ * @method MandateStruct[] getIterator()
+ * @method MandateStruct[] getElements()
  * @method null|MandateStruct get(string $key)
  * @method null|MandateStruct first()
  * @method null|MandateStruct last()

@@ -62,7 +62,7 @@ class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
         try {
             $this->paypalExpress->cancelSession($sessionId, $context);
         } catch (\Throwable $e) {
-            //todo: remove try catch once cancel is possible from mollie
+            // todo: remove try catch once cancel is possible from mollie
         }
 
         return new CancelCheckoutResponse($sessionId);

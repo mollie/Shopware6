@@ -14,9 +14,6 @@ class FakeCompatibilityGateway implements CompatibilityGatewayInterface
         return '';
     }
 
-    /**
-     * @param ?string $domainID
-     */
     public function getSalesChannelContext(string $salesChannelID, ?string $domainID, string $token): SalesChannelContext
     {
     }

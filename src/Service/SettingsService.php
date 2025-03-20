@@ -12,10 +12,10 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 class SettingsService implements PluginSettingsServiceInterface
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
-    const LIVE_API_KEY = 'liveApiKey';
-    const TEST_API_KEY = 'testApiKey';
-    const LIVE_PROFILE_ID = 'liveProfileId';
-    const TEST_PROFILE_ID = 'testProfileId';
+    public const LIVE_API_KEY = 'liveApiKey';
+    public const TEST_API_KEY = 'testApiKey';
+    public const LIVE_PROFILE_ID = 'liveProfileId';
+    public const TEST_PROFILE_ID = 'testProfileId';
     private const SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN = 'core.loginRegistration';
     private const SYSTEM_CORE_CART_CONFIG_DOMAIN = 'core.cart';
 
@@ -59,10 +59,7 @@ class SettingsService implements PluginSettingsServiceInterface
     private array $cachedStructs = [];
 
     /**
-     * @param ?string $envShopDomain
-     * @param ?string $envDevMode
-     * @param ?string $envCypressMode
-     * @param mixed $repoSalesChannels
+     * @param EntityRepository $repoSalesChannels
      */
     public function __construct(SystemConfigService $systemConfigService, $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
@@ -86,7 +83,7 @@ class SettingsService implements PluginSettingsServiceInterface
             return $this->cachedStructs[$cacheKey];
         }
         $structData = [];
-        /** @var array<mixed> $systemConfigData */
+        /** @var ?array<mixed> $systemConfigData */
         $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
 
         if (is_array($systemConfigData) && count($systemConfigData) > 0) {
@@ -99,7 +96,7 @@ class SettingsService implements PluginSettingsServiceInterface
             }
         }
 
-        /** @var array<mixed> $coreSettings */
+        /** @var ?array<mixed> $coreSettings */
         $coreSettings = $this->systemConfigService->get(self::SYSTEM_CORE_LOGIN_REGISTRATION_CONFIG_DOMAIN, $salesChannelId);
         if (is_array($coreSettings) && count($coreSettings) > 0) {
             $structData[self::PHONE_NUMBER_FIELD_REQUIRED] = $coreSettings[self::PHONE_NUMBER_FIELD_REQUIRED] ?? false;
@@ -107,7 +104,7 @@ class SettingsService implements PluginSettingsServiceInterface
             $structData[self::REQUIRE_DATA_PROTECTION] = $coreSettings[self::REQUIRE_DATA_PROTECTION] ?? false;
         }
 
-        /** @var array<mixed> $cartSettings */
+        /** @var ?array<mixed> $cartSettings */
         $cartSettings = $this->systemConfigService->get(self::SYSTEM_CORE_CART_CONFIG_DOMAIN, $salesChannelId);
         if (is_array($cartSettings) && count($cartSettings) > 0) {
             $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;

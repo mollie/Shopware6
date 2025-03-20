@@ -55,7 +55,7 @@ class OrderReturnHandler
             return;
         }
         $request = $this->createRequestFromOrder((string) $order->getOrderNumber(), $orderReturn);
-        $order = $this->orderService->getOrder($order->getId(), $context); //need to load the order again because the line items are not loaded in the event
+        $order = $this->orderService->getOrder($order->getId(), $context); // need to load the order again because the line items are not loaded in the event
         try {
             $this->refundManager->refund($order, $request, $context);
         } catch (\Throwable $throwable) {
@@ -71,7 +71,6 @@ class OrderReturnHandler
         $this->refundManager->cancelAllOrderRefunds($order, $context);
     }
 
-    // @phpstan-ignore argument.type
     private function createRequestFromOrder(string $orderNumber, OrderReturnEntity $orderReturn): RefundRequest
     {
         $request = new RefundRequest(
@@ -89,7 +88,6 @@ class OrderReturnHandler
         return $request;
     }
 
-    // @phpstan-ignore return.type
     private function findReturnByOrder(OrderEntity $order, Context $context): ?OrderReturnEntity
     {
         if ($this->orderReturnRepository === null) {

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
@@ -65,7 +64,7 @@ class CreateAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
     {
@@ -90,7 +89,7 @@ class CreateAction extends BaseAction
         $item = $order->getLineItems()->first();
 
         if (! $item instanceof OrderLineItemEntity) {
-            throw new Exception('No line item entity found for order ' . $order->getOrderNumber());
+            throw new \Exception('No line item entity found for order ' . $order->getOrderNumber());
         }
 
         // ------------------------------------------------------------------------------------------------------------------------
@@ -105,11 +104,11 @@ class CreateAction extends BaseAction
         }
 
         if ($attributes->getSubscriptionInterval() <= 0) {
-            throw new Exception('Invalid subscription interval unit');
+            throw new \Exception('Invalid subscription interval unit');
         }
 
         if (empty($attributes->getSubscriptionIntervalUnit())) {
-            throw new Exception('Invalid subscription interval unit');
+            throw new \Exception('Invalid subscription interval unit');
         }
 
         // ------------------------------------------------------------------------------------------------------------------------

@@ -26,8 +26,8 @@ class ApplePayShippingAddressFaker
      * @param EntityRepository $customerAddressRepository
      */
     public function __construct(
-         $customerRepository,
-         $customerAddressRepository
+        $customerRepository,
+        $customerAddressRepository
     ) {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;
@@ -47,8 +47,8 @@ class ApplePayShippingAddressFaker
                         'countryId' => $countryId,
                         'firstName' => $customerEntity->getFirstName(),
                         'lastName' => $customerEntity->getLastName(),
-                        'city' => 'not provided', //city is not necessary for rule builder
-                        'street' => 'not provided', //apple pay event "onshippingcontactselected"  does not provide a street https://developer.apple.com/documentation/apple_pay_on_the_web/applepaysession/1778009-onshippingcontactselected
+                        'city' => 'not provided', // city is not necessary for rule builder
+                        'street' => 'not provided', // apple pay event "onshippingcontactselected"  does not provide a street https://developer.apple.com/documentation/apple_pay_on_the_web/applepaysession/1778009-onshippingcontactselected
                     ],
                 ],
             ],

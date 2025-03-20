@@ -275,10 +275,7 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
     }
 
-    /**
-     * @param mixed $subscriptionId
-     */
-    public function cancelSubscription($subscriptionId, SalesChannelContext $context): Response
+    public function cancelSubscription(string $subscriptionId, SalesChannelContext $context): Response
     {
         if (! $this->isLoggedIn($context)) {
             return $this->redirectToLoginPage();

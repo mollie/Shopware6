@@ -25,7 +25,7 @@ class MailServiceTest extends TestCase
     private $mailFactory;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DataValidator|(DataValidator&\PHPUnit\Framework\MockObject\MockObject)
+     * @var DataValidator|(DataValidator&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dataValidator;
 
@@ -54,9 +54,9 @@ class MailServiceTest extends TestCase
      *
      * @dataProvider getMailData
      *
-     * @param $expectedData
-     * @param $mailData
-     * @param $attachments
+     * @param mixed $expectedData
+     * @param mixed $mailData
+     * @param mixed $attachments
      *
      * @return void
      */
@@ -207,7 +207,7 @@ class MailServiceTest extends TestCase
             if (is_string($attachment)) {
                 // embed our file if we have a filename
                 // TODO Daniel: This has changed in 6.4.20ish, file attachments work differently. Probably disallow adding filepath attachments and redo removed test.
-                //$email->embedFromPath($attachment, basename($attachment), 'application/fake');
+                // $email->embedFromPath($attachment, basename($attachment), 'application/fake');
                 continue;
             }
 

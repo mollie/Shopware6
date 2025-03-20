@@ -9,8 +9,8 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 
 class CustomerStruct extends Struct
 {
-    const LIVE_MODE = 'live';
-    const TEST_MODE = 'test';
+    public const LIVE_MODE = 'live';
+    public const TEST_MODE = 'test';
 
     /**
      * @var ?string

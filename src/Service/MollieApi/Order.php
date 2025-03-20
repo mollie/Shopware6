@@ -26,7 +26,6 @@ use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -182,7 +181,7 @@ class Order
                 ]
             );
 
-            throw new RuntimeException('Could not create Mollie order', $e->getCode(), $e);
+            throw new \RuntimeException('Could not create Mollie order', $e->getCode(), $e);
         }
     }
 

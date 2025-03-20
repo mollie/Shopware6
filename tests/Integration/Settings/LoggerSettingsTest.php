@@ -34,16 +34,15 @@ final class LoggerSettingsTest extends TestCase
         $this->assertFalse($actualSettings->isDebugMode());
     }
 
-    public function testSettingsAreCachedPerSalesChannel():void
+    public function testSettingsAreCachedPerSalesChannel(): void
     {
-
         $settingsService = new SettingsService($this->getContainer());
 
         $expectedSettings = $settingsService->getLoggerSettings();
         $actualSettings = $settingsService->getLoggerSettings();
         $differentSalesChannelSettings = $settingsService->getLoggerSettings(Uuid::randomHex());
 
-        $this->assertSame($expectedSettings,$actualSettings);
-        $this->assertNotSame($actualSettings,$differentSalesChannelSettings);
+        $this->assertSame($expectedSettings, $actualSettings);
+        $this->assertNotSame($actualSettings, $differentSalesChannelSettings);
     }
 }

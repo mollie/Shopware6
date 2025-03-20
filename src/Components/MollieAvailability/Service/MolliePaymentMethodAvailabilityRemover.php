@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\MollieAvailability\Service;
 
-use Exception;
 use Kiener\MolliePayments\Exception\MissingCartServiceException;
 use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
@@ -34,7 +33,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function removePaymentMethods(PaymentMethodRouteResponse $originalData, SalesChannelContext $context): PaymentMethodRouteResponse
     {
@@ -73,7 +72,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
         if ($this->isOrderRoute()) {
             try {
                 $order = $this->getOrder($context->getContext());
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->error($e->getMessage(), [
                     'exception' => $e,
                 ]);

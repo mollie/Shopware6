@@ -1,4 +1,4 @@
-import Plugin from '@shopware-storefront-sdk/plugin-system/plugin.class';
+import Plugin from '../plugin';
 import ExpressButtonsRepository from '../repository/express-buttons-repository';
 import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
 import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';

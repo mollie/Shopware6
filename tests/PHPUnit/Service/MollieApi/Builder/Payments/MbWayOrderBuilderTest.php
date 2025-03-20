@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace PHPUnit\Service\MollieApi\Builder\Payments;
 
-use DateTime;
-use DateTimeZone;
 use Kiener\MolliePayments\Handler\Method\MbWayPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use MolliePayments\Tests\Fakes\FakeContainer;
@@ -41,7 +39,7 @@ class MbWayOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $actual = $this->builder->buildOrderPayload($order, $transactionId, $this->paymentHandler::PAYMENT_METHOD_NAME, $this->salesChannelContext, $this->paymentHandler, []);
 
-        $expectedOrderLifeTime = (new DateTime())->setTimezone(new DateTimeZone('UTC'))
+        $expectedOrderLifeTime = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))
             ->modify(sprintf('+%d day', $this->expiresAt))
             ->format('Y-m-d')
         ;

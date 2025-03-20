@@ -71,6 +71,7 @@ class MollieRefundConfigService
             $structs = OrderLineItemStructCollection::create(...$structs);
 
             foreach ($refunds as $refund) {
+                /** @phpstan-ignore-next-line  */
                 if (! isset($refund['metadata'], $refund['metadata']->composition)) {
                     throw MetaDataNotFoundInRefundConfigException::create();
                 }

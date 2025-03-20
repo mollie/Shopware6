@@ -15,7 +15,7 @@ class ProfileHelper
      */
     public static function getProfile(MollieApiClient $apiClient, MollieSettingStruct $settings): ?Profile
     {
-        /** @var Profile $profile */
+        /** @var ?Profile $profile */
         $profile = null;
 
         try {

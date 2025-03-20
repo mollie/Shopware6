@@ -66,7 +66,7 @@ class StartCheckoutRoute extends AbstractStartCheckoutRoute
             $session = $this->paypalExpress->loadSession($sessionId, $context);
         }
 
-        if (! property_exists($session, 'id') || $session->id === null) {
+        if ($session->id === null) {
             throw PaypalExpressException::missingSessionId();
         }
 

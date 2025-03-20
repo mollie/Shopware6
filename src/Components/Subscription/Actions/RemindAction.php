@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
-use DateTime;
-use Exception;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
@@ -45,7 +43,7 @@ class RemindAction extends BaseAction
     /**
      * @param mixed $repoSalesChannel
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, $repoSalesChannel, ReminderValidator $reminderValidator)
     {
@@ -68,13 +66,13 @@ class RemindAction extends BaseAction
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function remindSubscriptionRenewal(Context $context): int
     {
         $remindedCount = 0;
 
-        $today = new DateTime();
+        $today = new \DateTime();
 
         $salesChannels = $this->repoSalesChannel->search(new Criteria(), $context);
 
@@ -117,7 +115,7 @@ class RemindAction extends BaseAction
                 $customer = $this->getCustomers()->getCustomer($subscription->getCustomerId(), $context);
 
                 if (! $customer instanceof CustomerEntity) {
-                    throw new Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
+                    throw new \Exception('Shopware Customer not found for Subscription! Cannot remind anyone!');
                 }
 
                 // --------------------------------------------------------------------------------------------------

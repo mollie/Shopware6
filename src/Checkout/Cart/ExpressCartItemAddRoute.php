@@ -42,7 +42,7 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
      */
     public function add(Request $request, Cart $cart, SalesChannelContext $context, ?array $items): CartResponse
     {
-        //we have to create a new request from global variables, because the request is not set here in the route
+        // we have to create a new request from global variables, because the request is not set here in the route
         $tempRequest = Request::createFromGlobals();
 
         $isExpressCheckout = (bool) $tempRequest->get('isExpressCheckout', false);
@@ -51,7 +51,7 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
             return $this->getDecorated()->add($request, $cart, $context, $items);
         }
 
-        //Shopware 6.4 have circular injection, we have to use container
+        // Shopware 6.4 have circular injection, we have to use container
         $cartBackupService = $this->container->get(CartBackupService::class);
         $cartService = $this->container->get(CartService::class);
 
