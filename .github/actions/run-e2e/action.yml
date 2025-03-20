@@ -120,7 +120,9 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
-        docker exec shop bash -c 'composer update'
+        docker exec shop bash -c 'rm -rf /var/www/html/vendor/*'
+        docker exec shop bash -c 'rm -rf /var/www/html/composer.lock'
+        docker exec shop bash -c 'composer install --no-scripts'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
 
     - name: Install Plugin
