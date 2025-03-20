@@ -69,7 +69,7 @@ inputs:
     required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
-    default: '~/.build/MolliePayments.zip'
+    default: '~/.build/MolliePayments-e2e.zip'
     required: false
 
 
@@ -98,6 +98,7 @@ runs:
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -111,6 +112,12 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
+
+    - name: Prepare Shop for e2e tests
+      shell: bash
+      run: |
+        docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
+        docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
 
     - name: Install Plugin
       shell: bash
@@ -138,7 +145,10 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
-
+    - name: Integration tests
+      shell: bash
+      run: |
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration'
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
