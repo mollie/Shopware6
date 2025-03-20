@@ -44,7 +44,8 @@
     "autoload": {
         "psr-4": {
             "Mollie\\Shopware\\": "shopware/",
-            "Kiener\\MolliePayments\\": "src/"
+            "Kiener\\MolliePayments\\": "src/",
+            "Mollie\\Api\\": "vendor_manual/mollie-api-php/src"
         }
     },
     "autoload-dev": {
@@ -63,7 +64,6 @@
     "require": {
         "php": ">=7.4",
         "ext-curl": "*",
-        "mollie/mollie-api-php": "^2",
         "shopware/core": "6.4.5.0 - 6.7.0.0",
         "shopware/administration": "6.4.5.0 - 6.7.0.0",
         "shopware/storefront": "6.4.5.0 - 6.7.0.0",

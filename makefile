@@ -41,7 +41,7 @@ prod: ##1 Installs all production dependencies
 
 dev: ##1 Installs all dev dependencies
 	@composer validate
-	@composer install
+	composer install
 	npm install
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
