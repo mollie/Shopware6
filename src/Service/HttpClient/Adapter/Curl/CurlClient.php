@@ -20,7 +20,6 @@ class CurlClient implements HttpClientInterface
 
     public function sendRequest(string $method, string $url, string $content = ''): HttpResponse
     {
-
         $handle = curl_init($url);
 
         assert($handle !== false);
