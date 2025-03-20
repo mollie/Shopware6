@@ -9,12 +9,12 @@
                 <json indent="2"/>
             </format>
             <locales>
-                <locale name="de-DE">./src/Resources/app/administration/src/snippet/de-DE.json</locale>
-                <locale name="en-GB">./src/Resources/app/administration/src/snippet/en-GB.json</locale>
-                <locale name="nl-NL">./src/Resources/app/administration/src/snippet/nl-NL.json</locale>
-                <locale name="it-IT">./src/Resources/app/administration/src/snippet/it-IT.json</locale>
-                <locale name="pt-PT">./src/Resources/app/administration/src/snippet/pt-PT.json</locale>
-                <locale name="es-ES">./src/Resources/app/administration/src/snippet/es-ES.json</locale>
+                <locale name="de-DE">./../src/Resources/app/administration/src/snippet/de-DE.json</locale>
+                <locale name="en-GB">./../src/Resources/app/administration/src/snippet/en-GB.json</locale>
+                <locale name="nl-NL">./../src/Resources/app/administration/src/snippet/nl-NL.json</locale>
+                <locale name="it-IT">./../src/Resources/app/administration/src/snippet/it-IT.json</locale>
+                <locale name="pt-PT">./../src/Resources/app/administration/src/snippet/pt-PT.json</locale>
+                <locale name="es-ES">./../src/Resources/app/administration/src/snippet/es-ES.json</locale>
             </locales>
         </set>
 
@@ -27,12 +27,12 @@
                 <style>kebab</style>
             </styles>
             <locales>
-                <locale name="de-DE">./src/Resources/snippet/de_DE/mollie-payments.de-DE.json</locale>
-                <locale name="en-GB">./src/Resources/snippet/en_GB/mollie-payments.en-GB.json</locale>
-                <locale name="nl-NL">./src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</locale>
-                <locale name="it-IT">./src/Resources/snippet/it_IT/mollie-payments.it-IT.json</locale>
-                <locale name="pt-PT">./src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
-                <locale name="es-ES">./src/Resources/snippet/es_ES/mollie-payments.es-ES.json</locale>
+                <locale name="de-DE">./../src/Resources/snippet/de_DE/mollie-payments.de-DE.json</locale>
+                <locale name="en-GB">./../src/Resources/snippet/en_GB/mollie-payments.en-GB.json</locale>
+                <locale name="nl-NL">./../src/Resources/snippet/nl_NL/mollie-payments.nl-NL.json</locale>
+                <locale name="it-IT">./../src/Resources/snippet/it_IT/mollie-payments.it-IT.json</locale>
+                <locale name="pt-PT">./../src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
+                <locale name="es-ES">./../src/Resources/snippet/es_ES/mollie-payments.es-ES.json</locale>
             </locales>
         </set>
     <!--

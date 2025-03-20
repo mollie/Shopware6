@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
 $finder = \PhpCsFixer\Finder::create()->in([
-    __DIR__ . '/src',
-    __DIR__ . '/shopware',
-    __DIR__.'/tests/PHPUnit',
-    __DIR__.'/tests/Integration',
+    __DIR__ . '/../src',
+    __DIR__ . '/../shopware',
+    __DIR__.'/../tests/PHPUnit',
+    __DIR__.'/../tests/Integration',
 ]);
 
 $finder->exclude(

@@ -1,12 +1,12 @@
 parameters:
     level: 8
     paths:
-        - ./src
+        - ./../src
     excludePaths:
-        - ./src/Resources/*
-        - ./src/Compatibility/Bundles/FlowBuilder/Events/*
+        - ./../src/Resources/*
+        - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
         # legacy code that is not working with abstract/interface changes
-        - ./src/Service/Mail/MailService63.php
+        - ./../src/Service/Mail/MailService63.php
     disallowedFunctionCalls:
         - function: 'var_dump()'
           message: 'use some logger instead'

@@ -67,7 +67,7 @@ clean: ##1 Cleans all dependencies and files
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
-	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli --config ./config/.shopware-extension.yml extension build custom/plugins/MolliePayments
 	# -----------------------------------------------------
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console --no-debug theme:refresh
@@ -99,10 +99,10 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpunuhi -B
 
 snippetexport: ##2 Exports all snippets
-	php vendor/bin/phpunuhi export --configuration=./.phpunuhi.xml --dir=./.phpunuhi
+	php vendor/bin/phpunuhi export --configuration=./config/.phpunuhi.xml --dir=./.phpunuhi
 
 snippetimport: ##2 Imports the provided snippet set [set=xyz file=xz.csv]
-	php vendor/bin/phpunuhi import --configuration=./.phpunuhi.xml --set=$(set) --file=$(file) --intent=1
+	php vendor/bin/phpunuhi import --configuration=./config/.phpunuhi.xml --set=$(set) --file=$(file) --intent=1
 
 # ------------------------------------------------------------------------------------------------------------
 
@@ -110,37 +110,37 @@ phpcheck: ##3 Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
 phpmin: ##3 Starts the PHP compatibility checks
-	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.4 ./src
+	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.4 ./src ./shopware
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php --dry-run
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run
 endif
 ifeq ($(mode), fix)
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./.php_cs.php
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php
 endif
 
 stan: ##3 Starts the PHPStan Analyser
-	@php vendor/bin/phpstan analyse -c ./.phpstan.neon
+	@php vendor/bin/phpstan analyse -c ./config/.phpstan.neon
 
 phpunit: ##3 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=phpunit.xml --coverage-html ./.reports/phpunit/coverage
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
 phpintegration: ##3 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --testsuite integration --configuration=custom/plugins/MolliePayments/phpunit.xml
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --testsuite integration --configuration=./custom/plugins/MolliePayments/config/phpunit.xml
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
 vitest: ##3 Starts all Vitest tests
-	npx vitest
+	npx vitest -c ./config/vitest.config.ts
 
 eslint: ##3 Starts the ESLinter
 ifndef mode
-	./node_modules/.bin/eslint --config ./.eslintrc.json ./src/Resources/app
+	./node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/eslint --config ./.eslintrc.json ./src/Resources/app --fix
+	./node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
 endif
 
 stylelint: ##3 Starts the Stylelinter
@@ -153,17 +153,17 @@ endif
 
 prettier: ##3 Starts the Prettier
 ifndef mode
-	./node_modules/.bin/prettier ./src/Resources/app/ --config=./.prettierrc  --check
+	./node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --check
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/prettier ./src/Resources/app/ --config=./.prettierrc  --write
+	./node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --write
 endif
 
 configcheck: ##3 Tests and verifies the plugin configuration file
 	cd ./tests/Custom && php verify-plugin-config.php
 
 phpunuhi: ##3 Tests and verifies all plugin snippets
-	php vendor/bin/phpunuhi validate --configuration=./.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
+	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
 
