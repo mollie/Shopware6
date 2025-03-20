@@ -19,7 +19,7 @@ parameters:
         - function: 'putenv()'
           message: 'might overwrite existing variables'
     scanDirectories:
-      - polyfill/Shopware
+      - ../polyfill/Shopware
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
 
@@ -29,4 +29,4 @@ services:
         - phpstan.rules.rule
 
 includes:
-    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - ../vendor/spaze/phpstan-disallowed-calls/extension.neon

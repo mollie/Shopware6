@@ -114,10 +114,10 @@ phpmin: ##3 Starts the PHP compatibility checks
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
 endif
 ifeq ($(mode), fix)
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php
+	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
 endif
 
 stan: ##3 Starts the PHPStan Analyser
@@ -145,10 +145,10 @@ endif
 
 stylelint: ##3 Starts the Stylelinter
 ifndef mode
-	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss
+	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --config=./config/.stylelintrc
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix
+	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix --config=./config/.stylelintrc
 endif
 
 prettier: ##3 Starts the Prettier
@@ -190,7 +190,7 @@ endif
 
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*' '*.editorconfig' '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/.shopware-extension.yml' '*/phpunit.xml' '*/.phpunuhi.xml' '*/.infection.json' '*/phpunit.autoload.php' '*/.phpstan*' '*/.php_cs.php' '*/phpinsights.php'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' '*/config/*'
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""
