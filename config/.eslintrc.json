@@ -13,7 +13,7 @@
     "prettier"
   ],
   "ignorePatterns": [
-    "../src/Resources/app/storefront/dist"
+    "/src/Resources/app/storefront/dist"
   ],
   "parser": "babel-eslint",
   "parserOptions": {
