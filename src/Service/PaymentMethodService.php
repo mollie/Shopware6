@@ -190,7 +190,7 @@ class PaymentMethodService
                     }
                 }
 
-                if ($this->versionCompare->gte('6.5.7.0') && method_exists($existingPaymentMethod,'getTechnicalName')) {
+                if ($this->versionCompare->gte('6.5.7.0') && method_exists($existingPaymentMethod, 'getTechnicalName')) {
                     // we do a string cast here, since getTechnicalName will be not nullable in the future
                     /** @phpstan-ignore-next-line  */
                     $technicalName = (string) $existingPaymentMethod->getTechnicalName();
