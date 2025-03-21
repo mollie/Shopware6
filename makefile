@@ -190,8 +190,8 @@ endif
 
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' 'config/*' '.prettierignore' '.shopware-extension.yml' 'package.json' 'package-lock.json'
-	cd .. && zip -qq -r -0 ./.build/MolliePayments-e2e.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*.DS_Store' '.prettierignore' '.shopware-extension.yml' 'package.json' 'package-lock.json'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' 'config/*' '.prettierignore' '.shopware-extension.yml' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments-e2e.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*.DS_Store' '.prettierignore' '.shopware-extension.yml' './package.json' './package-lock.json'
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""
