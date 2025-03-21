@@ -122,7 +122,6 @@ runs:
         docker exec shop bash -c 'rm -rf /var/www/html/composer.lock'
         # enqueue 0.10.24 is incompatible with 7.4
         docker exec shop bash -c 'composer require enqueue/enqueue:0.10.23 --no-scripts'
-        docker exec shop bash -c 'composer require --dev composer/xdebug-handler:^2 --no-scripts'
         docker exec shop bash -c 'composer update --no-scripts'
        
 
