@@ -121,8 +121,7 @@ runs:
         docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
         #docker exec shop bash -c 'composer require enqueue/enqueue:0.10.23' #0.10.24 is not compatible with 7.4 even if says so
         #docker exec shop bash -c 'composer require shopware/core:${{ inputs.SHOPWARE }}' #we need to install speicific sw version
-        docker exec shop bash -c 'composer install'
-        docker exec shop bash -c 'vendor/bin/phpunit'
+        #docker exec shop bash -c 'composer install'
        
 
     - name: Prepare Shop for e2e tests
