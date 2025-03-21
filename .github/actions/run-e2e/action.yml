@@ -69,7 +69,7 @@ inputs:
     required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
-    default: '~/.build/MolliePayments.zip'
+    default: '~/.build/MolliePayments-e2e.zip'
     required: false
 
 
@@ -98,19 +98,39 @@ runs:
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: Upload ZIP File to Docker
       shell: bash
       run: |
-        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/MolliePayments.zip
-        docker exec shop bash -c 'php bin/console plugin:zip-import /var/www/html/MolliePayments.zip --delete'
+        docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
+        docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
 
     - name: Configure Shopware
       shell: bash
       run: |
         docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
+
+    - name: Legacy fixes
+      if: ${{ startsWith(inputs.SHOPWARE,'6.4') }}
+      shell: bash
+      run: |
+        # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
+        docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
+        #docker exec shop bash -c 'composer require enqueue/enqueue:0.10.23' #0.10.24 is not compatible with 7.4 even if says so
+        #docker exec shop bash -c 'composer require shopware/core:${{ inputs.SHOPWARE }}' #we need to install speicific sw version
+        #docker exec shop bash -c 'composer install'
+       
+
+    - name: Prepare Shop for e2e tests
+      shell: bash
+      run: |
+        docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
+        docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
+        docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
+        docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
 
     - name: Install Plugin
       shell: bash
@@ -138,7 +158,10 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
-
+    - name: Integration tests
+      shell: bash
+      run: |
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}

@@ -127,7 +127,8 @@ phpunit: ##3 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
 phpintegration: ##3 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --testsuite integration --configuration=./custom/plugins/MolliePayments/config/phpunit.xml
+	#we call "real" phpunit, it seems like in sw 6.4 the vendor/bin/phpunit is overwritten by shopware
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --testsuite integration --configuration=./custom/plugins/MolliePayments/config/phpunit.xml
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
@@ -190,7 +191,8 @@ endif
 
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' 'config/*' '.prettierignore' '.shopware-extension.yml' 'package.json' 'package-lock.json'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' 'config/*' '.prettierignore' '.shopware-extension.yml' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -0 ./.build/MolliePayments-e2e.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*.DS_Store' '.prettierignore' '.shopware-extension.yml' './package.json' './package-lock.json'
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""

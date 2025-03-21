@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Tests\Service;
 
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\AlmaPayment;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BancomatPayment;
@@ -86,7 +87,7 @@ class PaymentMethodServiceTest extends TestCase
         $this->paymentMethodRepository = new FakePaymentMethodRepository($paymentMethod);
 
         $this->paymentMethodService = new PaymentMethodService(
-            '6.5.6.0',
+            new VersionCompare('6.5.6.0'),
             $this->createMock(MediaService::class),
             $this->mediaRepository,
             $this->paymentMethodRepository,
