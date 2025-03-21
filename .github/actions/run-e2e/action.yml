@@ -117,12 +117,8 @@ runs:
       if: ${{ startsWith(inputs.SHOPWARE,'6.4') }}
       shell: bash
       run: |
+        # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
         docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
-        docker exec shop bash -c 'rm -rf /var/www/html/vendor/*'
-        docker exec shop bash -c 'rm -rf /var/www/html/composer.lock'
-        # enqueue 0.10.24 is incompatible with 7.4
-        docker exec shop bash -c 'composer require enqueue/enqueue:0.10.23 --no-scripts'
-        docker exec shop bash -c 'composer update --no-scripts'
        
 
     - name: Prepare Shop for e2e tests
