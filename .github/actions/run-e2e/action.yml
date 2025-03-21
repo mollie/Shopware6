@@ -159,7 +159,8 @@ runs:
     - name: Integration tests
       shell: bash
       run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration'
+        docker exec shop bash -c 'php vendor/bin/phpunit --testsuite integration --configuration=./custom/plugins/MolliePayments/config/phpunit.xml'
+        # docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
