@@ -7,6 +7,5 @@ $pluginDir = realpath(__DIR__ . '/../../');
 
 (new TestBootstrapper())
     ->setProjectDir($projectDir)
-    ->setPlatformEmbedded(false)
     ->addCallingPlugin($pluginDir.'/composer.json')
     ->bootstrap();
