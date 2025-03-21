@@ -119,7 +119,7 @@ runs:
       run: |
         # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
         docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
-        docker exec shop bash -c 'composer install'
+        docker exec shop bash -c 'composer update'
        
 
     - name: Prepare Shop for e2e tests
@@ -159,8 +159,7 @@ runs:
     - name: Integration tests
       shell: bash
       run: |
-        docker exec shop bash -c 'php vendor/bin/phpunit --testsuite integration --configuration=./custom/plugins/MolliePayments/config/phpunit.xml'
-        # docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
