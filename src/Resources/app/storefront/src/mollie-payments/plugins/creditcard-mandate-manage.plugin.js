@@ -1,4 +1,4 @@
-import HttpClient from '../services/http-client';
+import HttpClientService from '../services/http-client.service';
 import Plugin from '../plugin';
 
 const DISPLAY_NONE_CLS = 'd-none';
@@ -37,7 +37,7 @@ export default class MollieCreditCardMandateManage extends Plugin {
             return;
         }
 
-        this.client = new HttpClient();
+        this.client = new HttpClientService();
         this.registerEvents();
     }
 

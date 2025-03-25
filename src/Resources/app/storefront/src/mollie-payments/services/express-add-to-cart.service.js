@@ -1,6 +1,6 @@
 import BuyButtonRepository from '../repository/buy-button-repository';
 
-export default class ExpressAddToCart {
+export default class ExpressAddToCartService {
     addItemToCartOrSkip(button) {
         return new Promise((resolve, reject) => {
             const buyButtonRepository = new BuyButtonRepository();

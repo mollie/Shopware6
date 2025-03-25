@@ -1,4 +1,4 @@
-import HttpClient from '../services/http-client';
+import HttpClientService from '../services/http-client.service';
 import Plugin from '../plugin';
 
 /**
@@ -16,7 +16,7 @@ export default class MollieCreditCardMandate extends Plugin {
     };
 
     init() {
-        this.client = new HttpClient();
+        this.client = new HttpClientService();
         this._fixShopUrl();
     }
 

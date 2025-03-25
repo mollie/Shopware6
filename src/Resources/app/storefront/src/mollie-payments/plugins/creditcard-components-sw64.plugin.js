@@ -1,7 +1,7 @@
 import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import DeviceDetection from '../services/device-detection';
-import CsrfAjaxMode from '../services/csrf-ajax-mode';
+import DeviceDetectionHelper from '../helper/device-detection.helper';
+import CsrfAjaxModeHelper from '../helper/csrf-ajax-mode.helper';
 import ConfirmPageRepository from '../repository/confirm-page-repository';
 
 const CARD_HOLDER_SELECTOR = '#cardHolder';
@@ -301,7 +301,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
      * @param form
      */
     continueShopwareCheckout(form) {
-        if (DeviceDetection.isIEBrowser()) {
+        if (DeviceDetectionHelper.isIEBrowser()) {
             const createInput = function (name, val) {
                 const input = document.createElement('input');
                 input.type = 'checkbox';
@@ -320,7 +320,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
                 form.insertAdjacentElement('beforeend', createInput('tos', checkTOS.checked));
             }
         }
-        const csrfMode = new CsrfAjaxMode(window.csrf);
+        const csrfMode = new CsrfAjaxModeHelper(window.csrf);
         if (!csrfMode.isActive()) {
             form.submit();
         }

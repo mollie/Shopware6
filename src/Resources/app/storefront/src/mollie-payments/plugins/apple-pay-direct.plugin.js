@@ -1,5 +1,5 @@
 import Plugin from '../plugin';
-import ApplePaySessionFactory from '../services/apple-pay-session-factory';
+import ApplePaySessionFactoryService from '../services/apple-pay-session-factory.service';
 import ExpressButtonsRepository from '../repository/express-buttons-repository';
 import BuyElementRepository from '../repository/buy-element-repository';
 import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
@@ -80,7 +80,7 @@ export default class MollieApplePayDirect extends Plugin {
             shopSlug = shopSlug.slice(0, -1);
         }
 
-        const applePaySessionFactory = new ApplePaySessionFactory();
+        const applePaySessionFactory = new ApplePaySessionFactoryService();
         const session = applePaySessionFactory.create(
             isProductMode,
             countryCode,

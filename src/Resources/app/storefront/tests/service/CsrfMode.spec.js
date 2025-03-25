@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
-import CsrfAjaxMode from '../../src/mollie-payments/services/csrf-ajax-mode';
+import CsrfAjaxModeHelper from '../../src/mollie-payments/helper/csrf-ajax-mode.helper';
 
 test('csrf mode is undefined', () => {
     const fakeConfig = {};
-    const csrfMode = new CsrfAjaxMode(fakeConfig.csrf);
+    const csrfMode = new CsrfAjaxModeHelper(fakeConfig.csrf);
 
     expect(csrfMode.isActive()).toBe(false);
 
@@ -12,7 +12,7 @@ test('csrf properties are not set',() =>{
     const fakeConfig = {
         csrf: {},
     };
-    const csrfMode = new CsrfAjaxMode(fakeConfig.csrf);
+    const csrfMode = new CsrfAjaxModeHelper(fakeConfig.csrf);
     expect(csrfMode.isActive()).toBe(false);
 });
 
@@ -22,7 +22,7 @@ test('csrf mode is disabled', () => {
             enabled: false,
         },
     };
-    const csrfMode = new CsrfAjaxMode(fakeConfig.csrf);
+    const csrfMode = new CsrfAjaxModeHelper(fakeConfig.csrf);
     expect(csrfMode.isActive()).toBe(false);
 });
 
@@ -33,7 +33,7 @@ test('csrf mode is not ajax', () => {
             mode:'twig',
         },
     };
-    const csrfMode = new CsrfAjaxMode(fakeConfig.csrf);
+    const csrfMode = new CsrfAjaxModeHelper(fakeConfig.csrf);
     expect(csrfMode.isActive()).toBe(false);
 });
 test('csrf is active', () => {
@@ -43,6 +43,6 @@ test('csrf is active', () => {
             mode:'ajax',
         },
     };
-    const csrfMode = new CsrfAjaxMode(fakeConfig.csrf);
+    const csrfMode = new CsrfAjaxModeHelper(fakeConfig.csrf);
     expect(csrfMode.isActive()).toBe(true);
 });

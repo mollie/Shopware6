@@ -1,4 +1,4 @@
-import HttpClient from '../services/http-client';
+import HttpClientService from '../services/http-client.service';
 import Plugin from '../plugin';
 
 const MOLLIE_POS_TERMINALS_SELECTOR = 'div.mollie-pos-terminals';
@@ -174,7 +174,7 @@ export default class MolliePosTerminalPlugin extends Plugin {
             return;
         }
 
-        const client = new HttpClient();
+        const client = new HttpClientService();
 
         client.get(
             shopUrl + '/mollie/pos/store-terminal/' + customerId + '/' + terminalsDropdown.value,

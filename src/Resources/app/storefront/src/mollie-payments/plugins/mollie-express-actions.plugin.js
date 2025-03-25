@@ -1,7 +1,7 @@
 import Plugin from '../plugin';
 import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
 import BuyButtonRepository from '../repository/buy-button-repository';
-import ExpressAddToCart from '../services/express-add-to-cart';
+import ExpressAddToCartService from '../services/express-add-to-cart.service';
 
 export const MOLLIE_BIND_EXPRESS_EVENTS = 'BindExpressEvents';
 
@@ -89,7 +89,7 @@ export class MollieExpressActions extends Plugin {
             }
         }
 
-        const expressAddToCart = new ExpressAddToCart();
+        const expressAddToCart = new ExpressAddToCartService();
 
         expressAddToCart.addItemToCartOrSkip(target).then(() => {
             // set to processed
