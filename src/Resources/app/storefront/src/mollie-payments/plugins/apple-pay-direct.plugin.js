@@ -4,6 +4,20 @@ import ExpressButtonsRepository from '../repository/express-buttons-repository';
 import BuyElementRepository from '../repository/buy-element-repository';
 import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
 
+const APPLE_PAY_BUTTON_SELECTOR = '.js-apple-pay';
+const APPLE_PAY_CONTAINER_SELECTOR = '.js-apple-pay-container';
+const APPLE_PAY_BUTTON_PROCESSED_CLS = 'processed';
+
+const COUNTRY_CODE_INPUT_SELECTOR = 'input[name="countryCode"]';
+const CURRENCY_INPUT_SELECTOR = 'input[name="currency"]';
+const MODE_INPUT_SELECTOR = 'input[name="mode"]';
+const WITH_PHONE_INPUT_SELECTOR = 'input[name="withPhone"]';
+const DATA_PROTECTION_INPUT_SELECTOR = 'input[name="acceptedDataProtection"]';
+const SHOP_URL_ATTR = 'data-shop-url';
+
+const DISPLAY_NONE_CLS = 'd-none';
+const DEFAULT_MODE = 'productMode';
+
 export default class MollieApplePayDirect extends Plugin {
     /**
      *
@@ -24,8 +38,8 @@ export default class MollieApplePayDirect extends Plugin {
             return;
         }
         const expressButtonsRepository = new ExpressButtonsRepository();
-        const expressButtons = expressButtonsRepository.findAll('.js-apple-pay');
-        const applePayContainers = document.querySelectorAll('.js-apple-pay-container');
+        const expressButtons = expressButtonsRepository.findAll(APPLE_PAY_BUTTON_SELECTOR);
+        const applePayContainers = document.querySelectorAll(APPLE_PAY_CONTAINER_SELECTOR);
 
         if (expressButtons.length === 0 && applePayContainers.length === 0) {
             return;
@@ -34,11 +48,11 @@ export default class MollieApplePayDirect extends Plugin {
         document.dispatchEvent(new CustomEvent(MOLLIE_BIND_EXPRESS_EVENTS, { detail: expressButtons }));
 
         applePayContainers.forEach((container) => {
-            container.classList.remove('d-none');
+            container.classList.remove(DISPLAY_NONE_CLS);
         });
 
         expressButtons.forEach((button) => {
-            button.classList.remove('d-none');
+            button.classList.remove(DISPLAY_NONE_CLS);
             button.addEventListener('click', this.onExpressCheckout);
         });
     }
@@ -46,21 +60,21 @@ export default class MollieApplePayDirect extends Plugin {
     onExpressCheckout(event) {
         const clickedButton = event.target;
 
-        if (!clickedButton.classList.contains('processed')) {
+        if (!clickedButton.classList.contains(APPLE_PAY_BUTTON_PROCESSED_CLS)) {
             return;
         }
 
         const buyElementRepository = new BuyElementRepository();
         const buyElement = buyElementRepository.find(clickedButton);
 
-        const countryCode = buyElement.querySelector('input[name="countryCode"]').value;
-        const currency = buyElement.querySelector('input[name="currency"]').value;
-        const mode = buyElement.querySelector('input[name="mode"]').value;
-        const withPhone = parseInt(buyElement.querySelector('input[name="withPhone"]').value);
-        const dataProtection = buyElement.querySelector('input[name="acceptedDataProtection"]');
-        const isProductMode = mode === 'productMode';
+        const countryCode = buyElement.querySelector(COUNTRY_CODE_INPUT_SELECTOR).value;
+        const currency = buyElement.querySelector(CURRENCY_INPUT_SELECTOR).value;
+        const mode = buyElement.querySelector(MODE_INPUT_SELECTOR).value;
+        const withPhone = parseInt(buyElement.querySelector(WITH_PHONE_INPUT_SELECTOR).value);
+        const dataProtection = buyElement.querySelector(DATA_PROTECTION_INPUT_SELECTOR);
+        const isProductMode = mode === DEFAULT_MODE;
 
-        let shopSlug = clickedButton.getAttribute('data-shop-url');
+        let shopSlug = clickedButton.getAttribute(SHOP_URL_ATTR);
 
         if (shopSlug.slice(-1) === '/') {
             shopSlug = shopSlug.slice(0, -1);

@@ -1,24 +1,38 @@
 import Plugin from '../plugin';
 
+const APPLE_PAY_INPUT_SELECTOR_OLD = '.payment-method-input.applepay';
+const APPLE_PAY_INPUT_SELECTOR_NEW = '#paymentMethod';
+const PAYMENT_METHOD_SELECTOR = '.payment-method';
+
 export default class MollieApplePayPaymentMethod extends Plugin {
+    static options = {
+        applePayId: null,
+        hideAlways: true,
+        hideApplePayOption: true,
+    };
+
     /**
      *
      */
     init() {
+        if (!this.options.applePayId) {
+            return;
+        }
+
         const hideAlways = this.options.hideAlways;
 
         // if we don't want to always hide it,
         // then only hide it, if Apple Pay is not active
         if (!hideAlways && window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
-            // apple pay is active
+            // Apple Pay is active
             return;
         }
 
         // support for < Shopware 6.4
-        this.hideApplePay('.payment-method-input.applepay');
+        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR_OLD);
 
         // support for >= Shopware 6.4
-        this.hideApplePay('#paymentMethod' + this.options.applePayId);
+        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR_NEW + this.options.applePayId);
 
         // hide cart apple pay select option
         if (this.options.hideApplePayOption) {
@@ -32,7 +46,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
      */
     hideApplePay(innerIdentifier) {
         const element = document.querySelector(innerIdentifier);
-        const rootElement = this.getClosest(element, '.payment-method');
+        const rootElement = this.getClosest(element, PAYMENT_METHOD_SELECTOR);
 
         if (!!rootElement && !!rootElement.classList) {
             rootElement.remove();
@@ -46,28 +60,6 @@ export default class MollieApplePayPaymentMethod extends Plugin {
     hideApplePaySelect(applePayId) {
         const option = document.querySelector('option[value="' + applePayId + '"]');
         option.remove();
-    }
-
-    /**
-     *
-     * @returns {*}
-     */
-    getShopUrl() {
-        // get sales channel base URL
-        // so that our shop slug is correctly
-        let shopSlug = this.options.shopUrl;
-
-        if (shopSlug === undefined) {
-            return '';
-        }
-
-        // remove trailing slash if existing
-        // sometimes more exist
-        while (shopSlug.substr(-1) === '/') {
-            shopSlug = shopSlug.substr(0, shopSlug.length - 1);
-        }
-
-        return shopSlug;
     }
 
     /**

@@ -1,6 +1,8 @@
 import HttpClient from '../services/http-client';
 import Plugin from '../plugin';
 
+const DISPLAY_NONE_CLS = 'd-none';
+
 /**
  * This plugin manage the credit card mandate of customer
  */
@@ -17,21 +19,20 @@ export default class MollieCreditCardMandateManage extends Plugin {
     };
 
     init() {
-        const { shopUrl, customerId } = this.options;
-        if (!shopUrl) {
+        if (!this.options.shopUrl) {
             throw new Error(`The "shopUrl" option for the plugin "${this._pluginName}" is not defined.`);
         }
 
-        if (!customerId) {
+        if (!this.options.customerId) {
             throw new Error(`The "customerId" option for the plugin "${this._pluginName}" is not defined.`);
         }
 
-        this.mollieMandateDeleteAlertEl = document.querySelector('#mollieCreditCardMandateDeleteSuccess');
+        this.mollieMandateDeleteAlertEl = document.querySelector(this.options.mollieMandateDeleteAlertSuccessId);
         if (!this.mollieMandateDeleteAlertEl) {
             return;
         }
 
-        this.mollieMandateDeleteAlertErrorEl = document.querySelector('#mollieCreditCardMandateDeleteError');
+        this.mollieMandateDeleteAlertErrorEl = document.querySelector(this.options.mollieMandateDeleteAlertErrorId);
         if (!this.mollieMandateDeleteAlertErrorEl) {
             return;
         }
@@ -41,12 +42,12 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     registerEvents() {
-        const removeButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove');
+        const removeButtons = document.querySelectorAll(this.options.mollieMandateRemoveButtonClass);
         if (!removeButtons || removeButtons.length === 0) {
             return;
         }
 
-        const modalRemoveButtons = document.querySelectorAll('.mollie-credit-card-mandate-remove-modal-button');
+        const modalRemoveButtons = document.querySelectorAll(this.options.mollieMandateRemoveModalButtonClass);
         if (!modalRemoveButtons || modalRemoveButtons.length === 0) {
             return;
         }
@@ -69,14 +70,12 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     onRemoveButtonClick(removeButton) {
-        const { mollieMandateContainerClass, mollieMandateDataId } = this.options;
-
-        this.currentContainerEl = removeButton.closest(mollieMandateContainerClass);
+        this.currentContainerEl = removeButton.closest(this.options.mollieMandateContainerClass);
         if (!this.currentContainerEl) {
             return;
         }
 
-        this.currentMandateId = this.currentContainerEl.getAttribute(mollieMandateDataId);
+        this.currentMandateId = this.currentContainerEl.getAttribute(this.options.mollieMandateDataId);
     }
 
     onConfirmRemoveButtonClick() {
@@ -88,22 +87,20 @@ export default class MollieCreditCardMandateManage extends Plugin {
 
         this.deleteMandate(currentMandateId).then(({ success }) => {
             if (success) {
-                this.mollieMandateDeleteAlertErrorEl.classList.add('d-none');
-                this.mollieMandateDeleteAlertEl.classList.remove('d-none');
+                this.mollieMandateDeleteAlertErrorEl.classList.add(DISPLAY_NONE_CLS);
+                this.mollieMandateDeleteAlertEl.classList.remove(DISPLAY_NONE_CLS);
                 currentContainerEl.remove();
             } else {
-                this.mollieMandateDeleteAlertEl.classList.add('d-none');
-                this.mollieMandateDeleteAlertErrorEl.classList.remove('d-none');
+                this.mollieMandateDeleteAlertEl.classList.add(DISPLAY_NONE_CLS);
+                this.mollieMandateDeleteAlertErrorEl.classList.remove(DISPLAY_NONE_CLS);
             }
         });
     }
 
     deleteMandate(mandateId) {
-        const { shopUrl, customerId } = this.options;
-
         return new Promise((resolve) => {
             this.client.get(
-                shopUrl + '/mollie/components/revoke-mandate/' + customerId + '/' + mandateId,
+                this.options.shopUrl + '/mollie/components/revoke-mandate/' + this.options.customerId + '/' + mandateId,
                 (res) => {
                     resolve({ success: res && res.success });
                 },

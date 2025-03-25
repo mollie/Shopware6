@@ -5,6 +5,11 @@ import ExpressAddToCart from '../services/express-add-to-cart';
 
 export const MOLLIE_BIND_EXPRESS_EVENTS = 'BindExpressEvents';
 
+const DISPLAY_NONE_CLS = 'd-none';
+const PROCESSED_CLS = 'processed';
+const WAS_VALIDATED_CLS = 'was-validated';
+const DISABLED_ATTR = 'disabled';
+
 export class MollieExpressActions extends Plugin {
     init() {
         const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
@@ -31,7 +36,7 @@ export class MollieExpressActions extends Plugin {
             const buyButtonRepository = new BuyButtonRepository();
 
             expressButtons.forEach((button) => {
-                button.classList.remove('d-none');
+                button.classList.remove(DISPLAY_NONE_CLS);
                 button.addEventListener('click', this.onButtonClick);
 
                 const buyButton = buyButtonRepository.find(button);
@@ -39,8 +44,8 @@ export class MollieExpressActions extends Plugin {
                     return;
                 }
 
-                if (buyButton.hasAttribute('disabled')) {
-                    button.classList.add('d-none');
+                if (buyButton.hasAttribute(DISABLED_ATTR)) {
+                    button.classList.add(DISPLAY_NONE_CLS);
                     button.removeEventListener('click', this.onButtonClick);
                 }
 
@@ -50,11 +55,11 @@ export class MollieExpressActions extends Plugin {
                 }
 
                 buyButtonForm.addEventListener('change', () => {
-                    button.classList.remove('d-none');
+                    button.classList.remove(DISPLAY_NONE_CLS);
                     button.addEventListener('click', this.onButtonClick);
 
-                    if (buyButton.hasAttribute('disabled')) {
-                        button.classList.add('d-none');
+                    if (buyButton.hasAttribute(DISABLED_ATTR)) {
+                        button.classList.add(DISPLAY_NONE_CLS);
                         button.removeEventListener('click', this.onButtonClick);
                     }
                 });
@@ -68,7 +73,7 @@ export class MollieExpressActions extends Plugin {
             target = target.closest('button');
         }
 
-        if (target.classList.contains('processed')) {
+        if (target.classList.contains(PROCESSED_CLS)) {
             return;
         }
 
@@ -77,7 +82,7 @@ export class MollieExpressActions extends Plugin {
         const privacyNoteElement = privacyNote.find(target);
 
         if (privacyNoteElement instanceof HTMLDivElement) {
-            privacyNoteElement.classList.add('was-validated');
+            privacyNoteElement.classList.add(WAS_VALIDATED_CLS);
             const isValid = privacyNote.validate(privacyNoteElement);
             if (isValid === false) {
                 return;
@@ -88,7 +93,7 @@ export class MollieExpressActions extends Plugin {
 
         expressAddToCart.addItemToCartOrSkip(target).then(() => {
             // set to processed
-            target.classList.add('processed');
+            target.classList.add(PROCESSED_CLS);
             // now trigger click event again for the real button
             const mollieEvent = new event.constructor(event.type, event);
             target.dispatchEvent(mollieEvent);

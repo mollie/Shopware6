@@ -1,13 +1,22 @@
 import HttpClient from '../services/http-client';
 import Plugin from '../plugin';
 
+const MOLLIE_POS_TERMINALS_SELECTOR = 'div.mollie-pos-terminals';
+const DROPDOWN_TERMINALS_SELECTOR = '#posTerminals';
+const PAYMENT_FORM_SELECTOR = '#changePaymentForm';
+const RADIO_INPUTS_SELECTOR = 'input[type="radio"]';
+const POS_RADIO_INPUT_SELECTOR = 'input[type="radio"].pointofsale';
+
+const DATA_SHOP_URL_ATTR = 'data-shop-url';
+const DATA_CUSTOMER_ID_ATTR = 'data-customer-id';
+
+const DISPLAY_NONE_CLS = 'd-none';
+
 export default class MolliePosTerminalPlugin extends Plugin {
     _shopUrl = '';
     _customerId = '';
 
     _dropdownTerminals = null;
-
-    _isModalForm = false;
 
     _container = null;
     _paymentForm = null;
@@ -18,7 +27,7 @@ export default class MolliePosTerminalPlugin extends Plugin {
      *
      */
     init() {
-        this._container = document.querySelector('div.mollie-pos-terminals');
+        this._container = document.querySelector(MOLLIE_POS_TERMINALS_SELECTOR);
 
         if (this._container === undefined || this._container === null) {
             return;
@@ -56,23 +65,23 @@ export default class MolliePosTerminalPlugin extends Plugin {
      *
      */
     initControls() {
-        this._shopUrl = this._container.getAttribute('data-shop-url');
+        this._shopUrl = this._container.getAttribute(DATA_SHOP_URL_ATTR);
 
         if (this._shopUrl.substr(-1) === '/') {
             this._shopUrl = this._shopUrl.substr(0, this._shopUrl.length - 1);
         }
 
-        this._customerId = this._container.getAttribute('data-customer-id');
-        this._dropdownTerminals = document.querySelector('#posTerminals');
+        this._customerId = this._container.getAttribute(DATA_CUSTOMER_ID_ATTR);
+        this._dropdownTerminals = document.querySelector(DROPDOWN_TERMINALS_SELECTOR);
 
-        this._paymentForm = document.querySelector('#changePaymentForm');
+        this._paymentForm = document.querySelector(PAYMENT_FORM_SELECTOR);
 
         if (this._paymentForm === undefined || this._paymentForm === null) {
             return;
         }
 
-        this._radioInputs = this._paymentForm.querySelectorAll('input[type="radio"]');
-        this._posRadioInput = this._paymentForm.querySelector('input[type="radio"].pointofsale');
+        this._radioInputs = this._paymentForm.querySelectorAll(RADIO_INPUTS_SELECTOR);
+        this._posRadioInput = this._paymentForm.querySelector(POS_RADIO_INPUT_SELECTOR);
     }
 
     /**
@@ -115,9 +124,9 @@ export default class MolliePosTerminalPlugin extends Plugin {
         let terminalRequired = false;
 
         if (posRadio === undefined || posRadio.checked === false) {
-            container.classList.add('d-none');
+            container.classList.add(DISPLAY_NONE_CLS);
         } else {
-            container.classList.remove('d-none');
+            container.classList.remove(DISPLAY_NONE_CLS);
             terminalRequired = true;
         }
 
