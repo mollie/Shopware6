@@ -19,7 +19,7 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
      */
     public function update(Connection $connection): void
     {
-        $connection->exec(
+        $connection->executeStatement(
             'CREATE TABLE IF NOT EXISTS mollie_subscription_address (
                       `id` binary(16) NOT NULL,
                       `subscription_id` binary(16) NOT NULL,
@@ -65,10 +65,10 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
      */
     private function createColumn(string $table, string $column, string $type, Connection $connection): void
     {
-        $colQuery = $connection->executeQuery('SHOW COLUMNS FROM ' . $table . " LIKE '" . $column . "'")->fetch();
+        $colQuery = $connection->executeQuery('SHOW COLUMNS FROM ' . $table . " LIKE '" . $column . "'")->fetchAssociative();
 
         if ($colQuery === false) {
-            $connection->exec('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . $type);
+            $connection->executeStatement('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . $type);
         }
     }
 
@@ -81,12 +81,12 @@ class Migration1652444730SubscriptionAddresses extends MigrationStep
             SELECT COUNT(1) indexIsThere 
             FROM INFORMATION_SCHEMA.STATISTICS 
             WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
-        ")->fetch();
+        ")->fetchAssociative();
 
         $isExisting = ((int) $indexExistsCheck['indexIsThere'] === 1);
 
         if (! $isExisting) {
-            $connection->exec('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
+            $connection->executeStatement('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
         }
     }
 }

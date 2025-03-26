@@ -21,4 +21,10 @@ class SalutationExtension extends EntityExtension
     {
         $collection->add((new OneToManyAssociationField('subscriptionAddress', SubscriptionAddressDefinition::class, 'salutation_id'))->addFlags(new CascadeDelete()));
     }
+
+    public function getEntityName(): string
+    {
+        return SalutationDefinition::ENTITY_NAME;
+    }
+
 }

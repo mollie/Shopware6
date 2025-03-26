@@ -37,7 +37,7 @@ class MigrationUtils
                 $sql .= ' AFTER `' . $after . '`';
             }
 
-            $this->connection->exec($sql);
+            $this->connection->executeStatement($sql);
         }
     }
 
@@ -51,7 +51,7 @@ class MigrationUtils
         // only delete if existing
         if ($colQuery !== false) {
             $sql = 'ALTER TABLE ' . $table . ' DROP ' . $column;
-            $this->connection->exec($sql);
+            $this->connection->executeStatement($sql);
         }
     }
 
@@ -77,7 +77,7 @@ class MigrationUtils
 
         $sql = 'ALTER TABLE `' . $table . '` ADD KEY `' . $keyName . '` (' . $columnsString . ')';
 
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
     }
 
     /**
@@ -95,7 +95,7 @@ class MigrationUtils
                 ADD CONSTRAINT `' . $constraintName . '` 
                 ' . $sqlContent;
 
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
     }
 
     /**
@@ -109,7 +109,7 @@ class MigrationUtils
             return;
         }
 
-        $this->connection->exec('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
+        $this->connection->executeStatement('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
     }
 
     /**
@@ -123,7 +123,7 @@ class MigrationUtils
             SELECT COUNT(1) foundCount 
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = DATABASE() and table_name = '" . $table . "' and index_name = '" . $indexName . "';
-        ")->fetch();
+        ")->fetchAssociative();
 
         return (int) $indexExistsCheck['foundCount'] >= 1;
     }
