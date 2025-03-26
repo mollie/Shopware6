@@ -29,6 +29,7 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
+use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Fakes\FakeEventDispatcher;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
@@ -168,6 +169,8 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         /* @var TransactionTransitionServiceInterface $transitionService */
         $this->transitionService = $this->getMockBuilder(TransactionTransitionService::class)->disableOriginalConstructor()->getMock();
 
+        $transactionConverter = $this->createMock(TransactionConverterInterface::class);
+
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
         $routingBuilder = new RoutingBuilder(
             $this->router,
@@ -199,7 +202,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $this->loggerService
         );
 
-        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $this->transitionService, $this->loggerService);
-        $this->finalizeAction = new FinalizeAction($this->molliePaymentFinalize, $this->loggerService);
+        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $transactionConverter, $this->transitionService, $this->loggerService);
+        $this->finalizeAction = new FinalizeAction($this->molliePaymentFinalize, $transactionConverter, $this->loggerService);
     }
 }

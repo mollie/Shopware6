@@ -7,12 +7,14 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
+use Shopware\Core\Framework\Api\Context\SalesChannelApiSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Throwable;
 
 trait PaymentHandlerTrait
 {
@@ -49,11 +51,24 @@ trait PaymentHandlerTrait
 
     public function pay(Request $request, PaymentTransactionStruct $transaction, Context $context, ?Struct $validateStruct): ?RedirectResponse
     {
-        return $this->payAction->pay($this, $transaction, new RequestDataBag(), $context);
+        /** @var SalesChannelContext $salesChannelContext */
+        $salesChannelContext = $request->get('sw-sales-channel-context');
+        try {
+            return $this->payAction->pay($this, $transaction, new RequestDataBag(), $salesChannelContext);
+        } catch (Throwable $exception) {
+            dump($exception);
+            throw $exception;
+        }
     }
 
     public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
     {
-        $this->finalizeAction->finalize($this, $transaction, $context);
+        $source = $context->getSource();
+        $salesChannelId = null;
+
+        if ($source instanceof SalesChannelApiSource) {
+            $salesChannelId = $source->getSalesChannelId();
+        }
+        $this->finalizeAction->finalize($this, $transaction, $context, $salesChannelId);
     }
 }
