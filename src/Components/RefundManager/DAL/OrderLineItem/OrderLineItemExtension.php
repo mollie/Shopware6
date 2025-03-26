@@ -27,6 +27,4 @@ class OrderLineItemExtension extends EntityExtension
     {
         return OrderLineItemDefinition::ENTITY_NAME;
     }
-
-
 }

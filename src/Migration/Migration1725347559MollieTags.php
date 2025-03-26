@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Result;
 use Kiener\MolliePayments\Struct\Tags\AbstractTag;
 use Kiener\MolliePayments\Struct\Tags\SubscriptionTag;
@@ -59,12 +57,11 @@ class Migration1725347559MollieTags extends MigrationStep
 
         $stmt = $connection->prepare($query);
 
-        $stmt->bindValue(':id',  Uuid::fromHexToBytes($id));
+        $stmt->bindValue(':id', Uuid::fromHexToBytes($id));
         $stmt->bindValue(':name', $name);
         $stmt->bindValue(':created_at', (new \DateTime())->format('Y-m-d H:i:s'));
         $stmt->bindValue(':updated_at', null);
         $stmt->executeStatement();
-
     }
 
     private function tagExists(Connection $connection, string $id): bool

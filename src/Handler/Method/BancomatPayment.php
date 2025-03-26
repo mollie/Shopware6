@@ -15,7 +15,6 @@ class BancomatPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::BANCOMATPAY;
     public const PAYMENT_METHOD_DESCRIPTION = 'Bancomat Pay';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

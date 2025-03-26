@@ -14,7 +14,6 @@ class DirectDebitPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::DIRECTDEBIT;
     public const PAYMENT_METHOD_DESCRIPTION = 'SEPA Direct Debit';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

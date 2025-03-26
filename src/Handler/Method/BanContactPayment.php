@@ -14,7 +14,6 @@ class BanContactPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::BANCONTACT;
     public const PAYMENT_METHOD_DESCRIPTION = 'Bancontact';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

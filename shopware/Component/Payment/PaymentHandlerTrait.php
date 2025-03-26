@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment;
 
-use Mollie\Api\Exceptions\ApiException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Context;
@@ -20,13 +18,11 @@ trait PaymentHandlerTrait
 {
     protected string $paymentMethod;
 
-
     private PayAction $payAction;
     private FinalizeAction $finalizeAction;
 
     public function __construct(PayAction $payAction, FinalizeAction $finalizeAction)
     {
-
         $this->payAction = $payAction;
         $this->finalizeAction = $finalizeAction;
     }
@@ -46,7 +42,6 @@ trait PaymentHandlerTrait
         return $orderData;
     }
 
-
     public function supports(PaymentHandlerType $type, string $paymentMethodId, Context $context): bool
     {
         return false;
@@ -54,12 +49,11 @@ trait PaymentHandlerTrait
 
     public function pay(Request $request, PaymentTransactionStruct $transaction, Context $context, ?Struct $validateStruct): ?RedirectResponse
     {
-        return $this->payAction->pay($this, $transaction,new RequestDataBag(), $context);
+        return $this->payAction->pay($this, $transaction, new RequestDataBag(), $context);
     }
 
     public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
     {
-       $this->finalizeAction->finalize($this,$transaction,$context);
+        $this->finalizeAction->finalize($this, $transaction, $context);
     }
-
 }

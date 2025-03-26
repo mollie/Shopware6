@@ -17,7 +17,6 @@ class PayByBankPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::PAYBYBANK;
     public const PAYMENT_METHOD_DESCRIPTION = 'Pay by Bank';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

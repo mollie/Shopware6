@@ -19,8 +19,6 @@ use Shopware\Elasticsearch\Admin\Indexer\AbstractAdminIndexer;
 
 class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
 {
-
-
     private Connection $connection;
     private IteratorFactory $factory;
     /** @var EntityRepository */
@@ -88,7 +86,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY + 100,//  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => ParameterType::BINARY + 100, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 

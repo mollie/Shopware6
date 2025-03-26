@@ -6,7 +6,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -22,8 +21,8 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
         $paymentMethod = PaymentMethod::PAYPAL;
 
         $this->paymentHandler = new PayPalPayment(
-            $this->loggerService,
-            new FakeContainer()
+            $this->payAction,
+            $this->finalizeAction
         );
 
         $transactionId = Uuid::randomHex();
@@ -71,8 +70,8 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
         $paymentMethod = PaymentMethod::PAYPAL;
 
         $this->paymentHandler = new PayPalPayment(
-            $this->loggerService,
-            new FakeContainer()
+            $this->payAction,
+            $this->finalizeAction
         );
 
         $transactionId = Uuid::randomHex();

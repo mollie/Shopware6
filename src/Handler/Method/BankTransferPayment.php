@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Types\PaymentMethod;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -24,12 +23,11 @@ class BankTransferPayment extends PaymentHandler
 
     private SettingsService $settingsService;
 
-    public function __construct(PayAction $payAction, FinalizeAction $finalizeAction,SettingsService $settingsService)
+    public function __construct(PayAction $payAction, FinalizeAction $finalizeAction, SettingsService $settingsService)
     {
         parent::__construct($payAction, $finalizeAction);
         $this->settingsService = $settingsService;
     }
-
 
     /**
      * @param array<mixed> $orderData

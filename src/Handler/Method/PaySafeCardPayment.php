@@ -14,7 +14,6 @@ class PaySafeCardPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::PAYSAFECARD;
     public const PAYMENT_METHOD_DESCRIPTION = 'paysafecard';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

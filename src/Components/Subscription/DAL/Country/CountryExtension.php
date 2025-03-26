@@ -24,7 +24,6 @@ class CountryExtension extends EntityExtension
 
     public function getEntityName(): string
     {
-       return CountryDefinition::ENTITY_NAME;
+        return CountryDefinition::ENTITY_NAME;
     }
-
 }

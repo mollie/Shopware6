@@ -4,6 +4,7 @@ parameters:
         - ./../src
     excludePaths:
         - ./../src/Resources/*
+        - ./../src/Migration/*
         - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
         # legacy code that is not working with abstract/interface changes
         - ./../src/Service/Mail/MailService63.php

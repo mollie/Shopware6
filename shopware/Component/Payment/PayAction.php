@@ -20,11 +20,6 @@ final class PayAction
     private MolliePaymentDoPay $payFacade;
     private TransactionTransitionService $transactionTransitionService;
 
-    /**
-     * @param MolliePaymentDoPay $payFacade
-     * @param TransactionTransitionService $transactionTransitionService
-     * @param LoggerInterface $logger
-     */
     public function __construct(MolliePaymentDoPay $payFacade, TransactionTransitionService $transactionTransitionService, LoggerInterface $logger)
     {
         $this->payFacade = $payFacade;
@@ -35,7 +30,6 @@ final class PayAction
     /** @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction */
     public function pay(PaymentHandler $paymentHandler, $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
-
         $this->logger->info(
             'Starting Checkout for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $paymentHandler->getPaymentMethod(),
             [

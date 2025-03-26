@@ -13,7 +13,7 @@ class EpsPayment extends PaymentHandler
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::EPS;
     public const PAYMENT_METHOD_DESCRIPTION = 'eps';
-    
+
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

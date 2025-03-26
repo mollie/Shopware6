@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment;
 
 use Mollie\Api\Exceptions\ApiException;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
-use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,13 +16,11 @@ trait PaymentHandlerLegacyTrait
 {
     protected string $paymentMethod;
 
-
     private PayAction $payAction;
     private FinalizeAction $finalizeAction;
 
     public function __construct(PayAction $payAction, FinalizeAction $finalizeAction)
     {
-
         $this->payAction = $payAction;
         $this->finalizeAction = $finalizeAction;
     }
@@ -49,10 +48,10 @@ trait PaymentHandlerLegacyTrait
      *
      * Throw a
      *
-     * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
-     *                          payment
      * @throws ApiException
      *
+     * @return RedirectResponse @see AsyncPaymentProcessException exception if an error ocurres while processing the
+     *                          payment
      */
     public function pay(AsyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
@@ -63,7 +62,4 @@ trait PaymentHandlerLegacyTrait
     {
         $this->finalizeAction->finalize($this, $transaction, $salesChannelContext);
     }
-
-
-
 }

@@ -14,7 +14,6 @@ class SofortPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::SOFORT;
     public const PAYMENT_METHOD_DESCRIPTION = 'SOFORT Banking';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
