@@ -1,7 +1,7 @@
 /**
  * @package storefront
  */
-export default class DeviceDetection {
+export default class DeviceDetectionHelper {
     /**
      * Returns whether the current device is a touch device
      * @returns {boolean}
@@ -15,7 +15,7 @@ export default class DeviceDetection {
      * @returns {boolean}
      */
     static isIOSDevice() {
-        return DeviceDetection.isIPhoneDevice() || DeviceDetection.isIPadDevice();
+        return DeviceDetectionHelper.isIPhoneDevice() || DeviceDetectionHelper.isIPadDevice();
     }
 
     /**
@@ -23,7 +23,7 @@ export default class DeviceDetection {
      * @returns {boolean}
      */
     static isNativeWindowsBrowser() {
-        return DeviceDetection.isIEBrowser() || DeviceDetection.isEdgeBrowser();
+        return DeviceDetectionHelper.isIEBrowser() || DeviceDetectionHelper.isEdgeBrowser();
     }
 
     /**
@@ -68,13 +68,13 @@ export default class DeviceDetection {
      */
     static getList() {
         return {
-            'is-touch': DeviceDetection.isTouchDevice(),
-            'is-ios': DeviceDetection.isIOSDevice(),
-            'is-native-windows': DeviceDetection.isNativeWindowsBrowser(),
-            'is-iphone': DeviceDetection.isIPhoneDevice(),
-            'is-ipad': DeviceDetection.isIPadDevice(),
-            'is-ie': DeviceDetection.isIEBrowser(),
-            'is-edge': DeviceDetection.isEdgeBrowser(),
+            'is-touch': DeviceDetectionHelper.isTouchDevice(),
+            'is-ios': DeviceDetectionHelper.isIOSDevice(),
+            'is-native-windows': DeviceDetectionHelper.isNativeWindowsBrowser(),
+            'is-iphone': DeviceDetectionHelper.isIPhoneDevice(),
+            'is-ipad': DeviceDetectionHelper.isIPadDevice(),
+            'is-ie': DeviceDetectionHelper.isIEBrowser(),
+            'is-edge': DeviceDetectionHelper.isEdgeBrowser(),
         };
     }
 }

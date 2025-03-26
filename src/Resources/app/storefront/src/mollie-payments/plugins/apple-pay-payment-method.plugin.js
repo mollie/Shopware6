@@ -1,6 +1,17 @@
 import Plugin from '../plugin';
 
+const APPLE_PAY_INPUT_SELECTOR_OLD = '.payment-method-input.applepay';
+const APPLE_PAY_INPUT_SELECTOR_NEW = '#paymentMethod';
+const PAYMENT_METHOD_SELECTOR = '.payment-method';
+
 export default class MollieApplePayPaymentMethod extends Plugin {
+    static options = {
+        shopUrl: null,
+        hideAlways: false,
+        applePayId: null,
+        hideApplePayOption: false,
+    };
+
     /**
      *
      */
@@ -10,15 +21,15 @@ export default class MollieApplePayPaymentMethod extends Plugin {
         // if we don't want to always hide it,
         // then only hide it, if Apple Pay is not active
         if (!hideAlways && window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
-            // apple pay is active
+            // Apple Pay is active
             return;
         }
 
         // support for < Shopware 6.4
-        this.hideApplePay('.payment-method-input.applepay');
+        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR_OLD);
 
         // support for >= Shopware 6.4
-        this.hideApplePay('#paymentMethod' + this.options.applePayId);
+        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR_NEW + this.options.applePayId);
 
         // hide cart apple pay select option
         if (this.options.hideApplePayOption) {
@@ -32,7 +43,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
      */
     hideApplePay(innerIdentifier) {
         const element = document.querySelector(innerIdentifier);
-        const rootElement = this.getClosest(element, '.payment-method');
+        const rootElement = this.getClosest(element, PAYMENT_METHOD_SELECTOR);
 
         if (!!rootElement && !!rootElement.classList) {
             rootElement.remove();

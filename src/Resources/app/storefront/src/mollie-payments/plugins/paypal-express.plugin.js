@@ -3,6 +3,11 @@ import ExpressButtonsRepository from '../repository/express-buttons-repository';
 import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
 import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
 
+const MOLLIE_PAYPAL_BUTTON_SELECTOR = '.mollie-paypal-button';
+const DATA_FORM_ACTION_ATTR = 'data-form-action';
+
+const PROCESSED_CLS = 'processed';
+
 export default class PayPalExpressPlugin extends Plugin {
     init() {
         const pluginOffCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
@@ -18,7 +23,7 @@ export default class PayPalExpressPlugin extends Plugin {
     bindEvents() {
         const expressButtonsRepository = new ExpressButtonsRepository();
 
-        const expressButtons = expressButtonsRepository.findAll('.mollie-paypal-button');
+        const expressButtons = expressButtonsRepository.findAll(MOLLIE_PAYPAL_BUTTON_SELECTOR);
 
         if (expressButtons.length === 0) {
             return;
@@ -36,30 +41,30 @@ export default class PayPalExpressPlugin extends Plugin {
     onPageShow() {
         const expressButtonsRepository = new ExpressButtonsRepository();
 
-        const expressButtons = expressButtonsRepository.findAll('.mollie-paypal-button');
+        const expressButtons = expressButtonsRepository.findAll(MOLLIE_PAYPAL_BUTTON_SELECTOR);
 
         if (expressButtons.length === 0) {
             return;
         }
 
         expressButtons.forEach((button) => {
-            if (!button.classList.contains('processed')) {
+            if (!button.classList.contains(PROCESSED_CLS)) {
                 return;
             }
             // remove processed again, so that it doesn't look disabled
             // because a BACK button in the browser would not refresh the page
             // and therefore it would still look disabled (even though it would work)
-            button.classList.remove('processed');
+            button.classList.remove(PROCESSED_CLS);
         });
     }
 
     onExpressCheckout(event) {
         const clickedButton = event.target;
-        if (!clickedButton.classList.contains('processed')) {
+        if (!clickedButton.classList.contains(PROCESSED_CLS)) {
             return;
         }
 
-        const submitUrl = clickedButton.getAttribute('data-form-action');
+        const submitUrl = clickedButton.getAttribute(DATA_FORM_ACTION_ATTR);
 
         const form = document.createElement('form');
         form.setAttribute('action', submitUrl);

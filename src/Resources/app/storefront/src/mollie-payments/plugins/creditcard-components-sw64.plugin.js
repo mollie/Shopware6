@@ -1,8 +1,15 @@
 import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import DeviceDetection from '../services/device-detection';
-import CsrfAjaxMode from '../services/csrf-ajax-mode';
+import DeviceDetectionHelper from '../helper/device-detection.helper';
+import CsrfAjaxModeHelper from '../helper/csrf-ajax-mode.helper';
 import ConfirmPageRepository from '../repository/confirm-page-repository';
+
+const CARD_HOLDER_SELECTOR = '#cardHolder';
+const COMPONENTS_CONTAINER_SELECTOR = 'div.mollie-components-credit-card';
+const CREDIT_CARD_RADIO_INPUT_SELECTOR = '#changePaymentForm input[type="radio"]';
+
+const ERROR_CLS = 'error';
+const FOCUS_CLS = 'is-focused';
 
 export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
     static options = deepmerge(MollieCreditCardMandate.options, {
@@ -42,8 +49,8 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
      */
     _initializeComponentInstance() {
         // Get the elements from the DOM
-        const cardHolder = document.querySelector(this.getSelectors().cardHolder);
-        const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
+        const cardHolder = document.querySelector(CARD_HOLDER_SELECTOR);
+        const componentsContainer = document.querySelector(COMPONENTS_CONTAINER_SELECTOR);
 
         // Initialize Mollie Components instance
         if (!!componentsContainer && !!cardHolder && !window.mollieComponentsObject) {
@@ -75,18 +82,6 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         if (loader) {
             loader.remove();
         }
-    }
-
-    getSelectors() {
-        return {
-            cardHolder: '#cardHolder',
-            componentsContainer: 'div.mollie-components-credit-card',
-            creditCardRadioInput: '#changePaymentForm input[type="radio"]',
-            mollieController: 'div.mollie-components-controller',
-            paymentForm: '#changePaymentForm',
-            confirmForm: '#confirmOrderForm',
-            confirmFormButton: '#confirmOrderForm > button[type="submit"]',
-        };
     }
 
     getDefaultProperties() {
@@ -155,10 +150,10 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
                     const componentError = document.getElementById(`${element.errors}`);
 
                     if (event.error && event.touched) {
-                        componentContainer.classList.add('error');
+                        componentContainer.classList.add(ERROR_CLS);
                         componentError.textContent = event.error;
                     } else {
-                        componentContainer.classList.remove('error');
+                        componentContainer.classList.remove(ERROR_CLS);
                         componentError.textContent = '';
                     }
                 });
@@ -191,7 +186,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
 
     setFocus(componentName, isFocused) {
         const element = document.querySelector(componentName);
-        element.classList.toggle('is-focused', isFocused);
+        element.classList.toggle(FOCUS_CLS, isFocused);
     }
 
     /**
@@ -204,7 +199,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         const paymentForm = this._confirmForm;
 
         const creditCardRadioInput = document.querySelector(
-            `${this.getSelectors().creditCardRadioInput}[value="${this.options.paymentId}"]`,
+            `${CREDIT_CARD_RADIO_INPUT_SELECTOR}[value="${this.options.paymentId}"]`,
         );
 
         // check if we have any credit card forms or elements visible
@@ -306,7 +301,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
      * @param form
      */
     continueShopwareCheckout(form) {
-        if (DeviceDetection.isIEBrowser()) {
+        if (DeviceDetectionHelper.isIEBrowser()) {
             const createInput = function (name, val) {
                 const input = document.createElement('input');
                 input.type = 'checkbox';
@@ -325,7 +320,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
                 form.insertAdjacentElement('beforeend', createInput('tos', checkTOS.checked));
             }
         }
-        const csrfMode = new CsrfAjaxMode(window.csrf);
+        const csrfMode = new CsrfAjaxModeHelper(window.csrf);
         if (!csrfMode.isActive()) {
             form.submit();
         }

@@ -1,6 +1,18 @@
 import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 
+const CARD_HOLDER_SELECTOR = '#cardHolder';
+const COMPONENTS_CONTAINER_SELECTOR = 'div.mollie-components-credit-card';
+const CREDIT_CARD_RADIO_INPUT_SELECTOR = '#confirmPaymentForm input[type="radio"].creditcard';
+const MOLLIE_CONTROLLER_SELECTOR = 'div.mollie-components-controller';
+const PAYMENT_FORM_SELECTOR = '#confirmPaymentForm';
+const RADIO_INPUTS_SELECTOR = '#confirmPaymentForm input[type="radio"]';
+const SUBMIT_BUTTON_SELECTOR = '#confirmPaymentForm button[type="submit"]';
+
+const DISPLAY_NONE_CLS = 'd-none';
+const ERROR_CLS = 'error';
+const FOCUS_CLS = 'is-focused';
+
 export default class MollieCreditCardComponents extends MollieCreditCardMandate {
     static options = deepmerge(MollieCreditCardMandate.options, {
         customerId: null,
@@ -16,7 +28,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         let componentsObject = null;
 
         // Get an existing Mollie controller element
-        const mollieController = document.querySelector(this.getSelectors().mollieController);
+        const mollieController = document.querySelector(MOLLIE_CONTROLLER_SELECTOR);
 
         // Remove the existing Mollie controller element
         if (mollieController) {
@@ -24,14 +36,10 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         }
 
         // Get the elements from the DOM
-        const cardHolder = document.querySelector(this.getSelectors().cardHolder);
-        const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
-        const paymentForm = document.querySelector(this.getSelectors().paymentForm);
-        const radioInputs = document.querySelectorAll(this.getSelectors().radioInputs);
-        const submitButton = document.querySelector(this.getSelectors().submitButton);
+        this.getElements();
 
         // Initialize Mollie Components instance
-        if (!!componentsContainer && !!cardHolder) {
+        if (!!this._componentsContainer && !!this._cardHolder) {
             // eslint-disable-next-line no-undef
             componentsObject = Mollie(this.options.profileId, {
                 locale: this.options.locale,
@@ -48,31 +56,28 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         ]);
 
         // Show/hide the components form based on the selected radio input
-        radioInputs.forEach((element) => {
+        this._radioInputs.forEach((element) => {
             element.addEventListener('change', () => {
                 me.showComponents();
             });
         });
 
         // Submit handler
-        submitButton.addEventListener('click', (event) => {
+        this._submitButton.addEventListener('click', (event) => {
             event.preventDefault();
-            me.submitForm(event, componentsObject, paymentForm);
+            me.submitForm(event, componentsObject, this._paymentForm);
         });
 
         this.registerMandateEvents();
     }
 
-    getSelectors() {
-        return {
-            cardHolder: '#cardHolder',
-            componentsContainer: 'div.mollie-components-credit-card',
-            creditCardRadioInput: '#confirmPaymentForm input[type="radio"].creditcard',
-            mollieController: 'div.mollie-components-controller',
-            paymentForm: '#confirmPaymentForm',
-            radioInputs: '#confirmPaymentForm input[type="radio"]',
-            submitButton: '#confirmPaymentForm button[type="submit"]',
-        };
+    getElements() {
+        this._cardHolder = document.querySelector(CARD_HOLDER_SELECTOR);
+        this._componentsContainer = document.querySelector(COMPONENTS_CONTAINER_SELECTOR);
+        this._paymentForm = document.querySelector(PAYMENT_FORM_SELECTOR);
+        this._radioInputs = document.querySelectorAll(RADIO_INPUTS_SELECTOR);
+        this._submitButton = document.querySelector(SUBMIT_BUTTON_SELECTOR);
+        this._creditCardRadioInput = document.querySelector(CREDIT_CARD_RADIO_INPUT_SELECTOR);
     }
 
     getDefaultProperties() {
@@ -122,14 +127,11 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
     }
 
     showComponents() {
-        const creditCardRadioInput = document.querySelector(this.getSelectors().creditCardRadioInput);
-        const componentsContainer = document.querySelector(this.getSelectors().componentsContainer);
-
-        if (componentsContainer) {
-            if (creditCardRadioInput === undefined || creditCardRadioInput.checked === false) {
-                componentsContainer.classList.add('d-none');
+        if (this._componentsContainer) {
+            if (this._creditCardRadioInput === undefined || this._creditCardRadioInput.checked === false) {
+                this._componentsContainer.classList.add(DISPLAY_NONE_CLS);
             } else {
-                componentsContainer.classList.remove('d-none');
+                this._componentsContainer.classList.remove(DISPLAY_NONE_CLS);
             }
         }
     }
@@ -148,10 +150,10 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                 const componentError = document.getElementById(`${element.errors}`);
 
                 if (event.error && event.touched) {
-                    componentContainer.classList.add('error');
+                    componentContainer.classList.add(ERROR_CLS);
                     componentError.textContent = event.error;
                 } else {
-                    componentContainer.classList.remove('error');
+                    componentContainer.classList.remove(ERROR_CLS);
                     componentError.textContent = '';
                 }
             });
@@ -168,22 +170,18 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
 
     setFocus(componentName, isFocused) {
         const element = document.querySelector(componentName);
-        element.classList.toggle('is-focused', isFocused);
+        element.classList.toggle(FOCUS_CLS, isFocused);
     }
 
     disableForm() {
-        const submitButton = document.querySelector(this.getSelectors().submitButton);
-
-        if (submitButton) {
-            submitButton.disabled = true;
+        if (this._submitButton) {
+            this._submitButton.disabled = true;
         }
     }
 
     enableForm() {
-        const submitButton = document.querySelector(this.getSelectors().submitButton);
-
-        if (submitButton) {
-            submitButton.disabled = false;
+        if (this._submitButton) {
+            this._submitButton.disabled = false;
         }
     }
 
@@ -192,18 +190,16 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         const me = this;
         this.disableForm();
 
-        const creditCardRadioInput = document.querySelector(this.getSelectors().creditCardRadioInput);
-
         if (
-            (creditCardRadioInput === undefined ||
-                creditCardRadioInput === null ||
-                creditCardRadioInput.checked === false) &&
+            (this._creditCardRadioInput === undefined ||
+                this._creditCardRadioInput === null ||
+                this._creditCardRadioInput.checked === false) &&
             !!paymentForm
         ) {
             paymentForm.submit();
         }
 
-        if (!!creditCardRadioInput && creditCardRadioInput.checked === true) {
+        if (!!this._creditCardRadioInput && this._creditCardRadioInput.checked === true) {
             const mandateId = this.getMandateCheckedValue();
             // If the mandateId is valid, that means there is a mandate already selected,
             // so we have to call the API to save it
