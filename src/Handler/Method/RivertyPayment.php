@@ -10,6 +10,6 @@ class RivertyPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = 'riverty';
     public const PAYMENT_METHOD_DESCRIPTION = 'Riverty';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

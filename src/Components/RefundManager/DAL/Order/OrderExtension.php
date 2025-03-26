@@ -23,4 +23,10 @@ class OrderExtension extends EntityExtension
     {
         $collection->add((new OneToManyAssociationField(self::REFUND_PROPERTY_NAME, RefundDefinition::class, 'order_id'))->addFlags(new CascadeDelete()));
     }
+
+    public function getEntityName(): string
+    {
+        return OrderDefinition::ENTITY_NAME;
+    }
+
 }

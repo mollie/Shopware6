@@ -21,4 +21,10 @@ class CurrencyExtension extends EntityExtension
     {
         $collection->add((new OneToManyAssociationField('subscriptions', SubscriptionDefinition::class, 'currency_id'))->addFlags(new CascadeDelete()));
     }
+
+    public function getEntityName(): string
+    {
+        return CurrencyDefinition::ENTITY_NAME;
+    }
+
 }

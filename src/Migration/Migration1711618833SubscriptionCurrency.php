@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Migration\MigrationStep;
@@ -51,7 +52,7 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         $statement = $connection->executeQuery($sql, [
             'currencies' => $currencies,
         ], [
-            'currencies' => Connection::PARAM_STR_ARRAY,
+            'currencies' => ArrayParameterType::STRING,
         ]);
 
         // update currency information

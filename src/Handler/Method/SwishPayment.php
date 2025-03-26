@@ -10,6 +10,5 @@ class SwishPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = 'swish';
     public const PAYMENT_METHOD_DESCRIPTION = 'Swish';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

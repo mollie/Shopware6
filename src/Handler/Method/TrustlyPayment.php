@@ -10,6 +10,5 @@ class TrustlyPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = 'trustly';
     public const PAYMENT_METHOD_DESCRIPTION = 'Trustly';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

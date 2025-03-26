@@ -10,6 +10,6 @@ class PayconiqPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = 'payconiq';
     public const PAYMENT_METHOD_DESCRIPTION = 'Payconiq';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }
