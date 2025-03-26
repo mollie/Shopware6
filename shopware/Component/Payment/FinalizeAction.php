@@ -19,10 +19,6 @@ final class FinalizeAction
     private LoggerInterface $logger;
     private MolliePaymentFinalize $finalizeFacade;
 
-    /**
-     * @param MolliePaymentFinalize $finalizeFacade
-     * @param LoggerInterface $logger
-     */
     public function __construct(MolliePaymentFinalize $finalizeFacade, LoggerInterface $logger)
     {
         $this->finalizeFacade = $finalizeFacade;
@@ -32,7 +28,6 @@ final class FinalizeAction
     /** @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction */
     public function finalize(PaymentHandler $paymentHandler, $transaction, SalesChannelContext $salesChannelContext): void
     {
-
         $orderAttributes = new OrderAttributes($transaction->getOrder());
         $mollieID = $orderAttributes->getMollieOrderId();
 

@@ -12,6 +12,5 @@ class In3Payment extends PaymentHandler
 
     public const PAYMENT_METHOD_DESCRIPTION = 'iDeal IN3';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

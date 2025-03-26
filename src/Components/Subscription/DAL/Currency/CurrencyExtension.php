@@ -26,5 +26,4 @@ class CurrencyExtension extends EntityExtension
     {
         return CurrencyDefinition::ENTITY_NAME;
     }
-
 }

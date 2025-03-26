@@ -19,7 +19,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
     private $settingsService;
 
     /**
-     * @var StorefrontPluginRegistryInterface|StorefrontPluginRegistry
+     * @var StorefrontPluginRegistry|StorefrontPluginRegistryInterface
      */
     private $pluginRegistry;
 
@@ -28,6 +28,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $versionCompare;
 
+    /** @param StorefrontPluginRegistry|StorefrontPluginRegistryInterface $pluginRegistry */
     public function __construct(SettingsService $settingsService, $pluginRegistry, VersionCompare $versionCompare)
     {
         $this->settingsService = $settingsService;
@@ -49,7 +50,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
-        $useJsValue = (int) $settings->isUseShopwareJavascript();
+        $useJsValue = (int)$settings->isUseShopwareJavascript();
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
 
         $mollieJavascriptAlreadyExists = false;

@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -25,8 +24,8 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
         $customerService->expects($this->never())->method('setCardToken');
 
         $this->paymentHandler = new CreditCardPayment(
-            $this->loggerService,
-            new FakeContainer(),
+            $this->payAction,
+            $this->finalizeAction,
             $customerService
         );
 
@@ -79,8 +78,8 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
         $customerService->expects($this->once())->method('setCardToken');
 
         $this->paymentHandler = new CreditCardPayment(
-            $this->loggerService,
-            new FakeContainer(),
+            $this->payAction,
+            $this->finalizeAction,
             $customerService
         );
 

@@ -14,7 +14,6 @@ class KlarnaOnePayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::KLARNA_ONE;
     public const PAYMENT_METHOD_DESCRIPTION = 'Klarna';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

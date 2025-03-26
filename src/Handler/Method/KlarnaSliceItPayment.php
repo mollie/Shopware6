@@ -14,7 +14,6 @@ class KlarnaSliceItPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::KLARNA_SLICE_IT;
     public const PAYMENT_METHOD_DESCRIPTION = 'Slice it.';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

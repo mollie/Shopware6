@@ -13,7 +13,6 @@ class BlikPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = 'blik';
     public const PAYMENT_METHOD_DESCRIPTION = 'Blik';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

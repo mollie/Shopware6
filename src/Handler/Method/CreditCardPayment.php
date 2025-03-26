@@ -9,8 +9,6 @@ use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -20,7 +18,6 @@ class CreditCardPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::CREDITCARD;
     public const PAYMENT_METHOD_DESCRIPTION = 'Card';
     protected const FIELD_CREDIT_CARD_TOKEN = 'cardToken';
-
 
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
@@ -33,7 +30,6 @@ class CreditCardPayment extends PaymentHandler
         parent::__construct($payAction, $finalizeAction);
         $this->customerService = $customerService;
     }
-
 
     /**
      * @param array<mixed> $orderData

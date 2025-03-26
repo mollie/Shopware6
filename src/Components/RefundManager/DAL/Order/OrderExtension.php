@@ -28,5 +28,4 @@ class OrderExtension extends EntityExtension
     {
         return OrderDefinition::ENTITY_NAME;
     }
-
 }

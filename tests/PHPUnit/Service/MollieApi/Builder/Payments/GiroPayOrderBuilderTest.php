@@ -6,7 +6,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -21,8 +20,8 @@ class GiroPayOrderBuilderTest extends AbstractMollieOrderBuilder
         $paymentMethod = PaymentMethod::GIROPAY;
 
         $this->paymentHandler = new GiroPayPayment(
-            $this->loggerService,
-            new FakeContainer()
+            $this->payAction,
+            $this->finalizeAction
         );
 
         $transactionId = Uuid::randomHex();

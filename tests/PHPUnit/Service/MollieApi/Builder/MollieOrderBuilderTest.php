@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -41,7 +40,7 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
             '123',
             'paypal',
             $this->salesChannelContext,
-            new PayPalPayment($this->loggerService, new FakeContainer()),
+            new PayPalPayment($this->payAction, $this->finalizeAction),
             []
         );
 

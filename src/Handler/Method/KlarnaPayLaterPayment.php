@@ -14,7 +14,6 @@ class KlarnaPayLaterPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::KLARNA_PAY_LATER;
     public const PAYMENT_METHOD_DESCRIPTION = 'Pay later.';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**

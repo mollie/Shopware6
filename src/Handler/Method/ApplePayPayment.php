@@ -14,7 +14,6 @@ class ApplePayPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::APPLEPAY;
     public const PAYMENT_METHOD_DESCRIPTION = 'Apple Pay';
 
-
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /** @var string */

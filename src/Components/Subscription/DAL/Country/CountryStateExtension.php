@@ -26,5 +26,4 @@ class CountryStateExtension extends EntityExtension
     {
         return CountryStateDefinition::ENTITY_NAME;
     }
-
 }
