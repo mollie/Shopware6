@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionService;
+use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
@@ -19,28 +20,31 @@ final class PayAction
     private LoggerInterface $logger;
     private MolliePaymentDoPay $payFacade;
     private TransactionTransitionService $transactionTransitionService;
+    private TransactionConverterInterface $transactionConverter;
 
-    public function __construct(MolliePaymentDoPay $payFacade, TransactionTransitionService $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(MolliePaymentDoPay $payFacade, TransactionConverterInterface $transactionConverter, TransactionTransitionService $transactionTransitionService, LoggerInterface $logger)
     {
         $this->payFacade = $payFacade;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->logger = $logger;
+        $this->transactionConverter = $transactionConverter;
     }
 
     /** @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction */
     public function pay(PaymentHandler $paymentHandler, $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
-        $this->logger->info(
-            'Starting Checkout for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $paymentHandler->getPaymentMethod(),
-            [
-                'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
-                'cart' => [
-                    'amount' => $transaction->getOrder()->getAmountTotal(),
-                ],
-            ]
-        );
-
         try {
+            $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
+            $this->logger->info(
+                'Starting Checkout for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $paymentHandler->getPaymentMethod(),
+                [
+                    'saleschannel' => $salesChannelContext->getSalesChannel()->getName(),
+                    'cart' => [
+                        'amount' => $transaction->getOrder()->getAmountTotal(),
+                    ],
+                ]
+            );
+
             $paymentData = $this->payFacade->startMolliePayment(
                 $paymentHandler->getPaymentMethod(),
                 $transaction,
