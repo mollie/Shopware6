@@ -72,8 +72,11 @@ class Migration1725347559MollieTags extends MigrationStep
             ->where('id = :id')
             ->setParameter('id', Uuid::fromHexToBytes($id))
         ;
-
-        $result = $qb->executeQuery();
+        if (method_exists($qb, 'execute')) {
+            $result = $qb->execute();
+        } else {
+            $result = $qb->executeQuery();
+        }
 
         if ($result instanceof Result) {
             return $result->rowCount() > 0;
