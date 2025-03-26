@@ -1,6 +1,6 @@
-import HttpClient from './http-client';
+import HttpClientService from './http-client.service';
 
-export default class ApplePaySessionFactory {
+export default class ApplePaySessionFactoryService {
     /**
      *
      * @type {number}
@@ -8,7 +8,7 @@ export default class ApplePaySessionFactory {
     APPLE_PAY_VERSION = 3;
 
     constructor() {
-        this.client = new HttpClient();
+        this.client = new HttpClientService();
     }
 
     /**

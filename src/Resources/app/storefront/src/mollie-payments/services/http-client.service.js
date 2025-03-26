@@ -1,6 +1,6 @@
 const DEFAULT_CONTENT_TYPE = 'application/json';
 
-export default class HttpClient {
+export default class HttpClientService {
     /**
      * Request GET
      * @param {string} url
