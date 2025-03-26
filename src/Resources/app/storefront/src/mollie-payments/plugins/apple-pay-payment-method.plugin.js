@@ -5,6 +5,13 @@ const APPLE_PAY_INPUT_SELECTOR_NEW = '#paymentMethod';
 const PAYMENT_METHOD_SELECTOR = '.payment-method';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
+    static options = {
+        shopUrl: null,
+        hideAlways: false,
+        applePayId: null,
+        hideApplePayOption: false,
+    };
+
     /**
      *
      */
