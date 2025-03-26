@@ -50,7 +50,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
     {
         $settings = $this->settingsService->getSettings($event->getSalesChannelContext()->getSalesChannel()->getId());
 
-        $useJsValue = (int)$settings->isUseShopwareJavascript();
+        $useJsValue = (int) $settings->isUseShopwareJavascript();
         $event->setParameter('mollie_javascript_use_shopware', $useJsValue);
 
         $mollieJavascriptAlreadyExists = false;
