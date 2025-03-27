@@ -16,6 +16,7 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
+use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
@@ -86,6 +87,7 @@ class CustomerService implements CustomerServiceInterface
 
     /** @var EntityRepository */
     private $customerAddressRepository;
+    private AbstractRegisterRoute $registerRoute;
 
     public function __construct(
         EntityRepository $countryRepository,
@@ -99,10 +101,11 @@ class CustomerService implements CustomerServiceInterface
         SettingsService $settingsService,
         string $shopwareVersion,
         ConfigService $configService,
-        ContainerInterface $container // we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
+        AbstractRegisterRoute $registerRoute
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
+        $this->customerAddressRepository = $customerAddressRepository;
         $this->customerApiService = $customerApiService;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
@@ -111,8 +114,8 @@ class CustomerService implements CustomerServiceInterface
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
         $this->configService = $configService;
-        $this->customerAddressRepository = $customerAddressRepository;
-        $this->container = $container;
+
+        $this->registerRoute = $registerRoute;
     }
 
     /**
@@ -698,9 +701,7 @@ class CustomerService implements CustomerServiceInterface
         }
 
         try {
-            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
-
-            return $abstractRegisterRoute->register($data, $context, false)->getCustomer();
+            return $this->registerRoute->register($data, $context, false)->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
             /* we have to store the errors in an array because getErrors returns a generator */

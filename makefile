@@ -4,13 +4,13 @@
 
 .PHONY: help
 .DEFAULT_GOAL := help
-
-PLUGIN_VERSION=`php -r 'echo json_decode(file_get_contents("MolliePayments/composer.json"))->version;'`
+PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
 NODE_VERSION:=$(shell node -v)
-SW_VERSION := 6.4.5.0
+SW_VERSION := $(shell php -r 'echo json_decode(file_get_contents("/var/www/html/vendor/shopware/core/composer.json"))->version;')
 # split by dot and use 2nd word and append it to "6."
 SW_MAJVER:=6.$(word 2, $(subst ., ,$(SW_VERSION)))
+
 
 
 help:
@@ -67,7 +67,11 @@ clean: ##1 Cleans all dependencies and files
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
+ifeq ("$(SW_MAJVER)", "6.4")
+	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
+else
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+endif
 	# -----------------------------------------------------
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console --no-debug theme:refresh
