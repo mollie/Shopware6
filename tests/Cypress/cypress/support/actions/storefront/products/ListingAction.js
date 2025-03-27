@@ -20,7 +20,7 @@ export default class ListingAction {
 
         const repo = new ListingRepository();
 
-        repo.getNthProduct(n).click({force:true});
+        repo.getNthProduct(n).click();
     }
 
 }

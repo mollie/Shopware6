@@ -47,6 +47,15 @@ export default class PaymentAction {
      * @version All Shopware versions.
      */
     switchPaymentMethod(paymentName) {
+        if (shopware.isVersionGreaterEqual(6.7)) {
+            this.selectPaymentMethod(paymentName);
+
+
+            if (paymentName === 'POS Terminal') {
+                this.selectPosTerminal();
+            }
+            return;
+        }
         if (shopware.isVersionGreaterEqual(6.4)) {
             // this version has all payment methods
             // directly on the confirm page.
@@ -54,23 +63,23 @@ export default class PaymentAction {
             // to see all payment methods
             this.showAllPaymentMethods();
             this.selectPaymentMethod(paymentName);
-            
-
-            if (paymentName === 'POS Terminal') {
-                this.selectPosTerminal();
-            }
-
-        } else {
-            this.openPaymentsModal();
-            this.selectPaymentMethod(paymentName);
 
 
             if (paymentName === 'POS Terminal') {
                 this.selectPosTerminal();
             }
-
-            this.closePaymentsModal();
+            return;
         }
+        this.openPaymentsModal();
+        this.selectPaymentMethod(paymentName);
+
+
+        if (paymentName === 'POS Terminal') {
+            this.selectPosTerminal();
+        }
+
+        this.closePaymentsModal();
+
     }
 
     /**

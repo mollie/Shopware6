@@ -14,7 +14,7 @@ export default class ListingRepository {
      * @returns {*}
      */
     getNthProduct(n) {
-        return cy.get(':nth-child(' + n + ') > .card > .card-body > .product-image-wrapper');
+        return cy.get(':nth-child(' + n + ') > .card > .card-body > .product-info > a');
     }
 
     /**
