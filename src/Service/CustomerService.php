@@ -389,8 +389,7 @@ class CustomerService implements CustomerServiceInterface
         $data->set('billingAddress', $billingAddress);
 
         try {
-            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
-            $response = $abstractRegisterRoute->register($data, $context, false);
+            $response = $this->registerRoute->register($data, $context, false);
 
             return $response->getCustomer();
         } catch (ConstraintViolationException $e) {
