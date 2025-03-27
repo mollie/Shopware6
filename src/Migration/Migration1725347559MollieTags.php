@@ -39,10 +39,9 @@ class Migration1725347559MollieTags extends MigrationStep
 
     private function createTag(
         Connection $connection,
-        string     $id,
-        string     $name
-    ): void
-    {
+        string $id,
+        string $name
+    ): void {
         // migration must be able to run multiple times in succession
         // with every install of the mollie plugin all migrations are run
         // since tags don't count as plugin data, they're not purged and they must not be created again
@@ -62,12 +61,11 @@ class Migration1725347559MollieTags extends MigrationStep
         $stmt->bindValue(':name', $name);
         $stmt->bindValue(':created_at', (new \DateTime())->format('Y-m-d H:i:s'));
         $stmt->bindValue(':updated_at', null);
-        if (method_exists($stmt, 'execute')) {
-            $stmt->execute();
-        } else {
+        if (method_exists($stmt, 'executeStatement')) {
             $stmt->executeStatement();
+        } else {
+            $stmt->execute();
         }
-      
     }
 
     private function tagExists(Connection $connection, string $id): bool
@@ -76,7 +74,8 @@ class Migration1725347559MollieTags extends MigrationStep
         $qb->select('id')
             ->from('tag')
             ->where('id = :id')
-            ->setParameter('id', Uuid::fromHexToBytes($id));
+            ->setParameter('id', Uuid::fromHexToBytes($id))
+        ;
         if (method_exists($qb, 'execute')) {
             $result = $qb->execute();
         } else {
