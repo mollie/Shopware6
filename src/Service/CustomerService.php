@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressDefinition;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
@@ -80,11 +79,6 @@ class CustomerService implements CustomerServiceInterface
     /** @var string */
     private $shopwareVersion;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
     /** @var EntityRepository */
     private $customerAddressRepository;
     private AbstractRegisterRoute $registerRoute;
@@ -114,7 +108,6 @@ class CustomerService implements CustomerServiceInterface
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
         $this->configService = $configService;
-
         $this->registerRoute = $registerRoute;
     }
 
