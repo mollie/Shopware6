@@ -27,7 +27,7 @@
         {% if applePayVisible %}
             {% block component_product_box_action_buy_apple_direct_component %}
                 <div class="mt-2 only-support-apple-pay js-apple-pay-container mollie-apple-pay-direct-listing d-none">
-                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.html.twig' %}
                 </div>
             {% endblock %}
         {% endif %}
@@ -37,7 +37,7 @@
         {% if paypalExpressVisible %}
             {% block component_product_box_action_buy_paypal_express_component %}
                 <div class="mt-2 mollie-paypal-express-plp">
-                    {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.html.twig' %}
                 </div>
             {% endblock %}
         {% endif %}
