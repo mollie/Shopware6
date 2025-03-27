@@ -5,7 +5,7 @@ export default class ListingRepository {
      * @returns {*}
      */
     getFirstProduct() {
-        return cy.get(':nth-child(1) > .card > .card-body > .product-image-wrapper');
+        return cy.get(':nth-child(1) > .card > .card-body > .product-info > a');
     }
 
     /**

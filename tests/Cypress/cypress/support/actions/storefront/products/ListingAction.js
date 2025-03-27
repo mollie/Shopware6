@@ -9,7 +9,7 @@ export default class ListingAction {
 
         const repo = new ListingRepository();
 
-        repo.getFirstProduct().click({force:true});
+        repo.getFirstProduct().click();
     }
 
     /**

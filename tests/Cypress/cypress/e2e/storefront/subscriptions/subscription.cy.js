@@ -440,7 +440,9 @@ function purchaseSubscriptionAndGoToPayment() {
     // that some of them are not available
     // this is a check to at least see that it does something
     // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
-    if (shopware.isVersionGreaterEqual(6.4)) {
+    if(shopware.isVersionGreaterEqual(6.7)){
+
+    } else if (shopware.isVersionGreaterEqual(6.4)) {
         paymentAction.showAllPaymentMethods();
     } else {
         paymentAction.openPaymentsModal();
