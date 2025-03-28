@@ -8,20 +8,15 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class StoreTerminalResponse extends StoreApiResponse
 {
-    /**
-     * @var ArrayStruct<mixed, mixed>
-     */
-    protected $object;
-
     public function __construct(bool $success)
     {
-        $this->object = new ArrayStruct(
+        $object = new ArrayStruct(
             [
                 'success' => $success,
             ],
             'mollie_payments_pos_terminal_stored'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

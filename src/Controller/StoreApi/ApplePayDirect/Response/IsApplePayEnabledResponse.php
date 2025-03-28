@@ -8,18 +8,13 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class IsApplePayEnabledResponse extends StoreApiResponse
 {
-    /**
-     * @var EnabledStruct
-     */
-    protected $object;
-
     public function __construct(bool $isEnabled)
     {
-        $this->object = new EnabledStruct(
+        $object = new EnabledStruct(
             $isEnabled,
             'mollie_payments_applepay_direct_enabled'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

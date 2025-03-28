@@ -8,20 +8,15 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class SubscriptionResumeResponse extends StoreApiResponse
 {
-    /**
-     * @var ArrayStruct<mixed, mixed>
-     */
-    protected $object;
-
     public function __construct()
     {
-        $this->object = new ArrayStruct(
+        $object = new ArrayStruct(
             [
                 'success' => true,
             ],
             'mollie_payments_subscriptions_resume'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

@@ -8,11 +8,6 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class RevokeMandateResponse extends StoreApiResponse
 {
-    /**
-     * @var SuccessStruct
-     */
-    protected $object;
-
     public function __construct()
     {
         $this->object = new SuccessStruct(
@@ -20,6 +15,6 @@ class RevokeMandateResponse extends StoreApiResponse
             'mollie_payments_mandate_revoke'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }
