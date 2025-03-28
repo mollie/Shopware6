@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
-import versionCompare from '../../../src/core/service/utils/version-compare.utils';
-const versionCompare = new versionCompare();
+import VersionCompare from '../../../src/core/service/utils/version-compare.utils';
+const versionCompare = new VersionCompare();
 test('Equals works', () => {
     let result;
    
