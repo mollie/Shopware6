@@ -67,9 +67,10 @@ clean: ##1 Cleans all dependencies and files
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
-ifeq ("$(SW_MAJVER)", "6.4")
+ifeq ($(nossl), true)
 	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
-else
+endif
+ifndef nossl
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 endif
 	# -----------------------------------------------------
