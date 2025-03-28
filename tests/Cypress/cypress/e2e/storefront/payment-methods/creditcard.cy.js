@@ -76,11 +76,7 @@ describe('Credit Card Components', () => {
 
             payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
 
-            // we are still in our modal, so we
-            // have to close it in older versions
-            if (shopware.isVersionLower(6.4)) {
-                payment.closePaymentsModal();
-            }
+            payment.closePaymentsModal();
 
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
@@ -242,24 +238,12 @@ describe('Credit Card Components', () => {
 
             cy.url().should('include', '/account/order/edit');
             cy.contains('Complete payment');
+            payment.showPaymentMethods();
+            payment.selectPaymentMethod('Card');
 
-            if (shopware.isVersionGreaterEqual(6.4)) {
 
-                payment.showAllPaymentMethods();
-                payment.selectPaymentMethod('Card');
-                payment.showAllPaymentMethods();
-
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-            } else {
-
-                payment.openPaymentsModal();
-                payment.selectPaymentMethod('Card');
-
-                payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
-
-                payment.closePaymentsModal();
-            }
+            payment.fillCreditCardComponents('Mollie Tester', validCardNumber, '1228', '1234');
+            payment.closePaymentsModal();
 
             shopware.prepareDomainChange();
 
@@ -387,16 +371,9 @@ function setUp() {
     // this is a bug, so we just switch to another payment
     // before switching back to credit card
     payment.switchPaymentMethod('PayPal');
+    payment.showPaymentMethods();
+    payment.switchPaymentMethod('Card');
 
-    if (shopware.isVersionGreaterEqual(6.4)) {
-        payment.switchPaymentMethod('Card');
-    } else {
-        payment.openPaymentsModal();
-        // only select the card, and do not switch completely
-        // we still need our modal, to add our components data
-        // before closing it.
-        payment.selectPaymentMethod('Card');
-    }
 }
 
 /**

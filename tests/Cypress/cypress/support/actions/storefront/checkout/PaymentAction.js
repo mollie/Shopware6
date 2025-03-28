@@ -59,7 +59,7 @@ export default class PaymentAction {
      * @version All Shopware versions.
      */
     switchPaymentMethod(paymentName) {
-        this.showAllPaymentMethods();
+        this.showPaymentMethods();
         this.selectPaymentMethod(paymentName);
 
         if (paymentName === 'POS Terminal') {
