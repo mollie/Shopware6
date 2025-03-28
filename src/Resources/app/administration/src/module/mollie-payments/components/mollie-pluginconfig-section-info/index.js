@@ -1,7 +1,6 @@
 import template from './mollie-pluginconfig-section-info.html.twig';
 import './mollie-pluginconfig-section-info.scss';
-
-const VersionCompare = require('../../../../core/service/utils/version-compare.utils').default;
+import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
 // eslint-disable-next-line no-undef
 const { Component, Context, Mixin } = Shopware;
