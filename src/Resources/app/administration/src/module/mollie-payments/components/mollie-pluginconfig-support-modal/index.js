@@ -49,7 +49,7 @@ Component.register('mollie-pluginconfig-support-modal', {
     computed: {
         isLoading() {
             if (this.shopwareExtensionService) {
-                return State.get('shopwareExtensions').myExtensions.loading;
+                return this.getShopwareExtensions().loading;
             }
 
             return this.isLoadingPlugins;
@@ -87,11 +87,12 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         user() {
-            if (this.versionCompare.greaterOrEqual(Context.app.config.version, '6.7')) {
-                return Shopware.Store.get('session').currentUser;
-            }
             // eslint-disable-next-line no-undef
-            return Shopware.State.get('session').currentUser;
+            let session = Shopware.State.get('session');
+            if(session === undefined){
+                session = Shopware.Store.get('session')
+            }
+            return session.currentUser;
         },
 
         userName() {
@@ -111,10 +112,13 @@ Component.register('mollie-pluginconfig-support-modal', {
         plugins() {
             // If this is not null, we're in Shopware 6.4 and using the new extension service
             if (this.shopwareExtensionService) {
-                return State.get('shopwareExtensions').myExtensions.data || [];
+                return this.getShopwareExtensions().data || [];
             }
-
-            return State.get('swPlugin').plugins || [];
+            let swPlugin = Shopware.State.get('swPlugin');
+            if(swPlugin === undefined){
+                swPlugin = Shopware.Store.get('swPlugin');
+            }
+            return swPlugin.plugins || [];
         },
 
         molliePlugin() {
@@ -148,7 +152,13 @@ Component.register('mollie-pluginconfig-support-modal', {
                 }
             }
         },
-
+        getShopwareExtensions(){
+            let myExtensions = Shopware.State.get('shopwareExtensions');
+            if(myExtensions === undefined){
+                myExtensions = Shopware.Store.get('shopwareExtensions')
+            }
+            return myExtensions.myExtensions;
+        },
         determineDefaultSupportDesk() {
             this.recipientLocale = this.recipientOptions.some((option) => option.value === this.locale)
                 ? this.locale

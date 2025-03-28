@@ -46,7 +46,7 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            cy.get('.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments > .sw-container > .sw-button').click();
+            cy.get('.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments > .sw-container > button').click();
 
             cy.contains('The payment methods are successfully updated.');
         })
@@ -68,7 +68,7 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            cy.get('.col-right > button.sw-button.mollie-support-action', {timeout: 10000}).click();
+            cy.get('.col-right > button.mollie-support-action', {timeout: 10000}).click();
 
             // we have to see our modal popup
             cy.contains('Request support from Mollie');
