@@ -10,7 +10,7 @@ class RevokeMandateResponse extends StoreApiResponse
 {
     public function __construct()
     {
-        $this->object = new SuccessStruct(
+        $object = new SuccessStruct(
             true,
             'mollie_payments_mandate_revoke'
         );
