@@ -1,15 +1,11 @@
 #
 # Makefile
 #
-
 .PHONY: help
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
 NODE_VERSION:=$(shell node -v)
-SW_VERSION := $(shell php -r 'echo json_decode(file_get_contents("/var/www/html/vendor/shopware/core/composer.json"))->version;')
-# split by dot and use 2nd word and append it to "6."
-SW_MAJVER:=6.$(word 2, $(subst ., ,$(SW_VERSION)))
 
 
 
