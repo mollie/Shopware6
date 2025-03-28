@@ -42,7 +42,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                     value: 'de-DE',
                 },
             ],
-            versionCompare:null
+            versionCompare:null,
         };
     },
 
@@ -87,7 +87,11 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         user() {
-            return State.get('session').currentUser;
+            if (this.versionCompare.greaterOrEqual(Context.app.config.version, '6.7')) {
+                return Shopware.Store.get('session').currentUser;
+            }
+            // eslint-disable-next-line no-undef
+            return Shopware.State.get('session').currentUser;
         },
 
         userName() {
@@ -126,7 +130,7 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
     },
     created(){
-      this.versionCompare = new VersionCompare();
+        this.versionCompare = new VersionCompare();
     },
     mounted() {
         this.mountedComponent();
