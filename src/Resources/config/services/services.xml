@@ -139,7 +139,7 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Voucher\VoucherService">
+        <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
             <argument type="service" id="product.repository"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
@@ -151,7 +151,7 @@
 
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">
-            <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <!-- // inject after product collector(5000) -->
             <tag name="shopware.cart.collector" priority="2000"/>
