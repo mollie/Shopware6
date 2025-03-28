@@ -42,6 +42,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                     value: 'de-DE',
                 },
             ],
+            versionCompare:null
         };
     },
 
@@ -117,14 +118,16 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         mollieVersion() {
-            return this.molliePlugin ? VersionCompare.getHumanReadableVersion(this.molliePlugin.version) : '';
+            return this.molliePlugin ? this.versionCompare.getHumanReadableVersion(this.molliePlugin.version) : '';
         },
 
         shopwareVersion() {
-            return VersionCompare.getHumanReadableVersion(Context.app.config.version);
+            return this.versionCompare.getHumanReadableVersion(Context.app.config.version);
         },
     },
-
+    created(){
+      this.versionCompare = new VersionCompare();
+    },
     mounted() {
         this.mountedComponent();
     },

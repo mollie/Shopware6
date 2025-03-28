@@ -13,13 +13,16 @@ Component.register('mollie-pluginconfig-section-info', {
     data() {
         return {
             isSupportOpen: false,
+            versionCompare:null
         };
     },
 
     shortcuts: {
         'SYSTEMKEY+i': 'openConfigImport',
     },
-
+    created() {
+        this.versionCompare = new VersionCompare();
+    },
     computed: {
         /**
          * @returns {string|*}
@@ -40,7 +43,7 @@ Component.register('mollie-pluginconfig-section-info', {
         },
 
         hasSalesChannelList() {
-            return VersionCompare.greaterOrEqual(Context.app.config.version, '6.4.2');
+            return this.versionCompare.greaterOrEqual(Context.app.config.version, '6.4.2');
         },
     },
 
