@@ -93,7 +93,9 @@ export default class MollieCreditCardMandate extends Plugin {
     onMandateInputChange(mandateValue) {
         if (mandateValue === this.options.newCardMandateOption) {
             this.mollieCreditCarfFormEl.classList.remove(DISPLAY_NONE_CLS);
-        } else {
+            return;
+        }
+        if (mandateValue !== null) {
             this.mollieCreditCarfFormEl.classList.add(DISPLAY_NONE_CLS);
         }
     }

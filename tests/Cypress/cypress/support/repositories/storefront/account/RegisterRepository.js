@@ -6,7 +6,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getAccountType() {
-        return cy.get('#accountType');
+        return cy.get('#accountType,[name="accountType"]');
     }
 
     /**
@@ -22,7 +22,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getFirstname() {
-        return cy.get('#personalFirstName');
+        return cy.get('#personalFirstName,[name="billingAddress[firstName]"]');
     }
 
     /**
@@ -30,7 +30,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getLastname() {
-        return cy.get('#personalLastName');
+        return cy.get('#personalLastName,[name="billingAddress[lastName]"]');
     }
 
     /**
@@ -38,7 +38,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getCompany() {
-        return cy.get('#billingAddresscompany');
+        return cy.get('#billingAddresscompany,[name="billingAddress[company]"]');
     }
 
     /**
@@ -62,7 +62,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getStreet() {
-        return cy.get('#billingAddressAddressStreet');
+        return cy.get('#billingAddressAddressStreet,[name="billingAddress[street]"]');
     }
 
     /**
@@ -70,7 +70,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getZipcode() {
-        return cy.get('#billingAddressAddressZipcode');
+        return cy.get('#billingAddressAddressZipcode,[name="billingAddress[zipcode]"]');
     }
 
     /**
@@ -78,7 +78,7 @@ export default class RegisterRepository {
      * @returns {*}
      */
     getCity() {
-        return cy.get('#billingAddressAddressCity');
+        return cy.get('#billingAddressAddressCity,[name="billingAddress[city]"]');
     }
 
     /**

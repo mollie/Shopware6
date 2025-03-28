@@ -20,7 +20,6 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Struct\MolliePaymentPrepareData;
@@ -28,10 +27,10 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Traits\StringTrait;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\OrderLine;
+use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Twig\Environment;
@@ -50,11 +49,6 @@ class MolliePaymentDoPay
      * @var MollieOrderBuilder
      */
     private $orderBuilder;
-
-    /**
-     * @var OrderService
-     */
-    private $orderService;
 
     /**
      * @var Order
@@ -95,11 +89,11 @@ class MolliePaymentDoPay
      */
     private $logger;
 
-    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, OrderService $orderService, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, Environment $twig, LoggerInterface $logger)
+    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, Environment $twig, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;
-        $this->orderService = $orderService;
+
         $this->mollieGateway = $orderApiService;
         $this->customerService = $customerService;
         $this->settingsService = $settingsService;
@@ -122,17 +116,17 @@ class MolliePaymentDoPay
      *
      * @throws ApiException
      */
-    public function startMolliePayment(string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler, RequestDataBag $dataBag): MolliePaymentPrepareData
+    public function startMolliePayment(string $paymentMethod, PaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler, RequestDataBag $dataBag): MolliePaymentPrepareData
     {
         $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannelId());
 
         // this is the current order transaction
         // of this payment attempt in Shopware
-        $swOrderTransactionID = $transactionStruct->getOrderTransaction()->getId();
+        $swOrderTransactionID = $transactionStruct->getOrderTransactionId();
 
         // get order with all needed associations
 
-        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
+        $order = $transactionStruct->getOrder();
 
         // build our custom fields
         // object for this order
@@ -324,7 +318,7 @@ class MolliePaymentDoPay
     /**
      * @throws ApiException|MollieOrderCancelledException|MollieOrderExpiredException
      */
-    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
+    private function handleNextPaymentAttempt(OrderEntity $order, string $swOrderTransactionID, OrderAttributes $orderCustomFields, string $mollieOrderId, string $paymentMethod, PaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentPrepareData
     {
         $this->logger->debug(
             'Start additional payment attempt for order: ' . $order->getOrderNumber(),
@@ -357,7 +351,7 @@ class MolliePaymentDoPay
         }
 
         if (empty($payment->getCheckoutUrl())) {
-            throw new PaymentUrlException($transactionStruct->getOrderTransaction()->getId(), "Couldn't get Mollie payment CheckoutURL for " . $payment->id);
+            throw new PaymentUrlException($transactionStruct->getOrderTransactionId(), "Couldn't get Mollie payment CheckoutURL for " . $payment->id);
         }
 
         // save custom fields because shopware return url could have changed
@@ -371,14 +365,14 @@ class MolliePaymentDoPay
     /**
      * @throws \Exception
      */
-    private function createMollieOrder(OrderEntity $orderEntity, string $paymentMethod, AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentData
+    private function createMollieOrder(OrderEntity $orderEntity, string $paymentMethod, PaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext, PaymentHandler $paymentHandler): MolliePaymentData
     {
         $salesChannelID = $orderEntity->getSalesChannelId();
 
         if ($paymentHandler instanceof PosPayment) {
             $params = $this->orderBuilder->buildPaymentsPayload(
                 $orderEntity,
-                $transactionStruct->getOrderTransaction()->getId(),
+                $transactionStruct->getOrderTransactionId(),
                 $paymentMethod,
                 $salesChannelContext,
                 $paymentHandler
@@ -405,7 +399,7 @@ class MolliePaymentDoPay
 
         $params = $this->orderBuilder->buildOrderPayload(
             $orderEntity,
-            $transactionStruct->getOrderTransaction()->getId(),
+            $transactionStruct->getOrderTransactionId(),
             $paymentMethod,
             $salesChannelContext,
             $paymentHandler

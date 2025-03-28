@@ -48,7 +48,7 @@
             <argument type="service" id="request_stack"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor"/>
             <argument type="service" id="monolog.logger.mollie"/>
 

@@ -9,20 +9,15 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class CreditCardMandatesResponse extends StoreApiResponse
 {
-    /**
-     * @var ArrayStruct<mixed, mixed>
-     */
-    protected $object;
-
     public function __construct(MandateCollection $mandates)
     {
-        $this->object = new ArrayStruct(
+        $object = new ArrayStruct(
             [
                 'mandates' => $mandates->jsonSerialize(),
             ],
             'mollie_payments_credit_card_mandates'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

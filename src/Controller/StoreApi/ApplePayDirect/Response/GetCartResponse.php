@@ -9,20 +9,15 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 class GetCartResponse extends StoreApiResponse
 {
     /**
-     * @var ApplePayCartStruct
-     */
-    protected $object;
-
-    /**
      * @param array<mixed> $formattedCart
      */
     public function __construct(array $formattedCart)
     {
-        $this->object = new ApplePayCartStruct(
+        $object = new ApplePayCartStruct(
             $formattedCart,
             'mollie_payments_applepay_direct_cart'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

@@ -22,4 +22,9 @@ class OrderLineItemExtension extends EntityExtension
     {
         $collection->add(new OneToManyAssociationField(self::ORDER_LINE_ITEM_PROPERTY_NAME, RefundItemDefinition::class, 'order_line_item_id'));
     }
+
+    public function getEntityName(): string
+    {
+        return OrderLineItemDefinition::ENTITY_NAME;
+    }
 }

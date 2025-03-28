@@ -8,14 +8,9 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class ConfigResponse extends StoreApiResponse
 {
-    /**
-     * @var ArrayStruct<mixed, mixed>
-     */
-    protected $object;
-
     public function __construct(string $profileId, bool $isTestMode, string $defaultLocale, bool $oneClickEnabled)
     {
-        $this->object = new ArrayStruct(
+        $object = new ArrayStruct(
             [
                 'profileId' => $profileId,
                 'testMode' => $isTestMode,
@@ -25,6 +20,6 @@ class ConfigResponse extends StoreApiResponse
             'mollie_payments_config'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

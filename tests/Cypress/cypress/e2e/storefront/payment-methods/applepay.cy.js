@@ -48,12 +48,7 @@ context("Apple Pay", () => {
             applePayFactory.registerApplePay(true);
 
             scenarioDummyBasket.execute();
-
-            if (shopware.isVersionGreaterEqual(6.4)) {
-                paymentAction.showAllPaymentMethods();
-            } else {
-                paymentAction.openPaymentsModal();
-            }
+            paymentAction.showPaymentMethods();
 
             cy.wait(2000);
             cy.contains('Apple Pay').should('exist');
@@ -67,11 +62,7 @@ context("Apple Pay", () => {
 
             scenarioDummyBasket.execute();
 
-            if (shopware.isVersionGreaterEqual(6.4)) {
-                paymentAction.showAllPaymentMethods();
-            } else {
-                paymentAction.openPaymentsModal();
-            }
+           paymentAction.showPaymentMethods();
 
             cy.wait(2000);
             cy.contains('Apple Pay').should('not.exist');

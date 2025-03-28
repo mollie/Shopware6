@@ -5,27 +5,27 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Kiener\MolliePayments\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
+        <service id="Kiener\MolliePayments\Resources\snippet\en_GB\SnippetFile_en_GB" >
             <tag name="shopware.snippet.file"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Resources\snippet\de_DE\SnippetFile_de_DE" public="true">
+        <service id="Kiener\MolliePayments\Resources\snippet\de_DE\SnippetFile_de_DE" >
             <tag name="shopware.snippet.file"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Resources\snippet\nl_NL\SnippetFile_nl_NL" public="true">
+        <service id="Kiener\MolliePayments\Resources\snippet\nl_NL\SnippetFile_nl_NL" >
             <tag name="shopware.snippet.file"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Resources\snippet\it_IT\SnippetFile_it_IT" public="true">
+        <service id="Kiener\MolliePayments\Resources\snippet\it_IT\SnippetFile_it_IT" >
             <tag name="shopware.snippet.file"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Resources\snippet\pt_PT\SnippetFile_pt_PT" public="true">
+        <service id="Kiener\MolliePayments\Resources\snippet\pt_PT\SnippetFile_pt_PT" >
             <tag name="shopware.snippet.file"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Resources\snippet\es_ES\SnippetFile_es_ES" public="true">
+        <service id="Kiener\MolliePayments\Resources\snippet\es_ES\SnippetFile_es_ES" >
             <tag name="shopware.snippet.file"/>
         </service>
     </services>

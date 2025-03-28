@@ -8,18 +8,13 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class RestoreCartResponse extends StoreApiResponse
 {
-    /**
-     * @var SuccessStruct
-     */
-    protected $object;
-
     public function __construct(bool $success)
     {
-        $this->object = new SuccessStruct(
+        $object = new SuccessStruct(
             $success,
             'mollie_payments_applepay_direct_cart_restored'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }
