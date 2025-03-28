@@ -134,9 +134,15 @@ Component.override('sw-order-line-items-grid', {
 
             // hook into our shipping events
             // we close our modals if shipping happened
-            this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
-                this.onCloseShipOrderModal();
-            });
+            if (this.$root && this.$root.$on) {
+                this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
+                    this.onCloseShipOrderModal();
+                });
+            } else {
+                Shopware.Utils.EventBus.on(MollieShippingEvents.EventShippedOrder, () => {
+                    this.onCloseShipOrderModal();
+                });
+            }
 
             this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
             this.shippingManagerService = new MollieShipping(this.MolliePaymentsShippingService);
