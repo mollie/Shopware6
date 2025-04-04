@@ -28,5 +28,10 @@
         <service id="Kiener\MolliePayments\Resources\snippet\es_ES\SnippetFile_es_ES" public="true">
             <tag name="shopware.snippet.file"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\se_SV\SnippetFile_sv_SE">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
     </services>
 </container>

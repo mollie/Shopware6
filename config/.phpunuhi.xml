@@ -15,6 +15,7 @@
                 <locale name="it-IT">./../src/Resources/app/administration/src/snippet/it-IT.json</locale>
                 <locale name="pt-PT">./../src/Resources/app/administration/src/snippet/pt-PT.json</locale>
                 <locale name="es-ES">./../src/Resources/app/administration/src/snippet/es-ES.json</locale>
+                <locale name="sv-SE">./../src/Resources/app/administration/src/snippet/sv-SE.json</locale>
             </locales>
         </set>
 
@@ -33,9 +34,10 @@
                 <locale name="it-IT">./../src/Resources/snippet/it_IT/mollie-payments.it-IT.json</locale>
                 <locale name="pt-PT">./../src/Resources/snippet/pt_PT/mollie-payments.pt-PT.json</locale>
                 <locale name="es-ES">./../src/Resources/snippet/es_ES/mollie-payments.es-ES.json</locale>
+                <locale name="sv-SE">./../src/Resources/snippet/sv_SE/mollie-payments.sv-SE.json</locale>
             </locales>
         </set>
-    <!--
+
         <set name="plugin-settings">
             <rules>
                 <emptyContent>
@@ -45,7 +47,7 @@
                 </emptyContent>
             </rules>
             <format>
-                <shopware6 type="config" file="src/Resources/config/config.xml"/>
+                <shopware6 type="config" file="../src/Resources/config/config.xml"/>
             </format>
             <locales>
                 <locale name="en-GB" base="true"></locale>
@@ -54,9 +56,10 @@
                 <locale name="it-IT"></locale>
                 <locale name="pt-PT"></locale>
                 <locale name="es-ES"></locale>
+                <locale name="sv-SE"></locale>
             </locales>
         </set>
-    -->
+
     </translations>
 
 </phpunuhi>
