@@ -17,10 +17,9 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay" public="true">
+        <service id="Kiener\MolliePayments\Facade\MolliePaymentDoPay">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
@@ -31,7 +30,7 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Facade\MolliePaymentFinalize" public="true">
+        <service id="Kiener\MolliePayments\Facade\MolliePaymentFinalize">
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

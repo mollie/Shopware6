@@ -45,7 +45,7 @@ export default class ShopConfigurationAction {
 
         // assign all payment methods to
         // all available sales channels
-        this.apiClient.get('/sales-channel').then(channels => {
+        return this.apiClient.get('/sales-channel').then(channels => {
 
             if (channels === undefined || channels === null) {
                 throw new Error('Attention, No Sales Channels found trough Shopware API');
@@ -63,10 +63,13 @@ export default class ShopConfigurationAction {
                 systemConfigData[channel.id] = mollieConfig;
             });
 
-            this.apiClient.post('/_action/system-config/batch', systemConfigData);
+            this.apiClient.post('/_action/system-config/batch', systemConfigData).then(()=>{
+                this._clearCache();
+            });
+
         });
 
-        this._clearCache();
+
     }
 
     /**

@@ -8,14 +8,9 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class GetIDResponse extends StoreApiResponse
 {
-    /**
-     * @var ArrayStruct<mixed, mixed>
-     */
-    protected $object;
-
     public function __construct(bool $success, string $id)
     {
-        $this->object = new ArrayStruct(
+        $object = new ArrayStruct(
             [
                 'success' => $success,
                 'id' => $id,
@@ -23,6 +18,6 @@ class GetIDResponse extends StoreApiResponse
             'mollie_payments_applepay_direct_id'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

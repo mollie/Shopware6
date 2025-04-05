@@ -24,6 +24,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
@@ -32,7 +33,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -406,7 +406,7 @@ class ApplePayDirect
 
         // generate the finish URL for our shopware page.
         // This is required, because we will immediately bring the user to this page.
-        $asyncPaymentTransition = new AsyncPaymentTransactionStruct($transaction, $order, $shopwareReturnUrl);
+        $asyncPaymentTransition = new PaymentTransactionStruct($transaction->getId(), $shopwareReturnUrl, $order, $transaction);
 
         // now set the Apple Pay payment token for our payment handler.
         // This is required for a smooth checkout with our already validated Apple Pay transaction.

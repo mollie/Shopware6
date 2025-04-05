@@ -89,11 +89,7 @@ describe('Voucher Payments', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal();
-                }
+                paymentAction.showPaymentMethods();
 
                 cy.contains('.checkout-container', 'Voucher').should('not.exist');
 
@@ -106,11 +102,7 @@ describe('Voucher Payments', () => {
                 mollieSandbox.initSandboxCookie();
                 molliePayment.selectFailed();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal();
-                }
+                paymentAction.showPaymentMethods();
 
                 cy.contains('.checkout-container', 'Voucher').should('not.exist');
             })

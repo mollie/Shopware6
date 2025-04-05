@@ -2,9 +2,6 @@ import template from './sw-product-detail-mollie.html.twig';
 import './sw-product-detail-mollie.scss';
 
 // eslint-disable-next-line no-undef
-const { mapState, mapGetters } = Shopware.Component.getComponentHelper();
-
-// eslint-disable-next-line no-undef
 Shopware.Component.register('sw-product-detail-mollie', {
     template,
 
@@ -34,19 +31,57 @@ Shopware.Component.register('sw-product-detail-mollie', {
     },
 
     computed: {
-        ...mapState('swProductDetail', ['product', 'parentProduct']),
-
-        ...mapGetters('swProductDetail', ['isLoading']),
-
-        ...mapGetters('context', ['isSystemDefaultLanguage']),
-
-        ...mapState('context', {
-            languageId: (state) => state.api.languageId,
-            systemLanguageId: (state) => state.api.systemLanguageId,
-        }),
-
         productId() {
             return this.$route.params.id;
+        },
+
+        product() {
+            // eslint-disable-next-line no-undef
+            let product = Shopware.State.get('swProductDetail');
+            if (product === undefined) {
+                product = Shopware.Store.get('swProductDetail');
+            }
+            return product.product;
+        },
+
+        parentProduct() {
+            // eslint-disable-next-line no-undef
+            let product = Shopware.State.get('swProductDetail');
+            if (product === undefined) {
+                product = Shopware.Store.get('swProductDetail');
+            }
+            return product.parentProduct;
+        },
+
+        isLoading() {
+            // eslint-disable-next-line no-undef
+            let product = Shopware.State.get('swProductDetail');
+            if (product === undefined) {
+                product = Shopware.Store.get('swProductDetail');
+            }
+
+            return product.isLoading;
+        },
+
+        context() {
+            // eslint-disable-next-line no-undef
+            let context = Shopware.State.get('context');
+            if (context === undefined) {
+                context = Shopware.Store.get('context');
+            }
+            return context;
+        },
+
+        languageId() {
+            return this.context.languageId;
+        },
+
+        systemLanguageId() {
+            return this.context.systemLanguageId;
+        },
+
+        isSystemDefaultLanguage() {
+            return this.context.isSystemDefaultLanguage;
         },
 
         /**
@@ -95,12 +130,12 @@ Shopware.Component.register('sw-product-detail-mollie', {
         initFields() {
             if (this.product) {
                 if (!this.product.customFields) {
-                    this.$set(this.product, 'customFields', {});
+                    this.product.customFields = {};
                 }
             }
             if (this.parentProduct) {
                 if (!this.parentProduct.customFields) {
-                    this.$set(this.parentProduct, 'customFields', {});
+                    this.parentProduct.customFields = {};
                 }
             }
         },

@@ -16,15 +16,14 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
+use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MolliePaymentFinalize
 {
@@ -93,9 +92,9 @@ class MolliePaymentFinalize
     /**
      * @throws \Exception
      */
-    public function finalize(AsyncPaymentTransactionStruct $transactionStruct, SalesChannelContext $salesChannelContext): void
+    public function finalize(PaymentTransactionStruct $transactionStruct, Context $context, string $salesChannelId): void
     {
-        $order = $this->orderService->getOrder($transactionStruct->getOrder()->getId(), $salesChannelContext->getContext());
+        $order = $transactionStruct->getOrder();
 
         $customFields = $order->getCustomFields() ?? [];
         $customFieldsStruct = new OrderAttributes($order);
@@ -109,11 +108,11 @@ class MolliePaymentFinalize
 
         $mollieOrder = $this->mollieOrderService->getMollieOrder(
             $mollieOrderId,
-            $salesChannelContext->getSalesChannel()->getId(),
+            $salesChannelId,
             ['embed' => 'payments']
         );
 
-        $settings = $this->settingsService->getSettings($salesChannelContext->getSalesChannel()->getId());
+        $settings = $this->settingsService->getSettings($salesChannelId);
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
 
         // Attention
@@ -124,7 +123,7 @@ class MolliePaymentFinalize
             $order,
             $paymentStatus,
             $settings,
-            $salesChannelContext->getContext()
+            $context
         );
 
         $paymentMethod = $transactionStruct->getOrderTransaction()->getPaymentMethod();
@@ -153,21 +152,21 @@ class MolliePaymentFinalize
                 $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $mollieOrder->id);
 
                 // fire flow builder event
-                $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $salesChannelContext->getContext());
+                $this->fireFlowBuilderEvent(self::FLOWBUILDER_CANCELED, $order, $context);
 
                 throw PaymentException::customerCanceled($orderTransactionID, $message);
             }
             $message = sprintf('Payment for order %s (%s) failed. The Mollie payment status was not successful for this payment attempt.', $order->getOrderNumber(), $mollieOrder->id);
 
             // fire flow builder event
-            $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $salesChannelContext->getContext());
+            $this->fireFlowBuilderEvent(self::FLOWBUILDER_FAILED, $order, $context);
 
             throw PaymentException::asyncFinalizeInterrupted($orderTransactionID, $message);
         }
 
         // --------------------------------------------------------------------------------------------------------------------
 
-        $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $salesChannelContext->getContext());
+        $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $context);
 
         // now update the custom fields of the order
         // we want to have as much information as possible in the shopware order
@@ -176,8 +175,8 @@ class MolliePaymentFinalize
             $order,
             $mollieOrderId,
             '',
-            $transactionStruct->getOrderTransaction()->getId(),
-            $salesChannelContext->getContext()
+            $transactionStruct->getOrderTransactionId(),
+            $context
         );
 
         // --------------------------------------------------------------------------------------------------------------------
@@ -193,14 +192,14 @@ class MolliePaymentFinalize
                 $paymentDetails = new MolliePaymentDetails();
                 $lasMolliePayment = count($mollieOrder->payments()) - 1;
                 $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[$lasMolliePayment]);
-                $this->subscriptionManager->confirmSubscription($order, $mandateId, $salesChannelContext->getContext());
+                $this->subscriptionManager->confirmSubscription($order, $mandateId, $context);
             }
         }
 
         // --------------------------------------------------------------------------------------------------------------------
         // FLOW BUILDER
 
-        $this->fireFlowBuilderEvent(self::FLOWBUILDER_SUCCESS, $order, $salesChannelContext->getContext());
+        $this->fireFlowBuilderEvent(self::FLOWBUILDER_SUCCESS, $order, $context);
     }
 
     /**

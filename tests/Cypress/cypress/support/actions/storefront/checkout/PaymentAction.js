@@ -21,6 +21,9 @@ export default class PaymentAction {
      * @version Shopware < 6.4
      */
     closePaymentsModal() {
+        if (shopware.isVersionGreaterEqual(6.4)) {
+            return;
+        }
         // always force, because the save button
         // might not be visible with a larger payments list
         repoPayments.getSubmitButton().click({force: true});
@@ -41,36 +44,28 @@ export default class PaymentAction {
     selectPaymentMethod(paymentName) {
         cy.get('.payment-methods').contains(paymentName).click({force: true});
     }
-
+    showPaymentMethods(){
+        if (shopware.isVersionGreaterEqual(6.7)) {
+            return;
+        }
+        if (shopware.isVersionGreaterEqual(6.4)) {
+            this.showAllPaymentMethods();
+            return;
+        }
+        this.openPaymentsModal();
+    }
     /**
      * @param paymentName
      * @version All Shopware versions.
      */
     switchPaymentMethod(paymentName) {
-        if (shopware.isVersionGreaterEqual(6.4)) {
-            // this version has all payment methods
-            // directly on the confirm page.
-            // but we need to expand the whole list
-            // to see all payment methods
-            this.showAllPaymentMethods();
-            this.selectPaymentMethod(paymentName);
-            
+        this.showPaymentMethods();
+        this.selectPaymentMethod(paymentName);
 
-            if (paymentName === 'POS Terminal') {
-                this.selectPosTerminal();
-            }
-
-        } else {
-            this.openPaymentsModal();
-            this.selectPaymentMethod(paymentName);
-
-
-            if (paymentName === 'POS Terminal') {
-                this.selectPosTerminal();
-            }
-
-            this.closePaymentsModal();
+        if (paymentName === 'POS Terminal') {
+            this.selectPosTerminal();
         }
+        this.closePaymentsModal();
     }
 
     /**

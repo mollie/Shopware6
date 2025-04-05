@@ -35,11 +35,7 @@ context('Active Payment Methods', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal()
-                }
+                paymentAction.showPaymentMethods();
 
                 // yes we require test mode, but this is
                 // the only chance to see if the plugin is being used, because
@@ -64,11 +60,7 @@ context('Deprecated Payment Methods', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal()
-                }
+                paymentAction.showPaymentMethods();
 
                 cy.contains('ING Home').should('not.exist');
             })
@@ -81,11 +73,7 @@ context('Deprecated Payment Methods', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal()
-                }
+                paymentAction.showPaymentMethods();
 
                 cy.contains('SEPA Direct Deb').should('not.exist');
             })

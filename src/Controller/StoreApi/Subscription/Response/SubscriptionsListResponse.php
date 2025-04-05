@@ -9,22 +9,17 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 class SubscriptionsListResponse extends StoreApiResponse
 {
     /**
-     * @var ArrayStruct<mixed, mixed>
-     */
-    protected $object;
-
-    /**
      * @param array<mixed> $subscriptions
      */
     public function __construct(array $subscriptions)
     {
-        $this->object = new ArrayStruct(
+        $object = new ArrayStruct(
             [
                 'subscriptions' => $subscriptions,
             ],
             'mollie_payments_subscriptions_list'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

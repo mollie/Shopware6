@@ -44,11 +44,7 @@ describe('POS Terminals', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal();
-                }
+                paymentAction.showPaymentMethods();
 
                 paymentAction.selectPaymentMethod('POS Terminal');
                 paymentAction.selectPosTerminal();
@@ -60,11 +56,7 @@ describe('POS Terminals', () => {
 
                 scenarioDummyBasket.execute();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal();
-                }
+                paymentAction.showPaymentMethods();
 
                 paymentAction.selectPaymentMethod('POS Terminal');
                 paymentAction.selectPosTerminal();
