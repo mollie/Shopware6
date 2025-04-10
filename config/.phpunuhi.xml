@@ -17,6 +17,7 @@
                 <locale name="es-ES">./../src/Resources/app/administration/src/snippet/es-ES.json</locale>
                 <locale name="sv-SE">./../src/Resources/app/administration/src/snippet/sv-SE.json</locale>
                 <locale name="nb-NO">./../src/Resources/app/administration/src/snippet/nb-NO.json</locale>
+                <locale name="pl-PL">./../src/Resources/app/administration/src/snippet/pl-PL.json</locale>
             </locales>
         </set>
 
@@ -37,6 +38,7 @@
                 <locale name="es-ES">./../src/Resources/snippet/es_ES/mollie-payments.es-ES.json</locale>
                 <locale name="sv-SE">./../src/Resources/snippet/sv_SE/mollie-payments.sv-SE.json</locale>
                 <locale name="nb-NO">./../src/Resources/snippet/nb_NO/mollie-payments.nb-NO.json</locale>
+                <locale name="pl-PL">./../src/Resources/snippet/pl_PL/mollie-payments.pl-PL.json</locale>
             </locales>
         </set>
 
@@ -60,6 +62,7 @@
                 <locale name="es-ES"></locale>
                 <locale name="sv-SE"></locale>
                 <locale name="nb-NO"></locale>
+                <locale name="pl-PL"></locale>
             </locales>
         </set>
 
