@@ -32,6 +32,7 @@ import itIT from './snippet/it-IT';
 import ptPT from './snippet/pt-PT';
 import esES from './snippet/es-ES';
 import svSE from './snippet/sv-SE';
+import nbNO from './snippet/nb-NO';
 
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('de-DE', deDE);
@@ -47,3 +48,5 @@ Shopware.Locale.extend('pt-PT', ptPT);
 Shopware.Locale.extend('es-ES', esES);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('sv-SE', svSE);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('nb-NO', nbNO);

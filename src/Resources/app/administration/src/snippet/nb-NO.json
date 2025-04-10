@@ -1,0 +1,505 @@
+{
+  "global": {
+    "entities": {
+      "mollie_subscription": "Mollie-abonnement | Mollie-abonnementer"
+    },
+    "businessEvents": {
+      "mollie_checkout_order_success": "Bestilling vellykket",
+      "mollie_checkout_order_failed": "Bestilling mislyktes",
+      "mollie_checkout_order_canceled": "Bestilling kansellert",
+      "mollie_webhook_received_All": "Mollie Webhook Mottatt (Alle)",
+      "mollie_webhook_received_status_authorized": "Mollie Webhook Mottatt (Autorisert)",
+      "mollie_webhook_received_status_failed": "Mollie Webhook Mottatt (Mislyktes)",
+      "mollie_webhook_received_status_canceled": "Mollie Webhook Mottatt (Kansellert)",
+      "mollie_webhook_received_status_expired": "Mollie Webhook Mottatt (Utløpt)",
+      "mollie_webhook_received_status_pending": "Mollie Webhook Mottatt (Ventende)",
+      "mollie_webhook_received_status_paid": "Mollie Webhook Mottatt (Betalt)",
+      "mollie_webhook_received_status_completed": "Mollie Webhook Mottatt (Fullført)",
+      "mollie_webhook_received_status_refunded": "Mollie Webhook Mottatt (Refundert)",
+      "mollie_webhook_received_status_partially_refunded": "Mollie Webhook Mottatt (Delvis refundert)",
+      "mollie_refund_started": "Mollie refusjon startet",
+      "mollie_subscription_started": "Mollie abonnement startet",
+      "mollie_subscription_ended": "Mollie abonnement fullført",
+      "mollie_subscription_cancelled": "Mollie abonnement kansellert",
+      "mollie_subscription_paused": "Mollie abonnement satt på pause",
+      "mollie_subscription_resumed": "Mollie abonnement gjenopptatt",
+      "mollie_subscription_skipped": "Mollie abonnement hoppet over",
+      "mollie_subscription_renewed": "Mollie abonnement fornyet",
+      "mollie_subscription_renewal_reminder": "Mollie påminnelse om fornyelse av abonnement"
+    }
+  },
+  "mollie-payments": {
+    "pluginTitle": "Mollie",
+    "pluginDescription": "Mollie Modul",
+    "searchPlaceholder": "Søk abonnementer...",
+    "general": {
+      "mainMenuItemGeneral": "Mollie Betalinger",
+      "descriptionTextModule": "Mollie Betalinger",
+      "btnMollieActions": "Mollie Handlinger",
+      "refundThroughMollie": "Refusjon gjennom Mollie",
+      "shipThroughMollie": "Frakt gjennom Mollie",
+      "cancelMollieItem": "Kanseller gjennom Mollie"
+    },
+    "config": {
+      "info": {
+        "title": "Hei {userName}, Velkommen til Mollie!",
+        "descriptionTop": "Onboarding er enkelt med Mollie!",
+        "descriptionBottom": "Det er det!",
+        "descriptionFooter": "Hvis du ønsker å lære mer om vår plugin, vennligst besøk vår offisielle dokumentasjonside.",
+        "onboardingStep1": "Registrer deg for en Mollie konto.",
+        "onboardingStep2": "Oppgi API-nøklene dine i seksjonen nedenfor.",
+        "onboardingStep2TestMode": "Aktiver 'Testmodus' hvis du kun ønsker å teste betalinger.",
+        "onboardingStep3": "Tildel betalingsmetoder til salgs kanalen din.",
+        "onboardingStep3Link": "til dine salgskanaler",
+        "btnDocumentation": "Dokumentasjon",
+        "btnRequestSupport": "Support",
+        "btnTroubleshooting": "Feilsøkingsguide"
+      },
+      "api": {
+        "apiLinkButton": "Hent API-nøklene dine fra Mollie Dashboard",
+        "testButton": "Test API nøkler",
+        "testApiKeys": {
+          "title": "Mollie Betalinger",
+          "apiKey": "API-nøkkel",
+          "isValid": "er gyldig",
+          "isInvalid": "er ugyldig"
+        }
+      },
+      "payments": {
+        "format": {
+          "placeholder": "Plassholder",
+          "preview": "Forhåndsvisning"
+        },
+        "updatePaymentMethods": {
+          "title": "Mollie Betalinger",
+          "button": "Oppdater betalingsmetoder",
+          "succeeded": "Betalingsmetodene er oppdatert.",
+          "failed": "Betalingsmetodene kunne ikke oppdateres."
+        },
+        "mollieLimits": {
+          "link": "Vis mollie tilgjengelighetsregler for betalingsmetoder"
+        }
+      },
+      "rounding": {
+        "info1": "Shopware kan bruke valutainnstillinger for å beregne hvordan den avrunder totalbeløpet for en bestilling. Dette inkluderer antall desimaler i produktprisene dine og nærmeste avrundingsintervall, som for eksempel 0,50 eller 1,00.",
+        "info2": "Disse innstillingene kan føre til et annet totalbeløp enn totalsummen av linjeelementene. Når Mollie kryssjekker disse beløpene og finner ut at de ikke stemmer overens, forårsaker det en feil ved utsjekking.",
+        "info3": "Du kan bruke denne funksjonen for å unngå avrundingsproblemer ved utsjekking. Når den er aktivert, legger den til et eget linjeelement i ditt Mollie Dashboard for forskjellen i avrunding, og kundene dine betaler totalbeløpet beregnet av Shopware."
+      },
+      "order": {
+        "bankTransferDueDateKlarnaLimitReached": "Det er ikke mulig å bruke Klarna Betal nå, Klarna Delbetaling eller Klarna Betal senere som metode når utløpsdatoen er mer enn 28 dager frem i tid, med mindre en annen maksimumsperiode er avtalt mellom selgern og Klarna.",
+        "bankTransferDueDateLimitReached": "Det er ikke mulig å sette bestillingens levetid høyere enn 100 dager."
+      },
+      "support": {
+        "modalTitle": "Be om support fra Mollie",
+        "btnCancel": "Avbryt",
+        "btnConfirm": "Be om støtte",
+        "btnSupport": "Mer om vår støtte",
+        "form": {
+          "name": "Ditt navn",
+          "email": "Din e-post",
+          "recipient": "Send forespørsel til",
+          "subject": "Emne",
+          "message": "Melding"
+        },
+        "data": {
+          "header": "Data sendt til Mollie:",
+          "other": "Annet:",
+          "shopwareVersion": "Shopware-versjon",
+          "pluginLogs": "{plugin} loggfiler",
+          "pluginConfiguration": "{plugin} konfigurasjon",
+          "pluginConfigurationHelpText": "API-nøkler er ekskludert.",
+          "paymentMethods": "Betalingsmetode-data",
+          "paymentMethodsHelpText": "Inneholder informasjon om hvilke betalingsmetoder som er aktive, tildelt hver salgskanal, samt deres status i Mollie-kontoen din."
+        },
+        "success": "Støtteforespøselen har blitt sendt. Vi gjør vårt beste for å svare så snart som mulig",
+        "error": "Det oppstod et problem da e-posten ble sendt gjennom Shopware. Vennligst prøv igjen eller kontakt oss direkte via e-post."
+      }
+    },
+    "rules": {
+      "itemSubscriptionRule": "Vare er abonnement (Mollie)",
+      "cartSubscriptionRule": "Handlekurv med abonnementer (Mollie)"
+    },
+    "refunds": {
+      "status": {
+        "queued": "Køet",
+        "pending": "Ventende",
+        "processing": "Behandles",
+        "refunded": "Refundert",
+        "failed": "Mislyktes",
+        "description": {
+          "queued": "Refusjonen er satt i kø til det er tilstrekkelig saldo for å behandle refusjonen. Du kan fortsatt kansellere refusjonen.",
+          "pending": "Refusjonen vil bli sendt til banken neste virkedag. Du kan fortsatt kansellere refusjonen.",
+          "processing": "Refusjonen har blitt sendt til banken. Refundert beløp vil bli overført til forbrukerkontoen så snart som mulig.",
+          "refunded": "Refundert beløp har blitt overført til forbrukeren.",
+          "failed": "Refusjonen har mislyktes etter behandling. For eksempel, kunden har stengt sin bankkonto. Midlene vil bli overført til kontoen din."
+        }
+      }
+    },
+    "refund-manager": {
+      "general": {
+        "unitQuantity": "pc."
+      },
+      "acl": {
+        "warningCreate": "Du har ikke tillatelse til å opprette refusjoner",
+        "warningCancel": "Du har ikke tillatelse til å kansellere refusjoner"
+      },
+      "cart": {
+        "title": "Bestilling ##orderNumber##",
+        "btnSelectAll": "Velg alle",
+        "btnResetForm": "Nullstill skjema",
+        "linkHowTo": "Hvordan bruke dette skjemaet?",
+        "grid": {
+          "columns": {
+            "item": "Vare",
+            "productNumber": "Produktnummer",
+            "unitPrice": "Enhetspris",
+            "quantity": "Antall",
+            "refunded": "Refundert",
+            "refundQuantity": "Refusjon",
+            "totalPrice": "Totalt",
+            "refundAmount": "Refusjon",
+            "resetStock": "Nullstill lager"
+          },
+          "btnResetLine": "Nullstill linje",
+          "checkDeductPromotion": "Trekk fra rabatt",
+          "checkRefundTax": "Refusjon av MVA"
+        },
+        "roundDiffItemAdded": "Automatisk avrunding av vare ble lagt til"
+      },
+      "instructions": {
+        "linkResetTutorials": "Nullstill veiledninger",
+        "btnToggleTutorial": "Vis/Skjul veiledning",
+        "titleFullRefund": "Full refusjon",
+        "textFullRefund": "Bare bruk knappen for full refusjon. Dette sikrer at alle varene blir merket som refusert og at hele beløpet blir betakebetalt til kunden.",
+        "titleStockReset": "Lager nullstilling",
+        "textStockReset": "Du kan automatisk øke tilgjengelig lager ved å skrive inn antallet du ønsker å sette tilbake på lager. Bare skriv det inn før du fortsetter med en full eller delvis refusjon. Nullstilling av lageret kan kombineres med selve refusjonsprosessen på en fleksibel måte.",
+        "titleShipping": "Frakt",
+        "textShipping": "Fraktvarer kan refunderes som andre produktvarer. Enten angi hele antallet eller et tilpasset delbeløp, og fortsett med refusjonen. Refusjon av fraktkostnader kan kombineres med selve refusjonsprosessen for varer på en fleksibel måte.",
+        "titlePartialAmount": "Delvis refusjon (kun beløp)",
+        "textPartialAmount": "Bare angi delbeløpet i tekstfeltet og start refusjonen.",
+        "titlePartialItems": "Delvis refusjon (med varer)",
+        "textPartialItems": "Hvis du vil merke antall og varer som refundert i Mollie, bruk skjemaet ovenfor. Sett antallet og angi et tilpasset beløp for hver vare som skal refunderes. Den totale summen vil deretter vises i textfeltet for det endelige refusjonsbeløpet. Husk at det fortsatt er mulig å justere dette sluttbeløpet før du starter refusjonen.",
+        "titlePartialPromotions": "Delvis refusjon (med rabatter)",
+        "textPartialPromotions": "Hvis du har en rabatt i handlekurven, så er rabatten en egen linjevare. Hvis du ønsker å refundere alle rabatterte varer, kan du refundere deres totale verdi og hele rabattlinjen. Hvis du derimot kun ønsker å refundere noen få rabatterte varer, kan du automatisk trekke fra den brukte rabatten for hver enkelt linjevare. Du kan selvfølgelig alltid endre verdier hvis de ikke er korrekte.",
+        "titleRoundingDiff": "Avrundingsforskjell",
+        "textRoundingDiff": "En full refusjon vil inkludere avrundingsforskjeller"
+      },
+      "summary": {
+        "dataLoading": "Data lastes...",
+        "headerExcludingVat": "Ekskl. MVA",
+        "headerIncludingVat": "Inkl. MVA",
+        "captionTotal": "Totalt",
+        "captionTotalTaxFree": "Totalt",
+        "captionPendingRefunds": "Venter på å bli refundert",
+        "captionVouchers": "Kupongbeløp",
+        "captionRefunded": "Refundert beløp",
+        "captionRemaining": "Refunderbart beløp",
+        "btnFixDiff": "Juster forskjell",
+        "placeholderDescription": "Angi  beskrivelse for bank-/kortutskrift for forbrukeren. Maks 140 tegn",
+        "lblDescription": "Beskrivelse (valgfritt) ({characters}/140 tegn)",
+        "descriptionHelp": "Dette vil vises på forbrukerens bank- eller kortutskrift når det er mulig. Meldingen vil bli avkortet etter 140 tegn.",
+        "placeholderInternalDescription": "Angi din interne beskrivelse",
+        "lblInternalDescription": "Intern beskrivelse (valgfritt)",
+        "internalDescriptionHelp": "Dette vil bli vist som en lokal beskrivelse i administrasjonsgrensesnittet.",
+        "checkVerification": "Jeg har bekreftet det totale refusjonsbeløpet og de konfigurerte antallene som skal refunderes og tillbake på lager.",
+        "btnRefund": "Refusjon",
+        "btnFullRefund": "Full refusjon",
+        "roundDiffItemAdded": "Avrundingspost"
+      },
+      "refunds": {
+        "title": "Refusjoner i Mollie Dashboard",
+        "linkMore": "Mer om refusjoner",
+        "grid": {
+          "columns": {
+            "amount": "Beløp",
+            "status": "Status",
+            "description": "Beskrivelse",
+            "internalDescription": "Intern beskrivelse",
+            "composition": "Sammensetning",
+            "date": "Dato"
+          },
+          "lblNoComposition": "Ingen sammensetning tilgjengelig",
+          "btnCancelRefund": "Kanseller denne refusjonen"
+        }
+      },
+      "notifications": {
+        "success": {
+          "refund-created": "En refusjon har blitt opprettet i Mollie. Det kan ta opptil 2 timer før refusjonen er fullført. Inntil da kan du kansellere refusjonen.",
+          "refund-canceled": "Den ventende refusjonen er kansellert og fjernet."
+        },
+        "error": {
+          "low-amount": "Vennligst oppgi et beløp som skal refunderes.",
+          "refund-created": "Noe gikk galt ved oppretting av refusjonen.",
+          "refund-canceled": "Det oppstod et problem ved kansellering av den ventende refusjonen. Vennligst prøv igjen i Mollie Dashboard."
+        }
+      }
+    },
+    "vouchers": {
+      "CARD_TITLE": "Kupong",
+      "VOUCHER_INFO_TITLE": "Kupongbetalinger",
+      "VOUCHER_INFO_DESCRIPTION": "Mollie lar deg enkelt akseptere betalinger i nettbutikken ved bruk av øko-, gave- og måltidskuponger—et smart valg for å øke salg og gjøre kundene fornøyde. Betalingsmetoden \"kupong\" er kun synlig hvis du har minst 1 produkt med en tildelt kupongtype i handlekurven.",
+      "VOUCHER_INFO_DEFAULTLANGUAGE": "Vennligst vær oppmerksom på at denne konfigurasjonen kun kan redigeres på ditt standardspråk. Vennligst endre språket ditt for å endre kupongtypen for dette produktet.",
+      "VOUCHER_BTN_READMORE": "Les mer",
+      "VOUCHER_TYPE_CAPTION": "Kupongtype for produkt",
+      "VOUCHER_TYPE_VALUE_NONE": "Ingen",
+      "VOUCHER_TYPE_VALUE_ECO": "Øko",
+      "VOUCHER_TYPE_VALUE_MEAL": "Måltid",
+      "VOUCHER_TYPE_VALUE_VOUCHER": "Gave"
+    },
+    "modals": {
+      "shipping": {
+        "title": "Frakt gjennom Mollie",
+        "item": {
+          "label": "Vare:",
+          "noQuantity": "Vennligst oppgi et antall som skal sendes.",
+          "shipAll": "Send alt",
+          "summary": {
+            "quantity": "Antall som skal sendes",
+            "shipped": "Antall sendt",
+            "shippable": "Antall som kan sendes"
+          },
+          "success": "Bestillingen har blitt sendt."
+        },
+        "order": {
+          "description": "Følgende vareantall vil bli sendt.",
+          "itemHeader": "Vare",
+          "quantityHeader": "Antall",
+          "originalQuantityHeader": "Antall (kan sendes)"
+        },
+        "availableTracking": {
+          "label": "Tilgjengelige sporingskoder",
+          "hint": "Klikk på en av disse sporingskodene for å fylle inn all data automatisk."
+        },
+        "showTracking": "Legg til sporingsinformasjon for denne forsendelsen",
+        "tracking": {
+          "carrier": "Leverandør",
+          "code": "Kode",
+          "url": "Url",
+          "invalid": "Vennligst oppgi både leverandør og kode"
+        },
+        "confirmButton": "Send bestilling",
+        "cancelButton": "Kanseller",
+        "selectAllButton": "Velg alt",
+        "resetButton": "Nullstill"
+      },
+      "cancel": {
+        "title": "Kanseller vare gjennom mollie",
+        "confirmButton": "Kanseller vare gjennom mollie",
+        "cancelButton": "Lukk modal",
+        "resetStock": "Nullstill lager",
+        "item": {
+          "success": "Produktet ble kansellert",
+          "failed": {
+            "quantityZero": "Antallet er 0",
+            "invalidLine": "Produktet eksisterer ikke i bestillingen",
+            "quantityTooHigh": "Antallet er for høyt"
+          }
+        }
+      }
+    },
+    "sw-flow": {
+      "actions": {
+        "shipOrder": {
+          "editor": {
+            "title": "Send bestilling (Mollie)",
+            "description": "Send bestilling i Mollie."
+          },
+          "modal": {
+            "title": "Send bestilling",
+            "description": "Denne handlingen vil automatisk sende en bestilling gjennom Mollie. Flytsekvensen vil motta bestillingsnummeret og sende det videre til Mollie API. Vellykkede forsendelser og mislykkede forsendelser vil være synlige i Mollie-loggfilene.",
+            "warningConfig": "Vennligst deaktiver all ekstra automatisering for denne typen handling for å unngå forstyrrelser.\nDe følgende aktiverte funksjonene i dette plugin kan forstyrre handlingen:",
+            "noWarnings": "Ingen varsler"
+          }
+        },
+        "refundOrder": {
+          "editor": {
+            "title": "Refusjon av bestilling (Mollie)",
+            "description": "Refunder bestilling gjennom Mollie."
+          },
+          "modal": {
+            "title": "Refusjon av bestilling",
+            "description": "Denne handlingen vil automatisk starte en refusjon gjennom Mollie. Flytsekvensen vil motta bestillingsnummeret og sende dette videre til Mollie API. Vellykkede refusjoner og mislykkede refusjoner vil være synlige i Mollie-loggfilene.",
+            "warning": "Vennligst husk at refusjoner kan ta opptil 2 timer før de er fullført og synlig i butikken. Inntil da kan du alltid kansellere en ventende refusjon, enten fra bestillingssiden i Shopware eller fra Mollie Dashboard.",
+            "warningConfig": "Vennligst sørg for å deaktivere all automatikk for denne typen handling for å unngå forstyrrelser."
+          }
+        },
+        "warnings": {
+          "automaticShipping": "Automatisk frakt i plugin-konfigurasjonen"
+        }
+      }
+    },
+    "subscriptions": {
+      "status": {
+        "pending": "Ventende",
+        "active": "Aktiv",
+        "canceled": "Kansellert",
+        "suspended": "Suspendert",
+        "completed": "Fullført",
+        "paused": "Pauset",
+        "resumed": "Gjenopptatt",
+        "skipped": "Hoppet over"
+      },
+      "navigation": {
+        "title": "Mollie Abonnementer"
+      },
+      "TYPE_DAYS": "Dag(er)",
+      "TYPE_WEEKS": "Uke(r)",
+      "TYPE_MONTHS": "Måned(er)",
+      "confirm": {
+        "cancelTitle": "Avslutt abonnement?",
+        "cancel": "Kanseller kundens abonnementet.",
+        "pauseTitle": "Pause abonnement?",
+        "pause": "Sett abonnementet på pause til du gjenopptar det igjen.",
+        "resumeTitle": "Gjenoppta abonnement?",
+        "resume": "Fortsett abonnementet igjen.",
+        "skipTitle": "Hopp over neste avbetaling?",
+        "skip": "Hopp over neste avbetaling i abonnementet. Det fortsetter automatisk etterpå."
+      },
+      "alerts": {
+        "cancelSuccess": "Abonnementet har blitt kansellert",
+        "pauseSuccess": "Abonnementet har blitt pauset",
+        "resumeSuccess": "Abonnementet har blitt gjenopptatt",
+        "skipSuccess": "Abonnementet har blitt hoppet over. Neste betaling er oppdatert."
+      },
+      "list": {
+        "title": "Mollie Abonnementer",
+        "columns": {
+          "customer": "Kunde",
+          "status": "Status",
+          "description": "Beskrivelse",
+          "amount": "Beløp",
+          "nextPaymentAt": "Neste betaling",
+          "prePaymentReminder": "Påminnet ved",
+          "canceledAt": "Kansellert ved",
+          "createdAt": "Opprettet ved"
+        },
+        "action": {
+          "edit": "Rediger abonnement"
+        },
+        "deletedCustomer": "Slettet kunde"
+      },
+      "detail": {
+        "title": "Mollie-abonnement",
+        "buttonCancelSubscription": "Kanseller abonnement",
+        "labelDescription": "Beskrivelse",
+        "labelAmount": "Beløp",
+        "labelQuantity": "Antall",
+        "labelMollieSubscription": "Mollie-abonnement",
+        "labelMollieCustomer": "Mollie-kunde",
+        "labelMandateId": "Mandat",
+        "labelShopwareCustomer": "Shopware-kunde",
+        "labelCreatedAt": "Opprettet ved",
+        "buttonShowShopwareOrder": "Vis Shopware-bestilling",
+        "buttonShowShopwareCustomer": "Vis Shopware-kunde",
+        "cardTitleSubscription": "Abonnement",
+        "cardTitleStatus": "Status",
+        "labelStatus": "Status",
+        "labelNextPaymentAt": "Neste betaling den",
+        "labelLastRemindedAt": "Sist påminnet den",
+        "labelCanceledAt": "Kansellert den",
+        "buttonPauseSubscription": "Sett abonnement på pause",
+        "buttonResumeSubscription": "Gjenoppta abonnement",
+        "buttonSkipSubscription": "Hopp over abonnement",
+        "history": {
+          "cardTitle": "Historikk",
+          "colDate": "Dato",
+          "colComment": "Kommentar",
+          "colStatusFrom": "Status (fra)",
+          "colStatusTo": "Status (til)",
+          "colMollieSubscription": "Mollie-abonnement"
+        }
+      },
+      "product": {
+        "card-title": "Abonnement",
+        "title": "Mollie-abonnementer",
+        "description": "Håndtering av gjentakende betalinger er enklere enn noen gang med våre praktiske funksjoner. Ta bedriften din til neste nivå med effektive sporingsalternativer, enkle integrasjoner og mer. Med Mollie-abonnementer kan du enkelt opprette abonnementsprodukter og planlegge gjentakende betalinger som skjer på det konfigurerte intervallet og perioden.",
+        "mollieSubscriptionProduct": "Abonnementsprodukt",
+        "mollieSubscriptionIntervalAmount": "Gjenta betaling hver",
+        "mollieSubscriptionIntervalType": "Intervalenhet",
+        "mollieSubscriptionRepetitionAmount": "Antall repetisjoner",
+        "mollieSubscriptionRepetitionPlaceholder": "Oppgi antall eller la det stå tomt",
+        "infoDefaultLanguage": "Vennligst vær oppmerksom på at denne konfigurasjonen kun kan redigeres på ditt standardspråk. Vennligst endre språket ditt for å endre abonnementsinnstillingene for dette produktet.",
+        "btnReadMore": "Les mer"
+      }
+    },
+    "sw-order-list": {
+      "columns": {
+        "mollie": "Mollie"
+      },
+      "badgeSubscription": "Abonnement"
+    }
+  },
+  "sw-order": {
+    "detailExtended": {
+      "titleCreditCardData": "Kredittkortdata",
+      "buttonMolliePaymentLink": "Kopier til utklippstavlen",
+      "columnRefunded": "Refundert",
+      "columnShipped": "Fraktet",
+      "columnCanceled": "Kansellert",
+      "labelMollieOrderId": "Mollie Bestillings-ID",
+      "labelMollieThirdPartyPaymentId": "Betalingsreferanse",
+      "labelMolliePaymentLink": "Mollie Checkout-URL",
+      "totalRefunds": "Refundert beløp",
+      "totalRefundsPending": "Venter på å bli refundert",
+      "totalRemaining": "Refunderbart beløp",
+      "totalVouchers": "Kupongbeløp",
+      "totalShipments": "Fraktet beløp ({quantity} varer)",
+      "subscriptionBadge": "Abonnementsbestilling",
+      "refundManager": {
+        "title": "Mollie Refusjonsansvarlig",
+        "btnOpenRefundManager": "Åpne refusjonsansvarlig",
+        "btnCloseRefundManager": "Lukk refusjonsansvarlig"
+      }
+    }
+  },
+  "sw-customer": {
+    "extendedInfo": {
+      "labelPreferredIdealIssuer": "Foretrukket iDeal-leverandør"
+    }
+  },
+  "sw-privileges": {
+    "permissions": {
+      "parents": {
+        "mollie": "Mollie"
+      },
+      "mollie_refund_manager": {
+        "label": "Refusjonsansvarlig"
+      },
+      "mollie_subscription": {
+        "label": "Abonnementer"
+      }
+    }
+  },
+  "sw-profile": {
+    "tabSearchPreferences": {
+      "modules": {
+        "mollie_subscription": {
+          "description": "Beskrivelse"
+        }
+      }
+    }
+  },
+  "sw-flow": {
+    "triggers": {
+      "mollie": "Mollie",
+      "refund": "Refusjon",
+      "subscription": "Abonnement",
+      "webhookReceived": "Webhooks",
+      "status": "Status",
+      "started": "Startet",
+      "ended": "Avsluttet",
+      "paused": "Pauset",
+      "renewalReminder": "Påminnelse om fornyelse",
+      "renewed": "Fornyet",
+      "resumed": "Gjenopptatt",
+      "skipped": "Hoppet over",
+      "all": "Alle",
+      "canceled": "Kansellert",
+      "expired": "Utløpt",
+      "partiallyRefunded": "Refundert (delvis)",
+      "orderSuccess": "Bestilling vellykket",
+      "orderFailed": "Bestilling mislyktes",
+      "orderCanceled": "Bestilling kansellert"
+    }
+  }
+}

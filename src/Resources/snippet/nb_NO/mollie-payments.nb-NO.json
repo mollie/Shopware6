@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Den valgte betalingsmetoden er ikke tilgjengelig for abonnementprodukter.",
+        "mollie-payments-cart-error-mixedcart": "Handlekurven din inneholder flere varer i kombinasjon med abonnementvarer. Vennligst merk at du kun kan kjøpe 1 abonnementvare om gangen.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Ikke alle betalingsmetoder er tilgjengelige når du bestiller abonnementprodukter.",
+        "mollie-payments-cart-guest-account": "Gjestekontoer kan ikke brukes for abonnementsbestillinger."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Den valgte betalingsmetoden er ikke tilgjengelig for abonnementprodukter.",
+        "mollie-payments-cart-error-mixedcart": "Handlekurven din inneholder flere varer i kombinasjon med abonnementvarer. Vennligst merk at du kun kan kjøpe 1 abonnementvare om gangen.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Ikke alle betalingsmetoder er tilgjengelige når du bestiller abonnementprodukter.",
+        "mollie-payments-cart-guest-account": "Gjestekontoer kan ikke brukes for abonnementsbestillinger."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Utløpsdato",
+                "cardHolderLabel": "Navn på kort",
+                "cardNumberLabel": "Kortnummer",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Betaling sikret og levert av",
+                "headLine": "Oppgi kortinformasjonen din",
+                "saveCardDetailLabel": "Lagre kortdetaljer for fremtidige betalinger"
+            },
+            "ideal": {
+                "selectBank": "Velg bank"
+            },
+            "pos": {
+                "selectTerminal": "Velg terminal"
+            },
+            "mandate": {
+                "sectionTitle": "Lagrede kort",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Kortet ditt er nå slettet",
+                "deleteErrorMessage": "Det oppstod et problem ved fjerning av kortet ditt",
+                "newCard": "Nytt kort",
+                "remove": "Fjern",
+                "subscriptionBadge": "Abonnement"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Kanseller",
+                "cardSubscription": "Dette kortet brukes for et abonnement. Vennligst kanseller abonnementet først før du fjerner dette kortet.",
+                "deleteButton": "Slett",
+                "deleteConfirmation": "Er du sikker på at du vil slette?",
+                "title": "Bekreft sletting"
+            },
+            "bancomatPay": {
+                "headLine": "Telefonnummer",
+                "phoneErrorMessage": "Telefonnummer er påkrevd. For eksempel +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Betal med en annen betalingsmetode",
+                "buttonReturnToShop": "Returner til butikken",
+                "error": "Betalingen mislyktes",
+                "failed": "Betalingen mislykkets eller ble kansellert. Du vil bli omdirigert til Mollie, hvor du kan fullføre betalingen med din valgte betalingsmetode "
+            },
+            "redirecting": "Omdirigerer deg til: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Delbeløp",
+                "captionTaxes": "Skatter",
+                "paymentError": "Betalingen med Apple Pay mislyktes."
+            },
+            "paypalExpress": {
+                "paymentError": "Betalingen med Paypal Express mislyktes."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "rediger faktureringsadresse",
+                "btnEditShippingAddress": "rediger fraktadresse",
+                "cancelSubscription": "Abonnementet be kansellert",
+                "errorCancelSubscription": "Abonnementet kunne ikke kanselleres på grunn av en feil. Vennligst kontakt vår support.",
+                "errorPause": "Det oppstod en feil ved pausing av abonnementet ditt",
+                "errorResume": "Det oppstod en feil ved gjenopptakelse av abonnementet ditt",
+                "errorSkip": "Det oppstod en feil ved overhopping av abonnementet ditt",
+                "errorUpdateAddress": "Det oppstod en feil ved oppdatering av adressen din",
+                "errorUpdatePayment": "Det oppstod en feil ved oppdatering av betalingsmetoden din",
+                "headlineBillingAddress": "Faktureringsadresse",
+                "headlineShippingAddress": "Fraktadresse",
+                "mollieSubscriptionAmount": "Beløp",
+                "mollieSubscriptionCancel": "Kanseller abonnement",
+                "mollieSubscriptionCancelUntil": "Avbestilling mulig frem til",
+                "mollieSubscriptionContextMenuReorder": "Gjenta abonnement",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Neste betaling på",
+                "mollieSubscriptionPause": "Sett abonnement på pause",
+                "mollieSubscriptionResume": "Gjenoppta abonnement",
+                "mollieSubscriptionSkip": "Hopp over abonnement",
+                "mollieSubscriptionUpdatePayment": "Oppdater betaling",
+                "mollieSubscriptionsHeadline": "Abonnement:",
+                "mollieSubscriptionsInfoEmpty": "Du har ingen abonnementer enda.",
+                "mollieSubscriptionsLink": "Abonnementer",
+                "mollieSubscriptionsTitle": "Abonnementer",
+                "mollieSubscriptionsWelcome": "Dine nyeste abonnementer:",
+                "orderActionHide": "Skjul",
+                "orderActionView": "Vis",
+                "shippingEqualToBilling": "Lik faktureringsadresse",
+                "successPause": "Abonnementet ditt har blitt pauset",
+                "successResume": "Abonnementet ditt vil nå bli gjenopptatt",
+                "successSkip": "Abonnementet ditt har blitt hoppet over",
+                "successUpdateAddress": "Adressen din er nå oppdatert",
+                "successUpdatePayment": "Betalingsmetoden din er nå oppdatert"
+            },
+            "options": {
+                "everyDay": "Hver dag",
+                "everyDays": "Hver %value% dager",
+                "everyMonth": "Hver måned",
+                "everyMonths": "Hver %value%måned",
+                "everyWeek": "Hver uke",
+                "everyWeeks": "Hver %value% uke",
+                "repetitionCount": "%value% gang(er)"
+            },
+            "product": {
+                "addToCartText": "Abonner",
+                "information": "Abonnementsprodukt"
+            }
+        },
+        "testMode": {
+            "label": "Testmodus"
+        }
+    }
+}
