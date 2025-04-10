@@ -33,5 +33,9 @@
             <tag name="shopware.snippet.file"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Resources\snippet\nb_NO\SnippetFile_nb_NO">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
     </services>
 </container>
