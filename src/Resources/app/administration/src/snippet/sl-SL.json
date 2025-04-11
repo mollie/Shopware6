@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie naročnina | Mollie naročnine"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Naročilo uspešno",
+            "mollie_checkout_order_failed": " Naročilo neuspešno",
+            "mollie_checkout_order_canceled": " Naročilo preklicano",
+            "mollie_webhook_received_All": " Prejeto avtomatizirano obvestilo Mollie (vsa)",
+            "mollie_webhook_received_status_authorized": " Prejeto avtomatizirano obvestilo Mollie (avtorizirano)",
+            "mollie_webhook_received_status_failed": " Mollie avtomatizirano obvestilo prejeto (neuspešno)",
+            "mollie_webhook_received_status_canceled": " Mollie avtomatizirano obvestilo prejeto (preklicano)",
+            "mollie_webhook_received_status_expired": " Mollie avtomatizirano obvestilo prejeto (potekel)",
+            "mollie_webhook_received_status_pending": " Mollie avtomatizirano obvestilo prejeto (v teku)",
+            "mollie_webhook_received_status_paid": " Mollie avtomatizirano obvestilo prejeto (plačano)",
+            "mollie_webhook_received_status_completed": " Mollie avtomatizirano obvestilo prejeto (končano)",
+            "mollie_webhook_received_status_refunded": " Mollie avtomatizirano obvestilo prejeto (vrnjeno)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie avtomatizirano obvestilo prejeto (delno vrnjeno)",
+            "mollie_refund_started": " Mollie vračilo je bilo začeto",
+            "mollie_subscription_started": " Mollie naročnina se je začela",
+            "mollie_subscription_ended": " Mollie naročnina se je končala",
+            "mollie_subscription_cancelled": " Mollie naročnina je preklicana",
+            "mollie_subscription_paused": " Mollie naročnina je začasno ustavljena",
+            "mollie_subscription_resumed": " Mollie naročnina se nadaljuje",
+            "mollie_subscription_skipped": " Mollie naročnina ni bila izvedena",
+            "mollie_subscription_renewed": " Mollie naročnina je obnovljena",
+            "mollie_subscription_renewal_reminder": " Mollie opomnik za obnovitev naročnine"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie modul",
+        "searchPlaceholder": "Iskanje naročnin...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie plačila",
+            "descriptionTextModule": "Mollie plačila",
+            "btnMollieActions": "Dejanja Mollie",
+            "refundThroughMollie": "Vračilo preko Mollie",
+            "shipThroughMollie": "Pošiljanje preko Mollie",
+            "cancelMollieItem": "Preklici preko Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Pozdravljeni {userName}, dobrodošli v Mollie!",
+                "descriptionTop": "Uvajanje z Mollie je enostavno!",
+                "descriptionBottom": "To je vse!",
+                "descriptionFooter": "Če želite izvedeti več o našem vtičniku, prosimo, obiščite našo uradno stran z dokumentacijo.",
+                "onboardingStep1": "Registrirajte se v Mollie račun.",
+                "onboardingStep2": "Vnesite svoje ključe API v spodnji razdelek.",
+                "onboardingStep2TestMode": "Vklopite 'Testni način', če želite plačila le testirati.",
+                "onboardingStep3": "Dodelite načine plačila vašemu prodajnemu kanalu.",
+                "onboardingStep3Link": "vašim prodajnim kanalom",
+                "btnDocumentation": "Dokumentacija",
+                "btnRequestSupport": "Podpora",
+                "btnTroubleshooting": "Priročnik za odpravljanje težav"
+            },
+            "api": {
+                "apiLinkButton": "Pridobite svoje ključe API iz Mollie Dashboard",
+                "testButton": "Testni ključi API",
+                "testApiKeys": {
+                    "title": "Mollie plačila",
+                    "apiKey": "ključ API",
+                    "isValid": "je veljaven",
+                    "isInvalid": "je neveljaven"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Vmesno besedilo",
+                    "preview": "Predogled"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie plačila",
+                    "button": "Posodobi načine plačil",
+                    "succeeded": "Načini plačila so bili uspešno posodobljeni.",
+                    "failed": "Načinov plačila ni mogoče posodobiti."
+                },
+                "mollieLimits": {
+                    "link": "Prikaži pravila razpoložljivosti Mollie za načine plačila"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware lahko uporablja nastavitve valute za izračun, kako zaokroži skupni znesek naročila. To vključuje število decimalnih mest v cenah vaših izdelkov in najbližji interval zaokroževanja, kot je 0,50 ali 1,00.",
+                "info2": "Te nastavitve lahko vodijo do drugačne končne cene, kot je skupna vsota vseh postavk. Ko Mollie preveri te zneske in ugotovi, da se ne ujemajo, pride do napake pri nakupu.",
+                "info3": "To funkcijo lahko uporabite, da se izognete težavam z zaokroževanjem pri nakupu. Ko je vklopljena, doda ločeno postavko v vašem Mollie Dashboardu za razliko v zaokroževanju, vaši kupci pa plačajo končno skupno ceno, izračunano v programu Shopware."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Uporaba Klarna Slice it ali Klarna Pay later kot način plačila ni mogoč, ko je datum poteka daljši od 28 dni, razen če je dogovor med trgovcem in Klarno drugačen.",
+                "bankTransferDueDateLimitReached": "Ni mogoče nastaviti življenjske dobe naročila nad 100 dni."
+            },
+            "support": {
+                "modalTitle": "Zahtevajte podporo od Mollie",
+                "btnCancel": "Prekliči",
+                "btnConfirm": "Zahteva za podporo",
+                "btnSupport": "Več o naši podpori",
+                "form": {
+                    "name": "Vaše ime",
+                    "email": "Vaš e-poštni naslov",
+                    "recipient": "Pošlji zahtevo na",
+                    "subject": "Predmet",
+                    "message": "Sporočilo"
+                },
+                "data": {
+                    "header": "Podatki poslani Mollie:",
+                    "other": "Drugo:",
+                    "shopwareVersion": "Različica Shopware",
+                    "pluginLogs": "{plugin} datoteke dnevnika",
+                    "pluginConfiguration": "{plugin} konfiguracija",
+                    "pluginConfigurationHelpText": "Ključi API so izključeni.",
+                    "paymentMethods": "Podatki o načinu plačila",
+                    "paymentMethodsHelpText": "Vsebuje informacije o tem, kateri načini plačila so aktivni, dodeljeni vsakemu prodajnemu kanalu, ter njihov status v vašem Mollie računu."
+                },
+                "success": "Zahteva za podporo je bila uspešno poslana. Potrudili se bomo, da odgovorimo čim prej.",
+                "error": "Prišlo je do težave pri pošiljanju e-pošte prek Shopware. Poskusite znova ali nas kontaktirajte neposredno po e-pošti."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Izdelek je naročnina (Mollie)",
+            "cartSubscriptionRule": "Košarica z naročninami (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Na čakanju",
+                "pending": "V teku",
+                "processing": "Obdelava",
+                "refunded": "Vrnjeno",
+                "failed": "Neuspešno",
+                "description": {
+                    "queued": "Vračilo je na čakanju, dokler ni dovolj stanja za obdelavo vračila. Vračilo še lahko prekličete.",
+                    "pending": "Vračilo bo poslano na banko naslednji delovni dan. Vračilo še lahko prekličete.",
+                    "processing": "Vračilo je bilo poslano na banko. Znesek vračila bo čim prej prenesen na račun potrošnika.",
+                    "refunded": "Znesek vračila je bil nakazan potrošniku.",
+                    "failed": "Vračilo je bilo po obdelavi neuspešno. Možno je, da je stranka zaprla svoj bančni račun. Sredstva bodo vrnjena na vaš račun."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "pc."
+            },
+            "acl": {
+                "warningCreate": "Nimate dovoljenj za ustvarjanje vračil",
+                "warningCancel": "Nimate dovoljenj za preklic vračil"
+            },
+            "cart": {
+                "title": "Naročilo ##orderNumber##",
+                "btnSelectAll": "Izberite vse",
+                "btnResetForm": "Ponastavite obrazec",
+                "linkHowTo": "Kako uporabiti ta obrazec?",
+                "grid": {
+                    "columns": {
+                        "item": "Izdelek",
+                        "productNumber": "Številka izdelka",
+                        "unitPrice": "Cena na enoto",
+                        "quantity": "Količina",
+                        "refunded": "Vrnjeno",
+                        "refundQuantity": "Vračilo",
+                        "totalPrice": "Skupaj",
+                        "refundAmount": "Vračilo",
+                        "resetStock": "Ponastavi zalogo"
+                    },
+                    "btnResetLine": "Ponastavi vrstico",
+                    "checkDeductPromotion": "Odštej popust",
+                    "checkRefundTax": "Vrnite DDV"
+                },
+                "roundDiffItemAdded": "Postavka za samodejno zaokroževanje je bil dodan"
+            },
+            "instructions": {
+                "linkResetTutorials": "Ponastavi navodila",
+                "btnToggleTutorial": "Prikaži/skrij navodilo",
+                "titleFullRefund": "Polno vračilo",
+                "textFullRefund": "Preprosto uporabite gumb za celotno vračilo. Tako zagotovite, da so vsi vaši predmeti označeni kot vrnjeni in da je celoten znesek vrnjen stranki.",
+                "titleStockReset": "Ponastavitev zaloge",
+                "textStockReset": "Razpoložljivo zalogo lahko samodejno povečate tako, da vnesete količino, ki jo želite vrniti. Preprosto jo vnesite preden nadaljujejte s polnim ali delnim vračilom. Ponastavitev zaloge se lahko prilagodi procesu vračila na fleksibilen način.",
+                "titleShipping": "Pošiljanje",
+                "textShipping": "Odposlani predmet se lahko vrne kot kateri koli drugi produkt. Vnesite celotno količino ali po meri določen delni znesek in nadaljujte s vračilom. Vračilo stroškov pošiljanja je mogoče združiti s procesom vračila predmetov na fleksibilen način.",
+                "titlePartialAmount": "Delno vračilo (samo znesek)",
+                "textPartialAmount": "Preprosto vnesite delni znesek v polje z besedilom in začnite vračilo.",
+                "titlePartialItems": "Delno vračilo (z izdelki)",
+                "textPartialItems": "Če želite označiti količine in izdelke kot vrnjene v Mollie, uporabite zgornji obrazec. Nastavite svoje količine in navedite prilagojen znesek za vsak izdelek, ki bo vrnjen. Skupni znesek bo nato viden v končnem polju z besedilom za vračilo.",
+                "titlePartialPromotions": "Delno vračilo (s popusti)",
+                "textPartialPromotions": "Če imate popust v svoji košarici, potem je vaša promocija ločena postavka. Če želite vrniti vse znižane izdelke, se lotite in vrnite njihovo celotno vrednost in celoten popust. Vendar pa lahko, če želite vrniti le nekaj znižanih izdelkov, avtomatsko odštejete uporabljeni popust za vsako postavko. Seveda lahko vedno spremenite vrednosti, če niso pravilne.",
+                "titleRoundingDiff": "Razlika pri zaokroževanju",
+                "textRoundingDiff": "Polno vračilo bo vključevalo razlike pri zaokroževanju"
+            },
+            "summary": {
+                "dataLoading": "Podatki se nalagajo...",
+                "headerExcludingVat": "Brez DDV",
+                "headerIncludingVat": "Z DDV",
+                "captionTotal": "Skupaj",
+                "captionTotalTaxFree": "Skupaj",
+                "captionPendingRefunds": "Čaka na vračilo",
+                "captionVouchers": "Znesek vavčerja",
+                "captionRefunded": "Znesek vračila",
+                "captionRemaining": "Znesek, ki ga je mogoče vrniti",
+                "btnFixDiff": "Odpravi razliko",
+                "placeholderDescription": "Vnesite opis izpiska za potrošnika. Maksimalno 140 znakov",
+                "lblDescription": "Opis (neobvezno) ({characters}/140 znakov)",
+                "descriptionHelp": "Ta opis bo prikazan na bančnem ali kartičnem izpisku potrošnika, kadar bo to mogoče. Sporočilo bo skrajšano po 140 znakih.",
+                "placeholderInternalDescription": "Vnesite svoj opis za interno uporabo",
+                "lblInternalDescription": "Interni opis (neobvezno)",
+                "internalDescriptionHelp": "Ta opis bo prikazan kot lokalni opis v vmesniku za upravljanje.",
+                "checkVerification": "Preveril(-a) sem skupni znesek vračila in nastavljene količine za vračilo in ponovno zalogo.",
+                "btnRefund": "Vračilo",
+                "btnFullRefund": "Polno vračilo",
+                "roundDiffItemAdded": "Razlika pri zaokroževanju"
+            },
+            "refunds": {
+                "title": "Vračila v Mollie Dashboardu",
+                "linkMore": "Več o vračilih",
+                "grid": {
+                    "columns": {
+                        "amount": "Znesek",
+                        "status": "Status",
+                        "description": "Opis",
+                        "internalDescription": "Notranji opis",
+                        "composition": "Sestava",
+                        "date": "Datum"
+                    },
+                    "lblNoComposition": "Nobena sestava ni na voljo",
+                    "btnCancelRefund": "Prekliči to vračilo"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Vračilo je bilo ustvarjeno v Mollie. Zaključitev vračila lahko traja do 2 uri. Do tega trenutka lahko prekličete vračilo.",
+                    "refund-canceled": "Vračilo v teku je bilo uspešno preklicano in odstranjeno."
+                },
+                "error": {
+                    "low-amount": "Prosimo, vnesite znesek, ki ga želite vrniti.",
+                    "refund-created": "Pri ustvarjanju vračila je prišlo do napake.",
+                    "refund-canceled": "Pri preklicu čakajočega vračila je prišlo do težave. Prosimo, poskusite znova v Mollie Dashboard."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Vavčer",
+            "VOUCHER_INFO_TITLE": "Vavčer plačila",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie vam omogoča enostavno sprejemanje plačil v vaši spletni trgovini z uporabo ekoloških, darilnih in obročnih vavčerjev—pametni izbor za povečanje prodaje in zadovoljstvo vaših kupcev. Način plačila \"vavčer\" je viden le, če imate vsaj 1 izdelek z dodeljeno vrsto vavčerja v nakupovalni košarici.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Prosimo, upoštevajte, da je to nastavitev mogoče urediti samo v vašem privzetem jeziku. Spremenite svoj jezik, da spremenite vrsto vavčerja za ta izdelek.",
+            "VOUCHER_BTN_READMORE": "Preberite več",
+            "VOUCHER_TYPE_CAPTION": "Vrsta vavčerja izdelka",
+            "VOUCHER_TYPE_VALUE_NONE": "Noben",
+            "VOUCHER_TYPE_VALUE_ECO": "Ekološki",
+            "VOUCHER_TYPE_VALUE_MEAL": "Obrok",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Darilo"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Odpošlji prek Mollie",
+                "item": {
+                    "label": "Izdelek:",
+                    "noQuantity": "Prosimo, vnesite količino za pošiljanje.",
+                    "shipAll": "Odpošlji vse",
+                    "summary": {
+                        "quantity": "Količina za pošiljanje",
+                        "shipped": "Količina, ki je bila poslana",
+                        "shippable": "Količina, ki jo lahko pošljemo"
+                    },
+                    "success": "Naročilo je bilo uspešno odposlano."
+                },
+                "order": {
+                    "description": "Naslednje količine predmetov bodo odposlane.",
+                    "itemHeader": "Izdelek",
+                    "quantityHeader": "Količina",
+                    "originalQuantityHeader": "Količina (ki jo lahko pošljemo)"
+                },
+                "availableTracking": {
+                    "label": "Razpoložljive številke za sledenje",
+                    "hint": "Kliknite na eno od teh številk za sledenje, da samodejno izpolnite vse podatke."
+                },
+                "showTracking": "Dodajte informacije o sledenju za to pošiljko",
+                "tracking": {
+                    "carrier": "Prevoznik",
+                    "code": "Številka",
+                    "url": "URL",
+                    "invalid": "Prosimo, vnesite tako Prevoznika kot Številko"
+                },
+                "confirmButton": "Odpošlji naročilo",
+                "cancelButton": "Prekliči",
+                "selectAllButton": "Izberi vse",
+                "resetButton": "Ponastavi"
+            },
+            "cancel": {
+                "title": "Prekliči izdelek preko Mollie",
+                "confirmButton": "Prekliči izdelek preko Mollie",
+                "cancelButton": "Zapri okno",
+                "resetStock": "Ponastavite zalogo",
+                "item": {
+                    "success": "Izdelek je bil uspešno preklicano",
+                    "failed": {
+                        "quantityZero": "Količina je 0",
+                        "invalidLine": "Izdelek ne obstaja v naročilu",
+                        "quantityTooHigh": "Količina je prekoračena"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Odpošlji naročilo (Mollie)",
+                        "description": "Odpošlji naročilo v Mollie."
+                    },
+                    "modal": {
+                        "title": "Odpošlji naročilo",
+                        "description": "Ta ukaz bo samodejno odposlal naročilo preko Mollie. Postopek bo prejel številko naročila in ta bo posredovana Mollie API-ju. Uspešna in neuspešna odpošiljanja bodo vidna v Mollie dnevniških datotekah.",
+                        "warningConfig": "Prosimo, prepričajte se, da ste izklopili vse dodatne avtomatizacije za to vrsto ukaza, da se izognete morebitnim motnjam.\nNekatere aktivirane funkcije tega vtičnika lahko motijo ta ukaz:",
+                        "noWarnings": "Brez opozoril"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Vračilo naročila (Mollie)",
+                        "description": "Vračilo naročila preko Mollie."
+                    },
+                    "modal": {
+                        "title": "Vračilo naročila",
+                        "description": "Ta ukaz bo samodejno odposlal naročilo preko Mollie. Postopek bo prejel številko naročila in ta bo posredovana Mollie API-ju. Uspešna in neuspešna odpošiljanja bodo vidna v Mollie dnevniških datotekah.",
+                        "warning": "Prosimo, upoštevajte, da lahko vračila trajajo do 2 uri, da se zaključijo in postanejo vidna v trgovini. Do takrat lahko vedno prekličete čakajoče vračilo bodisi s strani naročila v Shopware bodisi iz Mollie Dashboard.",
+                        "warningConfig": "Prosimo, prepričajte se, da ste izklopili vse dodatne avtomatizacije za to vrsto ukaza, da se izognete morebitnim motnjam."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Samodejno pošiljanje v konfiguraciji vtičnika"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "V teku",
+                "active": "Aktivno",
+                "canceled": "Preklicano",
+                "suspended": "Suspendiran",
+                "completed": "Končano",
+                "paused": "Na pavzi",
+                "resumed": "Nadaljevanje",
+                "skipped": "Izpuščeno"
+            },
+            "navigation": {
+                "title": "Mollie naročnine"
+            },
+            "TYPE_DAYS": "Dan(denvi)",
+            "TYPE_WEEKS": "Teden(i)",
+            "TYPE_MONTHS": "Mesec(i)",
+            "confirm": {
+                "cancelTitle": "Prekliči naročnino?",
+                "cancel": "Prekličite naročnino vašega kupca.",
+                "pauseTitle": "Začasno zaustavi naročnino?",
+                "pause": "Naročnino obdržite do ponovnega nadaljevanja.",
+                "resumeTitle": "Nadaljujte naročnino?",
+                "resume": "Nadaljujte naročnino.",
+                "skipTitle": "Preskoči naslednje obročno plačilo?",
+                "skip": "Preskočite naslednje obročno plačilo v naročnini. Nato se bo samodejno nadaljevala."
+            },
+            "alerts": {
+                "cancelSuccess": "Naročnina je bila uspešno preklicana",
+                "pauseSuccess": "Naročnina je bila uspešno začasno zaustavljena",
+                "resumeSuccess": "Naročnina je bila uspešno obnovljena",
+                "skipSuccess": "Naročnina je bila uspešno izpuščena. Naslednje plačilo je bilo posodobljeno."
+            },
+            "list": {
+                "title": "Mollie naročnine",
+                "columns": {
+                    "customer": "Stranka",
+                    "status": "Status",
+                    "description": "Opis",
+                    "amount": "Znesek",
+                    "nextPaymentAt": "Naslednje plačilo",
+                    "prePaymentReminder": "Opomnik na",
+                    "canceledAt": "Preklicano ob",
+                    "createdAt": "Ustvarjeno ob"
+                },
+                "action": {
+                    "edit": "Uredi naročnino"
+                },
+                "deletedCustomer": "Izbrisana stranka"
+            },
+            "detail": {
+                "title": "Mollie naročnina",
+                "buttonCancelSubscription": "Prekliči naročnino",
+                "labelDescription": "Opis",
+                "labelAmount": "Znesek",
+                "labelQuantity": "Količina",
+                "labelMollieSubscription": "Mollie naročnina",
+                "labelMollieCustomer": "Mollie stranka",
+                "labelMandateId": "Mandat",
+                "labelShopwareCustomer": "Stranka Shopware",
+                "labelCreatedAt": "Ustvarjeno ob",
+                "buttonShowShopwareOrder": "Prikaži naročilo Shopware",
+                "buttonShowShopwareCustomer": "Prikaži stranko Shopware",
+                "cardTitleSubscription": "Naročnina",
+                "cardTitleStatus": "Status",
+                "labelStatus": "Status",
+                "labelNextPaymentAt": "Naslednje plačilo ob",
+                "labelLastRemindedAt": "Zadnji opomnik ob",
+                "labelCanceledAt": "Preklicano ob",
+                "buttonPauseSubscription": "Začasno zaustavi naročnino",
+                "buttonResumeSubscription": "Nadaljuj naročnino",
+                "buttonSkipSubscription": "Preskoči naročnino",
+                "history": {
+                    "cardTitle": "Zgodovina",
+                    "colDate": "Datum",
+                    "colComment": "Komentar",
+                    "colStatusFrom": "Status (od)",
+                    "colStatusTo": "Status (do)",
+                    "colMollieSubscription": "Mollie naročnina"
+                }
+            },
+            "product": {
+                "card-title": "Naročnina",
+                "title": "Mollie naročnine",
+                "description": "Upravljajte vaša ponavljajoča se plačila lažje kot kdaj koli prej z našimi uporabnimi funkcijami. Popeljite svoj posel na naslednjo raven z učinkovitimi možnostmi sledenja, preprostimi integracijami in še več. S pomočjo Mollie naročnin lahko enostavno ustvarite naročniške izdelke in načrtujete ponavljajoča se plačila, ki bodo izvedena ob nastavljenem intervalu in obdobju.",
+                "mollieSubscriptionProduct": "Izdelki naročnin",
+                "mollieSubscriptionIntervalAmount": "Ponovite plačilo vsak",
+                "mollieSubscriptionIntervalType": "Enota intervala",
+                "mollieSubscriptionRepetitionAmount": "Število ponovitev",
+                "mollieSubscriptionRepetitionPlaceholder": "Vnesite število ali pustite prazno",
+                "infoDefaultLanguage": "Prosimo, upoštevajte, da lahko to nastavitev uredite samo v svojem privzetem jeziku. Prosimo, spremenite svoj jezik, da uredite nastavitve naročnine tega izdelka.",
+                "btnReadMore": "Preberite več"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Naročnina"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Podatki o kreditni kartici",
+            "buttonMolliePaymentLink": "Kopiraj v odložišče",
+            "columnRefunded": "Vrnjeno",
+            "columnShipped": "Odposlano",
+            "columnCanceled": "Preklicano",
+            "labelMollieOrderId": "ID naročila Mollie",
+            "labelMollieThirdPartyPaymentId": "Referenca plačila",
+            "labelMolliePaymentLink": "URL Mollie Checkout",
+            "totalRefunds": "Vrnjeni znesek",
+            "totalRefundsPending": "Čaka na vračilo",
+            "totalRemaining": "Znesek, ki se lahko vrne",
+            "totalVouchers": "Znesek vavčerja",
+            "totalShipments": "Poslana količina ({quantity} izdelkov)",
+            "subscriptionBadge": "Naročilo naročnine",
+            "refundManager": {
+                "title": "Mollie upravitelj vračil",
+                "btnOpenRefundManager": "Odpri upravitelja vračil",
+                "btnCloseRefundManager": "Zapri upravitelja vračil"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Prednostni izdajatelj iDeal"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Upravitelj vračil"
+            },
+            "mollie_subscription": {
+                "label": "Naročnine"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Opis"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Vračilo",
+            "subscription": "Naročnina",
+            "webhookReceived": "Avtomatizirana obvestila",
+            "status": "Status",
+            "started": "Začeto",
+            "ended": "Končano",
+            "paused": "Na pavzi",
+            "renewalReminder": "Opomnik za obnovitev",
+            "renewed": "Obnovljeno",
+            "resumed": "Se nadaljuje",
+            "skipped": "Izpuščeno",
+            "all": "Vse",
+            "canceled": "Preklicano",
+            "expired": "Potekel",
+            "partiallyRefunded": "Povrnjeno (delno)",
+            "orderSuccess": "Naročilo uspešno",
+            "orderFailed": "Naročilo neuspešno",
+            "orderCanceled": "Naročilo preklicano"
+        }
+    }
+}

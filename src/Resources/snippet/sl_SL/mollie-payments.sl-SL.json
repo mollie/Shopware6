@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Izbrani način plačila trenutno ni na voljo za naročniške izdelke.",
+        "mollie-payments-cart-error-mixedcart": "Vaša košarica vsebuje več izdelkov v kombinaciji z naročniškimi izdelki. Upoštevajte, da lahko hkrati kupite le 1 naročniški izdelek.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Pri naročanju naročniških izdelkov niso na voljo vsi načini plačila.",
+        "mollie-payments-cart-guest-account": "Računi gostov se ne morejo uporabljati za naročniška naročila."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Izbrani način plačila trenutno ni na voljo za naročniške izdelke.",
+        "mollie-payments-cart-error-mixedcart": "Vaša košarica vsebuje več predmetov v kombinaciji z naročniškimi izdelki. Upoštevajte, da lahko hkrati kupite le 1 naročniški izdelek.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Pri naročanju naročniških izdelkov niso na voljo vsi načini plačila.",
+        "mollie-payments-cart-guest-account": "Računi gostov se ne morejo uporabljati za naročniška naročila."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Datum poteka",
+                "cardHolderLabel": "Ime na kartici",
+                "cardNumberLabel": "Številka kartice",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Plačilo varuje in omogoča",
+                "headLine": "Vnesite informacije o kartici",
+                "saveCardDetailLabel": "Shrani podrobnosti o kartici za prihodnja plačila"
+            },
+            "ideal": {
+                "selectBank": "Izberite banko"
+            },
+            "pos": {
+                "selectTerminal": "Izberite terminal"
+            },
+            "mandate": {
+                "sectionTitle": "Shranjene kartice",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Vaša kartica je bila uspešno izbrisana",
+                "deleteErrorMessage": "Prišlo je do težave pri odstranjevanju vaše kartice",
+                "newCard": "Nova kartica",
+                "remove": "Odstrani",
+                "subscriptionBadge": "Naročnina"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Prekliči",
+                "cardSubscription": "Ta kartica se uporablja za naročnino. Najprej prekličite naročnino, preden odstranite to kartico.",
+                "deleteButton": "Izbriši",
+                "deleteConfirmation": "Ali ste prepričani, da želite izbrisati?",
+                "title": "Potrditev izbrisa"
+            },
+            "bancomatPay": {
+                "headLine": "Telefonska številka",
+                "phoneErrorMessage": "Telefonska številka je obvezna. Na primer +386 41 111 222"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Plačajte z drugim načinom plačila",
+                "buttonReturnToShop": "Vrni se v trgovino",
+                "error": "Plačilo je neuspešno",
+                "failed": "Plačilo je neuspešno ali je bilo preklicano. Preusmerjeni boste na Mollie, kjer lahko dokončate plačilo z načinom po vaši izbiri. "
+            },
+            "redirecting": "Preusmerjam vas na: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Znesek",
+                "captionTaxes": "Davki (DDV)",
+                "paymentError": "Plačilo z Apple Pay je bilo neuspešno."
+            },
+            "paypalExpress": {
+                "paymentError": "Plačilo s Paypal Express je bilo neuspešno."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "uredi naslov za račun",
+                "btnEditShippingAddress": "Uredi naslov za pošiljanje",
+                "cancelSubscription": "Naročnina je bila preklicana",
+                "errorCancelSubscription": "Naročnine ni bilo mogoče preklicati zaradi napake. Prosimo, kontaktirajte našo podporo.",
+                "errorPause": "Prišlo je do napake pri ustavljanju vaše naročnine",
+                "errorResume": "Prišlo je do napake pri nadaljevanju vaše naročnine",
+                "errorSkip": "Prišlo je do napake pri začasni zaustavitvi vaše naročnine",
+                "errorUpdateAddress": "Prišlo je do napake pri posodabljanju vašega naslova",
+                "errorUpdatePayment": "Prišlo je do napake pri posodabljanju vašega načina plačila",
+                "headlineBillingAddress": "Naslov za račun",
+                "headlineShippingAddress": "Naslov za pošiljanje",
+                "mollieSubscriptionAmount": "Znesek",
+                "mollieSubscriptionCancel": "Prekliči naročnino",
+                "mollieSubscriptionCancelUntil": "Preklic je mogoč do",
+                "mollieSubscriptionContextMenuReorder": "Ponovi naročnino",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Naslednje plačilo ob",
+                "mollieSubscriptionPause": "Ustavi naročnino",
+                "mollieSubscriptionResume": "Nadaljuj naročnino",
+                "mollieSubscriptionSkip": "Preskoči naročnino",
+                "mollieSubscriptionUpdatePayment": "Posodobi plačilo",
+                "mollieSubscriptionsHeadline": "Naročnina:",
+                "mollieSubscriptionsInfoEmpty": "Nimate naročnin.",
+                "mollieSubscriptionsLink": "Naročnine",
+                "mollieSubscriptionsTitle": "Naročnine",
+                "mollieSubscriptionsWelcome": "Vaše nedavne naročnine:",
+                "orderActionHide": "Skrij",
+                "orderActionView": "Poglej",
+                "shippingEqualToBilling": "Enako kot naslov za račun",
+                "successPause": "Vaša naročnina je bila začasno ustavljena",
+                "successResume": "Vaša naročnina se bo sedaj nadaljevala",
+                "successSkip": "Vaša naročnina je bila začasno zaustavljena",
+                "successUpdateAddress": "Vaš naslov je bil uspešno posodobljen",
+                "successUpdatePayment": "Vaš način plačila je bil uspešno posodobljen"
+            },
+            "options": {
+                "everyDay": "Vsak dan",
+                "everyDays": "Vsak %value% dan",
+                "everyMonth": "Vsak mesec",
+                "everyMonths": "Vsak %value% mesec",
+                "everyWeek": "Vsak teden",
+                "everyWeeks": "Vsak %value% teden",
+                "repetitionCount": "%value% krat<b>(</b>"
+            },
+            "product": {
+                "addToCartText": "Naroči se",
+                "information": "Naročniški izdelek"
+            }
+        },
+        "testMode": {
+            "label": "Testni način"
+        }
+    }
+}

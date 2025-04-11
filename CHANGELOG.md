@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added Swedish language support
 - Added Polish language support
 - Added Czech language support
+- Added Slovenian language support
 
 ### Changed
 - Removed typehints for EntityRepository in order to allow repository decoration in Shopware 6.4
