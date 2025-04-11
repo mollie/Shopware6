@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Tällä hetkellä valittu maksutapa ei ole käytettävissä tilaus tuotteille.",
+        "mollie-payments-cart-error-mixedcart": "Ostoskorisi sisältää useita tuotteita yhdessä tilaustuotteiden kanssa. Huomioithan, että voit ostaa vain yhden tilaustuotteen kerrallaan.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Kaikki maksutavat eivät ole käytettävissä tilaustuotteita tilattaessa.",
+        "mollie-payments-cart-guest-account": "Vierastilejä ei voida käyttää tilaustuotteide tilauksiin."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Tällä hetkellä valittu maksutapa ei ole käytettävissä tilaustuotteille.",
+        "mollie-payments-cart-error-mixedcart": "Ostoskorisi sisältää useita tuotteita yhdessä tilaustuotteiden kanssa. Huomioithan, että voit ostaa vain yhden tilaustuotteen kerrallaan.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Kaikki maksutavat eivät ole käytettävissä tilaustuotteita tilattaessa.",
+        "mollie-payments-cart-guest-account": "Vierastilejä ei voida käyttää tilaustuotteiden tilauksiin."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Viimeinen voimassaolopäivä",
+                "cardHolderLabel": "Kortinhaltijan nimi",
+                "cardNumberLabel": "Korttinumero",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Maksun suojaa ja tarjoaa",
+                "headLine": "Syötä korttitietosi",
+                "saveCardDetailLabel": "Tallenna korttitiedot tulevia maksuja varten"
+            },
+            "ideal": {
+                "selectBank": "Valitse pankki"
+            },
+            "pos": {
+                "selectTerminal": "Valitse maksupääte"
+            },
+            "mandate": {
+                "sectionTitle": "Tallennetut kortit",
+                "cardTitleLabel": "%name% ••••%number%",
+                "deleteSuccessMessage": "Korttisi poistettiin onnistuneesti",
+                "deleteErrorMessage": "Korttisi poistamisessa ilmeni ongelma",
+                "newCard": "Uusi kortti",
+                "remove": "Poista",
+                "subscriptionBadge": "Tilaus"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Peruuta",
+                "cardSubscription": "Tätä korttia käytetään tilaukseen. Peruuta tilaus ennen tämän kortin poistamista.",
+                "deleteButton": "Poista",
+                "deleteConfirmation": "Oletko varma, että haluat poistaa?",
+                "title": "Poista vahvistus"
+            },
+            "bancomatPay": {
+                "headLine": "Puhelinnumero",
+                "phoneErrorMessage": "Puhelinnumero on pakollinen. Esimerkiksi +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Maksa toisella maksutavalla",
+                "buttonReturnToShop": "Palaa kauppaan",
+                "error": "Maksu epäonnistui",
+                "failed": "Maksu epäonnistui tai se peruttiin. Sinut ohjataan Mollien verkkosivuille, jossa voit suorittaa maksun valitsemallasi maksutavalla. "
+            },
+            "redirecting": "Sinut ohjataan osoitteeseen: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Välisumma",
+                "captionTaxes": "Verot",
+                "paymentError": "Maksu Apple Pay:llä epäonnistui."
+            },
+            "paypalExpress": {
+                "paymentError": "Maksu PayPal Express -palvelulla epäonnistui."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "muokkaa laskutusosoitetta",
+                "btnEditShippingAddress": "muokkaa toimitusosoitetta",
+                "cancelSubscription": "Tilaus on peruutettu",
+                "errorCancelSubscription": "Tilauksen peruuttaminen epäonnistui virheen vuoksi. Ota yhteyttä tukeemme.",
+                "errorPause": "Tilauksen keskeyttämisessä ilmeni virhe",
+                "errorResume": "Tilauksen jatkamisessa ilmeni virhe",
+                "errorSkip": "Tilauksen ohittamisessa ilmeni virhe",
+                "errorUpdateAddress": "Osoitteen päivittämisessä ilmeni virhe",
+                "errorUpdatePayment": "Maksutavan päivittämisessä ilmeni virhe",
+                "headlineBillingAddress": "Laskutusosoite",
+                "headlineShippingAddress": "Toimitusosoite",
+                "mollieSubscriptionAmount": "Summa",
+                "mollieSubscriptionCancel": "Peruuta tilaus",
+                "mollieSubscriptionCancelUntil": "Peruutus mahdollista kunnes",
+                "mollieSubscriptionContextMenuReorder": "Toista tilaus",
+                "mollieSubscriptionId": "Tunnus",
+                "mollieSubscriptionNextPayment": "Seuraava maksupäivä",
+                "mollieSubscriptionPause": "Keskeytä tilaus",
+                "mollieSubscriptionResume": "Jatka tilausta",
+                "mollieSubscriptionSkip": "Ohita tilaus",
+                "mollieSubscriptionUpdatePayment": "Päivitä maksu",
+                "mollieSubscriptionsHeadline": "Tilaus:",
+                "mollieSubscriptionsInfoEmpty": "Sinulla ei ole vielä tilauksia.",
+                "mollieSubscriptionsLink": "Tilaukset",
+                "mollieSubscriptionsTitle": "Tilaukset",
+                "mollieSubscriptionsWelcome": "Viimeisimmät tilauksesi:",
+                "orderActionHide": "Piilota",
+                "orderActionView": "Näytä",
+                "shippingEqualToBilling": "Sama kuin laskutusosoite",
+                "successPause": "Tilauksesi on keskeytetty",
+                "successResume": "Tilaustasi jatketaan nyt",
+                "successSkip": "Tilauksesi on ohitettu",
+                "successUpdateAddress": "Osoitteesi on päivitetty onnistuneesti",
+                "successUpdatePayment": "Maksutapasi on päivitetty onnistuneesti"
+            },
+            "options": {
+                "everyDay": "Joka päivä",
+                "everyDays": "Joka %value% päivät",
+                "everyMonth": "Joka kuukausi",
+                "everyMonths": "Joka %value% kuukaudet",
+                "everyWeek": "Joka viikko",
+                "everyWeeks": "Joka %value% viikkot",
+                "repetitionCount": "%value% kertaa"
+            },
+            "product": {
+                "addToCartText": "Tilaa",
+                "information": "Tilaustuote"
+            }
+        },
+        "testMode": {
+            "label": "Testitila"
+        }
+    }
+}
