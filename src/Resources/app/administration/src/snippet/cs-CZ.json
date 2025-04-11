@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie Předplatné | Mollie Předplatná"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Objednávka byla úspěšná",
+            "mollie_checkout_order_failed": " Objednávka selhala",
+            "mollie_checkout_order_canceled": " Objednávka byla zrušena",
+            "mollie_webhook_received_All": " Mollie Webhook Přijat (Vše)",
+            "mollie_webhook_received_status_authorized": " Mollie Webhook Přijat (Oprávněno)",
+            "mollie_webhook_received_status_failed": " Mollie Webhook Přijat (Selhalo)",
+            "mollie_webhook_received_status_canceled": " Mollie Webhook Přijat (Zrušeno)",
+            "mollie_webhook_received_status_expired": " Mollie Webhook Přijat (Vypršelo)",
+            "mollie_webhook_received_status_pending": " Mollie Webhook Přijat (Čekající)",
+            "mollie_webhook_received_status_paid": " Mollie Webhook Přijat (Zaplaceno)",
+            "mollie_webhook_received_status_completed": " Mollie Webhook Přijat (Dokončeno)",
+            "mollie_webhook_received_status_refunded": " Mollie Webhook Přijat (Vráceno)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Přijat (Částečně vráceno)",
+            "mollie_refund_started": " Mollie vrácení peněz zahájeno",
+            "mollie_subscription_started": " Mollie předplatné zahájeno",
+            "mollie_subscription_ended": " Mollie předplatné dokončeno",
+            "mollie_subscription_cancelled": " Mollie předplatné zrušeno",
+            "mollie_subscription_paused": " Mollie předplatné pozastaveno",
+            "mollie_subscription_resumed": " Mollie předplatné pokračuje",
+            "mollie_subscription_skipped": " Mollie předplatné přeskočeno",
+            "mollie_subscription_renewed": " Mollie předplatné obnoveno",
+            "mollie_subscription_renewal_reminder": " Mollie připomínka pro obnovení předplatného"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie Modul",
+        "searchPlaceholder": "Hledat předplatná...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie Platby",
+            "descriptionTextModule": "Mollie Platby",
+            "btnMollieActions": "Mollie Akce",
+            "refundThroughMollie": "Vrácení peněz přes Mollie",
+            "shipThroughMollie": "Odeslat přes Mollie",
+            "cancelMollieItem": "Zrušit přes Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Ahoj {userName}, vítejte v Mollie!",
+                "descriptionTop": "Onboarding je s Mollie snadný!",
+                "descriptionBottom": "To je vše!",
+                "descriptionFooter": "Pokud se chcete dozvědět více o našem pluginu, navštivte prosím naši oficiální stránku dokumentace.",
+                "onboardingStep1": "Zaregistrujte se do Mollie účtu.",
+                "onboardingStep2": "Zadejte své API klíče v sekci níže.",
+                "onboardingStep2TestMode": "Povolte 'Testovací režim', pokud chcete platby pouze testovat.",
+                "onboardingStep3": "Přiřaďte způsoby platby k vašemu prodejnímu kanálu.",
+                "onboardingStep3Link": "k vašim prodejním kanálům",
+                "btnDocumentation": "Dokumentace",
+                "btnRequestSupport": "Podpora",
+                "btnTroubleshooting": "Průvodce řešením problémů"
+            },
+            "api": {
+                "apiLinkButton": "Získejte své API klíče z Mollie Dashboard",
+                "testButton": "Testovací API klíče",
+                "testApiKeys": {
+                    "title": "Mollie Platby",
+                    "apiKey": "API klíč",
+                    "isValid": "je platný",
+                    "isInvalid": "je neplatný"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Zástupný symbol",
+                    "preview": "Náhled"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie Platby",
+                    "button": "Aktualizovat způsoby platby",
+                    "succeeded": "Způsoby platby byly úspěšně aktualizovány.",
+                    "failed": "Způsob platby se nepodařilo aktualizovat."
+                },
+                "mollieLimits": {
+                    "link": "Zobrazit pravidla přístupnosti mollie pro platební metodz"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware může využít nastavení měny k výpočtu zaokrouhlení celkové částky objednávky. To zahrnuje počet desetinných míst v cenách vašich produktů a nejbližší interval zaokrouhlení, například 0,50 nebo 1,00.",
+                "info2": "Tato nastavení mohou vést k jinému celkovému součtu než součet jednotlivých položek. Když Mollie zkontroluje tyto částky a zjistí, že se neshodují, způsobí to chybu při pokladně.",
+                "info3": "Tuto funkci můžete použít k vyhnutí se problémům se zaokrouhlováním při pokladně. Po jejím aktivování se v přehledu Mollie přidá samostatná položka pro rozdíl v zaokrouhlování a vaši zákazníci zaplatí celkovou částku vypočítanou Shopware."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Použití Klarna Rozděl to nebo Klarna zaplať později není možné pokud je datum vypršení delší než 28 dní, za předpokladu, že mezi obchodníkem a Klarna není dohodnuta jiná maximální doba.",
+                "bankTransferDueDateLimitReached": "Není možné nastavit dobu platnosti objednávky na více než 100 dní."
+            },
+            "support": {
+                "modalTitle": "Požádat o podporu od Mollie",
+                "btnCancel": "Zrušit",
+                "btnConfirm": "Požádat o podporu",
+                "btnSupport": "Více o naší podpoře",
+                "form": {
+                    "name": "Vaše jméno",
+                    "email": "Váš e-mail",
+                    "recipient": "Odeslat žádost na",
+                    "subject": "Předmět",
+                    "message": "Zpráva"
+                },
+                "data": {
+                    "header": "Informace odeslané Mollie:",
+                    "other": "Ostatní:",
+                    "shopwareVersion": "Verze Shopware",
+                    "pluginLogs": "{plugin} soubory protokolu",
+                    "pluginConfiguration": "{plugin} konfigurace",
+                    "pluginConfigurationHelpText": "API klíče jsou vyloučeny.",
+                    "paymentMethods": "Údaje o způsobu platby",
+                    "paymentMethodsHelpText": "Obsahuje informace o tom, které platební metody jsou aktivní, jejich přiřazení k jednotlivým prodejním kanálům a jejich stav ve vašem účtu Mollie."
+                },
+                "success": "Žádost o podporu byla úspěšně odeslána. Děláme vše pro to, abychom odpověděli co nejdříve",
+                "error": "Došlo k problému při odesílání e-mailu přes Shopware. Prosím zkuste to znovu nebo nás kontaktujte přímo e-mailem."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Položka je předplatné (Mollie)",
+            "cartSubscriptionRule": "Košík s předplatným (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Ve frontě",
+                "pending": "Čekající",
+                "processing": "Zpracovává se",
+                "refunded": "Vráceno",
+                "failed": "Selhalo",
+                "description": {
+                    "queued": "Vrácení platby je zařazeno do fronty, dokud nebude dostatečný zůstatek pro jeho zpracování. Vrácení platby můžete stále zrušit.",
+                    "pending": "Vrácení platby bude odesláno bance následující pracovní den. Vrácení platby můžete stále zrušit",
+                    "processing": "Vrácená platba byla odeslána na banku. Vrácená částka bude na účet zákazníka převedena co nejdříve.",
+                    "refunded": "Vrácená částka byla převedena na účet zákazníka.",
+                    "failed": "Vrácení peněz se po zpracování nepodařilo, například protože zákazník zavřel svůj bankovní účet. Prostředky budou vráceny na váš účet."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "pc."
+            },
+            "acl": {
+                "warningCreate": "Nemáte oprávnění k provedení vrácení peněz",
+                "warningCancel": "Nemáte oprávnění k zrušení vrácení peněz"
+            },
+            "cart": {
+                "title": "Objednávka ##orderNumber##",
+                "btnSelectAll": "Vybrat vše",
+                "btnResetForm": "Resetovat formulář",
+                "linkHowTo": "Jak používat tento formulář?",
+                "grid": {
+                    "columns": {
+                        "item": "Položka",
+                        "productNumber": "Číslo produktu",
+                        "unitPrice": "Jednotková cena",
+                        "quantity": "Množství",
+                        "refunded": "Vráceno",
+                        "refundQuantity": "Vrácení peněz",
+                        "totalPrice": "Celková částka",
+                        "refundAmount": "Vrácení peněz",
+                        "resetStock": "Resetovat zásoby"
+                    },
+                    "btnResetLine": "Resetovat řádek",
+                    "checkDeductPromotion": "Odečíst slevu",
+                    "checkRefundTax": "Vrátit DPH"
+                },
+                "roundDiffItemAdded": "Automatické zaokrouhlení položky bylo přidáno"
+            },
+            "instructions": {
+                "linkResetTutorials": "Resetovat návody",
+                "btnToggleTutorial": "Zobrazit/Skrýt návod",
+                "titleFullRefund": "Úplné vrácení peněz",
+                "textFullRefund": "Stačí použít tlačítko pro úplné vrácení peněz. Tím zajistíte, že všechny vaše položky jsou označeny jako vrácené a celá částka je vrácena zákazníkovi.",
+                "titleStockReset": "Resetování zásob",
+                "textStockReset": "Můžete automaticky zvýšit dostupné zásoby zadáním množství, které chcete vrátit zpět do zásob. Toto množství zadejte před provedením úplného nebo částečného vrácení platby. Obnovení zásob můžete flexibilně spojit s procesem vrácení platby.",
+                "titleShipping": "Doprava",
+                "textShipping": "Poštovné lze vrátit stejně jako jakékoli jiné produktové položky. Zadejte celou nebo požadovanou částku a pokračujte ve vrácení platby. Vrácení nákladů na poštovné lze flexibilně spojit s vrácením platby za položky.",
+                "titlePartialAmount": "Částečné vrácení peněz (pouze částka)",
+                "textPartialAmount": "Jednoduše zadejte požadovanou částku do textového pole a zahajte vrácení peněz.",
+                "titlePartialItems": "Částečné vrácení peněz (s položkami)",
+                "textPartialItems": "Pokud chcete označit množství a položky jako vrácené v Mollie, použijte formulář výše. Nastavte množství a zadejte vlastní částku pro každou položku, která bude vrácena. Celková částka se následně zobrazí v textovém poli pro konečnou částku vrácení. Nezapomeňte, že tuto konečnou částku je stále možné upravit před zahájením vrácení platby.",
+                "titlePartialPromotions": "Částečné vrácení peněz (včetně slev)",
+                "textPartialPromotions": "Pokud máte v košíku položku se slevou, bude tato sleva zobrazena jako samostatná položka. Pokud chcete vrátit všechny položky se slevou, vraťte jejich celkové hodnoty a celou položku se slevou. Pokud chcete vrátit pouze některé položky se slevou, můžete automaticky odečíst slevu u každé jednotlivé položky. Samozřejmě nesprávné hodnoty můžete vždy upravit.",
+                "titleRoundingDiff": "Rozdíl zaokroulení",
+                "textRoundingDiff": "Úplné vrácení peněz zahrne rozdíly v zaokroulení"
+            },
+            "summary": {
+                "dataLoading": "Data se načítají...",
+                "headerExcludingVat": "Bez DPH",
+                "headerIncludingVat": "S DPH",
+                "captionTotal": "Celkem",
+                "captionTotalTaxFree": "Celkem",
+                "captionPendingRefunds": "Čeká na vrácení peněz",
+                "captionVouchers": "Částka poukazu",
+                "captionRefunded": "Vrácená částka",
+                "captionRemaining": "Vrátitelná částka",
+                "btnFixDiff": "Opravit rozdíl",
+                "placeholderDescription": "Zadejte popis pro výpis z banky/karty pro zákazníka. Max. 140 znaků",
+                "lblDescription": "Popis (volitelné) ({characters}/140 znaků)",
+                "descriptionHelp": "Toto bude zobrazeno na výpisu z banky nebo karty zákazníka, pokud to bude možné. Zpráva bude zkrácena po 140 znacích.",
+                "placeholderInternalDescription": "Zadejte popis pro interní použití",
+                "lblInternalDescription": "Interní popis (volitelné)",
+                "internalDescriptionHelp": "Toto bude zobrazeno jako místní popis v administrátorském rozhraní.",
+                "checkVerification": "Ověřil(a) jsem celkovou částku vrácení platby a nastavené množství pro vrácení a opětovné naskladnění.",
+                "btnRefund": "Vrátit",
+                "btnFullRefund": "Úplné vrácení",
+                "roundDiffItemAdded": "Položka zaokroulení"
+            },
+            "refunds": {
+                "title": "Vrácení peněz v Mollie Dashboard",
+                "linkMore": "Více o vrácení peněz",
+                "grid": {
+                    "columns": {
+                        "amount": "Částka",
+                        "status": "Status",
+                        "description": "Popis",
+                        "internalDescription": "Interní popis",
+                        "composition": "Složení",
+                        "date": "Datum"
+                    },
+                    "lblNoComposition": "Žádné dostupné složení",
+                    "btnCancelRefund": "Zrušit toto vrácení peněz"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Vrácení platby bylo vytvořeno v Mollie. Může trvat až 2 hodiny, než bude vrácení platby dokončeno. Během této doby můžete vrácení platby zrušit.",
+                    "refund-canceled": "Probíhající vrácení platby bylo úspěšně zrušeno a odstraněno."
+                },
+                "error": {
+                    "low-amount": "Prosím zadejte částku, která má být vrácena.",
+                    "refund-created": "Při vytváření vrácení platby došlo k chybě.",
+                    "refund-canceled": "Při zrušení probíhajícího vrácení platby došlo k problému. Prosím, zkuste to znovu v Mollie Dashboard."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Poukaz",
+            "VOUCHER_INFO_TITLE": "Platby poukazy",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie vám umožňuje snadno přijímat platby ve vašem online obchodě pomocí Eco-, dárkových a stravenkových poukazů – chytrý způsob, jak zvýšit prodeje a uspokojit vaše zákazníky. Platební metoda 'poukaz' je viditelná pouze v případě, že máte v košíku alespoň 1 produkt s přiřazeným typem poukazu.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Vezměte prosím na vědomí, že tuto konfiguraci lze upravit pouze v nastaveném výchozím jazyce. Změňte prosím jazyk, abyste mohli upravit typ poukazu u tohoto produktu.",
+            "VOUCHER_BTN_READMORE": "Zjistit více",
+            "VOUCHER_TYPE_CAPTION": "Typ poukazu produktu",
+            "VOUCHER_TYPE_VALUE_NONE": "Žádný",
+            "VOUCHER_TYPE_VALUE_ECO": "Eko",
+            "VOUCHER_TYPE_VALUE_MEAL": "Stravenky",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Dárkový"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Odeslat přes Mollie",
+                "item": {
+                    "label": "Položka:",
+                    "noQuantity": "Prosím zadejte množství k odeslání.",
+                    "shipAll": "Odeslat vše",
+                    "summary": {
+                        "quantity": "Množství k odeslání",
+                        "shipped": "Odeslané množství",
+                        "shippable": "Množství, které lze odeslat"
+                    },
+                    "success": "Objednávka byla úspěšně odeslána."
+                },
+                "order": {
+                    "description": "Následující množství položek bude odesláno.",
+                    "itemHeader": "Položka",
+                    "quantityHeader": "Množství",
+                    "originalQuantityHeader": "Množství (k odeslání)"
+                },
+                "availableTracking": {
+                    "label": "Dostupné sledovací kódy",
+                    "hint": "Kliknutím na jeden z těchto sledovacích kódů se všechna data automaticky vyplní."
+                },
+                "showTracking": "Přidat informace o sledování pro tuto zásilku",
+                "tracking": {
+                    "carrier": "Dopravce",
+                    "code": "Kód",
+                    "url": "Url",
+                    "invalid": "Prosím zadejte Dopravce i Kód"
+                },
+                "confirmButton": "Odeslat objednávku",
+                "cancelButton": "Zrušit",
+                "selectAllButton": "Vybrat vše",
+                "resetButton": "Resetovat"
+            },
+            "cancel": {
+                "title": "Zrušit položku prostřednictvím Mollie",
+                "confirmButton": "Zrušit položku prostřednictvím Mollie",
+                "cancelButton": "Zavřít modal",
+                "resetStock": "Obnovit zásoby",
+                "item": {
+                    "success": "Produkt byl úspěšně zrušen",
+                    "failed": {
+                        "quantityZero": "Množství je 0",
+                        "invalidLine": "Produkt neexistuje v objednávce",
+                        "quantityTooHigh": "Množství je příliš vysoké"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Odeslat objednávku (Mollie)",
+                        "description": "Odeslat objednávku v Mollie."
+                    },
+                    "modal": {
+                        "title": "Odeslat objednávku",
+                        "description": "Tato akce automaticky odešle objednávku prostřednictvím Mollie. Sekvence toku obdrží číslo objednávky a předá jej do API Mollie. Úspěšné a neúspěšné zásilky budou viditelné v protokolech Mollie.",
+                        "warningConfig": "Ujistěte se, že vypnete jakoukoli další automatizaci pro tento typ akce, aby nedošlo k žádným rušením. Následující aktivované funkce tohoto pluginu mohou s touto akcí kolidovat:",
+                        "noWarnings": "Žádná upozornění"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Vrácení peněz za objednávku (Mollie)",
+                        "description": "Vrácení peněz za objednávku skrze Mollie."
+                    },
+                    "modal": {
+                        "title": "Vrácení peněz za objednávku",
+                        "description": "Tato akce automaticky spustí vrácení platby prostřednictvím Mollie. Sekvence toku obdrží číslo objednávky a předá ho do Mollie API. Úspěšná a neúspěšná vrácení platby budou viditelná v protokolech Mollie.",
+                        "warning": "Mějte prosím na paměti, že vrácení platby může trvat až 2 hodiny, než bude dokončeno a zobrazeno v obchodě. Během této doby můžete vždy zrušit probíhající vrácení platby buď z objednávky v Shopware, nebo z Mollie Dashboard.",
+                        "warningConfig": "Prosím ujistěte se, že jste vypnuli veškerou další automatizaci pro tento typ akce, abyste předešli možným problémům."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Automatické odesílání v konfiguraci pluginu"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Čekající",
+                "active": "Aktivní",
+                "canceled": "Zrušeno",
+                "suspended": "Pozastaveno",
+                "completed": "Dokončeno",
+                "paused": "Pozastaveno",
+                "resumed": "Obnoveno",
+                "skipped": "Přeskočeno"
+            },
+            "navigation": {
+                "title": "Mollie Předplatná"
+            },
+            "TYPE_DAYS": "Den (dny)",
+            "TYPE_WEEKS": "Týden(y)",
+            "TYPE_MONTHS": "Měsíc(e)",
+            "confirm": {
+                "cancelTitle": "Zrušit předplatné?",
+                "cancel": "Zrušit předplatné vašeho zákazníka.",
+                "pauseTitle": "Pozastavit předplatné?",
+                "pause": "Pozastavit předplatné, dokud jej znovu neobnovíte.",
+                "resumeTitle": "Obnovit předplatné?",
+                "resume": "Pokračovat znovu v předplatném.",
+                "skipTitle": "Přeskočit příští splátku?",
+                "skip": "Přeskočte příští splátku v předplatném. Poté bude pokračovat automaticky."
+            },
+            "alerts": {
+                "cancelSuccess": "Předplatné bylo úspěšně zrušeno",
+                "pauseSuccess": "Předplatné bylo úspěšně pozastaveno",
+                "resumeSuccess": "Předplatné bylo úspěšně obnoveno",
+                "skipSuccess": "Předplatné bylo úspěšně přeskočeno. Následující platba byla aktualizována."
+            },
+            "list": {
+                "title": "Mollie Předplatná",
+                "columns": {
+                    "customer": "Zákazník",
+                    "status": "Status",
+                    "description": "Popis",
+                    "amount": "Částka",
+                    "nextPaymentAt": "Další platba",
+                    "prePaymentReminder": "Připomenuto k",
+                    "canceledAt": "Zrušeno k",
+                    "createdAt": "Vytvořeno k"
+                },
+                "action": {
+                    "edit": "Upravit předplatné"
+                },
+                "deletedCustomer": "Smazaný zákazník"
+            },
+            "detail": {
+                "title": "Mollie předplatné",
+                "buttonCancelSubscription": "Zrušit předplatné",
+                "labelDescription": "Popis",
+                "labelAmount": "Částka",
+                "labelQuantity": "Množství",
+                "labelMollieSubscription": "Mollie předplatné",
+                "labelMollieCustomer": "Mollie zákazník",
+                "labelMandateId": "Pověření",
+                "labelShopwareCustomer": "Shopware zákazník",
+                "labelCreatedAt": "Vytvořeno k",
+                "buttonShowShopwareOrder": "Zobrazit objednávku Shopware",
+                "buttonShowShopwareCustomer": "Zobrazit zákazníka Shopware",
+                "cardTitleSubscription": "Předplatné",
+                "cardTitleStatus": "Status",
+                "labelStatus": "Status",
+                "labelNextPaymentAt": "Další platba k",
+                "labelLastRemindedAt": "Poslední připomenutí k",
+                "labelCanceledAt": "Zrušeno k",
+                "buttonPauseSubscription": "Pozastavit předplatné",
+                "buttonResumeSubscription": "Obnovit předplatné",
+                "buttonSkipSubscription": "Přeskočit předplatné",
+                "history": {
+                    "cardTitle": "Historie",
+                    "colDate": "Datum",
+                    "colComment": "Komentář",
+                    "colStatusFrom": "Status (od)",
+                    "colStatusTo": "Stav (do)",
+                    "colMollieSubscription": "Mollie předplatné"
+                }
+            },
+            "product": {
+                "card-title": "Předplatné",
+                "title": "Mollie Předplatné",
+                "description": "Správa vašich opakovaných plateb je snadnější než kdy dříve díky našim užitečným funkcím. Posuňte své podnikání na novou úroveň s efektivními možnostmi sledování, jednoduchými integracemi a dalšími funkcemi. S předplatnými Mollie můžete snadno vytvářet produkty na předplatné i naplánovat opakované platby, které budou probíhat v nastaveném intervalu a období.",
+                "mollieSubscriptionProduct": "Produkt předplatného",
+                "mollieSubscriptionIntervalAmount": "Opakovat platbu každý",
+                "mollieSubscriptionIntervalType": "Jednotka intervalu",
+                "mollieSubscriptionRepetitionAmount": "Počet opakování",
+                "mollieSubscriptionRepetitionPlaceholder": "Zadejte číslo nebo nechte prázdné",
+                "infoDefaultLanguage": "Vezměte prosím na vědomí, že tuto konfiguraci lze upravit pouze ve vašem výchozím jazyce. Prosím změňte svůj jazyk pro úpravu nastavení předplatného tohoto produktu.",
+                "btnReadMore": "Zjistit více"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Předplatné"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Údaje o kreditní kartě",
+            "buttonMolliePaymentLink": "Kopírovat do schránky",
+            "columnRefunded": "Vráceno",
+            "columnShipped": "Odesláno",
+            "columnCanceled": "Zrušeno",
+            "labelMollieOrderId": "ID objednávky Mollie",
+            "labelMollieThirdPartyPaymentId": "Reference platby",
+            "labelMolliePaymentLink": "Mollie Checkout URL",
+            "totalRefunds": "Vrácená částka",
+            "totalRefundsPending": "Čeká na vrácení",
+            "totalRemaining": "Částka, která může být vrácena",
+            "totalVouchers": "Částka poukazu",
+            "totalShipments": "Odeslaná částka ({quantity} položek)",
+            "subscriptionBadge": "Objednávka předplatného",
+            "refundManager": {
+                "title": "Mollie Manager Vrácení",
+                "btnOpenRefundManager": "Otevřít Manager Vrácení",
+                "btnCloseRefundManager": "Zavřít Správce Vrácení Peněz"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Preferovaný iDEAL emitent"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Správce vrácení peněz"
+            },
+            "mollie_subscription": {
+                "label": "Předplatná"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Popis"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Vrácení peněz",
+            "subscription": "Předplatné",
+            "webhookReceived": "Webhooky",
+            "status": "Status",
+            "started": "Zahájeno",
+            "ended": "Ukončeno",
+            "paused": "Pozastaveno",
+            "renewalReminder": "Upomínka na obnovení",
+            "renewed": "Obnovený",
+            "resumed": "Pokračuje",
+            "skipped": "Přeskočeno",
+            "all": "Vše",
+            "canceled": "Zrušeno",
+            "expired": "Vypršelo",
+            "partiallyRefunded": "Vráceno (částečně)",
+            "orderSuccess": "Objednávka byla úspěšná",
+            "orderFailed": "Objednávka selhala",
+            "orderCanceled": "Objednávka byla zrušena"
+        }
+    }
+}
