@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "A jelenleg kiválasztott fizetési mód nem érhető el az előfizetésekhez.",
+        "mollie-payments-cart-error-mixedcart": "A kosara több tételt tartalmaz előfizetéssel kombinálva. Felhívjuk figyelmét, hogy egyszerre csak 1 előfizetéses terméket vásárolhat.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nem minden fizetési mód érhető el az előfizetéses tételeket tartalmazó rendeléseknél.",
+        "mollie-payments-cart-guest-account": "Vendégfiók nem használható előfizetési rendeléshez."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "A jelenleg kiválasztott fizetési mód nem elérhető előfizetési termékekhez.",
+        "mollie-payments-cart-error-mixedcart": "A kosara több tételt tartalmaz, együtt előfizetési tételekkel. Kérjük, vegye figyelembe, hogy egyszerre csak 1 előfizetési tételt vásárolhat.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nem minden fizetési mód érhető el előfizetési termékek rendelésekor.",
+        "mollie-payments-cart-guest-account": "Vendégfiók nem használható előfizetési rendeléshez."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Lejárati dátum",
+                "cardHolderLabel": "Kártya neve",
+                "cardNumberLabel": "Kártyaszám",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "A kifizetés biztonságát és folyamatát biztosítja a",
+                "headLine": "Adja meg a kártya adatait",
+                "saveCardDetailLabel": "Mentse el a kártyaadatokat a jövőbeni kifizetésekhez"
+            },
+            "ideal": {
+                "selectBank": "Válasszon bankot"
+            },
+            "pos": {
+                "selectTerminal": "Válasszon terminált"
+            },
+            "mandate": {
+                "sectionTitle": "Mentett kártyák",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "A kártya sikeresen törölve lett",
+                "deleteErrorMessage": "Hiba történt a kártya eltávolításakor",
+                "newCard": "Új kártya",
+                "remove": "Eltávolítás",
+                "subscriptionBadge": "Előfizetés"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Törlés",
+                "cardSubscription": "Ez a kártya egy előfizetéshez van használva. Kérjük, először törölje az előfizetést, mielőtt eltávolítja ezt a kártyát.",
+                "deleteButton": "Törlés",
+                "deleteConfirmation": "Biztosan törölni szeretné?",
+                "title": "Törlés megerősítése"
+            },
+            "bancomatPay": {
+                "headLine": "Telefonszám",
+                "phoneErrorMessage": "A telefonszám kötelező. Például +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Fizessen másik fizetési módon",
+                "buttonReturnToShop": "Vissza a boltba",
+                "error": "A kifizetés sikertelen",
+                "failed": "A fizetést elutasították vagy törölték. A rendszer átirányít Mollie-ba, ahol a kiválasztott fizetési móddal véglegesítheti fizetését. "
+            },
+            "redirecting": "Átirányítás a következőre: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Összesen",
+                "captionTaxes": "Adók",
+                "paymentError": "A kifizetés Apple Pay-el sikertelen."
+            },
+            "paypalExpress": {
+                "paymentError": "A kifizetés PayPal Express-szel sikertelen."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "címzett cím módosítása",
+                "btnEditShippingAddress": "szállítási cím módosítása",
+                "cancelSubscription": "Az előfizetés törölve lett",
+                "errorCancelSubscription": "Hiba miatt nem lehetett lemondani az előfizetést. Kérjük, lépjen kapcsolatba ügyfélszolgálatunkkal.",
+                "errorPause": "Hiba történt az előfizetés szüneteltetésekor",
+                "errorResume": "Hiba történt az előfizetés folytatásakor",
+                "errorSkip": "Hiba történt az előfizetés kihagyásakor",
+                "errorUpdateAddress": "Hiba történt a cím frissítésekor",
+                "errorUpdatePayment": "Hiba történt a fizetési mód frissítésekor",
+                "headlineBillingAddress": "Számlázási cím",
+                "headlineShippingAddress": "Szállítási cím",
+                "mollieSubscriptionAmount": "Összeg",
+                "mollieSubscriptionCancel": "Előfizetés törlése",
+                "mollieSubscriptionCancelUntil": "Törlés lehetséges",
+                "mollieSubscriptionContextMenuReorder": "Ismételje meg az előfizetést",
+                "mollieSubscriptionId": "Azonosító",
+                "mollieSubscriptionNextPayment": "Következő kifizetés",
+                "mollieSubscriptionPause": "Szüneteltesse az előfizetést",
+                "mollieSubscriptionResume": "Folytassa az előfizetést",
+                "mollieSubscriptionSkip": "Kihagyás",
+                "mollieSubscriptionUpdatePayment": "Fizetés frissítése",
+                "mollieSubscriptionsHeadline": "Előfizetés:",
+                "mollieSubscriptionsInfoEmpty": "Még nincsenek előfizetései.",
+                "mollieSubscriptionsLink": "Előfizetések",
+                "mollieSubscriptionsTitle": "Előfizetések",
+                "mollieSubscriptionsWelcome": "Legutóbbi előfizetései:",
+                "orderActionHide": "Elrejtés",
+                "orderActionView": "Nézet",
+                "shippingEqualToBilling": "Egyezik a számlázási címmel",
+                "successPause": "Az előfizetése szünetelésre került",
+                "successResume": "Az előfizetés mostantól folytatódik",
+                "successSkip": "Az előfizetés ki lett hagyva",
+                "successUpdateAddress": "A címe sikeresen frissítve lett",
+                "successUpdatePayment": "A fizetési módja sikeresen frissítve lett"
+            },
+            "options": {
+                "everyDay": "Minden nap",
+                "everyDays": "Minden %value% nap",
+                "everyMonth": "Minden hónapban",
+                "everyMonths": "Minden %value% hónapban",
+                "everyWeek": "Minden héten",
+                "everyWeeks": "Minden %value% héten",
+                "repetitionCount": "%value% alkalom<b>(</b>szor"
+            },
+            "product": {
+                "addToCartText": "Feliratkozás",
+                "information": "Előfizetési termék"
+            }
+        },
+        "testMode": {
+            "label": "Teszt környezet"
+        }
+    }
+}
