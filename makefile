@@ -43,6 +43,7 @@ dev: ##1 Installs all dev dependencies
 	@composer validate
 	composer install
 	npm install
+	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
 	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli -y
