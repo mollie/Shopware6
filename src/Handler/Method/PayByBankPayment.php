@@ -12,7 +12,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 /**
  * @final
  */
-class PayByBankPayment extends PaymentHandler
+class PayByBankPayment extends PaymentHandler implements BankTransfer
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::PAYBYBANK;
     public const PAYMENT_METHOD_DESCRIPTION = 'Pay by Bank';
