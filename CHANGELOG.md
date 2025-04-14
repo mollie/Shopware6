@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fixed the error "Call to a member function info() on null"
 - Fixed the issue, that a wrong API Key was used when lineitems were cancelled in administration
-
+- Fixed the issue that the payment method of a paypal express transaction was changed to paypal over webhooks
 
 ## [4.15.0] - 2025-04-03
 

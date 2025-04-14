@@ -114,10 +114,15 @@ class OrderAttributes
      * @var string
      */
     private $bancomatPayPhoneNumber;
+    /**
+     * We need to store the mollie payment method name, so we can later check if the method has been changed
+     */
+    private string $molliePaymentMethod;
 
     public function __construct(OrderEntity $order)
     {
         $this->order = $order;
+        $this->molliePaymentMethod = $this->getCustomFieldValue($order, 'payment_method');
         $this->mollieOrderId = $this->getCustomFieldValue($order, 'order_id');
         $this->molliePaymentId = $this->getCustomFieldValue($order, 'payment_id');
         $this->swSubscriptionId = $this->getCustomFieldValue($order, 'swSubscriptionId');
@@ -461,6 +466,10 @@ class OrderAttributes
             $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;
         }
 
+        if ($this->molliePaymentMethod !== '') {
+            $mollieData['payment_method'] = $this->molliePaymentMethod;
+        }
+
         return [
             CustomFieldsInterface::MOLLIE_KEY => $mollieData,
         ];
@@ -490,6 +499,16 @@ class OrderAttributes
         }
 
         return false;
+    }
+
+    public function getMolliePaymentMethod(): string
+    {
+        return $this->molliePaymentMethod;
+    }
+
+    public function setMolliePaymentMethod(string $molliePaymentMethod): void
+    {
+        $this->molliePaymentMethod = $molliePaymentMethod;
     }
 
     private function getCustomFieldValue(OrderEntity $order, string $keyName): string
