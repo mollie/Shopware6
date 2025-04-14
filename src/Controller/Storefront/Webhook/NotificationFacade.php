@@ -228,9 +228,12 @@ class NotificationFacade
         // then we want to update the one inside Shopware
         // If our order is Apple Pay, then DO NOT CONVERT THIS TO CREDIT CARD!
         // we want to keep Apple Pay as payment method
+        // also change only the payment method, if its actually changed
         if ($swTransaction->getPaymentMethod() instanceof PaymentMethodEntity
             && $mollieOrder instanceof Order
-            && $swTransaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class) {
+            && $swTransaction->getPaymentMethod()->getHandlerIdentifier() !== ApplePayPayment::class
+            && $mollieOrder->method !== $orderAttributes->getMolliePaymentMethod()
+        ) {
             $this->updatePaymentMethod($swTransaction, $mollieOrder, $context);
         }
 

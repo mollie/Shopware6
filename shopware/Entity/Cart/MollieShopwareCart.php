@@ -27,7 +27,7 @@ class MollieShopwareCart
 
     public function setSingleProductExpressCheckout(bool $true): void
     {
-        $this->setExtensionKey(CustomFieldsInterface::SINGLE_PRODUCT_EXPRESS_CHECKOUT, $true);
+        $this->setExtensionKey(CustomFieldsInterface::SINGLE_PRODUCT_EXPRESS_CHECKOUT, (string) $true);
     }
 
     public function isSingleProductExpressCheckout(): bool
