@@ -28,5 +28,35 @@
         <service id="Kiener\MolliePayments\Resources\snippet\es_ES\SnippetFile_es_ES" >
             <tag name="shopware.snippet.file"/>
         </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\se_SV\SnippetFile_sv_SE">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\nb_NO\SnippetFile_nb_NO">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\pl_PL\SnippetFile_pl_PL">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\cs_CZ\SnippetFile_cs_CZ">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\sl_SL\SnippetFile_sl_SL">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\hu_HU\SnippetFile_hu_HU">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\fi_FI\SnippetFile_fi_FI">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+
     </services>
 </container>

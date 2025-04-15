@@ -31,6 +31,13 @@ import nlNL from './snippet/nl-NL';
 import itIT from './snippet/it-IT';
 import ptPT from './snippet/pt-PT';
 import esES from './snippet/es-ES';
+import svSE from './snippet/sv-SE';
+import nbNO from './snippet/nb-NO';
+import plPL from './snippet/pl-PL';
+import csCZ from './snippet/cs-CZ';
+import slSL from './snippet/sl-SL';
+import huHU from './snippet/hu-HU';
+import fiFI from './snippet/fi-FI';
 
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('de-DE', deDE);
@@ -44,3 +51,17 @@ Shopware.Locale.extend('it-IT', itIT);
 Shopware.Locale.extend('pt-PT', ptPT);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('es-ES', esES);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('sv-SE', svSE);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('nb-NO', nbNO);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('pl-PL', plPL);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('cs-CZ', csCZ);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('sl-SL', slSL);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('hu-HU', huHU);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('fi-FI', fiFI);

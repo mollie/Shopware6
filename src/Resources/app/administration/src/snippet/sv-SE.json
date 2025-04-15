@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie Prenumeration | Mollie Prenumerationer"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Lyckad beställning",
+            "mollie_checkout_order_failed": " Misslyckad beställning",
+            "mollie_checkout_order_canceled": " Avbruten beställningen",
+            "mollie_webhook_received_All": " Mollie Webhook Mottagen (Alla)",
+            "mollie_webhook_received_status_authorized": " Mollie Webhook Mottagen (Auktoriserad)",
+            "mollie_webhook_received_status_failed": " Mollie Webhook Mottagen (Misslyckad)",
+            "mollie_webhook_received_status_canceled": " Mollie Webhook Mottagen (Avbruten)",
+            "mollie_webhook_received_status_expired": " Mollie Webhook Mottagen (Har utgått)",
+            "mollie_webhook_received_status_pending": " Mollie Webhook Mottagen (Pågående)",
+            "mollie_webhook_received_status_paid": " Mollie Webhook Mottagen (Betald)",
+            "mollie_webhook_received_status_completed": " Mollie Webhook Mottagen (Slutförd)",
+            "mollie_webhook_received_status_refunded": " Mollie Webhook Mottagen (Återbetald)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Mottagen (Delvis återbetalad)",
+            "mollie_refund_started": " Mollie återbetalning påbörjad",
+            "mollie_subscription_started": " Mollie-prenumerationen har startat",
+            "mollie_subscription_ended": " Mollie-prenumerationen slutförd",
+            "mollie_subscription_cancelled": " Mollie prenumeration avbruten",
+            "mollie_subscription_paused": " Mollie-prenumerationen har pausats",
+            "mollie_subscription_resumed": " Mollie-prenumerationen har återupptagits",
+            "mollie_subscription_skipped": " Mollie-prenumerationen har hoppats över",
+            "mollie_subscription_renewed": " Mollie prenumeration förnyad",
+            "mollie_subscription_renewal_reminder": " Mollie påminnelse för prenumerationsförnyelse"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie Modul",
+        "searchPlaceholder": "Sök prenumerationer...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie Betalningar",
+            "descriptionTextModule": "Mollie Betalningar",
+            "btnMollieActions": "Mollie åtgärder",
+            "refundThroughMollie": "Återbetalning genom Mollie",
+            "shipThroughMollie": "Frakta genom Mollie",
+            "cancelMollieItem": "Avbryt genom Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Hej {userName}, Välkommen till Mollie!",
+                "descriptionTop": "Att börja med Mollie är enkelt!",
+                "descriptionBottom": "Det var allt!",
+                "descriptionFooter": "Om du vill lära dig mer om vårt plugin, vänligen besök vår officiella dokumentationssida.",
+                "onboardingStep1": "Registrera dig för ett Mollie-konto.",
+                "onboardingStep2": "Ange dina API-nycklar i avsnittet nedan.",
+                "onboardingStep2TestMode": "Slå på 'Test Mode' om du endast vill testa betalningar.",
+                "onboardingStep3": "Tilldela betalningsmetoder till din försäljningskanal.",
+                "onboardingStep3Link": "till dina försäljningskanaler",
+                "btnDocumentation": "Dokumentation",
+                "btnRequestSupport": "Stöd",
+                "btnTroubleshooting": "Felsökningsguide"
+            },
+            "api": {
+                "apiLinkButton": "Hämta dina API-nycklar från Mollie Dashboard",
+                "testButton": "Test API-nycklar",
+                "testApiKeys": {
+                    "title": "Mollie Betalningar",
+                    "apiKey": "API-nyckel",
+                    "isValid": "är giltig",
+                    "isInvalid": "är ogiltigt"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Platshållare",
+                    "preview": "Förhandsvisning"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie Betalningar",
+                    "button": "Uppdatera betalningsmetoder",
+                    "succeeded": "Betalningsmetoderna har uppdaterats framgångsrikt.",
+                    "failed": "Betalningsmetoderna kunde inte uppdateras."
+                },
+                "mollieLimits": {
+                    "link": "Visa mollie tillgänglighetsregler för betalningsmetoder"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware kan använda valuta-inställningar för att beräkna hur den avrundar en beställnings totala belopp. Detta inkluderar antalet decimaler i din produktprissättning och det närmaste avrundningsintervallet, såsom 0,50 eller 1,00.",
+                "info2": "Dessa inställningar kan leda till ett annat totalbelopp än den totala summan av radposter. När Mollie kontrollerar dessa belopp och upptäcker att de inte stämmer, orsakar det ett checkoutfel.",
+                "info3": "Du kan använda den här funktionen för att undvika avrundningsproblem i din checkout. När den är aktiverad läggs en separat radpost till i ditt Mollie Dashboard för skillnaden i avrundning, och dina kunder betalar det totala belopp som beräknats av Shopware."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Det är inte möjligt att använda Klarna Betala nu, Klarna Slice it eller Klarna Betala senare som metod när ditt utgångsdatum är mer än 28 dagar framåt i tiden, om inte en annan maximal tid har överenskommits mellan handlaren och Klarna.",
+                "bankTransferDueDateLimitReached": "Det är inte möjligt att ställa in beställningens livslängd högre än 100 dagar."
+            },
+            "support": {
+                "modalTitle": "Begär hjälp från Mollie",
+                "btnCancel": "Avbryt",
+                "btnConfirm": "Begäran hjälp",
+                "btnSupport": "Mer om vårt hjälp",
+                "form": {
+                    "name": "Ditt namn",
+                    "email": "Din e-post",
+                    "recipient": "Skicka begäran till",
+                    "subject": "Ämne",
+                    "message": "Meddelande"
+                },
+                "data": {
+                    "header": "Data skickat till Mollie:",
+                    "other": "Övrigt:",
+                    "shopwareVersion": "Shopware-version",
+                    "pluginLogs": "{plugin} loggfiler",
+                    "pluginConfiguration": "{plugin} konfiguration",
+                    "pluginConfigurationHelpText": "API-nycklar är uteslutna.",
+                    "paymentMethods": "Betalningsmetoddata",
+                    "paymentMethodsHelpText": "Innehåller information om vilka betalningsmetoder som är aktiva, tilldelade varje försäljningskanal, samt deras status i ditt Mollie-konto."
+                },
+                "success": "Förfrågan om hjälp har skickats framgångsrikt. Vi gör vårt bästa för att svara så snart som möjligt",
+                "error": "Det uppstod ett problem när mailet skickades via Shopware. Vänligen försök igen eller kontakta oss direkt via e-post."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Objektet är en prenumeration (Mollie)",
+            "cartSubscriptionRule": "Varukorg med prenumerationer (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Köad",
+                "pending": "Pågående",
+                "processing": "Bearbetar",
+                "refunded": "Återbetald",
+                "failed": "Misslyckad",
+                "description": {
+                    "queued": "Återbetalningen är köad tills det finns tillräckligt med saldo för att bearbeta återbetalningen. Du kan fortfarande avbryta återbetalningen.",
+                    "pending": "Återbetalningen kommer att skickas till banken nästa arbetsdag. Du kan fortfarande avbryta återbetalningen.",
+                    "processing": "Återbetalningen har skickats till banken. Återbetalt belopp kommer att överföras till konsumentens konto så snart som möjligt.",
+                    "refunded": "Återbetalat belopp har överförts till konsumenten.",
+                    "failed": "Återbetalningen har misslyckats efter bearbetningen. Till exempel har kunden stängt sitt bankkonto. Medlen kommer att återföras till ditt konto."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "st."
+            },
+            "acl": {
+                "warningCreate": "Du har inte behörighet att skapa återbetalningar",
+                "warningCancel": "Du har inte behörighet att avboka återbetalningar"
+            },
+            "cart": {
+                "title": "Beställning ##orderNumber##",
+                "btnSelectAll": "Välj Alla",
+                "btnResetForm": "Återställnings Formulär",
+                "linkHowTo": "Hur använder jag detta formulär?",
+                "grid": {
+                    "columns": {
+                        "item": "Objekt",
+                        "productNumber": "Produktnummer",
+                        "unitPrice": "Enhetspris",
+                        "quantity": "Antal",
+                        "refunded": "Återbetald",
+                        "refundQuantity": "Återbetalning",
+                        "totalPrice": "Totalt",
+                        "refundAmount": "Återbetalning",
+                        "resetStock": "Återställ lager"
+                    },
+                    "btnResetLine": "Återställ rad",
+                    "checkDeductPromotion": "Dra av kampanj",
+                    "checkRefundTax": "Återbetalning av moms"
+                },
+                "roundDiffItemAdded": "Automatiskt avrundningsobjekt har lagts till"
+            },
+            "instructions": {
+                "linkResetTutorials": "Återställ handledningar",
+                "btnToggleTutorial": "Visa/Dölj handledning",
+                "titleFullRefund": "Full återbetalning",
+                "textFullRefund": "Använd bara knappen för full återbetalning. Detta säkerställer att alla dina objekt markeras som återbetalda och hela beloppet återgår till kunden.",
+                "titleStockReset": "Lageråterställning",
+                "textStockReset": "Du kan automatiskt öka det tillgängliga lagret genom att ange den mängd du vill sätta tillbaka i lager. Ange det innan du går vidare med en fullständig eller delvis återbetalning. Återställning av lagret kan kombineras med den faktiska återbetalningsprocessen på ett flexibelt sätt.",
+                "titleShipping": "Frakt",
+                "textShipping": "Fraktartiklar kan återbetalas som alla andra produktartiklar. Antingen anger du hela mängden eller ett anpassat delbelopp och går vidare med återbetalningen. Återbetalning av fraktkostnader kan kombineras med den faktiska återbetalningsprocessen för artiklar på ett flexibelt sätt.",
+                "titlePartialAmount": "Delvis återbetalning (endast belopp)",
+                "textPartialAmount": "Ange bara delbeloppet i textfältet och starta återbetalningen.",
+                "titlePartialItems": "Delvis återbetalning (med artiklar)",
+                "textPartialItems": "Om du vill markera mängder och artiklar som återbetalda i Mollie, använd formuläret ovan. Ställ in dina mängder och ange ett anpassat belopp för varje produkt som ska återbetalas. Totalsumman kommer sedan att synas i det slutliga återbetalningsbeloppets textfält. Kom ihåg, det är fortfarande möjligt att justera detta slutliga belopp innan du startar din återbetalning.",
+                "titlePartialPromotions": "Delvis återbetalning (med kampanjer)",
+                "textPartialPromotions": "Om du har en kampanj i din varukorg så är din kampanj en separat artikelrad. Om du vill återbetala alla rabatterade artiklar, gå vidare och återbetala deras totalsummor och hela kampanjartikeln i sig. Men om du bara vill återbetala några få artiklar som är rabatterade kan du dra av den tillämpade rabatten automatiskt för varje enskild artikelrad. Du kan självklart alltid ändra värden om de inte är korrekta.",
+                "titleRoundingDiff": "Avrundningsskillnad",
+                "textRoundingDiff": "En full återbetalning kommer att inkludera avrundningsskillnader"
+            },
+            "summary": {
+                "dataLoading": "Data laddas...",
+                "headerExcludingVat": "Exkl. moms",
+                "headerIncludingVat": "Inkl. moms",
+                "captionTotal": "Totalt",
+                "captionTotalTaxFree": "Totalt",
+                "captionPendingRefunds": "Väntar på att återbetalas",
+                "captionVouchers": "Värde av voucher",
+                "captionRefunded": "Återbetalt belopp",
+                "captionRemaining": "Återbetalningsbart belopp",
+                "btnFixDiff": "Fixa skillnaden",
+                "placeholderDescription": "Ange bank-/korttransaktionsbeskrivning för konsumenten. Max 140 tecken",
+                "lblDescription": "Beskrivning (valfritt) ({characters}/140 tecken)",
+                "descriptionHelp": "Detta kommer att visas på konsumentens bank- eller kortutdrag när det är möjligt. Meddelandet kommer att avkortas efter 140 tecken.",
+                "placeholderInternalDescription": "Ange din interna beskrivning",
+                "lblInternalDescription": "Intern beskrivning (valfritt)",
+                "internalDescriptionHelp": "Detta kommer att visas som en lokal beskrivning i admingränssnittet.",
+                "checkVerification": "Jag har kontrollerat det totala återbetalningsbeloppet och de konfigurerade mängderna för att återbetala och lagra på nytt.",
+                "btnRefund": "Återbetalning",
+                "btnFullRefund": "Full återbetalning",
+                "roundDiffItemAdded": "Avrundningsobjekt"
+            },
+            "refunds": {
+                "title": "Återbetalningar i Mollie Dashboard",
+                "linkMore": "Mer om återbetalningar",
+                "grid": {
+                    "columns": {
+                        "amount": "Belopp",
+                        "status": "Status",
+                        "description": "Beskrivning",
+                        "internalDescription": "Intern beskrivning",
+                        "composition": "Komposition",
+                        "date": "Datum"
+                    },
+                    "lblNoComposition": "Ingen tillgänglig komposition",
+                    "btnCancelRefund": "Avbryt denna återbetalning"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "En återbetalning har skapats i Mollie. Det kan ta 2 timmar för återbetalningen att slutföras. Fram till dess kan du avbryta återbetalningen.",
+                    "refund-canceled": "Den pågående återbetalningen har framgångsrikt avbrutits och tagits bort."
+                },
+                "error": {
+                    "low-amount": "Ange ett belopp som ska återbetalas.",
+                    "refund-created": "Något gick fel när en återbetalning skapades.",
+                    "refund-canceled": "Det uppstod ett problem när den pågående återbetalningen avbröts. Vänligen försök igen i Mollie Dashboard."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Voucher",
+            "VOUCHER_INFO_TITLE": "Voucherbetalningar",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie låter dig enkelt ta emot betalningar i din webbutik med hjälp av Eco-, present- och måltidsvouchers – ett smart val för att öka försäljningen och tillfredsställa dina kunder. Betalningsmetoden \"voucher\" är endast synlig om du har minst 1 produkt med en tilldelad vouchertyp i varukorgen.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Observera att denna konfiguration endast kan redigeras på ditt standardspråk. Vänligen ändra ditt språk för att modifiera vouchertypen för denna produkt.",
+            "VOUCHER_BTN_READMORE": "Läs mer",
+            "VOUCHER_TYPE_CAPTION": "Vouchertyp av produkt",
+            "VOUCHER_TYPE_VALUE_NONE": "Ingen",
+            "VOUCHER_TYPE_VALUE_ECO": "Ekologisk",
+            "VOUCHER_TYPE_VALUE_MEAL": "Måltid",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Present"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Frakta genom Mollie",
+                "item": {
+                    "label": "Artikel:",
+                    "noQuantity": "Vänligen ange en kvantitet att frakta.",
+                    "shipAll": "Frakta allt",
+                    "summary": {
+                        "quantity": "Antal att frakta",
+                        "shipped": "Mängd skickad",
+                        "shippable": "Mängd som kan skickas"
+                    },
+                    "success": "Beställningen har fraktats framgångsrikt."
+                },
+                "order": {
+                    "description": "De följande artikelmängderna kommer att skickas.",
+                    "itemHeader": "Artikel",
+                    "quantityHeader": "Mängd",
+                    "originalQuantityHeader": "Kvantitet (leveransbar)"
+                },
+                "availableTracking": {
+                    "label": "Tillgängliga spårningskoder",
+                    "hint": "Klicka på en av dessa spårningskoder för att automatiskt fylla i all data."
+                },
+                "showTracking": "Lägg till spårningsinformation för denna leverans",
+                "tracking": {
+                    "carrier": "Transportör",
+                    "code": "Kod",
+                    "url": "Url",
+                    "invalid": "Ange både transportör och kod"
+                },
+                "confirmButton": "Frakta beställning",
+                "cancelButton": "Avbryt",
+                "selectAllButton": "Välj alla",
+                "resetButton": "Återställ"
+            },
+            "cancel": {
+                "title": "Avbryt objekt genom mollie",
+                "confirmButton": "Avbryt objekt genom mollie",
+                "cancelButton": "Stäng modal",
+                "resetStock": "Återställ lager",
+                "item": {
+                    "success": "Produkt avbokad framgångsrikt",
+                    "failed": {
+                        "quantityZero": "Kvantitet är 0",
+                        "invalidLine": "Produkten finns inte i beställningen",
+                        "quantityTooHigh": "Kvantiteten är för hög"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Frakta beställning (Mollie)",
+                        "description": "Frakta order i Mollie."
+                    },
+                    "modal": {
+                        "title": "Frakta beställning",
+                        "description": "Denna åtgärd kommer automatiskt att frakta en beställning genom Mollie. Användarflödet kommer att ta emot beställningsnumret och vidarebefordra det till Mollie API. Frakt som lyckas och frakt som misslyckas kommer att synas i Mollie-loggfilerna.",
+                        "warningConfig": "Vänligen se till att stänga av alla ytterligare automatiseringar för denna typ av åtgärd för att undvika störningar.\nDe följande aktiverade funktionerna i denna plugin kan störa denna åtgärd:",
+                        "noWarnings": "Inga varningar"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Återbetalning av order (Mollie)",
+                        "description": "Återbetala order genom Mollie."
+                    },
+                    "modal": {
+                        "title": "Återbetalning av order",
+                        "description": "Denna åtgärd kommer automatiskt att frakta en beställning genom Mollie. Användarflödet kommer att ta emot beställningsnumret och vidarebefordra det till Mollie API. Frakt som lyckas och frakt som misslyckas kommer att synas i Mollie-loggfilerna.",
+                        "warning": "Var vänlig observera att återbetalningar kan ta upp till 2 timmar att slutföras och bli synliga i butiken. Fram till dess kan du alltid avbryta en pågående återbetalning antingen från beställningssidan i Shopware eller från Mollie Dashboard.",
+                        "warningConfig": "Vänligen se till att stänga av alla ytterligare automatiseringar för denna typ av åtgärd för att undvika störningar."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Automatisk frakt i plugin-konfiguration"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Pågående",
+                "active": "Aktiv",
+                "canceled": "Avbruten",
+                "suspended": "Avstängd",
+                "completed": "Slutförd",
+                "paused": "Pausad",
+                "resumed": "Återupptagen",
+                "skipped": "Hoppade över"
+            },
+            "navigation": {
+                "title": "Mollie Prenumerationer"
+            },
+            "TYPE_DAYS": "Dag(ar)",
+            "TYPE_WEEKS": "Vecka(or)",
+            "TYPE_MONTHS": "Månad(er)",
+            "confirm": {
+                "cancelTitle": "Avsluta prenumerationen?",
+                "cancel": "Avbryt din kunds prenumeration.",
+                "pauseTitle": "Pausa prenumeration?",
+                "pause": "Sätt prenumerationen på paus tills du återupptar den igen.",
+                "resumeTitle": "Återuppta prenumeration?",
+                "resume": "Fortsätt prenumerationen igen.",
+                "skipTitle": "Hoppa över nästa betalning?",
+                "skip": "Hoppa över nästa avbetalning i prenumerationen. Den fortsätter automatiskt efteråt."
+            },
+            "alerts": {
+                "cancelSuccess": "Prenumerationen har avbrutits framgångsrikt",
+                "pauseSuccess": "Prenumerationen har pausats framgångsrikt",
+                "resumeSuccess": "Prenumerationen har återupptagits framgångsrikt",
+                "skipSuccess": "Prenumerationen har hoppa överts framgångsrikt. Nästa betalning har uppdaterats."
+            },
+            "list": {
+                "title": "Mollie Prenumerationer",
+                "columns": {
+                    "customer": "Kund",
+                    "status": "Status",
+                    "description": "Beskrivning",
+                    "amount": "Belopp",
+                    "nextPaymentAt": "Nästa betalning",
+                    "prePaymentReminder": "Påmind klockan",
+                    "canceledAt": "Avbruten klockan",
+                    "createdAt": "Skapad klockan"
+                },
+                "action": {
+                    "edit": "Redigera prenumeration"
+                },
+                "deletedCustomer": "Raderad kund"
+            },
+            "detail": {
+                "title": "Mollie prenumeration",
+                "buttonCancelSubscription": "Avbryt prenumeration",
+                "labelDescription": "Beskrivning",
+                "labelAmount": "Belopp",
+                "labelQuantity": "Kvantitet",
+                "labelMollieSubscription": "Mollie Prenumeration",
+                "labelMollieCustomer": "Mollie kund",
+                "labelMandateId": "Mandat",
+                "labelShopwareCustomer": "Shopware kund",
+                "labelCreatedAt": "Skapad klockan",
+                "buttonShowShopwareOrder": "Visa Shopware beställning",
+                "buttonShowShopwareCustomer": "Visa Shopware kund",
+                "cardTitleSubscription": "Prenumeration",
+                "cardTitleStatus": "Status",
+                "labelStatus": "Status",
+                "labelNextPaymentAt": "Nästa betalning klockan",
+                "labelLastRemindedAt": "Senaste påminnelse klockan",
+                "labelCanceledAt": "Avbruten klockan",
+                "buttonPauseSubscription": "Pausa prenumeration",
+                "buttonResumeSubscription": "Återuppta prenumeration",
+                "buttonSkipSubscription": "Hoppa över prenumeration",
+                "history": {
+                    "cardTitle": "Historik",
+                    "colDate": "Datum",
+                    "colComment": "Kommentar",
+                    "colStatusFrom": "Status (från)",
+                    "colStatusTo": "Status (till)",
+                    "colMollieSubscription": "Mollie prenumeration"
+                }
+            },
+            "product": {
+                "card-title": "Prenumeration",
+                "title": "Mollie Prenumerationer",
+                "description": "Att hantera dina återkommande betalningar är enklare än någonsin med våra hjälpsamma funktioner. Ta din verksamhet till nästa nivå med effektiva spårningsalternativ, enkla integrationer och mer. Med Mollie-prenumerationer kan du enkelt skapa prenumerationsprodukter och schemalägga återkommande betalningar att äga rum vid det konfigurerade intervallet och perioden.",
+                "mollieSubscriptionProduct": "Prenumerationsprodukt",
+                "mollieSubscriptionIntervalAmount": "Upprepa betalning varje",
+                "mollieSubscriptionIntervalType": "Intervall enhet",
+                "mollieSubscriptionRepetitionAmount": "Antal upprepningar",
+                "mollieSubscriptionRepetitionPlaceholder": "Ange nummer eller lämna tomt",
+                "infoDefaultLanguage": "Vänligen observera att denna konfiguration endast kan redigeras på ditt standardspråk. Vänligen ändra ditt språk för att ändra prenumerationsinställningarna för denna produkt.",
+                "btnReadMore": "Läs mer"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Prenumeration"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Kreditkort data",
+            "buttonMolliePaymentLink": "Kopiera till urklipp",
+            "columnRefunded": "Återbetald",
+            "columnShipped": "Fraktad",
+            "columnCanceled": "Avbruten",
+            "labelMollieOrderId": "Mollie Beställnings-ID",
+            "labelMollieThirdPartyPaymentId": "Betalningsreferens",
+            "labelMolliePaymentLink": "Mollie Checkout-URL",
+            "totalRefunds": "Återbetalt belopp",
+            "totalRefundsPending": "Väntar på att bli återbetald",
+            "totalRemaining": "Belopp för återbetalning",
+            "totalVouchers": "Värde av voucher",
+            "totalShipments": "Fraktbelopp ({quantity} artiklar)",
+            "subscriptionBadge": "Prenumerationsbeställning",
+            "refundManager": {
+                "title": "Mollie Återbetalningshanterare",
+                "btnOpenRefundManager": "Öppna återbetalningshanterare",
+                "btnCloseRefundManager": "Stäng återbetalningshanterare"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Önskad iDeal-utgivare"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Återbetalningshanterare"
+            },
+            "mollie_subscription": {
+                "label": "Prenumerationer"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Beskrivning"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Återbetalning",
+            "subscription": "Prenumeration",
+            "webhookReceived": "Webhooks",
+            "status": "Status",
+            "started": "Startad",
+            "ended": "Avslutad",
+            "paused": "Pausad",
+            "renewalReminder": "Påminnelse om förnyelse",
+            "renewed": "Förnyad",
+            "resumed": "Återupptagen",
+            "skipped": "Hoppade över",
+            "all": "Alla",
+            "canceled": "Avbruten",
+            "expired": "Utgått",
+            "partiallyRefunded": "Återbetald (delvis)",
+            "orderSuccess": "Beställning lyckad",
+            "orderFailed": "Beställning misslyckades",
+            "orderCanceled": "Beställning avbruten"
+        }
+    }
+}

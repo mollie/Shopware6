@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service\Transition;
 
 use Kiener\MolliePayments\Compatibility\CompatibilityFactory;
+use Kiener\MolliePayments\Handler\Method\BankTransfer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
@@ -44,8 +46,19 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
         $defaultState = OrderTransactionStates::STATE_IN_PROGRESS;
         $action = StateMachineTransitionActions::ACTION_DO_PAY;
+        $paymentMethod = $transaction->getPaymentMethod();
+        $isBankTransfer = false;
+        if ($paymentMethod === null) {
+            $this->logger->warning('Payment method is not set in Transaction');
+        }
 
-        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED')) {
+        if ($paymentMethod instanceof PaymentMethodEntity) {
+            /** @phpstan-ignore-next-line */
+            $reflectionClass = new \ReflectionClass($paymentMethod->getHandlerIdentifier());
+
+            $isBankTransfer = $reflectionClass->implementsInterface(BankTransfer::class);
+        }
+        if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED') && ! $isBankTransfer) {
             $defaultState = OrderTransactionStates::STATE_UNCONFIRMED;
             $action = StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED;
         }

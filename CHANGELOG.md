@@ -5,13 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added Norwegian language support
+- Added Swedish language support
+- Added Polish language support
+- Added Czech language support
+- Added Slovenian language support
+- Added Hungarian language support
+- Added Finnish language support
+
 ### Changed
 - Removed typehints for EntityRepository in order to allow repository decoration in Shopware 6.4
+- Bank transfer payments are now set to the 'In Progress' state instead of 'Unconfirmed', as these payment methods require several days to process and should not be modified.
+- Mandates for Mollie Customers are not loaded if the customer was deleted in Mollie dashboard
 
 ### Fixed
 - Fixed the error "Call to a member function info() on null"
 - Fixed the issue, that a wrong API Key was used when lineitems were cancelled in administration
-
+- Fixed the issue that the payment method of a paypal express transaction was changed to paypal over webhooks
 
 ## [4.15.0] - 2025-04-03
 

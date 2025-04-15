@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie előfizetés | Mollie előfizetések"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " A rendelés sikeres",
+            "mollie_checkout_order_failed": " A rendelés sikertelen",
+            "mollie_checkout_order_canceled": " A rendelés törölve",
+            "mollie_webhook_received_All": " Mollie Webhook beérkezett (Minden)",
+            "mollie_webhook_received_status_authorized": " Mollie Webhook beérkezett (Engedélyezett)",
+            "mollie_webhook_received_status_failed": " Mollie Webhook beérkezett (Sikertelen)",
+            "mollie_webhook_received_status_canceled": " Mollie Webhook beérkezett (Törölve)",
+            "mollie_webhook_received_status_expired": " Mollie Webhook beérkezett (Lejárt)",
+            "mollie_webhook_received_status_pending": " Mollie Webhook beérkezett (Függőben)",
+            "mollie_webhook_received_status_paid": " Mollie Webhook beérkezett (Fizetve)",
+            "mollie_webhook_received_status_completed": " Mollie Webhook beérkezett (Befejezett)",
+            "mollie_webhook_received_status_refunded": " Mollie Webhook beérkezett (Visszatérítve)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie Webhook beérkezett (Részben visszatérítve)",
+            "mollie_refund_started": " Mollie visszatérítés megkezdődött",
+            "mollie_subscription_started": " Mollie előfizetés megkezdődött",
+            "mollie_subscription_ended": " Mollie előfizetés befejeződött",
+            "mollie_subscription_cancelled": " Mollie előfizetés törölve",
+            "mollie_subscription_paused": " Mollie előfizetés szüneteltetve",
+            "mollie_subscription_resumed": " Mollie előfizetés folytatva",
+            "mollie_subscription_skipped": " Mollie előfizetés átugorva",
+            "mollie_subscription_renewed": " Mollie előfizetés megújítva",
+            "mollie_subscription_renewal_reminder": " Mollie emlékeztető az előfizetés megújításához"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie Modul",
+        "searchPlaceholder": "Search subscriptions...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie Fizetések",
+            "descriptionTextModule": "Mollie Fizetések",
+            "btnMollieActions": "Mollie Akciók",
+            "refundThroughMollie": "Visszatérítés Mollie-n keresztül",
+            "shipThroughMollie": "Szállítás Mollie-n keresztül",
+            "cancelMollieItem": "Törlés Mollie-n keresztül"
+        },
+        "config": {
+            "info": {
+                "title": "Szia {userName}, üdvözöljük a Mollie-nál!",
+                "descriptionTop": "A Mollie-nál könnyű a bevezetés!",
+                "descriptionBottom": "Ez ennyi!",
+                "descriptionFooter": "Ha többet szeretne megtudni a plugin-ról, kérjük, látogassa meg hivatalos dokumentációs oldalunkat.",
+                "onboardingStep1": "Regisztráljon egy Mollie Fiókra.",
+                "onboardingStep2": "Adja meg az API kulcsait az alábbi szekcióban.",
+                "onboardingStep2TestMode": "'Teszt környezet' bekapcsolása, ha csak a kifizetéseket szeretné tesztelni.",
+                "onboardingStep3": "Fizetési módokat rendeljen eladási csatornájához.",
+                "onboardingStep3Link": "az eladási csatornáihoz",
+                "btnDocumentation": "Dokumentáció",
+                "btnRequestSupport": "Támogatás",
+                "btnTroubleshooting": "Hibaelhárítási útmutató"
+            },
+            "api": {
+                "apiLinkButton": "Szerezze meg API kulcsait a Mollie Irányítópultról",
+                "testButton": "Teszt API Kulcsok",
+                "testApiKeys": {
+                    "title": "Mollie Fizetések",
+                    "apiKey": "API kulcs",
+                    "isValid": "érvényes",
+                    "isInvalid": "érvénytelen"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Helyőrző",
+                    "preview": "Előnézet"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie Fizetések",
+                    "button": "Fizetési módok frissítése",
+                    "succeeded": "A fizetési módok sikeresen frissítve lettek.",
+                    "failed": "A fizetési módokat nem sikerült frissíteni."
+                },
+                "mollieLimits": {
+                    "link": "Mollie elérhetőségi szabályok megjelenítése a fizetési módokhoz"
+                }
+            },
+            "rounding": {
+                "info1": "A Shopware pénznembeállításokat használ a rendelés teljes összegének kerekítésének kiszámításához. Ez magában foglalja a termékárak tizedesjegyeinek számát és a kerekítési intervallumot, például 0.50 vagy 1.00.",
+                "info2": "Ezek a módosítások a tételek összegétől eltérő teljes összeget eredményezhetnek. Amikor Mollie ellenőrzi ezeket az összegeket, és nem egyeznek, a fizetési folyamat meghiúsul.",
+                "info3": "Ezzel a funkcióval elkerülheti a kerekítési problémákat a fizetési folyamat során. Ha ez a funkció be van kapcsolva, egy új tételsor kerül a Mollie Dashboardba a kerekítési különbséggel, és ügyfelei kifizetik a Shopware által kiszámított végösszeget."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "28 napnál hosszabb esedékesség esetén a Klarna (fizessen most, fizessen részletben vagy utólag) fizetési módként nem választható, kivéve, ha a Klarna és a kereskedő külön megállapodást kötött ennek meghosszabbítására.",
+                "bankTransferDueDateLimitReached": "Nem lehetséges a rendelés élettartamát 100 napnál magasabbra állítani."
+            },
+            "support": {
+                "modalTitle": "Kérjen segítséget Mollie-tól",
+                "btnCancel": "Törlés",
+                "btnConfirm": "Kérjen támogatást",
+                "btnSupport": "Több információ támogatásunkról",
+                "form": {
+                    "name": "Az Ön neve",
+                    "email": "Az Ön email címe",
+                    "recipient": "Kérelem elküldése",
+                    "subject": "Tárgy",
+                    "message": "Üzenet"
+                },
+                "data": {
+                    "header": "Adatok elküldve a Mollie-nak:",
+                    "other": "Más:",
+                    "shopwareVersion": "Shopware verzió",
+                    "pluginLogs": "{plugin} naplófájlok",
+                    "pluginConfiguration": "{plugin} konfiguráció",
+                    "pluginConfigurationHelpText": "API kulcsok ki vannak zárva.",
+                    "paymentMethods": "Fizetési mód adat",
+                    "paymentMethodsHelpText": "Információkat tartalmaz arról, hogy mely fizetési módok aktívak, az egyes értékesítési csatornákhoz vannak hozzárendelve, valamint azok állapotáról a Mollie-fiókjában."
+                },
+                "success": "The suport request has been successfully sent. We do our best to reply as soon as possible",
+                "error": "Probléma lépett fel a levél Shopware-en keresztüli elküldésekor. Kérjük, próbálja újra, vagy lépjen közvetlenül kapcsolatba velünk emailben."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "A termék előfizetés (Mollie)",
+            "cartSubscriptionRule": "Kosár előfizetésekkel (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Folyamatban",
+                "pending": "Függőben",
+                "processing": "Feldolgozás alatt",
+                "refunded": "Visszatérítve",
+                "failed": "Sikertelen",
+                "description": {
+                    "queued": "A visszatérítés addig van sorban, amíg elegendő egyenleg nem áll rendelkezésre a feldolgozásához. Továbbra is lemondhatja a visszatérítést.",
+                    "pending": "A visszatérítést a következő munkanapon küldik a banknak. A visszatérítés még mindig törölhető.",
+                    "processing": "A visszatérítést elküldtük a banknak. A visszatérített összeg a lehető leghamarabb át lesz utalva a fogyasztói számlára.",
+                    "refunded": "A visszatérített összeg át lett utalva a fogyasztónak.",
+                    "failed": "A visszatérítés feldolgozás után meghiúsult. Például a vásárló bezárta a bankszámláját. Az összeg visszakerül az Ön számlájára."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "pc."
+            },
+            "acl": {
+                "warningCreate": "Nincs jogosultsága a visszatérítések létrehozására",
+                "warningCancel": "Nincs jogosultsága a visszatérítések törlésére"
+            },
+            "cart": {
+                "title": "Megrendelés ##orderNumber##",
+                "btnSelectAll": "Összes kiválasztása",
+                "btnResetForm": "Űrlap visszaállítása",
+                "linkHowTo": "Hogyan használjam ezt az űrlapot?",
+                "grid": {
+                    "columns": {
+                        "item": "Termék",
+                        "productNumber": "Termékszám",
+                        "unitPrice": "Egységár",
+                        "quantity": "Mennyiség",
+                        "refunded": "Visszatérítve",
+                        "refundQuantity": "Visszatérítés",
+                        "totalPrice": "Összesen",
+                        "refundAmount": "Visszatérítés",
+                        "resetStock": "Készlet visszaállítása"
+                    },
+                    "btnResetLine": "Sor visszaállítása",
+                    "checkDeductPromotion": "Promóció levonása",
+                    "checkRefundTax": "ÁFA visszatérítése"
+                },
+                "roundDiffItemAdded": "Automatikus kerekítési elem került hozzáadásra"
+            },
+            "instructions": {
+                "linkResetTutorials": "Útmutatók visszaállítása",
+                "btnToggleTutorial": "Útmutató megjelenítése/elrejtése",
+                "titleFullRefund": "Teljes visszatérítés",
+                "textFullRefund": "Csak használja a teljes visszatérítés gombot. Ez biztosítja, hogy az összes elemét visszatérítettnek jelöljön meg, és a teljes összeg visszatérítést nyújtsa a vásárlónak.",
+                "titleStockReset": "Készlet visszaállítás",
+                "textStockReset": "A feltöltendő mennyiség hozzáadásával automatikusan növelheti a rendelkezésre álló készletet. Egyszerűen adja meg az információkat, mielőtt folytatná a teljes vagy részleges visszatérítést. Az állomány helyreállítása kombinálható a visszatérítési folyamattal.",
+                "titleShipping": "Szállítás",
+                "textShipping": "A kiszállításra kerülő tételeket ugyanúgy vissza lehet téríteni, mint bármely más terméket. Egyszerűen írja be a teljes vagy a kívánt összeget, és folytassa a visszatérítéssel. A szállítási költségek visszatérítése kombinálható a tétel-visszatérítési folyamattal.",
+                "titlePartialAmount": "Részleges Visszatérítés (csak összeg)",
+                "textPartialAmount": "Csak írja be a részletösszeget a szövegmezőbe, és kezdje meg a visszatérítést.",
+                "titlePartialItems": "Részleges Visszatérítés (termékekkel)",
+                "textPartialItems": "A fenti űrlap segítségével jelölje meg a Mollie-nál visszatérített összegeket és tételeket. Állítsa be a mennyiségeket, és adja hozzá az egyszeri összeget minden egyes visszatérített tételhez. A teljes összeg a teljes visszatérített összeg szövegmezőben lesz látható. Ne feledje, hogy a visszatérítés megkezdése előtt módosíthatja a végső összeget.",
+                "titlePartialPromotions": "Részleges Visszatérítés (promóciókkal)",
+                "textPartialPromotions": "Ha van egy akció a kosarában, az akció új tételsorként jelenik meg. Ha az összes kedvezményes terméket vissza kívánja téríteni, vissza kell adnia az összérték sort és a promóciós tétel sort. Ha csak néhány akciós tételt szeretne visszafizetni, akkor az egyes sorokra alkalmazott kedvezményt automatikusan levonhatja. Természetesen bármikor módosíthatja az értékeket, ha nem megfelelőek.",
+                "titleRoundingDiff": "Kerekítési különbség",
+                "textRoundingDiff": "A teljes visszatérítés tartalmazni fogja a kerekítési különbségeket"
+            },
+            "summary": {
+                "dataLoading": "Adatok betöltése...",
+                "headerExcludingVat": "Nettó",
+                "headerIncludingVat": "Bruttó",
+                "captionTotal": "Összesen",
+                "captionTotalTaxFree": "Összesen",
+                "captionPendingRefunds": "Visszatérítésre vár",
+                "captionVouchers": "Kupon összege",
+                "captionRefunded": "Visszatérített összeg",
+                "captionRemaining": "Visszatéríthető összeg",
+                "btnFixDiff": "Különbség javítása",
+                "placeholderDescription": "Írja be a bank/kártya kimutatás leírását a fogyasztó számára. Max 140 karakter",
+                "lblDescription": "Leírás (opcionális) ({characters}/140 karakter)",
+                "descriptionHelp": "Ez meg fog jelenni a fogyasztó bank- vagy kártyakimutatásán, amikor lehetséges. Az üzenet 140 karakter után trunkolva lesz.",
+                "placeholderInternalDescription": "Adja meg a belső leírását",
+                "lblInternalDescription": "Belső leírás (opcionális)",
+                "internalDescriptionHelp": "Ez a helyi leírása fog megjelenni az adminisztrációs felületen.",
+                "checkVerification": "Ellenőriztem a teljes visszatérítési összeget és a konfigurált mennyiségeket a visszatérítéshez és a készletvisszahelyezéshez.",
+                "btnRefund": "Visszatérítés",
+                "btnFullRefund": "Teljes visszatérítés",
+                "roundDiffItemAdded": "Kerekítési elem"
+            },
+            "refunds": {
+                "title": "Visszatérítések a Mollie Irányítópulton",
+                "linkMore": "Több információ a visszatérítésekről",
+                "grid": {
+                    "columns": {
+                        "amount": "Összeg",
+                        "status": "Állapot",
+                        "description": "Leírás",
+                        "internalDescription": "Belső leírás",
+                        "composition": "Összetétel",
+                        "date": "Dátum"
+                    },
+                    "lblNoComposition": "Nincs elérhető összetétel",
+                    "btnCancelRefund": "Törölje ezt a visszatérítést"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Egy visszatérítést létrehoztak Mollie-ban. A visszatérítés teljesítése legfeljebb 2 órát vehet igénybe. Ezen idő alatt törölheti a visszatérítést.",
+                    "refund-canceled": "A függőben lévő visszatérítést sikeresen törölték és eltávolították."
+                },
+                "error": {
+                    "low-amount": "Kérjük, adjon meg egy visszatérítendő összeget.",
+                    "refund-created": "Valami elromlott a visszatérítés létrehozásakor.",
+                    "refund-canceled": "Probléma történt a függőben lévő visszatérítés törlésekor. Kérjük, próbálja újra a Mollie Irányítópulton."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Kupon",
+            "VOUCHER_INFO_TITLE": "Kuponos kifizetések",
+            "VOUCHER_INFO_DESCRIPTION": "A Mollie lehetővé teszi, hogy ökológiai, ajándék- és élelmiszerutalványokkal fogadjon be fizetéseket online áruházából. Ez a lehetőség növelheti az eladásokat, és kielégítheti ügyfeleit. Az \"utalványos\" fizetési mód csak akkor látható, ha a kosárban legalább 1 db utalványtípushoz rendelt termék van.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Kérjük, vegye figyelembe, hogy ezt a beállítást csak az alapnyelvén tudja szerkeszteni. Kérjük, váltson nyelvet, hogy módosíthassa ennek a terméknek a kupon típusát.",
+            "VOUCHER_BTN_READMORE": "További információ",
+            "VOUCHER_TYPE_CAPTION": "Termék kupon típusa",
+            "VOUCHER_TYPE_VALUE_NONE": "Nincs",
+            "VOUCHER_TYPE_VALUE_ECO": "Öko",
+            "VOUCHER_TYPE_VALUE_MEAL": "Étkezés",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Ajándék"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Szállítás Mollie-on keresztül",
+                "item": {
+                    "label": "Termék:",
+                    "noQuantity": "Kérjük, adjon meg egy mennyiséget a szállításhoz.",
+                    "shipAll": "Minden szállítása",
+                    "summary": {
+                        "quantity": "Szállítandó mennyiség",
+                        "shipped": "Szállított mennyiség",
+                        "shippable": "Szállítható mennyiség"
+                    },
+                    "success": "A rendelést sikeresen szállították."
+                },
+                "order": {
+                    "description": "A következő termékek mennyisége lesz szállítva.",
+                    "itemHeader": "Termék",
+                    "quantityHeader": "Mennyiség",
+                    "originalQuantityHeader": "Mennyiség (szállítható)"
+                },
+                "availableTracking": {
+                    "label": "Elérhető nyomkövetési kódok",
+                    "hint": "Kattintson az egyik nyomkövetési kódra, hogy automatikusan kitölthesse az összes adatot."
+                },
+                "showTracking": "Adjon meg nyomkövetési információt ehhez a szállításhoz",
+                "tracking": {
+                    "carrier": "Fuvarozó",
+                    "code": "Kód",
+                    "url": "Url",
+                    "invalid": "Kérjük, adja meg a Fuvarozót és a Kódot"
+                },
+                "confirmButton": "Rendelés szállítása",
+                "cancelButton": "Törlés",
+                "selectAllButton": "Mind kiválasztása",
+                "resetButton": "Visszaállítás"
+            },
+            "cancel": {
+                "title": "Törölje a tételt Mollie-on keresztül",
+                "confirmButton": "Törölje a tételt Mollie-on keresztül",
+                "cancelButton": "Modal bezárása",
+                "resetStock": "Készletek visszaállítása",
+                "item": {
+                    "success": "A termék sikeresen törölve",
+                    "failed": {
+                        "quantityZero": "A mennyiség 0",
+                        "invalidLine": "A termék nem létezik a rendelésben",
+                        "quantityTooHigh": "A mennyiség túl magas"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Rendelés szállítása (Mollie)",
+                        "description": "Rendelés szállítása Mollie-val."
+                    },
+                    "modal": {
+                        "title": "Rendelés szállítása",
+                        "description": "Ez a művelet automatikusan szállítja a rendelést Mollie-n keresztül. A folyamat fel fogja venni a rendelési számot, és továbbítja azt a Mollie API-nak. A sikeres és sikertelen szállítások láthatóak lesznek a Mollie naplófájljaiban.",
+                        "warningConfig": "Kérjük, kapcsoljon ki minden további automatizálást az ilyen típusú műveletekhez a zavarás elkerülése érdekében.\nA következő paraméterek aktiválva vannak, és zavarhatják a műveletet:",
+                        "noWarnings": "Nincsenek figyelmeztetések"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Rendelés visszatérítése (Mollie)",
+                        "description": "Rendelés visszatérítése Mollie-n keresztül."
+                    },
+                    "modal": {
+                        "title": "Rendelés visszatérítése",
+                        "description": "Ez a művelet automatikusan elindít egy visszatérítést Mollie-n keresztül. A folyamat fel fogja venni a rendelési számot, és továbbítja azt a Mollie API-nak. A sikeres és sikertelen visszatérítések láthatóak lesznek a Mollie naplófájljaiban.",
+                        "warning": "Felhívjuk figyelmét, hogy a visszatérítés legfeljebb 2 órát vesz igénybe, és az üzletben látható. Ez előtt az idő előtt bármikor törölhet egy függőben lévő visszatérítést, akár a Shopware rendelési oldalán, akár a Mollie irányítópultján.",
+                        "warningConfig": "Kérjük, a zavarás elkerülése érdekében tiltsa le az ilyen típusú műveletek további automatizálását."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Automatikus elküldés a plugin beállításaiban"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Függőben",
+                "active": "Aktív",
+                "canceled": "Törölve",
+                "suspended": "Felfüggesztve",
+                "completed": "Befejezett",
+                "paused": "Felfüggesztve",
+                "resumed": "Folyamatban",
+                "skipped": "Átugrott"
+            },
+            "navigation": {
+                "title": "Mollie Előfizetések"
+            },
+            "TYPE_DAYS": "Nap(ek)",
+            "TYPE_WEEKS": "Hét(ek)",
+            "TYPE_MONTHS": "Hónap(ok)",
+            "confirm": {
+                "cancelTitle": "Előfizetés lemondása?",
+                "cancel": "Lemondja az ügyfél előfizetését.",
+                "pauseTitle": "Előfizetés felfüggesztése?",
+                "pause": "Tartsa az előfizetést a felfüggesztéséig.",
+                "resumeTitle": "Előfizetés folytatása?",
+                "resume": "Folytassa az előfizetést.",
+                "skipTitle": "Átugorja a következő részletet?",
+                "skip": "Átugorja a következő részletet az előfizetésben. Később automatikusan folytatódik."
+            },
+            "alerts": {
+                "cancelSuccess": "Az előfizetések sikeresen lemondásra kerültek",
+                "pauseSuccess": "Az előfizetés sikeresen felfüggesztve",
+                "resumeSuccess": "Az előfizetés sikeresen folytatva",
+                "skipSuccess": "Az előfizetés sikeresen átugrásra került. A következő kifizetés frissítve lett."
+            },
+            "list": {
+                "title": "Mollie Előfizetések",
+                "columns": {
+                    "customer": "Ügyfél",
+                    "status": "Állapot",
+                    "description": "Leírás",
+                    "amount": "Összeg",
+                    "nextPaymentAt": "Következő kifizetés",
+                    "prePaymentReminder": "Emlékeztető",
+                    "canceledAt": "Lemondva",
+                    "createdAt": "Létrehozva"
+                },
+                "action": {
+                    "edit": "Előfizetés szerkesztése"
+                },
+                "deletedCustomer": "Törölt ügyfél"
+            },
+            "detail": {
+                "title": "Mollie előfizetés",
+                "buttonCancelSubscription": "Előfizetés lemondása",
+                "labelDescription": "Leírás",
+                "labelAmount": "Összeg",
+                "labelQuantity": "Mennyiség",
+                "labelMollieSubscription": "Mollie előfizetés",
+                "labelMollieCustomer": "Mollie ügyfél",
+                "labelMandateId": "Mandátum",
+                "labelShopwareCustomer": "Shopware ügyfél",
+                "labelCreatedAt": "Létrehozva",
+                "buttonShowShopwareOrder": "Shopware rendelés megjelenítése",
+                "buttonShowShopwareCustomer": "Shopware ügyfél megjelenítése",
+                "cardTitleSubscription": "Előfizetés",
+                "cardTitleStatus": "Állapot",
+                "labelStatus": "Állapot",
+                "labelNextPaymentAt": "Következő kifizetés időpontja",
+                "labelLastRemindedAt": "Utolsó emlékeztető",
+                "labelCanceledAt": "Lemondva",
+                "buttonPauseSubscription": "Előfizetés felfüggesztése",
+                "buttonResumeSubscription": "Előfizetés folytatása",
+                "buttonSkipSubscription": "Előfizetés átugrása",
+                "history": {
+                    "cardTitle": "Történet",
+                    "colDate": "Dátum",
+                    "colComment": "Megjegyzés",
+                    "colStatusFrom": "Állapot (től)",
+                    "colStatusTo": "Állapot (ig)",
+                    "colMollieSubscription": "Mollie előfizetés"
+                }
+            },
+            "product": {
+                "card-title": "Előfizetés",
+                "title": "Mollie Előfizetések",
+                "description": "Az általunk kínált funkcióknak köszönhetően nagyon egyszerű az ismétlődő fizetések kezelése. Emelje vállalkozását a következő szintre a nyomkövetési lehetőségekkel, az egyszerű integrációkkal és sok mással. A Mollie Subscriptions segítségével előfizetéseket hozhat létre, és ütemezheti az ismétlődő fizetéseket meghatározott időközönként és időszakonkénti fizetéssel.",
+                "mollieSubscriptionProduct": "Előfizetési termék",
+                "mollieSubscriptionIntervalAmount": "Kifizetés ismétlése minden",
+                "mollieSubscriptionIntervalType": "Időköz típusa",
+                "mollieSubscriptionRepetitionAmount": "Ismétlések száma",
+                "mollieSubscriptionRepetitionPlaceholder": "Adja meg a számot, vagy hagyja üresen",
+                "infoDefaultLanguage": "Kérjük, vegye figyelembe, hogy ezt a beállítást csak az alapnyelvén tudja szerkeszteni. Kérjük, váltson nyelvet, hogy módosíthassa ennek a terméknek az előfizetési beállításait.",
+                "btnReadMore": "További információ"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Előfizetés"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Hitelkártya adatok",
+            "buttonMolliePaymentLink": "Másolás a vágólapra",
+            "columnRefunded": "Visszatérítve",
+            "columnShipped": "Kiszállítva",
+            "columnCanceled": "Törölve",
+            "labelMollieOrderId": "Mollie Rendelés ID",
+            "labelMollieThirdPartyPaymentId": "Fizetési hivatkozás",
+            "labelMolliePaymentLink": "Mollie Fizetés URL",
+            "totalRefunds": "Visszatérített összeg",
+            "totalRefundsPending": "Visszatérítésre vár",
+            "totalRemaining": "Visszatéríthető összeg",
+            "totalVouchers": "Kupon összeg",
+            "totalShipments": "Kiszállított összeg ({quantity} tétel)",
+            "subscriptionBadge": "Előfizetés Rendelés",
+            "refundManager": {
+                "title": "Mollie Visszatérítési Menedzser",
+                "btnOpenRefundManager": "Visszatérítési Menedzser megnyitása",
+                "btnCloseRefundManager": "Visszatérítési Menedzser bezárása"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Preferált iDeal kibocsátó"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Visszatérítési Menedzser"
+            },
+            "mollie_subscription": {
+                "label": "Előfizetések"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Leírás"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Visszatérítés",
+            "subscription": "Előfizetés",
+            "webhookReceived": "Webhookok",
+            "status": "Állapot",
+            "started": "Kezdődött",
+            "ended": "Befejeződött",
+            "paused": "Felfüggesztve",
+            "renewalReminder": "Megújítási emlékeztető",
+            "renewed": "Megújítva",
+            "resumed": "Folytatva",
+            "skipped": "Átugorva",
+            "all": "Mind",
+            "canceled": "Törölve",
+            "expired": "Lejárt",
+            "partiallyRefunded": "Refunded (partially)",
+            "orderSuccess": "A megrendelés sikeres",
+            "orderFailed": "A megrendelés sikertelen",
+            "orderCanceled": "A megrendelés törölve"
+        }
+    }
+}

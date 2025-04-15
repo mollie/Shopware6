@@ -12,7 +12,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class BankTransferPayment extends PaymentHandler
+class BankTransferPayment extends PaymentHandler implements BankTransfer
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::BANKTRANSFER;
     public const PAYMENT_METHOD_DESCRIPTION = 'Banktransfer';

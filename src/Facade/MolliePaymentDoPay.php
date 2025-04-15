@@ -132,7 +132,7 @@ class MolliePaymentDoPay
         // object for this order
         $orderCustomFields = new OrderAttributes($order);
         $orderCustomFields->setTransactionReturnUrl($transactionStruct->getReturnUrl());
-
+        $orderCustomFields->setMolliePaymentMethod($paymentMethod);
         // Store current timezone in the order so we can fix the timezone during webhook calls.
         if ($this->twig->hasExtension(CoreExtension::class)) {
             /** @var CoreExtension $coreExtension */

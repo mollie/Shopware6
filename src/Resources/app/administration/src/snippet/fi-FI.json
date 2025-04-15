@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie-tilaus | Mollie-tilaukset"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Tilaus onnistui",
+            "mollie_checkout_order_failed": " Tilaus epäonnistui",
+            "mollie_checkout_order_canceled": " Tilaus peruutettu",
+            "mollie_webhook_received_All": " Mollie Webhook vastaanotettu (Kaikki)",
+            "mollie_webhook_received_status_authorized": " Mollie Webhook vastaanotettu (Valtuutettu)",
+            "mollie_webhook_received_status_failed": " Mollie Webhook vastaanotettu (Epäonnistunut)",
+            "mollie_webhook_received_status_canceled": " Mollie Webhook vastaanotettu (Peruutettu)",
+            "mollie_webhook_received_status_expired": " Mollie Webhook vastaanotettu (Vanhentunut)",
+            "mollie_webhook_received_status_pending": " Mollie Webhook vastaanotettu (Kesken)",
+            "mollie_webhook_received_status_paid": " Mollie Webhook vastaanotettu (Maksettu)",
+            "mollie_webhook_received_status_completed": " Mollie Webhook vastaanotettu (Suoritettu)",
+            "mollie_webhook_received_status_refunded": " Mollie Webhook vastaanotettu (Hyvitetty)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie Webhook vastaanotettu (Osittain hyvitetty)",
+            "mollie_refund_started": " Mollie hyvityspyyntö aloitettu",
+            "mollie_subscription_started": " Mollie-tilaus aloitettu",
+            "mollie_subscription_ended": " Mollie-tilaus suoritettu",
+            "mollie_subscription_cancelled": " Mollie-tilaus peruutettu",
+            "mollie_subscription_paused": " Mollie-tilaus keskeytetty",
+            "mollie_subscription_resumed": " Mollie-tilaus jatkettu",
+            "mollie_subscription_skipped": " Mollie-tilaus ohitettu",
+            "mollie_subscription_renewed": " Mollie-tilaus uusittu",
+            "mollie_subscription_renewal_reminder": " Mollie muistutus tilauksen uusimisesta"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie-moduuli",
+        "searchPlaceholder": "Etsi tilauksia...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie Payments",
+            "descriptionTextModule": "Mollie Payments",
+            "btnMollieActions": "Mollie Actions",
+            "refundThroughMollie": "Hyvitys Mollien kautta",
+            "shipThroughMollie": "Toimita Mollien kautta",
+            "cancelMollieItem": "Peruuta Mollien kautta"
+        },
+        "config": {
+            "info": {
+                "title": "Hei {userName}, Tervetuloa Mollieen!",
+                "descriptionTop": "Mollien käyttöönotto on helppoa!",
+                "descriptionBottom": "Siinä se!",
+                "descriptionFooter": "Jos haluat lukea lisää laajennuksistamme, vieraile virallisella asiakirjasivullamme.",
+                "onboardingStep1": "Luo Mollie-tili.",
+                "onboardingStep2": "Syötä API-avaimesi alla olevaan osioon.",
+                "onboardingStep2TestMode": "Ota käyttöön 'Test Mode', jos haluat testata vain maksuja.",
+                "onboardingStep3": "Määritä maksutavat myyntikanavallesi.",
+                "onboardingStep3Link": "myyntikanavillesi",
+                "btnDocumentation": "Asiakirjat",
+                "btnRequestSupport": "Tuki",
+                "btnTroubleshooting": "Vianetsintäopas"
+            },
+            "api": {
+                "apiLinkButton": "Hanki API-avaimesi Mollie-hallintapaneelista",
+                "testButton": "Test API-avaimet",
+                "testApiKeys": {
+                    "title": "Mollie Payments",
+                    "apiKey": "API-avain",
+                    "isValid": "on voimassa",
+                    "isInvalid": "on virheellinen"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Paikkamerkki",
+                    "preview": "Esikatselu"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie Payments",
+                    "button": "Päivitä maksutavat",
+                    "succeeded": "Maksutavat on päivitetty onnistuneesti.",
+                    "failed": "Maksutapoja ei voitu päivittää."
+                },
+                "mollieLimits": {
+                    "link": "Näytä Mollien saatavuus säännöt maksutavoille"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware voi käyttää valuutta-asetuksia laskeakseen, kuinka se pyöristää tilauksen loppusumman. Tämä sisältää tuotteen hinnan desimaalien määrän ja lähimmän pyöristysvälin, kuten 0,50 tai 1,00.",
+                "info2": "Nämä asetukset voivat johtaa erilaiseen loppusummaan kuin rivikohtien kokonaissumma. Kun Mollie tarkistaa nämä summat ja huomaa, että ne eivät täsmää, se aiheuttaa kassavirheen.",
+                "info3": "Voit käyttää tätä ominaisuutta välttääksesi pyöristysongelmia kassalla. Kun se on käytössä, se lisää erillisen rivikohdan Mollie-hallintapaneeliin pyöristyksen eroa varten, ja asiakkaasi maksavat Shopwaren laskeman loppusumman."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Ei ole mahdollista käyttää Klarna Pay now, Klarna Slice it tai Klarna Pay later -menetelmää, kun vanhenemispäiväsi on yli 28 päivän päässä, ellei kauppiaan ja Klarnan välillä olla sovittu muuta maksimiarvoa.",
+                "bankTransferDueDateLimitReached": "Tilauksen kestoaikaa ei voi asettaa yli 100 päivää pidemmäksi."
+            },
+            "support": {
+                "modalTitle": "Pyydä tukea Mollielta",
+                "btnCancel": "Peruuta",
+                "btnConfirm": "Pyydä tukea",
+                "btnSupport": "Lisää tietoa tuestamme",
+                "form": {
+                    "name": "Nimesi",
+                    "email": "Sähköpostisi",
+                    "recipient": "Lähetä pyyntö osoitteeseen",
+                    "subject": "Aihe",
+                    "message": "Viesti"
+                },
+                "data": {
+                    "header": "Data lähetetty Mollielle:",
+                    "other": "Muu:",
+                    "shopwareVersion": "Shopware-versio",
+                    "pluginLogs": "{plugin} lokitiedostot",
+                    "pluginConfiguration": "{plugin} konfiguraatio",
+                    "pluginConfigurationHelpText": "API-avaimet ovat suljettu pois.",
+                    "paymentMethods": "Maksutavan tiedot",
+                    "paymentMethodsHelpText": "Sisältää tiedot aktiivisista maksutavoista, jotka on määritetty kullekin myyntikanavalle, sekä niiden tilan Mollie-tililläsi."
+                },
+                "success": "Tukipyyntö on lähetetty onnistuneesti. Teemme parhaamme vastataksemme sinulle mahdollisimman pian",
+                "error": "Sähköpostin lähettämisessä Shopwaren kautta ilmeni ongelma. Yritä uudelleen tai ota yhteyttä suoraan sähköpostitse."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Tuote on tilaus (Mollie)",
+            "cartSubscriptionRule": "Ostoskärry, jossa on tilauksia (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Jonossa",
+                "pending": "Odottaa",
+                "processing": "Käsittelyssä",
+                "refunded": "Hyvitetty",
+                "failed": "Epäonnistunut",
+                "description": {
+                    "queued": "Hyvitys on jonossa, kunnes saldoa on riittävästi hyvityksen käsittelyyn. Voit silti peruuttaa hyvityksen.",
+                    "pending": "Hyvitys lähetetään pankkiin seuraavana arkipäivänä. Voit silti peruuttaa hyvityksen.",
+                    "processing": "Hyvitys on lähetetty pankkiin. Hyvityssumma siirretään kuluttajan tilille mahdollisimman pian.",
+                    "refunded": "Hyvityssumma on siirretty kuluttajalle.",
+                    "failed": "Hyvitys epäonnistui käsittelyn jälkeen. Esimerkiksi asiakas on sulkenut pankkitilinsä. Varat palautetaan tilillesi."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "kpl."
+            },
+            "acl": {
+                "warningCreate": "Sinulla ei ole oikeuksia luoda hyvityksiä",
+                "warningCancel": "Sinulla ei ole oikeuksia peruuttaa hyvityksiä"
+            },
+            "cart": {
+                "title": "Tilaus ##orderNumber##",
+                "btnSelectAll": "Valitse kaikki",
+                "btnResetForm": "Nollaa lomake",
+                "linkHowTo": "Kuinka käyttää tätä lomaketta?",
+                "grid": {
+                    "columns": {
+                        "item": "Tuote",
+                        "productNumber": "Tuotenumero",
+                        "unitPrice": "Yksikköhinta",
+                        "quantity": "Määrä",
+                        "refunded": "Hyvitetty",
+                        "refundQuantity": "Hyvitys",
+                        "totalPrice": "Yhteensä",
+                        "refundAmount": "Hyvitys",
+                        "resetStock": "Nollaa varasto"
+                    },
+                    "btnResetLine": "Nollaa rivi",
+                    "checkDeductPromotion": "Vähennä alennusta",
+                    "checkRefundTax": "Hyvitä ALV"
+                },
+                "roundDiffItemAdded": "Automaattinen pyöristysrivi lisättiin"
+            },
+            "instructions": {
+                "linkResetTutorials": "Nollaa oppat",
+                "btnToggleTutorial": "Näytä/piilota opas",
+                "titleFullRefund": "Kokonaishyvitys",
+                "textFullRefund": "Käytä vain painiketta tehdäksesi täyden hyvityksen. Tämä varmistaa, että kaikki tuotteet merkitään hyvitetyiksi ja koko summa palautetaan asiakkaalle.",
+                "titleStockReset": "Varaston nollaus",
+                "textStockReset": "Voit automaattisesti lisätä käytettävissä olevaa varastoa syöttämällä määrän, jonka haluat palauttaa varastoon. Syötä se ennen kuin jatkat täyden tai osittaisen hyvityksen kanssa. Varaston nollaus voidaan yhdistää joustavasti varsinaiseen palautusprosessiin.",
+                "titleShipping": "Toimitus",
+                "textShipping": "Toimituksessa olevat tuotteet voidaan palauttaa kuten mikä tahansa muu tuote. Syötä joko koko määrä tai mukautettu osasumma ja jatka hyvitystä. Toimituskulujen hyvitys voidaan yhdistää joustavasti tuotteiden varsinaiseen palautusprosessiin.",
+                "titlePartialAmount": "Osittainen hyvitys (vain summa)",
+                "textPartialAmount": "Syötä vain osasumma tekstikenttään ja aloita hyvitys.",
+                "titlePartialItems": "Osittainen hyvitys (tuotteiden kanssa)",
+                "textPartialItems": "Jos haluat merkitä määrät ja tuotteet hyvitetyiksi Molliessa, käytä yllä olevaa lomaketta. Syötä määrät ja anna mukautettu summa jokaiselle hyvitettävälle tuotteelle. Kokonaissumma näkyy sitten lopullisen hyvityssumman tekstikentässä. Muista, että tätä lopullista summaa on edelleen mahdollista muuttaa ennen hyvityksen aloittamista.",
+                "titlePartialPromotions": "Osittainen hyvitys (sisältäen alennukset)",
+                "textPartialPromotions": "Jos ostoskorissasi on tarjous, tarjous on erillinen rivikohta. Jos haluat hyvittää kaikki alennetut tuotteet, jatka ja hyvitä niiden kokonaisarvot ja koko tarjousrivikohta. Jos kuitenkin haluat hyvittää vain tiettyjä alennettuja tuotteita, voit vähentää sovelletun alennuksen automaattisesti jokaisesta rivikohdasta. Voit aina muuttaa arvoja, jos ne eivät ole oikein.",
+                "titleRoundingDiff": "Pyöristysero",
+                "textRoundingDiff": "Kokonaishyvitys sisältää pyöristyseron"
+            },
+            "summary": {
+                "dataLoading": "Tietoja ladataan...",
+                "headerExcludingVat": "Ei sisällä alv.",
+                "headerIncludingVat": "Sis. ALV",
+                "captionTotal": "Yhteensä",
+                "captionTotalTaxFree": "Yhteensä",
+                "captionPendingRefunds": "Odottaa hyvitystä",
+                "captionVouchers": "Kupongin arvo",
+                "captionRefunded": "Hyvitetty summa",
+                "captionRemaining": "Hyvitettävä summa",
+                "btnFixDiff": "Korjaa ero",
+                "placeholderDescription": "Syötä pankki-/korttiotteen kuvaus kuluttajalle. Max 140 merkkiä",
+                "lblDescription": "Kuvaus (valinnainen) ({characters}/140 merkkiä)",
+                "descriptionHelp": "Tämä näkyy mahdollisuuksien mukaan kuluttajan pankki- tai korttiotteella. Viesti katkaistaan ​​140 merkin jälkeen.",
+                "placeholderInternalDescription": "Syötä sisäinen kuvaus",
+                "lblInternalDescription": "Sisäinen kuvaus (valinnainen)",
+                "internalDescriptionHelp": "Tämä näytetään paikallisena kuvauksena hallintoliittymässä.",
+                "checkVerification": "Olen tarkistanut palautuksen kokonaissumman ja määritetyt määrät hyvitettäväksi ja varastoitavaksi.",
+                "btnRefund": "Hyvitys",
+                "btnFullRefund": "Täysi hyvitys",
+                "roundDiffItemAdded": "Pyöristyskohde"
+            },
+            "refunds": {
+                "title": "Hyvitykset Mollie-hallintapaneelissa",
+                "linkMore": "Lisää tietoa hyvityksistä",
+                "grid": {
+                    "columns": {
+                        "amount": "Summa",
+                        "status": "Tila",
+                        "description": "Kuvaus",
+                        "internalDescription": "Sisäinen kuvaus",
+                        "composition": "Rakenne",
+                        "date": "Päivämäärä"
+                    },
+                    "lblNoComposition": "Ei käytettävissä olevaa rakennetta",
+                    "btnCancelRefund": "Peruuta tämä hyvitys"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Hyvitys on luotu Molliessa. Hyvityksen suorittaminen voi kestää 2 tuntia. Tähän asti voit peruuttaa hyvityksen.",
+                    "refund-canceled": "Odottava hyvitys on onnistuneesti peruutettu ja poistettu."
+                },
+                "error": {
+                    "low-amount": "Ole hyvä ja syötä hyvitettävä määrä.",
+                    "refund-created": "Jokin meni pieleen hyvitystä luotaessa.",
+                    "refund-canceled": "Hyvityksen peruuttamisessa oli ongelma. Ole hyvä ja yritä uudelleen Mollie-hallintapaneelissa."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Kuponki",
+            "VOUCHER_INFO_TITLE": "Kuponkimaksut",
+            "VOUCHER_INFO_DESCRIPTION": "Mollien avulla voit helposti hyväksyä maksuja verkkokaupassasi käyttämällä eko-, lahja- ja ateriaseteleitä – fiksu valinta myynnin lisäämiseen ja asiakkaiden tyytyväisyyteen. Maksutapa \"kunponki\" näkyy vain, jos ostoskorissa on vähintään 1 tuote, jolle on määritetty kuponkityyppi.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Huomaa, että tätä rakennetta voidaan muokata vain oletuskielelläsi. Vaihda kieli muuttaaksesi tämän tuotteen kuponkityyppiä.",
+            "VOUCHER_BTN_READMORE": "Lue lisää",
+            "VOUCHER_TYPE_CAPTION": "Tuotteen kuponkityyppi",
+            "VOUCHER_TYPE_VALUE_NONE": "Ei mitään",
+            "VOUCHER_TYPE_VALUE_ECO": "Eko",
+            "VOUCHER_TYPE_VALUE_MEAL": "Ateria",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Lahja"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Toimita Mollien kautta",
+                "item": {
+                    "label": "Tuote:",
+                    "noQuantity": "Ole hyvä ja syötä lähettävä määrä.",
+                    "shipAll": "Toimita kaikki",
+                    "summary": {
+                        "quantity": "Lähetys määrä",
+                        "shipped": "Lähetetty määrä",
+                        "shippable": "Toimitettava määrä"
+                    },
+                    "success": "Tilaus on toimitettu onnistuneesti."
+                },
+                "order": {
+                    "description": "Seuraavat tuotemäärät toimitetaan.",
+                    "itemHeader": "Tuote",
+                    "quantityHeader": "Määrä",
+                    "originalQuantityHeader": "Määrä (toimitettavissa)"
+                },
+                "availableTracking": {
+                    "label": "Saatavilla olevat seurantakoodit",
+                    "hint": "Täytä kaikki tiedot automaattisesti napsauttamalla jotakin näistä seurantakoodeista."
+                },
+                "showTracking": "Lisää seurantatietoja tälle lähetykselle",
+                "tracking": {
+                    "carrier": "Kuriiri",
+                    "code": "Koodi",
+                    "url": "Url",
+                    "invalid": "Syötä sekä kuriiri että koodi"
+                },
+                "confirmButton": "Toimita tilaus",
+                "cancelButton": "Peruuta",
+                "selectAllButton": "Valitse kaikki",
+                "resetButton": "Nollaa"
+            },
+            "cancel": {
+                "title": "Peruuta tuote Mollien kautta",
+                "confirmButton": "Peruuta tuote Mollien kautta",
+                "cancelButton": "Sulje modaali",
+                "resetStock": "Nollaa varastot",
+                "item": {
+                    "success": "Tuote on peruutettu onnistuneesti",
+                    "failed": {
+                        "quantityZero": "Määrä on 0",
+                        "invalidLine": "Tuotetta ei ole tilauksessa",
+                        "quantityTooHigh": "Määrä on liian suuri"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Toimita tilaus (Mollie)",
+                        "description": "Toimita tilaus Molliessa."
+                    },
+                    "modal": {
+                        "title": "Toimita tilaus",
+                        "description": "Tämä toiminto lähettää tilauksen automaattisesti Mollien kautta. Prosessointijärjestelmä vastaanottaa tilausnumeron ja välittää sen Mollie API:lle. Onnistuneet ja epäonnistuneet lähetykset näkyvät Mollien lokitiedostoissa.",
+                        "warningConfig": "Varmista, että samantyyppisille toiminnoille ei ole käytössä muita automaatioita häiriöiden välttämiseksi.\nSeuraavat tämän laajennuksen aktivoidut ominaisuudet saattavat häiritä tätä toimintoa:",
+                        "noWarnings": "Ei varoituksia"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Hyvitä tilaus (Mollie)",
+                        "description": "Hyvitä tilaus Mollien kautta."
+                    },
+                    "modal": {
+                        "title": "Hyvitä tilaus",
+                        "description": "Tämä toiminto aloittaa automaattisesti hyvityksen Mollien kautta. Prosessijärjestelmä vastaanottaa tilausnumeron ja välittää sen Mollien API:lle. Onnistuneet hyvitykset ja epäonnistuneet hyvitykset näkyvät Mollien lokitiedostoissa.",
+                        "warning": "Huomaa, että hyvitysten viimeistely ja näkyminen kaupassa voi kestää jopa 2 tuntia. Siihen asti voit peruuttaa odottavan hyvityksen joko Shopwaren tilaussivulta tai Mollie-hallintapaneelista.",
+                        "warningConfig": "Varmista, että samantyyppisille toimille ei ole käytössä muita automaatioita häiriöiden välttämiseksi."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Automaattinen toimitus laajennusmäärityksessä"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Odottaa",
+                "active": "Aktiivinen",
+                "canceled": "Peruutettu",
+                "suspended": "Keskeytetty",
+                "completed": "Suoritettu",
+                "paused": "Pysäytetty",
+                "resumed": "Jatkettu",
+                "skipped": "Ohitettu"
+            },
+            "navigation": {
+                "title": "Mollie-tilaukset"
+            },
+            "TYPE_DAYS": "Päivä(t)",
+            "TYPE_WEEKS": "Viikko(t)",
+            "TYPE_MONTHS": "Kuukausi/kuukaudet",
+            "confirm": {
+                "cancelTitle": "Lopeta tilaus?",
+                "cancel": "Peruuta asiakkaasi tilaus.",
+                "pauseTitle": "Keskeytä tilaus?",
+                "pause": "Laita tilaus pysäytetään, kunnes jatkat sitä uudelleen.",
+                "resumeTitle": "Jatketaanko tilausta?",
+                "resume": "Jatka tilausta uudelleen.",
+                "skipTitle": "Ohita seuraava erä?",
+                "skip": "Ohita tilauksen seuraava erä. Se jatkuu automaattisesti sen jälkeen."
+            },
+            "alerts": {
+                "cancelSuccess": "Tilaus on peruutettu onnistuneesti",
+                "pauseSuccess": "Tilaus on keskeytetty onnistuneesti",
+                "resumeSuccess": "Tilausta on jatkettu onnistuneesti",
+                "skipSuccess": "Tilaus on ohitettu onnistuneesti. Seuraava maksu on päivitetty."
+            },
+            "list": {
+                "title": "Mollie-tilaukset",
+                "columns": {
+                    "customer": "Asiakas",
+                    "status": "Tila",
+                    "description": "Kuvaus",
+                    "amount": "Summa",
+                    "nextPaymentAt": "Seuraava maksu",
+                    "prePaymentReminder": "Muistutettu",
+                    "canceledAt": "Peruutettu",
+                    "createdAt": "Luotu"
+                },
+                "action": {
+                    "edit": "Muokkaa tilausta"
+                },
+                "deletedCustomer": "Poistettu asiakas"
+            },
+            "detail": {
+                "title": "Mollie-tilaus",
+                "buttonCancelSubscription": "Peruuta tilaus",
+                "labelDescription": "Kuvaus",
+                "labelAmount": "Summa",
+                "labelQuantity": "Määrä",
+                "labelMollieSubscription": "Mollie-tilaus",
+                "labelMollieCustomer": "Mollie-asiakas",
+                "labelMandateId": "Valtuutus",
+                "labelShopwareCustomer": "Shopware-asiakas",
+                "labelCreatedAt": "Luotu",
+                "buttonShowShopwareOrder": "Näytä Shopware-tilaus",
+                "buttonShowShopwareCustomer": "Näytä Shopware-asiakas",
+                "cardTitleSubscription": "Tilaus",
+                "cardTitleStatus": "Tila",
+                "labelStatus": "Tila",
+                "labelNextPaymentAt": "Seuraava maksu",
+                "labelLastRemindedAt": "Viimeksi muistutettu",
+                "labelCanceledAt": "Peruutettu",
+                "buttonPauseSubscription": "Keskeytä tilaus",
+                "buttonResumeSubscription": "Jatka tilausta",
+                "buttonSkipSubscription": "Ohita tilaus",
+                "history": {
+                    "cardTitle": "Historia",
+                    "colDate": "Päivämäärä",
+                    "colComment": "Kommentti",
+                    "colStatusFrom": "Tila (alkaen)",
+                    "colStatusTo": "Tila (asti)",
+                    "colMollieSubscription": "Mollie-tilaus"
+                }
+            },
+            "product": {
+                "card-title": "Tilaus",
+                "title": "Mollie-tilaukset",
+                "description": "Toistuvien maksujesi hallinta on helpompaa kuin koskaan hyödyllisten ominaisuuksiemme ansiosta. Vie yrityksesi uudelle tasolle tehokkailla seurantavaihtoehdoilla, yksinkertaisilla integroinneilla ja monilla muilla tavoilla. Mollie-tilausten avulla voit helposti luoda tilaustuotteita ja ajoittaa toistuvia maksuja suoritettavaksi määritetyllä aikavälillä ja ajanjaksolla.",
+                "mollieSubscriptionProduct": "Tilaustuote",
+                "mollieSubscriptionIntervalAmount": "Toista maksu joka",
+                "mollieSubscriptionIntervalType": "Aikaväliyksikkö",
+                "mollieSubscriptionRepetitionAmount": "Toistojen määrä",
+                "mollieSubscriptionRepetitionPlaceholder": "Syötä numero tai jätä tyhjäksi",
+                "infoDefaultLanguage": "Huomaa, että tätä rakennetta voidaan muokata vain oletuskielelläsi. Vaihda kielesi, jotta voit muokata tämän tuotteen tilaushallinnan.",
+                "btnReadMore": "Lue lisää"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Tilaus"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Luottokorttitiedot",
+            "buttonMolliePaymentLink": "Kopioi leikepöydälle",
+            "columnRefunded": "Hyvitetty",
+            "columnShipped": "Toimitettu",
+            "columnCanceled": "Peruutettu",
+            "labelMollieOrderId": "Mollie-tilaustunnus",
+            "labelMollieThirdPartyPaymentId": "Maksuviite",
+            "labelMolliePaymentLink": "Mollie Checkout URL",
+            "totalRefunds": "Hyvitetty summa",
+            "totalRefundsPending": "Odottaa hyvitystä",
+            "totalRemaining": "Hyvitettävä summa",
+            "totalVouchers": "Kuponkimäärä",
+            "totalShipments": "Toimitettu määrä ({quantity} tuotetta)",
+            "subscriptionBadge": "Tilaus",
+            "refundManager": {
+                "title": "Mollie-hyvityshallinta",
+                "btnOpenRefundManager": "Avaa hyvityshallinta",
+                "btnCloseRefundManager": "Sulje hyvityshallinta"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Suositeltu iDeal-myöntäjä"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Hyvityshallinta"
+            },
+            "mollie_subscription": {
+                "label": "Tilaukset"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Kuvaus"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Hyvitys",
+            "subscription": "Tilaus",
+            "webhookReceived": "Webhook",
+            "status": "Tila",
+            "started": "Aloitettu",
+            "ended": "Päättynyt",
+            "paused": "Keskeytetty",
+            "renewalReminder": "Uusimismuistutus",
+            "renewed": "Uusittu",
+            "resumed": "Jatkettu",
+            "skipped": "Ohitettu",
+            "all": "Kaikki",
+            "canceled": "Peruutettu",
+            "expired": "Vanhentunut",
+            "partiallyRefunded": "Hyvitetty (osittain)",
+            "orderSuccess": "Tilaus onnistui",
+            "orderFailed": "Tilaus epäonnistui",
+            "orderCanceled": "Tilaus peruutettu"
+        }
+    }
+}

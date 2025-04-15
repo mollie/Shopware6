@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Den för närvarande valda betalningsmetoden är inte tillgänglig för prenumerationsprodukter.",
+        "mollie-payments-cart-error-mixedcart": "Din varukorg innehåller flera objekt i kombination med prenumerationsobjekt. Observera att du bara kan köpa 1 prenumerationsobjekt åt gången.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Alla betalningsmetoder är inte tillgängliga när du beställer prenumerationsprodukter.",
+        "mollie-payments-cart-guest-account": "Gästekonton kan inte användas för prenumerationsbeställningar."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Den för närvarande valda betalningsmetoden är inte tillgänglig för prenumerationsprodukter.",
+        "mollie-payments-cart-error-mixedcart": "Din varukorg innehåller flera objekt i kombination med prenumerationsobjekt. Observera att du bara kan köpa 1 prenumerationsobjekt åt gången.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Alla betalningsmetoder är inte tillgängliga när du beställer prenumerationsprodukter.",
+        "mollie-payments-cart-guest-account": "Gästekonton kan inte användas för prenumerationsbeställningar."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Utgångsdatum",
+                "cardHolderLabel": "Namn på kortet",
+                "cardNumberLabel": "Kortnummer",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Betalningen krypterad och tillhandahållen av",
+                "headLine": "Ange dina kortuppgifter",
+                "saveCardDetailLabel": "Spara kortuppgifter för framtida betalningar"
+            },
+            "ideal": {
+                "selectBank": "Välj bank"
+            },
+            "pos": {
+                "selectTerminal": "Välj terminal"
+            },
+            "mandate": {
+                "sectionTitle": "Sparade kort",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Ditt kort har raderats framgångsrikt",
+                "deleteErrorMessage": "Det uppstod ett problem när ditt kort skulle tas bort",
+                "newCard": "Ny kort",
+                "remove": "Ta bort",
+                "subscriptionBadge": "Prenumeration"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Avbryt",
+                "cardSubscription": "Detta kort används för en prenumeration. Vänligen avbryt prenumerationen först innan du tar bort detta kort.",
+                "deleteButton": "Radera",
+                "deleteConfirmation": "Är du säker på att du vill radera?",
+                "title": "Radera bekräftelse"
+            },
+            "bancomatPay": {
+                "headLine": "Telefonnummer",
+                "phoneErrorMessage": "Telefonnummer krävs. Till exempel +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Betala med en annan betalningsmetod",
+                "buttonReturnToShop": "Återvänd till butiken",
+                "error": "Betalningen misslyckades",
+                "failed": "Betalningen misslyckades eller avbröts. Du kommer att bli omdirigerad till Mollie, där du kan slutföra din betalning med den metod du väljer. "
+            },
+            "redirecting": "Omdirigerar dig till: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Delsumma",
+                "captionTaxes": "Skatter",
+                "paymentError": "Betalningen med Apple Pay misslyckades."
+            },
+            "paypalExpress": {
+                "paymentError": "Betalningen med Paypal Express misslyckades."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "redigera faktureringsadress",
+                "btnEditShippingAddress": "redigera fraktadress",
+                "cancelSubscription": "Prenumerationen har avbrutits",
+                "errorCancelSubscription": "Prenumerationen kunde inte avbrytas på grund av ett fel. Vänligen kontakta vår support.",
+                "errorPause": "Det uppstod ett fel när prenumerationen skulle pausas",
+                "errorResume": "Det uppstod ett fel när prenumerationen skulle återupptas",
+                "errorSkip": "Det uppstod ett fel när prenumerationen skulle hoppas över",
+                "errorUpdateAddress": "Det uppstod ett fel när adressen skulle uppdateras",
+                "errorUpdatePayment": "Det uppstod ett fel när betalningsmetoden skulle uppdateras",
+                "headlineBillingAddress": "Faktureringsadress",
+                "headlineShippingAddress": "Fraktadress",
+                "mollieSubscriptionAmount": "Belopp",
+                "mollieSubscriptionCancel": "Avbryt prenumeration",
+                "mollieSubscriptionCancelUntil": "Avbokning möjlig fram till",
+                "mollieSubscriptionContextMenuReorder": "Upprepa prenumeration",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Nästa betalningen den",
+                "mollieSubscriptionPause": "Pausa prenumeration",
+                "mollieSubscriptionResume": "Återuppta prenumeration",
+                "mollieSubscriptionSkip": "Hoppa över prenumeration",
+                "mollieSubscriptionUpdatePayment": "Uppdatera betalning",
+                "mollieSubscriptionsHeadline": "Prenumeration:",
+                "mollieSubscriptionsInfoEmpty": "Du har inga prenumerationer än.",
+                "mollieSubscriptionsLink": "Prenumerationer",
+                "mollieSubscriptionsTitle": "Prenumerationer",
+                "mollieSubscriptionsWelcome": "Dina senaste prenumerationer:",
+                "orderActionHide": "Dölj",
+                "orderActionView": "Visa",
+                "shippingEqualToBilling": "Samma som faktureringsadress",
+                "successPause": "Din prenumeration har pausats",
+                "successResume": "Din prenumeration kommer nu att återupptas",
+                "successSkip": "Din prenumeration har hoppats över",
+                "successUpdateAddress": "Din adress har uppdaterats framgångsrikt",
+                "successUpdatePayment": "Din betalningsmetod har uppdaterats framgångsrikt"
+            },
+            "options": {
+                "everyDay": "Varje dag",
+                "everyDays": "Varje %value% dagar",
+                "everyMonth": "Varje månad",
+                "everyMonths": "Varje %value% månader",
+                "everyWeek": "Varje vecka",
+                "everyWeeks": "Varje %value% veckor",
+                "repetitionCount": "%value% gång(er)"
+            },
+            "product": {
+                "addToCartText": "Prenumerera",
+                "information": "Prenumerationsprodukt"
+            }
+        },
+        "testMode": {
+            "label": "Testläge"
+        }
+    }
+}
