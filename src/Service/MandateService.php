@@ -67,15 +67,17 @@ class MandateService implements MandateServiceInterface
             $context->getSalesChannelId(),
             $context->getContext()
         );
+        $mandatesArray = [];
         try {
             $mandates = $this->mandateApiService->getMandatesByMollieCustomerId($mollieCustomerId, $context->getSalesChannelId());
+            $mandatesArray = $mandates->getArrayCopy();
         } catch (CouldNotFetchMollieCustomerMandatesException $e) {
             $customFields = $this->customerService->getCustomerStruct($customerId, $context->getContext());
             $customFields->setCustomerIds([]);
             $this->customerService->saveCustomerCustomFields($customerId, $customFields->toCustomFieldsArray(), $context->getContext());
         }
 
-        return $this->parseCreditCardMandateToStruct($mandates->getArrayCopy(), $customerId, $context->getContext());
+        return $this->parseCreditCardMandateToStruct($mandatesArray, $customerId, $context->getContext());
     }
 
     /**
