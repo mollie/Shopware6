@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Removed typehints for EntityRepository in order to allow repository decoration in Shopware 6.4
 - Bank transfer payments are now set to the 'In Progress' state instead of 'Unconfirmed', as these payment methods require several days to process and should not be modified.
+- Mandates for Mollie Customers are not loaded if the customer was deleted in Mollie dashboard
 
 ### Fixed
 - Fixed the error "Call to a member function info() on null"
