@@ -30,6 +30,6 @@ export default class CancelItemRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getConfirmButton(){
-        return cy.get('.cy-cancel-item-confirm .sw-button__content');
+        return cy.get('.cy-cancel-item-confirm *[class$="-button__content"]');
     }
 }

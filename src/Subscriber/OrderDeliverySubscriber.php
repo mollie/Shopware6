@@ -80,19 +80,21 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        // get the configuration of the sales channel from the order
-        $configSalesChannel = $this->settings->getSettings($event->getSalesChannelId());
-
-        // if we don't even configure automatic shipping
-        // then don't even look into our order to find out if we should actually starts
-        if (! $configSalesChannel->getAutomaticShipping()) {
-            return;
-        }
 
         $orderDeliveryId = $event->getTransition()->getEntityId();
 
         try {
             $order = $this->orderService->getOrderByDeliveryId($orderDeliveryId, $event->getContext());
+
+            // get the configuration of the sales channel from the order
+            $configSalesChannel = $this->settings->getSettings($order->getSalesChannelId());
+
+            // if we don't even configure automatic shipping
+            // then don't even look into our order to find out if we should actually starts
+            if (! $configSalesChannel->getAutomaticShipping()) {
+                return;
+            }
+
 
             $swTransaction = $this->getLatestOrderTransaction($order->getId(), $event->getContext());
             if (! $swTransaction) {

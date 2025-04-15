@@ -32,6 +32,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Shipment">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Payment">
