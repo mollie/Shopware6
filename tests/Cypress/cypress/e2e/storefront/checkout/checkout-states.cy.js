@@ -73,13 +73,8 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             adminOrders.assertLatestOrderStatus('Open');
-            if (shopware.isVersionLower('6.4.4.0')) {
-                adminOrders.assertLatestPaymentStatus('In Progress');
-            } else {
-                adminOrders.assertLatestPaymentStatus('Unconfirmed');
-            }
-
-
+            adminOrders.assertLatestPaymentStatus('In Progress');
+            
         })
 
         it('C4023: Test Status Paid', () => {
