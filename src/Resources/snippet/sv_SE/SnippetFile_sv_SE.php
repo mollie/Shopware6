@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Resources\snippet\se_SV;
+namespace Kiener\MolliePayments\Resources\snippet\sv_SE;
 
 use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
 

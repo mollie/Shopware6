@@ -29,7 +29,7 @@
             <tag name="shopware.snippet.file"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Resources\snippet\se_SV\SnippetFile_sv_SE">
+        <service id="Kiener\MolliePayments\Resources\snippet\sv_SE\SnippetFile_sv_SE">
             <tag name="shopware.snippet.file"/>
         </service>
 
