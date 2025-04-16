@@ -80,7 +80,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-
         $orderDeliveryId = $event->getTransition()->getEntityId();
 
         try {
@@ -94,7 +93,6 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
             if (! $configSalesChannel->getAutomaticShipping()) {
                 return;
             }
-
 
             $swTransaction = $this->getLatestOrderTransaction($order->getId(), $event->getContext());
             if (! $swTransaction) {

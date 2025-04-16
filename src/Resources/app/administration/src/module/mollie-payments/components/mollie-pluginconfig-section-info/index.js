@@ -13,7 +13,7 @@ Component.register('mollie-pluginconfig-section-info', {
     data() {
         return {
             isSupportOpen: false,
-            versionCompare:null,
+            versionCompare: null,
         };
     },
 
@@ -49,11 +49,11 @@ Component.register('mollie-pluginconfig-section-info', {
         openConfigImport() {
             // TODO create and open a configuration import modal
         },
-        getCurrentUser(){
+        getCurrentUser() {
             // eslint-disable-next-line no-undef
             let session = Shopware.State.get('session');
-            if(session === undefined){
-                session = Shopware.Store.get('session')
+            if (session === undefined) {
+                session = Shopware.Store.get('session');
             }
             return session.currentUser;
         },

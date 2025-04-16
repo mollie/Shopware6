@@ -1,4 +1,4 @@
-export default class VersionCompare{
+export default class VersionCompare {
     equals(versionA, versionB) {
         return this.compare(versionA, versionB, '=');
     }
@@ -161,4 +161,4 @@ export default class VersionCompare{
                 return text;
         }
     }
-};
+}

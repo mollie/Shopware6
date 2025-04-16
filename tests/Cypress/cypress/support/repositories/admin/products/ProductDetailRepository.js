@@ -29,7 +29,7 @@ export default class ProductDetailRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getSubscriptionToggle() {
-        return cy.get('.mollie-subscription-enabled > div > div >input');
+        return cy.get('.mollie-subscription-enabled input');
     }
 
 }

@@ -4,9 +4,7 @@ import svgr from 'vite-plugin-svgr';
 import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
-    plugins: [
-        svgr(),
-    ],
+    plugins: [svgr()],
     resolve: {
         alias: {
             '@creditcard_logos': fileURLToPath(new URL('../src/assets/creditcard_logos', import.meta.url)),
@@ -26,9 +24,6 @@ export default defineConfig({
     },
     esbuild: {
         loader: 'tsx',
-        include: [
-            fileURLToPath(new URL('../src/assets/creditcard_logos', import.meta.url))
-        ],
+        include: [fileURLToPath(new URL('../src/assets/creditcard_logos', import.meta.url))],
     },
-
 });

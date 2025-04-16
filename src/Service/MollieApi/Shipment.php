@@ -25,7 +25,7 @@ class Shipment implements ShipmentInterface
     private EventDispatcherInterface $eventDispatcher;
     private LoggerInterface $logger;
 
-    public function __construct(Order $orderApiService, EventDispatcherInterface $eventDispatcher,LoggerInterface $logger)
+    public function __construct(Order $orderApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->orderApiService = $orderApiService;
         $this->eventDispatcher = $eventDispatcher;
@@ -68,10 +68,11 @@ class Shipment implements ShipmentInterface
             // if we have no items
             // then simply ship all
             if (empty($items)) {
-                $this->logger->debug('ship all items',[
+                $this->logger->debug('ship all items', [
                     'options' => $options,
                     'mollieOrderId' => $mollieOrderId,
                 ]);
+
                 return $mollieOrder->shipAll($options);
             }
 
@@ -84,7 +85,7 @@ class Shipment implements ShipmentInterface
                 ];
             }
 
-            $this->logger->debug('ship lines items',[
+            $this->logger->debug('ship lines items', [
                 'options' => $options,
                 'mollieOrderId' => $mollieOrderId,
             ]);

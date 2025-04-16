@@ -2,7 +2,6 @@ import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
-
 // eslint-disable-next-line no-undef
 const { Application, Component, Context, Mixin, State } = Shopware;
 // eslint-disable-next-line no-undef
@@ -42,7 +41,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                     value: 'de-DE',
                 },
             ],
-            versionCompare:null,
+            versionCompare: null,
         };
     },
 
@@ -89,8 +88,8 @@ Component.register('mollie-pluginconfig-support-modal', {
         user() {
             // eslint-disable-next-line no-undef
             let session = Shopware.State.get('session');
-            if(session === undefined){
-                session = Shopware.Store.get('session')
+            if (session === undefined) {
+                session = Shopware.Store.get('session');
             }
             return session.currentUser;
         },
@@ -115,7 +114,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                 return this.getShopwareExtensions().data || [];
             }
             let swPlugin = Shopware.State.get('swPlugin');
-            if(swPlugin === undefined){
+            if (swPlugin === undefined) {
                 swPlugin = Shopware.Store.get('swPlugin');
             }
             return swPlugin.plugins || [];
@@ -133,7 +132,7 @@ Component.register('mollie-pluginconfig-support-modal', {
             return this.versionCompare.getHumanReadableVersion(Context.app.config.version);
         },
     },
-    created(){
+    created() {
         this.versionCompare = new VersionCompare();
     },
     mounted() {
@@ -152,10 +151,10 @@ Component.register('mollie-pluginconfig-support-modal', {
                 }
             }
         },
-        getShopwareExtensions(){
+        getShopwareExtensions() {
             let myExtensions = Shopware.State.get('shopwareExtensions');
-            if(myExtensions === undefined){
-                myExtensions = Shopware.Store.get('shopwareExtensions')
+            if (myExtensions === undefined) {
+                myExtensions = Shopware.Store.get('shopwareExtensions');
             }
             return myExtensions.myExtensions;
         },
