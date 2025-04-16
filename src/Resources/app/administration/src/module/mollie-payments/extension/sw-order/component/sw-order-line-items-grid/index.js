@@ -266,7 +266,9 @@ Component.override('sw-order-line-items-grid', {
                 });
                 return;
             }
-
+            if(this.isShipItemLoading === true){
+                return;
+            }
             this.isShipItemLoading = true;
 
             this.MolliePaymentsShippingService.shipItem({
@@ -278,6 +280,7 @@ Component.override('sw-order-line-items-grid', {
                 trackingUrl: this.tracking.url,
             })
                 .then(() => {
+                    this.isShipItemLoading = false;
                     this.createNotificationSuccess({
                         message: this.$tc('mollie-payments.modals.shipping.item.success'),
                     });
@@ -289,6 +292,7 @@ Component.override('sw-order-line-items-grid', {
                     this.$emit('ship-item-success');
                 })
                 .catch((response) => {
+                    this.isShipItemLoading = false;
                     this.createNotificationError({
                         message: response.response.data.message,
                     });
