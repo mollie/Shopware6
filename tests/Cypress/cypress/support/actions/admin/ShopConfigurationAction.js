@@ -182,6 +182,7 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.orderStateWithAPaidTransaction": 'completed',
             "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
             "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
+            "MolliePayments.config.refundManagerEnabled": true,
             // ------------------------------------------------------------------
             "MolliePayments.config.subscriptionsEnabled": true,
             "MolliePayments.config.subscriptionsShowIndicator": subscriptionIndicator,
