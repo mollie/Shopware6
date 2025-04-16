@@ -25,7 +25,7 @@ Component.register('mollie-cancel-item', {
 
     methods: {
         submit() {
-            if(this.isLoading){
+            if (this.isLoading) {
                 return;
             }
             this.isLoading = true;

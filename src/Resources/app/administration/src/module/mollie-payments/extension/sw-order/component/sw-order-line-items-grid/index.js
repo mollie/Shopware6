@@ -266,7 +266,7 @@ Component.override('sw-order-line-items-grid', {
                 });
                 return;
             }
-            if(this.isShipItemLoading === true){
+            if (this.isShipItemLoading === true) {
                 return;
             }
             this.isShipItemLoading = true;
