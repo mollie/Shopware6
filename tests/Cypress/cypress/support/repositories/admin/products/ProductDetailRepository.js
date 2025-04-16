@@ -21,7 +21,7 @@ export default class ProductDetailRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getVoucherTypeDropdown() {
-        return cy.get('.mollie-voucher-type > div > select');
+        return cy.get('.mollie-voucher-type');
     }
 
     /**

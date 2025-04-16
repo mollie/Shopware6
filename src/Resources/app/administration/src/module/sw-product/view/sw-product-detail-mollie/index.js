@@ -90,10 +90,10 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         voucherTypes() {
             return [
-                { key: 0, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_NONE') },
-                { key: 1, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO') },
-                { key: 2, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL') },
-                { key: 3, name: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER') },
+                { value: 0, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_NONE') },
+                { value: 1, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO') },
+                { value: 2, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL') },
+                { value: 3, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER') },
             ];
         },
 

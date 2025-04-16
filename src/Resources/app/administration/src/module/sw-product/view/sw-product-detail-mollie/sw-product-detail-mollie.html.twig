@@ -36,18 +36,16 @@
                             :has-parent="!!parentProduct.id"
                             :inherited-value="parentProduct.customFields.mollie_payments_product_voucher_type">
                         <template #content="props">
-                            <sw-select-field
+                            <sw-single-select
                                     class="mollie-voucher-type"
                                     :disabled="props.isInherited"
                                     :value="props.currentValue"
+                                    :options="voucherTypes"
                                     v-model:value="props.currentValue"
                                     @change="props.updateCurrentValue"
                                     @update:value="props.updateCurrentValue"
                             >
-                                <option v-for="type in voucherTypes" :key="type.key" :value="type.key">
-                                    {{ type.name }}
-                                </option>
-                            </sw-select-field>
+                            </sw-single-select>
                         </template>
                     </sw-inherit-wrapper>
 
