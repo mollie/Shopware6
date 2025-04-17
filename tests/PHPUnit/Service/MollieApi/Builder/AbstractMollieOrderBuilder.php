@@ -30,7 +30,6 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
-use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Fakes\FakeEventDispatcher;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Traits\OrderTrait;
@@ -189,7 +188,6 @@ abstract class AbstractMollieOrderBuilder extends TestCase
                 new IsOrderLineItemValid(),
                 new PriceCalculator(),
                 new LineItemDataExtractor(new UrlParsingService()),
-                new FakeCompatibilityGateway(),
                 new RoundingDifferenceFixer(),
                 new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
                 new MollieShippingLineItemBuilder(new PriceCalculator())

@@ -9,13 +9,14 @@ use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Kiener\MolliePayments\Struct\CustomerStruct;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressDefinition;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\Event\CustomerBeforeLoginEvent;
 use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
-use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
+use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -80,21 +81,27 @@ class CustomerService implements CustomerServiceInterface
 
     /** @var EntityRepository */
     private $customerAddressRepository;
-    private AbstractRegisterRoute $registerRoute;
+    private ContainerInterface $container;
 
+    /**
+     * @param EntityRepository $countryRepository
+     * @param EntityRepository $customerRepository
+     * @param EntityRepository $customerAddressRepository
+     * @param EntityRepository $salutationRepository
+     */
     public function __construct(
-        EntityRepository $countryRepository,
-        EntityRepository $customerRepository,
-        EntityRepository $customerAddressRepository,
+        $countryRepository,
+        $customerRepository,
+        $customerAddressRepository,
         Customer $customerApiService,
         EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
-        EntityRepository $salutationRepository,
+        $salutationRepository,
         SettingsService $settingsService,
         string $shopwareVersion,
         ConfigService $configService,
-        AbstractRegisterRoute $registerRoute
+        ContainerInterface $container
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -107,7 +114,7 @@ class CustomerService implements CustomerServiceInterface
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
         $this->configService = $configService;
-        $this->registerRoute = $registerRoute;
+        $this->container = $container;
     }
 
     /**
@@ -364,43 +371,6 @@ class CustomerService implements CustomerServiceInterface
             'city' => $address->getCity(),
             'country' => $address->getCountry() !== null ? $address->getCountry()->getIso() : 'NL',
         ];
-    }
-
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
-    {
-        $countryId = $this->getCountryId($countryISO2, $context->getContext());
-        $salutationId = $this->getSalutationId($context->getContext());
-
-        $data = new RequestDataBag();
-        $data->set('salutationId', $salutationId);
-        $data->set('guest', true);
-        $data->set('firstName', $firstname);
-        $data->set('lastName', $lastname);
-        $data->set('email', $email);
-
-        $billingAddress = new RequestDataBag();
-        $billingAddress->set('street', $street);
-        $billingAddress->set('zipcode', $zipCode);
-        $billingAddress->set('city', $city);
-        $billingAddress->set('phoneNumber', $phone);
-        $billingAddress->set('countryId', $countryId);
-
-        $data->set('billingAddress', $billingAddress);
-
-        try {
-            $response = $this->registerRoute->register($data, $context, false);
-
-            return $response->getCustomer();
-        } catch (ConstraintViolationException $e) {
-            $errors = [];
-            /* we have to store the errors in an array because getErrors returns a generator */
-            foreach ($e->getErrors() as $error) {
-                $errors[] = $error;
-            }
-            $this->logger->error($e->getMessage(), ['errors' => $errors]);
-
-            return null;
-        }
     }
 
     /**
@@ -692,7 +662,9 @@ class CustomerService implements CustomerServiceInterface
         }
 
         try {
-            return $this->registerRoute->register($data, $context, false)->getCustomer();
+            $registerRoute = $this->container->get(RegisterRoute::class);
+
+            return $registerRoute->register($data, $context, false)->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
             /* we have to store the errors in an array because getErrors returns a generator */

@@ -12,10 +12,10 @@ use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
 use MolliePayments\Tests\Fakes\Repositories\FakeOrderRepository;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
@@ -43,11 +43,11 @@ class OrderServiceTest extends TestCase
 
         $this->orderService = new OrderService(
             $this->orderRepository,
-            $this->createMock(ShopwareOrderService::class),
             $this->createMock(\Kiener\MolliePayments\Service\MollieApi\Order::class),
             $this->createMock(UpdateOrderCustomFields::class),
             $this->createMock(UpdateOrderTransactionCustomFields::class),
             $this->createMock(OrderDeliveryService::class),
+            $this->createMock(ContainerInterface::class),
             new NullLogger()
         );
     }
