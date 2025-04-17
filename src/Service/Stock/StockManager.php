@@ -67,14 +67,10 @@ class StockManager implements StockManagerInterface
         $update = $this->connection->prepare(
             'UPDATE product SET available_stock = available_stock + :quantity, sales = sales - :quantity, updated_at = :now WHERE id = :id'
         );
-
-        $update->execute(
-            [
-                'id' => Uuid::fromHexToBytes($productID),
-                'quantity' => $quantity,
-                'now' => (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT),
-            ]
-        );
+        $update->bindValue(':quantity', $quantity);
+        $update->bindValue(':now', (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT));
+        $update->bindValue(':id', Uuid::fromHexToBytes($productID));
+        $update->executeStatement();
     }
 
     /**
