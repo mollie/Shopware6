@@ -130,7 +130,7 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\CartService">
+        <service id="Kiener\MolliePayments\Service\CartService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory"/>
