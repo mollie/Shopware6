@@ -79,30 +79,33 @@ class CustomerService implements CustomerServiceInterface
     /** @var string */
     private $shopwareVersion;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
     /** @var EntityRepository */
     private $customerAddressRepository;
+    private ContainerInterface $container;
 
+    /**
+     * @param EntityRepository $countryRepository
+     * @param EntityRepository $customerRepository
+     * @param EntityRepository $customerAddressRepository
+     * @param EntityRepository $salutationRepository
+     */
     public function __construct(
-        EntityRepository $countryRepository,
-        EntityRepository $customerRepository,
-        EntityRepository $customerAddressRepository,
+        $countryRepository,
+        $customerRepository,
+        $customerAddressRepository,
         Customer $customerApiService,
         EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         SalesChannelContextPersister $salesChannelContextPersister,
-        EntityRepository $salutationRepository,
+        $salutationRepository,
         SettingsService $settingsService,
         string $shopwareVersion,
         ConfigService $configService,
-        ContainerInterface $container // we have to inject the container, because in SW 6.4.20.2 we have circular injection for the register route
+        ContainerInterface $container
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
+        $this->customerAddressRepository = $customerAddressRepository;
         $this->customerApiService = $customerApiService;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
@@ -111,7 +114,6 @@ class CustomerService implements CustomerServiceInterface
         $this->settingsService = $settingsService;
         $this->shopwareVersion = $shopwareVersion;
         $this->configService = $configService;
-        $this->customerAddressRepository = $customerAddressRepository;
         $this->container = $container;
     }
 
@@ -369,44 +371,6 @@ class CustomerService implements CustomerServiceInterface
             'city' => $address->getCity(),
             'country' => $address->getCountry() !== null ? $address->getCountry()->getIso() : 'NL',
         ];
-    }
-
-    public function createApplePayDirectCustomer(string $firstname, string $lastname, string $email, string $phone, string $street, string $zipCode, string $city, string $countryISO2, SalesChannelContext $context): ?CustomerEntity
-    {
-        $countryId = $this->getCountryId($countryISO2, $context->getContext());
-        $salutationId = $this->getSalutationId($context->getContext());
-
-        $data = new RequestDataBag();
-        $data->set('salutationId', $salutationId);
-        $data->set('guest', true);
-        $data->set('firstName', $firstname);
-        $data->set('lastName', $lastname);
-        $data->set('email', $email);
-
-        $billingAddress = new RequestDataBag();
-        $billingAddress->set('street', $street);
-        $billingAddress->set('zipcode', $zipCode);
-        $billingAddress->set('city', $city);
-        $billingAddress->set('phoneNumber', $phone);
-        $billingAddress->set('countryId', $countryId);
-
-        $data->set('billingAddress', $billingAddress);
-
-        try {
-            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
-            $response = $abstractRegisterRoute->register($data, $context, false);
-
-            return $response->getCustomer();
-        } catch (ConstraintViolationException $e) {
-            $errors = [];
-            /* we have to store the errors in an array because getErrors returns a generator */
-            foreach ($e->getErrors() as $error) {
-                $errors[] = $error;
-            }
-            $this->logger->error($e->getMessage(), ['errors' => $errors]);
-
-            return null;
-        }
     }
 
     /**
@@ -698,9 +662,9 @@ class CustomerService implements CustomerServiceInterface
         }
 
         try {
-            $abstractRegisterRoute = $this->container->get(RegisterRoute::class);
+            $registerRoute = $this->container->get(RegisterRoute::class);
 
-            return $abstractRegisterRoute->register($data, $context, false)->getCustomer();
+            return $registerRoute->register($data, $context, false)->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
             /* we have to store the errors in an array because getErrors returns a generator */

@@ -6,7 +6,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getSelectAllItemsButton() {
-        return cy.get('[style="grid-template-columns: 1fr 1fr 4fr; place-items: stretch;"] > :nth-child(1) > .sw-button__content');
+        return cy.get('[style="grid-template-columns: 1fr 1fr 4fr; place-items: stretch;"] > :nth-child(1) > *[class$="-button__content"]');
     }
 
     /**
@@ -46,7 +46,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getAvailableTrackingCodes() {
-        return cy.get('[style="place-items: stretch;"] > :nth-child(1) > .sw-button > .sw-button__content');
+        return cy.get('[style="place-items: stretch;"] > :nth-child(1) > *[class$="-button"] > *[class$="-button__content"]');
     }
 
     /**

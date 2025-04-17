@@ -14,8 +14,7 @@ class MyBankPayment extends PaymentHandler implements BankTransfer
     public const PAYMENT_METHOD_NAME = PaymentMethod::MYBANK;
     public const PAYMENT_METHOD_DESCRIPTION = 'MyBank';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
      * @param array<mixed> $orderData

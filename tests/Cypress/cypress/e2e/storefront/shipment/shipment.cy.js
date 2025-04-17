@@ -83,13 +83,8 @@ context("Order Shipping", () => {
             if (shopware.isVersionLower('6.5')) {
                 repoOrderDetails.getMollieActionsButton().click({force: true});
             }
+            assertShippingButtonIsDisabled();
 
-            let disabledClassName = 'is--disabled'
-            if (shopware.isVersionGreaterEqual('6.5')) {
-                disabledClassName = 'sw-button--disabled';
-            }
-
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
         })
 
         it('C152048: Full Shipping in Administration with Tracking', () => {
@@ -119,12 +114,7 @@ context("Order Shipping", () => {
                 repoOrderDetails.getMollieActionsButton().click({force: true});
             }
 
-            let disabledClassName = 'is--disabled'
-            if (shopware.isVersionGreaterEqual('6.5')) {
-                disabledClassName = 'sw-button--disabled';
-            }
-
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
+            assertShippingButtonIsDisabled();
         })
 
         it('C2138608: Partial Batch Shipping in Administration', () => {
@@ -198,13 +188,7 @@ context("Order Shipping", () => {
                 repoOrderDetails.getMollieActionsButton().click({force: true});
             }
 
-            let disabledClassName = 'is--disabled'
-            if (shopware.isVersionGreaterEqual('6.5')) {
-                disabledClassName = 'sw-button--disabled';
-            }
-
-            cy.wait(1000);
-            repoOrderDetails.getMollieActionButtonShipThroughMollie().should('have.class', disabledClassName);
+            assertShippingButtonIsDisabled();
         })
 
         it('C4044: Line Item Shipping with Tracking', () => {
@@ -301,7 +285,7 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  * @param shippedItemsCount
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
-
+    cy.reload();
     cy.wait(2000);
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
@@ -310,4 +294,11 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
         /** since 6.5 you don't see the shipped items in summary **/
         repoOrderDetails.getOrderSummarySection().should('contain.text', 'Shipped amount (' + shippedItemsCount + ' items)', {timeout: 6000});
     }
+}
+
+function assertShippingButtonIsDisabled(){
+
+    repoOrderDetails.getMollieActionButtonShipThroughMollie()
+        .should('have.attr','class')
+        .and('match', /--disabled/);
 }

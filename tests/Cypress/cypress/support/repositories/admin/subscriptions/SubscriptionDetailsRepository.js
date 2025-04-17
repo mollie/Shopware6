@@ -12,6 +12,7 @@ export default class SubscriptionDetailsRepository {
         return cy.get('.cy-subscription-mollie-id input');
     }
 
+
     getMandateField() {
         return cy.get('.cy-subscription-mandate-id input');
     }
@@ -45,7 +46,7 @@ export default class SubscriptionDetailsRepository {
     }
 
     getCancelButton() {
-        return cy.get('.smart-bar__actions > .sw-button');
+        return cy.get('.smart-bar__actions button[class*="-button"]');
     }
 
     getHistoryCommentSelector(rowIndex) {

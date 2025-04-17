@@ -7,9 +7,9 @@ use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\SettingsService;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Fakes\Repositories\FakeCustomerRepository;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -49,7 +49,7 @@ class CustomerServiceTest extends TestCase
             $this->settingsService,
             'does.not.matter.here',
             $this->createMock(ConfigService::class),
-            new FakeContainer(),
+            $this->createMock(ContainerInterface::class)
         );
     }
 

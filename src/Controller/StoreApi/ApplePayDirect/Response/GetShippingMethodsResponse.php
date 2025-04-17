@@ -9,20 +9,15 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 class GetShippingMethodsResponse extends StoreApiResponse
 {
     /**
-     * @var ShippingMethodsStruct
-     */
-    protected $object;
-
-    /**
      * @param array<mixed> $shippingMethods
      */
     public function __construct(array $shippingMethods)
     {
-        $this->object = new ShippingMethodsStruct(
+        $object = new ShippingMethodsStruct(
             $shippingMethods,
             'mollie_payments_applepay_direct_shipping_methods'
         );
 
-        parent::__construct($this->object);
+        parent::__construct($object);
     }
 }

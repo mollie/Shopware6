@@ -40,7 +40,7 @@ class TransactionService
         if ($versionId !== null) {
             $transactionCriteria->addFilter(new EqualsFilter('versionId', $versionId));
         }
-
+        $transactionCriteria->addAssociation('paymentMethod');
         $transactionCriteria->addAssociation('order.currency');
         $transactionCriteria->addAssociation('order.lineItems');
         $transactionCriteria->addAssociation('order.stateMachineState');

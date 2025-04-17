@@ -29,7 +29,7 @@ export default class LineItemShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getShippingButton() {
-        return cy.get('.sw-modal__footer > .sw-button--primary');
+        return cy.get('*[class*="modal__footer"] > *[class*="button--primary"]');
     }
 
     /**

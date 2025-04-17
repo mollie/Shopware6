@@ -151,7 +151,6 @@
 
         <service id="Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase">
             <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>

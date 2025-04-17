@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Exception\MissingPriceLineItemException;
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
@@ -43,11 +42,6 @@ class MollieLineItemBuilder
     private $lineItemDataExtractor;
 
     /**
-     * @var CompatibilityGatewayInterface
-     */
-    private $compatibilityGateway;
-
-    /**
      * @var RoundingDifferenceFixer
      */
     private $roundingDiffFixer;
@@ -62,12 +56,11 @@ class MollieLineItemBuilder
      */
     private $shippingLineItemBuilder;
 
-    public function __construct(IsOrderLineItemValid $orderLineItemValidator, PriceCalculator $priceCalculator, LineItemDataExtractor $lineItemDataExtractor, CompatibilityGatewayInterface $compatibilityGateway, RoundingDifferenceFixer $orderAmountFixer, MollieLineItemHydrator $mollieLineItemHydrator, MollieShippingLineItemBuilder $shippingLineItemBuilder)
+    public function __construct(IsOrderLineItemValid $orderLineItemValidator, PriceCalculator $priceCalculator, LineItemDataExtractor $lineItemDataExtractor, RoundingDifferenceFixer $orderAmountFixer, MollieLineItemHydrator $mollieLineItemHydrator, MollieShippingLineItemBuilder $shippingLineItemBuilder)
     {
         $this->orderLineItemValidator = $orderLineItemValidator;
         $this->priceCalculator = $priceCalculator;
         $this->lineItemDataExtractor = $lineItemDataExtractor;
-        $this->compatibilityGateway = $compatibilityGateway;
         $this->roundingDiffFixer = $orderAmountFixer;
         $this->mollieLineItemHydrator = $mollieLineItemHydrator;
         $this->shippingLineItemBuilder = $shippingLineItemBuilder;
@@ -196,6 +189,15 @@ class MollieLineItemBuilder
         return $lines;
     }
 
+    public function getLineItemPromotionType(): string
+    {
+        if (defined('Shopware\Core\Checkout\Cart\LineItem::PROMOTION_LINE_ITEM_TYPE')) {
+            return LineItem::PROMOTION_LINE_ITEM_TYPE;
+        }
+
+        return 'promotion';
+    }
+
     /**
      * Return the type of the line item.
      */
@@ -209,7 +211,7 @@ class MollieLineItemBuilder
             return OrderLineType::TYPE_STORE_CREDIT;
         }
 
-        if ($item->getType() === $this->compatibilityGateway->getLineItemPromotionType() || $item->getTotalPrice() < 0) {
+        if ($item->getType() === $this->getLineItemPromotionType() || $item->getTotalPrice() < 0) {
             return OrderLineType::TYPE_DISCOUNT;
         }
 

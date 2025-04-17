@@ -19,7 +19,7 @@ class Migration1644753635CreateSubscription extends MigrationStep
      */
     public function update(Connection $connection): void
     {
-        $connection->exec(
+        $connection->executeStatement(
             'CREATE TABLE IF NOT EXISTS mollie_subscription (
                     id BINARY(16) NOT NULL,
                     customer_id BINARY(16) NOT NULL,
@@ -64,12 +64,12 @@ class Migration1644753635CreateSubscription extends MigrationStep
             SELECT COUNT(1) indexIsThere 
             FROM INFORMATION_SCHEMA.STATISTICS 
             WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
-        ")->fetch();
+        ")->fetchAssociative();
 
         $isExisting = ((int) $indexExistsCheck['indexIsThere'] === 1);
 
         if (! $isExisting) {
-            $connection->exec('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
+            $connection->executeStatement('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
         }
     }
 }

@@ -17,8 +17,7 @@ class GiftCardPayment extends PaymentHandler
     protected const FIELD_GIFT_CARD_VOUCHER_NUMBER = 'voucherNumber';
     protected const FIELD_GIFT_CARD_VOUCHER_PIN = 'voucherPin';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
      * @param array<mixed> $orderData

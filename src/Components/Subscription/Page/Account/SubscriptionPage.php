@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Salutation\SalutationCollection;
-use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\Page;
 
 class SubscriptionPage extends Page
 {
     /**
-     * @var StorefrontSearchResult<SubscriptionEntity>
+     * @var EntitySearchResult<SubscriptionEntity>
      */
     protected $subscriptions;
 
@@ -52,17 +52,17 @@ class SubscriptionPage extends Page
     protected $allowSkip;
 
     /**
-     * @return StorefrontSearchResult<SubscriptionEntity>
+     * @return EntitySearchResult<SubscriptionEntity>
      */
-    public function getSubscriptions(): StorefrontSearchResult
+    public function getSubscriptions(): EntitySearchResult
     {
         return $this->subscriptions;
     }
 
     /**
-     * @param StorefrontSearchResult<SubscriptionEntity> $subscriptions
+     * @param EntitySearchResult<SubscriptionEntity> $subscriptions
      */
-    public function setSubscriptions(StorefrontSearchResult $subscriptions): void
+    public function setSubscriptions(EntitySearchResult $subscriptions): void
     {
         $this->subscriptions = $subscriptions;
     }

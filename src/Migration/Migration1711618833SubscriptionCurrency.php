@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Migration;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Migration\MigrationStep;
@@ -46,12 +47,17 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         while ($row = $statement->fetchAssociative()) {
             $currencies[] = $row['currency'];
         }
+        if (class_exists(ArrayParameterType::class)) {
+            $type = ArrayParameterType::STRING;
+        } else {
+            $type = Connection::PARAM_STR_ARRAY;
+        }
         // get the data for each currency
         $sql = 'SELECT HEX(`id`) as `id`,`iso_code`,`item_rounding`,`total_rounding` FROM `currency` WHERE `iso_code` IN(:currencies)';
         $statement = $connection->executeQuery($sql, [
             'currencies' => $currencies,
         ], [
-            'currencies' => Connection::PARAM_STR_ARRAY,
+            'currencies' => $type,
         ]);
 
         // update currency information
@@ -60,12 +66,11 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         $updateStatement = $connection->prepare($sql);
 
         while ($row = $statement->fetchAssociative()) {
-            $updateStatement->executeStatement([
-                'currencyId' => Uuid::fromHexToBytes($row['id']),
-                'itemRounding' => $row['item_rounding'],
-                'totalRounding' => $row['total_rounding'],
-                'currencyIso' => $row['iso_code'],
-            ]);
+            $updateStatement->bindValue(':currencyId', Uuid::fromHexToBytes($row['id']));
+            $updateStatement->bindValue(':itemRounding', $row['item_rounding']);
+            $updateStatement->bindValue(':totalRounding', $row['total_rounding']);
+            $updateStatement->bindValue(':currencyIso', $row['iso_code']);
+            $updateStatement->executeStatement();
         }
 
         // delete unsused column

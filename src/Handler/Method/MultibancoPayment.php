@@ -10,6 +10,5 @@ class MultibancoPayment extends PaymentHandler implements BankTransfer
     public const PAYMENT_METHOD_NAME = 'multibanco';
     public const PAYMENT_METHOD_DESCRIPTION = 'Multibanco';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

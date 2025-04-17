@@ -88,7 +88,7 @@ export default class AdminOrdersAction {
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getMollieActionsButton().click(forceOption);
         }
-
+        cy.reload();
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().click(forceOption);
 
@@ -104,7 +104,7 @@ export default class AdminOrdersAction {
     openLineItemShipping(nthItem) {
 
         cy.wait(2000);
-
+        cy.reload();
         repoOrdersDetails.getLineItemActionsButton(nthItem).trigger('click')
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');

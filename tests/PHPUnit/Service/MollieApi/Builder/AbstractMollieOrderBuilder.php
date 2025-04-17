@@ -22,11 +22,14 @@ use Kiener\MolliePayments\Service\MollieLocaleService;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\SettingsService;
+use Kiener\MolliePayments\Service\Transition\TransactionTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
-use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
+use Mollie\Shopware\Component\Payment\FinalizeAction;
+use Mollie\Shopware\Component\Payment\PayAction;
+use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use MolliePayments\Tests\Fakes\FakeEventDispatcher;
 use MolliePayments\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Tests\Traits\OrderTrait;
@@ -116,6 +119,9 @@ abstract class AbstractMollieOrderBuilder extends TestCase
      */
     protected $settingStruct;
 
+    protected PayAction $payAction;
+    protected FinalizeAction $finalizeAction;
+
     /**
      * @var MockObject|MollieLocaleService
      */
@@ -160,7 +166,9 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         /* @var MolliePaymentFinalize $molliePaymentFianlize */
         $this->molliePaymentFinalize = $this->getMockBuilder(MolliePaymentFinalize::class)->disableOriginalConstructor()->getMock();
         /* @var TransactionTransitionServiceInterface $transitionService */
-        $this->transitionService = $this->getMockBuilder(TransactionTransitionServiceInterface::class)->disableOriginalConstructor()->getMock();
+        $this->transitionService = $this->getMockBuilder(TransactionTransitionService::class)->disableOriginalConstructor()->getMock();
+
+        $transactionConverter = $this->createMock(TransactionConverterInterface::class);
 
         $routingDetector = new RoutingDetector(new RequestStack(new Request()));
         $routingBuilder = new RoutingBuilder(
@@ -180,7 +188,6 @@ abstract class AbstractMollieOrderBuilder extends TestCase
                 new IsOrderLineItemValid(),
                 new PriceCalculator(),
                 new LineItemDataExtractor(new UrlParsingService()),
-                new FakeCompatibilityGateway(),
                 new RoundingDifferenceFixer(),
                 new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
                 new MollieShippingLineItemBuilder(new PriceCalculator())
@@ -192,5 +199,8 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new FakeEventDispatcher(),
             $this->loggerService
         );
+
+        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $transactionConverter, $this->transitionService, $this->loggerService);
+        $this->finalizeAction = new FinalizeAction($this->molliePaymentFinalize, $transactionConverter, $this->loggerService);
     }
 }

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Transition;
 
-use Kiener\MolliePayments\Compatibility\CompatibilityFactory;
 use Kiener\MolliePayments\Handler\Method\BankTransfer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
@@ -22,22 +21,15 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
     private $transitionService;
 
     /**
-     * @var CompatibilityFactory
-     */
-    private $compatibilityFactory;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
 
     public function __construct(
         TransitionServiceInterface $transitionService,
-        CompatibilityFactory $compatibilityFactory,
         LoggerInterface $loggerService
     ) {
         $this->transitionService = $transitionService;
-        $this->compatibilityFactory = $compatibilityFactory;
         $this->logger = $loggerService;
     }
 
@@ -214,9 +206,7 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
 
     public function chargebackTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        $compatibilityGateway = $this->compatibilityFactory->createGateway();
-
-        $chargebackState = $compatibilityGateway->getChargebackOrderTransactionState();
+        $chargebackState = $this->getChargebackOrderTransactionState();
 
         $currentState = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
 
@@ -238,6 +228,15 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         }
 
         $this->performTransition($entityId, StateMachineTransitionActions::ACTION_CHARGEBACK, $context);
+    }
+
+    private function getChargebackOrderTransactionState(): string
+    {
+        if (defined('Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_CHARGEBACK')) {
+            return OrderTransactionStates::STATE_CHARGEBACK;
+        }
+
+        return 'chargeback';
     }
 
     /**

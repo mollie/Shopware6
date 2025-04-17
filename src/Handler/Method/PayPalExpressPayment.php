@@ -16,8 +16,7 @@ class PayPalExpressPayment extends PaymentHandler
 
     public const PAYMENT_METHOD_DESCRIPTION = 'PayPal Express';
 
-    /** @var string */
-    protected $paymentMethod = PaymentMethod::PAYPAL;
+    protected string $paymentMethod = PaymentMethod::PAYPAL;
 
     /**
      * @param array<mixed> $orderData

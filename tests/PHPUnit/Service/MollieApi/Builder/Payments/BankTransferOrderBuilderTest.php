@@ -6,7 +6,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -26,8 +25,8 @@ class BankTransferOrderBuilderTest extends AbstractMollieOrderBuilder
         $paymentMethod = PaymentMethod::BANKTRANSFER;
 
         $this->paymentHandler = new BankTransferPayment(
-            $this->loggerService,
-            new FakeContainer(),
+            $this->payAction,
+            $this->finalizeAction,
             $this->settingsService
         );
 

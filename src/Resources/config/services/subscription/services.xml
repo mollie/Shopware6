@@ -63,7 +63,7 @@
 
         <!-- ============================================================================================== -->
 
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller" public="true">
+        <service id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller" >
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="mail_template_type.repository"/>
             <argument type="service" id="mail_template.repository"/>

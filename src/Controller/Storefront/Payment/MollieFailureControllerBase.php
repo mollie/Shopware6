@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Controller\Storefront\Payment;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Event\PaymentPageFailEvent;
 use Kiener\MolliePayments\Exception\CouldNotFetchTransactionException;
@@ -42,11 +41,6 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
      * @var RouterInterface
      */
     private $router;
-
-    /**
-     * @var CompatibilityGatewayInterface
-     */
-    private $compatibilityGateway;
 
     /**
      * @var MollieApiFactory
@@ -98,10 +92,10 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
      */
     private $customerService;
 
-    public function __construct(RouterInterface $router, CompatibilityGatewayInterface $compatibilityGateway, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, CustomerService $customerService)
+    public function __construct(RouterInterface $router, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, CustomerService $customerService)
     {
         $this->router = $router;
-        $this->compatibilityGateway = $compatibilityGateway;
+
         $this->apiFactory = $apiFactory;
         $this->orderStateService = $orderStateService;
         $this->transactionService = $transactionService;
@@ -162,7 +156,7 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
         // TODO: Refactor to use Service/MollieApi/Order::getMollieOrder
 
         try {
-            $apiClient = $this->apiFactory->getClient($this->compatibilityGateway->getSalesChannelID($salesChannelContext));
+            $apiClient = $this->apiFactory->getClient($salesChannelContext->getSalesChannelId());
 
             $mollieOrder = $apiClient->orders->get($mollieOrderId, ['embed' => 'payments']);
         } catch (ApiException $e) {

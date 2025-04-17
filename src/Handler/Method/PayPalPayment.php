@@ -16,8 +16,7 @@ class PayPalPayment extends PaymentHandler
     protected const FIELD_PAYPAL_DESCRIPTION = 'description';
     protected const FIELD_PAYPAL_DIGITAL_GOODS = 'digitalGoods';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
      * @param array<mixed> $orderData

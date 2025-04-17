@@ -14,8 +14,7 @@ class AlmaPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::ALMA;
     public const PAYMENT_METHOD_DESCRIPTION = 'Alma';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
      * @param array<mixed> $orderData

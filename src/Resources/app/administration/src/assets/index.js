@@ -1,3 +1,4 @@
+//import  logos from '@creditcard_logos';
 export default (() => {
     const context = require.context('./creditcard_logos', true, /svg$/);
 

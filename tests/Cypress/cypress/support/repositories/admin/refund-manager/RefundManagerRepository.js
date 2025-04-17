@@ -19,7 +19,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getVerifyCheckbox() {
-        return cy.get('.mollie-refund-manager-summary-container > .sw-field--checkbox > .sw-field--checkbox__content > .sw-field > .sw-field__label > label');
+        return cy.get('.mollie-refund-manager-summary-container > *[class*="-field--checkbox"] label');
     }
 
     /**
@@ -43,7 +43,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getRefundButton() {
-        return cy.get('.sw-button--contrast');
+        return cy.get('button[class*="-button--contrast"]');
     }
 
     /**
@@ -51,7 +51,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFullRefundButton() {
-        return cy.get('.sw-button--danger');
+        return cy.get('button[class*="-button--danger"]');
     }
 
     /**
@@ -113,10 +113,10 @@ export default class RefundManagerRepository {
         if (shopware.isVersionGreaterEqual('6.6.10.0')) {
             // selector changed
             // this works for now, yolo
-            return cy.get('.mollie-refund-manager-refunds > .sw-card__content > .sw-data-grid > .sw-data-grid__wrapper > .sw-data-grid__table > .sw-data-grid__body > .sw-data-grid__row > .sw-data-grid__cell--actions > .sw-data-grid__cell-content > .sw-context-button > .sw-context-button__button');
+            return cy.get('.mollie-refund-manager-refunds .sw-context-button').eq(0);
         }
 
-        return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button');
+        return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button]');
     }
 
     /**

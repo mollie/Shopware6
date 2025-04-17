@@ -9,7 +9,7 @@ import './module/mollie-payments/components/mollie-pluginconfig-support-modal';
 import './module/mollie-payments/components/mollie-pluginconfig-section-order-lifetime-warning';
 import './module/mollie-payments/components/mollie-pluginconfig-element-orderstate-select';
 import './init/api-service.init';
-import './init/credit-card-components.init';
+//import './init/credit-card-components.init';
 import './extension/sw-flow-sequence-action';
 import './extension/structure/sw-search-bar-item';
 import './component/flow-sequence/action-order-ship-modal';

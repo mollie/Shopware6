@@ -33,7 +33,7 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect" public="true">
+        <service id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect" >
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService"/>
             <argument type="service" id="Kiener\MolliePayments\Handler\Method\ApplePayPayment"/>
             <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
@@ -52,7 +52,7 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress" public="true">
+        <service id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress" >
            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>

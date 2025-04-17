@@ -104,8 +104,8 @@ class SubscriptionPageLoader
             return $page;
         }
 
-        /** @var StorefrontSearchResult<SubscriptionEntity> $storefrontSubscriptions */
-        $storefrontSubscriptions = StorefrontSearchResult::createFrom($subscriptions);
+        /** @var EntitySearchResult<SubscriptionEntity> $storefrontSubscriptions */
+        $storefrontSubscriptions = EntitySearchResult::createFrom($subscriptions);
 
         // ---------------------------------------------------------------------------------------------
         // assign data for our page

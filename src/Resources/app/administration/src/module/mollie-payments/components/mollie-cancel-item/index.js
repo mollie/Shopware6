@@ -25,6 +25,9 @@ Component.register('mollie-cancel-item', {
 
     methods: {
         submit() {
+            if (this.isLoading) {
+                return;
+            }
             this.isLoading = true;
 
             this.MolliePaymentsItemCancelService.cancel({

@@ -95,14 +95,12 @@ SHOPWARE 6.5
                     {% endblock %}
                     {% block sw_order_detail_general_mollie_info_property_paymentref %}
                         <div v-if="mollieThirdPartyPaymentId" class="mollie-property-section">
-                            <template>
                                 <dt class="mollie-property-title mollie-order-user-card-payment-reference-title">
                                     {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
                                 </dt>
                                 <dd class="mollie-property-content">
                                     {{ mollieThirdPartyPaymentId }}
                                 </dd>
-                            </template>
                         </div>
                     {% endblock %}
                     {% block sw_order_detail_general_mollie_info_property_paymentlink %}

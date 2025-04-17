@@ -6,7 +6,8 @@ namespace Kiener\MolliePayments\Handler\Method;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Types\PaymentMethod;
-use Psr\Log\LoggerInterface;
+use Mollie\Shopware\Component\Payment\FinalizeAction;
+use Mollie\Shopware\Component\Payment\PayAction;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -18,15 +19,13 @@ class BankTransferPayment extends PaymentHandler implements BankTransfer
     public const DUE_DATE_MIN_DAYS = 1;
     public const DUE_DATE_MAX_DAYS = 100;
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    /** @var SettingsService */
-    private $settingsService;
+    private SettingsService $settingsService;
 
-    public function __construct(LoggerInterface $logger, \Psr\Container\ContainerInterface $container, SettingsService $settingsService)
+    public function __construct(PayAction $payAction, FinalizeAction $finalizeAction, SettingsService $settingsService)
     {
-        parent::__construct($logger, $container);
+        parent::__construct($payAction, $finalizeAction);
         $this->settingsService = $settingsService;
     }
 
