@@ -54,7 +54,7 @@ trait PaymentHandlerTrait
         /** @var SalesChannelContext $salesChannelContext */
         $salesChannelContext = $request->get('sw-sales-channel-context');
         try {
-            return $this->payAction->pay($this, $transaction, new RequestDataBag(), $salesChannelContext);
+            return $this->payAction->pay($this, $transaction, new RequestDataBag($request->request->all()), $salesChannelContext);
         } catch (Throwable $exception) {
             dump($exception);
             throw $exception;
