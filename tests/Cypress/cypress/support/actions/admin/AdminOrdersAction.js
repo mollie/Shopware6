@@ -88,9 +88,9 @@ export default class AdminOrdersAction {
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getMollieActionsButton().click(forceOption);
         }
-        cy.reload();
+
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
-        repoOrdersDetails.getMollieActionButtonShipThroughMollie().click(forceOption);
+        repoOrdersDetails.getMollieActionButtonShipThroughMollie().trigger('click');
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human

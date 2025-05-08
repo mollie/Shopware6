@@ -46,7 +46,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getAvailableTrackingCodes() {
-        return cy.get('[style="place-items: stretch;"] > :nth-child(1) > *[class$="-button"] > *[class$="-button__content"]');
+        return cy.get('*[class*="-modal"] [style="place-items: stretch;"] > :nth-child(1) *[class*="-button"] > *[class$="-button__content"]');
     }
 
     /**
