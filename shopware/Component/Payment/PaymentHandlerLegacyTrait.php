@@ -60,6 +60,6 @@ trait PaymentHandlerLegacyTrait
 
     public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
     {
-        $this->finalizeAction->finalize($this, $transaction, $salesChannelContext);
+        $this->finalizeAction->finalize($this, $transaction, $salesChannelContext->getContext());
     }
 }

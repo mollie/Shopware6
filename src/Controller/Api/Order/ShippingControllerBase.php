@@ -641,7 +641,7 @@ class ShippingControllerBase extends AbstractController
         $finalList = [];
 
         foreach ($items as $item) {
-            $finalList[] = new ShipmentLineItem($item['id'], $item['quantity']);
+            $finalList[] = new ShipmentLineItem($item['id'], (int) $item['quantity']);
         }
 
         return $finalList;

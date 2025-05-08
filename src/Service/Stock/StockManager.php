@@ -70,7 +70,16 @@ class StockManager implements StockManagerInterface
         $update->bindValue(':quantity', $quantity);
         $update->bindValue(':now', (new \DateTime())->format(Defaults::STORAGE_DATE_TIME_FORMAT));
         $update->bindValue(':id', Uuid::fromHexToBytes($productID));
-        $update->executeStatement();
+
+        /** @phpstan-ignore-next-line  */
+        if (method_exists($update, 'execute')) {
+            $update->execute();
+        }
+
+        /** @phpstan-ignore-next-line  */
+        if (method_exists($update, 'executeStatement')) {
+            $update->executeStatement();
+        }
     }
 
     /**
