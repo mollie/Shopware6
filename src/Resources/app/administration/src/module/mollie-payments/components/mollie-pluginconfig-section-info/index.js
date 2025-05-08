@@ -1,10 +1,9 @@
 import template from './mollie-pluginconfig-section-info.html.twig';
 import './mollie-pluginconfig-section-info.scss';
-
-const VersionCompare = require('../../../../core/service/utils/version-compare.utils').default;
+import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
 // eslint-disable-next-line no-undef
-const { Component, Context, Mixin } = Shopware;
+const { Component, Mixin } = Shopware;
 
 Component.register('mollie-pluginconfig-section-info', {
     template,
@@ -14,21 +13,22 @@ Component.register('mollie-pluginconfig-section-info', {
     data() {
         return {
             isSupportOpen: false,
+            versionCompare: null,
         };
     },
 
     shortcuts: {
         'SYSTEMKEY+i': 'openConfigImport',
     },
-
+    created() {
+        this.versionCompare = new VersionCompare();
+    },
     computed: {
         /**
          * @returns {string|*}
          */
         userName() {
-            // eslint-disable-next-line no-undef
-            const user = Shopware.State.get('session').currentUser;
-
+            const user = this.getCurrentUser();
             if (!user) {
                 return '';
             }
@@ -41,7 +41,7 @@ Component.register('mollie-pluginconfig-section-info', {
         },
 
         hasSalesChannelList() {
-            return VersionCompare.greaterOrEqual(Context.app.config.version, '6.4.2');
+            return this.versionCompare.greaterOrEqual(Shopware.Context.app.config.version, '6.4.2');
         },
     },
 
@@ -49,7 +49,14 @@ Component.register('mollie-pluginconfig-section-info', {
         openConfigImport() {
             // TODO create and open a configuration import modal
         },
-
+        getCurrentUser() {
+            // eslint-disable-next-line no-undef
+            let session = Shopware.State.get('session');
+            if (session === undefined) {
+                session = Shopware.Store.get('session');
+            }
+            return session.currentUser;
+        },
         openSupport() {
             this.isSupportOpen = true;
         },

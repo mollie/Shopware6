@@ -6,7 +6,6 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 use Kiener\MolliePayments\Handler\Method\BancomatPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -20,8 +19,8 @@ class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
 
         $this->paymentHandler = new BancomatPayment(
-            $this->loggerService,
-            new FakeContainer()
+            $this->payAction,
+            $this->finalizeAction
         );
 
         $transactionId = Uuid::randomHex();

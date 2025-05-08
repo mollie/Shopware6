@@ -14,6 +14,7 @@ use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Types\OrderLineType;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ShipmentTest extends TestCase
@@ -40,7 +41,7 @@ class ShipmentTest extends TestCase
         $this->orderApiService = $this->createMock(Order::class);
         $this->orderApiService->method('getMollieOrder')->willReturn($this->mollieOrder);
 
-        $this->shipmentApiService = new Shipment($this->orderApiService, $dispatcher);
+        $this->shipmentApiService = new Shipment($this->orderApiService, $dispatcher, new NullLogger());
     }
 
     /**

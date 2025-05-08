@@ -12,11 +12,6 @@ class RefundEntity extends Entity
     use EntityIdTrait;
 
     /**
-     * @var string
-     */
-    protected $id;
-
-    /**
      * @var null|string
      */
     protected $orderId;

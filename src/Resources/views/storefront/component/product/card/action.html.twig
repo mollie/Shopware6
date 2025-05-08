@@ -16,7 +16,7 @@
         {% endif %}
     {% endif %}
 
-    {% set applePayVisible = mollie_applepaydirect_enabled and ('plp' not in mollie_applepaydirect_restrictions) and productPrice > 0  %}
+    {% set applePayVisible = mollie_applepaydirect_enabled and ('plp' not in mollie_applepaydirect_restrictions) and productPrice > 0 %}
     {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('plp' not in mollie_paypalexpress_restrictions) and productPrice > 0 %}
     {% set noticeVisible = applePayVisible or paypalExpressVisible %}
 
@@ -27,7 +27,7 @@
         {% if applePayVisible %}
             {% block component_product_box_action_buy_apple_direct_component %}
                 <div class="mt-2 only-support-apple-pay js-apple-pay-container mollie-apple-pay-direct-listing d-none">
-                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.twig' %}
+                    {% include '@MolliePayments/mollie/component/apple-pay-direct-button.html.twig' %}
                 </div>
             {% endblock %}
         {% endif %}
@@ -36,27 +36,37 @@
     {% block component_product_box_action_buy_paypal_express %}
         {% if paypalExpressVisible %}
             {% block component_product_box_action_buy_paypal_express_component %}
-                    <div class="mt-2 mollie-paypal-express-plp">
-                        {% include '@MolliePayments/mollie/component/paypal-express-button.twig' %}
-                    </div>
+                <div class="mt-2 mollie-paypal-express-plp">
+                    {% include '@MolliePayments/mollie/component/paypal-express-button.html.twig' %}
+                </div>
             {% endblock %}
         {% endif %}
     {% endblock %}
 
 {% endblock %}
 
+{% set showButton = mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
+{% set subscribeButton %}
+    <div class="d-grid">
+        <button class="btn btn-block btn-buy"
+                title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+        </button>
+    </div>
+{% endset %}
 
-{% block page_product_detail_product_buy_button %}
-
-
-    {% if mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
-        <div class="d-grid">
-            <button class="btn btn-block btn-buy" title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-                {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-            </button>
-        </div>
+{% block component_product_box_action_buy_button %}
+    {% if showButton %}
+        {{ subscribeButton }}
     {% else %}
         {{ parent() }}
     {% endif %}
+{% endblock %}
 
+{% block page_product_detail_product_buy_button %}
+    {% if showButton %}
+        {{ subscribeButton }}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
 {% endblock %}

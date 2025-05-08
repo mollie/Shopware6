@@ -13,6 +13,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Shipment as MollieShipment;
 use Mollie\Api\Resources\ShipmentCollection;
 use Mollie\Api\Types\OrderLineType;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Shipment implements ShipmentInterface
@@ -22,11 +23,13 @@ class Shipment implements ShipmentInterface
      */
     private $orderApiService;
     private EventDispatcherInterface $eventDispatcher;
+    private LoggerInterface $logger;
 
-    public function __construct(Order $orderApiService, EventDispatcherInterface $eventDispatcher)
+    public function __construct(Order $orderApiService, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->orderApiService = $orderApiService;
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
     }
 
     /**
@@ -65,6 +68,11 @@ class Shipment implements ShipmentInterface
             // if we have no items
             // then simply ship all
             if (empty($items)) {
+                $this->logger->debug('ship all items', [
+                    'options' => $options,
+                    'mollieOrderId' => $mollieOrderId,
+                ]);
+
                 return $mollieOrder->shipAll($options);
             }
 
@@ -77,6 +85,10 @@ class Shipment implements ShipmentInterface
                 ];
             }
 
+            $this->logger->debug('ship lines items', [
+                'options' => $options,
+                'mollieOrderId' => $mollieOrderId,
+            ]);
             $shipment = $mollieOrder->createShipment($options);
 
             $this->eventDispatcher->dispatch(new OrderLinesUpdatedEvent($mollieOrder));

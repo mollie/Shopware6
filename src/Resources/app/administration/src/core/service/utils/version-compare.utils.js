@@ -1,22 +1,22 @@
-export default {
+export default class VersionCompare {
     equals(versionA, versionB) {
         return this.compare(versionA, versionB, '=');
-    },
+    }
     notEquals(versionA, versionB) {
         return this.compare(versionA, versionB, '!=');
-    },
+    }
     greater(versionA, versionB) {
         return this.compare(versionA, versionB, '>');
-    },
+    }
     greaterOrEqual(versionA, versionB) {
         return this.compare(versionA, versionB, '>=');
-    },
+    }
     lesser(versionA, versionB) {
         return this.compare(versionA, versionB, '<');
-    },
+    }
     lesserOrEqual(versionA, versionB) {
         return this.compare(versionA, versionB, '<=');
-    },
+    }
 
     /**
      * Compare functions do not take into account prerelease versions
@@ -104,7 +104,7 @@ export default {
         }
 
         return false;
-    },
+    }
 
     matchVersion(version) {
         const match = version.match(
@@ -123,7 +123,7 @@ export default {
         });
 
         return groups;
-    },
+    }
 
     getHumanReadableVersion(version) {
         const match = this.matchVersion(version);
@@ -145,7 +145,7 @@ export default {
         }
 
         return output;
-    },
+    }
 
     getHumanReadablePrereleaseText(text) {
         switch (text) {
@@ -160,5 +160,5 @@ export default {
             default:
                 return text;
         }
-    },
-};
+    }
+}

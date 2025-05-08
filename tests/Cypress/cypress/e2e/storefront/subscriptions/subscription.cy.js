@@ -311,11 +311,7 @@ describe('Subscription', () => {
                     // that some of them are not available
                     // this is a check to at least see that it does something
                     // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
-                    if (shopware.isVersionGreaterEqual(6.4)) {
-                        paymentAction.showAllPaymentMethods();
-                    } else {
-                        paymentAction.openPaymentsModal();
-                    }
+                    paymentAction.showPaymentMethods();
 
                     paymentAction.switchPaymentMethod('Card');
 
@@ -327,11 +323,7 @@ describe('Subscription', () => {
                     mollieCreditCardForm.submitForm();
                     molliePayment.selectFailed();
 
-                    if (shopware.isVersionGreaterEqual(6.4)) {
-                        paymentAction.showAllPaymentMethods();
-                    } else {
-                        paymentAction.openPaymentsModal();
-                    }
+                    paymentAction.showPaymentMethods();
 
                     assertAvailablePaymentMethods();
                 })
@@ -440,19 +432,12 @@ function purchaseSubscriptionAndGoToPayment() {
     // that some of them are not available
     // this is a check to at least see that it does something
     // we also verify that we see all available methods (just to also check if mollie is even configured correctly).
-    if (shopware.isVersionGreaterEqual(6.4)) {
-        paymentAction.showAllPaymentMethods();
-    } else {
-        paymentAction.openPaymentsModal();
-    }
+    paymentAction.showPaymentMethods();
 
     assertAvailablePaymentMethods();
 
-    if (shopware.isVersionLower(6.4)) {
-        paymentAction.closePaymentsModal();
-    }
-
     paymentAction.switchPaymentMethod('Card');
+
 
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();

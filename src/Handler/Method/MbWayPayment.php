@@ -10,6 +10,5 @@ class MbWayPayment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = 'mbway';
     public const PAYMENT_METHOD_DESCRIPTION = 'MB Way';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 }

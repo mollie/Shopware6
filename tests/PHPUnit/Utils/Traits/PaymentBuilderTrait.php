@@ -12,7 +12,6 @@ use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
-use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -71,7 +70,6 @@ trait PaymentBuilderTrait
             new IsOrderLineItemValid(),
             new PriceCalculator(),
             new LineItemDataExtractor(new UrlParsingService()),
-            new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
             new MollieShippingLineItemBuilder(new PriceCalculator())

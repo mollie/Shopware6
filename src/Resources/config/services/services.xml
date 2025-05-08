@@ -33,24 +33,23 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService" public="true">
+        <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService" >
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\CompatibilityFactory"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Order\OrderStateService" class="Kiener\MolliePayments\Service\Order\OrderStateService">
+        <service id="Kiener\MolliePayments\Service\Order\OrderStateService" >
             <argument type="service" id="monolog.logger.mollie"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\OrderService" class="Kiener\MolliePayments\Service\OrderService">
+        <service id="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\SalesChannel\OrderService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
+            <argument type="service" id="service_container"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
@@ -131,15 +130,15 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\CartService" class="Kiener\MolliePayments\Service\CartService" public="true">
+        <service id="Kiener\MolliePayments\Service\CartService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Voucher\VoucherService" class="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
+        <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
             <argument type="service" id="product.repository"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
@@ -151,7 +150,7 @@
 
 
         <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">
-            <argument type="service" id="Kiener\MolliePayments\Service\Voucher\VoucherService"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
             <!-- // inject after product collector(5000) -->
             <tag name="shopware.cart.collector" priority="2000"/>

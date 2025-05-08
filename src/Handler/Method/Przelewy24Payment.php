@@ -14,8 +14,7 @@ class Przelewy24Payment extends PaymentHandler
     public const PAYMENT_METHOD_NAME = PaymentMethod::PRZELEWY24;
     public const PAYMENT_METHOD_DESCRIPTION = 'Przelewy24';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
      * @param array<mixed> $orderData

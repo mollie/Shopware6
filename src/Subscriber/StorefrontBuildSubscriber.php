@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Service\SettingsService;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Shopware\Storefront\Theme\StorefrontPluginConfiguration\StorefrontPluginConfiguration;
+use Shopware\Storefront\Theme\StorefrontPluginRegistry;
 use Shopware\Storefront\Theme\StorefrontPluginRegistryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -18,7 +19,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
     private $settingsService;
 
     /**
-     * @var StorefrontPluginRegistryInterface
+     * @var StorefrontPluginRegistry|StorefrontPluginRegistryInterface
      */
     private $pluginRegistry;
 
@@ -27,7 +28,8 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $versionCompare;
 
-    public function __construct(SettingsService $settingsService, StorefrontPluginRegistryInterface $pluginRegistry, VersionCompare $versionCompare)
+    /** @param StorefrontPluginRegistry|StorefrontPluginRegistryInterface $pluginRegistry */
+    public function __construct(SettingsService $settingsService, $pluginRegistry, VersionCompare $versionCompare)
     {
         $this->settingsService = $settingsService;
         $this->pluginRegistry = $pluginRegistry;

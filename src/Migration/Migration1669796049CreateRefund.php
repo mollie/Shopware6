@@ -18,7 +18,7 @@ class Migration1669796049CreateRefund extends MigrationStep
      */
     public function update(Connection $connection): void
     {
-        $connection->exec(
+        $connection->executeStatement(
             '
                 CREATE TABLE IF NOT EXISTS `mollie_refund` (
                   `id` BINARY(16) NOT NULL,

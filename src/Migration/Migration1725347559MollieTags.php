@@ -57,14 +57,15 @@ class Migration1725347559MollieTags extends MigrationStep
 
         $stmt = $connection->prepare($query);
 
-        $parameters = [
-            'id' => Uuid::fromHexToBytes($id),
-            'name' => $name,
-            'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
-            'updated_at' => null,
-        ];
-
-        $stmt->execute($parameters);
+        $stmt->bindValue(':id', Uuid::fromHexToBytes($id));
+        $stmt->bindValue(':name', $name);
+        $stmt->bindValue(':created_at', (new \DateTime())->format('Y-m-d H:i:s'));
+        $stmt->bindValue(':updated_at', null);
+        if (method_exists($stmt, 'executeStatement')) {
+            $stmt->executeStatement();
+        } else {
+            $stmt->execute();
+        }
     }
 
     private function tagExists(Connection $connection, string $id): bool
@@ -75,8 +76,11 @@ class Migration1725347559MollieTags extends MigrationStep
             ->where('id = :id')
             ->setParameter('id', Uuid::fromHexToBytes($id))
         ;
-
-        $result = $qb->execute();
+        if (method_exists($qb, 'execute')) {
+            $result = $qb->execute();
+        } else {
+            $result = $qb->executeQuery();
+        }
 
         if ($result instanceof Result) {
             return $result->rowCount() > 0;

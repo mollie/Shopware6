@@ -61,7 +61,7 @@ Component.override('sw-order-detail-general', {
          * @returns {*}
          */
         hasCreditCardData() {
-            return this._creditCardData().hasCreditCardData();
+            return this._creditCardData()?.hasCreditCardData() ?? false;
         },
 
         /**
@@ -166,12 +166,21 @@ Component.override('sw-order-detail-general', {
             this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
             this.shippingManagerService = new MollieShipping(this.MolliePaymentsShippingService);
 
-            this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
-                this.onCloseShippingManager();
-                // let's reload our page so that the
-                // full order is updated like shipping status and more
-                location.reload();
-            });
+            if (this.$root && this.$root.$on) {
+                this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
+                    this.onCloseShippingManager();
+                    // let's reload our page so that the
+                    // full order is updated like shipping status and more
+                    location.reload();
+                });
+            } else {
+                Shopware.Utils.EventBus.on(MollieShippingEvents.EventShippedOrder, () => {
+                    this.onCloseShippingManager();
+                    // let's reload our page so that the
+                    // full order is updated like shipping status and more
+                    location.reload();
+                });
+            }
 
             this.getMollieData();
         },

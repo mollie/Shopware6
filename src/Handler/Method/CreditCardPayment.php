@@ -7,8 +7,8 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Types\PaymentMethod;
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
+use Mollie\Shopware\Component\Payment\FinalizeAction;
+use Mollie\Shopware\Component\Payment\PayAction;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -19,24 +19,15 @@ class CreditCardPayment extends PaymentHandler
     public const PAYMENT_METHOD_DESCRIPTION = 'Card';
     protected const FIELD_CREDIT_CARD_TOKEN = 'cardToken';
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
-    /**
-     * @var CustomerService
-     */
-    private $customerService;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
-    /**
-     * @var bool
-     */
-    private $enableSingleClickPayment = false;
+    private CustomerService $customerService;
 
-    public function __construct(
-        LoggerInterface $logger,
-        ContainerInterface $container,
-        CustomerService $customerService
-    ) {
-        parent::__construct($logger, $container);
+    private bool $enableSingleClickPayment = false;
+
+    public function __construct(PayAction $payAction, FinalizeAction $finalizeAction, CustomerService $customerService)
+    {
+        parent::__construct($payAction, $finalizeAction);
         $this->customerService = $customerService;
     }
 

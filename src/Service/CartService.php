@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGateway;
-use Kiener\MolliePayments\Compatibility\Gateway\CompatibilityGatewayInterface;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory;
@@ -12,6 +10,8 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartServ
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
 use Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -33,25 +33,19 @@ class CartService implements CartServiceInterface
     private $productItemFactory;
 
     /**
-     * @var CompatibilityGatewayInterface
-     */
-    private $compatibilityGateway;
-
-    /**
      * @var ApplePayShippingAddressFaker
      */
     private $shippingAddressFaker;
 
-    /**
-     * @param CompatibilityGateway $compatibilityGateway
-     */
-    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, CompatibilityGatewayInterface $compatibilityGateway, ApplePayShippingAddressFaker $shippingAddressFaker)
+    private SalesChannelContextServiceInterface $contextService;
+
+    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, SalesChannelContextServiceInterface $contextService, ApplePayShippingAddressFaker $shippingAddressFaker)
     {
         $this->swCartService = $swCartService;
         $this->contextSwitcher = $contextSwitcher;
         $this->productItemFactory = $productItemFactory;
-        $this->compatibilityGateway = $compatibilityGateway;
         $this->shippingAddressFaker = $shippingAddressFaker;
+        $this->contextService = $contextService;
     }
 
     public function addProduct(string $productId, int $quantity, SalesChannelContext $context): Cart
@@ -101,10 +95,7 @@ class CartService implements CartServiceInterface
 
         $this->contextSwitcher->update($dataBag, $context);
 
-        $scID = $this->compatibilityGateway->getSalesChannelID($context);
-        $dID = $this->compatibilityGateway->getDomainId($context);
-
-        return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
+        return $this->getNewSalesChannelContext($context);
     }
 
     public function updateShippingMethod(SalesChannelContext $context, string $shippingMethodID): SalesChannelContext
@@ -117,10 +108,7 @@ class CartService implements CartServiceInterface
 
         $this->contextSwitcher->update($dataBag, $context);
 
-        $scID = $this->compatibilityGateway->getSalesChannelID($context);
-        $dID = $this->compatibilityGateway->getDomainId($context);
-
-        return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
+        return $this->getNewSalesChannelContext($context);
     }
 
     public function updatePaymentMethod(SalesChannelContext $context, string $paymentMethodID): SalesChannelContext
@@ -133,10 +121,7 @@ class CartService implements CartServiceInterface
 
         $this->contextSwitcher->update($dataBag, $context);
 
-        $scID = $this->compatibilityGateway->getSalesChannelID($context);
-        $dID = $this->compatibilityGateway->getDomainId($context);
-
-        return $this->compatibilityGateway->getSalesChannelContext($scID, $dID, $context->getToken());
+        return $this->getNewSalesChannelContext($context);
     }
 
     public function clearFakeAddressIfExists(SalesChannelContext $context): void
@@ -152,5 +137,24 @@ class CartService implements CartServiceInterface
     public function persistCart(Cart $cart, SalesChannelContext $context): Cart
     {
         return $this->swCartService->recalculate($cart, $context);
+    }
+
+    private function getNewSalesChannelContext(SalesChannelContext $oldContext): SalesChannelContext
+    {
+        $scalesChannelId = $oldContext->getSalesChannelId();
+        $domainId = $oldContext->getDomainId();
+        $customerId = null;
+        /** @phpstan-ignore-next-line  */
+        if ($oldContext->getCustomer() !== null && ! method_exists($oldContext, 'getCustomerId')) {
+            $customerId = $oldContext->getCustomer()->getId();
+        }
+
+        /** @phpstan-ignore-next-line  */
+        if (method_exists($oldContext, 'getCustomerId')) {
+            $customerId = $oldContext->getCustomerId();
+        }
+        $params = new SalesChannelContextServiceParameters($scalesChannelId, $oldContext->getToken(), $oldContext->getContext()->getLanguageId(), $oldContext->getCurrencyId(), $domainId, $oldContext->getContext(), $customerId);
+
+        return $this->contextService->get($params);
     }
 }

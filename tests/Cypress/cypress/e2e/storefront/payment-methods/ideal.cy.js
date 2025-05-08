@@ -35,12 +35,8 @@ describe('iDEAL Issuers', () => {
                 session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();
+                paymentAction.showPaymentMethods();
 
-                if (shopware.isVersionGreaterEqual(6.4)) {
-                    paymentAction.showAllPaymentMethods();
-                } else {
-                    paymentAction.openPaymentsModal();
-                }
 
                 paymentAction.selectPaymentMethod('iDEAL');
             })

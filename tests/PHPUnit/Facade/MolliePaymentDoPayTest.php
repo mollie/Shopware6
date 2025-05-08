@@ -11,7 +11,6 @@ use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor;
 use Kiener\MolliePayments\Service\Order\UpdateOrderLineItems;
-use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
@@ -87,7 +86,6 @@ class MolliePaymentDoPayTest extends TestCase
         $this->payFacade = new MolliePaymentDoPay(
             $orderDataExtractor,
             $this->createMock(MollieOrderBuilder::class),
-            $this->createMock(OrderService::class),
             $this->createMock(Order::class),
             $this->customerService,
             $settingsService,

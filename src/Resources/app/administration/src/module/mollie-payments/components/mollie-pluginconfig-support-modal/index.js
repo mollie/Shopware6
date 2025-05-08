@@ -1,7 +1,6 @@
 import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
-
-const VersionCompare = require('../../../../core/service/utils/version-compare.utils').default;
+import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
 // eslint-disable-next-line no-undef
 const { Application, Component, Context, Mixin, State } = Shopware;
@@ -42,13 +41,14 @@ Component.register('mollie-pluginconfig-support-modal', {
                     value: 'de-DE',
                 },
             ],
+            versionCompare: null,
         };
     },
 
     computed: {
         isLoading() {
             if (this.shopwareExtensionService) {
-                return State.get('shopwareExtensions').myExtensions.loading;
+                return this.getShopwareExtensions().loading;
             }
 
             return this.isLoadingPlugins;
@@ -86,7 +86,12 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         user() {
-            return State.get('session').currentUser;
+            // eslint-disable-next-line no-undef
+            let session = Shopware.State.get('session');
+            if (session === undefined) {
+                session = Shopware.Store.get('session');
+            }
+            return session.currentUser;
         },
 
         userName() {
@@ -106,10 +111,13 @@ Component.register('mollie-pluginconfig-support-modal', {
         plugins() {
             // If this is not null, we're in Shopware 6.4 and using the new extension service
             if (this.shopwareExtensionService) {
-                return State.get('shopwareExtensions').myExtensions.data || [];
+                return this.getShopwareExtensions().data || [];
             }
-
-            return State.get('swPlugin').plugins || [];
+            let swPlugin = Shopware.State.get('swPlugin');
+            if (swPlugin === undefined) {
+                swPlugin = Shopware.Store.get('swPlugin');
+            }
+            return swPlugin.plugins || [];
         },
 
         molliePlugin() {
@@ -117,14 +125,16 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         mollieVersion() {
-            return this.molliePlugin ? VersionCompare.getHumanReadableVersion(this.molliePlugin.version) : '';
+            return this.molliePlugin ? this.versionCompare.getHumanReadableVersion(this.molliePlugin.version) : '';
         },
 
         shopwareVersion() {
-            return VersionCompare.getHumanReadableVersion(Context.app.config.version);
+            return this.versionCompare.getHumanReadableVersion(Context.app.config.version);
         },
     },
-
+    created() {
+        this.versionCompare = new VersionCompare();
+    },
     mounted() {
         this.mountedComponent();
     },
@@ -141,7 +151,13 @@ Component.register('mollie-pluginconfig-support-modal', {
                 }
             }
         },
-
+        getShopwareExtensions() {
+            let myExtensions = Shopware.State.get('shopwareExtensions');
+            if (myExtensions === undefined) {
+                myExtensions = Shopware.Store.get('shopwareExtensions');
+            }
+            return myExtensions.myExtensions;
+        },
         determineDefaultSupportDesk() {
             this.recipientLocale = this.recipientOptions.some((option) => option.value === this.locale)
                 ? this.locale

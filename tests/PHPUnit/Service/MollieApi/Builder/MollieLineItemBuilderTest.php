@@ -14,7 +14,6 @@ use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
-use MolliePayments\Tests\Fakes\FakeCompatibilityGateway;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +36,6 @@ class MollieLineItemBuilderTest extends TestCase
             new IsOrderLineItemValid(),
             new PriceCalculator(),
             new LineItemDataExtractor(new UrlParsingService()),
-            new FakeCompatibilityGateway(),
             new RoundingDifferenceFixer(),
             new MollieLineItemHydrator(new MollieOrderPriceBuilder()),
             new MollieShippingLineItemBuilder(new PriceCalculator())

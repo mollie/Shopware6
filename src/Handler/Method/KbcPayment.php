@@ -15,8 +15,7 @@ class KbcPayment extends PaymentHandler
     public const PAYMENT_METHOD_DESCRIPTION = 'KBC/CBC Payment Button';
     public const KBC_DESCRIPTION_LENGTH = 13;
 
-    /** @var string */
-    protected $paymentMethod = self::PAYMENT_METHOD_NAME;
+    protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 
     /**
      * @param array<mixed> $orderData

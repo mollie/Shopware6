@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
 
 use Kiener\MolliePayments\Handler\Method\PosPayment;
-use MolliePayments\Tests\Fakes\FakeContainer;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -36,8 +35,8 @@ class PosOrderBuilderTest extends AbstractMollieOrderBuilder
     public function testTerminalIsExtractedFromCustomer(): void
     {
         $pos = new PosPayment(
-            $this->loggerService,
-            new FakeContainer()
+            $this->payAction,
+            $this->finalizeAction
         );
 
         $customer = new CustomerEntity();

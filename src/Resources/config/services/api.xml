@@ -5,11 +5,11 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Mollie\Api\MollieApiClient" class="Mollie\Api\MollieApiClient">
+        <service id="Mollie\Api\MollieApiClient">
             <factory service="Kiener\MolliePayments\Factory\MollieApiFactory" method="getClient"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Factory\MollieApiFactory" class="Kiener\MolliePayments\Factory\MollieApiFactory">
+        <service id="Kiener\MolliePayments\Factory\MollieApiFactory">
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="monolog.logger.mollie"/>
@@ -32,6 +32,7 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Shipment">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Payment">
