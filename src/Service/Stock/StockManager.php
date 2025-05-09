@@ -72,13 +72,15 @@ class StockManager implements StockManagerInterface
         $update->bindValue(':id', Uuid::fromHexToBytes($productID));
 
         /** @phpstan-ignore-next-line  */
-        if (method_exists($update, 'execute')) {
-            $update->execute();
+        if (method_exists($update, 'executeStatement')) {
+            $update->executeStatement();
+
+            return;
         }
 
         /** @phpstan-ignore-next-line  */
-        if (method_exists($update, 'executeStatement')) {
-            $update->executeStatement();
+        if (method_exists($update, 'execute')) {
+            $update->execute();
         }
     }
 
