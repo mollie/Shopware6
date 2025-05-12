@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added Slovenian language support
 - Added Hungarian language support
 - Added Finnish language support
+- Added orderId to JSON response of the Apple Pay Direct pay route in the Store API 
 
 ### Changed
 - Removed typehints for EntityRepository in order to allow repository decoration in Shopware 6.4

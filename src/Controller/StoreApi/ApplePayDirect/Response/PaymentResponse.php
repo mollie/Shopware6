@@ -8,13 +8,14 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 class PaymentResponse extends StoreApiResponse
 {
-    public function __construct(bool $success, string $redirectUrl, string $message)
+    public function __construct(bool $success, string $redirectUrl, string $message, string $orderId)
     {
         $object = new ArrayStruct(
             [
                 'success' => $success,
                 'url' => $redirectUrl,
                 'message' => $message,
+                'orderId' => $orderId,
             ],
             'mollie_payments_applepay_direct_payment'
         );

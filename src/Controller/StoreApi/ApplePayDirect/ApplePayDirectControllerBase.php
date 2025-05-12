@@ -210,9 +210,9 @@ class ApplePayDirectControllerBase
                 $newContext
             );
 
-            return new PaymentResponse(true, $finishUrl, '');
+            return new PaymentResponse(true, $finishUrl, '', $order->getId());
         } catch (\Throwable $ex) {
-            return new PaymentResponse(false, $errorUrl, $ex->getMessage());
+            return new PaymentResponse(false, $errorUrl, $ex->getMessage(), '');
         }
     }
 
