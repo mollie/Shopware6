@@ -1,0 +1,39 @@
+{% sw_extends '@Storefront/storefront/page/account/order-history/order-detail.html.twig' %}
+{% block page_account_order_item_detail_amount_value %}
+    {{ parent() }}
+    {% set totals = order.extensions.mollie_refunds.totals %}
+
+    {% block page_account_order_item_detail_amount_mollie_refund_pending_label %}
+        {% if totals.pendingRefunds != 0 %}
+            <dt class="col-6 col-md-8">
+                {{ "molliePayments.order.refundPendingLabel"|trans|sw_sanitize }}
+            </dt>
+        {% endif %}
+    {% endblock %}
+
+    {% block page_account_order_item_detail_amount_mollie_refund_pending_value %}
+        {% if totals.pendingRefunds != 0 %}
+            <dd class="col-6 col-md-4">
+                {{ totals.pendingRefunds|currency(order.currency.isoCode) }}
+            </dd>
+        {% endif %}
+    {% endblock %}
+
+    {% block page_account_order_item_detail_amount_mollie_refunded_label %}
+        {% if totals.refunded != 0 %}
+            <dt class="col-6 col-md-8">
+                {{ "molliePayments.order.refundedLabel"|trans|sw_sanitize }}
+            </dt>
+        {% endif %}
+    {% endblock %}
+
+    {% block page_account_order_item_detail_amount_mollie_refunded_value %}
+        {% if totals.refunded != 0 %}
+            <dd class="col-6 col-md-4">
+                {{ totals.refunded|currency(order.currency.isoCode) }}
+            </dd>
+        {% endif %}
+    {% endblock %}
+
+
+{% endblock %}
