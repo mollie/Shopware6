@@ -59,7 +59,7 @@ export default class RefundManagerRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getFirstRefundStatusLabel() {
-        return cy.get('.sw-data-grid__cell--status > .sw-data-grid__cell-content > .sw-container');
+        return cy.get('.cy-refund-list .cy-refund-status:eq(0)');
     }
 
     /**

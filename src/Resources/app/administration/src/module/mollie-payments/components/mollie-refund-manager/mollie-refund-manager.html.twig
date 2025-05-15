@@ -426,6 +426,7 @@
             <sw-data-grid :dataSource="mollieRefunds"
                           :columns="gridMollieRefundsColumns"
                           :showSelection="false"
+                          class="cy-refund-list"
                           :isLoading="isRefundDataLoading">
                 <template #column-amount.value="{ item }">
                     <sw-container columns="1fr auto" gap="8px" align="center">
@@ -434,7 +435,7 @@
                     </sw-container>
                 </template>
                 <template #column-status="{ item }">
-                    <sw-container columns="1fr auto" gap="8px" align="center">
+                    <sw-container columns="1fr auto" gap="8px" class="cy-refund-status" align="center">
                         <sw-label :variant="getRefundStatusBadge(item.status)"
                                   size="medium"
                                   appearance="default"
