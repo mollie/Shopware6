@@ -47,7 +47,7 @@ jobs:
         include:
           - shopware: '6.7.0.0-rc3'
             php: '8.3'
-          - shopware: '6.6.10.3'
+          - shopware: '6.6.10.4'
             php: '8.3'
           - shopware: '6.6.9.0'
             php: '8.2'
