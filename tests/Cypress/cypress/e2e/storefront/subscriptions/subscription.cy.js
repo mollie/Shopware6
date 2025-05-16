@@ -395,6 +395,12 @@ describe('Subscription', () => {
             })
         })
     })
+
+    after(()=>{
+
+        cy.log('Reset subscriptions');
+        configAction.updateProducts('', false, '', '');
+    })
 })
 
 
