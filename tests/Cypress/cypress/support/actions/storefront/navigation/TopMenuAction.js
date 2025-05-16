@@ -1,7 +1,7 @@
 import NavigationRepository from 'Repositories/storefront/navigation/NavigationRepository';
-
+import Shopware from "Services/shopware/Shopware";
 const repo = new NavigationRepository();
-
+const shopware = new Shopware();
 export default class TopMenuAction {
 
     /**
@@ -16,6 +16,9 @@ export default class TopMenuAction {
      */
     clickOnSecondCategory() {
         repo.getSecondMenuItem().click();
+        if(shopware.isVersionGreaterEqual('6.7.0.0')){
+            repo.getFlyOutMenuItem().click({force:true});
+        }
     }
 
     /**
