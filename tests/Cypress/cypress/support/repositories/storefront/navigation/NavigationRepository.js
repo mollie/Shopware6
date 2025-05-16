@@ -16,4 +16,8 @@ export default class NavigationRepository {
         return cy.get('#mainNavigation > div.container > nav > a:nth-child(2),.main-navigation-menu-list li.nav-item:nth-child(2) a.nav-link').first();
     }
 
+    getFlyOutMenuItem(){
+        return cy.get('#mainNavigation > div.container > nav > a:nth-child(2),.main-navigation-menu-list li.nav-item:nth-child(2) .navigation-flyout-category-link a');
+    }
+
 }
