@@ -73,7 +73,15 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             adminOrders.assertLatestOrderStatus('Open');
-            adminOrders.assertLatestPaymentStatus('In Progress');
+            let paymentStatus = 'In Progress'
+            /**
+             * In Shopware 6.7 the action DO_PAY was removed, so we use ACTION_PROCESS for bank payments. this action sets status to open in lower than 6.7
+             */
+            if(shopware.isVersionLower('6.7.0.0')){
+                paymentStatus = 'Open'
+            }
+
+            adminOrders.assertLatestPaymentStatus(paymentStatus);
             
         })
 
