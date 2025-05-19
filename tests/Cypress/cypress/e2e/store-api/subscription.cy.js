@@ -15,10 +15,7 @@ const loginAction = new StoreApiLoginAction(client);
 
 
 function beforeEach() {
-    cy.wrap(null).then(() => {
-        // clear token
-        client.clearContextToken();
-    });
+    client.clearContextToken();
 }
 
 
