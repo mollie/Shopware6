@@ -21,7 +21,7 @@ export default class LoginAction {
             repo.getSubmitButton().click();
 
         }, {
-            cacheAcrossSpecs: true,
+            cacheAcrossSpecs: false,
             validate() {
             }
         });
