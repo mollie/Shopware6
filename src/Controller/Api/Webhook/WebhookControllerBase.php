@@ -6,7 +6,6 @@ namespace Kiener\MolliePayments\Controller\Api\Webhook;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
-use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Repository\OrderRepository;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Psr\Log\LoggerInterface;
@@ -15,7 +14,6 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class WebhookControllerBase extends AbstractController
 {
@@ -61,18 +59,6 @@ class WebhookControllerBase extends AbstractController
             return new JsonResponse([
                 'success' => true,
             ]);
-        } catch (WebhookIsTooEarlyException $exception) {
-            $this->logger->debug('Webhook too early', [
-                ['message' => $exception->getMessage()],
-            ]);
-
-            return new JsonResponse(
-                [
-                    'success' => false,
-                    'error' => $exception->getMessage(),
-                ],
-                Response::HTTP_TOO_EARLY
-            );
         } catch (\Throwable $ex) {
             $this->logger->error(
                 'Error in Mollie Webhook for Transaction ' . $swTransactionId,

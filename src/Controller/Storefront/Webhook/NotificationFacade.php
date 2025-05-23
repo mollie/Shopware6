@@ -8,7 +8,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
-use Kiener\MolliePayments\Exception\WebhookIsTooEarlyException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
@@ -116,7 +115,6 @@ class NotificationFacade
     }
 
     /**
-     * @throws WebhookIsTooEarlyException
      * @throws CustomerCouldNotBeFoundException
      */
     public function onNotify(string $swTransactionId, Context $context): void
@@ -135,20 +133,6 @@ class NotificationFacade
 
         if (! $swOrder instanceof OrderEntity) {
             throw new \Exception('Shopware Order not found for transaction: ' . $swTransactionId);
-        }
-
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        /** @var ?\DateTimeImmutable $transactionCreatedAt */
-        $transactionCreatedAt = $swTransaction->getCreatedAt();
-
-        if ($transactionCreatedAt !== null) {
-            $createdAt = \DateTime::createFromImmutable($transactionCreatedAt);
-            $createdAt->modify('+2 minutes');
-
-            if ($now < $createdAt) {
-                throw new WebhookIsTooEarlyException((string) $swOrder->getOrderNumber(), $now, $createdAt);
-            }
         }
 
         // --------------------------------------------------------------------------------------------
