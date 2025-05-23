@@ -62,18 +62,15 @@ class OrderStatusUpdater
      */
     public function updatePaymentStatus(OrderTransactionEntity $transaction, string $targetShopwareStatusKey, Context $context): void
     {
-        $currentShopwareState = $transaction->getStateMachineState();
+        // always fetch new, (race condition between storefront and webhooks at the same time)
+        $criteria = new Criteria([$transaction->getStateId()]);
+        $searchResult = $this->stateMachineStateRepository->search($criteria, $context);
+
+        /** @var ?StateMachineStateEntity OrderStatusUpdater.php */
+        $currentShopwareState = $searchResult->first();
 
         if (! $currentShopwareState instanceof StateMachineStateEntity) {
-            $criteria = new Criteria([$transaction->getStateId()]);
-            $searchResult = $this->stateMachineStateRepository->search($criteria, $context);
-
-            /** @var ?StateMachineStateEntity OrderStatusUpdater.php */
-            $currentShopwareState = $searchResult->first();
-
-            if (! $currentShopwareState instanceof StateMachineStateEntity) {
-                return;
-            }
+            return;
         }
 
         $order = $transaction->getOrder();
