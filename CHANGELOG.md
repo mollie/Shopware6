@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Bank transfer payments are now set to the 'In Progress' state instead of 'Unconfirmed', as these payment methods require several days to process and should not be modified.
 - Mandates for Mollie Customers are not loaded if the customer was deleted in Mollie dashboard
 - Removed "Webhook too early" functionality by fixing updatePayment race conditions in a different way. Webhook updates are now faster again.
+- The payment status "open" is now valid again for credit cards. In previous flows this was not possible and thus a problem, but due to new async. flows, this is now by design a valid way.
 
 ### Fixed
 - Fixed the error "Call to a member function info() on null"

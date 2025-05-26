@@ -39,14 +39,6 @@ class MolliePaymentStatus
      */
     public static function isFailedStatus($paymentIdentifier, $status)
     {
-        // some payment methods have certain states that can happen
-        // which would be "valid" for Mollie, but not for an eCommerce shop that has either a SUCCESS or a FAILED page.
-        if ($paymentIdentifier === 'creditcard' && $status === MolliePaymentStatus::MOLLIE_PAYMENT_OPEN) {
-            // we don't know why, but it can happen.
-            // if a credit card is OPEN then it's not valid. it will fail after 15 minutes...so show an error
-            return true;
-        }
-
         $list = [
             MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED,
             MolliePaymentStatus::MOLLIE_PAYMENT_FAILED,

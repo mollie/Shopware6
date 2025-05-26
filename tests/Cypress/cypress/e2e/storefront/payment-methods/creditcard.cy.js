@@ -264,7 +264,7 @@ describe('Credit Card Components', () => {
 
 describe('Status Tests', () => {
 
-    it('C4266: Open Credit Card payment leads to failure', () => {
+    it('C4266: Open Credit Card payment leads to success', () => {
 
         // BEFORE
         devices.setDevice(devices.getFirstDevice());
@@ -296,8 +296,8 @@ describe('Status Tests', () => {
 
         molliePayment.selectOpen();
 
-        cy.url().should('include', '/account/order/edit');
-        cy.contains('Complete payment');
+        cy.url().should('include', '/checkout/finish');
+        cy.contains('Thank you for your order');
     })
 
 })
