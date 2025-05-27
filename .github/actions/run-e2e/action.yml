@@ -157,6 +157,10 @@ runs:
         docker exec shop bash -c 'php bin/console dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
+    - name: Integration analyzer
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php vendor/bin/phpstan analyse -c .custom/plugins/MolliePayments/config/.phpstan.neon'
 
     - name: Integration tests
       shell: bash
