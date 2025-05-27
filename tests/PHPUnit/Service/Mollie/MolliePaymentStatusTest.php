@@ -78,15 +78,13 @@ class MolliePaymentStatusTest extends TestCase
     }
 
     /**
-     * This test verifies that open credit cards are not approved as valid payment.
-     * We don't know when this happens, but the payment has still "created" and will be expired
-     * after 15 minutes by Mollie. If we show a success, then nobody would recognize that it didnt work
-     * and so its expired and leads to a cancelled order.
+     * Back then it was not allowed to have open credit card payments but especially with mandate-id (one click) orders
+     * and the new async workflow, it can happen that credit card payments can be "open" so this needs to be successful now
      */
-    public function testOpenCreditCardFails(): void
+    public function testOpenCreditCardSucceeds(): void
     {
-        $isApproved = MolliePaymentStatus::isFailedStatus('creditcard', MolliePaymentStatus::MOLLIE_PAYMENT_OPEN);
+        $isFailed = MolliePaymentStatus::isFailedStatus('creditcard', MolliePaymentStatus::MOLLIE_PAYMENT_OPEN);
 
-        $this->assertEquals(true, $isApproved);
+        $this->assertEquals(false, $isFailed);
     }
 }
