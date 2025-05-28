@@ -127,12 +127,9 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
                 return true;
             }
         } catch (MissingRequestException|MissingRouteException $e) {
-            $this->logger
-                ->error('Could not determine if the current route is allowed to remove payment methods', [
-                    'exception' => $e,
-                    'request' => $request ?? null,
-                ])
-            ;
+            // This can occur when Symfony handles requests for assets like CSS or images
+            // that do not have a matching Shopware route.
+            // Avoid logging or throwing unnecessary errors for these non-critical cases.
 
             // Make sure Shopware will behave normally in the case of an error.
             return false;
