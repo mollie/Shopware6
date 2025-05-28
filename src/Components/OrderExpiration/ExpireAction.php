@@ -23,7 +23,7 @@ class ExpireAction
 {
     /** @var EntityRepository */
     private $orderRepository;
-    /** @var EntityRepository */
+    /** @var EntityRepository<SalesChannelEntity> */
     private $salesChannelRepository;
     private OrderExpireService $orderExpireService;
     private SettingsService $settingsService;

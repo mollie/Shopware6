@@ -27,7 +27,7 @@ class CancelItemFacade
     private EventDispatcherInterface $eventDispatcher;
 
     /**
-     * @param EntityRepository $orderLineItemRepository
+     * @param EntityRepository<OrderLineItemEntity> $orderLineItemRepository
      */
     public function __construct(MollieApiFactory $clientFactory, $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {

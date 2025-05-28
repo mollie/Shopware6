@@ -159,8 +159,12 @@ class ApplePayDirect
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', ApplePayPayment::class));
         $criteria->addFilter(new EqualsFilter('active', true));
 
+        /**
+         * @phpstan-ignore class.notFound
+         */
+        $repository = $this->repoPaymentMethods->getRepository();
         /** @var array<string> $paymentMethods */
-        $paymentMethods = $this->repoPaymentMethods->getRepository()->searchIds($criteria, $context->getContext())->getIds();
+        $paymentMethods = $repository->searchIds($criteria, $context->getContext())->getIds();
 
         if (count($paymentMethods) <= 0) {
             throw new \Exception('Payment Method Apple Pay Direct not found in system');

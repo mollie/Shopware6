@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MollieLocaleService
@@ -33,12 +35,12 @@ class MollieLocaleService
     ];
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<LanguageEntity>>
      */
     private $repoLanguages;
 
     /**
-     * @param EntityRepository $repoLanguages
+     * @param EntityRepository<EntityCollection<LanguageEntity>> $repoLanguages
      */
     public function __construct($repoLanguages)
     {

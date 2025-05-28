@@ -32,9 +32,7 @@ class MailService extends AbstractMailService
         $this->mailSender = $mailSender;
     }
 
-    /**
-     * @throws MailTransportFailedException
-     */
+
     public function send(array $data, array $attachments = []): void
     {
         $definition = $this->getValidationDefinition();

@@ -12,6 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ApplePayDownloadCommand extends Command
 {
+    /** @var string  */
     public static $defaultName = 'mollie:applepay:download-verification';
 
     /**

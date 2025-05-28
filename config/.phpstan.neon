@@ -24,6 +24,7 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
+    		- identifier: class.notFound
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule

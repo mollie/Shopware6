@@ -51,6 +51,8 @@ use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -190,6 +192,7 @@ class PaymentMethodService
                     }
                 }
 
+                /** @phpstan-ignore-next-line  */
                 if ($this->versionCompare->gte('6.5.7.0') && method_exists($existingPaymentMethod, 'getTechnicalName')) {
                     // we do a string cast here, since getTechnicalName will be not nullable in the future
                     /** @phpstan-ignore-next-line  */
@@ -430,6 +433,7 @@ class PaymentMethodService
 
         if (! $paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
+            /** @var PaymentMethodEntity $paymentMethod */
             $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
         }
 

@@ -15,6 +15,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
@@ -22,12 +23,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 class CompositionMigrationService implements CompositionMigrationServiceInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<RefundItemEntity>>
      */
     private $refundItemRepository;
 
     /**
-     * @param EntityRepository $refundItemRepository
+     * @param EntityRepository<EntityCollection<RefundItemEntity>> $refundItemRepository
      */
     public function __construct($refundItemRepository)
     {

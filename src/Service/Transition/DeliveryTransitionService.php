@@ -191,8 +191,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
     private function getStatusName(OrderDeliveryEntity $delivery): string
     {
-        if ($delivery->getStateMachineState() instanceof StateMachineStateEntity) {
-            return $delivery->getStateMachineState()->getName();
+        $stateMachineState = $delivery->getStateMachineState();
+        if ($stateMachineState instanceof StateMachineStateEntity) {
+            return (string)$stateMachineState->getName();
         }
 
         return '';
@@ -200,8 +201,9 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
 
     private function getStatusTechnicalName(OrderDeliveryEntity $delivery): string
     {
-        if ($delivery->getStateMachineState() instanceof StateMachineStateEntity) {
-            return $delivery->getStateMachineState()->getTechnicalName();
+        $stateMachineState = $delivery->getStateMachineState();
+        if ($stateMachineState instanceof StateMachineStateEntity) {
+            return (string)$stateMachineState->getTechnicalName();
         }
 
         return '';

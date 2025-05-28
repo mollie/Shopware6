@@ -17,10 +17,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DALCleanupCommand extends Command
 {
+    /** @var string  */
     public static $defaultName = 'mollie:dal:cleanup';
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<ProductEntity>
      */
     private $repoProducts;
 
@@ -35,7 +36,7 @@ class DALCleanupCommand extends Command
     private $logger;
 
     /**
-     * @param EntityRepository $repoProducts
+     * @param EntityRepository<ProductEntity> $repoProducts
      */
     public function __construct($repoProducts, Connection $connection, LoggerInterface $logger)
     {

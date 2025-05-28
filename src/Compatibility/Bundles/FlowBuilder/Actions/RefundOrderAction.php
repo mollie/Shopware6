@@ -73,15 +73,17 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 
     /**
      * @throws \Exception
+     * @phpstan-ignore class.notFound
      */
     public function handle(FlowEvent $event): void
     {
+        /** @phpstan-ignore class.notFound */
         $config = $event->getConfig();
 
         if (empty($config)) {
             return;
         }
-
+        /** @phpstan-ignore class.notFound */
         $baseEvent = $event->getEvent();
 
         if (! $baseEvent instanceof OrderAware) {

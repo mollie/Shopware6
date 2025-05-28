@@ -21,6 +21,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -30,7 +31,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class OrderService implements OrderServiceInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderEntity>>
      */
     protected $orderRepository;
 
@@ -61,7 +62,7 @@ class OrderService implements OrderServiceInterface
     private ContainerInterface $container;
 
     /**
-     * @param EntityRepository $orderRepository
+     * @param EntityRepository<EntityCollection<OrderEntity>> $orderRepository
      */
     public function __construct($orderRepository, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, ContainerInterface $container, LoggerInterface $logger)
     {
