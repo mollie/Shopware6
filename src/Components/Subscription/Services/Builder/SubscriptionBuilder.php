@@ -128,7 +128,7 @@ class SubscriptionBuilder
             $address->setDepartment($orderAddress->getDepartment());
             $address->setVatId($orderAddress->getVatId());
             $address->setStreet($orderAddress->getStreet());
-            $address->setZipcode($orderAddress->getZipcode());
+            $address->setZipcode((string) $orderAddress->getZipcode());
             $address->setCity($orderAddress->getCity());
             $address->setCountryId($orderAddress->getCountryId());
             $address->setCountryStateId($orderAddress->getCountryStateId());
@@ -157,7 +157,7 @@ class SubscriptionBuilder
                     $address->setDepartment($shippingAddress->getDepartment());
                     $address->setVatId($shippingAddress->getVatId());
                     $address->setStreet($shippingAddress->getStreet());
-                    $address->setZipcode($shippingAddress->getZipcode());
+                    $address->setZipcode((string) $shippingAddress->getZipcode());
                     $address->setCity($shippingAddress->getCity());
                     $address->setCountryId($shippingAddress->getCountryId());
                     $address->setCountryStateId($shippingAddress->getCountryStateId());

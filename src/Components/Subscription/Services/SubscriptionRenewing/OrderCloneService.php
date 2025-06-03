@@ -13,13 +13,14 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 class OrderCloneService
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderEntity>>
      */
     private $repoOrders;
 
@@ -34,7 +35,7 @@ class OrderCloneService
     private $processor;
 
     /**
-     * @param EntityRepository $repoOrders
+     * @param EntityRepository<EntityCollection<OrderEntity>> $repoOrders
      */
     public function __construct($repoOrders, OrderConverter $orderConverter, Processor $processor)
     {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
@@ -21,14 +22,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 
 class SubscriptionRepository
 {
-    /** @var EntityRepository */
+    /** @var EntityRepository<SubscriptionCollection<SubscriptionEntity>> */
     private $repository;
-    /** @var EntityRepository */
+    /** @var EntityRepository<SubscriptionAddressCollection<SubscriptionAddressEntity>> */
     private $addressRepository;
 
     /**
-     * @param EntityRepository $repository
-     * @param EntityRepository $addressRepository
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $repository
+     * @param EntityRepository<SubscriptionAddressCollection<SubscriptionAddressEntity>> $addressRepository
      */
     public function __construct($repository, $addressRepository)
     {
@@ -36,7 +37,7 @@ class SubscriptionRepository
         $this->addressRepository = $addressRepository;
     }
 
-    /** @return EntityRepository */
+    /** @return EntityRepository<SubscriptionCollection<SubscriptionEntity>> */
     public function getRepository()
     {
         return $this->repository;
@@ -59,8 +60,12 @@ class SubscriptionRepository
         if ($result->count() <= 0) {
             throw new SubscriptionNotFoundException($id);
         }
-
-        return $result->first();
+        /** @var ?SubscriptionEntity $subscription */
+        $subscription = $result->first();
+        if($subscription === null) {
+            throw new SubscriptionNotFoundException($id);
+        }
+        return $subscription;
     }
 
     public function findByMandateId(string $customerId, string $mandateId, Context $context): SubscriptionCollection
@@ -70,10 +75,13 @@ class SubscriptionRepository
         $criteria->addFilter(new EqualsFilter('customerId', $customerId));
         $criteria->addFilter(new EqualsFilter('mandateId', $mandateId));
 
-        /** @var SubscriptionCollection */
+        /** @var SubscriptionCollection<SubscriptionEntity> */
         return $this->repository->search($criteria, $context)->getEntities();
     }
 
+    /**
+     * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
+     */
     public function findAll(Context $context): EntitySearchResult
     {
         $criteria = new Criteria();
@@ -81,6 +89,9 @@ class SubscriptionRepository
         return $this->repository->search($criteria, $context);
     }
 
+    /**
+     * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
+     */
     public function findByCustomer(string $swCustomerId, bool $includedPending, Context $context): EntitySearchResult
     {
         $criteria = new Criteria();
@@ -103,6 +114,8 @@ class SubscriptionRepository
 
     /**
      * @throws \Exception
+     *
+     * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
     public function findByReminderRangeReached(string $salesChannelId, Context $context): EntitySearchResult
     {
@@ -121,6 +134,9 @@ class SubscriptionRepository
         return $this->repository->search($criteria, $context);
     }
 
+    /**
+     * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
+     */
     public function findPendingSubscriptions(string $orderId, Context $context): EntitySearchResult
     {
         $criteria = new Criteria();

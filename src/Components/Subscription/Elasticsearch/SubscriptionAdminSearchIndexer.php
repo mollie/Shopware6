@@ -5,7 +5,9 @@ namespace Kiener\MolliePayments\Components\Subscription\Elasticsearch;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IterableQuery;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory;
@@ -19,14 +21,15 @@ use Shopware\Elasticsearch\Admin\Indexer\AbstractAdminIndexer;
 
 class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
 {
+    private const BINARY_OFFSET = 100;
     private Connection $connection;
     private IteratorFactory $factory;
-    /** @var EntityRepository */
+    /** @var EntityRepository<SubscriptionCollection<SubscriptionEntity>> */
     private $repository;
     private int $indexingBatchSize;
 
     /**
-     * @param EntityRepository $repository
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $repository
      */
     public function __construct(
         Connection $connection,

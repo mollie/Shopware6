@@ -43,6 +43,8 @@ class ConfigControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return ConfigResponse
      */
     public function getConfig(SalesChannelContext $context): StoreApiResponse
     {

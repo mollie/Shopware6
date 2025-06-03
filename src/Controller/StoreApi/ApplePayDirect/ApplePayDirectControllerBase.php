@@ -38,6 +38,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return IsApplePayEnabledResponse
      */
     public function isEnabled(SalesChannelContext $context): StoreApiResponse
     {
@@ -48,6 +50,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return GetIDResponse
      */
     public function getId(SalesChannelContext $context): StoreApiResponse
     {
@@ -67,6 +71,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return AddProductResponse
      */
     public function addProduct(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -88,6 +94,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return CreateSessionResponse
      */
     public function createPaymentSession(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -105,6 +113,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return GetCartResponse
      */
     public function getCart(SalesChannelContext $context): StoreApiResponse
     {
@@ -115,6 +125,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return GetShippingMethodsResponse
      */
     public function getShippingMethods(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -131,6 +143,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SetShippingMethodResponse
      */
     public function setShippingMethod(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -147,6 +161,8 @@ class ApplePayDirectControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return PaymentResponse
      */
     public function pay(RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -216,6 +232,9 @@ class ApplePayDirectControllerBase
         }
     }
 
+    /**
+     * @return RestoreCartResponse
+     */
     public function restoreCart(SalesChannelContext $context): StoreApiResponse
     {
         $this->applePay->restoreCart($context);

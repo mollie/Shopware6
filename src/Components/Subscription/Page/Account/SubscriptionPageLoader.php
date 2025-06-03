@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -20,7 +21,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\Salutation\SalesChannel\AbstractSalutationRoute;
 use Shopware\Core\System\Salutation\SalutationCollection;
 use Shopware\Core\System\Salutation\SalutationEntity;
-use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Shopware\Storefront\Page\MetaInformation;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,7 +34,7 @@ class SubscriptionPageLoader
     private $genericLoader;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<SubscriptionCollection<SubscriptionEntity>>
      */
     private $repoSubscriptions;
 
@@ -64,7 +64,7 @@ class SubscriptionPageLoader
     private $container;
 
     /**
-     * @param EntityRepository $repoSubscriptions
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $repoSubscriptions
      */
     public function __construct(GenericPageLoaderInterface $genericLoader, $repoSubscriptions, CustomerService $customerService, AbstractCountryRoute $countryRoute, AbstractSalutationRoute $salutationRoute, SettingsService $settingsService, ContainerInterface $container)
     {
@@ -104,7 +104,7 @@ class SubscriptionPageLoader
             return $page;
         }
 
-        /** @var EntitySearchResult<SubscriptionEntity> $storefrontSubscriptions */
+        /** @var EntitySearchResult<SubscriptionCollection<SubscriptionEntity>> $storefrontSubscriptions */
         $storefrontSubscriptions = EntitySearchResult::createFrom($subscriptions);
 
         // ---------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ class SubscriptionPageLoader
     }
 
     /**
-     * @return null|StorefrontSearchResult<SubscriptionEntity>
+     * @return null|EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
     private function getSubscriptions(Request $request, SalesChannelContext $context): ?EntitySearchResult
     {
@@ -144,7 +144,6 @@ class SubscriptionPageLoader
         );
         $criteria = $this->createCriteria($request, $customerId);
 
-        /** @var StorefrontSearchResult<SubscriptionEntity> */
         return $this->repoSubscriptions->search($criteria, $context->getContext());
     }
 

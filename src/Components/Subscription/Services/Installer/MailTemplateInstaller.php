@@ -7,8 +7,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Content\MailTemplate\Aggregate\MailTemplateType\MailTemplateTypeEntity;
+use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -24,24 +27,24 @@ class MailTemplateInstaller
     private $connection;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<MailTemplateTypeEntity>>
      */
     private $repoMailTypes;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<MailTemplateEntity>>
      */
     private $repoMailTemplates;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<SalesChannelEntity>>
      */
     private $repoSalesChannels;
 
     /**
-     * @param EntityRepository $repoMailTypes
-     * @param EntityRepository $repoMailTemplates
-     * @param EntityRepository $repoSalesChannels
+     * @param EntityRepository<EntityCollection<MailTemplateTypeEntity>> $repoMailTypes
+     * @param EntityRepository<EntityCollection<MailTemplateEntity>> $repoMailTemplates
+     * @param EntityRepository<EntityCollection<SalesChannelEntity>> $repoSalesChannels
      */
     public function __construct(Connection $connection, $repoMailTypes, $repoMailTemplates, $repoSalesChannels)
     {
