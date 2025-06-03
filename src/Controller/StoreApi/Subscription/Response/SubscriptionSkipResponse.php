@@ -6,6 +6,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\Subscription\Response;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct<array{success:bool}>>
+ */
 class SubscriptionSkipResponse extends StoreApiResponse
 {
     public function __construct()

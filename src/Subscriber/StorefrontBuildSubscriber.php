@@ -20,7 +20,6 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
 
     /** @phpstan-ignore class.notFound */
     /**
-     *
      * @var StorefrontPluginRegistry|StorefrontPluginRegistryInterface
      */
     private $pluginRegistry;

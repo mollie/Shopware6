@@ -13,15 +13,17 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Product\Exception\ProductNotFoundException;
 use Shopware\Core\Content\Product\Exception\ProductNumberNotFoundException;
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class VoucherService
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<ProductEntity>>
      */
     private $repoProducts;
 
@@ -31,7 +33,7 @@ class VoucherService
     private $logger;
 
     /**
-     * @param EntityRepository $repoProducts
+     * @param EntityRepository<EntityCollection<ProductEntity>> $repoProducts
      */
     public function __construct($repoProducts, LoggerInterface $logger)
     {
@@ -93,13 +95,19 @@ class VoucherService
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('productNumber', $productNumber));
 
+        /** @var EntitySearchResult<EntityCollection<ProductEntity>> $productsSearchResult */
         $productsSearchResult = $this->repoProducts->search($criteria, $context->getContext());
 
         if ($productsSearchResult->count() === 0) {
             throw new ProductNumberNotFoundException($productNumber);
         }
+        /** @var ?ProductEntity $product */
+        $product = $productsSearchResult->first();
+        if ($product === null) {
+            throw new ProductNotFoundException($productNumber);
+        }
 
-        return $productsSearchResult->first();
+        return $product;
     }
 
     private function getProductById(string $productId, SalesChannelContext $context): ProductEntity
@@ -111,6 +119,12 @@ class VoucherService
             throw new ProductNotFoundException($productId);
         }
 
-        return $productSearchResult->first();
+        /** @var ?ProductEntity $product */
+        $product = $productSearchResult->first();
+        if ($product === null) {
+            throw new ProductNotFoundException($productId);
+        }
+
+        return $product;
     }
 }

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DALCleanupCommand extends Command
 {
-    /** @var string  */
+    /** @var string */
     public static $defaultName = 'mollie:dal:cleanup';
 
     /**

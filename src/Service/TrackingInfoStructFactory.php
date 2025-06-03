@@ -50,7 +50,7 @@ class TrackingInfoStructFactory
         }
 
         $orderDeliveryEntity = $deliveries->first();
-        if($orderDeliveryEntity === null) {
+        if ($orderDeliveryEntity === null) {
             throw new NoDeliveriesFoundException('No deliveries found for order with ID ' . $order->getId() . '!');
         }
         $trackingCodes = $orderDeliveryEntity->getTrackingCodes();

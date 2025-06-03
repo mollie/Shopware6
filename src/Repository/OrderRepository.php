@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository;
 
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
@@ -13,19 +15,19 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 class OrderRepository
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderEntity>>
      */
     private $repository;
 
     /**
-     * @param EntityRepository $repository
+     * @param EntityRepository<EntityCollection<OrderEntity>> $repository
      */
     public function __construct($repository)
     {
         $this->repository = $repository;
     }
 
-    /** @return EntityRepository */
+    /** @return EntityRepository<EntityCollection<OrderEntity>> */
     public function getRepository()
     {
         return $this->repository;
@@ -33,6 +35,8 @@ class OrderRepository
 
     /**
      * Searches orders of the provided customer with the provided Mollie ID (ord_xyz or tr_xyz) in Shopware.
+     *
+     * @return EntitySearchResult<EntityCollection<OrderEntity>>
      */
     public function findByMollieId(string $customerId, string $mollieId, Context $context): EntitySearchResult
     {

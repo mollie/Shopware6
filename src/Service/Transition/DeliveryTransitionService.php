@@ -193,7 +193,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
     {
         $stateMachineState = $delivery->getStateMachineState();
         if ($stateMachineState instanceof StateMachineStateEntity) {
-            return (string)$stateMachineState->getName();
+            return (string) $stateMachineState->getName();
         }
 
         return '';
@@ -203,7 +203,7 @@ class DeliveryTransitionService implements DeliveryTransitionServiceInterface
     {
         $stateMachineState = $delivery->getStateMachineState();
         if ($stateMachineState instanceof StateMachineStateEntity) {
-            return (string)$stateMachineState->getTechnicalName();
+            return (string) $stateMachineState->getTechnicalName();
         }
 
         return '';

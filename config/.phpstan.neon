@@ -32,4 +32,4 @@ services:
         - phpstan.rules.rule
 
 includes:
-    - ../vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - ../../../../vendor/spaze/phpstan-disallowed-calls/extension.neon

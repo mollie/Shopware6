@@ -74,7 +74,7 @@ class MollieLineItemBuilder
         $fixRoundingDifferences = $settings->isFixRoundingDiffEnabled();
         $fixRoundingTitle = $settings->getFixRoundingDiffName();
         $fixRoundingSKU = $settings->getFixRoundingDiffSKU();
-        $taxStatus = (string)$order->getTaxStatus();
+        $taxStatus = (string) $order->getTaxStatus();
         $mollieOrderLines = $this->buildLineItems($taxStatus, $order->getNestedLineItems(), $isVerticalTaxCalculation);
 
         $deliveries = $order->getDeliveries();

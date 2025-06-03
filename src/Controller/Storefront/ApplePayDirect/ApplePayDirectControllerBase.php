@@ -11,9 +11,11 @@ use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -53,7 +55,7 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
     private $flowBuilderEventFactory;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<CustomerEntity>>
      */
     private $repoCustomers;
 
@@ -68,9 +70,11 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
     private $logger;
 
     /**
+     * @param EntityRepository<EntityCollection<CustomerEntity>> $repoCustomers
+     *
      * @throws \Exception
      */
-    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, EntityRepository $repoCustomers, OrderService $orderService)
+    public function __construct(ApplePayDirect $applePay, RouterInterface $router, LoggerInterface $logger, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, $repoCustomers, OrderService $orderService)
     {
         $this->applePay = $applePay;
         $this->router = $router;
@@ -423,17 +427,18 @@ class ApplePayDirectControllerBase extends AbstractStoreFrontController
         if ($customers->count() <= 0) {
             return;
         }
-
+        /** @var CustomerEntity $customer */
+        $customer = $customers->first();
         // we also have to reload the order because data is missing
         $finalOrder = $this->orderService->getOrder($order->getId(), $context);
 
         switch ($status) {
             case self::FLOWBUILDER_FAILED:
-                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customers->first(), $finalOrder, $context);
+                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customer, $finalOrder, $context);
                 break;
 
             default:
-                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customer, $finalOrder, $context);
         }
 
         $this->flowBuilderDispatcher->dispatch($event);

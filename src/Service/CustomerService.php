@@ -19,6 +19,7 @@ use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -29,8 +30,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
+use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\Salutation\SalutationEntity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomerService implements CustomerServiceInterface
@@ -44,12 +47,12 @@ class CustomerService implements CustomerServiceInterface
     public const CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID = 'express_address_id';
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<CountryEntity>>
      */
     private $countryRepository;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<CustomerEntity>>
      */
     private $customerRepository;
 
@@ -65,7 +68,7 @@ class CustomerService implements CustomerServiceInterface
     /** @var SalesChannelContextPersister */
     private $salesChannelContextPersister;
 
-    /** @var EntityRepository */
+    /** @var EntityRepository<EntityCollection<SalutationEntity>> */
     private $salutationRepository;
 
     /** @var SettingsService */
@@ -79,15 +82,15 @@ class CustomerService implements CustomerServiceInterface
     /** @var string */
     private $shopwareVersion;
 
-    /** @var EntityRepository */
+    /** @var EntityRepository<EntityCollection<CustomerAddressEntity>> */
     private $customerAddressRepository;
     private ContainerInterface $container;
 
     /**
-     * @param EntityRepository $countryRepository
-     * @param EntityRepository $customerRepository
-     * @param EntityRepository $customerAddressRepository
-     * @param EntityRepository $salutationRepository
+     * @param EntityRepository<EntityCollection<CountryEntity>> $countryRepository
+     * @param EntityRepository<EntityCollection<CustomerEntity>> $customerRepository
+     * @param EntityRepository<EntityCollection<CustomerAddressEntity>> $customerAddressRepository
+     * @param EntityRepository<EntityCollection<SalutationEntity>> $salutationRepository
      */
     public function __construct(
         $countryRepository,
@@ -505,7 +508,9 @@ class CustomerService implements CustomerServiceInterface
         if ($boundCustomers->getTotal() > 0) {
             $foundCustomer = $boundCustomers->first();
         }
-
+        if ($foundCustomer === null) {
+            return null;
+        }
         $bindCustomers = $this->configService->getSystemConfigService()->get('core.systemWideLoginRegistration.isCustomerBoundToSalesChannel');
 
         if ($bindCustomers && $foundCustomer->getBoundSalesChannelId() === null) {

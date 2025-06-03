@@ -94,7 +94,7 @@ abstract class AbstractMailService
     /**
      * @param array<mixed> $attachments
      *
-     * @return list<array{content: resource|string, fileName: string|null, mimeType: string|null}>|null
+     * @return array<mixed>
      */
     protected function filterBinaryAttachments(array $attachments = []): array
     {

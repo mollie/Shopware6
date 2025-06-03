@@ -27,7 +27,7 @@ class PaymentMethodRepository
     }
 
     /**
-     * @return EntityRepository<EntityCollection<PaymentMethodEntity>> |EntityRepositoryInterface<EntityCollection<PaymentMethodEntity>>
+     * @return EntityRepository<EntityCollection<PaymentMethodEntity>>|EntityRepositoryInterface<EntityCollection<PaymentMethodEntity>>
      */
     public function getRepository()
     {

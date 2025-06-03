@@ -74,7 +74,7 @@ class StockManager implements StockManagerInterface
         /** @phpstan-ignore-next-line  */
         if (method_exists($update, 'executeStatement')) {
             $update->executeStatement();
-        }else{
+        } else {
             /** @phpstan-ignore-next-line  */
             $update->execute();
         }
