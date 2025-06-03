@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Struct\Product\ProductAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\Console\Command\Command;
@@ -21,7 +22,7 @@ class DALCleanupCommand extends Command
     public static $defaultName = 'mollie:dal:cleanup';
 
     /**
-     * @var EntityRepository<ProductEntity>
+     * @var EntityRepository<EntityCollection<ProductEntity>>
      */
     private $repoProducts;
 
@@ -36,7 +37,7 @@ class DALCleanupCommand extends Command
     private $logger;
 
     /**
-     * @param EntityRepository<ProductEntity> $repoProducts
+     * @param EntityRepository<EntityCollection<ProductEntity>> $repoProducts
      */
     public function __construct($repoProducts, Connection $connection, LoggerInterface $logger)
     {

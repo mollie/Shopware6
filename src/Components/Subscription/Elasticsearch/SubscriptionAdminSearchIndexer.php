@@ -21,7 +21,6 @@ use Shopware\Elasticsearch\Admin\Indexer\AbstractAdminIndexer;
 
 class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
 {
-    private const BINARY_OFFSET = 100;
     private Connection $connection;
     private IteratorFactory $factory;
     /** @var EntityRepository<SubscriptionCollection<SubscriptionEntity>> */
@@ -64,7 +63,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
     }
 
     /**
-     * @param array<int, array<string>>|array<string> $ids
+     * @param array<string> $ids
      *
      * @return array<string, array<string, string>>
      */
@@ -89,7 +88,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY + 100, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => ParameterType::BINARY, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 
@@ -106,7 +105,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
     /**
      * @param array<string, mixed> $result
      *
-     * @return array{total:int, data:EntityCollection<Entity>}
+     * @return array{total:int, data:SubscriptionCollection<SubscriptionEntity>}
      *
      * Return EntityCollection<Entity> and their total by ids in the result parameter
      */

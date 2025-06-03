@@ -9,8 +9,10 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -21,17 +23,17 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 class ExpireAction
 {
-    /** @var EntityRepository */
+    /** @var EntityRepository<EntityCollection<OrderEntity>> */
     private $orderRepository;
-    /** @var EntityRepository<SalesChannelEntity> */
+    /** @var EntityRepository<EntityCollection<SalesChannelEntity>> */
     private $salesChannelRepository;
     private OrderExpireService $orderExpireService;
     private SettingsService $settingsService;
     private LoggerInterface $logger;
 
     /**
-     * @param EntityRepository $orderRepository
-     * @param EntityRepository $salesChannelRepository
+     * @param EntityRepository<EntityCollection<OrderEntity>> $orderRepository
+     * @param EntityRepository<EntityCollection<SalesChannelEntity>> $salesChannelRepository
      */
     public function __construct(
         $orderRepository,

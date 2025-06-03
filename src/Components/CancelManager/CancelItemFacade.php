@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,13 +22,13 @@ class CancelItemFacade
 {
     private MollieApiFactory $clientFactory;
     private LoggerInterface $logger;
-    /** @var EntityRepository */
+    /** @var EntityRepository<EntityCollection<OrderLineItemEntity>> */
     private $orderLineItemRepository;
     private StockManagerInterface $stockManager;
     private EventDispatcherInterface $eventDispatcher;
 
     /**
-     * @param EntityRepository<OrderLineItemEntity> $orderLineItemRepository
+     * @param EntityRepository<EntityCollection<OrderLineItemEntity>> $orderLineItemRepository
      */
     public function __construct(MollieApiFactory $clientFactory, $orderLineItemRepository, StockManagerInterface $stockManager, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {

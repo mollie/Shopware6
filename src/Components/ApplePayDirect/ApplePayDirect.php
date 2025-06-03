@@ -30,9 +30,11 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -108,7 +110,7 @@ class ApplePayDirect
     private $orderService;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderAddressEntity>>
      */
     private $repoOrderAdresses;
 
@@ -123,7 +125,7 @@ class ApplePayDirect
     private $domainSanitizer;
 
     /**
-     * @param EntityRepository $repoOrderAdresses
+     * @param EntityRepository<EntityCollection<OrderAddressEntity>> $repoOrderAdresses
      */
     public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {

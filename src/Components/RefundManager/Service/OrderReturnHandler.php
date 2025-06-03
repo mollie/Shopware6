@@ -12,6 +12,7 @@ use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -21,7 +22,7 @@ class OrderReturnHandler
     private RefundManagerInterface $refundManager;
 
     /**
-     * @var ?EntityRepository
+     * @var ?EntityRepository<EntityCollection<OrderReturnEntity>>
      */
     private $orderReturnRepository;
     private LoggerInterface $logger;
@@ -30,7 +31,7 @@ class OrderReturnHandler
     private bool $featureDisabled = false;
 
     /**
-     * @param ?EntityRepository $orderReturnRepository
+     * @param ?EntityRepository<EntityCollection<OrderReturnEntity>> $orderReturnRepository
      */
     public function __construct(
         RefundManagerInterface $refundManager,

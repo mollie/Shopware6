@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\DAL\Repository;
 
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -16,6 +18,11 @@ interface RefundRepositoryInterface
      */
     public function create(array $data, Context $context): EntityWrittenContainerEvent;
 
+    /**
+     * @param Criteria $criteria
+     * @param Context $context
+     * @return EntitySearchResult<RefundCollection<RefundEntity>>
+     */
     public function search(Criteria $criteria, Context $context): EntitySearchResult;
 
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult;
