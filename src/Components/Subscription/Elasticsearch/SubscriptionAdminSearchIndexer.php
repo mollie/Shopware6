@@ -105,7 +105,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
     /**
      * @param array<string, mixed> $result
      *
-     * @return array{total:int, data:SubscriptionCollection<SubscriptionEntity>}
+     * @return array{total:int, data:EntityCollection<SubscriptionEntity>}
      *
      * Return EntityCollection<Entity> and their total by ids in the result parameter
      */

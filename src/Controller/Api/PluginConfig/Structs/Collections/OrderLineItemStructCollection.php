@@ -12,6 +12,9 @@ use Shopware\Core\Framework\Struct\StructCollection;
  */
 class OrderLineItemStructCollection extends StructCollection
 {
+    /**
+     * @param iterable<OrderLineItemStruct> $elements
+     */
     final private function __construct(iterable $elements)
     {
         parent::__construct($elements);
@@ -27,6 +30,7 @@ class OrderLineItemStructCollection extends StructCollection
      */
     public function getById(string $id): OrderLineItemStruct
     {
+        /** @var OrderLineItemStruct $item */
         foreach ($this as $item) {
             if ($item->getId() === $id) {
                 return $item;
@@ -39,7 +43,7 @@ class OrderLineItemStructCollection extends StructCollection
     public function getRefundableQuantity(): int
     {
         $refundableQuantity = 0;
-
+        /** @var OrderLineItemStruct $item */
         foreach ($this as $item) {
             $refundableQuantity += $item->getRefundableQuantity();
         }

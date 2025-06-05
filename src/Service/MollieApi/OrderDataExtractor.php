@@ -78,6 +78,7 @@ class OrderDataExtractor
     public function extractLocale(OrderEntity $orderEntity, SalesChannelContext $salesChannelContext): ?LocaleEntity
     {
         $orderLanguage = $orderEntity->getLanguage();
+        /** @phpstan-ignore-next-line  */
         if ($orderLanguage === null) {
             return null;
         }

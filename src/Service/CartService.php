@@ -153,6 +153,7 @@ class CartService implements CartServiceInterface
         if (method_exists($oldContext, 'getCustomerId')) {
             $customerId = $oldContext->getCustomerId();
         }
+        /** @phpstan-ignore arguments.count */
         $params = new SalesChannelContextServiceParameters($scalesChannelId, $oldContext->getToken(), $oldContext->getContext()->getLanguageId(), $oldContext->getCurrencyId(), $domainId, $oldContext->getContext(), $customerId);
 
         return $this->contextService->get($params);

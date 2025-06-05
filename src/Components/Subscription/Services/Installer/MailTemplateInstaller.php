@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Statement;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Content\MailTemplate\Aggregate\MailTemplateType\MailTemplateTypeEntity;
@@ -298,7 +299,9 @@ class MailTemplateInstaller
                 WHERE `locale`.`code` = :code
                 ';
 
-        $languageId = $connection->executeQuery($sql, ['code' => $locale])->fetchOne();
+        /** @var Statement $statement */
+        $statement = $connection->executeQuery($sql, ['code' => $locale]);
+        $languageId = $statement->fetchOne();
 
         if (! $languageId) {
             return null;

@@ -100,7 +100,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
     /**
      * @param array<string, mixed> $result
      *
-     * @return array{total:int, data:RefundCollection<RefundEntity>}
+     * @return array{total:int, data:EntityCollection<RefundEntity>}
      *
      * Return EntityCollection<Entity> and their total by ids in the result parameter
      */
