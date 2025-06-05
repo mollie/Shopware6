@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository;
 
+use Shopware\Core\Content\Media\MediaEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
 /**
  * @TODO: remove after dropping 6.4 this is only required because in 6.4 a decoredated class is provided
@@ -12,12 +13,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 class MediaRepository
 {
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var EntityRepository<EntityCollection<MediaEntity>>
      */
     private $repository;
 
     /**
-     * @param EntityRepository|EntityRepositoryInterface $repository
+     * @param EntityRepository<EntityCollection<MediaEntity>> $repository
      */
     public function __construct($repository)
     {
@@ -25,7 +26,7 @@ class MediaRepository
     }
 
     /**
-     * @return EntityRepository|EntityRepositoryInterface
+     * @return EntityRepository<EntityCollection<MediaEntity>>
      */
     public function getRepository()
     {

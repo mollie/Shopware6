@@ -53,6 +53,9 @@ class LiveDataEnricher implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param EntityLoadedEvent<SubscriptionEntity> $event
+     */
     public function onSubscriptionsLoaded(EntityLoadedEvent $event): void
     {
         /** @var SubscriptionEntity $subscription */

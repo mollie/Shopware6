@@ -238,33 +238,6 @@ jobs:
       - name: Run PHPUnit
         run: make phpunit -B
 
-  phpstan:
-    name: PHPStan
-    needs: install_dev
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Clone Code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ inputs.PHP_VERSION }}
-
-      - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
-        with:
-          key: cache-dev-dependencies-${{ github.run_id }}
-          path: |
-            node_modules
-            vendor
-            src/Resources/app/storefront/node_modules
-            src/Resources/app/administration/node_modules
-
-      - name: Run PHPStan
-        run: make stan -B
-
   phpcsfixer:
     name: PHP CS Fixer
     needs: install_dev

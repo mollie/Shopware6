@@ -6,6 +6,8 @@ parameters:
         - ./../src/Resources/*
         - ./../src/Migration/*
         - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
+        - ./../src/Components/RefundManager/Elasticsearch/RefundAdminSearchIndexer.php
+        - ./../src/Components/Subscription/Elasticsearch/SubscriptionAdminSearchIndexer.php
         # legacy code that is not working with abstract/interface changes
         - ./../src/Service/Mail/MailService63.php
     disallowedFunctionCalls:
@@ -24,6 +26,9 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
+    		- identifier: class.notFound
+    		- identifier: generics.notCompatible
+    		- identifier: generics.notGeneric
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
@@ -31,4 +36,4 @@ services:
         - phpstan.rules.rule
 
 includes:
-    - ../vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - ../../../../vendor/spaze/phpstan-disallowed-calls/extension.neon

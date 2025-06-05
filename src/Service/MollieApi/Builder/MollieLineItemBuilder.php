@@ -74,14 +74,14 @@ class MollieLineItemBuilder
         $fixRoundingDifferences = $settings->isFixRoundingDiffEnabled();
         $fixRoundingTitle = $settings->getFixRoundingDiffName();
         $fixRoundingSKU = $settings->getFixRoundingDiffSKU();
-
-        $mollieOrderLines = $this->buildLineItems($order->getTaxStatus(), $order->getNestedLineItems(), $isVerticalTaxCalculation);
+        $taxStatus = (string) $order->getTaxStatus();
+        $mollieOrderLines = $this->buildLineItems($taxStatus, $order->getNestedLineItems(), $isVerticalTaxCalculation);
 
         $deliveries = $order->getDeliveries();
 
         if ($deliveries instanceof OrderDeliveryCollection) {
             $shippingLineItems = $this->shippingLineItemBuilder->buildShippingLineItems(
-                $order->getTaxStatus(),
+                $taxStatus,
                 $deliveries,
                 $isVerticalTaxCalculation
             );
@@ -148,6 +148,7 @@ class MollieLineItemBuilder
                     });
 
                     if ($filteredItems->count() === 1) {
+                        /** @var OrderLineItemEntity $item */
                         $item = $filteredItems->first();
                     }
                 }

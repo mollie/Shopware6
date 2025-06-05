@@ -6,6 +6,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 use Kiener\MolliePayments\Struct\StringStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<StringStruct>
+ */
 class CreateSessionResponse extends StoreApiResponse
 {
     public function __construct(string $session)

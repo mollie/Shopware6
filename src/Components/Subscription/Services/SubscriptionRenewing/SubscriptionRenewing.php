@@ -7,11 +7,13 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\Sub
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\OrderService;
 use Mollie\Api\Resources\Payment;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface;
 
@@ -23,7 +25,7 @@ class SubscriptionRenewing
     private $numberRanges;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderAddressEntity>>
      */
     private $repoOrderAddress;
 
@@ -38,7 +40,7 @@ class SubscriptionRenewing
     private $orderCloneService;
 
     /**
-     * @param EntityRepository $repoOrderAddress
+     * @param EntityRepository<EntityCollection<OrderAddressEntity>> $repoOrderAddress
      */
     public function __construct(NumberRangeValueGeneratorInterface $numberRanges, $repoOrderAddress, OrderService $orderService, OrderCloneService $orderCloneService)
     {

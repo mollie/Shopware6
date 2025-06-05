@@ -49,6 +49,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionsListResponse
      */
     public function getSubscriptions(SalesChannelContext $context): StoreApiResponse
     {
@@ -74,6 +76,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionUpdateBillingResponse
      */
     public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -125,6 +129,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionUpdateShippingResponse
      */
     public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -177,6 +183,8 @@ class SubscriptionControllerBase
     /**
      * @throws \Throwable
      * @throws CustomerCouldNotBeFoundException
+     *
+     * @return SubscriptionPaymentUpdateResponse
      */
     public function updatePayment(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -200,6 +208,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionPauseResponse
      */
     public function pause(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
@@ -221,6 +231,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionResumeResponse
      */
     public function resume(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
@@ -242,6 +254,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionSkipResponse
      */
     public function skip(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
@@ -263,6 +277,8 @@ class SubscriptionControllerBase
 
     /**
      * @throws \Throwable
+     *
+     * @return SubscriptionCancelResponse
      */
     public function cancel(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {

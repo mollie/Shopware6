@@ -6,6 +6,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\Config\Response;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct<array{profileId:string,testMode:bool,locale:string,oneClickPayments:bool}>>
+ */
 class ConfigResponse extends StoreApiResponse
 {
     public function __construct(string $profileId, bool $isTestMode, string $defaultLocale, bool $oneClickEnabled)

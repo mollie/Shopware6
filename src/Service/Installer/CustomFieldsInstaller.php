@@ -6,7 +6,9 @@ namespace Kiener\MolliePayments\Service\Installer;
 
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
 
 class CustomFieldsInstaller
@@ -22,12 +24,12 @@ class CustomFieldsInstaller
     private const ID_SUBSCRIPTION_REPETITION = '786f49b48bf34a418c5edb5503f31de5';
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<CustomFieldSetEntity>>
      */
     private $repoCustomFields;
 
     /**
-     * @param EntityRepository $repoCustomFields
+     * @param EntityRepository<EntityCollection<CustomFieldSetEntity>> $repoCustomFields
      */
     public function __construct($repoCustomFields)
     {

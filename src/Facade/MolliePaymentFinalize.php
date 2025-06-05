@@ -17,11 +17,13 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\PaymentMethod\PaymentMethodAttributes;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 
@@ -59,7 +61,7 @@ class MolliePaymentFinalize
     private $subscriptionManager;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<CustomerEntity>>
      */
     private $repoCustomer;
 
@@ -74,7 +76,7 @@ class MolliePaymentFinalize
     private $flowBuilderEventFactory;
 
     /**
-     * @param EntityRepository $repoCustomer
+     * @param EntityRepository<EntityCollection<CustomerEntity>> $repoCustomer
      */
     public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
@@ -220,21 +222,25 @@ class MolliePaymentFinalize
         if ($customers->count() <= 0) {
             return;
         }
-
+        /** @var ?CustomerEntity $customer */
+        $customer = $customers->first();
+        if ($customer === null) {
+            return;
+        }
         // we also have to reload the order because data is missing
         $finalOrder = $this->orderService->getOrder($order->getId(), $context);
 
         switch ($status) {
             case self::FLOWBUILDER_FAILED:
-                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customers->first(), $finalOrder, $context);
+                $event = $this->flowBuilderEventFactory->buildOrderFailedEvent($customer, $finalOrder, $context);
                 break;
 
             case self::FLOWBUILDER_CANCELED:
-                $event = $this->flowBuilderEventFactory->buildOrderCanceledEvent($customers->first(), $finalOrder, $context);
+                $event = $this->flowBuilderEventFactory->buildOrderCanceledEvent($customer, $finalOrder, $context);
                 break;
 
             default:
-                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customers->first(), $finalOrder, $context);
+                $event = $this->flowBuilderEventFactory->buildOrderSuccessEvent($customer, $finalOrder, $context);
         }
 
         $this->flowBuilderFactory->createDispatcher()->dispatch($event);

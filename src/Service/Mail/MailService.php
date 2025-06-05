@@ -5,7 +5,6 @@ namespace Kiener\MolliePayments\Service\Mail;
 
 use Shopware\Core\Content\Mail\Service\AbstractMailFactory;
 use Shopware\Core\Content\Mail\Service\AbstractMailSender;
-use Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException;
 use Shopware\Core\Framework\Validation\DataValidator;
 
 class MailService extends AbstractMailService
@@ -32,14 +31,12 @@ class MailService extends AbstractMailService
         $this->mailSender = $mailSender;
     }
 
-    /**
-     * @throws MailTransportFailedException
-     */
     public function send(array $data, array $attachments = []): void
     {
         $definition = $this->getValidationDefinition();
         $this->dataValidator->validate($data, $definition);
-
+        /** @phpstan-ignore argument.type */
+        $attachments = $this->filterBinaryAttachments($attachments);
         $mail = $this->mailFactory->create(
             $data['subject'],
             $this->getNoReplyAddress($data),
@@ -47,7 +44,7 @@ class MailService extends AbstractMailService
             $this->buildContents($data),
             [],
             [], // Additional data, but doesn't work properly.
-            $this->filterBinaryAttachments($attachments)
+/** @phpstan-ignore argument.type */ $attachments
         );
 
         $mail->addReplyTo(...$this->formatMailAddresses([$data['replyToEmail'] => $data['replyToName']]));

@@ -20,6 +20,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -31,7 +32,7 @@ class RemindAction extends BaseAction
      */
     protected $log;
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<SalesChannelEntity>>
      */
     private $repoSalesChannel;
 
@@ -41,7 +42,7 @@ class RemindAction extends BaseAction
     private $reminderValidator;
 
     /**
-     * @param mixed $repoSalesChannel
+     * @param EntityRepository<EntityCollection<SalesChannelEntity>> $repoSalesChannel
      *
      * @throws \Exception
      */

@@ -6,6 +6,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs\ApplePayCartStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ApplePayCartStruct>
+ */
 class GetCartResponse extends StoreApiResponse
 {
     /**

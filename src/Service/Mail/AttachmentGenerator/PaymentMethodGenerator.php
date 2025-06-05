@@ -13,6 +13,7 @@ use Mollie\Api\Resources\Method;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -36,7 +37,7 @@ class PaymentMethodGenerator extends AbstractSalesChannelGenerator
     protected $salesChannelDataExtractor;
 
     /**
-     * @param EntityRepository $salesChannelRepository
+     * @param EntityRepository<EntityCollection<SalesChannelEntity>> $salesChannelRepository
      */
     public function __construct($salesChannelRepository, MollieApiFactory $apiFactory, PaymentMethodRepository $paymentMethodRepository, SalesChannelDataExtractor $salesChannelDataExtractor)
     {

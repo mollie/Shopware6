@@ -8,6 +8,7 @@ use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 /**
  * @final
+ * @extends StoreApiResponse<ArrayStruct<array{sessionId:string,authenticateId:string}>>
  */
 class FinishCheckoutResponse extends StoreApiResponse
 {

@@ -96,7 +96,7 @@ class MollieRefundConfigService
     public function createResponse(OrderLineItemStructCollection $lineItems, MollieSettingStruct $config): ConfigControllerResponse
     {
         $hasRefundableItems = false;
-
+        /** @var OrderLineItemStruct $lineItem */
         foreach ($lineItems as $lineItem) {
             // when the line item has a pending refund, the merchant
             // needs to be able to open the refund manager to cancel the refund

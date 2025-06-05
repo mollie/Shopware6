@@ -6,6 +6,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\POS\Response;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct<array{terminals:array<mixed>}>>
+ */
 class TerminalsResponse extends StoreApiResponse
 {
     /**

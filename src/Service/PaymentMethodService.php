@@ -190,6 +190,7 @@ class PaymentMethodService
                     }
                 }
 
+                /** @phpstan-ignore-next-line  */
                 if ($this->versionCompare->gte('6.5.7.0') && method_exists($existingPaymentMethod, 'getTechnicalName')) {
                     // we do a string cast here, since getTechnicalName will be not nullable in the future
                     /** @phpstan-ignore-next-line  */
@@ -430,6 +431,7 @@ class PaymentMethodService
 
         if (! $paymentMethod instanceof PaymentMethodEntity) {
             $criteria = new Criteria([$paymentMethodId]);
+            /** @var PaymentMethodEntity $paymentMethod */
             $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
         }
 

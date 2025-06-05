@@ -3,13 +3,17 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\Subscription\Response;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct<array{subscriptions:array<SubscriptionEntity>}>>
+ */
 class SubscriptionsListResponse extends StoreApiResponse
 {
     /**
-     * @param array<mixed> $subscriptions
+     * @param array<SubscriptionEntity> $subscriptions
      */
     public function __construct(array $subscriptions)
     {

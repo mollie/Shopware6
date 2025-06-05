@@ -7,6 +7,9 @@ use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct<array{mandates:array}>>
+ */
 class CreditCardMandatesResponse extends StoreApiResponse
 {
     public function __construct(MandateCollection $mandates)

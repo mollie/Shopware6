@@ -5,8 +5,10 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class SettingsService implements PluginSettingsServiceInterface
@@ -33,7 +35,7 @@ class SettingsService implements PluginSettingsServiceInterface
     protected $systemConfigService;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<SalesChannelEntity>>
      */
     private $repoSalesChannels;
 
@@ -59,7 +61,7 @@ class SettingsService implements PluginSettingsServiceInterface
     private array $cachedStructs = [];
 
     /**
-     * @param EntityRepository $repoSalesChannels
+     * @param EntityRepository<EntityCollection<SalesChannelEntity>> $repoSalesChannels
      */
     public function __construct(SystemConfigService $systemConfigService, $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {

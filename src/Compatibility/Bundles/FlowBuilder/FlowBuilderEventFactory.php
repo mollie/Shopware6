@@ -41,22 +41,29 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatus
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\WebhookStatusReceived\WebhookReceivedRefundedEvent;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\Context\AbstractSalesChannelContextFactory;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FlowBuilderEventFactory
 {
     private const SW_VERSION_651 = '6.5.1.0';
+    private const SW_VERSION_67 = '6.7.0.0';
     /**
      * @var VersionCompare
      */
     private $versionCompare;
+    private AbstractSalesChannelContextFactory $salesChannelContextFactory;
 
-    public function __construct(string $shopwareVersion)
+    public function __construct(VersionCompare $versionCompare, AbstractSalesChannelContextFactory $salesChannelContextFactory)
     {
-        $this->versionCompare = new VersionCompare($shopwareVersion);
+        $this->versionCompare = $versionCompare;
+        $this->salesChannelContextFactory = $salesChannelContextFactory;
     }
 
     /**
@@ -381,5 +388,16 @@ class FlowBuilderEventFactory
         }
 
         return new OrderCanceledEvent($order, $customer, $context);
+    }
+
+    public function buildCheckoutOrderPlacedEvent(OrderEntity $newOrder, Context $context): Event
+    {
+        if ($this->versionCompare->gte(self::SW_VERSION_67)) {
+            $salesChannelContext = $this->salesChannelContextFactory->create(Uuid::randomHex(), $newOrder->getSalesChannelId());
+            /** @phpstan-ignore-next-line  */
+            return new CheckoutOrderPlacedEvent($salesChannelContext, $newOrder);
+        }
+        /** @phpstan-ignore-next-line  */
+        return new CheckoutOrderPlacedEvent($context, $newOrder, $newOrder->getSalesChannelId());
     }
 }

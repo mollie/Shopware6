@@ -7,6 +7,8 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatche
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactoryInterface;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
@@ -40,7 +42,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 class RefundManager implements RefundManagerInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<RefundCollection<RefundEntity>>
      */
     protected $refundRepository;
     /**
@@ -85,7 +87,7 @@ class RefundManager implements RefundManagerInterface
     private RefundCreditNoteService $creditNoteService;
 
     /**
-     * @param EntityRepository $refundRepository
+     * @param EntityRepository<RefundCollection<RefundEntity>> $refundRepository
      */
     public function __construct(
         RefundDataBuilder $refundDataBuilder,
@@ -125,7 +127,7 @@ class RefundManager implements RefundManagerInterface
                 0.0,
                 0.0,
                 0.0,
-                $order->getTaxStatus(),
+                (string) $order->getTaxStatus(),
             );
         }
     }

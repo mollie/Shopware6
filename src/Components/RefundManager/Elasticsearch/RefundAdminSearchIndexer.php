@@ -5,7 +5,9 @@ namespace Kiener\MolliePayments\Components\RefundManager\Elasticsearch;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundDefinition;
+use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IterableQuery;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory;
@@ -21,12 +23,12 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
 {
     private Connection $connection;
     private IteratorFactory $factory;
-    /** @var EntityRepository */
+    /** @var EntityRepository<RefundCollection<RefundEntity>> */
     private $repository;
     private int $indexingBatchSize;
 
     /**
-     * @param EntityRepository $repository
+     * @param EntityRepository<RefundCollection<RefundEntity>> $repository
      */
     public function __construct(
         Connection $connection,
@@ -61,7 +63,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
     }
 
     /**
-     * @param array<int, array<string>>|array<string> $ids
+     * @param array<string> $ids
      *
      * @return array<string, array<string, string>>
      */
@@ -81,7 +83,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY + 100, // elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => ParameterType::BINARY, // elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 
@@ -98,7 +100,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
     /**
      * @param array<string, mixed> $result
      *
-     * @return array{total:int, data:EntityCollection<Entity>}
+     * @return array{total:int, data:EntityCollection<RefundEntity>}
      *
      * Return EntityCollection<Entity> and their total by ids in the result parameter
      */

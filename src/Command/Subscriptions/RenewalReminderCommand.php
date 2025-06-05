@@ -13,6 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RenewalReminderCommand extends Command
 {
+    /** @var string */
     public static $defaultName = 'mollie:subscriptions:renewal-reminder';
 
     /**

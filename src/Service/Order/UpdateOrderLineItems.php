@@ -9,18 +9,19 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Types\OrderLineType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class UpdateOrderLineItems
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderLineItemEntity>>
      */
     private $orderLineRepository;
 
     /**
-     * @param EntityRepository $orderLineRepository
+     * @param EntityRepository<EntityCollection<OrderLineItemEntity>> $orderLineRepository
      */
     public function __construct($orderLineRepository)
     {

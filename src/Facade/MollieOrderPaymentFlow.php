@@ -13,6 +13,7 @@ use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
@@ -36,11 +37,11 @@ class MollieOrderPaymentFlow
     /** @var PaymentMethodRepository */
     private $paymentMethodRepository;
 
-    /** @var EntityRepository */
+    /** @var EntityRepository<EntityCollection<OrderTransactionEntity>> */
     private $orderTransactionRepository;
 
     /**
-     * @param EntityRepository $orderTransactionRepository
+     * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
     public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, $orderTransactionRepository)
     {

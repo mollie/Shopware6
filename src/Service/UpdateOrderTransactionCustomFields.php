@@ -4,18 +4,20 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class UpdateOrderTransactionCustomFields
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderTransactionEntity>>
      */
     private $repoTransactions;
 
     /**
-     * @param EntityRepository $repoTransactions
+     * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $repoTransactions
      */
     public function __construct($repoTransactions)
     {

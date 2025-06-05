@@ -7,6 +7,7 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 /**
+ * @extends StoreApiResponse<ArrayStruct<array{sessionId:string,redirectUrl:string|null}>>
  * @final
  */
 class StartCheckoutResponse extends StoreApiResponse

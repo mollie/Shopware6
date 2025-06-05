@@ -7,7 +7,9 @@ use Kiener\MolliePayments\Components\OrderExpiration\ExpireAction;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskEntity;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 #[\Symfony\Component\Messenger\Attribute\AsMessageHandler(handles: ExpireOrderTask::class)]
@@ -16,7 +18,7 @@ class ExpireOrderTaskHandler extends ScheduledTaskHandler
     private ExpireAction $expireAction;
 
     /**
-     * @param EntityRepository $scheduledTaskRepository
+     * @param EntityRepository<EntityCollection<ScheduledTaskEntity>> $scheduledTaskRepository
      */
     public function __construct(
         $scheduledTaskRepository,

@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @final
  *
- *
+ * @template TEntityCollection of EntityCollection
  */
 #[Package('core')]
 class EntityRepository implements EntityRepositoryInterface

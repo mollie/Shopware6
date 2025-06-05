@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Components\RefundManager;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Components\RefundManager\Builder\RefundDataBuilder;
 use Kiener\MolliePayments\Components\RefundManager\RefundManager;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
@@ -27,6 +28,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory;
 
 class RefundManagerTest extends TestCase
 {
@@ -76,8 +78,10 @@ class RefundManagerTest extends TestCase
         $fakeOrder = $this->createDummyMock(Order::class, $this);
         $fakeOrder->method('getMollieOrder')->willReturn(new MollieOrder($this->createMock(MollieApiClient::class)));
 
+        $fakeSalesChannelContextFactory = $this->createMock(SalesChannelContextFactory::class);
+
         $this->fakeFlowBuilderDispatcher = new FakeFlowBuilderDispatcher();
-        $flowBuilderEventFactory = new FlowBuilderEventFactory('6.4.8.0'); // use any higher version so that we get real events
+        $flowBuilderEventFactory = new FlowBuilderEventFactory(new VersionCompare('6.4.8.0'), $fakeSalesChannelContextFactory); // use any higher version so that we get real events
 
         $this->fakeRefundRespository = new FakeRefundRepository();
         $fakeRefundCreditNotesService = $this->createMock(RefundCreditNoteService::class);

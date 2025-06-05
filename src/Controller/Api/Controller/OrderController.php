@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,12 +45,12 @@ class OrderController extends AbstractController
     private $cancelLineController;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderEntity>>
      */
     private $orderRepository;
 
     /**
-     * @param EntityRepository $orderRepository
+     * @param EntityRepository<EntityCollection<OrderEntity>> $orderRepository
      */
     public function __construct(
         RequestBagFactory $requestBagFactory,
@@ -107,8 +108,10 @@ class OrderController extends AbstractController
         if ($orders->count() === 0) {
             throw new \RuntimeException('Order not found');
         }
+        /** @var OrderEntity $order */
+        $order = $orders->first();
 
-        return $orders->first()->getSalesChannelId();
+        return $order->getSalesChannelId();
     }
 
     private function getMollieOrderId(string $orderId, Context $context): string
