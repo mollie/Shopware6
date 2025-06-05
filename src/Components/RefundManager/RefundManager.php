@@ -127,7 +127,7 @@ class RefundManager implements RefundManagerInterface
                 0.0,
                 0.0,
                 0.0,
-                (string)$order->getTaxStatus(),
+                (string) $order->getTaxStatus(),
             );
         }
     }

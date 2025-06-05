@@ -62,9 +62,10 @@ class SubscriptionRepository
         }
         /** @var ?SubscriptionEntity $subscription */
         $subscription = $result->first();
-        if($subscription === null) {
+        if ($subscription === null) {
             throw new SubscriptionNotFoundException($id);
         }
+
         return $subscription;
     }
 

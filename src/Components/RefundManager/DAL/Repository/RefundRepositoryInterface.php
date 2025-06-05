@@ -19,8 +19,6 @@ interface RefundRepositoryInterface
     public function create(array $data, Context $context): EntityWrittenContainerEvent;
 
     /**
-     * @param Criteria $criteria
-     * @param Context $context
      * @return EntitySearchResult<RefundCollection<RefundEntity>>
      */
     public function search(Criteria $criteria, Context $context): EntitySearchResult;

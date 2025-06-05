@@ -36,8 +36,6 @@ class RefundRepository implements RefundRepositoryInterface
     }
 
     /**
-     * @param Criteria $criteria
-     * @param Context $context
      * @return EntitySearchResult<RefundCollection<RefundEntity>>
      */
     public function search(Criteria $criteria, Context $context): EntitySearchResult

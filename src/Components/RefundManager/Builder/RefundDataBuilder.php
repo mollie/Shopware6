@@ -182,7 +182,7 @@ class RefundDataBuilder
         $refundItems = array_merge($refundItems, $refundPromotionItems, $refundDeliveryItems);
 
         // get the tax status of the order
-        $taxStatus = (string)$order->getTaxStatus();
+        $taxStatus = (string) $order->getTaxStatus();
 
         // now fetch some basic values from the API
         // TODO: these API calls should be removed one day, once I have more time (this refund manager is indeed huge) for now it's fine
