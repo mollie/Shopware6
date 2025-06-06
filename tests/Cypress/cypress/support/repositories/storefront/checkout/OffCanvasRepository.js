@@ -28,7 +28,12 @@ export default class OffCanvasRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
-    getPayPalExpressButton(){
+    getPayPalExpressButton() {
         return cy.get('.mollie-paypal-express-offcanvas button[name="paypal-express"]');
     }
+
+    getDataPrivacyCheckbox() {
+        return cy.get('.offcanvas-cart #acceptedDataProtection');
+    }
+
 }

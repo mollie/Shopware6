@@ -32,4 +32,10 @@ export default class ListingRepository {
     getPayPalExpressButton(){
         return cy.get('.mollie-paypal-express-plp button[name="paypal-express"]')
     }
+
+    getDataPrivacyCheckbox() {
+        return cy.get('#acceptedDataProtection');
+    }
+
 }
+
