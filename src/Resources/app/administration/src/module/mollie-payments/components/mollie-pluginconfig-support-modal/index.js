@@ -121,7 +121,7 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         molliePlugin() {
-            return this.plugins.find((plugin) => plugin.name === 'MolliePayments');
+            return this.plugins.findClosest((plugin) => plugin.name === 'MolliePayments');
         },
 
         mollieVersion() {

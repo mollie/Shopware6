@@ -1,5 +1,7 @@
 export default class BuyElementRepository {
+
     find(target) {
+
         let buyElementContainer = target.closest('.product-action');
 
         if (buyElementContainer === null) {
