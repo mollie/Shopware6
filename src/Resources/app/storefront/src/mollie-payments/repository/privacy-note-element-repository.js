@@ -8,7 +8,7 @@ export class PrivacyNoteElementRepository {
         this.buyElementRepository = new BuyElementRepository();
     }
 
-    find(button) {
+    findClosest(button) {
         const buyElementContainer = this.buyElementRepository.find(button);
         if (buyElementContainer === null) {
             return null;

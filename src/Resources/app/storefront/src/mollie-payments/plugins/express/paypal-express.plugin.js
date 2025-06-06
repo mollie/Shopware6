@@ -1,7 +1,7 @@
-import Plugin from '../plugin';
-import ExpressButtonsRepository from '../repository/express-buttons-repository';
-import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
-import { MOLLIE_BIND_EXPRESS_EVENTS } from './mollie-express-actions.plugin';
+import Plugin from '../../plugin';
+import ExpressButtonsRepository from '../../repository/express-buttons-repository';
+import { PrivacyNoteElementRepository } from '../../repository/privacy-note-element-repository';
+import { MOLLIE_BIND_EXPRESS_EVENTS } from '../mollie-express-actions.plugin';
 
 const MOLLIE_PAYPAL_BUTTON_SELECTOR = '.mollie-paypal-button';
 const DATA_FORM_ACTION_ATTR = 'data-form-action';
@@ -71,7 +71,7 @@ export default class PayPalExpressPlugin extends Plugin {
         form.setAttribute('method', 'POST');
 
         const privacyNoteElement = new PrivacyNoteElementRepository();
-        const privacyNote = privacyNoteElement.find(clickedButton);
+        const privacyNote = privacyNoteElement.findClosest(clickedButton);
         if (privacyNote instanceof HTMLDivElement) {
             const checkbox = privacyNoteElement.getCheckbox(privacyNote);
             const checkboxValue = checkbox.checked ? 'on' : '';

@@ -1,7 +1,7 @@
 import Plugin from '../plugin';
 import { PrivacyNoteElementRepository } from '../repository/privacy-note-element-repository';
 import BuyButtonRepository from '../repository/buy-button-repository';
-import ExpressAddToCartService from '../services/express-add-to-cart.service';
+import AddToCartService from '../services/express/add-to-cart.service';
 
 export const MOLLIE_BIND_EXPRESS_EVENTS = 'BindExpressEvents';
 
@@ -18,6 +18,8 @@ export class MollieExpressActions extends Plugin {
                 pluginOffCanvas.$emitter.subscribe('offCanvasOpened', this.bindEvents.bind(this));
             });
         }
+
+        return;
 
         this.bindEvents();
     }
@@ -79,7 +81,7 @@ export class MollieExpressActions extends Plugin {
 
         const privacyNote = new PrivacyNoteElementRepository();
 
-        const privacyNoteElement = privacyNote.find(target);
+        const privacyNoteElement = privacyNote.findClosest(target);
 
         if (privacyNoteElement instanceof HTMLDivElement) {
             privacyNoteElement.classList.add(WAS_VALIDATED_CLS);
@@ -89,14 +91,13 @@ export class MollieExpressActions extends Plugin {
             }
         }
 
-        const expressAddToCart = new ExpressAddToCartService();
+        const expressAddToCart = new AddToCartService();
 
-        expressAddToCart.addItemToCartOrSkip(target).then(() => {
-            // set to processed
-            target.classList.add(PROCESSED_CLS);
-            // now trigger click event again for the real button
-            const mollieEvent = new event.constructor(event.type, event);
-            target.dispatchEvent(mollieEvent);
-        });
+        expressAddToCart.addItemToCartOrSkip(target);
+        // set to processed
+        target.classList.add(PROCESSED_CLS);
+        // now trigger click event again for the real button
+        const mollieEvent = new event.constructor(event.type, event);
+        target.dispatchEvent(mollieEvent);
     }
 }
