@@ -15,4 +15,9 @@ export default class CartRepository {
     getPayPalExpressButton(){
         return cy.get('.mollie-paypal-express-cart button[name="paypal-express"]');
     }
+
+    getDataPrivacyCheckbox() {
+        return cy.get('#acceptedDataProtection');
+    }
+
 }
