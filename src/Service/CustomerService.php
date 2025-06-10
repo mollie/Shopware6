@@ -506,6 +506,7 @@ class CustomerService implements CustomerServiceInterface
         });
 
         if ($boundCustomers->getTotal() > 0) {
+            /** @var ?CustomerEntity $foundCustomer */
             $foundCustomer = $boundCustomers->first();
         }
         if ($foundCustomer === null) {

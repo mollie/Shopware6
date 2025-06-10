@@ -135,7 +135,12 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
 
         $result = $this->repoOrderTransactions->search($criteria, $context);
+        /** @var ?OrderTransactionEntity $orderTransaction */
+        $orderTransaction = $result->first();
+        if ($orderTransaction === null) {
+            return null;
+        }
 
-        return $result->first();
+        return $orderTransaction;
     }
 }

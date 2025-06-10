@@ -61,10 +61,14 @@ class DeliveryService
         }
 
         $deliveryCriteria->addAssociation('order');
+        $orderDeliverySearchResult = $this->orderDeliveryRepository->search($deliveryCriteria, $context ?? Context::createDefaultContext());
+        /** @var ?OrderDeliveryEntity $orderDelivery */
+        $orderDelivery = $orderDeliverySearchResult->first();
+        if ($orderDelivery === null) {
+            return null;
+        }
 
-        return $this->orderDeliveryRepository
-            ->search($deliveryCriteria, $context ?? Context::createDefaultContext())->first()
-        ;
+        return $orderDelivery;
     }
 
     /**

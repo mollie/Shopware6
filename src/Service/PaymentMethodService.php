@@ -341,8 +341,13 @@ class PaymentMethodService
         if ($paymentMethods->getTotal() === 0) {
             return null;
         }
+        /** @var ?PaymentMethodEntity $paymentMethod */
+        $paymentMethod = $paymentMethods->first();
+        if ($paymentMethod === null) {
+            return null;
+        }
 
-        return $paymentMethods->first();
+        return $paymentMethod;
     }
 
     /**
@@ -456,8 +461,13 @@ class PaymentMethodService
         if ($paymentMethods->getTotal() === 0) {
             return null;
         }
+        /** @var ?PaymentMethodEntity $paymentMethod */
+        $paymentMethod = $paymentMethods->first();
+        if ($paymentMethod === null) {
+            return null;
+        }
 
-        return $paymentMethods->first();
+        return $paymentMethod;
     }
 
     /**

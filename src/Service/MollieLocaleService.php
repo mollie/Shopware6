@@ -59,7 +59,7 @@ class MollieLocaleService
         $languageCriteria->addAssociation('locale');
 
         $languagesResult = $this->repoLanguages->search($languageCriteria, $salesChannelContext->getContext());
-
+        /** @var ?LanguageEntity $language */
         $language = $languagesResult->first();
 
         if ($language !== null && $language->getLocale() !== null) {

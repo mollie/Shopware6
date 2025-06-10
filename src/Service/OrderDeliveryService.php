@@ -31,8 +31,15 @@ class OrderDeliveryService
         $criteria->addAssociation('order.deliveries.shippingMethod');
         $criteria->addAssociation('order.deliveries.stateMachineState');
         $criteria->addAssociation('shippingMethod');
+        $orderDeliverySearchResult = $this->orderDeliveryRepository->search($criteria, $context);
 
-        return $this->orderDeliveryRepository->search($criteria, $context)->first();
+        /** @var ?OrderDeliveryEntity $orderDelivery */
+        $orderDelivery = $orderDeliverySearchResult->first();
+        if ($orderDelivery === null) {
+            return null;
+        }
+
+        return $orderDelivery;
     }
 
     /**
