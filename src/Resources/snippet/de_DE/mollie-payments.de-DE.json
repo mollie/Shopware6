@@ -119,6 +119,10 @@
                 "information": "Abonnementprodukt"
             }
         },
+        "order": {
+          "refundedLabel": "Rückerstattet:",
+          "refundPendingLabel": "Rückerstattung ausstehend:"
+        },
         "testMode": {
             "label": "Testmodus"
         }
