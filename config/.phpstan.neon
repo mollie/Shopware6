@@ -29,6 +29,11 @@ parameters:
     		- identifier: class.notFound
     		- identifier: generics.notCompatible
     		- identifier: generics.notGeneric
+    		- identifier: generics.lessTypes
+    		- identifier: return.unresolvableType
+    		- identifier: property.unresolvableType
+    		- identifier: parameter.unresolvableType
+    		- identifier: varTag.unresolvableType
 
 services:
     - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
