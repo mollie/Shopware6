@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.16.0] - TBD
 ### Added
 - Added Compatibility with Shopware 6.7
 - Added Norwegian language support
