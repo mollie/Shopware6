@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Controller\Storefront\AbstractStoreFrontController;
 use Kiener\MolliePayments\Repository\OrderRepository;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -124,6 +125,7 @@ class WebhookControllerBase extends AbstractStoreFrontController
             if ($existingOrders->count() <= 0) {
                 $swOrder = $this->subscriptions->renewSubscription($swSubscriptionId, $molliePaymentId, $context->getContext());
             } else {
+                /** @var OrderEntity $swOrder */
                 $swOrder = $existingOrders->last();
             }
 

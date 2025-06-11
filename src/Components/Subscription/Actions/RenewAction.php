@@ -21,7 +21,6 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Event\CheckoutOrderPlacedEvent;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
@@ -148,7 +147,7 @@ class RenewAction extends BaseAction
         $this->getFlowBuilderDispatcher()->dispatch($event);
 
         // send original checkout-order-placed of shopware
-        $event = new CheckoutOrderPlacedEvent($context, $newOrder, $newOrder->getSalesChannelId());
+        $event = $this->getFlowBuilderEventFactory()->buildCheckoutOrderPlacedEvent($newOrder, $context);
         $this->getFlowBuilderDispatcher()->dispatch($event);
 
         // if this was our last renewal, then send out

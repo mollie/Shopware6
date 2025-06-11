@@ -29,6 +29,9 @@ class PosControllerBase
         $this->mollieGateway = $mollieGateway;
     }
 
+    /**
+     * @return TerminalsResponse
+     */
     public function getIssuers(SalesChannelContext $context): StoreApiResponse
     {
         $this->mollieGateway->switchClient($context->getSalesChannelId());
@@ -49,6 +52,8 @@ class PosControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return StoreTerminalResponse
      */
     public function saveTerminalId(string $customerId, string $terminalID, SalesChannelContext $context): StoreApiResponse
     {

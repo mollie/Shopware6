@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Service;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -16,14 +17,14 @@ class DeliveryService
     private const PARAM_IS_SHIPPED = 'is_shipped';
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderDeliveryEntity>>
      */
     private $orderDeliveryRepository;
 
     /**
      * Creates a new instance of the transaction service.
      *
-     * @param mixed $orderDeliveryRepository
+     * @param EntityRepository<EntityCollection<OrderDeliveryEntity>> $orderDeliveryRepository
      */
     public function __construct($orderDeliveryRepository)
     {
@@ -60,10 +61,14 @@ class DeliveryService
         }
 
         $deliveryCriteria->addAssociation('order');
+        $orderDeliverySearchResult = $this->orderDeliveryRepository->search($deliveryCriteria, $context ?? Context::createDefaultContext());
+        /** @var ?OrderDeliveryEntity $orderDelivery */
+        $orderDelivery = $orderDeliverySearchResult->first();
+        if ($orderDelivery === null) {
+            return null;
+        }
 
-        return $this->orderDeliveryRepository
-            ->search($deliveryCriteria, $context ?? Context::createDefaultContext())->first()
-        ;
+        return $orderDelivery;
     }
 
     /**

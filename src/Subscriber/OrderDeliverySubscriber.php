@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -37,7 +38,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     private $orderService;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderTransactionEntity>>
      */
     private $repoOrderTransactions;
 
@@ -47,7 +48,7 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
     private $logger;
 
     /**
-     * @param EntityRepository $repoOrderTransactions
+     * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $repoOrderTransactions
      */
     public function __construct(SettingsService $settings, ShipmentManager $mollieShipment, OrderService $orderService, $repoOrderTransactions, LoggerInterface $logger)
     {
@@ -134,7 +135,12 @@ class OrderDeliverySubscriber implements EventSubscriberInterface
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
 
         $result = $this->repoOrderTransactions->search($criteria, $context);
+        /** @var ?OrderTransactionEntity $orderTransaction */
+        $orderTransaction = $result->first();
+        if ($orderTransaction === null) {
+            return null;
+        }
 
-        return $result->first();
+        return $orderTransaction;
     }
 }

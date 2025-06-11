@@ -31,6 +31,7 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
     {
         return [
             AccountOverviewPageLoadedEvent::class => 'addTestModeInformationToPages',
+            /** @phpstan-ignore class.notFound */
             AccountPaymentMethodPageLoadedEvent::class => 'addTestModeInformationToPages',
             AccountEditOrderPageLoadedEvent::class => 'addTestModeInformationToPages',
             CheckoutConfirmPageLoadedEvent::class => 'addTestModeInformationToPages',

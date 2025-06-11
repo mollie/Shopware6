@@ -273,8 +273,14 @@ class NotificationFacade
         $criteria->addAssociation('order.stateMachineState');
         $criteria->addAssociation('paymentMethod');
         $criteria->addAssociation('stateMachineState');
+        $orderTransactionSearchResult = $this->repoOrderTransactions->getRepository()->search($criteria, $context);
+        /** @var ?OrderTransactionEntity $orderTransaction */
+        $orderTransaction = $orderTransactionSearchResult->first();
+        if ($orderTransaction === null) {
+            return null;
+        }
 
-        return $this->repoOrderTransactions->getRepository()->search($criteria, $context)->first();
+        return $orderTransaction;
     }
 
     private function updatePaymentMethod(OrderTransactionEntity $transaction, Order $mollieOrder, Context $context): void

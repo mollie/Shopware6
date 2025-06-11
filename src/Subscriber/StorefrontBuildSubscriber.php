@@ -18,6 +18,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $settingsService;
 
+    /** @phpstan-ignore class.notFound */
     /**
      * @var StorefrontPluginRegistry|StorefrontPluginRegistryInterface
      */
@@ -28,6 +29,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
      */
     private $versionCompare;
 
+    /** @phpstan-ignore class.notFound */
     /** @param StorefrontPluginRegistry|StorefrontPluginRegistryInterface $pluginRegistry */
     public function __construct(SettingsService $settingsService, $pluginRegistry, VersionCompare $versionCompare)
     {
@@ -56,6 +58,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
         $mollieJavascriptAlreadyExists = false;
 
         if ($this->versionCompare->gte('6.6')) {
+            /** @phpstan-ignore class.notFound */
             $plugin = $this->pluginRegistry->getConfigurations()->getByTechnicalName('MolliePayments');
 
             if ($plugin instanceof StorefrontPluginConfiguration) {

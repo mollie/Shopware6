@@ -5,7 +5,9 @@ namespace Kiener\MolliePayments\Components\Subscription\Elasticsearch;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IterableQuery;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory;
@@ -21,12 +23,12 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
 {
     private Connection $connection;
     private IteratorFactory $factory;
-    /** @var EntityRepository */
+    /** @var EntityRepository<SubscriptionCollection<SubscriptionEntity>> */
     private $repository;
     private int $indexingBatchSize;
 
     /**
-     * @param EntityRepository $repository
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $repository
      */
     public function __construct(
         Connection $connection,
@@ -61,7 +63,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
     }
 
     /**
-     * @param array<int, array<string>>|array<string> $ids
+     * @param array<string> $ids
      *
      * @return array<string, array<string, string>>
      */
@@ -86,7 +88,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY + 100, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => ParameterType::BINARY, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 
@@ -103,7 +105,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
     /**
      * @param array<string, mixed> $result
      *
-     * @return array{total:int, data:EntityCollection<Entity>}
+     * @return array{total:int, data:EntityCollection<SubscriptionEntity>}
      *
      * Return EntityCollection<Entity> and their total by ids in the result parameter
      */

@@ -34,6 +34,8 @@ class CreditCardControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return StoreCardTokenResponse
      */
     public function saveCardToken(string $customerId, string $cardToken, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
@@ -57,6 +59,8 @@ class CreditCardControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return StoreMandateIdResponse
      */
     public function saveMandateId(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
@@ -77,6 +81,8 @@ class CreditCardControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return RevokeMandateResponse
      */
     public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
@@ -87,6 +93,8 @@ class CreditCardControllerBase
 
     /**
      * @throws \Exception
+     *
+     * @return CreditCardMandatesResponse
      */
     public function getMandates(string $customerId, SalesChannelContext $context): StoreApiResponse
     {

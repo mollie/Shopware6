@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Service;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 class ShippingMethodService
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<ShippingMethodEntity>>
      */
     private $shippingMethodRepository;
 
@@ -28,7 +29,7 @@ class ShippingMethodService
     /**
      * Creates a new instance of the shipping method repository.
      *
-     * @param EntityRepository $shippingMethodRepository
+     * @param EntityRepository<EntityCollection<ShippingMethodEntity>> $shippingMethodRepository
      */
     public function __construct($shippingMethodRepository, AbstractShippingMethodRoute $shippingMethodRoute)
     {

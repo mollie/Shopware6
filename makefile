@@ -123,7 +123,7 @@ ifeq ($(mode), fix)
 endif
 
 stan: ##3 Starts the PHPStan Analyser
-	@php vendor/bin/phpstan analyse -c ./config/.phpstan.neon
+	cd ../../.. && php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon
 
 phpunit: ##3 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage

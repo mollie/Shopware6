@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
@@ -24,7 +25,7 @@ class OrderStatusUpdater
     private $orderHandler;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<OrderEntity>>
      */
     private $repoOrders;
 
@@ -39,13 +40,13 @@ class OrderStatusUpdater
     private $logger;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<EntityCollection<StateMachineStateEntity>>
      */
     private $stateMachineStateRepository;
 
     /**
-     * @param EntityRepository $repoOrders
-     * @param EntityRepository $stateMachineStateRepository
+     * @param EntityRepository<EntityCollection<OrderEntity>> $repoOrders
+     * @param EntityRepository<EntityCollection<StateMachineStateEntity>> $stateMachineStateRepository
      */
     public function __construct(OrderStateService $orderHandler, $repoOrders, TransactionTransitionServiceInterface $transactionTransitionService, $stateMachineStateRepository, LoggerInterface $logger)
     {

@@ -6,6 +6,9 @@ namespace Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Response;
 use Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\Structs\ShippingMethodsStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ShippingMethodsStruct>
+ */
 class GetShippingMethodsResponse extends StoreApiResponse
 {
     /**

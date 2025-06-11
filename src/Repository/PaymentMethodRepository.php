@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Repository;
 
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 
@@ -12,12 +14,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 class PaymentMethodRepository
 {
     /**
-     * @var EntityRepository|EntityRepositoryInterface
+     * @var EntityRepository<EntityCollection<PaymentMethodEntity>>|EntityRepositoryInterface<EntityCollection<PaymentMethodEntity>>
      */
     private $repository;
 
     /**
-     * @param EntityRepository|EntityRepositoryInterface $repository
+     * @param EntityRepository<EntityCollection<PaymentMethodEntity>>|EntityRepositoryInterface<EntityCollection<PaymentMethodEntity>> $repository
      */
     public function __construct($repository)
     {
@@ -25,7 +27,7 @@ class PaymentMethodRepository
     }
 
     /**
-     * @return EntityRepository|EntityRepositoryInterface
+     * @return EntityRepository<EntityCollection<PaymentMethodEntity>>|EntityRepositoryInterface<EntityCollection<PaymentMethodEntity>>
      */
     public function getRepository()
     {

@@ -235,6 +235,7 @@ class MollieOrderBuilder
         // but valid use cases might be the injection of custom metadata for example.
         // please do not use this unless you know what you are doing!
         $event = new MollieOrderBuildEvent($orderData, $order, $transactionId, $salesChannelContext);
+        /** @var MollieOrderBuildEvent|object $event */
         $event = $this->eventDispatcher->dispatch($event);
 
         if (! $event instanceof MollieOrderBuildEvent) {

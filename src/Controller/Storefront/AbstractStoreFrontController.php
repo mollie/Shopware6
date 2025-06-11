@@ -10,9 +10,6 @@ abstract class AbstractStoreFrontController extends StorefrontController
 {
     /**
      * Since Shopware 6.6.0.0 twig must be set with setTwig method, prior the method does not exists
-     *
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function setContainer(ContainerInterface $container): ?ContainerInterface
     {
