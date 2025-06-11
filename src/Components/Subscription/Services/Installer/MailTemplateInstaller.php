@@ -299,6 +299,7 @@ class MailTemplateInstaller
                 ';
 
         $statement = $connection->executeQuery($sql, ['code' => $locale]);
+        /** @phpstan-ignore-next-line  */
         $languageId = $statement->fetchOne();
 
         if (! $languageId) {
