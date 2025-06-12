@@ -123,10 +123,14 @@ class RefundDataBuilder
                     }
                 }
 
+                // Clone to make sure we do not modify the original entity.
+                $item = clone $item;
+                $item->setQuantity($quantity);
+
                 $taxTotal = round($lineItemTax, 2);
                 $taxPerItem = floor($taxTotal / $quantity * 100) / 100;
                 $taxDiff = round($taxTotal - ($taxPerItem * $quantity), 2);
-
+                
                 // this is just a way to move the promotions to the last positions of our array.
                 // also, shipping-free promotions have their discount item in the deliveries,...so here would just
                 // be a 0,00 value line item, that we want to skip.
