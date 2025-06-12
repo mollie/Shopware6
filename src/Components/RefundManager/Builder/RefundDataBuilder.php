@@ -109,9 +109,23 @@ class RefundDataBuilder
                     $alreadyRefundedQty = $this->getRefundedQuantity($mollieOrderLineId, $mollieOrder, $refunds);
                 }
 
-                $taxTotal = round($this->calculateLineItemTaxTotal($item), 2);
-                $taxPerItem = floor($taxTotal / $item->getQuantity() * 100) / 100;
-                $taxDiff = round($taxTotal - ($taxPerItem * $item->getQuantity()), 2);
+                $quantity = 0;
+                $lineItemTax = 0;
+
+                if ($mollieOrder instanceof \Mollie\Api\Resources\Order) {
+                    /** @var OrderLine $mollieLine */
+                    foreach ($mollieOrder->lines as $mollieLine) {
+                        if ($mollieLine->id === $mollieOrderLineId) {
+                            $quantity += $mollieLine->quantity;
+                            $lineItemTax += $mollieLine->vatAmount;
+                            break;
+                        }
+                    }
+                }
+
+                $taxTotal = round($lineItemTax, 2);
+                $taxPerItem = floor($taxTotal / $quantity * 100) / 100;
+                $taxDiff = round($taxTotal - ($taxPerItem * $quantity), 2);
 
                 // this is just a way to move the promotions to the last positions of our array.
                 // also, shipping-free promotions have their discount item in the deliveries,...so here would just
