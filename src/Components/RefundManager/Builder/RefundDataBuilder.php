@@ -117,7 +117,7 @@ class RefundDataBuilder
                     foreach ($mollieOrder->lines as $mollieLine) {
                         if ($mollieLine->id === $mollieOrderLineId) {
                             $quantity += $mollieLine->quantity;
-                            $lineItemTax += $mollieLine->vatAmount;
+                            $lineItemTax += $mollieLine->vatAmount->value;
                             break;
                         }
                     }
