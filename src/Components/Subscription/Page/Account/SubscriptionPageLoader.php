@@ -175,8 +175,12 @@ class SubscriptionPageLoader
     private function getCountries(SalesChannelContext $salesChannelContext): CountryCollection
     {
         $criteria = (new Criteria())
-            ->addFilter(new EqualsFilter('country.active', true))
+            ->addFilter(new EqualsFilter('active', true))
             ->addAssociation('states')
+            ->addSorting(new FieldSorting('position', FieldSorting::DESCENDING))
+            ->addSorting(new FieldSorting('name', FieldSorting::DESCENDING, true))
+            ->addSorting(new FieldSorting('states.position', FieldSorting::DESCENDING))
+            ->addSorting(new FieldSorting('states.name', FieldSorting::DESCENDING, true))
         ;
 
         /** @var string $version */
@@ -190,8 +194,6 @@ class SubscriptionPageLoader
             // @phpstan-ignore-next-line
             $countries = $this->countryRoute->load($criteria, $salesChannelContext)->getCountries();
         }
-
-        $countries->sortCountryAndStates();
 
         return $countries;
     }
