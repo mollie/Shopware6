@@ -220,7 +220,7 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\OrderCreateService">
+        <service id="Kiener\MolliePayments\Service\OrderCreateService" public="true">
             <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Validation\OrderValidationFactory"/>
             <argument type="service" id="event_dispatcher"/>
