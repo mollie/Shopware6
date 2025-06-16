@@ -13,13 +13,11 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentMethod;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -59,12 +57,13 @@ class OrderService implements OrderServiceInterface
      * @var OrderDeliveryService
      */
     private $orderDeliveryService;
-    private ContainerInterface $container;
+
+    private OrderCreateService $orderCreateService;
 
     /**
      * @param EntityRepository<EntityCollection<OrderEntity>> $orderRepository
      */
-    public function __construct($orderRepository, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, ContainerInterface $container, LoggerInterface $logger)
+    public function __construct($orderRepository, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, OrderCreateService $orderCreateService, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
 
@@ -73,7 +72,8 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
         $this->orderDeliveryService = $orderDeliveryService;
         $this->logger = $logger;
-        $this->container = $container;
+
+        $this->orderCreateService = $orderCreateService;
     }
 
     public function getOrder(string $orderId, Context $context): OrderEntity
@@ -193,8 +193,7 @@ class OrderService implements OrderServiceInterface
 
     public function createOrder(DataBag $data, SalesChannelContext $context): OrderEntity
     {
-        $swOrderService = $this->container->get(ShopwareOrderService::class);
-        $orderId = $swOrderService->createOrder($data, $context);
+        $orderId = $this->orderCreateService->createOrder($data, $context);
 
         return $this->getOrder($orderId, $context->getContext());
     }
