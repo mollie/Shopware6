@@ -19,7 +19,6 @@ use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\SalesChannel\OrderService as ShopwareOrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -59,6 +58,7 @@ class OrderService implements OrderServiceInterface
      * @var OrderDeliveryService
      */
     private $orderDeliveryService;
+
     private ContainerInterface $container;
 
     /**
@@ -73,6 +73,7 @@ class OrderService implements OrderServiceInterface
         $this->updateOrderTransactionCustomFields = $updateOrderTransactionCustomFields;
         $this->orderDeliveryService = $orderDeliveryService;
         $this->logger = $logger;
+
         $this->container = $container;
     }
 
@@ -193,8 +194,10 @@ class OrderService implements OrderServiceInterface
 
     public function createOrder(DataBag $data, SalesChannelContext $context): OrderEntity
     {
-        $swOrderService = $this->container->get(ShopwareOrderService::class);
-        $orderId = $swOrderService->createOrder($data, $context);
+        /** @var OrderCreateService $orderCreateService */
+        $orderCreateService = $this->container->get(OrderCreateService::class);
+
+        $orderId = $orderCreateService->createOrder($data, $context);
 
         return $this->getOrder($orderId, $context->getContext());
     }
