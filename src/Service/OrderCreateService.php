@@ -79,6 +79,7 @@ class OrderCreateService
         $flatLineItems = $lineItems->getFlat();
         /** @var LineItem $lineItem */
         foreach ($flatLineItems as $lineItem) {
+            /** @phpstan-ignore-next-line  */
             if (! method_exists($lineItem, 'getStates')) {
                 return false;
             }
