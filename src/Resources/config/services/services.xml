@@ -49,7 +49,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderDeliveryService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderCreateService"/>
+            <argument type="service" id="service_container"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 

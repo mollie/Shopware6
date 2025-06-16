@@ -6,7 +6,6 @@ namespace Kiener\MolliePayments\Tests\Service;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
-use Kiener\MolliePayments\Service\OrderCreateService;
 use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
@@ -20,7 +19,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\Filter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 class OrderServiceTest extends TestCase
@@ -47,7 +45,7 @@ class OrderServiceTest extends TestCase
             $this->createMock(UpdateOrderCustomFields::class),
             $this->createMock(UpdateOrderTransactionCustomFields::class),
             $this->createMock(OrderDeliveryService::class),
-            $this->createMock(OrderCreateService::class),
+            $this->createMock(ContainerInterface::class),
             new NullLogger()
         );
     }

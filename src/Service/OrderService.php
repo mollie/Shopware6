@@ -13,6 +13,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\PaymentMethod;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\CartException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -58,12 +59,12 @@ class OrderService implements OrderServiceInterface
      */
     private $orderDeliveryService;
 
-    private OrderCreateService $orderCreateService;
+    private ContainerInterface $container;
 
     /**
      * @param EntityRepository<EntityCollection<OrderEntity>> $orderRepository
      */
-    public function __construct($orderRepository, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, OrderCreateService $orderCreateService, LoggerInterface $logger)
+    public function __construct($orderRepository, Order $mollieOrderService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderTransactionCustomFields $updateOrderTransactionCustomFields, OrderDeliveryService $orderDeliveryService, ContainerInterface $container, LoggerInterface $logger)
     {
         $this->orderRepository = $orderRepository;
 
@@ -73,7 +74,7 @@ class OrderService implements OrderServiceInterface
         $this->orderDeliveryService = $orderDeliveryService;
         $this->logger = $logger;
 
-        $this->orderCreateService = $orderCreateService;
+        $this->container = $container;
     }
 
     public function getOrder(string $orderId, Context $context): OrderEntity
@@ -193,7 +194,10 @@ class OrderService implements OrderServiceInterface
 
     public function createOrder(DataBag $data, SalesChannelContext $context): OrderEntity
     {
-        $orderId = $this->orderCreateService->createOrder($data, $context);
+        /** @var OrderCreateService $orderCreateService */
+        $orderCreateService = $this->container->get(OrderCreateService::class);
+
+        $orderId = $orderCreateService->createOrder($data, $context);
 
         return $this->getOrder($orderId, $context->getContext());
     }

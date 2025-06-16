@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service;
 
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\Exception\PaymentMethodNotAvailableException;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Content\Product\State;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -26,12 +27,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * This class is use for Apple Pay direct to create an order.
- * There is a class from Shopware to create the order, but this class creates and endless loop in lower shopware versions. only lazy fetch from Container works.
+ * There is a class from Shopware to create the order, but this class creates and endless loop in lower shopware versions if you inject the order service via DI. only lazy fetch from Container works.
  * however in newer version this class is not public anymore so fetching from container throws an exceptions.
  * because of this, we copy the functionality and use this class instead
  */
 class OrderCreateService
 {
+    public const IS_DOWNLOAD = 'is-download';
     private DataValidator $dataValidator;
     private DataValidationFactoryInterface $orderValidationFactory;
     private EventDispatcherInterface $eventDispatcher;
@@ -49,7 +51,7 @@ class OrderCreateService
         DataValidationFactoryInterface $orderValidationFactory,
         EventDispatcherInterface $eventDispatcher,
         CartService $cartService,
-        $paymentMethodRepository
+                                       $paymentMethodRepository
     ) {
         $this->dataValidator = $dataValidator;
         $this->orderValidationFactory = $orderValidationFactory;
@@ -64,12 +66,28 @@ class OrderCreateService
     public function createOrder(DataBag $data, SalesChannelContext $context): string
     {
         $cart = $this->cartService->getCart($context->getToken(), $context);
-
-        $this->validateOrderData($data, $context, $cart->getLineItems()->hasLineItemWithState(State::IS_DOWNLOAD));
+        $hasVirtualGoods = $this->hasLineItemWithState($cart->getLineItems(), self::IS_DOWNLOAD);
+        $this->validateOrderData($data, $context, $hasVirtualGoods);
 
         $this->validateCart($cart, $context->getContext());
 
         return $this->cartService->order($cart, $context, $data->toRequestDataBag());
+    }
+
+    private function hasLineItemWithState(LineItemCollection $lineItems, string $state): bool
+    {
+        $flatLineItems = $lineItems->getFlat();
+        /** @var LineItem $lineItem */
+        foreach ($flatLineItems as $lineItem) {
+            if (! method_exists($lineItem, 'getStates')) {
+                return false;
+            }
+            if (\in_array($state, $lineItem->getStates(), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
