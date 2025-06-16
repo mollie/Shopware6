@@ -6,6 +6,8 @@ namespace Kiener\MolliePayments\Service;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\Exception\PaymentMethodNotAvailableException;
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Product\State;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -34,17 +36,20 @@ class OrderCreateService
     private DataValidationFactoryInterface $orderValidationFactory;
     private EventDispatcherInterface $eventDispatcher;
     private CartService $cartService;
-    private EntityRepository $paymentMethodRepository;
+    /**
+     * @var EntityRepository<PaymentMethodCollection<PaymentMethodEntity>>
+     */
+    private $paymentMethodRepository;
 
     /**
-     * @internal
+     * @param EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $paymentMethodRepository
      */
     public function __construct(
         DataValidator $dataValidator,
         DataValidationFactoryInterface $orderValidationFactory,
         EventDispatcherInterface $eventDispatcher,
         CartService $cartService,
-        EntityRepository $paymentMethodRepository,
+        $paymentMethodRepository
     ) {
         $this->dataValidator = $dataValidator;
         $this->orderValidationFactory = $orderValidationFactory;
