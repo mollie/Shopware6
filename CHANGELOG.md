@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [4.16.0] - TBD
+## [4.16.0] - 2025-06-18
+
 ### Added
 - Added Compatibility with Shopware 6.7
 - Added Norwegian language support
