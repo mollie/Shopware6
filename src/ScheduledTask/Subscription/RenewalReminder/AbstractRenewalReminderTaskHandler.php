@@ -8,6 +8,8 @@ use PHPUnuhi\Bundles\Storage\Shopware6\Repository\EntityRepository;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskCollection;
+use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskEntity;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 
 abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
@@ -23,7 +25,7 @@ abstract class AbstractRenewalReminderTaskHandler extends ScheduledTaskHandler
     private $logger;
 
     /**
-     * @param EntityRepository $scheduledTaskRepository
+     * @param EntityRepository<ScheduledTaskCollection<ScheduledTaskEntity>> $scheduledTaskRepository
      */
     public function __construct($scheduledTaskRepository, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
