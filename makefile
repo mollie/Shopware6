@@ -191,7 +191,7 @@ endif
 	make dev -B
 	make build -B
 	@echo "Show build artifacts"
-	ls -la ./src/Resources/public/administration
+	ls -la ./src/Resources/public/administration/.vite
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	make prod -B
@@ -201,11 +201,11 @@ endif
 	# in our plugin configuration! (use shopware standard js)
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	@echo "Show build artifacts"
-	ls -la ./src/Resources/public/administration
+	ls -la ./src/Resources/public/administration/.vite
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
-	cd .. && zip -qq -r -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*'  '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*'  '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json'
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""
