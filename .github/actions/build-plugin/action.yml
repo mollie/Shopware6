@@ -60,6 +60,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: MolliePayments-Shopware
+        include-hidden-files: true
         retention-days: 4
         path: ~/.build/MolliePayments
 
@@ -67,6 +68,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: MolliePayments-Shopware-e2e
+        include-hidden-files: true
         retention-days: 4
         path: ~/.build/MolliePayments-e2e
 

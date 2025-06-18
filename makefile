@@ -190,8 +190,6 @@ endif
 	make clean -B
 	make dev -B
 	make build -B
-	@echo "Show build artifacts"
-	ls -la ./src/Resources/public/administration/.vite
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	make prod -B
@@ -200,8 +198,6 @@ endif
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	@echo "Show build artifacts"
-	ls -la ./src/Resources/public/administration/.vite
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
 	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
