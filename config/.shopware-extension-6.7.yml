@@ -1,0 +1,2 @@
+build:
+  shopwareVersionConstraint: '6.7.0.0'

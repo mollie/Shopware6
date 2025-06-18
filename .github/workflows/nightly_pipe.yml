@@ -12,7 +12,7 @@ jobs:
     name: Review Pipeline
     uses: ./.github/workflows/step_review.yml
     with:
-      PHP_VERSION: 7.4
+      PHP_VERSION: 8.0
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -96,15 +96,15 @@ jobs:
           - shopware: '6.4.10.0'
             php: '8.0'
           - shopware: '6.4.9.0'
-            php: '7.4'
+            php: '8.0'
           - shopware: '6.4.8.2'
-            php: '7.4'
+            php: '8.0'
           - shopware: '6.4.7.0'
-            php: '7.4'
+            php: '8.0'
           - shopware: '6.4.6.1'
-            php: '7.4'
+            php: '8.0'
           - shopware: '6.4.5.1'
-            php: '7.4'
+            php: '8.0'
     steps:
 
       - name: Clone Code

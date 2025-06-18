@@ -64,12 +64,21 @@ clean: ##1 Cleans all dependencies and files
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
+	rm -f .shopware-extension.yml
 ifndef nossl
+	# importan, first we run build wit 6.7 because it removes files from public/administration, the build before 6.7 does not removes them
+	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
+	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	cp ./config/.shopware-extension.yml .shopware-extension.yml
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 endif
 ifeq ($(nossl),true)
+	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
+	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
+	cp ./config/.shopware-extension.yml .shopware-extension.yml
 	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
 endif
+	rm -f .shopware-extension.yml
 	# -----------------------------------------------------
 	# -----------------------------------------------------
 	cd ../../.. && php bin/console --no-debug theme:refresh
@@ -112,7 +121,7 @@ phpcheck: ##3 Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
 phpmin: ##3 Starts the PHP compatibility checks
-	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 7.4 ./src ./shopware
+	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.0 ./src ./shopware
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
@@ -189,12 +198,10 @@ endif
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-
-
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*' '*/makefile' '*.DS_Store' 'config/*' '.prettierignore' '.shopware-extension.yml' './package.json' './package-lock.json'
-	cd .. && zip -qq -r -0 ./.build/MolliePayments-e2e.zip MolliePayments/* -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*.DS_Store' '.prettierignore' '.shopware-extension.yml' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*'  '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json'
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""
