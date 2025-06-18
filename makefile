@@ -66,6 +66,7 @@ build: ##2 Installs the plugin, and builds the artifacts using the Shopware buil
 	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
 ifndef nossl
+	# importan, first we run build wit 6.7 because it removes files from public/administration, the build before 6.7 does not removes them
 	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
 	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
 	cp ./config/.shopware-extension.yml .shopware-extension.yml
@@ -189,6 +190,8 @@ endif
 	make clean -B
 	make dev -B
 	make build -B
+	@echo "Show build artifacts"
+	ls -la ./src/Resources/public/administration
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
 	make prod -B
@@ -197,8 +200,8 @@ endif
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-
-
+	@echo "Show build artifacts"
+	ls -la ./src/Resources/public/administration
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
 	cd .. && zip -qq -r -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
