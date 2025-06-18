@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed "Webhook too early" functionality by fixing updatePayment race conditions in a different way. Webhook updates are now faster again.
 - The payment status "open" is now valid again for credit cards. In previous flows this was not possible and thus a problem, but due to new async. flows, this is now by design a valid way.
 - Remove logs in PaymentMethodRemover that lead to filling up the log files and disk space if Symfony handles requests for assets like CSS or images
+- Increased minimum PHP Version to 8.0
 
 ### Fixed
 - Fixed the error "Call to a member function info() on null"
