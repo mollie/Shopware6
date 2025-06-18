@@ -50,7 +50,8 @@ export default class CheckoutAction {
      *
      */
     goToCartInOffCanvas() {
-        repoOffCanvas.getCartButton().click();
+        // sometimes cookie banner seems to be on top
+        repoOffCanvas.getCartButton().click({force: true});
     }
 
     /**

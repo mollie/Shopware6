@@ -1,5 +1,6 @@
 import AdminAPIClient from "Services/shopware/AdminAPIClient";
 import Shopware from "Services/shopware/Shopware"
+import ShopConfiguration from "../../models/ShopConfiguration";
 
 const shopware = new Shopware();
 
@@ -15,17 +16,22 @@ export default class ShopConfigurationAction {
 
     /**
      *
-     * @param mollieFailureMode
-     * @param creditCardComponents
-     * @param applePayDirect
+     * @param {boolean} mollieFailureMode
+     * @param {boolean} creditCardComponents
+     * @param {boolean} applePayDirect
+     * @param {ShopConfiguration|null} [shopConfiguration=null] - Optional shop configuration object
      */
-    setupShop(mollieFailureMode, creditCardComponents, applePayDirect) {
+    setupShop(mollieFailureMode, creditCardComponents, applePayDirect, shopConfiguration = null) {
 
         this.setupPlugin(mollieFailureMode, creditCardComponents, applePayDirect, false, []);
 
         this._activatePaymentMethods();
 
-        this._configureShop();
+        if (shopConfiguration === null) {
+            shopConfiguration = new ShopConfiguration();
+        }
+
+        this._configureShop(shopConfiguration);
 
         this.prepareShippingMethods();
 
@@ -63,7 +69,7 @@ export default class ShopConfigurationAction {
                 systemConfigData[channel.id] = mollieConfig;
             });
 
-            this.apiClient.post('/_action/system-config/batch', systemConfigData).then(()=>{
+            this.apiClient.post('/_action/system-config/batch', systemConfigData).then(() => {
                 this._clearCache();
             });
 
@@ -319,13 +325,15 @@ export default class ShopConfigurationAction {
 
     /**
      *
+     * @param {ShopConfiguration} shopConfiguration - The shop configuration object
      * @private
      */
-    _configureShop() {
+    _configureShop(shopConfiguration) {
         const data = {};
 
         const config = {
             "core.loginRegistration.showAccountTypeSelection": true,
+            "core.loginRegistration.requireDataProtectionCheckbox": shopConfiguration.getDataPrivacy(),
         };
 
         data[null] = config;
