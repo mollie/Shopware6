@@ -38,8 +38,7 @@ export default class CreditcardAttributes {
             !!this._feeRegion &&
             !!this._holder &&
             !!this._label &&
-            !!this._number &&
-            !!this._security
+            !!this._number
         );
     }
 
