@@ -9,6 +9,7 @@ import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import CartRepository from "Repositories/storefront/checkout/CartRepository";
 import ListingRepository from "Repositories/storefront/products/ListingRepository";
 import RegisterRepository from "Repositories/storefront/checkout/RegisterRepository";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
 
 
 const devices = new Devices();
@@ -25,9 +26,19 @@ const repoCart = new CartRepository();
 const registerRepo = new RegisterRepository();
 
 
-function beforeEach() {
+function beforeEachNoPrivacy() {
     cy.wrap(null).then(() => {
         devices.setDevice(devices.getFirstDevice());
+        configAction.setupShop(true, false, false, new ShopConfiguration());
+    });
+}
+
+function beforeEachPrivacy() {
+    cy.wrap(null).then(() => {
+        devices.setDevice(devices.getFirstDevice());
+        const config = new ShopConfiguration();
+        config.setDataPrivacy(true);
+        configAction.setupShop(true, false, false, config);
     });
 }
 
@@ -36,9 +47,9 @@ describe('Paypal Express - UI Tests', () => {
 
     describe('PDP', () => {
 
-        it('Paypal Express button is visible @core', () => {
+        it('C4247553: Paypal Express button is visible @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, []);
 
@@ -46,14 +57,12 @@ describe('Paypal Express - UI Tests', () => {
             topMenu.clickOnSecondCategory();
             listing.clickOnFirstProduct();
 
-            const button = repoPDP.getPayPalExpressButton();
-            button.should('be.visible');
-
+            repoPDP.getPayPalExpressButton().should('be.visible');
         })
 
-        it('Paypal Express button is hidden because of restriction @core', () => {
+        it('C4247549: Paypal Express button is hidden because of restriction @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, ['pdp']);
 
@@ -64,13 +73,29 @@ describe('Paypal Express - UI Tests', () => {
             repoPDP.getPayPalExpressButton().should('not.exist');
         })
 
+        it('C4247548: PayPal Express requires data protection to be accepted if enabled @core', () => {
+
+            beforeEachPrivacy();
+
+            cy.visit('/');
+            topMenu.clickOnSecondCategory();
+            listing.clickOnFirstProduct();
+
+            // click and make sure data privacy is validated
+            repoPDP.getPayPalExpressButton().click();
+            repoPDP.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
+
+            // now click on checkbox
+            repoPDP.getDataPrivacyCheckbox().check();
+        })
+
     })
 
     describe('Listing', () => {
 
-        it('Paypal Express button is visible @core', () => {
+        it('C4247554: Paypal Express button is visible @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, []);
 
@@ -82,9 +107,9 @@ describe('Paypal Express - UI Tests', () => {
 
         })
 
-        it('Paypal Express button is hidden because of restriction @core', () => {
+        it('C4247550: Paypal Express button is hidden because of restriction @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, ['plp']);
 
@@ -93,14 +118,29 @@ describe('Paypal Express - UI Tests', () => {
 
             repoListing.getPayPalExpressButton().should('not.exist');
         })
-    })
 
+        it('C4247547: PayPal Express requires data protection to be accepted if enabled @core', () => {
+
+            beforeEachPrivacy();
+
+            cy.visit('/');
+            topMenu.clickOnSecondCategory();
+
+            // click and make sure data privacy is validated
+            repoListing.getPayPalExpressButton().first().click();
+            repoListing.getDataPrivacyCheckbox().first().should('have.class', 'is-invalid');
+
+            // now click on checkbox
+            repoListing.getDataPrivacyCheckbox().first().check();
+        })
+
+    })
 
     describe('Offcanvas', () => {
 
-        it('Paypal Express button is visible @core', () => {
+        it('C4247556: Paypal Express button is visible @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, []);
 
@@ -113,9 +153,9 @@ describe('Paypal Express - UI Tests', () => {
             button.should('be.visible');
         })
 
-        it('Paypal Express button is hidden because of restriction @core', () => {
+        it('C4247551: Paypal Express button is hidden because of restriction @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, ['offcanvas'])
 
@@ -127,13 +167,30 @@ describe('Paypal Express - UI Tests', () => {
             repoOffcanvas.getPayPalExpressButton().should('not.exist');
         })
 
+        it('C4247546: PayPal Express requires data protection to be accepted if enabled @core', () => {
+
+            beforeEachPrivacy();
+
+            cy.visit('/');
+            topMenu.clickOnSecondCategory();
+            listing.clickOnFirstProduct();
+            pdp.addToCart(1);
+
+            // click and make sure data privacy is validated
+            repoOffcanvas.getPayPalExpressButton().click();
+            repoOffcanvas.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
+
+            // now click on checkbox
+            repoOffcanvas.getDataPrivacyCheckbox().check();
+        })
+
     })
 
     describe('Cart', () => {
 
-        it('Paypal Express button is visible @core', () => {
+        it('C4247555: Paypal Express button is visible @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, []);
 
@@ -149,9 +206,9 @@ describe('Paypal Express - UI Tests', () => {
 
         })
 
-        it('Paypal Express button is hidden because of restriction @core', () => {
+        it('C4247552: Paypal Express button is hidden because of restriction @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, ['cart']);
 
@@ -165,13 +222,32 @@ describe('Paypal Express - UI Tests', () => {
             repoCart.getPayPalExpressButton().should('not.exist');
         })
 
+        it('C4247545: PayPal Express requires data protection to be accepted if enabled @core', () => {
+
+            beforeEachPrivacy();
+
+            cy.visit('/');
+            topMenu.clickOnSecondCategory();
+            listing.clickOnFirstProduct();
+            pdp.addToCart(1);
+
+            checkout.goToCartInOffCanvas();
+
+            // click and make sure data privacy is validated
+            repoCart.getPayPalExpressButton().click();
+            repoCart.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
+
+            // now click on checkbox
+            repoCart.getDataPrivacyCheckbox().check();
+        })
+
     })
 
     describe('Register Page', () => {
 
-        it('Paypal Express button is visible @core', () => {
+        it('C4247557: Paypal Express button is visible @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, []);
 
@@ -187,9 +263,9 @@ describe('Paypal Express - UI Tests', () => {
 
         })
 
-        it('Paypal Express button is hidden because of restriction @core', () => {
+        it('C4247558: Paypal Express button is hidden because of restriction @core', () => {
 
-            beforeEach();
+            beforeEachNoPrivacy();
 
             configAction.setupPlugin(false, false, false, false, ['register']);
 
