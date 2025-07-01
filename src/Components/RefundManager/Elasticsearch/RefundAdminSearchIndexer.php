@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\Elasticsearch;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Kiener\MolliePayments\Components\RefundManager\DAL\Refund\RefundCollection;
@@ -83,7 +84,7 @@ class RefundAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY, // elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET // elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 
