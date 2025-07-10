@@ -10,6 +10,7 @@ import OffCanvasRepository from "Repositories/storefront/checkout/OffCanvasRepos
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import CartRepository from "Repositories/storefront/checkout/CartRepository";
 import ListingRepository from "Repositories/storefront/products/ListingRepository";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
 
 const storefrontClient = new StorefrontClient();
 
@@ -27,32 +28,27 @@ const repoOffcanvas = new OffCanvasRepository();
 const repoCart = new CartRepository();
 
 
-let beforeAllCalledConfigDisabled = false;
-let beforeAllCalledConfigEnabled = false;
-
 function beforeEachUIConfigDisabled() {
     cy.wrap(null).then(() => {
-        if (!beforeAllCalledConfigDisabled) {
-            devices.setDevice(devices.getFirstDevice());
-            configAction.setupShop(true, false, false);
-            beforeAllCalledConfigDisabled = true;
-        }
-
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupShop(true, false, false);
         devices.setDevice(devices.getFirstDevice());
     });
 }
 
-function beforeEachUIConfigEnabled() {
+/**
+ * @param {ShopConfiguration} shopConfiguration
+ */
+function beforeEachUIConfigEnabled(shopConfiguration) {
     cy.wrap(null).then(() => {
-        if (!beforeAllCalledConfigEnabled) {
-            devices.setDevice(devices.getFirstDevice());
-            configAction.setupShop(true, false, true);
-            beforeAllCalledConfigEnabled = true;
-        }
-
+        devices.setDevice(devices.getFirstDevice());
+        configAction.setupShop(true, false, true, shopConfiguration);
         devices.setDevice(devices.getFirstDevice());
     });
 }
+
+const privacyConfig = new ShopConfiguration();
+privacyConfig.setDataPrivacy(true);
 
 
 describe('Apple Pay Direct - Storefront Routes', () => {
@@ -283,7 +279,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C4099: Apple Pay Direct visible if configured and possible in browser (PDP) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(true);
 
@@ -296,7 +292,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C4085: Apple Pay Direct hidden if configured but not possible in browser (PDP) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(false);
 
@@ -307,13 +303,31 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoPDP.getApplePayDirectButton().should('have.class', 'd-none');
             })
 
+            it('C4247541: Apple Pay Direct requires data protection to be accepted if enabled @core', () => {
+
+                beforeEachUIConfigEnabled(privacyConfig);
+
+                applePayFactory.registerApplePay(true);
+
+                cy.visit('/');
+                topMenu.clickOnSecondCategory();
+                listing.clickOnFirstProduct();
+
+                // click and make sure data privacy is validated
+                repoPDP.getApplePayDirectButton().click();
+                repoPDP.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
+
+                // now click on checkbox
+                repoPDP.getDataPrivacyCheckbox().check();
+            })
+
         })
 
         describe('Listing', () => {
 
             it('C266712: Apple Pay Direct visible if configured and possible in browser (Listing) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(true);
 
@@ -325,7 +339,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266713: Apple Pay Direct hidden if configured but not possible in browser (Listing) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(false);
 
@@ -334,6 +348,24 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 repoListing.getApplePayDirectButton().should('have.class', 'd-none');
             })
+
+            it('C4247542: Apple Pay Direct requires data protection to be accepted if enabled @core', () => {
+
+                beforeEachUIConfigEnabled(privacyConfig);
+
+                applePayFactory.registerApplePay(true);
+
+                cy.visit('/');
+                topMenu.clickOnSecondCategory();
+
+                // click and make sure data privacy is validated
+                repoListing.getApplePayDirectButton().first().click();
+                repoListing.getDataPrivacyCheckbox().first().should('have.class', 'is-invalid');
+
+                // now click on checkbox
+                repoListing.getDataPrivacyCheckbox().first().check();
+            })
+
         })
 
 
@@ -341,7 +373,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266714: Apple Pay Direct visible if configured and possible in browser (Offcanvas) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(true);
 
@@ -355,7 +387,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266715: Apple Pay Direct hidden if configured but not possible in browser (Offcanvas) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(false);
 
@@ -367,13 +399,32 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoOffcanvas.getApplePayDirectButton().should('have.class', 'd-none');
             })
 
+            it('C4247544: Apple Pay Direct requires data protection to be accepted if enabled @core', () => {
+
+                beforeEachUIConfigEnabled(privacyConfig);
+
+                applePayFactory.registerApplePay(true);
+
+                cy.visit('/');
+                topMenu.clickOnSecondCategory();
+                listing.clickOnFirstProduct();
+                pdp.addToCart(1);
+
+                // click and make sure data privacy is validated
+                repoOffcanvas.getApplePayDirectButton().click();
+                repoOffcanvas.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
+
+                // now click on checkbox
+                repoOffcanvas.getDataPrivacyCheckbox().check();
+            })
+
         })
 
         describe('Cart', () => {
 
             it('C266716: Apple Pay Direct visible if configured and possible in browser (Cart) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(true);
 
@@ -389,7 +440,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
             it('C266717: Apple Pay Direct hidden if configured but not possible in browser (Cart) @core', () => {
 
-                beforeEachUIConfigEnabled();
+                beforeEachUIConfigEnabled(new ShopConfiguration());
 
                 applePayFactory.registerApplePay(false);
 
@@ -401,6 +452,27 @@ describe('Apple Pay Direct - UI Tests', () => {
                 checkout.goToCartInOffCanvas();
 
                 repoCart.getApplePayDirectButton().should('have.class', 'd-none');
+            })
+
+            it('C4247543: Apple Pay Direct requires data protection to be accepted if enabled @core', () => {
+
+                beforeEachUIConfigEnabled(privacyConfig);
+
+                applePayFactory.registerApplePay(true);
+
+                cy.visit('/');
+                topMenu.clickOnSecondCategory();
+                listing.clickOnFirstProduct();
+                pdp.addToCart(1);
+
+                checkout.goToCartInOffCanvas();
+
+                // click and make sure data privacy is validated
+                repoCart.getApplePayDirectButton().click();
+                repoCart.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
+
+                // now click on checkbox
+                repoCart.getDataPrivacyCheckbox().check();
             })
 
         })

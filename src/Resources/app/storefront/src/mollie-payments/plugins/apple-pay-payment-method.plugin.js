@@ -56,7 +56,10 @@ export default class MollieApplePayPaymentMethod extends Plugin {
      */
     hideApplePaySelect(applePayId) {
         const option = document.querySelector('option[value="' + applePayId + '"]');
-        option.remove();
+
+        if (option !== null) {
+            option.remove();
+        }
     }
 
     /**

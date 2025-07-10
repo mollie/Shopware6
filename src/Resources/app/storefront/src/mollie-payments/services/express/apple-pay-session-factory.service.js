@@ -1,4 +1,4 @@
-import HttpClientService from './http-client.service';
+import HttpClientService from '../http-client.service';
 
 export default class ApplePaySessionFactoryService {
     /**
