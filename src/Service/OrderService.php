@@ -202,7 +202,7 @@ class OrderService implements OrderServiceInterface
         return $this->getOrder($orderId, $context->getContext());
     }
 
-    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $molliePaymentId, string $orderTransactionId, Context $context): void
+    public function updateMollieDataCustomFields(OrderEntity $order, string $mollieOrderID, string $molliePaymentId, string $orderTransactionId, int $webhookReceived, Context $context): void
     {
         $customFieldsStruct = new OrderAttributes($order);
         $customFieldsStruct->setMollieOrderId($mollieOrderID); // TODO i dont like that this is an optional SETTER in here!
@@ -261,6 +261,7 @@ class OrderService implements OrderServiceInterface
         $orderTransactionCustomFields->setMollieOrderId($customFieldsStruct->getMollieOrderId());
         $orderTransactionCustomFields->setMolliePaymentId($molliePaymentID);
         $orderTransactionCustomFields->setThirdPartyPaymentId($thirdPartyPaymentId);
+        $orderTransactionCustomFields->setWebhookReceived($webhookReceived);
 
         $this->updateOrderTransactionCustomFields->updateOrderTransaction(
             $orderTransactionId,
