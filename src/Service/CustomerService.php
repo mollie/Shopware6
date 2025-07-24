@@ -29,7 +29,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -667,20 +666,9 @@ class CustomerService implements CustomerServiceInterface
             $data->set('billingAddress', $shippingAddressData);
         }
 
-        try {
-            $registerRoute = $this->container->get(RegisterRoute::class);
+        $registerRoute = $this->container->get(RegisterRoute::class);
 
-            return $registerRoute->register($data, $context, false)->getCustomer();
-        } catch (ConstraintViolationException $e) {
-            $errors = [];
-            /* we have to store the errors in an array because getErrors returns a generator */
-            foreach ($e->getErrors() as $error) {
-                $errors[] = $error;
-            }
-            $this->logger->error($e->getMessage(), ['errors' => $errors]);
-
-            return null;
-        }
+        return $registerRoute->register($data, $context, false)->getCustomer();
     }
 
     /**
