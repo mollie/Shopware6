@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Fixed language of error labels in payment forms
+
 ## [4.16.0] - 2025-06-18
 
 ### Added
