@@ -33,6 +33,7 @@ class OrderTransactionAttributesTest extends TestCase
                 'order_id' => 'order_id',
                 'payment_id' => 'payment_id',
                 'third_party_payment_id' => 'third_party_payment_id',
+                'webhook_received' => 3,
             ],
         ]);
 
@@ -41,6 +42,7 @@ class OrderTransactionAttributesTest extends TestCase
                 'order_id' => 'order_id',
                 'payment_id' => 'payment_id',
                 'third_party_payment_id' => 'third_party_payment_id',
+                'webhook_received' => 3,
             ],
             $struct->toArray()
         );
@@ -48,6 +50,7 @@ class OrderTransactionAttributesTest extends TestCase
         $this->assertEquals('order_id', $struct->getMollieOrderId());
         $this->assertEquals('payment_id', $struct->getMolliePaymentId());
         $this->assertEquals('third_party_payment_id', $struct->getThirdPartyPaymentId());
+        $this->assertEquals(3, $struct->getWebhookReceived());
     }
 
     /**

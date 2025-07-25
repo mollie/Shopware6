@@ -17,6 +17,8 @@ interface CustomFieldsInterface
 
     public const THIRD_PARTY_PAYMENT_KEY = 'third_party_payment_id';
 
+    public const WEBHOOK_RECEIVED = 'webhook_received';
+
     public const SINGLE_PRODUCT_EXPRESS_CHECKOUT = 'mollie_single_product_express_checkout';
 
     public const PAYPAL_EXPRESS_SESSION_ID_KEY = 'mollie_ppe_session_id';
