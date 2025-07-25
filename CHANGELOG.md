@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed webhook race condition
+- Fixed language of error labels in payment forms
 - Show register violations for paypal express
-
 
 ## [4.16.0] - 2025-06-18
 
