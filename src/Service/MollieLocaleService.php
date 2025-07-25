@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -52,8 +53,14 @@ class MollieLocaleService
         // Get the language object from the sales channel context.
         $locale = '';
 
-        $salesChannel = $salesChannelContext->getSalesChannel();
-        $languageId = $salesChannel->getLanguageId();
+        /** @var null|CustomerEntity $customer */
+        $customer = $salesChannelContext->getCustomer();
+        if ($customer instanceof CustomerEntity) {
+            $languageId = $customer->getLanguageId();
+        } else {
+            $salesChannel = $salesChannelContext->getSalesChannel();
+            $languageId = $salesChannel->getLanguageId();
+        }
 
         $languageCriteria = new Criteria([$languageId]);
         $languageCriteria->addAssociation('locale');
