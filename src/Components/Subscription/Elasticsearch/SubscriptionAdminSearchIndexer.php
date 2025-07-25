@@ -88,7 +88,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 

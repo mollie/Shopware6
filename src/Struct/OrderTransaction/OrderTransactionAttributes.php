@@ -22,6 +22,8 @@ class OrderTransactionAttributes
      */
     private $thirdPartyPaymentId;
 
+    private ?int $webhookReceived;
+
     /**
      * @param array<string,mixed> $orderCustomFields
      */
@@ -62,6 +64,16 @@ class OrderTransactionAttributes
         $this->thirdPartyPaymentId = $thirdPartyPaymentId;
     }
 
+    public function getWebhookReceived(): ?int
+    {
+        return $this->webhookReceived;
+    }
+
+    public function setWebhookReceived(?int $webhookReceived): void
+    {
+        $this->webhookReceived = $webhookReceived;
+    }
+
     /**
      * @return array<mixed>
      */
@@ -75,6 +87,7 @@ class OrderTransactionAttributes
             CustomFieldsInterface::ORDER_KEY => $this->mollieOrderId,
             CustomFieldsInterface::PAYMENT_KEY => $this->molliePaymentId,
             CustomFieldsInterface::THIRD_PARTY_PAYMENT_KEY => $this->thirdPartyPaymentId,
+            CustomFieldsInterface::WEBHOOK_RECEIVED => $this->webhookReceived,
         ];
     }
 
@@ -97,6 +110,10 @@ class OrderTransactionAttributes
 
         if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::THIRD_PARTY_PAYMENT_KEY])) {
             $this->setThirdPartyPaymentId((string) $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::THIRD_PARTY_PAYMENT_KEY]);
+        }
+
+        if (isset($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::WEBHOOK_RECEIVED])) {
+            $this->setWebhookReceived((int) $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::WEBHOOK_RECEIVED]);
         }
     }
 }

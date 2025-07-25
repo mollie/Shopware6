@@ -178,6 +178,7 @@ class MolliePaymentFinalize
             $mollieOrderId,
             '',
             $transactionStruct->getOrderTransactionId(),
+            0,
             $context
         );
 

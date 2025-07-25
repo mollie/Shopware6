@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- Fixed webhook race condition
 - Show register violations for paypal express
+
 
 ## [4.16.0] - 2025-06-18
 
