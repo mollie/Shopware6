@@ -49,4 +49,18 @@ class OrderTransactionRepository
 
         return $orderTransaction;
     }
+
+    /**
+     * @param array<string,array<string,mixed>|mixed> $customFields
+     */
+    public function saveCustomFields(string $transactionId, array $customFields, Context $context): void
+    {
+        $this->repository->update(
+            [[
+                'id' => $transactionId,
+                'customFields' => $customFields,
+            ]],
+            $context
+        );
+    }
 }
