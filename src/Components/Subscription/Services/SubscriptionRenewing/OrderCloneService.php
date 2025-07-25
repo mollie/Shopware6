@@ -73,7 +73,13 @@ class OrderCloneService
         $conversionContext->setIncludeBillingAddress(true);
         $conversionContext->setIncludeDeliveries(true);
         $conversionContext->setIncludeTransactions(true);
-        $conversionContext->setIncludeOrderDate(false);
+
+        if(method_exists($conversionContext, 'setIncludePersistentData')) {
+            $conversionContext->setIncludePersistentData(false);
+        }else{
+            $conversionContext->setIncludeOrderDate(false);
+        }
+
 
         $orderData = $this->orderConverter->convertToOrder($cart, $salesChannelContext, $conversionContext);
 
