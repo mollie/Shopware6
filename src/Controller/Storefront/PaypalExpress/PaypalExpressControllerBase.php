@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Components\PaypalExpress\Route\AbstractStartCheckoutRo
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Mollie\Api\Exceptions\ApiException;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -90,14 +91,17 @@ class PaypalExpressControllerBase extends StorefrontController
             $this->finishCheckoutRoute->finishCheckout($context);
 
             $returnUrl = $this->getCheckoutConfirmPage($this->router);
+        } catch (ConstraintViolationException $e) {
+            foreach ($e->getErrors() as $error) {
+                $this->addFlash('danger', $this->trans(sprintf('error.%s', $error['detail'] ?? $error['code'])));
+            }
         } catch (\Throwable $e) {
-            $returnUrl = $this->getCheckoutCartPage($this->router);
-            $this->addFlash('danger', $this->trans(self::SNIPPET_ERROR));
             $this->logger->error(
                 'Failed to finish Paypal Express Checkout',
                 ['message' => $e->getMessage()]
             );
         }
+        $returnUrl = $this->getCheckoutCartPage($this->router);
 
         return new RedirectResponse($returnUrl);
     }
