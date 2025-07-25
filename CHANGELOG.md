@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fixed webhook race condition
 - Fixed language of error labels in payment forms
+- Fixed order cloning when a subscription is renewed
 
 ## [4.16.0] - 2025-06-18
 
