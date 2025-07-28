@@ -273,7 +273,7 @@ Component.override('sw-order-detail-general', {
                 this.refundedManagerService = new RefundManager(this.MolliePaymentsConfigService, this.acl);
             }
             this.refundedManagerService
-                .isRefundManagerAvailable(this.order.salesChannelId, this.order.id)
+                .isRefundManagerAvailable(this.order.salesChannelId, this.order)
                 .then((possible) => {
                     this.isRefundManagerPossible = possible;
                 });
