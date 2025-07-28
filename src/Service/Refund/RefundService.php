@@ -228,8 +228,11 @@ class RefundService implements RefundServiceInterface
                 // migrate those compositions (if existing) to our database storage (for legacy refunds)
                 /** @phpstan-ignore-next-line  */
                 if (property_exists($refund, 'metadata')) {
-                    /** @var \stdClass|string $metadata */
+                    /** @var null|\stdClass|string $metadata */
                     $metadata = $refund->metadata;
+                    if ($metadata === null) {
+                        continue;
+                    }
                     if (is_string($metadata)) {
                         $order = $this->compositionRepairService->updateRefundItems($refund, $order, $context);
                     }

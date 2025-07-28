@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed webhook race condition
 - Fixed language of error labels in payment forms
 - Fixed order cloning when a subscription is renewed
+- Fixed the display of refunded items in refund manager, while the refund is pending
+- Fixed button styling in Refund Manager
+- Fixed division by zero error for promotions without amount
 
 ## [4.16.0] - 2025-06-18
 
