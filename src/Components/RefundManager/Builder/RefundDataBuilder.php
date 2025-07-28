@@ -255,13 +255,11 @@ class RefundDataBuilder
             $taxSum = 0;
 
             foreach ($promotionComposition as $i => &$composition) {
-
                 $partialTax = 0.0;
                 // calculate the tax only if lineItemTotal bigger than 0, otherwise we have devision by zero
-                if($lineItemTotal > 0.0){
+                if ($lineItemTotal > 0.0) {
                     $partialTax = round($taxTotal * $composition['discount'] / $lineItemTotal, 2);
                 }
-
 
                 if ($i === $lastIndex) {
                     $partialTax = -$taxTotal - $taxSum;
