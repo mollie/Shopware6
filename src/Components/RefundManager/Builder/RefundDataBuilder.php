@@ -249,12 +249,19 @@ class RefundDataBuilder
         if ($lineItemAttribute->isPromotion()) {
             $taxTotal = round($this->calculateLineItemTaxTotal($item), 2);
             $lineItemTotal = $item->getTotalPrice();
+
             $lastIndex = array_keys($promotionComposition)[count($promotionComposition) - 1];
 
             $taxSum = 0;
 
             foreach ($promotionComposition as $i => &$composition) {
-                $partialTax = round($taxTotal * $composition['discount'] / $lineItemTotal, 2);
+
+                $partialTax = 0.0;
+                // calculate the tax only if lineItemTotal bigger than 0, otherwise we have devision by zero
+                if($lineItemTotal > 0.0){
+                    $partialTax = round($taxTotal * $composition['discount'] / $lineItemTotal, 2);
+                }
+
 
                 if ($i === $lastIndex) {
                     $partialTax = -$taxTotal - $taxSum;
@@ -301,7 +308,7 @@ class RefundDataBuilder
             $meta = $refund['metadata'];
 
             // refund initiated within mollie dashboard, so no metadata is set
-            if ($meta instanceof \stdClass) {
+            if ($meta instanceof \stdClass && property_exists($meta, 'composition') && count($meta->composition) === 0) {
                 continue;
             }
 

@@ -95,12 +95,12 @@ SHOPWARE 6.5
                     {% endblock %}
                     {% block sw_order_detail_general_mollie_info_property_paymentref %}
                         <div v-if="mollieThirdPartyPaymentId" class="mollie-property-section">
-                                <dt class="mollie-property-title mollie-order-user-card-payment-reference-title">
-                                    {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
-                                </dt>
-                                <dd class="mollie-property-content">
-                                    {{ mollieThirdPartyPaymentId }}
-                                </dd>
+                            <dt class="mollie-property-title mollie-order-user-card-payment-reference-title">
+                                {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
+                            </dt>
+                            <dd class="mollie-property-content">
+                                {{ mollieThirdPartyPaymentId }}
+                            </dd>
                         </div>
                     {% endblock %}
                     {% block sw_order_detail_general_mollie_info_property_paymentlink %}
@@ -127,14 +127,16 @@ SHOPWARE 6.5
                         <sw-button-group split-button>
                             {% block sw_order_detail_general_mollie_info_action_buttons_order_shipping %}
                                 <sw-button class="sw-order-line-items-grid__actions-ship-button"
-                                           variant="ghost" size="small"
+                                           size="small"
+                                           ghost="true"
                                            :disabled="!isShippingPossible"
                                            @click="onOpenShippingManager">
                                     {{ $tc('mollie-payments.general.shipThroughMollie') }}</sw-button>
                             {% endblock %}
                             {% block sw_order_detail_general_mollie_info_action_buttons_refund_manager %}
                                 <sw-button class="sw-order-line-items-grid__actions-refund-btn"
-                                           variant="ghost" size="small"
+                                           size="small"
+                                           ghost="true"
                                            :disabled="!isRefundManagerPossible"
                                            @click="onOpenRefundManager">
                                     {{ $tc('sw-order.detailExtended.refundManager.btnOpenRefundManager') }}</sw-button>

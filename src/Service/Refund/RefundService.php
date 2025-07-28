@@ -230,6 +230,9 @@ class RefundService implements RefundServiceInterface
                 if (property_exists($refund, 'metadata')) {
                     /** @var \stdClass|string $metadata */
                     $metadata = $refund->metadata;
+                    if ($metadata === null) {
+                        continue;
+                    }
                     if (is_string($metadata)) {
                         $order = $this->compositionRepairService->updateRefundItems($refund, $order, $context);
                     }
