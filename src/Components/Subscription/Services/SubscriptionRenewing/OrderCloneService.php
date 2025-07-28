@@ -74,6 +74,7 @@ class OrderCloneService
         $conversionContext->setIncludeDeliveries(true);
         $conversionContext->setIncludeTransactions(true);
 
+        /** @phpstan-ignore-next-line  */
         if (method_exists($conversionContext, 'setIncludePersistentData')) {
             $conversionContext->setIncludePersistentData(false);
         } else {
