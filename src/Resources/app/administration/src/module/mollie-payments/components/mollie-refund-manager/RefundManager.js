@@ -14,10 +14,9 @@ export default class RefundManager {
      * @returns Promise<boolean>
      */
     async isRefundManagerAvailable(salesChannelId, order) {
-
         let currentPaymentTransactionStatus = order?.transactions?.[0]?.stateMachineState?.technicalName ?? 'unknown';
         //Authorized orders cannot be refunded.
-        if(currentPaymentTransactionStatus === 'authorized'){
+        if (currentPaymentTransactionStatus === 'authorized') {
             return false;
         }
 
