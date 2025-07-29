@@ -13,7 +13,13 @@ export default class RefundManager {
      * Gets if the refund manager is available
      * @returns Promise<boolean>
      */
-    async isRefundManagerAvailable(salesChannelId, orderId) {
+    async isRefundManagerAvailable(salesChannelId, order) {
+        let currentPaymentTransactionStatus = order?.transactions?.[0]?.stateMachineState?.technicalName ?? 'unknown';
+        //Authorized orders cannot be refunded.
+        if (currentPaymentTransactionStatus === 'authorized') {
+            return false;
+        }
+
         const aclAllowed = this._acl.can('mollie_refund_manager:read');
 
         if (!aclAllowed) {
@@ -22,7 +28,7 @@ export default class RefundManager {
 
         let refundManagerPossible = false;
 
-        await this._configService.getRefundManagerConfig(salesChannelId, orderId).then((response) => {
+        await this._configService.getRefundManagerConfig(salesChannelId, order.id).then((response) => {
             refundManagerPossible = response.enabled;
         });
 
