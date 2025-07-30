@@ -38,6 +38,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomerService implements CustomerServiceInterface
@@ -684,6 +685,7 @@ class CustomerService implements CustomerServiceInterface
         } catch (ConstraintViolationException $e) {
             $errors = [];
 
+            /** @var Session $session */
             $session = $this->requestStack->getSession();
             $flashBag = $session->getFlashBag();
             foreach ($e->getViolations() as $violation) {
