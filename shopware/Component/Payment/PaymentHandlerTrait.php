@@ -56,7 +56,6 @@ trait PaymentHandlerTrait
         try {
             return $this->payAction->pay($this, $transaction, new RequestDataBag($request->request->all()), $salesChannelContext);
         } catch (Throwable $exception) {
-            dump($exception);
             throw $exception;
         }
     }

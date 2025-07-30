@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\SettingsService;
+use MolliePayments\Tests\Fakes\FakeTranslator;
 use MolliePayments\Tests\Fakes\Repositories\FakeCustomerRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -19,6 +20,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEve
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CustomerServiceTest extends TestCase
 {
@@ -34,7 +36,7 @@ class CustomerServiceTest extends TestCase
     public function setUp(): void
     {
         $this->customerRepository = new FakeCustomerRepository(new CustomerDefinition());
-
+        $fakeTranslator = new FakeTranslator();
         $this->settingsService = $this->createMock(SettingsService::class);
 
         $this->customerService = new CustomerService(
@@ -49,7 +51,9 @@ class CustomerServiceTest extends TestCase
             $this->settingsService,
             'does.not.matter.here',
             $this->createMock(ConfigService::class),
-            $this->createMock(ContainerInterface::class)
+            $this->createMock(ContainerInterface::class),
+            $this->createMock(RequestStack::class),
+            $fakeTranslator
         );
     }
 

@@ -6,7 +6,7 @@
 
 src/Resources/app/administration/node_modules
 
-src/Resources/app/storefront/dist/
+src/Resources/app/storefront/dist/storefront
 src/Resources/app/storefront/node_modules
 
 src/Resources/public/administration/css/

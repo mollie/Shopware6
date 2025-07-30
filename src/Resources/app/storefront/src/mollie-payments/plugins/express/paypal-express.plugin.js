@@ -75,6 +75,8 @@ export default class PayPalExpressPlugin extends Plugin {
             return;
         }
 
+        this._cartService.addItemToCart(clickedButton);
+
         // -----------------------------------------------------------------
 
         const submitUrl = clickedButton.getAttribute('data-form-action');

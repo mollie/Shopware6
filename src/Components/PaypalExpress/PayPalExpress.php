@@ -113,6 +113,7 @@ class PayPalExpress
             'methodDetails' => [
                 'checkoutFlow' => 'express',
             ],
+            'description' => 'Paypal Express',
             'amount' => $this->priceBuilder->build(
                 $cart->getPrice()->getTotalPrice(),
                 $context->getCurrency()->getIsoCode()

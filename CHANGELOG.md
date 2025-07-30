@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Show validation errors when a guest account is created from Express Checkout e.g. Paypal Express or Apple Pay Direct
+
 ### Changed
 - Refundmanager is now disabled for orders in Authorized state, it is not possible to refund an order if nothing was caputred yet
 
