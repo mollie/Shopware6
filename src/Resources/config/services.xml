@@ -81,6 +81,8 @@
             <argument>%kernel.shopware_version%</argument>
             <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
             <argument type="service" id="service_container"/>
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="translator"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\MandateService" >

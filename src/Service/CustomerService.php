@@ -35,6 +35,9 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\Salutation\SalutationEntity;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomerService implements CustomerServiceInterface
 {
@@ -85,6 +88,8 @@ class CustomerService implements CustomerServiceInterface
     /** @var EntityRepository<EntityCollection<CustomerAddressEntity>> */
     private $customerAddressRepository;
     private ContainerInterface $container;
+    private RequestStack $requestStack;
+    private TranslatorInterface $translator;
 
     /**
      * @param EntityRepository<EntityCollection<CountryEntity>> $countryRepository
@@ -104,7 +109,9 @@ class CustomerService implements CustomerServiceInterface
         SettingsService $settingsService,
         string $shopwareVersion,
         ConfigService $configService,
-        ContainerInterface $container
+        ContainerInterface $container,
+        RequestStack $requestStack,
+        TranslatorInterface $translator
     ) {
         $this->countryRepository = $countryRepository;
         $this->customerRepository = $customerRepository;
@@ -118,6 +125,8 @@ class CustomerService implements CustomerServiceInterface
         $this->shopwareVersion = $shopwareVersion;
         $this->configService = $configService;
         $this->container = $container;
+        $this->requestStack = $requestStack;
+        $this->translator = $translator;
     }
 
     /**
@@ -673,6 +682,14 @@ class CustomerService implements CustomerServiceInterface
             return $registerRoute->register($data, $context, false)->getCustomer();
         } catch (ConstraintViolationException $e) {
             $errors = [];
+
+            /** @var Session $session */
+            $session = $this->requestStack->getSession();
+            $flashBag = $session->getFlashBag();
+            foreach ($e->getViolations() as $violation) {
+                $message = $this->translator->trans('error.' . $violation->getCode());
+                $flashBag->add('danger', $violation->getPropertyPath() . ': ' . $message);
+            }
             /* we have to store the errors in an array because getErrors returns a generator */
             foreach ($e->getErrors() as $error) {
                 $errors[] = $error;

@@ -18,7 +18,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class PaypalExpressSubscriber implements EventSubscriberInterface
@@ -173,12 +172,6 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
         $cart = $mollieShopwareCart->getCart();
 
         $this->mollieCartService->persistCart($cart, $salesChannelContext);
-
-        // we have to do a refresh of our page, so
-        // that the restored cart + the updated payment method options are updated
-        $request = $event->getRequest();
-        $response = new RedirectResponse($request->getUri());
-        $response->send();
     }
 
     private function isPPEActive(SalesChannelContext $context): bool
