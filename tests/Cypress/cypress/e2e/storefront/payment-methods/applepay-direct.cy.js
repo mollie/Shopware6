@@ -318,7 +318,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoPDP.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoPDP.getDataPrivacyCheckbox().check();
+                repoPDP.getDataPrivacyCheckbox().check({force:true});
             })
 
         })
@@ -363,7 +363,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoListing.getDataPrivacyCheckbox().first().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoListing.getDataPrivacyCheckbox().first().check();
+                repoListing.getDataPrivacyCheckbox().first().check({force:true});
             })
 
         })
@@ -415,7 +415,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoOffcanvas.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoOffcanvas.getDataPrivacyCheckbox().check();
+                repoOffcanvas.getDataPrivacyCheckbox().check({force:true});
             })
 
         })
@@ -472,7 +472,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoCart.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoCart.getDataPrivacyCheckbox().check();
+                repoCart.getDataPrivacyCheckbox().check({force:true});
             })
 
         })
