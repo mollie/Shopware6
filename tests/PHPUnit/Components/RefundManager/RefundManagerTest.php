@@ -86,7 +86,7 @@ class RefundManagerTest extends TestCase
         $this->fakeRefundRespository = new FakeRefundRepository();
         $fakeRefundCreditNotesService = $this->createMock(RefundCreditNoteService::class);
         $this->manager = new RefundManager(
-            new RefundDataBuilder($fakeOrderService, $fakeRefundService, $fakeOrder),
+            new RefundDataBuilder($fakeOrderService, $fakeRefundService, $fakeOrder, new NullLogger()),
             $fakeOrderService,
             $fakeRefundService,
             $fakeOrder,

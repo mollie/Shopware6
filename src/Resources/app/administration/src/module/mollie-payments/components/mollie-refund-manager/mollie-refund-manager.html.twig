@@ -133,6 +133,65 @@
                 {{ $tc('mollie-payments.refund-manager.cart.roundDiffItemAdded') }} ({{ currencyFilter( roundingDiff , order.currency.isoCode, order.totalRounding.decimals) }})
             </div>
         </sw-card>
+        <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" position-identifier="mollie-refund-manager-refunds" class="mollie-refund-manager-refunds"
+                 :hero="false" :large="true">
+            <div class="instructions-bar">
+                <sw-alert v-if="!isAclCancelAllowed"
+                          variant="warning">
+                    {{ $tc('mollie-payments.refund-manager.acl.warningCancel') }}
+                </sw-alert>
+                <sw-external-link href="https://docs.mollie.com/payments/refunds#refund-statuses">
+                    {{ $tc('mollie-payments.refund-manager.refunds.linkMore') }}
+                </sw-external-link>
+            </div>
+            <sw-data-grid :dataSource="mollieRefunds"
+                          :columns="gridMollieRefundsColumns"
+                          :showSelection="false"
+                          class="cy-refund-list"
+                          :isLoading="isRefundDataLoading">
+                <template #column-amount.value="{ item }">
+                    <sw-container columns="1fr auto" gap="8px" align="center">
+                        {{ currencyFilter(  item.amount.value  , order.currency.isoCode, order.totalRounding.decimals) }}
+                        <sw-help-text :text="item.description"></sw-help-text>
+                    </sw-container>
+                </template>
+                <template #column-status="{ item }">
+                    <sw-container columns="1fr auto" gap="8px" class="cy-refund-status" align="center">
+                        <sw-label :variant="getRefundStatusBadge(item.status)"
+                                  size="medium"
+                                  appearance="default"
+                                  ghost=false
+                                  :caps="true"
+                                  :dismissable="false">
+                            {{ getRefundStatusName(item.status) }}
+                        </sw-label>
+                        <sw-help-text :text="getRefundStatusDescription(item.status)"></sw-help-text>
+                    </sw-container>
+                </template>
+                <template #column-createdAt="{ item }">
+                    {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit' }) }}
+                </template>
+                <template #column-composition="{ item }">
+                    <sw-label v-for="composition in getRefundCompositions(item)"
+                              :key="composition.createdAt"
+                              variant="neutral"
+                              ghost=false
+                              size="default"
+                              appearance="default"
+                              :caps="false"
+                              :dismissable="false">
+                        {{ composition }}
+                    </sw-label>
+                </template>
+                <template #actions="{ item }">
+                    <sw-context-menu-item :disabled="(!isAclCancelAllowed || !isRefundCancelable(item))"
+                                          variant="danger"
+                                          @click="btnCancelRefund_Click(item)">
+                        {{ $tc('mollie-payments.refund-manager.refunds.grid.btnCancelRefund') }}
+                    </sw-context-menu-item>
+                </template>
+            </sw-data-grid>
+        </sw-card>
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
@@ -414,67 +473,6 @@
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
         {# --------------------------------------------------------------------------------------------- #}
-        <sw-card :title="$tc('mollie-payments.refund-manager.refunds.title')" position-identifier="mollie-refund-manager-refunds" class="mollie-refund-manager-refunds"
-                 :hero="false" :large="true">
-            <div class="instructions-bar">
-                <sw-alert v-if="!isAclCancelAllowed"
-                          variant="warning">
-                    {{ $tc('mollie-payments.refund-manager.acl.warningCancel') }}
-                </sw-alert>
-                <sw-external-link href="https://docs.mollie.com/payments/refunds#refund-statuses">
-                    {{ $tc('mollie-payments.refund-manager.refunds.linkMore') }}
-                </sw-external-link>
-            </div>
-            <sw-data-grid :dataSource="mollieRefunds"
-                          :columns="gridMollieRefundsColumns"
-                          :showSelection="false"
-                          class="cy-refund-list"
-                          :isLoading="isRefundDataLoading">
-                <template #column-amount.value="{ item }">
-                    <sw-container columns="1fr auto" gap="8px" align="center">
-                        {{ currencyFilter(  item.amount.value  , order.currency.isoCode, order.totalRounding.decimals) }}
-                        <sw-help-text :text="item.description"></sw-help-text>
-                    </sw-container>
-                </template>
-                <template #column-status="{ item }">
-                    <sw-container columns="1fr auto" gap="8px" class="cy-refund-status" align="center">
-                        <sw-label :variant="getRefundStatusBadge(item.status)"
-                                  size="medium"
-                                  appearance="default"
-                                  ghost=false
-                                  :caps="true"
-                                  :dismissable="false">
-                            {{ getRefundStatusName(item.status) }}
-                        </sw-label>
-                        <sw-help-text :text="getRefundStatusDescription(item.status)"></sw-help-text>
-                    </sw-container>
-                </template>
-                <template #column-createdAt="{ item }">
-                    {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit' }) }}
-                </template>
-                <template #column-composition="{ item }">
-                    <sw-label v-for="composition in getRefundCompositions(item)"
-                              :key="composition.createdAt"
-                              variant="neutral"
-                              ghost=false
-                              size="default"
-                              appearance="default"
-                              :caps="false"
-                              :dismissable="false">
-                        {{ composition }}
-                    </sw-label>
-                </template>
-                <template #actions="{ item }">
-                    <sw-context-menu-item :disabled="(!isAclCancelAllowed || !isRefundCancelable(item))"
-                                          variant="danger"
-                                          @click="btnCancelRefund_Click(item)">
-                        {{ $tc('mollie-payments.refund-manager.refunds.grid.btnCancelRefund') }}
-                    </sw-context-menu-item>
-                </template>
-            </sw-data-grid>
-        </sw-card>
-        {# --------------------------------------------------------------------------------------------- #}
-        {# --------------------------------------------------------------------------------------------- #}
-        {# --------------------------------------------------------------------------------------------- #}
+
     </sw-container>
 </sw-card-section>

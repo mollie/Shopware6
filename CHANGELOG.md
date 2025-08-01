@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Refundmanager is now disabled for orders in Authorized state, it is not possible to refund an order if nothing was caputred yet
+- Changed the position of pending refunds in Refundmanager.
 
 ### Fixed
 - Fixed webhook race condition
