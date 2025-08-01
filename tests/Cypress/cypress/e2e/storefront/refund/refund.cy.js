@@ -218,8 +218,9 @@ context("Order Refunds", () => {
             // and make sure that its gone afterwards
             refundManager.cancelPendingRefund();
 
+
             // after cancel, the refund input field should be visible again
-            repoRefundManager.getFirstLineItemQuantityInput().should('be.visible');
+            repoRefundManager.getFirstLineItemQuantityInput().scrollIntoView().should('be.visible');
 
             // now start another full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
