@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\Builder;
 
+use Exception;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\DeliveryItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\PromotionItem;
@@ -20,6 +21,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Refund;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -43,15 +45,17 @@ class RefundDataBuilder
      * @var Order
      */
     private $mollie;
+    private LoggerInterface $logger;
 
     /**
      * @param RefundService $refundService
      */
-    public function __construct(OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder)
+    public function __construct(OrderServiceInterface $orderService, RefundServiceInterface $refundService, Order $mollieOrder, LoggerInterface $logger)
     {
         $this->orderService = $orderService;
         $this->mollie = $mollieOrder;
         $this->refundService = $refundService;
+        $this->logger = $logger;
     }
 
     public function buildRefundData(OrderEntity $order, Context $context): RefundData
@@ -78,9 +82,10 @@ class RefundDataBuilder
             // we will add our database data to the Mollie metadata.composition and therefore "fake" a response of Mollie,
             // so that we can reuse the old code from below, even though Mollie does not really have a metadata.composition.
             $refunds = $this->refundService->getRefunds($order, $context);
-        } catch (PaymentNotFoundException $ex) {
+        } catch (Exception $ex) {
             // if we dont have a payment, then theres also no refunds
             // we still need our data, only with an empty list of refunds
+            $this->logger->critical($ex->getMessage());
             $refunds = [];
         }
 
