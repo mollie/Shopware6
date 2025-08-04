@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Show validation errors when a guest account is created from Express Checkout e.g. Paypal Express or Apple Pay Direct
 
 ### Changed
-- Refundmanager is now disabled for orders in Authorized state, it is not possible to refund an order if nothing was caputred yet
+- Refundmanager is now disabled for orders in Authorized state, it is not possible to refund an order if nothing was captured yet
 - Changed the position of pending refunds in Refundmanager.
 
 ### Fixed
-- Fixed webhook race condition
+- Fixed webhook, they were executed at same time as redirect back to shop, which changed the payment status twice
 - Fixed language of error labels in payment forms
 - Fixed order cloning when a subscription is renewed
 - Fixed the display of refunded items in refund manager, while the refund is pending
