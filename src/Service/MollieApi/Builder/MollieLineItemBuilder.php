@@ -93,7 +93,7 @@ class MollieLineItemBuilder
         }
 
         $mollieOrderLines = $this->addGiftCardLineItems($order, $mollieOrderLines);
-        
+
         // if we should automatically fix any rounding issues
         // then proceed with this. It will make sure that a separate line item
         // is created so that the sum of line item values matches the order total value.
