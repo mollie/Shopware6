@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Changed
+- Finalize Action now uses the SalesChannel from the Order. In some cases the SalesChannel is not set correctly which leads to use wrong API Keys in Finalize Action
+
 ## [4.17.0] - 2025-08-04
 ### Added
 - Show validation errors when a guest account is created from Express Checkout e.g. Paypal Express or Apple Pay Direct

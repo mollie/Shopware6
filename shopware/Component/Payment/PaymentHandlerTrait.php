@@ -7,7 +7,6 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
-use Shopware\Core\Framework\Api\Context\SalesChannelApiSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -62,12 +61,6 @@ trait PaymentHandlerTrait
 
     public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
     {
-        $source = $context->getSource();
-        $salesChannelId = null;
-
-        if ($source instanceof SalesChannelApiSource) {
-            $salesChannelId = $source->getSalesChannelId();
-        }
-        $this->finalizeAction->finalize($this, $transaction, $context, $salesChannelId);
+        $this->finalizeAction->finalize($this, $transaction, $context);
     }
 }
