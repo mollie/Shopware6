@@ -29,12 +29,14 @@ final class FinalizeAction
     }
 
     /** @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction */
-    public function finalize(PaymentHandler $paymentHandler, $transaction, Context $context, ?string $salesChannelId = null): void
+    public function finalize(PaymentHandler $paymentHandler, $transaction, Context $context): void
     {
         try {
             $transaction = $this->transactionConverter->convert($transaction, $context);
 
-            $orderAttributes = new OrderAttributes($transaction->getOrder());
+            $shopwareOrder = $transaction->getOrder();
+            $salesChannelId = $shopwareOrder->getSalesChannelId();
+            $orderAttributes = new OrderAttributes($shopwareOrder);
             $mollieID = $orderAttributes->getMollieOrderId();
 
             $this->logger->info(
