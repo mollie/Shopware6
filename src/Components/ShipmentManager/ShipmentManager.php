@@ -128,7 +128,7 @@ class ShipmentManager implements ShipmentManagerInterface
             throw new NoLineItemsProvidedException('Please provide a valid list of line items that should be shipped!');
         }
 
-        $trackingData = $this->getTrackingInfoStruct($tracking, $order);
+        $trackingData = $this->getTrackingInfoStruct($order, $tracking);
 
         $orderAttr = new OrderAttributes($order);
 
@@ -180,7 +180,7 @@ class ShipmentManager implements ShipmentManagerInterface
      */
     public function shipOrderRest(OrderEntity $order, ?TrackingData $tracking, Context $context): \Mollie\Api\Resources\Shipment
     {
-        $trackingData = $this->getTrackingInfoStruct($tracking, $order);
+        $trackingData = $this->getTrackingInfoStruct($order, $tracking);
 
         $orderAttr = new OrderAttributes($order);
 
@@ -224,7 +224,7 @@ class ShipmentManager implements ShipmentManagerInterface
             throw new OrderLineItemNotFoundException($itemIdentifier);
         }
 
-        $mollieTracking = $this->getTrackingInfoStruct($tracking, $order);
+        $mollieTracking = $this->getTrackingInfoStruct($order, $tracking);
 
         $mollieOrderLineId = $this->orderService->getMollieOrderLineId($lineItem);
 
@@ -321,7 +321,7 @@ class ShipmentManager implements ShipmentManagerInterface
     /**
      * @throws NoDeliveriesFoundException
      */
-    private function getTrackingInfoStruct(?TrackingData $tracking, OrderEntity $order): ?ShipmentTrackingInfoStruct
+    private function getTrackingInfoStruct(OrderEntity $order, ?TrackingData $tracking): ?ShipmentTrackingInfoStruct
     {
         try {
             if ($tracking instanceof TrackingData) {
@@ -337,6 +337,7 @@ class ShipmentManager implements ShipmentManagerInterface
             return $trackingData;
         } catch (\InvalidArgumentException $exception) {
             $loggerData = ['exception' => $exception->getMessage(), 'order' => $order->getOrderNumber()];
+            /** @phpstan-ignore-next-line  */
             if ($tracking instanceof TrackingData && count($tracking->toArray()) > 0) {
                 $loggerData['tracking'] = $tracking->toArray();
             }
