@@ -28,6 +28,9 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         if (! $utils->columnExists('mollie_subscription', 'currency')) {
             return;
         }
+        if ($utils->columnExists('mollie_subscription', 'currency_id')) {
+            return;
+        }
         // add new columns
         $sql = 'ALTER TABLE `mollie_subscription` 
                 ADD COLUMN `currency_id` BINARY(16) NULL AFTER `currency`,
@@ -47,6 +50,7 @@ class Migration1711618833SubscriptionCurrency extends MigrationStep
         while ($row = $statement->fetchAssociative()) {
             $currencies[] = $row['currency'];
         }
+
         if (class_exists(ArrayParameterType::class)) {
             $type = ArrayParameterType::STRING;
         } else {

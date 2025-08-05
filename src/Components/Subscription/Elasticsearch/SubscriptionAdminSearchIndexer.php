@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Elasticsearch;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
@@ -69,6 +70,12 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
      */
     public function fetch(array $ids): array
     {
+        if (class_exists(ArrayParameterType::class)) {
+            $type = ArrayParameterType::BINARY;
+        } else {
+            $type = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
+        }
+
         $data = $this->connection->fetchAllAssociative(
             '
             SELECT LOWER(HEX(mollie_subscription.id)) as id,
@@ -88,7 +95,7 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
                 'ids' => Uuid::fromHexToBytesList($ids),
             ],
             [
-                'ids' => ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
+                'ids' => $type, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
             ]
         );
 
