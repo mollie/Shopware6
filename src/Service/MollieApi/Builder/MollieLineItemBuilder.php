@@ -207,11 +207,12 @@ class MollieLineItemBuilder
      */
     private function addGiftCardLineItems(OrderEntity $order, MollieLineItemCollection $mollieOrderLines): MollieLineItemCollection
     {
-        $orderCustomFields = $order->getCustomFields();
-        if (! isset($orderCustomFields['lae-giftcards'])) {
+        $giftCards = $order->getCustomFields()['lae-giftcards'] ?? null;
+
+        if (! $giftCards) {
             return $mollieOrderLines;
         }
-        $giftCards = $orderCustomFields['lae-giftcards'];
+
         foreach ($giftCards as $giftCard) {
             $cardAmount = $giftCard['appliedAmount'] * -1;
             $priceStruct = new LineItemPriceStruct($cardAmount, $cardAmount, 0, 0);
