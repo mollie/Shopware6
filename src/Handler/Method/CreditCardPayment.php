@@ -40,10 +40,10 @@ class CreditCardPayment extends PaymentHandler
     {
         $customFields = $customer->getCustomFields() ?? [];
         $cardToken = $customFields[CustomFieldsInterface::MOLLIE_KEY]['credit_card_token'] ?? '';
-
+        $shouldSaveCardDetail = $customFields[CustomFieldsInterface::MOLLIE_KEY]['shouldSaveCardDetail'] ?? false;
         if (! empty($cardToken)) {
             $orderData['payment']['cardToken'] = $cardToken;
-            $this->customerService->setCardToken($customer, '', $salesChannelContext);
+            $this->customerService->setCardToken($customer, '', $salesChannelContext, $shouldSaveCardDetail);
 
             $isSaveCardToken = $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomerService::CUSTOM_FIELDS_KEY_SHOULD_SAVE_CARD_DETAIL] ?? false;
             // change payment sequenceType to first if this is a single-click payment
