@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\Checkout\Payment;
+if(class_exists(PaymentException::class)){
+    return;
+}
 use Shopware\Core\Checkout\Payment\Exception\AsyncPaymentFinalizeException;
 use Shopware\Core\Checkout\Payment\Exception\CustomerCanceledAsyncPaymentException;
 use Shopware\Core\Framework\HttpException;

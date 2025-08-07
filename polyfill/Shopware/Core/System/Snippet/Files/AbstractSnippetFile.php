@@ -2,6 +2,9 @@
 
 namespace Shopware\Core\System\Snippet\Files;
 
+if(class_exists(AbstractSnippetFile::class)){
+    return;
+}
 use Shopware\Core\Framework\Log\Package;
 
 #[Package('system-settings')]

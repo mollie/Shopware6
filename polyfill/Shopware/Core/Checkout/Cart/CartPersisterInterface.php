@@ -2,6 +2,9 @@
 
 namespace Shopware\Core\Checkout\Cart;
 
+if(interface_exists(CartPersisterInterface::class)){
+    return;
+}
 use Shopware\Core\Checkout\Cart\Exception\CartTokenNotFoundException;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;

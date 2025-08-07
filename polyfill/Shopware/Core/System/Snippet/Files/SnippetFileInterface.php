@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\System\Snippet\Files;
-
+if(interface_exists(SnippetFileInterface::class)){
+    return;
+}
 interface SnippetFileInterface
 {
     /**

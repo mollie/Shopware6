@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\Framework\Event;
-
+if(interface_exists(BusinessEventInterface::class)){
+    return;
+}
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 
 /**
