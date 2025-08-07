@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\Framework;
-
+if(class_exists(HttpException::class)){
+    return;
+}
 use Shopware\Core\Framework\Log\Package;
 
 #[Package('core')]

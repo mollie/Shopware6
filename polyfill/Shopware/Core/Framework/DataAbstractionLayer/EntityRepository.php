@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
 namespace Shopware\Core\Framework\DataAbstractionLayer;
-
+if(class_exists(EntityRepository::class)){
+    return;
+}
 use Shopware\Core\Framework\Adapter\Database\ReplicaConnection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityAggregationResultLoadedEvent;
