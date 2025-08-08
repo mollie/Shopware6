@@ -44,6 +44,14 @@ class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
             $originalData = $paymentMethodRemover->removePaymentMethods($originalData, $context);
         }
 
+        $object = $originalData->getObject();
+        foreach ($object as $paymentMethodId => $paymentMethodEntity) {
+            if ($originalData->getPaymentMethods()->has($paymentMethodId)) {
+                continue;
+            }
+            $object->remove($paymentMethodId);
+        }
+
         return $originalData;
     }
 }
