@@ -24,6 +24,7 @@ parameters:
     scanDirectories:
       - ../polyfill/Shopware
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
     ignoreErrors:
     		- '#.*Shopware\\Commercial\\ReturnManagement\\Entity\\OrderReturn.*#'
     		- identifier: class.notFound
