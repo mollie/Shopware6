@@ -6,9 +6,11 @@ namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRout
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemoverInterface;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
+use Traversable;
 
 class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
 {
@@ -25,7 +27,7 @@ class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
     /**
      * @param \Traversable<PaymentMethodRemoverInterface> $paymentMethodRemovers
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, Traversable $paymentMethodRemovers)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->paymentMethodRemovers = iterator_to_array($paymentMethodRemovers);
@@ -42,6 +44,18 @@ class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
 
         foreach ($this->paymentMethodRemovers as $paymentMethodRemover) {
             $originalData = $paymentMethodRemover->removePaymentMethods($originalData, $context);
+        }
+        $object = $originalData->getObject();
+
+        if (! $object instanceof EntityCollection) {
+            return $originalData;
+        }
+
+        foreach ($object as $paymentMethodId => $paymentMethodEntity) {
+            if ($originalData->getPaymentMethods()->has($paymentMethodId)) {
+                continue;
+            }
+            $object->remove($paymentMethodId);
         }
 
         return $originalData;

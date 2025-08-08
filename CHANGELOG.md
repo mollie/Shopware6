@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed the doctrine parameter types in elastic search and migrations
 - Fixed logging if automatic shipment didn't work. 
 - Fixed saving Credit Card information
+- Fixed Payment Method route in store-api
 - Fixed config assignment for the refund manager
+
 
 ## [4.17.0] - 2025-08-04
 ### Added
