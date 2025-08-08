@@ -151,9 +151,9 @@ Component.register('mollie-refund-manager', {
                 // so that we can show/hide a few things
                 this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId, this.order.id).then(
                     (response) => {
-                        me.configVerifyRefund = response.config.verifyRefund;
-                        me.configAutoStockReset = response.config.autoStockReset;
-                        me.configShowInstructions = response.config.showInstructions;
+                        me.configVerifyRefund = response.verifyRefund;
+                        me.configAutoStockReset = response.autoStockReset;
+                        me.configShowInstructions = response.showInstructions;
                     },
                 );
             }
