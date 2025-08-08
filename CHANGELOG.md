@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - The Finalize Action now uses the SalesChannel from the Order. However, in some cases, the SalesChannel is not set correctly, which can result in incorrect API keys being used during the Finalize Action.
 - Modified polyfill classes to ensure they are only loaded if they no longer exist in Shopware.
+- Fix configs for the refund manager
 
 ### Fixed
 - Fixed the doctrine parameter types in elastic search and migrations
