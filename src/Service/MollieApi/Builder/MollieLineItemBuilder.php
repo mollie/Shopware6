@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
@@ -90,6 +91,8 @@ class MollieLineItemBuilder
                 $mollieOrderLines->add($shipping);
             }
         }
+
+        $mollieOrderLines = $this->addGiftCardLineItems($order, $mollieOrderLines);
 
         // if we should automatically fix any rounding issues
         // then proceed with this. It will make sure that a separate line item
@@ -197,6 +200,36 @@ class MollieLineItemBuilder
         }
 
         return 'promotion';
+    }
+
+    /**
+     * apply giftcards to the order from the voucher plugin https://store.shopware.com/de/laene61720950437m/gutscheine.html
+     */
+    private function addGiftCardLineItems(OrderEntity $order, MollieLineItemCollection $mollieOrderLines): MollieLineItemCollection
+    {
+        $giftCards = $order->getCustomFields()['lae-giftcards'] ?? null;
+
+        if (! $giftCards) {
+            return $mollieOrderLines;
+        }
+
+        foreach ($giftCards as $giftCard) {
+            $cardAmount = $giftCard['appliedAmount'] * -1;
+            $priceStruct = new LineItemPriceStruct($cardAmount, $cardAmount, 0, 0);
+            $mollieLineItem = new MollieLineItem(
+                OrderLineType::TYPE_GIFT_CARD,
+                sprintf('Giftcard %s', $giftCard['name']),
+                1,
+                $priceStruct,
+                $giftCard['giftcardId'],
+                $giftCard['code'],
+                '',
+                ''
+            );
+            $mollieOrderLines->add($mollieLineItem);
+        }
+
+        return $mollieOrderLines;
     }
 
     /**
