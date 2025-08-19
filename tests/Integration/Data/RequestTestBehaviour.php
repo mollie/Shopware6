@@ -12,6 +12,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Framework\Routing\RequestTransformer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 
 trait RequestTestBehaviour
 {
@@ -27,7 +28,10 @@ trait RequestTestBehaviour
 
         $request = Request::create($domain->getUrl(), $method);
 
-        $request->setSession($this->getSession());
+        /** @var SessionFactoryInterface $factory */
+        $factory = $this->getContainer()->get('session.factory');
+
+        $request->setSession($factory->createSession());
 
         $requestTransformer = $this->getContainer()->get(RequestTransformer::class);
 
