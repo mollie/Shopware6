@@ -31,13 +31,16 @@ trait CheckoutTestBehaviour
         $request = $this->createStoreFrontRequest($salesChannelContext);
 
         $requestDataBag = new RequestDataBag();
+
+        $lineItemDataBag = new RequestDataBag([
+            'id' => $product->getId(),
+            'referenceId' => $product->getId(),
+            'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
+            'quantity' => $quantity,
+        ]);
+
         $requestDataBag->set('lineItems', [
-            $product->getId() => [
-                'id' => $product->getId(),
-                'referenceId' => $product->getId(),
-                'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
-                'quantity' => $quantity,
-            ]
+            $product->getId() => $lineItemDataBag
         ]);
 
         return $cartLineItemController->addLineItems($cart, $requestDataBag, $request, $salesChannelContext);
