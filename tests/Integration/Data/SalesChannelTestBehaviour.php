@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Data;
 
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -44,7 +45,7 @@ trait SalesChannelTestBehaviour
         $criteria->addAssociation('currency');
         $criteria->addAssociation('type');
 
-        $criteria->addFilter(new ContainsFilter('type.iconName', 'storefront'));
+        $criteria->addFilter(new EqualsFilter('typeId', Defaults::SALES_CHANNEL_TYPE_STOREFRONT));
 
         return $repository->search($criteria, $context)->first();
     }

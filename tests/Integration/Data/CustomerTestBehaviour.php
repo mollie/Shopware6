@@ -31,7 +31,7 @@ trait CustomerTestBehaviour
 
         $requestDat = new RequestDataBag($data);
         $request = $this->createStoreFrontRequest($salesChannelContext);
-        $request->request->set('errorRoute', '');
+        $request->request->set('errorRoute', 'frontend.account.login.page');
 
         return $registerController->register($request, $requestDat, $salesChannelContext);
     }
