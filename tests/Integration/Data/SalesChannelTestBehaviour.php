@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Integration\Data;
 
 use Shopware\Core\Defaults;
+use Shopware\Core\DevOps\Environment\EnvironmentHelper;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -39,7 +40,7 @@ trait SalesChannelTestBehaviour
         $repository = $this->getContainer()->get('sales_channel.repository');
 
         $criteria = new Criteria();
-        $criteria->addAssociation('domain.url');
+        $criteria->addAssociation('domains');
         $criteria->addAssociation('language.locale');
         $criteria->addAssociation('currency');
         $criteria->addAssociation('type');
