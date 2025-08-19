@@ -64,8 +64,8 @@ trait CustomerTestBehaviour
 
     private function createDefaultData(SalesChannelContext $salesChannelContext): array
     {
-
         $countryId = $this->getValidCountryId($salesChannelContext->getSalesChannelId());
+
         return [
             'firstName' => 'Max',
             'lastName' => 'Mollie',
