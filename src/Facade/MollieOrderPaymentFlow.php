@@ -58,11 +58,18 @@ class MollieOrderPaymentFlow
      */
     public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context $context): bool
     {
-        $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
         $settings = $this->settingsService->getSettings($salesChannelId);
-        // this is only mollie payment flow here we are doing failed management here
-        $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $context);
-        $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
+
+        $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
+        /**
+         * We want to make sure that payment and order status is changed only over webhook. we need to change the status in return url only for dev environment
+         * this way we avoid the status change if the return url and webhook url is called at same time
+         */
+        if ($this->settingsService->getEnvMollieDevMode() || $this->settingsService->getMollieCypressMode()) {
+            // this is only mollie payment flow here we are doing failed management here
+            $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $context);
+            $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
+        }
 
         // now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
         if (! $this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {

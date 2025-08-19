@@ -11,7 +11,6 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order;
-use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -37,10 +36,6 @@ class MolliePaymentFinalize
      * @var OrderStatusConverter
      */
     private $orderStatusConverter;
-    /**
-     * @var OrderStatusUpdater
-     */
-    private $orderStatusUpdater;
     /**
      * @var SettingsService
      */
@@ -78,10 +73,9 @@ class MolliePaymentFinalize
     /**
      * @param EntityRepository<EntityCollection<CustomerEntity>> $repoCustomer
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
-        $this->orderStatusUpdater = $orderStatusUpdater;
         $this->settingsService = $settingsService;
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
@@ -116,17 +110,6 @@ class MolliePaymentFinalize
 
         $settings = $this->settingsService->getSettings($salesChannelId);
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
-
-        // Attention
-        // Our payment status will either be set by us, or automatically by Shopware using exceptions below.
-        // But the order status, is something that we always have to set MANUALLY in both cases.
-        // That's why we do this here, before throwing exceptions.
-        $this->orderStatusUpdater->updateOrderStatus(
-            $order,
-            $paymentStatus,
-            $settings,
-            $context
-        );
 
         $paymentMethod = $transactionStruct->getOrderTransaction()->getPaymentMethod();
 
@@ -168,8 +151,6 @@ class MolliePaymentFinalize
 
         // --------------------------------------------------------------------------------------------------------------------
 
-        $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $context);
-
         // now update the custom fields of the order
         // we want to have as much information as possible in the shopware order
         // this includes the Mollie Payment ID and maybe additional references
@@ -178,7 +159,6 @@ class MolliePaymentFinalize
             $mollieOrderId,
             '',
             $transactionStruct->getOrderTransactionId(),
-            0,
             $context
         );
 
