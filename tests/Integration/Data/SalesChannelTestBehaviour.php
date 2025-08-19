@@ -32,6 +32,22 @@ trait SalesChannelTestBehaviour
         return $repository->search($criteria, $context)->first();
     }
 
+    public function findRegularSalesChannel(Context $context): SalesChannelEntity
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('sales_channel.repository');
+
+        $criteria = new Criteria();
+        $criteria->addAssociation('domain.url');
+        $criteria->addAssociation('language.locale');
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('type');
+
+        $criteria->addFilter(new EqualsFilter('type.iconName', 'regular-storefront'));
+
+        return $repository->search($criteria, $context)->first();
+    }
+
     public function getSalesChannelContext(SalesChannelEntity $salesChannel, array $options = []): SalesChannelContext
     {
         $salesChannelContextFactory = $this->getContainer()->get(SalesChannelContextFactory::class);
@@ -39,9 +55,9 @@ trait SalesChannelTestBehaviour
         return $salesChannelContextFactory->create(Uuid::fromStringToHex($salesChannel->getName()), $salesChannel->getId(), $options);
     }
 
-    public function getDefaultSalesChannelContext(string $domain = 'https://mollie-local.diwc.de'): SalesChannelContext
+    public function getDefaultSalesChannelContext(): SalesChannelContext
     {
-        $salesChannel = $this->findSalesChannelByDomain($domain, Context::createDefaultContext());
+        $salesChannel = $this->findRegularSalesChannel(Context::createDefaultContext());
 
         return $this->getSalesChannelContext($salesChannel);
     }

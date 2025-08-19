@@ -28,4 +28,14 @@ final class UpdateStatusTaskHandler extends ScheduledTaskHandler
     {
         $result = $this->action->execute();
     }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public static function getHandledMessages(): iterable
+    {
+        return [
+            UpdateStatusScheduledTask::class,
+        ];
+    }
 }
