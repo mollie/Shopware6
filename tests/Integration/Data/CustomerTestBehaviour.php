@@ -54,6 +54,7 @@ trait CustomerTestBehaviour
             $this->createAccount($email, $salesChannelContext, $accountData);
             $customerId = $this->findUserIdByEmail($email, $salesChannelContext->getContext());
         }
+
         $options = [
             SalesChannelContextService::CUSTOMER_ID => $customerId,
         ];
@@ -63,8 +64,8 @@ trait CustomerTestBehaviour
 
     private function createDefaultData(SalesChannelContext $salesChannelContext): array
     {
-        $countryId = $salesChannelContext->getCountryId();
 
+        $countryId = $this->getValidCountryId($salesChannelContext->getSalesChannelId());
         return [
             'firstName' => 'Max',
             'lastName' => 'Mollie',

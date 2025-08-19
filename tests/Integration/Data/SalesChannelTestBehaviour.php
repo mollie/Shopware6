@@ -6,6 +6,7 @@ namespace Mollie\Integration\Data;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -43,7 +44,7 @@ trait SalesChannelTestBehaviour
         $criteria->addAssociation('currency');
         $criteria->addAssociation('type');
 
-        $criteria->addFilter(new EqualsFilter('type.iconName', 'regular-storefront'));
+        $criteria->addFilter(new ContainsFilter('type.iconName', 'storefront'));
 
         return $repository->search($criteria, $context)->first();
     }
