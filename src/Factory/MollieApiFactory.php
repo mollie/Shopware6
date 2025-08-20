@@ -63,7 +63,7 @@ class MollieApiFactory
     public function getClient(?string $salesChannelId = null): MollieApiClient
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
-
+        var_dump($salesChannelId,$settings->isTestMode());
         if ($settings->isTestMode()) {
             return $this->getTestClient((string) $salesChannelId);
         }
