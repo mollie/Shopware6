@@ -35,6 +35,7 @@ trait CheckoutTestBehaviour
         $lineItemDataBag = new RequestDataBag([
             'id' => $product->getId(),
             'referenceId' => $product->getId(),
+            'referencedId' => $product->getId(), //this is required for shopware 6.5.5.2
             'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
             'quantity' => $quantity,
         ]);

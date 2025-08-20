@@ -25,7 +25,7 @@ trait RequestTestBehaviour
         $domain = $salesChannel->getDomains()->filter(function (SalesChannelDomainEntity $domain) {
             return str_starts_with($domain->getUrl(), 'https');
         })->first();
-        dump($domain->getUrl());
+
         $request = Request::create($domain->getUrl(), $method);
 
         /** @var SessionFactoryInterface $factory */
