@@ -80,10 +80,10 @@ class SettingsService implements PluginSettingsServiceInterface
     public function getSettings(?string $salesChannelId = null): MollieSettingStruct
     {
         $cacheKey = $salesChannelId ?? 'all';
-
+        /*
         if (isset($this->cachedStructs[$cacheKey])) {
             return $this->cachedStructs[$cacheKey];
-        }
+        }*/
         $structData = [];
         /** @var ?array<mixed> $systemConfigData */
         $systemConfigData = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);

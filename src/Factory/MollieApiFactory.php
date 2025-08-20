@@ -93,7 +93,7 @@ class MollieApiFactory
         }
 
         $apiKey = $settings->getTestApiKey();
-
+        dump(strlen($apiKey), $salesChannelId);
         // now check if our TEST api key starts with "live_"...if that is the case
         // do NOT use it, and log an error. This helps us to avoid that merchants
         // accidentally use a PROD key in test mode.
