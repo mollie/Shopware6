@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Data;
 
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -67,6 +66,7 @@ trait CustomerTestBehaviour
     {
         $countryId = $this->getValidCountryId($salesChannelContext->getSalesChannelId());
         $salutationId = $this->getValidSalutationId();
+
         return [
             'salutationId' => $salutationId,
             'firstName' => 'Max',
