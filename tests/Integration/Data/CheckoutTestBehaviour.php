@@ -51,7 +51,7 @@ trait CheckoutTestBehaviour
     {
         $options = [
             SalesChannelContextService::PAYMENT_METHOD_ID => $paymentMethod->getId(),
-            SalesChannelContextService::CUSTOMER_ID => $salesChannelContext->getCustomerId(),
+            SalesChannelContextService::CUSTOMER_ID => $salesChannelContext->getCustomer()->getId(),
         ];
 
         return $this->getSalesChannelContext($salesChannelContext->getSalesChannel(), $options);
