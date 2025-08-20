@@ -63,7 +63,7 @@ class MollieApiFactory
     public function getClient(?string $salesChannelId = null): MollieApiClient
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
-        dump($salesChannelId, $settings->isTestMode());
+
         if ($settings->isTestMode()) {
             return $this->getTestClient((string) $salesChannelId);
         }
@@ -116,6 +116,7 @@ class MollieApiFactory
             $httpClient = new MollieHttpClient($connectTimeout, $responseTimeout);
 
             $this->apiClient = new MollieApiClient($httpClient);
+            dump(strlen($apiKey));
             $this->apiClient->setApiKey($apiKey);
 
             $this->apiClient->addVersionString('Shopware/' . $this->shopwareVersion);
