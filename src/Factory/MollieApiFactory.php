@@ -33,6 +33,9 @@ class MollieApiFactory
      */
     private $logger;
 
+    /**
+     * @var array<string,MollieApiClient>
+     */
     private array $cachedClients = [];
 
     public function __construct(string $shopwareVersion, SettingsService $settingsService, LoggerInterface $logger)
@@ -68,7 +71,8 @@ class MollieApiFactory
 
         $isTestMode = $settings->isTestMode();
 
-        $cacheKey = 'client_' . ($isTestMode ? 'test' : 'live') . '_' . $salesChannelId ?? 'all';
+        $cacheKey = 'client_' . ($isTestMode ? 'test' : 'live') . '_' . ($salesChannelId ?? 'all');
+
         if (isset($this->cachedClients[$cacheKey])) {
             return $this->cachedClients[$cacheKey];
         }
