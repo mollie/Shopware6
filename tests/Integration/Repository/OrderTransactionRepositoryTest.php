@@ -87,6 +87,9 @@ class OrderTransactionRepositoryTest extends TestCase
     {
         $cashPaymentMethod = $this->getPaymentMethodByIdentifier(CashPayment::class, $salesChannelContext->getContext());
 
+        $this->activatePaymentMethod($cashPaymentMethod, $salesChannelContext->getContext());
+        $this->assignPaymentMethodToSalesChannel($cashPaymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
+
         $salesChannelContext = $this->setPaymentMethod($cashPaymentMethod, $salesChannelContext);
         $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
         /** @var RedirectResponse $response */
