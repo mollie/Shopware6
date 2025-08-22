@@ -404,4 +404,16 @@ class SubscriptionRepository
     }
 
     // endregion
+    public function updateMetadata(SubscriptionEntity $swSubscription, Context $context)
+    {
+        $this->repository->update(
+            [
+                [
+                    'id' => $swSubscription->getId(),
+                    'metadata' => $swSubscription->getMetadata()->toArray()
+                ],
+            ],
+            $context
+        );
+    }
 }

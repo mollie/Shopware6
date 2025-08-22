@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionSkippedException;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
@@ -125,6 +126,18 @@ class RenewAction extends BaseAction
             (string) $mollieSubscription->nextPaymentDate,
             $context
         );
+
+        if (property_exists($mollieSubscription, 'timesRemaining') &&$mollieSubscription->timesRemaining !== null) {
+            $metadata = $swSubscription->getMetadata();
+            $metaDataArray = $metadata->toArray();
+            $metaDataArray['times'] = $mollieSubscription->timesRemaining;
+            $swSubscription->setMetadata(SubscriptionMetadata::fromArray($metaDataArray));
+
+            $this->getRepository()->updateMetadata(
+                $swSubscription,
+                $context
+            );
+        }
 
         // now that we know that we have to renew something,
         // we also need to make sure, that a skipped subscription is "resumed" again.
