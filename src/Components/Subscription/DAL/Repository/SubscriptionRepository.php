@@ -375,6 +375,21 @@ class SubscriptionRepository
         );
     }
 
+    // endregion
+
+    public function updateMetadata(SubscriptionEntity $swSubscription, Context $context): void
+    {
+        $this->repository->update(
+            [
+                [
+                    'id' => $swSubscription->getId(),
+                    'metadata' => $swSubscription->getMetadata()->toArray()
+                ],
+            ],
+            $context
+        );
+    }
+
     private function upsertAddress(string $subscriptionId, SubscriptionAddressEntity $address, Context $context): void
     {
         $this->addressRepository->upsert(
@@ -402,6 +417,4 @@ class SubscriptionRepository
             $context
         );
     }
-
-    // endregion
 }
