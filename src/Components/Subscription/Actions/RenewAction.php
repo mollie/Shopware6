@@ -127,7 +127,7 @@ class RenewAction extends BaseAction
             $context
         );
 
-        if (property_exists($mollieSubscription, 'timesRemaining') &&$mollieSubscription->timesRemaining !== null) {
+        if ($mollieSubscription->timesRemaining !== null) {
             $metadata = $swSubscription->getMetadata();
             $metaDataArray = $metadata->toArray();
             $metaDataArray['times'] = $mollieSubscription->timesRemaining;
