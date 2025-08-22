@@ -116,7 +116,7 @@ context("Plugin Config", () => {
             cy.contains(divPreview, '"cypress_1000-stage"');
         })
 
-        it('C1097313: Display order lifetime days warning', () => {
+        it('C1097313: Display order lifetime days warning @core', () => {
 
             beforeEach(device);
 
@@ -154,7 +154,7 @@ context("Plugin Config", () => {
 
         })
 
-        it('Wiki Button redirects to correct page', () => {
+        it('Wiki Button redirects to correct page @core', () => {
 
             beforeEach(device);
             adminLogin.login();
