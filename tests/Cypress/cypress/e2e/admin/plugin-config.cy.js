@@ -153,5 +153,23 @@ context("Plugin Config", () => {
             cy.get(errorDiv).should('not.exist');
 
         })
+
+        it('Wiki Button redirects to correct page', () => {
+
+            beforeEach(device);
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.get('.cy-documentation')
+                .should('be.visible')
+                .invoke('removeAttr', 'target')
+                .invoke('attr', 'href')
+                .then((expectedUrl) => {
+                    cy.get('.cy-documentation').click();
+
+                    cy.url().should('eq', expectedUrl);
+                });
+        })
+
     })
 })
