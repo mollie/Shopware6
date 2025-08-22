@@ -116,7 +116,7 @@ context("Plugin Config", () => {
             cy.contains(divPreview, '"cypress_1000-stage"');
         })
 
-        it('C1097313: Display order lifetime days warning', () => {
+        it('C1097313: Display order lifetime days warning @core', () => {
 
             beforeEach(device);
 
@@ -153,5 +153,23 @@ context("Plugin Config", () => {
             cy.get(errorDiv).should('not.exist');
 
         })
+
+        it('Wiki Button redirects to correct page @core', () => {
+
+            beforeEach(device);
+            adminLogin.login();
+            pluginAction.openPluginConfiguration();
+
+            cy.get('.cy-documentation')
+                .should('be.visible')
+                .invoke('removeAttr', 'target')
+                .invoke('attr', 'href')
+                .then((expectedUrl) => {
+                    cy.get('.cy-documentation').click();
+
+                    cy.url().should('eq', expectedUrl);
+                });
+        })
+
     })
 })
