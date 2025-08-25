@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+         bootstrap="./../tests/bootstrap.php"
+         cacheResult="false"
+         colors="true"
+         executionOrder="random"
+>
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <server name="KERNEL_CLASS" value="Shopware\Core\Kernel"/>
+        <env name="APP_ENV" value="test"/>
+        <env name="APP_DEBUG" value="1"/>
+        <env name="APP_SECRET" value="+g1fbgB/u0y45NSqftvvfvIksdBJUKSLjmxiNPDRyhGs6X+O625znsPHR0AUStElmDA21XOdn5lnwAoQR34Q5lamMXiUqn1DIT5LTHEVjtJ9CVUBX4FZwzldq9q6OmHDYjjXIV1P"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="integration">
+            <directory>./../tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">./../src</directory>
+            <directory suffix=".php">./../shopware</directory>
+        </include>
+    </coverage>
+
+    
+</phpunit>

@@ -86,7 +86,7 @@ class PaymentReturnFacade
         // Get the transaction from the order transaction repository. With the
         // transaction we can fetch the order from the database.
         $transaction = $this->transactionService->getTransactionById($transactionId, null, $context);
-
+        $this->logger->info('Return Action called.', ['transactionId' => $transactionId]);
         if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->critical('Transaction with id ' . $transactionId . ' could not be read from database');
             throw new CouldNotFetchTransactionException($transactionId);

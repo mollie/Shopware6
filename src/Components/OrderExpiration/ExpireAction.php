@@ -51,8 +51,6 @@ class ExpireAction
 
     public function expireOrders(Context $context): void
     {
-        $this->logger->debug('Start resetting in_progress orders');
-
         $salesChannelsCriteria = new Criteria();
         $salesChannelsCriteria->addFilter(new EqualsFilter('active', true));
 

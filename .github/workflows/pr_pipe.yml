@@ -77,7 +77,7 @@ jobs:
             SHOPWARE: ${{ matrix.shopware }}
             PHP: ${{ matrix.php }}
             # -------------------------------------------
-            MOLLIE_APIKEY_TEST: ""
+            MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
             # -------------------------------------------
             RUN_CYPRESS: true
             TESTRAIL: false

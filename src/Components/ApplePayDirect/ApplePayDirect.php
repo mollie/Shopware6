@@ -428,7 +428,6 @@ class ApplePayDirect
             $paymentData->getMollieID(),
             '',
             $transaction->getId(),
-            0,
             $context->getContext()
         );
 

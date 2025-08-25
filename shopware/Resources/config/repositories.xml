@@ -3,9 +3,11 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services
         https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="Mollie\Shopware\Repository\OrderTransactionRepository">
+            <argument type="service" id="order_transaction.repository"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+        </service>
 
-   <imports>
-       <import resource="./../../Component/**/Resources/config/**.xml"/>
-       <import resource="repositories.xml"/>
-   </imports>
+    </services>
 </container>
