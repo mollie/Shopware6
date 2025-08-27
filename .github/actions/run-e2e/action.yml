@@ -99,6 +99,7 @@ runs:
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -149,6 +150,8 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
+        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
+        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent null'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
