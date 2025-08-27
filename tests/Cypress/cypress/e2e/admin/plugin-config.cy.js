@@ -154,7 +154,7 @@ context("Plugin Config", () => {
 
         })
 
-        it('Wiki Button redirects to correct page @core', () => {
+        it('C4255361: Wiki Button redirects to correct page @core', () => {
 
             beforeEach(device);
             adminLogin.login();
