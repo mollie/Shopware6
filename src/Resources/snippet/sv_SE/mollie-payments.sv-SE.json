@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Är du säker på att du vill radera?",
                 "title": "Radera bekräftelse"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Telefonnummer",
                 "phoneErrorMessage": "Telefonnummer krävs. Till exempel +31208202070"
             }

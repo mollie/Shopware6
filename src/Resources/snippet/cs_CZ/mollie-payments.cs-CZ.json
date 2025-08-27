@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Opravdu si to přejete smazat?",
                 "title": "Potvrzení o smazání"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Telefonní číslo",
                 "phoneErrorMessage": "Telefonní číslo je povinné. Například +31208202070"
             }

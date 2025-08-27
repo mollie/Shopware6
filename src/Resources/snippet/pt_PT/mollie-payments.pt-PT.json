@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Tem a certeza de que pretende eliminar?",
                 "title": "Confirmar a eliminação"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Número de telefone",
                 "phoneErrorMessage": "O número de telefone é obrigatório. Por exemplo +351 912 345 678"
             }

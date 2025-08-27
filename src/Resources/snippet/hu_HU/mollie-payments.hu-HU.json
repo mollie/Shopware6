@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Biztosan törölni szeretné?",
                 "title": "Törlés megerősítése"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Telefonszám",
                 "phoneErrorMessage": "A telefonszám kötelező. Például +31208202070"
             }

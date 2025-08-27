@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Er du sikker på at du vil slette?",
                 "title": "Bekreft sletting"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Telefonnummer",
                 "phoneErrorMessage": "Telefonnummer er påkrevd. For eksempel +31208202070"
             }
