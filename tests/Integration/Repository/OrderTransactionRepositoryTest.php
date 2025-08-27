@@ -40,6 +40,7 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->assignPaymentMethodToSalesChannel($paypalPaymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
 
         $salesChannelContext = $this->loginOrCreateAccount('test@mollie.com', $salesChannelContext);
+        $this->assertNotNull($salesChannelContext->getCustomer());
 
         $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
 
