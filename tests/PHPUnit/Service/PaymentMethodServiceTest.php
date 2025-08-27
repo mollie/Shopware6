@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
 use Kiener\MolliePayments\Handler\Method\BilliePayment;
+use Kiener\MolliePayments\Handler\Method\BizumPayment;
 use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
@@ -148,6 +149,7 @@ class PaymentMethodServiceTest extends TestCase
             MbWayPayment::class,
             MultibancoPayment::class,
             SwishPayment::class,
+            BizumPayment::class,
             PayPalExpressPayment::class,
         ];
 

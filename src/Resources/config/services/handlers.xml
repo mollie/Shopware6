@@ -54,6 +54,14 @@
             <tag name="shopware.payment.method"/>
         </service>
 
+        <!-- Bizum PaymentHandler -->
+        <service id="Kiener\MolliePayments\Handler\Method\BizumPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
+            <tag name="shopware.payment.method.async"/>
+            <tag name="shopware.payment.method"/>
+        </service>
+
         <!-- Credit Card PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" >
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>

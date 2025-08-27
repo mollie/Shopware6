@@ -33,7 +33,7 @@
         } %}
     {% elseif payment.translated.customFields.mollie_payment_method_name == 'pointofsale' %}
         {% sw_include '@MolliePayments/storefront/component/payment/component/pos-fields.html.twig' %}
-    {% elseif payment.translated.customFields.mollie_payment_method_name == 'bancomatpay' %}
-        {% sw_include '@MolliePayments/storefront/component/payment/component/bancomat-fields.html.twig' %}
+    {% elseif payment.translated.customFields.mollie_payment_method_name in ['bancomatpay', 'bizum'] %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/phone-fields.html.twig' %}
     {% endif %}
 {% endblock %}

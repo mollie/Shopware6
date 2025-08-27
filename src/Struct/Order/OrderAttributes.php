@@ -111,9 +111,11 @@ class OrderAttributes
     private $payPalExpressAuthenticateId;
 
     /**
+     * Universal phone number for payment methods that require phone number
+     *
      * @var string
      */
-    private $bancomatPayPhoneNumber;
+    private $payPhoneNumber;
     /**
      * We need to store the mollie payment method name, so we can later check if the method has been changed
      */
@@ -141,7 +143,7 @@ class OrderAttributes
         $this->bankAccount = $this->getCustomFieldValue($order, 'bankAccount');
         $this->bankBic = $this->getCustomFieldValue($order, 'bankBic');
         $this->timezone = $this->getCustomFieldValue($order, 'timezone');
-        $this->bancomatPayPhoneNumber = $this->getCustomFieldValue($order, 'bancomatPayPhoneNumber');
+        $this->payPhoneNumber = $this->getCustomFieldValue($order, 'payPhoneNumber');
         $this->payPalExpressAuthenticateId = $this->getCustomFieldValue($order, CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID);
     }
 
@@ -365,14 +367,20 @@ class OrderAttributes
         $this->payPalExpressAuthenticateId = $payPalExpressAuthenticateId;
     }
 
-    public function getBancomatPayPhoneNumber(): string
+    /**
+     * Universal getter for payment phone number
+     */
+    public function getPayPhoneNumber(): string
     {
-        return $this->bancomatPayPhoneNumber;
+        return $this->payPhoneNumber;
     }
 
-    public function setBancomatPayPhoneNumber(string $bancomatPayPhoneNumber): void
+    /**
+     * Universal setter for payment phone number
+     */
+    public function setPayPhoneNumber(string $payPhoneNumber): void
     {
-        $this->bancomatPayPhoneNumber = $bancomatPayPhoneNumber;
+        $this->payPhoneNumber = $payPhoneNumber;
     }
 
     /**
@@ -459,8 +467,8 @@ class OrderAttributes
             $mollieData['bankBic'] = $this->bankBic;
         }
 
-        if ($this->bancomatPayPhoneNumber !== '') {
-            $mollieData['bancomatPayPhoneNumber'] = $this->bancomatPayPhoneNumber;
+        if ($this->payPhoneNumber !== '') {
+            $mollieData['payPhoneNumber'] = $this->payPhoneNumber;
         }
         if ((string) $this->payPalExpressAuthenticateId !== '') {
             $mollieData[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] = $this->payPalExpressAuthenticateId;

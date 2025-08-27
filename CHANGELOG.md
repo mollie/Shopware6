@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Bizum Payment method is now available for Mollie Payments.
+
 ### Changed
 - The Finalize Action now uses the SalesChannel from the Order. However, in some cases, the SalesChannel is not set correctly, which can result in incorrect API keys being used during the Finalize Action.
 - Modified polyfill classes to ensure they are only loaded if they no longer exist in Shopware.
@@ -15,7 +18,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed saving Credit Card information
 - Fixed Payment Method route in store-api
 - Fixed config assignment for the refund manager
-
 
 ## [4.17.0] - 2025-08-04
 ### Added
