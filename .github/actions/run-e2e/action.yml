@@ -151,7 +151,6 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
-        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent null'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
