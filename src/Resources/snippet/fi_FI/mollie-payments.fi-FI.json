@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Oletko varma, että haluat poistaa?",
                 "title": "Poista vahvistus"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Puhelinnumero",
                 "phoneErrorMessage": "Puhelinnumero on pakollinen. Esimerkiksi +31208202070"
             }

@@ -44,7 +44,7 @@
                 "deleteConfirmation": "Ali ste prepričani, da želite izbrisati?",
                 "title": "Potrditev izbrisa"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Telefonska številka",
                 "phoneErrorMessage": "Telefonska številka je obvezna. Na primer +386 41 111 222"
             }

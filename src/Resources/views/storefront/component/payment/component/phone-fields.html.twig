@@ -1,0 +1,30 @@
+{% set requiresPhoneNumber = payment.translated.customFields.mollie_payment_method_name in ['bancomatpay', 'bizum'] %}
+{% set isSelected = false %}
+
+{# Check if this payment method is currently selected - support both Shopware versions #}
+{% if selectedPaymentMethodId is defined %}
+    {% set isSelected = (payment.id is same as(selectedPaymentMethodId)) %}
+{% elseif defaultPaymentMethodId is defined %}
+    {% set isSelected = (payment.id is same as(defaultPaymentMethodId)) %}
+{% endif %}
+
+{% if requiresPhoneNumber and isSelected %}
+    <div class="mollie-phone-field" data-mollie-phone-validation="true">
+        <label for="molliePayPhone">{{ "molliePayments.components.phoneField.headLine"|trans|striptags }}:</label>
+        <input id="molliePayPhone"
+               placeholder="+49123456789"
+               name="molliePayPhone" 
+               form="confirmOrderForm" 
+               type="text"
+               pattern="\+[1-9]\d{1,14}"
+               class="form-control"
+               autocomplete="off"
+               value="{{ context.customer.activeBillingAddress.phoneNumber }}"
+              />
+        <small class="form-text js-validation-message invalid-feedback d-none"
+               data-form-validation-invalid-phone="true" invalid="true">
+
+            {{ "molliePayments.components.phoneField.phoneErrorMessage"|trans|striptags }}
+        </small>
+    </div>
+{% endif %}

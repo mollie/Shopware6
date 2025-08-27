@@ -1,23 +1,23 @@
 import Plugin from '../plugin';
 
-const MOLLIE_BANCOMAT_PAY_PHONE_ID = 'mollieBancomatPayPhone';
-const MOLLIE_BANCOMAT_WRAPPER_SELECTOR = '.mollie-bancomat-pay';
-const MOLLIE_BANCOMAT_ERROR_MESSAGE_SELECTOR = '.mollie-bancomat-pay [data-form-validation-invalid-phone="true"]';
+const MOLLIE_PHONE_FIELD_ID = 'molliePayPhone';
+const MOLLIE_PHONE_WRAPPER_SELECTOR = '.mollie-phone-field';
+const MOLLIE_PHONE_ERROR_MESSAGE_SELECTOR = '.mollie-phone-field [data-form-validation-invalid-phone="true"]';
 
 const DISPLAY_NONE_CLS = 'd-none';
 const WAS_VALIDATED_CLS = 'was-validated';
 const INVALID_ATTR = 'invalid';
 
-export default class MollieBancomatPlugin extends Plugin {
+export default class MolliePhonePlugin extends Plugin {
     init() {
-        const phoneField = document.getElementById(MOLLIE_BANCOMAT_PAY_PHONE_ID);
+        const phoneField = document.getElementById(MOLLIE_PHONE_FIELD_ID);
         if (phoneField === null) {
             return;
         }
 
-        const inputFieldWrapper = document.querySelector(MOLLIE_BANCOMAT_WRAPPER_SELECTOR);
+        const inputFieldWrapper = document.querySelector(MOLLIE_PHONE_WRAPPER_SELECTOR);
 
-        const errorMessageElement = document.querySelector(MOLLIE_BANCOMAT_ERROR_MESSAGE_SELECTOR);
+        const errorMessageElement = document.querySelector(MOLLIE_PHONE_ERROR_MESSAGE_SELECTOR);
 
         phoneField.addEventListener('focus', (e) => {
             inputFieldWrapper.classList.add(WAS_VALIDATED_CLS);

@@ -5,7 +5,7 @@ import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-pay
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
 import PayPalExpressPlugin from './mollie-payments/plugins/express/paypal-express.plugin';
-import MollieBancomatPlugin from './mollie-payments/plugins/bancomat-plugin';
+import MolliePhonePlugin from './mollie-payments/plugins/phone-plugin';
 
 export default class MollieRegistration {
     /**
@@ -61,7 +61,8 @@ export default class MollieRegistration {
         // -----------------------------------------------------------------------------
         pluginManager.register('MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]');
 
-        // BANCOMAT PAY
-        pluginManager.register('MollieBancomatPlugin', MollieBancomatPlugin);
+        // UNIVERSAL PHONE VALIDATION
+        // -----------------------------------------------------------------------------
+        pluginManager.register('MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]');
     }
 }

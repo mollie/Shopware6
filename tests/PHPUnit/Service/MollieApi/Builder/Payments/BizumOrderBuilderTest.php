@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
+namespace PHPUnit\Service\MollieApi\Builder\Payments;
 
-use Kiener\MolliePayments\Handler\Method\BancomatPayment;
+use Kiener\MolliePayments\Handler\Method\BizumPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
@@ -11,14 +11,14 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
+class BizumOrderBuilderTest extends AbstractMollieOrderBuilder
 {
     public function testOrderBuild(): void
     {
         $redirectWebhookUrl = 'https://foo';
         $this->router->method('generate')->willReturn($redirectWebhookUrl);
 
-        $this->paymentHandler = new BancomatPayment(
+        $this->paymentHandler = new BizumPayment(
             $this->payAction,
             $this->finalizeAction
         );
@@ -49,9 +49,6 @@ class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
             ->format('Y-m-d')
         ;
 
-        $expectedBillingAddress = $this->getExpectedTestAddress($this->address, $this->email);
-        $expectedBillingAddress['phone'] = $phoneNumber;
-
         $expected = [
             'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
             'locale' => $this->localeCode,
@@ -61,11 +58,11 @@ class BancomatOrderBuilderTest extends AbstractMollieOrderBuilder
             'redirectUrl' => $redirectWebhookUrl,
             'webhookUrl' => $redirectWebhookUrl,
             'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
-            'billingAddress' => $expectedBillingAddress,
+            'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
             'expiresAt' => $expectedOrderLifeTime,
         ];
-
+        $expected['billingAddress']['phone'] = $phoneNumber;
         self::assertSame($expected, $actual);
     }
 }

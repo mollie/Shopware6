@@ -44,7 +44,7 @@
                 "deleteConfirmation": "¿Estás seguro de eliminar la tarjeta?",
                 "title": "Confirmar eliminación"
             },
-            "bancomatPay": {
+            "phoneField": {
                 "headLine": "Número de teléfono",
                 "phoneErrorMessage": "Se requiere un número de teléfono. Por ejemplo: +34 665 202 070"
             }

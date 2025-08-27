@@ -145,11 +145,11 @@ class MolliePaymentDoPay
         // but filled if we do another payment attempt for an existing order.
         $mollieOrderId = $orderCustomFields->getMollieOrderId();
 
-        $bancomatPayPhoneNumber = $dataBag->get('mollieBancomatPayPhone');
+        $payPhoneNumber = $dataBag->get('molliePayPhone');
 
-        if ($bancomatPayPhoneNumber !== null) {
+        if ($payPhoneNumber !== null) {
             // # we need to pass the custom fields now, so we can use them in create order and display the number on failed orders
-            $orderCustomFields->setBancomatPayPhoneNumber($bancomatPayPhoneNumber);
+            $orderCustomFields->setPayPhoneNumber($payPhoneNumber);
             $order->setCustomFields($orderCustomFields->toArray());
             $this->updaterOrderCustomFields->updateOrder($order->getId(), $orderCustomFields, $salesChannelContext->getContext());
         }
