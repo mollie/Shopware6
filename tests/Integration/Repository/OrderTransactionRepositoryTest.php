@@ -70,7 +70,7 @@ class OrderTransactionRepositoryTest extends TestCase
     private function createMollieOrderWithPaymentMethod(string $status, PaymentMethodEntity $paymentMethod, SalesChannelContext $salesChannelContext): SalesChannelContext
     {
         $salesChannelContext = $this->setPaymentMethod($paymentMethod, $salesChannelContext);
-
+        $this->assertNotNull($salesChannelContext->getCustomer());
         $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
 
         /** @var RedirectResponse $response */
