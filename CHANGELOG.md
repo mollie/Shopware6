@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed config assignment for the refund manager
 - Fixed last remaining subscription times being reset when paused and resumed 
 - Fixed the error that the storefront/dist folder does not exists
+- Fixed automatic delivery when the tracking codes are just empty strings
 
 ## [4.17.0] - 2025-08-04
 ### Added
