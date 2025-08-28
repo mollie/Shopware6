@@ -8,7 +8,9 @@ use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Kiener\MolliePayments\Traits\StringTrait;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Throwable;
 
 class TrackingInfoStructFactory
 {
@@ -48,7 +50,7 @@ class TrackingInfoStructFactory
         if (! $deliveries instanceof OrderDeliveryCollection || $deliveries->count() === 0) {
             throw new NoDeliveriesFoundException('No deliveries found for order with ID ' . $order->getId() . '!');
         }
-
+        /** @var OrderDeliveryEntity $orderDeliveryEntity */
         $orderDeliveryEntity = $deliveries->first();
         if ($orderDeliveryEntity === null) {
             throw new NoDeliveriesFoundException('No deliveries found for order with ID ' . $order->getId() . '!');
@@ -59,7 +61,7 @@ class TrackingInfoStructFactory
         if ($shippingMethod === null) {
             return null;
         }
-
+        $trackingCodes = array_filter($trackingCodes);
         /*
          * Currently we create one shipping in mollie for one order. one shipping object can have only one tracking code.
          * When we have multiple Tracking Codes, we do not know which tracking code we should send to mollie. So we just dont send any tracking information at all
@@ -71,12 +73,17 @@ class TrackingInfoStructFactory
         }
 
         $this->logger->info(sprintf('Creating tracking information for shipment with shipping method %s. Order: "%s"', $shippingMethod->getName(), $order->getOrderNumber()));
+        try {
+            return $this->createInfoStruct(
+                (string) $shippingMethod->getName(),
+                (string) $trackingCodes[0],
+                (string) $shippingMethod->getTrackingUrl()
+            );
+        } catch (Throwable $exception) {
+            $this->logger->error($exception->getMessage());
 
-        return $this->createInfoStruct(
-            (string) $shippingMethod->getName(),
-            $trackingCodes[0],
-            (string) $shippingMethod->getTrackingUrl()
-        );
+            return null;
+        }
     }
 
     public function create(string $trackingCarrier, string $trackingCode, string $trackingUrl): ?ShipmentTrackingInfoStruct
