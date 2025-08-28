@@ -9,7 +9,6 @@ const PAYMENT_FORM_SELECTOR = '#confirmPaymentForm';
 const RADIO_INPUTS_SELECTOR = '#confirmPaymentForm input[type="radio"]';
 const SUBMIT_BUTTON_SELECTOR = '#confirmPaymentForm button[type="submit"]';
 
-const DISPLAY_NONE_CLS = 'd-none';
 const ERROR_CLS = 'error';
 const FOCUS_CLS = 'is-focused';
 
@@ -55,12 +54,6 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             this.getInputFields().verificationCode,
         ]);
 
-        // Show/hide the components form based on the selected radio input
-        this._radioInputs.forEach((element) => {
-            element.addEventListener('change', () => {
-                me.showComponents();
-            });
-        });
 
         // Submit handler
         this._submitButton.addEventListener('click', (event) => {
@@ -126,15 +119,6 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         };
     }
 
-    showComponents() {
-        if (this._componentsContainer) {
-            if (this._creditCardRadioInput === undefined || this._creditCardRadioInput.checked === false) {
-                this._componentsContainer.classList.add(DISPLAY_NONE_CLS);
-            } else {
-                this._componentsContainer.classList.remove(DISPLAY_NONE_CLS);
-            }
-        }
-    }
 
     createComponentsInputs(componentsObject, inputs) {
         const me = this;
