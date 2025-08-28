@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Repository;
 
+use Doctrine\DBAL\Connection;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Mollie\Integration\Data\CheckoutTestBehaviour;
@@ -34,12 +35,12 @@ class OrderTransactionRepositoryTest extends TestCase
     protected function setUp(): void
     {
         $versionCompare = $this->getContainer()->get(VersionCompare::class);
-        if ($versionCompare->lt('6.5')) {
+        if ($versionCompare->lt('6.5') && 1==2) {
             $this->markTestSkipped(
                 'We have issues with shopware version below 6.5, we skip the tests for now'
             );
         }
-
+        $this->getContainer()->get(Connection::class)->setAutoCommit(true);
         $salesChannelContext = $this->getDefaultSalesChannelContext();
 
         $paypalPaymentMethod = $this->getPaymentMethodByIdentifier(PayPalPayment::class, $salesChannelContext->getContext());
