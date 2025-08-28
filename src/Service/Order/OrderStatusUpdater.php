@@ -201,9 +201,7 @@ class OrderStatusUpdater
                 }
             }
         }
-        if (! $this->orderHandler->isValidState($statusTo)) {
-            return;
-        }
+
         $statusFrom = ($stateMachine instanceof StateMachineStateEntity) ? $stateMachine->getTechnicalName() : '';
 
         $addLog = false;

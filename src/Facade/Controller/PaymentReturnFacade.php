@@ -156,7 +156,7 @@ class PaymentReturnFacade
         // this is only done in the Storefront, and only if we have activated this feature.
         // depending on the success of the payment, we either redirect
         // to the standard Shopware success route, or to our custom failure route and page in the Storefront.
-        $success = $this->molliePaymentFlow->process($transaction, $swOrder, $mollieOrder, $salesChannelId, $context);
+        $success = $this->molliePaymentFlow->process($transaction, $mollieOrder, $context);
 
         if ($success) {
             return $this->navigateShopwareStandardRoute(

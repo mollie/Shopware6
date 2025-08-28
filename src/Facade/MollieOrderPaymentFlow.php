@@ -6,12 +6,9 @@ namespace Kiener\MolliePayments\Facade;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
-use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\PaymentMethodService;
-use Kiener\MolliePayments\Service\SettingsService;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -25,12 +22,6 @@ class MollieOrderPaymentFlow
     /** @var OrderStatusConverter */
     private $orderStatusConverter;
 
-    /** @var OrderStatusUpdater */
-    private $orderStatusUpdater;
-
-    /** @var SettingsService */
-    private $settingsService;
-
     /** @var PaymentMethodService */
     private $paymentMethodService;
 
@@ -43,11 +34,10 @@ class MollieOrderPaymentFlow
     /**
      * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, OrderStatusUpdater $orderStatusUpdater, SettingsService $settingsService, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, $orderTransactionRepository)
+    public function __construct(OrderStatusConverter $orderStatusConverter, PaymentMethodService $paymentMethodService, PaymentMethodRepository $paymentMethodRepository, $orderTransactionRepository)
     {
         $this->orderStatusConverter = $orderStatusConverter;
-        $this->orderStatusUpdater = $orderStatusUpdater;
-        $this->settingsService = $settingsService;
+
         $this->paymentMethodService = $paymentMethodService;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->orderTransactionRepository = $orderTransactionRepository;
@@ -56,20 +46,9 @@ class MollieOrderPaymentFlow
     /**
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function process(OrderTransactionEntity $transaction, OrderEntity $order, Order $mollieOrder, string $salesChannelId, Context $context): bool
+    public function process(OrderTransactionEntity $transaction, Order $mollieOrder, Context $context): bool
     {
-        $settings = $this->settingsService->getSettings($salesChannelId);
-
         $paymentStatus = $this->orderStatusConverter->getMollieOrderStatus($mollieOrder);
-        /**
-         * We want to make sure that payment and order status is changed only over webhook. we need to change the status in return url only for dev environment
-         * this way we avoid the status change if the return url and webhook url is called at same time
-         */
-        if ($this->settingsService->getEnvMollieDevMode() || $this->settingsService->getMollieCypressMode()) {
-            // this is only mollie payment flow here we are doing failed management here
-            $this->orderStatusUpdater->updatePaymentStatus($transaction, $paymentStatus, $context);
-            $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
-        }
 
         // now check if payment method has changed, but only in case that it is no paid apple pay (apple pay returns credit card as method)
         if (! $this->paymentMethodService->isPaidApplePayTransaction($transaction, $mollieOrder)) {
