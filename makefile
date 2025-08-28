@@ -135,11 +135,11 @@ stan: ##3 Starts the PHPStan Analyser
 	cd ../../.. && php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon
 
 phpunit: ##3 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --testsuite unit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
 phpintegration: ##3 Starts all PHPUnit Tests
 	#we call "real" phpunit, it seems like in sw 6.4 the vendor/bin/phpunit is overwritten by shopware
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --testsuite integration --configuration=./custom/plugins/MolliePayments/config/phpunit.xml
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction

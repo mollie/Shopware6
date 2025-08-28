@@ -25,6 +25,16 @@ class OrderStateService
         $this->orderTransitionService = $orderTransitionService;
     }
 
+    public function isValidState(string $targetState): bool
+    {
+        return in_array($targetState, [
+            OrderStates::STATE_OPEN,
+            OrderStates::STATE_IN_PROGRESS,
+            OrderStates::STATE_COMPLETED,
+            OrderStates::STATE_CANCELLED,
+        ]);
+    }
+
     /**
      * Handle order state automation.
      */

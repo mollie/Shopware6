@@ -12,7 +12,6 @@ use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -31,7 +30,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\MultiFilter;
-use function sleep;
 
 class NotificationFacade
 {
@@ -136,21 +134,6 @@ class NotificationFacade
         if (! $swOrder instanceof OrderEntity) {
             throw new \Exception('Shopware Order not found for transaction: ' . $swTransactionId);
         }
-
-        /** @var array<string,array<string,mixed>|mixed> $customFields */
-        $customFields = $swTransaction->getCustomFields() ?: [];
-
-        $webhookReceived = (int) ($customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::WEBHOOK_RECEIVED] ?? 0);
-        if ($webhookReceived === 0) {
-            sleep(2);
-        }
-
-        ++$webhookReceived;
-
-        $customFields[CustomFieldsInterface::MOLLIE_KEY][CustomFieldsInterface::WEBHOOK_RECEIVED] = $webhookReceived;
-        $swTransaction->setCustomFields($customFields);
-
-        $this->repoOrderTransactions->saveCustomFields($swTransactionId, $customFields, $context);
 
         // --------------------------------------------------------------------------------------------
 
@@ -268,7 +251,6 @@ class NotificationFacade
             $mollieOrderId,
             $molliePaymentId,
             $swTransaction->getId(),
-            $webhookReceived,
             $context
         );
 

@@ -33,6 +33,11 @@ class MollieApiFactory
      */
     private $logger;
 
+    /**
+     * @var array<string,MollieApiClient>
+     */
+    private array $cachedClients = [];
+
     public function __construct(string $shopwareVersion, SettingsService $settingsService, LoggerInterface $logger)
     {
         $this->shopwareVersion = $shopwareVersion;
@@ -64,11 +69,23 @@ class MollieApiFactory
     {
         $settings = $this->settingsService->getSettings($salesChannelId);
 
-        if ($settings->isTestMode()) {
-            return $this->getTestClient((string) $salesChannelId);
+        $isTestMode = $settings->isTestMode();
+
+        $cacheKey = 'client_' . ($isTestMode ? 'test' : 'live') . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->cachedClients[$cacheKey])) {
+            return $this->cachedClients[$cacheKey];
         }
 
-        return $this->getLiveClient((string) $salesChannelId);
+        if ($isTestMode) {
+            $client = $this->getTestClient((string) $salesChannelId);
+
+            return $this->cachedClients[$cacheKey] = $client;
+        }
+
+        $client = $this->getLiveClient((string) $salesChannelId);
+
+        return $this->cachedClients[$cacheKey] = $client;
     }
 
     public function getLiveClient(string $salesChannelId): MollieApiClient
@@ -93,7 +110,6 @@ class MollieApiFactory
         }
 
         $apiKey = $settings->getTestApiKey();
-
         // now check if our TEST api key starts with "live_"...if that is the case
         // do NOT use it, and log an error. This helps us to avoid that merchants
         // accidentally use a PROD key in test mode.
@@ -116,6 +132,7 @@ class MollieApiFactory
             $httpClient = new MollieHttpClient($connectTimeout, $responseTimeout);
 
             $this->apiClient = new MollieApiClient($httpClient);
+
             $this->apiClient->setApiKey($apiKey);
 
             $this->apiClient->addVersionString('Shopware/' . $this->shopwareVersion);
