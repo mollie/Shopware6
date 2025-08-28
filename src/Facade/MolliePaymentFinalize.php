@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order;
+use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -69,11 +70,12 @@ class MolliePaymentFinalize
      * @var FlowBuilderEventFactory
      */
     private $flowBuilderEventFactory;
+    private OrderStatusUpdater $orderStatusUpdater;
 
     /**
      * @param EntityRepository<EntityCollection<CustomerEntity>> $repoCustomer
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, OrderStatusUpdater $orderStatusUpdater, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->settingsService = $settingsService;
@@ -83,6 +85,7 @@ class MolliePaymentFinalize
         $this->repoCustomer = $repoCustomer;
         $this->flowBuilderFactory = $flowBuilderFactory;
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
+        $this->orderStatusUpdater = $orderStatusUpdater;
     }
 
     /**
@@ -124,6 +127,16 @@ class MolliePaymentFinalize
         } else {
             // load it from the mollie order id
             $molliePaymentMethodKey = $mollieOrder->method;
+        }
+
+        /**
+         * We want to make sure that payment and order status is changed only over webhook. we need to change the status in return url only for dev environment
+         * this way we avoid the status change if the return url and webhook url is called at same time
+         */
+        if ($this->settingsService->getEnvMollieDevMode() || $this->settingsService->getMollieCypressMode()) {
+            // this is only mollie payment flow here we are doing failed management here
+            $this->orderStatusUpdater->updatePaymentStatus($transactionStruct->getOrderTransaction(), $paymentStatus, $context);
+            $this->orderStatusUpdater->updateOrderStatus($order, $paymentStatus, $settings, $context);
         }
 
         // now either set the payment status for successful payments
