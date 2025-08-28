@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Settings;
 
+use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,11 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 final class LoggerSettingsTest extends TestCase
 {
     use IntegrationTestBehaviour;
+
+    protected function setUp(): void
+    {
+        $this->getContainer()->get(Connection::class)->setAutoCommit(true);
+    }
 
     public function testSettingsCanBeReadFromDatabase(): void
     {
