@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed saving Credit Card information
 - Fixed Payment Method route in store-api
 - Fixed config assignment for the refund manager
+- Fixed last remaining subscription times being reset when paused and resumed 
 
 ## [4.17.0] - 2025-08-04
 ### Added
