@@ -54,7 +54,6 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             this.getInputFields().verificationCode,
         ]);
 
-
         // Submit handler
         this._submitButton.addEventListener('click', (event) => {
             event.preventDefault();
@@ -118,7 +117,6 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
             },
         };
     }
-
 
     createComponentsInputs(componentsObject, inputs) {
         const me = this;
