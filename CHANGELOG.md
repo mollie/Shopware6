@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed Payment Method route in store-api
 - Fixed config assignment for the refund manager
 - Fixed last remaining subscription times being reset when paused and resumed 
+- Fixed the error that the storefront/dist folder does not exists
 
 ## [4.17.0] - 2025-08-04
 ### Added
