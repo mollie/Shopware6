@@ -3,10 +3,18 @@
         a {
             color: white;
             text-decoration: none;
+
         }
     }
 
     .mollie-subscriptions-detail-status-action-row {
         margin-bottom: 20px;
     }
+
+    .cy-btn-pause,.cy-btn-skip,.danger {
+        background: #de294c;
+        color: #fff;
+        line-height: 36px;
+    }
+
 }
