@@ -10,8 +10,9 @@
                 {% block sw_order_detail_actions_cancel %}
                     <sw-button v-if="!isLoading && isAclCancelAllowed && isCancellationAllowed"
                                variant="danger"
+                               ghost=true
                                :disabled="false" :square="false" :block="false" :isLoading="false"
-                               class="mollie-subscriptions-detail-link-button"
+                               class="mollie-subscriptions-detail-link-button danger"
                                @click="btnCancel_Click()">
                         {{ $tc('mollie-payments.subscriptions.detail.buttonCancelSubscription') }}
                     </sw-button>
@@ -189,6 +190,7 @@
                                            class="mollie-subscriptions-detail-link-button cy-btn-pause"
                                            :disabled="!allowPauseResume"
                                            variant="ghost-danger"
+                                           ghost=true
                                            @click="btnPause_Click()">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonPauseSubscription') }}
                                 </sw-button>
@@ -198,6 +200,7 @@
                                            class="mollie-subscriptions-detail-link-button cy-btn-resume"
                                            :disabled="!allowPauseResume"
                                            variant="ghost"
+                                           ghost=true
                                            @click="btnResume_Click()">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonResumeSubscription') }}
                                 </sw-button>
@@ -207,6 +210,7 @@
                                            class="mollie-subscriptions-detail-link-button cy-btn-skip"
                                            :disabled="!allowSkip"
                                            variant="ghost-danger"
+                                           ghost=true
                                            @click="btnSkip_Click()">
                                     {{ $tc('mollie-payments.subscriptions.detail.buttonSkipSubscription') }}
                                 </sw-button>
