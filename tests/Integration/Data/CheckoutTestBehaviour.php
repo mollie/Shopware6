@@ -13,6 +13,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CartLineItemController;
 use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
 trait CheckoutTestBehaviour
 {
@@ -64,6 +65,16 @@ trait CheckoutTestBehaviour
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('tos', true);
 
-        return $checkoutController->order($requestDataBag, $salesChannelContext, $request);
+        $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
+        /** @var FlashBag $flashBag */
+        $flashBag = $request->getSession()->getBag('flashes');
+        $flashBagData = $flashBag->peekAll();
+        $dangerErrors = $flashBagData['danger']??[];
+        $hasFlashes = count($dangerErrors) > 0;
+
+        $this->assertFalse($hasFlashes,"Create order has error messages ".print_r($dangerErrors, true));
+
+
+        return $response;
     }
 }
