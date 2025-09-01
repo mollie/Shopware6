@@ -52,6 +52,7 @@ class OrderTransactionRepositoryTest extends TestCase
 
         $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
         $this->assertNotNull($salesChannelContext->getCustomer());
+
         $salesChannelContext = $this->createMollieOrderWithPaymentMethod('paid', $paypalPaymentMethod, $salesChannelContext);
 
         $salesChannelContext = $this->createMollieOrderWithPaymentMethod('paid', $paypalPaymentMethod, $salesChannelContext);

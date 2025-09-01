@@ -3,7 +3,6 @@
         a {
             color: white;
             text-decoration: none;
-
         }
     }
 
@@ -11,10 +10,11 @@
         margin-bottom: 20px;
     }
 
-    .cy-btn-pause,.cy-btn-skip,.danger {
+    .cy-btn-pause,
+    .cy-btn-skip,
+    .danger {
         background: #de294c;
         color: #fff;
         line-height: 36px;
     }
-
 }
