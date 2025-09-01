@@ -39,8 +39,9 @@ class OrderTransactionRepositoryTest extends TestCase
                 'We have issues with shopware version below 6.5, we skip the tests for now'
             );
         }
-
-        $this->disableNestTransactionsWithSavepointsForNextTest();
+        if (method_exists($this, 'disableNestTransactionsWithSavepointsForNextTest')) {
+            $this->disableNestTransactionsWithSavepointsForNextTest();
+        }
 
         $salesChannelContext = $this->getDefaultSalesChannelContext();
 
