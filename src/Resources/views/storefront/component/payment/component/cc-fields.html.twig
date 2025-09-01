@@ -2,10 +2,21 @@
 {% set enableOneClickPayments = page.enable_one_click_payments %}
 {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
 {% set mollieCart = page.extensions.mollieSubscriptionCart %}
+{% set requiresCreditCard = payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}
+{% set isSelected = false %}
+
+{# Check if this payment method is currently selected - support both Shopware versions #}
+{% if selectedPaymentMethodId is defined %}
+    {% set isSelected = (payment.id is same as(selectedPaymentMethodId)) %}
+{% elseif defaultPaymentMethodId is defined %}
+    {% set isSelected = (payment.id is same as(defaultPaymentMethodId)) %}
+{% endif %}
+
+{% if requiresCreditCard and isSelected %}
 
 {% block mollie_credit_card_mandate_list %}
     {% block mollie_credit_card_mandate_list_include %}
-        {% if enableOneClickPayments and showIfActive and mandates|length > 0 and activeRoute is not same as ('frontend.account.payment.page') %}
+        {% if enableOneClickPayments and mandates|length > 0 and activeRoute is not same as ('frontend.account.payment.page') %}
             {% sw_include '@MolliePayments/mollie/component/credit-card-mandate.html.twig' with {
                 'mandates': mandates,
                 'compactView': page.enable_one_click_payments_compact_view,
@@ -20,7 +31,7 @@
     <div class="mollie-credit-card-mandate">
 
         {% block mollie_credit_card_mandate_form_radio %}
-            {% if enableOneClickPayments and page.enable_credit_card_components == true and showIfActive and mandates|length > 0 %}
+            {% if enableOneClickPayments and page.enable_credit_card_components == true and mandates|length > 0 %}
                 <div class="mollie-credit-card-mandate-radio {{ formRadioWrapperClass ?? 'custom-control custom-radio form-check' }}">
                     {% block mollie_credit_card_mandate_form_radio_input %}
                         <input type="radio"
@@ -42,7 +53,7 @@
 
         {% block mollie_credit_card_mandate_form_component %}
             <div id="mollie_components_credit_card{% if sw64 %}_sw64{% endif %}"
-                 class="mollie-components-credit-card{% if not showIfActive %} d-none{% endif %}"
+                 class="mollie-components-credit-card"
                  data-mollie-template-creditcard-components{% if sw64 %}-sw64{% endif %}
                     {% if page.enable_credit_card_components == true %}
                 data-mollie-credit-card-components-{% if sw64 %}sw64-{% endif %}options='{
@@ -130,3 +141,5 @@
 
     </div>
 {% endblock %}
+
+{% endif %}
