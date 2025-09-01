@@ -17,6 +17,11 @@ final class LoggerSettingsTest extends TestCase
 {
     use IntegrationTestBehaviour;
 
+    protected function setUp(): void
+    {
+        $this->disableNestTransactionsWithSavepointsForNextTest();
+    }
+
     public function testSettingsCanBeReadFromDatabase(): void
     {
         /**
