@@ -69,11 +69,10 @@ trait CheckoutTestBehaviour
         /** @var FlashBag $flashBag */
         $flashBag = $request->getSession()->getBag('flashes');
         $flashBagData = $flashBag->peekAll();
-        $dangerErrors = $flashBagData['danger']??[];
+        $dangerErrors = $flashBagData['danger'] ?? [];
         $hasFlashes = count($dangerErrors) > 0;
 
-        $this->assertFalse($hasFlashes,"Create order has error messages ".print_r($dangerErrors, true));
-
+        $this->assertFalse($hasFlashes, 'Create order has error messages ' . print_r($dangerErrors, true));
 
         return $response;
     }
