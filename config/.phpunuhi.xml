@@ -23,6 +23,7 @@
                 <locale name="hu-HU">./../src/Resources/app/administration/src/snippet/hu-HU.json</locale>
                 <locale name="fi-FI">./../src/Resources/app/administration/src/snippet/fi-FI.json</locale>
                 <locale name="da-DK">./../src/Resources/app/administration/src/snippet/da-DK.json</locale>
+                <locale name="is-IS">./../src/Resources/app/administration/src/snippet/is-IS.json</locale>
             </locales>
         </set>
 
@@ -49,6 +50,7 @@
                 <locale name="hu-HU">./../src/Resources/snippet/hu_HU/mollie-payments.hu-HU.json</locale>
                 <locale name="fi-FI">./../src/Resources/snippet/fi_FI/mollie-payments.fi-FI.json</locale>
                 <locale name="da-DK">./../src/Resources/snippet/da_DK/mollie-payments.da-DK.json</locale>
+                <locale name="is-IS">./../src/Resources/snippet/is_IS/mollie-payments.is-IS.json</locale>
             </locales>
         </set>
 
@@ -78,6 +80,7 @@
                 <locale name="hu-HU"></locale>
                 <locale name="fi-FI"></locale>
                 <locale name="da-DK"></locale>
+                <locale name="is-IS"></locale>
             </locales>
         </set>
 
