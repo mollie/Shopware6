@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Šiuo metu pasirinktas mokėjimo būdas nėra prieinamas prenumeratos produktams.",
+        "mollie-payments-cart-error-mixedcart": "Jūsų krepšelyje yra kelios prekės kartu su prenumeruojamais produktais. Atminkite, kad vienu metu galite įsigyti tik 1 prenumeratos prekę.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Užsisakant prenumeratos produktus, ne visi mokėjimo būdai yra prieinami.",
+        "mollie-payments-cart-guest-account": "Svečio paskyros negali būti naudojamos prenumeratos užsakymams."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Šiuo metu pasirinktas mokėjimo būdas nėra prieinamas prenumeratos produktams.",
+        "mollie-payments-cart-error-mixedcart": "Jūsų krepšelyje yra kelios prekės kartu su prenumeruojamais produktais. Atminkite, kad vienu metu galite įsigyti tik 1 prenumeratos prekę.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Užsisakant prenumeratos produktus, ne visi mokėjimo būdai yra prieinami.",
+        "mollie-payments-cart-guest-account": "Svečio paskyros negali būti naudojamos prenumeratos užsakymams."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Galiojimo data",
+                "cardHolderLabel": "Vardas ant kortelės",
+                "cardNumberLabel": "Kortelės numeris",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Mokėjimas užtikrintas ir palaikomas",
+                "headLine": "Įveskite savo kortelės informaciją",
+                "saveCardDetailLabel": "Išsaugokite kortelės informaciją ateities mokėjimams"
+            },
+            "ideal": {
+                "selectBank": "Pasirinkite banką"
+            },
+            "pos": {
+                "selectTerminal": "Pasirinkite terminalą"
+            },
+            "mandate": {
+                "sectionTitle": "Išsaugotos kortelės",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Jūsų kortelė buvo sėkmingai ištrinta",
+                "deleteErrorMessage": "Įvyko problema, kai bandėte pašalinti savo kortelę",
+                "newCard": "Nauja kortelė",
+                "remove": "Pašalinti",
+                "subscriptionBadge": "Prenumerata"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Atšaukti",
+                "cardSubscription": "Ši kortelė naudojama prenumeratai. Prašome pirmiausia atšaukti prenumeratą prieš pašalinant šią kortelę.",
+                "deleteButton": "Ištrinti",
+                "deleteConfirmation": "Ar tikrai norite ištrinti?",
+                "title": "Ištrynimo patvirtinimas"
+            },
+            "phoneField": {
+                "headLine": "Telefono numeris",
+                "phoneErrorMessage": "Telefono numeris yra privalomas. Pavyzdžiui, +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Apmokėti kitu mokėjimo būdu",
+                "buttonReturnToShop": "Grįžti į parduotuvę",
+                "error": "Mokėjimas nepavyko",
+                "failed": "Mokėjimas nepavyko arba buvo atšauktas. Būsite nukreipti į Mollie, kur galėsite užbaigti savo mokėjimą pasirinktu metodu. "
+            },
+            "redirecting": "Nukreipiama į: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Tarpinė suma",
+                "captionTaxes": "Mokesčiai",
+                "paymentError": "Mokėjimas su Apple Pay nepavyko."
+            },
+            "paypalExpress": {
+                "paymentError": "Mokėjimas su Paypal Express nepavyko."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "redaguoti sąskaitos faktūros adresą",
+                "btnEditShippingAddress": "redaguoti siuntimo adresą",
+                "cancelSubscription": "Prenumerata sėkmingai atšaukta",
+                "errorCancelSubscription": "Dėl klaidos nepavyko atšaukti prenumeratos. Prašome susisiekti su mūsų pagalbos komanda.",
+                "errorPause": "Sustabdant jūsų prenumeratą įvyko klaida",
+                "errorResume": "Atnaujinant jūsų prenumeratą įvyko klaida",
+                "errorSkip": "Praleidžiant jūsų prenumeratą įvyko klaida",
+                "errorUpdateAddress": "Atnaujinant jūsų adresą įvyko klaida",
+                "errorUpdatePayment": "Atnaujinant jūsų mokėjimo būdą įvyko klaida",
+                "headlineBillingAddress": "Atsiskaitymo adresas",
+                "headlineShippingAddress": "Siuntimo adresas",
+                "mollieSubscriptionAmount": "Suma",
+                "mollieSubscriptionCancel": "Atšaukti prenumeratą",
+                "mollieSubscriptionCancelUntil": "Atšaukimas galimas iki",
+                "mollieSubscriptionContextMenuReorder": "Pakartoti prenumeratą",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Kitas mokėjimas",
+                "mollieSubscriptionPause": "Sustabdyti prenumeratą",
+                "mollieSubscriptionResume": "Pratęsti prenumeratą",
+                "mollieSubscriptionSkip": "Praleisti prenumeratą",
+                "mollieSubscriptionUpdatePayment": "Atnaujinti mokėjimą",
+                "mollieSubscriptionsHeadline": "Prenumerata:",
+                "mollieSubscriptionsInfoEmpty": "Jūs dar neturite prenumeratų.",
+                "mollieSubscriptionsLink": "Prenumeratos",
+                "mollieSubscriptionsTitle": "Prenumeratos",
+                "mollieSubscriptionsWelcome": "Jūsų naujausios prenumeratos:",
+                "orderActionHide": "Slėpti",
+                "orderActionView": "Peržiūrėti",
+                "shippingEqualToBilling": "Toks pat kaip atsiskaitymo adresas",
+                "successPause": "Jūsų prenumerata buvo sustabdyta",
+                "successResume": "Jūsų prenumerata bus atnaujinta",
+                "successSkip": "Jūsų prenumerata buvo praleista",
+                "successUpdateAddress": "Jūsų adresas sėkmingai atnaujintas",
+                "successUpdatePayment": "Jūsų mokėjimo metodas buvo sėkmingai atnaujintas"
+            },
+            "options": {
+                "everyDay": "Kiekvieną dieną",
+                "everyDays": "Kiekvieną %value% dieną",
+                "everyMonth": "Kiekvieną mėnesį",
+                "everyMonths": "Kas %value% mėnesius",
+                "everyWeek": "Kiekvieną savaitę",
+                "everyWeeks": "Kas %value% savaitę",
+                "repetitionCount": "%value% kartą(-us)"
+            },
+            "product": {
+                "addToCartText": "Prenumeruoti",
+                "information": "Prenumeruojamas produktas"
+            }
+        },
+        "testMode": {
+            "label": "Bandymo režimas"
+        }
+    }
+}
