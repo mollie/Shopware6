@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Abonament Mollie | Abonamente Mollie"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Comandă reușită",
+            "mollie_checkout_order_failed": " Comandă eșuată",
+            "mollie_checkout_order_canceled": " Comandă anulată",
+            "mollie_webhook_received_All": " Webhook Mollie primit (Toate)",
+            "mollie_webhook_received_status_authorized": " Webhook Mollie primit (Autorizat)",
+            "mollie_webhook_received_status_failed": " Webhook Mollie primit (Eșuat)",
+            "mollie_webhook_received_status_canceled": "Webhook Mollie primit (Anulat)",
+            "mollie_webhook_received_status_expired": "Webhook Mollie primit (Expirat)",
+            "mollie_webhook_received_status_pending": " Webhook Mollie primit (În așteptare)",
+            "mollie_webhook_received_status_paid": " Webhook Mollie primit (Plătit)",
+            "mollie_webhook_received_status_completed": " Webhook Mollie primit (Finalizat)",
+            "mollie_webhook_received_status_refunded": " Webhook Mollie primit (Rambursat)",
+            "mollie_webhook_received_status_partially_refunded": " Webhook Mollie primit (Rambursat parțial)",
+            "mollie_refund_started": " Rambursarea Mollie a început",
+            "mollie_subscription_started": " Abonamentul Mollie a început",
+            "mollie_subscription_ended": " Abonament Mollie finalizat",
+            "mollie_subscription_cancelled": " Abonament Mollie anulat",
+            "mollie_subscription_paused": " Abonament Mollie suspendat",
+            "mollie_subscription_resumed": " Abonamentul Mollie a fost reluat",
+            "mollie_subscription_skipped": " Abonamentul Mollie a fost omis",
+            "mollie_subscription_renewed": " Abonamentul Mollie s-a reînnoit",
+            "mollie_subscription_renewal_reminder": " Memento Mollie pentru reînnoirea abonamentului"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Modul Mollie",
+        "searchPlaceholder": "Căutați abonamente...",
+        "general": {
+            "mainMenuItemGeneral": "Plăți Mollie",
+            "descriptionTextModule": "Plăți Mollie",
+            "btnMollieActions": "Acțiuni Mollie",
+            "refundThroughMollie": "Rambursare prin Mollie",
+            "shipThroughMollie": "Expediere prin Mollie",
+            "cancelMollieItem": "Anulare prin Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Bună {userName}, Bine ai venit la Mollie!",
+                "descriptionTop": "Onboardingul este ușor cu Mollie!",
+                "descriptionBottom": "Asta e tot!",
+                "descriptionFooter": "Dacă doriți să aflați mai multe despre pluginul nostru, vizitați pagina noastră oficială de informații.",
+                "onboardingStep1": "Înregistrează-te pentru un cont Mollie.",
+                "onboardingStep2": "Introduceți codurile dumneavoastră API în secțiunea de mai jos.",
+                "onboardingStep2TestMode": "Activați 'Mod Test' dacă doriți să testați doar plățile.",
+                "onboardingStep3": "Atribuiți metode de plată canalelor de vânzare.",
+                "onboardingStep3Link": "pentru canalele de vânzare",
+                "btnDocumentation": "Documentație",
+                "btnRequestSupport": "Asistență",
+                "btnTroubleshooting": "Ghid de soluționare a problemelor"
+            },
+            "api": {
+                "apiLinkButton": "Obțineți codurile API de pe tabloul de bord Mollie",
+                "testButton": "Testează codurile API",
+                "testApiKeys": {
+                    "title": "Plăți Mollie",
+                    "apiKey": "Cod API",
+                    "isValid": "este valid",
+                    "isInvalid": "este invalid"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Placeholder",
+                    "preview": "Previzualizare"
+                },
+                "updatePaymentMethods": {
+                    "title": "Plăți Mollie",
+                    "button": "Actualizează metodele de plată",
+                    "succeeded": "Metodele de plată au fost actualizate cu succes.",
+                    "failed": "Metodele de plată nu au putut fi actualizate."
+                },
+                "mollieLimits": {
+                    "link": "Afișați regulile de disponibilitate Mollie pentru metodele de plată"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware poate utiliza setările valutare pentru a calcula cum rotunjește suma totală a unei comenzi. Aceasta include numărul de zecimale din prețurile produselor și intervalul de rotunjire cel mai apropiat, cum ar fi 0,50 sau 1,00.",
+                "info2": "Aceste setări pot duce la un total general diferit față de suma totală a elementelor de linie. Atunci când Mollie verifică aceste sume și constată că nu se potrivesc, aceasta provoacă o eroare la finalizarea comenzii.",
+                "info3": "Puteți folosi această funcție pentru a evita problemele de rotunjire în finalizarea comenzii. Când este activată, ea adaugă un element de linie separat în tabloul de bord Mollie pentru diferența de rotunjire, iar clienții dumneavoastră plătesc suma totală calculată de Shopware."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Nu este posibil să folosiți Klarna Plătiți acum, Klarna Împărțiți sau Klarna Plătiți mai târziu ca metodă atunci când data limită este mai mare de 28 de zile în viitor, cu excepția cazului în care un alt maxim este convenit între comerciant și Klarna.",
+                "bankTransferDueDateLimitReached": "Nu este posibil să setați durata de viață a comenzii mai mare de 100 de zile."
+            },
+            "support": {
+                "modalTitle": "Solicitați asistență de la Mollie",
+                "btnCancel": "Anulați",
+                "btnConfirm": "Solicitați asistență",
+                "btnSupport": "Mai multe despre asistența noastră",
+                "form": {
+                    "name": "Numele dumneavoastră",
+                    "email": "Emailul dumneavoastră",
+                    "recipient": "Trimiteți cererea la",
+                    "subject": "Subiect",
+                    "message": "Mesaj"
+                },
+                "data": {
+                    "header": "Date trimise către Mollie:",
+                    "other": "Altele:",
+                    "shopwareVersion": "Versiunea Shopware",
+                    "pluginLogs": "Fișierele log {plugin}",
+                    "pluginConfiguration": "Configurația {plugin}",
+                    "pluginConfigurationHelpText": "Codurile API sunt excluse.",
+                    "paymentMethods": "Datele metodei de plată",
+                    "paymentMethodsHelpText": "Conține informații despre care metode de plată sunt active, atribuite fiecărui canal de vânzare, precum și statusul lor în contul dumneavoastră Mollie."
+                },
+                "success": "Cererea de asistență a fost trimisă cu succes. Facem tot posibilul să răspundem cât mai repede posibil",
+                "error": "A apărut o problemă la trimiterea mailului prin Shopware. Vă rugăm să încercați din nou sau să ne contactați direct prin e-mail."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Articolul este un abonament (Mollie)",
+            "cartSubscriptionRule": "Coș cu abonamente (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "În așteptare",
+                "pending": "În așteptare",
+                "processing": "Se procesează",
+                "refunded": "Rambursat",
+                "failed": "Eșuat",
+                "description": {
+                    "queued": "Rambursarea este în așteptare până când există suficient sold pentru a procesa rambursarea. Puteți, de asemenea, să anulați rambursarea.",
+                    "pending": "Rambursarea va fi trimisă băncii în următoarea zi lucrătoare. Puteți, de asemenea, să anulați rambursarea.",
+                    "processing": "Rambursarea a fost trimisă băncii. Suma rambursată va fi transferată contului consumatorului cât mai curând posibil.",
+                    "refunded": "Suma rambursării a fost transferată către consumator.",
+                    "failed": "Rambursarea a eșuat după procesare. De exemplu, clientul și-a închis contul bancar. Fondurile vor fi returnate în contul dvs."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "buc."
+            },
+            "acl": {
+                "warningCreate": "Nu aveți permisiuni pentru a crea rambursări",
+                "warningCancel": "Nu aveți permisiuni pentru a anula rambursările"
+            },
+            "cart": {
+                "title": "Comanda ##orderNumber##",
+                "btnSelectAll": "Selectați tot",
+                "btnResetForm": "Resetați formularul",
+                "linkHowTo": "Cum să folosiți acest formular?",
+                "grid": {
+                    "columns": {
+                        "item": "Articol",
+                        "productNumber": "Numărul produsului",
+                        "unitPrice": "Preț unitar",
+                        "quantity": "Cantitate",
+                        "refunded": "Rambursat",
+                        "refundQuantity": "Rambursare",
+                        "totalPrice": "Total",
+                        "refundAmount": "Rambursare",
+                        "resetStock": "Resetați stocul"
+                    },
+                    "btnResetLine": "Resetați linia",
+                    "checkDeductPromotion": "Scădeți promoția",
+                    "checkRefundTax": "Rambursare TVA"
+                },
+                "roundDiffItemAdded": "Articolul de rotunjire a fost adăugat"
+            },
+            "instructions": {
+                "linkResetTutorials": "Resetați tutorialele",
+                "btnToggleTutorial": "Arată/Ascunde tutorialul",
+                "titleFullRefund": "Rambursare totală",
+                "textFullRefund": "Trebuie doar să folosiți butonul pentru rambursarea totală. Acest lucru asigură că toate articolele dvs. sunt marcate ca fiind rambursate și întreaga sumă este returnată clientului.",
+                "titleStockReset": "Resetare stoc",
+                "textStockReset": "Puteți crește automat stocul disponibil introducând cantitatea pe care doriți să o repuneți în stoc. Introduceți-o înainte de a continua cu o rambursare totală sau parțială. Resetarea stocului poate fi combinată cu procesul efectiv de rambursare într-un mod flexibil.",
+                "titleShipping": "Livrare",
+                "textShipping": "Articolele de livrare pot fi rambursate ca orice alt articol de produs. Fie introduceți cantitatea totală, fie o sumă parțială personalizată și continuați cu rambursarea. Rambursarea costurilor de livrare poate fi combinată cu procesul efectiv de rambursare a articolelor într-un mod flexibil.",
+                "titlePartialAmount": "Rambursare parțială (doar suma)",
+                "textPartialAmount": "Doar introduceți suma parțială în câmpul de text și începeți rambursarea.",
+                "titlePartialItems": "Rambursare parțială (cu articole)",
+                "textPartialItems": "Dacă doriți să marcați cantitățile și articolele ca fiind rambursate în Mollie, folosiți formularul de mai sus. Stabiliți cantitățile dvs. și oferiți o sumă personalizată pentru fiecare articol care va fi rambursat. Suma totală va fi apoi vizibilă în câmpul de text pentru suma finală a rambursării. Amintiți-vă, este încă posibil să ajustați această sumă finală înainte de a începe rambursarea.",
+                "titlePartialPromotions": "Rambursare parțială (cu promoții)",
+                "textPartialPromotions": "Dacă aveți o promoție în coșul dvs., atunci promoția dvs. este un element de linie separat. Dacă doriți să rambursați toate articolele reduse, continuați și rambursați valorile lor totale și întreaga linie de promoție. Cu toate acestea, dacă doriți să rambursați doar câteva articole care au fost reduse, puteți scădea automat discountul aplicat pentru fiecare linie. Desigur, puteți întotdeauna schimba valorile dacă nu sunt corecte.",
+                "titleRoundingDiff": "Diferență de rotunjire",
+                "textRoundingDiff": "O rambursare totală va include diferențele de rotunjire"
+            },
+            "summary": {
+                "dataLoading": "Datele se încarcă...",
+                "headerExcludingVat": "Excl. TVA",
+                "headerIncludingVat": "Incl. TVA",
+                "captionTotal": "Total",
+                "captionTotalTaxFree": "Total",
+                "captionPendingRefunds": "Așteaptă să fie rambursat",
+                "captionVouchers": "Suma voucherului",
+                "captionRefunded": "Suma rambursată",
+                "captionRemaining": "Suma rambursabilă",
+                "btnFixDiff": "Corectați diferența",
+                "placeholderDescription": "Introduceți descrierea extrasului bancar/de cont pentru consumator. Max 140 de caractere",
+                "lblDescription": "Descriere (opțională) ({characters}/140 de caractere)",
+                "descriptionHelp": "Aceasta va fi afișată pe extrasul bancar sau de cont al consumatorului, atunci când este posibil. Mesajul nu poate depăși 140 de caractere.",
+                "placeholderInternalDescription": "Introduceți descrierea dumneavoastră internă",
+                "lblInternalDescription": "Descriere internă (opțională)",
+                "internalDescriptionHelp": "Aceasta va fi afișată ca o descriere locală în interfața de administrare.",
+                "checkVerification": "Am verificat suma totală a rambursării și cantitățile configurate pentru rambursare și re-stocare.",
+                "btnRefund": "Rambursare",
+                "btnFullRefund": "Rambursare totală",
+                "roundDiffItemAdded": "Articol de rotunjire"
+            },
+            "refunds": {
+                "title": "Rambursări în tabloul de bord Mollie",
+                "linkMore": "Mai multe despre rambursări",
+                "grid": {
+                    "columns": {
+                        "amount": "Sumă",
+                        "status": "Status",
+                        "description": "Descriere",
+                        "internalDescription": "Descriere internă",
+                        "composition": "Compoziție",
+                        "date": "Dată"
+                    },
+                    "lblNoComposition": "Nicio compoziție disponibilă",
+                    "btnCancelRefund": "Anulați această rambursare"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "O rambursare a fost creată în Mollie. Poate dura până la 2 ore pentru a finaliza rambursarea. Până atunci, puteți anula rambursarea.",
+                    "refund-canceled": "Rambursarea în așteptare a fost anulată cu succes și eliminată."
+                },
+                "error": {
+                    "low-amount": "Vă rugăm să introduceți o sumă care să fie rambursată.",
+                    "refund-created": "A apărut o problemă la crearea unei rambursări.",
+                    "refund-canceled": "A existat o problemă la anularea rambursării în așteptare. Vă rugăm să încercați din nou în tabloul de bord Mollie."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Voucher",
+            "VOUCHER_INFO_TITLE": "Plăți prin voucher",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie vă permite să acceptați cu ușurință plăți în magazinul dvs. online folosind vouchere ecologice, de cadou și de masă—o alegere inteligentă pentru a crește vânzările și a anticipa clienții dvs.. Metoda de plată \"voucher\" este vizibilă doar dacă aveți cel puțin 1 produs cu un tip de voucher asociat în coș.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Vă rugăm să rețineți, că această configurație poate fi editată doar în limba dvs. implicită. Vă rugăm să schimbați limba pentru a modifica tipul de voucher al acestui produs.",
+            "VOUCHER_BTN_READMORE": "Citiți mai mult",
+            "VOUCHER_TYPE_CAPTION": "Tip voucher al produsului",
+            "VOUCHER_TYPE_VALUE_NONE": "Niciunul",
+            "VOUCHER_TYPE_VALUE_ECO": "Eco",
+            "VOUCHER_TYPE_VALUE_MEAL": "Masă",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Cadou"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Expediați prin Mollie",
+                "item": {
+                    "label": "Articol:",
+                    "noQuantity": "Vă rugăm să introduceți o cantitate de expediat.",
+                    "shipAll": "Expediați tot",
+                    "summary": {
+                        "quantity": "Cantitate de expediat",
+                        "shipped": "Cantitate expediată",
+                        "shippable": "Cantitate expediabilă"
+                    },
+                    "success": "Comanda a fost expediată cu succes."
+                },
+                "order": {
+                    "description": "Următoarele cantități de articole vor fi expediate.",
+                    "itemHeader": "Articol",
+                    "quantityHeader": "Cantitate",
+                    "originalQuantityHeader": "Cantitate (expediabilă)"
+                },
+                "availableTracking": {
+                    "label": "Coduri de urmărire disponibile",
+                    "hint": "Faceți clic pe unul dintre aceste coduri de urmărire pentru a completa automat toate datele."
+                },
+                "showTracking": "Adăugați informații de urmărire pentru această expediere",
+                "tracking": {
+                    "carrier": "Transportator",
+                    "code": "Cod",
+                    "url": "Url",
+                    "invalid": "Vă rugăm să introduceți atât Transportator, cât și Cod"
+                },
+                "confirmButton": "Expediați comanda",
+                "cancelButton": "Anulați",
+                "selectAllButton": "Selectați tot",
+                "resetButton": "Resetare"
+            },
+            "cancel": {
+                "title": "Anulați articolul prin mollie",
+                "confirmButton": "Anulați articolul prin mollie",
+                "cancelButton": "Închideți modalul",
+                "resetStock": "Resetare stocuri",
+                "item": {
+                    "success": "Produs anulat cu succes",
+                    "failed": {
+                        "quantityZero": "Cantitatea este 0",
+                        "invalidLine": "Produsul nu există în comandă",
+                        "quantityTooHigh": "Cantitatea este prea mare"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Expediați comanda (Mollie)",
+                        "description": "Expediați comanda în Mollie."
+                    },
+                    "modal": {
+                        "title": "Expediați comanda",
+                        "description": "Această acțiune va expedia automat o comandă prin Mollie. Secvența de flux va primi numărul comenzii și îl va transmite la API-ul Mollie. Expedierile reușite și cele eșuate vor fi vizibile în fișierele de jurnal Mollie.",
+                        "warningConfig": "Vă rugăm să vă asigurați că opriți orice automatizare suplimentară pentru acest tip de acțiune pentru a evita interferențele.\nUrmătoarele funcții activate ale acestui plugin ar putea interfera cu această acțiune:",
+                        "noWarnings": "Nu există avertismente"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Rambursați comanda (Mollie)",
+                        "description": "Rambursați comanda prin Mollie."
+                    },
+                    "modal": {
+                        "title": "Rambursați comanda",
+                        "description": "Această acțiune va porni automat o rambursare prin Mollie. Secvența de flux va primi numărul comenzii și îl va transmite la API-ul Mollie. Rambursările reușite și cele eșuate vor fi vizibile în fișierele de jurnal Mollie.",
+                        "warning": "Vă rugăm să rețineți, că rambursările pot dura până la 2 ore pentru a fi finalizate și vizibile în magazin. Până atunci, puteți anula întotdeauna o rambursare în așteptare fie din pagina comenzii în Shopware, fie din tabloul de bord Mollie.",
+                        "warningConfig": "Vă rugăm să vă asigurați că opriți orice automatizare suplimentară pentru acest tip de acțiune pentru a evita interferențele."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Expediere automată în configurația plugin-ului"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "În așteptare",
+                "active": "Activ",
+                "canceled": "Anulat",
+                "suspended": "Suspendat",
+                "completed": "Finalizat",
+                "paused": "Suspendat",
+                "resumed": "Reluat",
+                "skipped": "Sărit"
+            },
+            "navigation": {
+                "title": "Abonamente Mollie"
+            },
+            "TYPE_DAYS": "Zi(le)",
+            "TYPE_WEEKS": "Săptămână(i)",
+            "TYPE_MONTHS": "Lună(i)",
+            "confirm": {
+                "cancelTitle": "Anulare abonament?",
+                "cancel": "Anulați abonamentul clientului dvs..",
+                "pauseTitle": "Suspendare abonament?",
+                "pause": "Pune abonamentul pe pauză până când decizi să îl reactivezi.",
+                "resumeTitle": "Reactivați abonamentul?",
+                "resume": "Reluați abonamentul din nou.",
+                "skipTitle": "Sari peste următoarea rată?",
+                "skip": "Sari peste următoarea tranșă din abonament. Acesta continuă automat după aceea."
+            },
+            "alerts": {
+                "cancelSuccess": "Abonamentul a fost anulat cu succes",
+                "pauseSuccess": "Abonamentul a fost pus pe pauză cu succes",
+                "resumeSuccess": "Abonamentul a fost reluat cu succes",
+                "skipSuccess": "Abonamentul a fost sărit cu succes. Următoarea plată a fost actualizată."
+            },
+            "list": {
+                "title": "Abonamente Mollie",
+                "columns": {
+                    "customer": "Client",
+                    "status": "Status",
+                    "description": "Descriere",
+                    "amount": "Sumă",
+                    "nextPaymentAt": "Următoarea plată",
+                    "prePaymentReminder": "Reamintit la",
+                    "canceledAt": "Anulat la",
+                    "createdAt": "Creat la"
+                },
+                "action": {
+                    "edit": "Editați abonamentul"
+                },
+                "deletedCustomer": "Client șters"
+            },
+            "detail": {
+                "title": "Abonament Mollie",
+                "buttonCancelSubscription": "Anulați abonamentul",
+                "labelDescription": "Descriere",
+                "labelAmount": "Sumă",
+                "labelQuantity": "Cantitate",
+                "labelMollieSubscription": "Abonament Mollie",
+                "labelMollieCustomer": "Client Mollie",
+                "labelMandateId": "Mandat",
+                "labelShopwareCustomer": "Client Shopware",
+                "labelCreatedAt": "Creat la",
+                "buttonShowShopwareOrder": "Arată comanda Shopware",
+                "buttonShowShopwareCustomer": "Arată clientul Shopware",
+                "cardTitleSubscription": "Abonament",
+                "cardTitleStatus": "Status",
+                "labelStatus": "Status",
+                "labelNextPaymentAt": "Următoarea plată la",
+                "labelLastRemindedAt": "Ultima reamintire la",
+                "labelCanceledAt": "Anulat la",
+                "buttonPauseSubscription": "Pauza abonament",
+                "buttonResumeSubscription": "Reiați abonamentul",
+                "buttonSkipSubscription": "Sari peste abonament",
+                "history": {
+                    "cardTitle": "Istoric",
+                    "colDate": "Data",
+                    "colComment": "Comentariu",
+                    "colStatusFrom": "Status (de la)",
+                    "colStatusTo": "Status (până la)",
+                    "colMollieSubscription": "Abonament Mollie"
+                }
+            },
+            "product": {
+                "card-title": "Abonament",
+                "title": "Abonamente Mollie",
+                "description": "Gestionarea plăților recurente este mai ușoară ca niciodată cu caracteristicile noastre utile. Duceți-vă afacerea la nivelul următor cu opțiuni eficiente de urmărire, integrații simple și multe altele. Cu abonamentele Mollie, puteți crea cu ușurință produse de abonament și programa plăți recurente care să aibă loc la intervalul și perioada configurate.",
+                "mollieSubscriptionProduct": "Produs de abonament",
+                "mollieSubscriptionIntervalAmount": "Repetă plata la fiecare",
+                "mollieSubscriptionIntervalType": "Unitate de interval",
+                "mollieSubscriptionRepetitionAmount": "Numărul de repetiții",
+                "mollieSubscriptionRepetitionPlaceholder": "Introduceți numărul sau lăsați gol",
+                "infoDefaultLanguage": "Vă rugăm să rețineți că această configurație poate fi editată doar în limba dvs. implicită. Vă rugăm să schimbați limba pentru a modifica setările abonamentului pentru acest produs.",
+                "btnReadMore": "Citiți mai mult"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Abonament"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Date card de credit",
+            "buttonMolliePaymentLink": "Copiați în clipboard",
+            "columnRefunded": "Rambursat",
+            "columnShipped": "Expediat",
+            "columnCanceled": "Anulat",
+            "labelMollieOrderId": "ID comandă Mollie",
+            "labelMollieThirdPartyPaymentId": "Referință plată",
+            "labelMolliePaymentLink": "URL Mollie Checkout",
+            "totalRefunds": "Sumă rambursată",
+            "totalRefundsPending": "Așteaptă să fie rambursat",
+            "totalRemaining": "Sumă rambursabilă",
+            "totalVouchers": "Sumă voucher",
+            "totalShipments": "Cantitate expediată ({quantity} articole)",
+            "subscriptionBadge": "Comandă de abonament",
+            "refundManager": {
+                "title": "Mollie Refund Manager",
+                "btnOpenRefundManager": "Deschideți Refund Manager",
+                "btnCloseRefundManager": "Închideți Refund Manager"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Emitent iDeal recomandat"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Refund Manager"
+            },
+            "mollie_subscription": {
+                "label": "Abonamente"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Descriere"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Rambursare",
+            "subscription": "Abonament",
+            "webhookReceived": "Webhooks",
+            "status": "Status",
+            "started": "Început",
+            "ended": "Finalizat",
+            "paused": "Pus pe pauză",
+            "renewalReminder": "Memento de reînnoire",
+            "renewed": "Reînnoit",
+            "resumed": "Reluat",
+            "skipped": "Sărit",
+            "all": "Toate",
+            "canceled": "Anulat",
+            "expired": "Expirat",
+            "partiallyRefunded": "Rambursat (parțial)",
+            "orderSuccess": "Comandă reușită",
+            "orderFailed": "Comandă eșuată",
+            "orderCanceled": "Comandă anulată"
+        }
+    }
+}
