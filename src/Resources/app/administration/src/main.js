@@ -39,6 +39,7 @@ import slSL from './snippet/sl-SL';
 import huHU from './snippet/hu-HU';
 import fiFI from './snippet/fi-FI';
 import daDK from './snippet/da-DK';
+import roRO from './snippet/ro-RO';
 
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('de-DE', deDE);
@@ -68,3 +69,5 @@ Shopware.Locale.extend('hu-HU', huHU);
 Shopware.Locale.extend('fi-FI', fiFI);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('da-DK', daDK);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('ro-RO', roRO);
