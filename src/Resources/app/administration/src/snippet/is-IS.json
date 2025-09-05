@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie áskrift | Mollie áskriftir"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Pöntun árángursrík",
+            "mollie_checkout_order_failed": "Pöntun misheppnaðist",
+            "mollie_checkout_order_canceled": "Pöntun aflýst",
+            "mollie_webhook_received_All": " Mollie Webhook Móttekin (Allt)",
+            "mollie_webhook_received_status_authorized": " Mollie Webhook Móttekin (Viðurkennd)",
+            "mollie_webhook_received_status_failed": " Mollie Webhook Móttekin (Mistókst)",
+            "mollie_webhook_received_status_canceled": " Mollie Webhook Móttekin (Aflýst)",
+            "mollie_webhook_received_status_expired": " Mollie Webhook Móttekin (útrunnin)",
+            "mollie_webhook_received_status_pending": " Mollie Webhook Móttekin (Í vinnslu)",
+            "mollie_webhook_received_status_paid": " Mollie Webhook Móttekin (Greidd)",
+            "mollie_webhook_received_status_completed": " Mollie Webhook Móttekin (Fullunnin)",
+            "mollie_webhook_received_status_refunded": " Mollie Webhook Móttekin (Endurgreidd)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Móttekin (Að hluta til endurgreidd)",
+            "mollie_refund_started": "Endurgreiðsla Mollie hafin",
+            "mollie_subscription_started": "Mollie áskrift hafin",
+            "mollie_subscription_ended": "Mollie áskrift lokið",
+            "mollie_subscription_cancelled": "Mollie áskrift aflýst",
+            "mollie_subscription_paused": "Mollie áskrift stöðvuð",
+            "mollie_subscription_resumed": "Mollie áskrift endurtekinn",
+            "mollie_subscription_skipped": "Mollie áskrift sleppt",
+            "mollie_subscription_renewed": "Mollie áskrift endurnýjuð",
+            "mollie_subscription_renewal_reminder": "Mollie áminning um endurnýjun áskriftar"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie Eining",
+        "searchPlaceholder": "Leita að áskriftum...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie greiðslur",
+            "descriptionTextModule": "Mollie greiðslur",
+            "btnMollieActions": "Mollie aðgerðir",
+            "refundThroughMollie": "Endurgreiðsla í gegnum Mollie",
+            "shipThroughMollie": "Sending í gegnum Mollie",
+            "cancelMollieItem": "Aflýsa í gegnum Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Halló {userName}, velkomin/n til Mollie!",
+                "descriptionTop": "Innleiðsla er auðveld hjá Mollie!",
+                "descriptionBottom": "Það er allt og sumt!",
+                "descriptionFooter": "Ef þú vilt læra meira um viðbótina okkar, vinsamlegast heimsæktu opinberu skjalasíðuna okkar.",
+                "onboardingStep1": "Skráðu þig inn til þess að fá Mollie reikning.",
+                "onboardingStep2": "Sláðu inn API lyklana þína í hlutanum hér fyrir að neðan.",
+                "onboardingStep2TestMode": "Kveiktu á 'Prófunarham' ef þú vilt prófa greiðslurnar.",
+                "onboardingStep3": "Tilefndu greiðslumáta til sölurásar þinnar.",
+                "onboardingStep3Link": "til þinnar sölurásar",
+                "btnDocumentation": "Skjalfesting",
+                "btnRequestSupport": "Stuðningur",
+                "btnTroubleshooting": "Leiðbeiningar um úrræðaleit"
+            },
+            "api": {
+                "apiLinkButton": "Sæktu API lyklana þína í Stjórnborði Mollie",
+                "testButton": "Prófa API lykla",
+                "testApiKeys": {
+                    "title": "Mollie greiðslur",
+                    "apiKey": "API lykill",
+                    "isValid": "er gildur",
+                    "isInvalid": "er ógildur"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Staðgengill",
+                    "preview": "Forskoðun"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie greiðslur",
+                    "button": "Uppfæra greiðslumáta",
+                    "succeeded": "Greiðslumátar hafa verið uppfærðir með góðum árangri.",
+                    "failed": "Ekki var hægt að uppfæra greiðslumáta."
+                },
+                "mollieLimits": {
+                    "link": "Sýna aðgengisreglur fyrir greiðslumáta Mollie"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware getur notað gjaldmiðlastillingar til þess að reikna út hvernig það námundar heildarverð pöntunnar. Þetta inniheldur fjölda aukastafa á verði varanna þinna og næsta námundunarbili eins og 0,50 eða 1,00.",
+                "info2": "Þessar stillingar geta valdið því að heildarupphæð verður önnur en heildarsumman af línuþáttum. Þegar Mollie athugar þessa upphæð og kemst að því að þær passi ekki, veldur það villu í afgreiðslu.",
+                "info3": "Þú getur notað þessan eiginleika til þess að forðast vandamál við námundum í afgreiðslu. Þegar það er virkt, bætir það við sér línuhlut í Stjórnborði Mollie fyrir mismun við námundun, og viðskiptavinir þínir greiða heildartölu sem Shopware reiknar."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Það er ekki mögulegt að nota Klarna Greiða núna, Klarna Skera það eða Klarna Greiða síðar sem aðferð þegar gildistíminn þinn er meira en 28 daga í framtíðinni, nema annað hámark sé samið um milli seljanda og Klarna.",
+                "bankTransferDueDateLimitReached": "Það er ekki hægt að stilla líftíma pöntunar hærri en 100 daga."
+            },
+            "support": {
+                "modalTitle": "Óskaðu eftir stuðningi frá Mollie",
+                "btnCancel": "Hætta við",
+                "btnConfirm": "Óska eftir stuðningi",
+                "btnSupport": "Meira um stuðninginn okkar",
+                "form": {
+                    "name": "Nafnið þitt",
+                    "email": "Tölvupósturinn þinn",
+                    "recipient": "Senda beiðni til",
+                    "subject": "Efni",
+                    "message": "Skilaboð"
+                },
+                "data": {
+                    "header": "Gögn send til Mollie:",
+                    "other": "Annað:",
+                    "shopwareVersion": "Shopware útgáfa",
+                    "pluginLogs": "{plugin} skrá",
+                    "pluginConfiguration": "{plugin} grunnstilling",
+                    "pluginConfigurationHelpText": "API lyklar eru undanskildir.",
+                    "paymentMethods": "Gögn um greiðslumáta",
+                    "paymentMethodsHelpText": "Inniheldur upplýsingar um hvaða greiðslumátar eru virkir, tilnefndar hverju söluþætti og stöðu þeirra í Mollie reikningnum þínum."
+                },
+                "success": "Beiðni um stuðning hefur verið send með góðum árangri. Við gerum okkar besta til að svara eins fljótt og auðið er",
+                "error": "Það kom upp vandamál þegar sendingin var send með Shopware. Vinsamlegast reyndu aftur eða hafðu samband við okkur beint í gegnum tölvupóst."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Vara er áskrift (Mollie)",
+            "cartSubscriptionRule": "Karfa með áskriftum (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Í röð",
+                "pending": "Í bið",
+                "processing": "Í vinnslu",
+                "refunded": "Endurgreidd",
+                "failed": "Mistókst",
+                "description": {
+                    "queued": "Endurgreiðslan er í bið þar til nægileg innistæða finnst til að vinna endurgreiðsluna. Þú getur enn afskráð endurgreiðsluna.",
+                    "pending": "Endurgreiðslan verður send til bankans á næsta vinnudegi. Þú getur enn afskráð endurgreiðsluna.",
+                    "processing": "Endurgreiðslan hefur verið send til bankans. Endurgreiðslufjárhæðin mun verða flutt á reikning neytenda eins fljótt og auðið er.",
+                    "refunded": "Endurgreiðslufjárhæðin hefur verið flutt til neytandans.",
+                    "failed": "Endurgreiðslan hefur mistekist eftir vinnslu. Til dæmis, gæti viðskiptavinurinn hafa lokað bankareikning sínum. Fjármunirnir verða sendir til þíns reiknings."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "stk."
+            },
+            "acl": {
+                "warningCreate": "Þú hefur ekki heimildir til að búa til endurgreiðslur",
+                "warningCancel": "Þú hefur ekki heimildir til að hætta við endurgreiðslur"
+            },
+            "cart": {
+                "title": "Pöntun ##orderNumber##",
+                "btnSelectAll": "Velja allt",
+                "btnResetForm": "Endurstilla eyðublað",
+                "linkHowTo": "Hvernig á að nota þetta eyðublað?",
+                "grid": {
+                    "columns": {
+                        "item": "Hlutur",
+                        "productNumber": "Vörunúmer",
+                        "unitPrice": "Verð á einingu",
+                        "quantity": "Magn",
+                        "refunded": "Endurgreitt",
+                        "refundQuantity": "Endurgreiðsla",
+                        "totalPrice": "Samtals",
+                        "refundAmount": "Endurgreiðsla",
+                        "resetStock": "Endurstilla birgðir"
+                    },
+                    "btnResetLine": "Endurstilla línu",
+                    "checkDeductPromotion": "Draga frá afslætti",
+                    "checkRefundTax": "Endurgreiða VSK"
+                },
+                "roundDiffItemAdded": "Bætt var við sjálfvirka námundun"
+            },
+            "instructions": {
+                "linkResetTutorials": "Endurstilla leiðbeiningar",
+                "btnToggleTutorial": "Sýna/Fela leiðbeiningar",
+                "titleFullRefund": "Full endurgreiðsla",
+                "textFullRefund": "Notaðu einungis hnappinn til þess að fá fulla endurgreiðslu. Þetta tryggir að allar þínar vörur séu merktar sem endurgreiddar og að heildarfjárhæðinni sé skilað til viðskiptavinarins.",
+                "titleStockReset": "Endurstilling birgða",
+                "textStockReset": "Þú getur sjálfkrafa aukið fáanlegar birgðir með því að slá inn magn sem er aftur komið á lager. Sláðu það inn áður en þú hefur heila eða bútaða endurgreiðslu. Þú getur sameinað endurstillingu birgða og endurgreiðslu á sveigjanlegan máta.",
+                "titleShipping": "Sending",
+                "textShipping": "Vörur í sendingu má endurgreiða eins og aðrar vörur. Annað hvort sláðu inn fullt magn eða hluta magns og haltu áfram með endurgreiðsluna. Endurgreiðsla sendingarkostnaðs má sameina á sveigjanlegan hátt við endurgreiðsluferli vöru.",
+                "titlePartialAmount": "Sundruð endurgreiðsla (einungis magn)",
+                "textPartialAmount": "Sláðu einfaldlega inn hluta fjárhæðar í reitinn og byrjaðu endurgreiðsluna.",
+                "titlePartialItems": "Sundruð endurgreiðsla (með vörum)",
+                "textPartialItems": "Ef þú vilt merkja magn og vörur sem endurgreiddar í Mollie, skaltu nota eyðublaðið hér að ofan. Stilltu magn og gefðu sérstaka upp fjárhæð fyrir hverja vöru sem verður endurgreidd. Heildarfjárhæðin mun þá vera sýnileg í textareitnum fyrir lokafjárhæðina. Mundu eftir því að enn er mögulegt að breyta þessari lokafjárhæð áður en þú hefur endurgreiðsluna.",
+                "titlePartialPromotions": "Hlutbundin endurgreiðsla (með afsláttum)",
+                "textPartialPromotions": "Ef þú ert með afslátt í innkaupakörfunni þinni, er afsláttirinn aðskilin línufærsla. Ef þú vilt endurgreiða allar afsláttarvörur, skaltu halda áfram og endurgreiða heildargildin þeirra og alla afsláttalínuvöruna sjálfa. Hins vegar, ef þú vilt aðeins endurgreiða nokkrar vörur sem voru afsláttarvörur, geturðu dregið af brúkuðum afslætti sjálfkrafa fyrir hverja einstaka línuvöru. Þú getur auðvitað alltaf breytt gildum ef þau eru vitlaus.",
+                "titleRoundingDiff": "Mismunur á námundun",
+                "textRoundingDiff": "Full endurgreiðsla mun fela í sér mismun í námundun"
+            },
+            "summary": {
+                "dataLoading": "Gögn eru að hlaðast...",
+                "headerExcludingVat": "Án VSK",
+                "headerIncludingVat": "Með VSK",
+                "captionTotal": "Samtals",
+                "captionTotalTaxFree": "Samtals",
+                "captionPendingRefunds": "Bíð eftir endurgreiðslu",
+                "captionVouchers": "Upphæð ásláttarmiða",
+                "captionRefunded": "Fjárhæð sem endurgreidd",
+                "captionRemaining": "Fjárhæð sem hægt er að endurgreiða",
+                "btnFixDiff": "Laga mismun",
+                "placeholderDescription": "Sláðu inn lýsingu fyrir bankarreikning/kort fyrir neytandann. Að hámarki 140 stafir",
+                "lblDescription": "Lýsing (valfrjáls) ({characters}/140 stafir)",
+                "descriptionHelp": "Þetta verður sýnt í banka eða kortayfirliti neytandans þegar það er mögulegt. Skilaboðin verða stytt eftir 140 stafi.",
+                "placeholderInternalDescription": "Sláðu inn innri lýsingu þína",
+                "lblInternalDescription": "Innri lýsing (valfrjáls)",
+                "internalDescriptionHelp": "Þetta verður sýnt sem staðbundin lýsing í stjórnunaraðgerðunum.",
+                "checkVerification": "Ég hef staðfest heildarfjárhæð endurgreiðslu og samstilltan fjölda sem á að endurgreiða og birgja.",
+                "btnRefund": "Endurgreiðsla",
+                "btnFullRefund": "Full endurgreiðsla",
+                "roundDiffItemAdded": "Námundun hluts"
+            },
+            "refunds": {
+                "title": "Endurgreiðslur í Mollie stjórnborðinu",
+                "linkMore": "Meira um endurgreiðslur",
+                "grid": {
+                    "columns": {
+                        "amount": "Fjárhæð",
+                        "status": "Staða",
+                        "description": "Lýsing",
+                        "internalDescription": "Innri lýsing",
+                        "composition": "Samsetning",
+                        "date": "Dagsetning"
+                    },
+                    "lblNoComposition": "Engin samsetning tiltæk",
+                    "btnCancelRefund": "Hætta við þessa endurgreiðslu"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Endurgreiðsla hefur verið stofnuð í Mollie. Það getur tekið allt að 2 klukkustundir að vinna endurgreiðsluna. Upp að því marki getur þú enn hætt við endurgreiðsluna.",
+                    "refund-canceled": "Endurgreiðslan í bið hefur verið hætt við og fjarlægð með góðum árangri."
+                },
+                "error": {
+                    "low-amount": "Vinsamlegast sláðu inn upphæð sem á að endurgreiða.",
+                    "refund-created": "Eitthvað fór úrskeiðis við stofnun endurgreiðslu.",
+                    "refund-canceled": "Það kom upp vandamál þegar hætt var við endurgreiðsluna í bið. Vinsamlegast reyndu aftur í Mollie stjórnborðinu."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Afsláttarmiði",
+            "VOUCHER_INFO_TITLE": "Borgun afsláttarmiða",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie gerir þér kleift að þiggja greiðslur auðveldlega í vefverslun þinni með Eco-, gjaf- og máltíðarafsláttarmiða — snjallur kostur til þess að auka hagnað og fullnægja viðskiptavinum þínum. Greiðslumátinn \"afsláttarmiði\" er aðeins sýnilegur ef þú hefur að minnsta kosti 1 vöru með tiltekinni tegund afsláttarmiða í verslunarkörfunni.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Vinsamlegast athugaðu að þessa uppsetningu má aðeins breyta á þínu sjálfgefna tungumáli. Vinsamlegast breyttu tungumálinu þínu til að breyta tegund afsláttarmiða þessarar vöru.",
+            "VOUCHER_BTN_READMORE": "Lesa meira",
+            "VOUCHER_TYPE_CAPTION": "Tegund afsláttarmiða vörunnar",
+            "VOUCHER_TYPE_VALUE_NONE": "Enginn",
+            "VOUCHER_TYPE_VALUE_ECO": "Eco",
+            "VOUCHER_TYPE_VALUE_MEAL": "Máltíð",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Gjöf"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Senda í gegnum Mollie",
+                "item": {
+                    "label": "Vara:",
+                    "noQuantity": "Vinsamlegast sláðu inn fjölda til þess að hefja sendingu.",
+                    "shipAll": "Senda allt",
+                    "summary": {
+                        "quantity": "Fjöldi til sendingar",
+                        "shipped": "Fjöldi sendur",
+                        "shippable": "Fjöldi sem hægt er að senda"
+                    },
+                    "success": "Pöntun hefur verið send með góðum árangri."
+                },
+                "order": {
+                    "description": "Eftirfarandi hlutir gátu ekki verið sendir.",
+                    "itemHeader": "Vara",
+                    "quantityHeader": "Fjöldi",
+                    "originalQuantityHeader": "Fjöldi (sem hægt er að senda)"
+                },
+                "availableTracking": {
+                    "label": "Tiltækir kóðar til rakningar",
+                    "hint": "Smelltu á einn af þessum sendingarkóðum til að fylla sjálfvirkt út allar upplýsingar."
+                },
+                "showTracking": "Bæta við upplýsingar um sendingu fyrir þessa sendingu",
+                "tracking": {
+                    "carrier": "Flutningsaðili",
+                    "code": "Kóði",
+                    "url": "Url",
+                    "invalid": "Vinsamlegast sláðu inn bæði flutningsaðila og kóða"
+                },
+                "confirmButton": "Senda pöntun",
+                "cancelButton": "Hætta við",
+                "selectAllButton": "Velja allt",
+                "resetButton": "Endurstilla"
+            },
+            "cancel": {
+                "title": "Hætta við vöru í gegnum Mollie",
+                "confirmButton": "Hætta við vöru í gegnum Mollie",
+                "cancelButton": "Loka glugga",
+                "resetStock": "Endurstilla birgðir",
+                "item": {
+                    "success": "Vörunni hefur verið aflýst með góðum árangri",
+                    "failed": {
+                        "quantityZero": "Fjöldi er 0",
+                        "invalidLine": "Varan er ekki til í pöntuninni",
+                        "quantityTooHigh": "Fjöldi er of hár"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Senda pöntun (Mollie)",
+                        "description": "Senda pöntun í Mollie."
+                    },
+                    "modal": {
+                        "title": "Senda pöntun",
+                        "description": "Þessi aðgerð mun sjálfkrafa senda pöntun í gegnum Mollie. Flæðisröðin mun taka á móti pöntunarnúmerinu og senda það á Mollie API. Árángursríkar sendingar og mislukkaðar sendingar munu sjást í skrám Mollie.",
+                        "warningConfig": "Vinsamlegast vertu viss um að slökkva á allri viðbótar sjálfvirkni fyrir þessa tegund aðgerðar til að forðast truflanir.\nVirkjaðir eiginleikarnar í þessari viðbót gætu truflað þessa aðgerð:",
+                        "noWarnings": "Engar viðvaranir"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Endurgreiðsla pöntunar (Mollie)",
+                        "description": "Endurgreiða pöntun í gegnum Mollie."
+                    },
+                    "modal": {
+                        "title": "Endurgreiðsla pöntunar",
+                        "description": "Þessi aðgerð mun sjálfkrafa hefja endurgreiðslu í gegnum Mollie. Flæðisröðin mun taka á móti pöntunarnúmerinu og senda það á Mollie API. Árángursríkar endurgreiðslur og misheppanaðar endurgreiðslur munu sjást í Mollie skráningu.",
+                        "warning": "Vinsamlegast hafðu í huga að það gæti tekið allt að 2 klukkustundir þar til endurgreiðslur eru sjáanlegar í verslun. Þangað til geturðu alltaf hætt við endurgreiðslu í vinnsly annað hvort frá pöntunarsíðunni í Shopware eða frá Mollie stjórnborðinu.",
+                        "warningConfig": "Vinsamlegast vertu viss um að slökkva á allri viðbótar sjálfvirkni fyrir þessa tegund aðgerðar til að forðast truflanir."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Sjálfvirk sending í viðbótarstillingum"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Í bið",
+                "active": "Virkur",
+                "canceled": "Hætt við",
+                "suspended": "Frestað",
+                "completed": "Lokið",
+                "paused": "Stöðvað",
+                "resumed": "Endurnýjað",
+                "skipped": "Sleppt"
+            },
+            "navigation": {
+                "title": "Mollie áskriftir"
+            },
+            "TYPE_DAYS": "Dagur/dagar",
+            "TYPE_WEEKS": "Vika/vikur",
+            "TYPE_MONTHS": "Mánuður/mánuðir",
+            "confirm": {
+                "cancelTitle": "Binda enda á áskrift?",
+                "cancel": "Hætta við áskrift viðskiptavinarins.",
+                "pauseTitle": "Stöðva áskrift?",
+                "pause": "Setji áskriftina á hlé þar til þú endurnýjar hana aftur.",
+                "resumeTitle": "Endurnýja áskrift?",
+                "resume": "Halda áfram áskriftinni aftur.",
+                "skipTitle": "Sleppa næstu greiðslu?",
+                "skip": "Sleppa næstu greiðslu í áskriftinni. Hún heldur áfram sjálfkrafa eftir það."
+            },
+            "alerts": {
+                "cancelSuccess": "Hætt var við pöntun með góðum árangri",
+                "pauseSuccess": "Áskriftin hefur verið dregin í hlé með góðum árangri",
+                "resumeSuccess": "Áskriftin hefur verið endurnýjuð með góðum árangri",
+                "skipSuccess": "Áskriftinni hefur verið sleppt með góðum árangri. Næsta greiðsla hefur verið uppfærð."
+            },
+            "list": {
+                "title": "Mollie áskriftir",
+                "columns": {
+                    "customer": "Viðskiptavinur",
+                    "status": "Staða",
+                    "description": "Lýsing",
+                    "amount": "Upphæð",
+                    "nextPaymentAt": "Næsta greiðsla",
+                    "prePaymentReminder": "Áminning á",
+                    "canceledAt": "Hætt við á",
+                    "createdAt": "Búið til á"
+                },
+                "action": {
+                    "edit": "Breyta áskrift"
+                },
+                "deletedCustomer": "Eyddur viðskiptavinur"
+            },
+            "detail": {
+                "title": "Mollie áskrift",
+                "buttonCancelSubscription": "Hætta við áskrift",
+                "labelDescription": "Lýsing",
+                "labelAmount": "Upphæð",
+                "labelQuantity": "Magn",
+                "labelMollieSubscription": "Mollie áskrift",
+                "labelMollieCustomer": "Mollie viðskiptavinur",
+                "labelMandateId": "Umboð",
+                "labelShopwareCustomer": "Shopware viðskiptavinur",
+                "labelCreatedAt": "Búið til á",
+                "buttonShowShopwareOrder": "Sýna Shopware pöntun",
+                "buttonShowShopwareCustomer": "Sýna Shopware viðskiptavin",
+                "cardTitleSubscription": "Áskrift",
+                "cardTitleStatus": "Staða",
+                "labelStatus": "Staða",
+                "labelNextPaymentAt": "Næsta greiðsla á",
+                "labelLastRemindedAt": "Síðast áminnt á",
+                "labelCanceledAt": "Afskráð á",
+                "buttonPauseSubscription": "Stöðva áskrift",
+                "buttonResumeSubscription": "Hefja áskrift aftur",
+                "buttonSkipSubscription": "Sleppa áskrift",
+                "history": {
+                    "cardTitle": "Saga",
+                    "colDate": "Dagsetning",
+                    "colComment": "Athugasemd",
+                    "colStatusFrom": "Staða (frá)",
+                    "colStatusTo": "Staða (til)",
+                    "colMollieSubscription": "Mollie áskrift"
+                }
+            },
+            "product": {
+                "card-title": "Áskrift",
+                "title": "Mollie áskriftir",
+                "description": "Að stýra endurteknum greiðslum er auðveldari en nokkru sinni fyrr með nytsamlegu eiginleikunum okkar. Færðu fyrirtæki þitt á næsta stig með virkri eftirfylgni, einföldum samþættingum og fleiru. Með Mollie áskriftum geturðu auðveldlega skapað áskriftarvörur og skipulagt endurteknar greiðslur sem eiga að eiga sér stað á tilskildnu tímabili.",
+                "mollieSubscriptionProduct": "Áskriftarvara",
+                "mollieSubscriptionIntervalAmount": "Endurtaka greiðslu á hverju",
+                "mollieSubscriptionIntervalType": "Tímabilseining",
+                "mollieSubscriptionRepetitionAmount": "Fjöldi eða endurtekningar",
+                "mollieSubscriptionRepetitionPlaceholder": "Sláðu inn fjölda eða skildu eftir autt",
+                "infoDefaultLanguage": "Vinsamlegast athugið að þessi uppsetning er aðeins breytanleg á þínu staðal tungumáli. Vinsamlegast breyttu tungumálinu þínu til að breyta áskriftarstillingum á þessari vöru.",
+                "btnReadMore": "Lesa meira"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Áskrift"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Kreditkortagögn",
+            "buttonMolliePaymentLink": "Afrita í klippibúnað",
+            "columnRefunded": "Endurgreitt",
+            "columnShipped": "Sent",
+            "columnCanceled": "Hætt við",
+            "labelMollieOrderId": "Mollie pöntunar ID",
+            "labelMollieThirdPartyPaymentId": "Greiðsluauðkenni",
+            "labelMolliePaymentLink": "Mollie Afgreiðsla URL",
+            "totalRefunds": "Endurgreidd upphæð",
+            "totalRefundsPending": "Bíð eftir endurgreiðslu",
+            "totalRemaining": "Endurgreidd upphæð",
+            "totalVouchers": "Magn afsláttarmiða",
+            "totalShipments": "Send upphæð ({quantity} vörur)",
+            "subscriptionBadge": "Pöntun áskriftar",
+            "refundManager": {
+                "title": "Mollie endurgreiðslustjóri",
+                "btnOpenRefundManager": "Opna endurgreiðslustjóra",
+                "btnCloseRefundManager": "Loka endurgreiðslustjóra"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Ákjósanlegur iDeal útgefandi"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Endurgreiðslustjóri"
+            },
+            "mollie_subscription": {
+                "label": "Áskriftir"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Lýsing"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Endurgreiðsla",
+            "subscription": "Áskrift",
+            "webhookReceived": "Webhooks",
+            "status": "Staða",
+            "started": "Byrjað",
+            "ended": "Lokið",
+            "paused": "Stöðvað",
+            "renewalReminder": "Áminning um endurnýjun",
+            "renewed": "Endurnýjað",
+            "resumed": "Hafið aftur",
+            "skipped": "Sleppt",
+            "all": "Allt",
+            "canceled": "Hætt við",
+            "expired": "Útrunnið",
+            "partiallyRefunded": "Endurgreitt (að hluta til)",
+            "orderSuccess": "Pöntun árángursrík",
+            "orderFailed": "Pöntun misheppnaðist",
+            "orderCanceled": "Hætt við pöntun"
+        }
+    }
+}

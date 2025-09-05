@@ -61,6 +61,10 @@
             <tag name="shopware.snippet.file"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Resources\snippet\is_IS\SnippetFile_is_IS">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
 
 
     </services>
