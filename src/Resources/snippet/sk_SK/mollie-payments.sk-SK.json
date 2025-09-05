@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Vybraná metóda platby momentálne nie je dostupná pre predplatné produkty.",
+        "mollie-payments-cart-error-mixedcart": "Váš košík obsahuje viacero položiek vrátane predplatných. Upozorňujeme, že naraz je možné kúpiť iba jednu predplatnú položku.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nie všetky metódy platby sú dostupné pri objednávaní predplatných produktov.",
+        "mollie-payments-cart-guest-account": "Účty bez registácie nemožno používať na objednávky predplatného."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Vybraná metóda platby momentálne nie je dostupná pre predplatné produkty.",
+        "mollie-payments-cart-error-mixedcart": "Váš košík obsahuje viacero položiek vrátane predplatných. Upozorňujeme, že naraz je možné kúpiť iba jednu predplatnú položku. ",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nie všetky metódy platby sú dostupné pri objednávaní predplatných produktov.",
+        "mollie-payments-cart-guest-account": "Účty bez registácie nemožno používať na objednávky predplatného."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Dátum vypršania platnosti",
+                "cardHolderLabel": "Meno na karte",
+                "cardNumberLabel": "Číslo karty",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Platba zabezpečená a poskytovaná cez",
+                "headLine": "Zadajte údaje karty",
+                "saveCardDetailLabel": "Uložiť údaje o karte pre budúce platby"
+            },
+            "ideal": {
+                "selectBank": "Vyberte banku"
+            },
+            "pos": {
+                "selectTerminal": "Vyberte terminál"
+            },
+            "mandate": {
+                "sectionTitle": "Uložené karty",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Vaša karta bola úspešne odstránená",
+                "deleteErrorMessage": "Pri odstraňovaní vašej karty nastala chyba",
+                "newCard": "Nová karta",
+                "remove": "Odstrániť",
+                "subscriptionBadge": "Predplatné"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Zrušiť",
+                "cardSubscription": "Táto karta sa používa na predplatné. Prosím, najprv zrušte predplatné, než túto kartu odstránite.",
+                "deleteButton": "Odstrániť",
+                "deleteConfirmation": "Ste si istý, že chcete odstrániť?",
+                "title": "Potvrdenie o odstránení"
+            },
+            "phoneField": {
+                "headLine": "Telefónne číslo",
+                "phoneErrorMessage": "Telefónne číslo je povinné. Napríklad +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Zaplaťte inou platobnou metódou",
+                "buttonReturnToShop": "Vrátiť sa do obchodu",
+                "error": "Platba zlyhala",
+                "failed": "Platba zlyhala alebo bola zrušená. Budete presmerovaný na Mollie, kde môžete dokončiť platbu zvolenou metódou. "
+            },
+            "redirecting": "Presmerovávame vás na: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Medzisúčet",
+                "captionTaxes": "Dane",
+                "paymentError": "Platba pomocou Apple Pay zlyhala."
+            },
+            "paypalExpress": {
+                "paymentError": "Platba pomocou Paypal Express zlyhala."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "Upraviť fakturačnú adresu",
+                "btnEditShippingAddress": "Upraviť dodaciu adresu",
+                "cancelSubscription": "Predplatné bolo zrušené",
+                "errorCancelSubscription": "Predplatné sa nepodarilo zrušiť kvôli chybe. Prosím, kontaktujte našu podporu.",
+                "errorPause": "Pri pozastavovaní vášho predplatného nastala chyba",
+                "errorResume": "Pri obnove vášho predplatného nastala chyba",
+                "errorSkip": "Pri preskočení predplatného došlo k chybe",
+                "errorUpdateAddress": "Pri aktualizácii vašej adresy nastala chyba",
+                "errorUpdatePayment": "Pri aktualizácii vašej platobnej metódy nastala chyba",
+                "headlineBillingAddress": "Fakturačná adresa",
+                "headlineShippingAddress": "Dodacia adresa",
+                "mollieSubscriptionAmount": "Suma",
+                "mollieSubscriptionCancel": "Zrušiť predplatné",
+                "mollieSubscriptionCancelUntil": "Zrušenie je možné do",
+                "mollieSubscriptionContextMenuReorder": "Opakovať predplatné",
+                "mollieSubscriptionId": "ID",
+                "mollieSubscriptionNextPayment": "Ďalšia platba k",
+                "mollieSubscriptionPause": "Pozastaviť predplatné",
+                "mollieSubscriptionResume": "Obnoviť predplatné",
+                "mollieSubscriptionSkip": "Preskočiť predplatné",
+                "mollieSubscriptionUpdatePayment": "Aktualizovať platbu",
+                "mollieSubscriptionsHeadline": "Predplatné:",
+                "mollieSubscriptionsInfoEmpty": "Ešte nemáte žiadne predplatné.",
+                "mollieSubscriptionsLink": "Predplatné",
+                "mollieSubscriptionsTitle": "Predplatné",
+                "mollieSubscriptionsWelcome": "Vaše nedávne predplatné:",
+                "orderActionHide": "Skryť",
+                "orderActionView": "Zobraziť",
+                "shippingEqualToBilling": "Zhoduje sa s fakturačnou adresou",
+                "successPause": "Vaše predplatné bolo pozastavené",
+                "successResume": "Vaše predplatné bude teraz obnovené",
+                "successSkip": "Vaše predplatné bolo preskočené",
+                "successUpdateAddress": "Vaša adresa bola úspešne aktualizovaná",
+                "successUpdatePayment": "Vaša platobná metóda bola úspešne aktualizovaná"
+            },
+            "options": {
+                "everyDay": "Každý deň",
+                "everyDays": "Každé %value% dni",
+                "everyMonth": "Každý mesiac",
+                "everyMonths": "Každé %value% mesiace",
+                "everyWeek": "Každý týždeň",
+                "everyWeeks": "Každé %value% týždne",
+                "repetitionCount": "%value% krát"
+            },
+            "product": {
+                "addToCartText": "Predplatiť",
+                "information": "Produkt predplatného"
+            }
+        },
+        "testMode": {
+            "label": "Testovací režim"
+        }
+    }
+}
