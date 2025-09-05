@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Pašreiz izvēlētā maksājuma metode nav pieejama abonēšanas produktiem.",
+        "mollie-payments-cart-error-mixedcart": "Jūsu grozā ir vairākas preces kombinācijā ar abonēšanas precēm. Lūdzu, ņemiet vērā, ka jūs varat iegādāties tikai 1 abonēšanas preci reizē.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Ne visas maksājumu metodes ir pieejamas, pasūtot abonēšanas produktus.",
+        "mollie-payments-cart-guest-account": "Viesu konti nevar tikt izmantoti abonēšanas pasūtījumiem."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Pašreizējā izvēlētā maksājuma metode nav pieejama abonēšanas produktiem.",
+        "mollie-payments-cart-error-mixedcart": "Jūsu grozā ir vairākas preces kombinācijā ar abonēšanas precēm. Lūdzu, ņemiet vērā, ka jūs varat iegādāties tikai 1 abonēšanas preci reizē!",
+        "mollie-payments-cart-error-paymentmethod-availability": "Ne visas maksājumu metodes ir pieejamas, pasūtot abonēšanas produktus.",
+        "mollie-payments-cart-guest-account": "Viesu konti nevar tikt izmantoti abonēšanas pasūtījumiem."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Derīguma termiņš",
+                "cardHolderLabel": "Vārds uz kartes",
+                "cardNumberLabel": "Kartes numurs",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Maksājums ir nodrošināts un pārvaldīts ar",
+                "headLine": "Ievadiet savu kartes informāciju",
+                "saveCardDetailLabel": "Saglabāt kartes datus nākotnes maksājumiem"
+            },
+            "ideal": {
+                "selectBank": "Izvēlieties banku"
+            },
+            "pos": {
+                "selectTerminal": "Izvēlieties termināli"
+            },
+            "mandate": {
+                "sectionTitle": "Saglabātās kartes",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Jūsu karte ir veiksmīgi izdzēsta",
+                "deleteErrorMessage": "Radās problēma, izdzēšot jūsu karti",
+                "newCard": "Jauna karte",
+                "remove": "Noņemt",
+                "subscriptionBadge": "Abonements"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Atcelt",
+                "cardSubscription": "Šī karte tiek izmantota abonēšanai. Lūdzu, vispirms atcelt abonēšanu, pirms noņemat šo karti.",
+                "deleteButton": "Izdzēst",
+                "deleteConfirmation": "Vai tiešām vēlaties izdzēst?",
+                "title": "Izdzēšanas apstiprinājums"
+            },
+            "phoneField": {
+                "headLine": "Tālruņa numurs",
+                "phoneErrorMessage": "Tālruņa numurs ir obligāts. Piemēram, +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Maksājiet ar citu maksājuma metodi",
+                "buttonReturnToShop": "Atgriezties uz veikalu",
+                "error": "Maksājums neizdevās",
+                "failed": "Maksājums neizdevās vai tika atcelts. Jūs tiksiet novirzīts uz Mollie, kur varat pabeigt savu maksājumu ar izvēlēto metodi. "
+            },
+            "redirecting": "Tiek veikta pāradresācija uz: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Starpsumma",
+                "captionTaxes": "Nodokļi",
+                "paymentError": "Maksājums ar Apple Pay neizdevās."
+            },
+            "paypalExpress": {
+                "paymentError": "Maksājums ar Paypal Express neizdevās."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "rediģēt rēķina adresi",
+                "btnEditShippingAddress": "rediģēt piegādes adresi",
+                "cancelSubscription": "Abonēšana ir atcelta",
+                "errorCancelSubscription": "Abonementu nevarēja atcelt kļūdas dēļ. Lūdzu, sazinieties ar mūsu atbalsta dienestu.",
+                "errorPause": "Radās kļūda, pauzējot jūsu abonēšanu",
+                "errorResume": "Radās kļūda, atsākot jūsu abonēšanu",
+                "errorSkip": "Radās kļūda, izlaižot jūsu abonēšanu",
+                "errorUpdateAddress": "Adreses atjaunošanas laikā radās kļūda",
+                "errorUpdatePayment": "Radās kļūda, atjauninot jūsu maksājuma metodi",
+                "headlineBillingAddress": "Norēķinu adrese",
+                "headlineShippingAddress": "Piegādes adrese",
+                "mollieSubscriptionAmount": "Daudzums",
+                "mollieSubscriptionCancel": "Atcelt abonēšanu",
+                "mollieSubscriptionCancelUntil": "Atcelšana iespējama līdz",
+                "mollieSubscriptionContextMenuReorder": "Atkārtot abonementu",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Nākamais maksājums",
+                "mollieSubscriptionPause": "Pauzēt abonementu",
+                "mollieSubscriptionResume": "Atjaunot abonementu",
+                "mollieSubscriptionSkip": "Izlaist abonementu",
+                "mollieSubscriptionUpdatePayment": "Atjaunināt maksājumu",
+                "mollieSubscriptionsHeadline": "Abonements:",
+                "mollieSubscriptionsInfoEmpty": "Jums vēl nav abonementa.",
+                "mollieSubscriptionsLink": "Abonementi",
+                "mollieSubscriptionsTitle": "Abonementi",
+                "mollieSubscriptionsWelcome": "Jūsu jaunākie abonementi:",
+                "orderActionHide": "Paslēpt",
+                "orderActionView": "Skatīt",
+                "shippingEqualToBilling": "Vienāds ar rēķina adresi",
+                "successPause": "Jūsu abonements ir pauzēts",
+                "successResume": "Jūsu abonements tagad tiks atsākts",
+                "successSkip": "Jūsu abonements ir izlaists",
+                "successUpdateAddress": "Jūsu adrese ir veiksmīgi atjaunināta",
+                "successUpdatePayment": "Jūsu maksājuma metode ir veiksmīgi atjaunināta"
+            },
+            "options": {
+                "everyDay": "Katru dienu",
+                "everyDays": "Katrā %value% dienā",
+                "everyMonth": "Katru mēnesi",
+                "everyMonths": "Katrā %value% mēnesī",
+                "everyWeek": "Katru nedēļu",
+                "everyWeeks": "Katrā %value% nedēļā",
+                "repetitionCount": "%value% reizes"
+            },
+            "product": {
+                "addToCartText": "Abonēt",
+                "information": "Abonēšanas produkts"
+            }
+        },
+        "testMode": {
+            "label": "Testa režīms"
+        }
+    }
+}

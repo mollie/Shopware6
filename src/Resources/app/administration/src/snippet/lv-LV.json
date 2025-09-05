@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": "Pasūtījums veiksmīgs ",
+            "mollie_checkout_order_failed": " Pasūtījums neizdevās",
+            "mollie_checkout_order_canceled": " Pasūtījums atcelts",
+            "mollie_webhook_received_All": " Mollie Webhook Saņemts (Visi)",
+            "mollie_webhook_received_status_authorized": "Mollie tīmekļa āķi saņemti (Autorizēti)",
+            "mollie_webhook_received_status_failed": "Mollie tīmekļa āķi saņemti (Neizdevušies)",
+            "mollie_webhook_received_status_canceled": "Mollie tīmekļa āķi saņemti (Atcelti)",
+            "mollie_webhook_received_status_expired": "Mollie tīmekļa āķi saņemti (Beigušies)",
+            "mollie_webhook_received_status_pending": "Mollie tīmekļa āķi saņemti (Procesā esoši)",
+            "mollie_webhook_received_status_paid": "Mollie tīmekļa āķi saņemti (Samaksāti)",
+            "mollie_webhook_received_status_completed": "Mollie tīmekļa āķi saņemti (Pabeigti)",
+            "mollie_webhook_received_status_refunded": "Mollie tīmekļa āķi saņemti (Atmaksāti)",
+            "mollie_webhook_received_status_partially_refunded": "Mollie tīmekļa āķi saņemti (Daļēji Atmaksāti)",
+            "mollie_refund_started": "Mollie atmaksa sākta",
+            "mollie_subscription_started": " Sākta Mollie abonēšana",
+            "mollie_subscription_ended": " Mollie abonēšana pabeigta",
+            "mollie_subscription_cancelled": "Mollie abonements atcelts",
+            "mollie_subscription_paused": "Mollie abonements apturēts",
+            "mollie_subscription_resumed": "Mollie abonements atsākts",
+            "mollie_subscription_skipped": "Mollie abonements izlaists",
+            "mollie_subscription_renewed": "Mollie abonements atjaunots",
+            "mollie_subscription_renewal_reminder": "Mollie atgādinājums par abonementa atjaunošanu"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie Module",
+        "searchPlaceholder": "Meklēt abonementus...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie Payments",
+            "descriptionTextModule": "Mollie Payments",
+            "btnMollieActions": "Mollie darbības",
+            "refundThroughMollie": "Atmaksa caur Mollie",
+            "shipThroughMollie": "Nosūtīt caur Mollie",
+            "cancelMollieItem": "Atcelt caur Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Sveiks {userName}, laipni lūdzam Mollie!",
+                "descriptionTop": "Iepazīšanās ar Mollie ir vienkārša!",
+                "descriptionBottom": "Tas ir viss!",
+                "descriptionFooter": "Ja vēlies uzzināt vairāk par mūsu spraudni, lūdzu, apmeklē mūsu oficiālo dokumentācijas lapu.",
+                "onboardingStep1": "Reģistrēties Mollie kontam.",
+                "onboardingStep2": "Ievadiet savas API atslēgas zemāk esošajā sadaļā.",
+                "onboardingStep2TestMode": "Ieslēdziet 'Testa režīmu', ja vēlaties tikai izmēģināt maksājumus.",
+                "onboardingStep3": "Piešķiriet maksājuma metodes savam pārdošanas kanālam.",
+                "onboardingStep3Link": "uz jūsu pārdošanas kanāliem",
+                "btnDocumentation": "Dokumentācija",
+                "btnRequestSupport": "Atbalsts",
+                "btnTroubleshooting": "Problēmu novēršanas rokasgrāmata"
+            },
+            "api": {
+                "apiLinkButton": "Iegūstiet savas API atslēgas no Mollie Dashboard",
+                "testButton": "Test API atslēgas",
+                "testApiKeys": {
+                    "title": "Mollie Payments",
+                    "apiKey": "API atslēga",
+                    "isValid": "ir derīga",
+                    "isInvalid": "ir nederīga"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Aizvietotājs",
+                    "preview": "Priekšskatījums"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie Payments",
+                    "button": "Atjaunot maksājumu metodes",
+                    "succeeded": "Maksājumu metodes veiksmīgi atjaunotas.",
+                    "failed": "Maksājuma metodes nevarēja tikt atjauninātas."
+                },
+                "mollieLimits": {
+                    "link": "Rādīt Mollie pieejamības noteikumus maksājumu metodēm"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware var izmantot valūtas iestatījumus, lai aprēķinātu, kā tas noapaļo pasūtījuma kopējo summu. Tas ietver decimāldaļu skaitu jūsu produktu cenās un tuvāko noapaļošanas intervālu, piemēram, 0.50 vai 1.00.",
+                "info2": "Šie iestatījumi var novest pie kopējās summas, kas atšķiras no rindu elementu kopējās summas. Kad Mollie pārbauda šos apmērus un atklāj, ka tie nesakrīt, tas apmaksas kases kļūdu.",
+                "info3": "Šo funkciju varat izmantot, lai izvairītos no noapaļošanas problēmām jūsu apmaksā. Kad tā ir iespējota, tā pievieno atsevišķu rindu jūsu Mollie vadības panelī par starpību noapaļošanā, un jūsu klienti samaksā kopējo summu, ko aprēķina Shopware."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Nav iespējams izmantot Klarna Pay now, Klarna Slice it vai Klarna Pay later kā metodi, kad jūsu derīguma termiņš ir vairāk nekā 28 dienas nākotnē, ja vien tirgotājs un Klarna nav vienojušies par citu maksimumu.",
+                "bankTransferDueDateLimitReached": "Nav iespējams iestatīt pasūtījuma ilgumu ilgāk par 100 dienām."
+            },
+            "support": {
+                "modalTitle": "Pieprasīt Mollie atbalstu",
+                "btnCancel": "Atcelt",
+                "btnConfirm": "Pieprasīt atbalstu",
+                "btnSupport": "Vairāk par mūsu atbalstu",
+                "form": {
+                    "name": "Jūsu vārds",
+                    "email": "Jūsu e-pasts",
+                    "recipient": "Nosūtīt pieprasījumu uz",
+                    "subject": "Temats",
+                    "message": "Ziņojums"
+                },
+                "data": {
+                    "header": "Dati nosūtīti uz Mollie:",
+                    "other": "Citi:",
+                    "shopwareVersion": "Shopware versija",
+                    "pluginLogs": "{plugin} žurnāla faili",
+                    "pluginConfiguration": "{plugin} konfigurācija",
+                    "pluginConfigurationHelpText": "API atslēgas ir izslēgtas.",
+                    "paymentMethods": "Maksājumu metodes informācija",
+                    "paymentMethodsHelpText": "Satur informāciju par to, kuras maksājuma metodes ir aktīvas un piešķirtas katram pārdošanas kanālam, kā arī to statusu jūsu Mollie kontā."
+                },
+                "success": "Atbalsta pieprasījums ir veiksmīgi nosūtīts. Mēs darām visu iespējamo, lai atbildētu cik ātri vien iespējams.",
+                "error": "Radās problēma, nosūtot e-pastu caur Shopware. Lūdzu, mēģiniet vēlreiz vai sazinieties ar mums tieši pa e-pastu."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Prece ir abonements (Mollie)",
+            "cartSubscriptionRule": "Grozs ar abonementiem (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Kārtots",
+                "pending": "Procesā esošs",
+                "processing": "Apstrādā",
+                "refunded": "Atmaksāts",
+                "failed": "Neizdevies",
+                "description": {
+                    "queued": "Atmaksa ir kārtota, līdz ir pietiekams atlikums, lai apstrādātu atmaksu. Jūs joprojām varat atcelt atmaksu.",
+                    "pending": "Atmaksa tiks nosūtīta uz banku nākamajā darba dienā. Jūs joprojām varat atcelt atmaksu.",
+                    "processing": "Atmaksa ir nosūtīta uz banku. Atmaksātā summa tiks pārskaitīta uz patērētāja kontu pēc iespējas ātrāk.",
+                    "refunded": "Atmaksas summa ir pārsūtīts patērētājam.",
+                    "failed": "Atmaksa neizdevās pēc apstrādes. Piemēram, klients ir slēdzis savu bankas kontu. Līdzekļi tiks atgriezti jūsu kontā."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "gab."
+            },
+            "acl": {
+                "warningCreate": "Jums nav atļauju veidot atmaksas",
+                "warningCancel": "Jums nav atļauju atcelt atmaksas"
+            },
+            "cart": {
+                "title": "Pasūtījums ##orderNumber##",
+                "btnSelectAll": "Atlasīt visus",
+                "btnResetForm": "Atjaunot formu",
+                "linkHowTo": "Kā izmantot šo formu?",
+                "grid": {
+                    "columns": {
+                        "item": "Prece",
+                        "productNumber": "Produkta numurs",
+                        "unitPrice": "Vienības cena",
+                        "quantity": "Daudzums",
+                        "refunded": "Atmaksāts",
+                        "refundQuantity": "Atmaksa",
+                        "totalPrice": "Kopā",
+                        "refundAmount": "Atmaksa",
+                        "resetStock": "Atjaunot krājumus"
+                    },
+                    "btnResetLine": "Atiestatīt rindu",
+                    "checkDeductPromotion": "Atcelt akciju",
+                    "checkRefundTax": "Atmaksāt PVN"
+                },
+                "roundDiffItemAdded": "Automātiskā noapaļošanas vienība tika pievienota"
+            },
+            "instructions": {
+                "linkResetTutorials": "Atjaunot apmācības",
+                "btnToggleTutorial": "Rādīt/Slēpt apmācību",
+                "titleFullRefund": "Pilna atmaksa",
+                "textFullRefund": "Vienkārši izmantojiet pogu pilnīgai atmaksai. Tas nodrošina, ka visas jūsu preces tiek atzītas par atgrieztām un pilna summa tiek atgriezta klientam.",
+                "titleStockReset": "Krājuma atiestatīšana",
+                "textStockReset": "Jūs varat automātiski palielināt pieejamo krājumu, ievadot daudzumu, kuru vēlaties atgriezt krājumā. Vienkārši ievadiet to, pirms turpināt ar pilnu vai daļēju atmaksu. Krājumu atiestatīšanu var elastīgi apvienot ar faktiskā atmaksas procesa veikšanu.",
+                "titleShipping": "Piegāde",
+                "textShipping": "Piegādes priekšmetus var atmaksāt kā jebkuru citu preces priekšmetu. Ievadiet pilnu daudzumu vai pielāgotu daļēju summu un turpiniet ar atmaksu. Piegādes izmaksu atmaksa var tikt elastīgi kombinēta ar faktisko priekšmetu atmaksas procesu.",
+                "titlePartialAmount": "Daļēja atmaksa (tikai daudzums)",
+                "textPartialAmount": "Vienkārši ievadiet daļēju summu teksta laukā un sāciet atmaksu.",
+                "titlePartialItems": "Daļēja atmaksa (ar precēm)",
+                "textPartialItems": "Ja vēlaties atzīmēt daudzumus un priekšmetus kā atmaksātus Mollie, izmantojiet iepriekš minēto formu. Iestatiet savus daudzumus un norādiet pielāgotu summu katram priekšmetam, kas tiks atmaksāts. Kopējā summa tad būs redzama galīgās atmaksas summas tekstlaukā. Atcerieties, ka joprojām ir iespējams pielāgot šo galīgo summu pirms atmaksas uzsākšanas.",
+                "titlePartialPromotions": "Daļēja atmaksa (ar akcijām)",
+                "textPartialPromotions": "Ja jums ir akcija savā grozā, tad jūsu akcija ir atsevišķa rindas vienība. Ja vēlaties atmaksāt visas atlaides preces, turpiniet un atmaksājiet to kopējās vērtības un pilnīgu akcijas rindas vienību pati. Tomēr, ja vēlaties atmaksāt tikai dažas atlaides preces, jūs varat automātiski atņemt piemēroto atlaidi katram atsevišķam rindas vienībai. Protams, jūs vienmēr varat mainīt vērtības, ja tās nav pareizas.",
+                "titleRoundingDiff": "Noapaļošanas atšķirība",
+                "textRoundingDiff": "Pilna atmaksa iekļaus noapaļošanas atšķirības"
+            },
+            "summary": {
+                "dataLoading": "Dati tiek ielādēti...",
+                "headerExcludingVat": "Bez PVN",
+                "headerIncludingVat": "Ar PVN",
+                "captionTotal": "Kopā",
+                "captionTotalTaxFree": "Kopā",
+                "captionPendingRefunds": "Gaida atgriešanu",
+                "captionVouchers": "Kupona summa",
+                "captionRefunded": "Atmaksātā summa",
+                "captionRemaining": "Atmaksājamā summa",
+                "btnFixDiff": "Labot atšķirību",
+                "placeholderDescription": "Ievadiet bankas/kartes izrakstu aprakstu patērētājam. Maks. 140 zīmes",
+                "lblDescription": "Apraksts (pēc izvēles) ({characters}/140 rakstzīmes)",
+                "descriptionHelp": "Kad tas ir iespējams, tas tiks rādīts patērētāja bankas vai kartes izrakstā. Ziņojums tiks saīsināts pēc 140 rakstzīmēm.",
+                "placeholderInternalDescription": "Ievadiet savu iekšējo aprakstu",
+                "lblInternalDescription": "Iekšējais apraksts (pēc izvēles)",
+                "internalDescriptionHelp": "Šis tiks rādīts kā vietējā apraksts administrācijas interfeisā.",
+                "checkVerification": "Es esmu pārbaudījis kopējo atmaksas summu un konfigurētos daudzumus atmaksai un piegādei.",
+                "btnRefund": "Atmaksa",
+                "btnFullRefund": "Pilna atmaksa",
+                "roundDiffItemAdded": "Noapaļošanas pozīcija"
+            },
+            "refunds": {
+                "title": "Atmaksas Mollie vadības panelī",
+                "linkMore": "Vairāk par atmaksām",
+                "grid": {
+                    "columns": {
+                        "amount": "Daudzums",
+                        "status": "Statuss",
+                        "description": "Apraksts",
+                        "internalDescription": "Iekšējais apraksts",
+                        "composition": "Kompozīcija",
+                        "date": "Datums"
+                    },
+                    "lblNoComposition": "Nav pieejama kompozīcija",
+                    "btnCancelRefund": "Atcelt šo atmaksu"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Atmaksa ir izveidota Mollie. Var paiet 2 stundas, līdz atmaksas process pabeigts. Līdz tam brīdim jūs varat atcelt atmaksu.",
+                    "refund-canceled": "Procesā esošā atmaksāšana ir veiksmīgi atcelta un noņemta."
+                },
+                "error": {
+                    "low-amount": "Lūdzu, ievadiet summu, kas jāatmaksā.",
+                    "refund-created": "Kaut kas nogāja greizi, veidojot atmaksu.",
+                    "refund-canceled": "Radās problēma, atceļot procesā esošo atmaksu. Lūdzu, mēģiniet vēlreiz Mollie informācijas paneļā."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Kupons",
+            "VOUCHER_INFO_TITLE": "Kupona maksājumi",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie ļauj jums viegli pieņemt maksājumus jūsu tiešsaistes veikalā, izmantojot ekoloģiskos, dāvanu un ēdienu kuponus — gudra izvēle, lai palielinātu pārdošanu un apmierinātu jūsu klientus. Maksājuma metode \"kupons\" ir redzama tikai tad, ja grozā ir vismaz 1 produkts ar piešķirtu kupona veidu.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Lūdzu, ņemiet vērā, ka šo konfigurāciju var rediģēt tikai jūsu noklusējuma valodā! Lūdzu, mainiet savu valodu, lai mainītu šī produkta kupona veidu!",
+            "VOUCHER_BTN_READMORE": "Lasiet vairāk",
+            "VOUCHER_TYPE_CAPTION": "Produkta kupona veids",
+            "VOUCHER_TYPE_VALUE_NONE": "Nav",
+            "VOUCHER_TYPE_VALUE_ECO": "Eko",
+            "VOUCHER_TYPE_VALUE_MEAL": "Maltīte",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Dāvana"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Nosūtīt caur Mollie",
+                "item": {
+                    "label": "Prece:",
+                    "noQuantity": "Lūdzu, ievadiet daudzumu, kas jānosūta!",
+                    "shipAll": "Nosūtīt visu",
+                    "summary": {
+                        "quantity": "Nosūtāmais daudzumu",
+                        "shipped": "Nosūtītais daudzums",
+                        "shippable": "Nosūtāmo preču daudzums"
+                    },
+                    "success": "Pasūtījums veiksmīgi nosūtīts."
+                },
+                "order": {
+                    "description": "Sekojamo preču daudzumi tiks nosūtīti.",
+                    "itemHeader": "Prece",
+                    "quantityHeader": "Daudzums",
+                    "originalQuantityHeader": "Daudzums (nosūtāms)"
+                },
+                "availableTracking": {
+                    "label": "Pieejamie izsekošanas kodi",
+                    "hint": "Noklikšķiniet uz viena no šiem izsekošanas kodiem, lai automātiski aizpildītu visus datus."
+                },
+                "showTracking": "Pievienot izsekošanas informāciju šai sūtījumam",
+                "tracking": {
+                    "carrier": "Pārvadātājs",
+                    "code": "Kods",
+                    "url": "Url",
+                    "invalid": "Lūdzu, ievadiet gan pārvadātāju, gan kodu"
+                },
+                "confirmButton": "Nosūtīt pasūtījumu",
+                "cancelButton": "Atcelt",
+                "selectAllButton": "Izvēlēties visu",
+                "resetButton": "Atjaunot"
+            },
+            "cancel": {
+                "title": "Atcelt preci caur Mollie",
+                "confirmButton": "Atcelt preci caur Mollie",
+                "cancelButton": "Aizvērt modālo logu",
+                "resetStock": "Atjaunot krājumus",
+                "item": {
+                    "success": "Produkts veiksmīgi atcelts",
+                    "failed": {
+                        "quantityZero": "Daudzums ir 0",
+                        "invalidLine": "Produkta nav pasūtījumā",
+                        "quantityTooHigh": "Daudzums ir pārāk liels"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Nosūtīt pasūtījumu (Mollie)",
+                        "description": "Nosūtīt pasūtījumu caur Mollie."
+                    },
+                    "modal": {
+                        "title": "Nosūtīt pasūtījumu",
+                        "description": "Šī darbība automātiski nosūtīs pasūtījumu, izmantojot Mollie. Procesa secība saņems pasūtījuma numuru un nodos to Mollie API. Veiksmīgas nosūtīšanas un neizdevušās nosūtīšanas būs redzamas Mollie žurnāla failos.",
+                        "warningConfig": "Lūdzu, pārliecinieties, ka izslēdzāt visas papildu automatizācijas šī veida darbībām, lai izvairītos no iejaukšanās.\nŠīs spraudņa aktivētās funkcijas var traucēt šo darbību:",
+                        "noWarnings": "Nav brīdinājumu"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Atmaksāt pasūtījumu (Mollie)",
+                        "description": "Atmaksāt pasūtījumu caur Mollie."
+                    },
+                    "modal": {
+                        "title": "Atmaksāt pasūtījumu",
+                        "description": "Šī darbība automātiski uzsāks atmaksu caur Mollie. Darbības secība saņems pasūtījuma numuru un nosūtīs to uz Mollie API. Veiksmīgās atmaksas un neveiksmīgās atmaksas būs redzamas Mollie žurnāla failos.",
+                        "warning": "Lūdzu, ņemiet vērā, ka atmaksas var ilgt līdz 2 stundām, lai tiktu pabeigtas un redzamas veikalā. Līdz tam jūs vienmēr varat atcelt gaidošo atmaksu, vai nu no pasūtījuma lapas Shopware, vai no Mollie Dashboard.",
+                        "warningConfig": "Lūdzu, pārliecinieties, ka izslēdzāt visas papildu automatizācijas šī veida darbībām, lai izvairītos no iejaukšanās."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Automātiskā piegāde spraudņa konfigurācijā"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Procesā esošs",
+                "active": "Aktīvs",
+                "canceled": "Atcelts",
+                "suspended": "Pārtraukts",
+                "completed": "Pabeigts",
+                "paused": "Pauzēts",
+                "resumed": "Turpināts",
+                "skipped": "Izlaists"
+            },
+            "navigation": {
+                "title": "Mollie Subscriptions"
+            },
+            "TYPE_DAYS": "Diena(-s)",
+            "TYPE_WEEKS": "Nedēļa(-s)",
+            "TYPE_MONTHS": "Mēnesis(-ši)",
+            "confirm": {
+                "cancelTitle": "Atcelt abonementu?",
+                "cancel": "Atcelt klienta abonementu.",
+                "pauseTitle": "Pauzēt abonementu?",
+                "pause": "Nolikt abonementu uz gaidīšanu līdz jūs to atkal atsākat.",
+                "resumeTitle": "Atjaunot abonementu?",
+                "resume": "Turpināt abonementu vēlreiz.",
+                "skipTitle": "Izlaist nākamo iemaksu?",
+                "skip": "Izlaidiet nākamo maksājumu abonementā. Pēc tam tas automātiski turpinās."
+            },
+            "alerts": {
+                "cancelSuccess": "Abonements tika veiksmīgi atcelts",
+                "pauseSuccess": "Abonements ir veiksmīgi pauzēts",
+                "resumeSuccess": "Abonements ir veiksmīgi atjaunots",
+                "skipSuccess": "Abonements ir veiksmīgi izlaists. Nākamais maksājums ir atjaunināts."
+            },
+            "list": {
+                "title": "Mollie Subscriptions",
+                "columns": {
+                    "customer": "Klients",
+                    "status": "Statuss",
+                    "description": "Apraksts",
+                    "amount": "Daudzums",
+                    "nextPaymentAt": "Nākamais maksājums",
+                    "prePaymentReminder": "Atgādināts par",
+                    "canceledAt": "Atcelts pie",
+                    "createdAt": "Izveidots pie"
+                },
+                "action": {
+                    "edit": "Rediģēt abonementu"
+                },
+                "deletedCustomer": "Izdzēsts klients"
+            },
+            "detail": {
+                "title": "Mollie abonements",
+                "buttonCancelSubscription": "Atcelt abonementu",
+                "labelDescription": "Apraksts",
+                "labelAmount": "Daudzums",
+                "labelQuantity": "Daudzums",
+                "labelMollieSubscription": "Mollie Subscription",
+                "labelMollieCustomer": "Mollie klients",
+                "labelMandateId": "Pilnvarot",
+                "labelShopwareCustomer": "Shopware klients",
+                "labelCreatedAt": "Izveidots pie",
+                "buttonShowShopwareOrder": "Rādīt Shopware pasūtījumu",
+                "buttonShowShopwareCustomer": "Rādīt Shopware klientu",
+                "cardTitleSubscription": "Abonements",
+                "cardTitleStatus": "Statuss",
+                "labelStatus": "Statuss",
+                "labelNextPaymentAt": "Nākamais maksājums pie",
+                "labelLastRemindedAt": "Pēdējais atgādinājums pie",
+                "labelCanceledAt": "Atcelts pie",
+                "buttonPauseSubscription": "Pauzēt abonementu",
+                "buttonResumeSubscription": "Atjaunot abonementu",
+                "buttonSkipSubscription": "Izlaist abonementu",
+                "history": {
+                    "cardTitle": "Vēsture",
+                    "colDate": "Datums",
+                    "colComment": "Komentārs",
+                    "colStatusFrom": "Statuss (no)",
+                    "colStatusTo": "Statuss (uz)",
+                    "colMollieSubscription": "Mollie abonements"
+                }
+            },
+            "product": {
+                "card-title": "Abonements",
+                "title": "Mollie Subscriptions",
+                "description": "Jūsu regulāro maksājumu pārvaldīšana ir vieglāka nekā jebkad agrāk ar mūsu noderīgajām funkcijām. Paceliet savu biznesu jaunā līmenī ar efektīvām izsekosanas iespējām, vienkāršām integrācijām un vairāk. Ar Mollie abonementiem jūs varat viegli izveidot abonementa produktus un ieplānot regulārus maksājumus, lai tie notiktu noteiktajos intervālos un periodos.",
+                "mollieSubscriptionProduct": "Abonementa Produkts",
+                "mollieSubscriptionIntervalAmount": "Atkārtot maksājumu katru",
+                "mollieSubscriptionIntervalType": "Intervāla vienība",
+                "mollieSubscriptionRepetitionAmount": "Atkārtojumu skaits",
+                "mollieSubscriptionRepetitionPlaceholder": "Ievadiet skaitli vai atstājiet tukšu",
+                "infoDefaultLanguage": "Lūdzu, ņemiet vērā, ka šo konfigurāciju varat rediģēt tikai savā noklusējuma valodā. Lūdzu, mainiet valodu, lai modificētu šī produkta abonementa iestatījumus.",
+                "btnReadMore": "Lasiet vairāk"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Abonements"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Kredītkartes dati",
+            "buttonMolliePaymentLink": "Kopēt uz starpliktuvi",
+            "columnRefunded": "Atmaksāts",
+            "columnShipped": "Nosūtīts",
+            "columnCanceled": "Atcelts",
+            "labelMollieOrderId": "Mollie Order ID",
+            "labelMollieThirdPartyPaymentId": "Maksājuma atsauce",
+            "labelMolliePaymentLink": "Mollie Checkout URL",
+            "totalRefunds": "Atmaksātā summa",
+            "totalRefundsPending": "Gaidot atmaksu",
+            "totalRemaining": "Atmaksājamā summa",
+            "totalVouchers": "Kupona summa",
+            "totalShipments": "Nosūtītā summa ({quantity} priekšmeti)",
+            "subscriptionBadge": "Abonementa Pasūtījums",
+            "refundManager": {
+                "title": "Mollie Refund Manager",
+                "btnOpenRefundManager": "Atvērt Refund Manager",
+                "btnCloseRefundManager": "Aizvērt Refund Manager"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Vēlamā iDEAL izsniedzējs"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Atmaksas pārvaldnieks"
+            },
+            "mollie_subscription": {
+                "label": "Abonementi"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Apraksts"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Atmaksa",
+            "subscription": "Abonements",
+            "webhookReceived": "Webhooks",
+            "status": "Statuss",
+            "started": "Sācies",
+            "ended": "Beidzies",
+            "paused": "Pauzēts",
+            "renewalReminder": "Atjaunošanas atgādinājums",
+            "renewed": "Atjaunots",
+            "resumed": "Atjaunots",
+            "skipped": "Izlaists",
+            "all": "Visi",
+            "canceled": "Atcelts",
+            "expired": "Beidzies",
+            "partiallyRefunded": "Atmaksāts (daļēji)",
+            "orderSuccess": "Pasūtījums veiksmīgs",
+            "orderFailed": "Pasūtījums neizdevās",
+            "orderCanceled": "Pasūtījums atcelts"
+        }
+    }
+}
