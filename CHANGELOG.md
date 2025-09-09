@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [Unreleased]
 ### Added
 - Added Greek Language Support
 
-## [4.18.0] - 2025-09-xx
+
+## [4.18.0] - 2025-09-08
+
 ### Added
 - Bizum Payment method is now available for Mollie Payments.
 
@@ -16,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Order and Payment status is now changed only over webhooks, this way we prevent that the status is changed twice when the customer redirected back to shop and webhook is executed at the exact same time. If you have a test system which do not accept webhooks from outside, please set the environment variable MOLLIE_DEV_MODE=1
 - The Finalize Action now uses the SalesChannel from the Order. However, in some cases, the SalesChannel is not set correctly, which can result in incorrect API keys being used during the Finalize Action.
 - Modified polyfill classes to ensure they are only loaded if they no longer exist in Shopware.
+- twig variable "formCheckInputClass" added to payment methods
+- credit card payment method is now rendered through twig instead of javascript
 
 ### Fixed
 - Fixed the doctrine parameter types in elastic search and migrations
