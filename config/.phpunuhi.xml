@@ -27,6 +27,7 @@
                 <locale name="el-GR">./../src/Resources/app/administration/src/snippet/el-GR.json</locale>
                 <locale name="hr-HR">./../src/Resources/app/administration/src/snippet/hr-HR.json</locale>
                 <locale name="is-IS">./../src/Resources/app/administration/src/snippet/is-IS.json</locale>
+                <locale name="lt-LT">./../src/Resources/app/administration/src/snippet/lt-LT.json</locale>
             </locales>
         </set>
 
@@ -57,6 +58,7 @@
                 <locale name="el-GR">./../src/Resources/snippet/el_GR/mollie-payments.el-GR.json</locale>
                 <locale name="hr-HR">./../src/Resources/snippet/hr_HR/mollie-payments.hr-HR.json</locale>
                 <locale name="is-IS">./../src/Resources/snippet/is_IS/mollie-payments.is-IS.json</locale>
+                <locale name="lt-LT">./../src/Resources/snippet/lt_LT/mollie-payments.lt-LT.json</locale>
             </locales>
         </set>
 
@@ -90,6 +92,7 @@
                 <locale name="el-GR"></locale>
                 <locale name="hr-HR"></locale>
                 <locale name="is-IS"></locale>
+                <locale name="lt-LT"></locale>
             </locales>
         </set>
 

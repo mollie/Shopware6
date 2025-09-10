@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added Greek Language Support
 - Added Croatian language support
 - Added Icelandic language support
+- Added Lithuanian language support
 
 ## [4.18.0] - 2025-09-xx
 ### Added

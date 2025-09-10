@@ -43,6 +43,7 @@ import elGR from './snippet/el-GR';
 import hrHR from './snippet/hr-HR';
 import etEE from './snippet/et-EE';
 import isIS from './snippet/is-IS';
+import ltLT from './snippet/lt-LT';
 
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('de-DE', deDE);
@@ -80,3 +81,5 @@ Shopware.Locale.extend('hr-HR', hrHR);
 Shopware.Locale.extend('et-EE', etEE);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('is-IS', isIS);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('lt-LT', ltLT);
