@@ -61,6 +61,26 @@
             <tag name="shopware.snippet.file"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Resources\snippet\el_GR\SnippetFile_el_GR">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\hr_HR\SnippetFile_hr_HR">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\et_EE\SnippetFile_et_EE">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\is_IS\SnippetFile_is_IS">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Resources\snippet\lt_LT\SnippetFile_lt_LT">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Resources\snippet\lv_LV\SnippetFile_lv_LV">
             <tag name="shopware.snippet.file"/>
         </service>
