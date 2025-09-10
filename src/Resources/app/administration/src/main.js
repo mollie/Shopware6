@@ -39,6 +39,13 @@ import slSL from './snippet/sl-SL';
 import huHU from './snippet/hu-HU';
 import fiFI from './snippet/fi-FI';
 import daDK from './snippet/da-DK';
+import elGR from './snippet/el-GR';
+import hrHR from './snippet/hr-HR';
+import etEE from './snippet/et-EE';
+import isIS from './snippet/is-IS';
+import ltLT from './snippet/lt-LT';
+import lvLV from './snippet/lv-LV';
+import roRO from './snippet/ro-RO';
 import skSK from './snippet/sk-SK';
 
 // eslint-disable-next-line no-undef
@@ -69,5 +76,19 @@ Shopware.Locale.extend('hu-HU', huHU);
 Shopware.Locale.extend('fi-FI', fiFI);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('da-DK', daDK);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('el-GR', elGR);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('hr-HR', hrHR);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('et-EE', etEE);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('is-IS', isIS);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('lt-LT', ltLT);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('lv-LV', lvLV);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('ro-RO', roRO);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('sk-SK', skSK);

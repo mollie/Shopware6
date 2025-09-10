@@ -7,7 +7,7 @@
            name="paymentMethodId"
            value="{{ payment.id }}"
            {% if payment.id is same as(selectedPaymentMethodId) %}checked="checked"{% endif %}
-           class="custom-control-input form-check-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
+           class=" {{ formCheckInputClass }} custom-control-input form-check-input payment-method-input {{ payment.translated.customFields.mollie_payment_method_name }}">
 {% endblock %}
 
 
@@ -34,7 +34,6 @@
     {# load mollie creditcard components #}
     {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}
         {% sw_include '@MolliePayments/storefront/component/payment/component/cc-fields.html.twig' with {
-            showIfActive: (payment.id is same as(selectedPaymentMethodId)),
             sw64: true
         } %}
     {% elseif payment.translated.customFields.mollie_payment_method_name == 'pointofsale' %}

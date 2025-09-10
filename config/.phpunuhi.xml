@@ -23,6 +23,13 @@
                 <locale name="hu-HU">./../src/Resources/app/administration/src/snippet/hu-HU.json</locale>
                 <locale name="fi-FI">./../src/Resources/app/administration/src/snippet/fi-FI.json</locale>
                 <locale name="da-DK">./../src/Resources/app/administration/src/snippet/da-DK.json</locale>
+                <locale name="et-EE">./../src/Resources/app/administration/src/snippet/et-EE.json</locale>
+                <locale name="el-GR">./../src/Resources/app/administration/src/snippet/el-GR.json</locale>
+                <locale name="hr-HR">./../src/Resources/app/administration/src/snippet/hr-HR.json</locale>
+                <locale name="is-IS">./../src/Resources/app/administration/src/snippet/is-IS.json</locale>
+                <locale name="lt-LT">./../src/Resources/app/administration/src/snippet/lt-LT.json</locale>
+                <locale name="lv-LV">./../src/Resources/app/administration/src/snippet/lv-LV.json</locale>
+                <locale name="ro-RO">./../src/Resources/app/administration/src/snippet/ro-RO.json</locale>
                 <locale name="sk-SK">./../src/Resources/app/administration/src/snippet/sk-SK.json</locale>
             </locales>
         </set>
@@ -50,6 +57,13 @@
                 <locale name="hu-HU">./../src/Resources/snippet/hu_HU/mollie-payments.hu-HU.json</locale>
                 <locale name="fi-FI">./../src/Resources/snippet/fi_FI/mollie-payments.fi-FI.json</locale>
                 <locale name="da-DK">./../src/Resources/snippet/da_DK/mollie-payments.da-DK.json</locale>
+                <locale name="et-EE">./../src/Resources/snippet/et_EE/mollie-payments.et-EE.json</locale>
+                <locale name="el-GR">./../src/Resources/snippet/el_GR/mollie-payments.el-GR.json</locale>
+                <locale name="hr-HR">./../src/Resources/snippet/hr_HR/mollie-payments.hr-HR.json</locale>
+                <locale name="is-IS">./../src/Resources/snippet/is_IS/mollie-payments.is-IS.json</locale>
+                <locale name="lt-LT">./../src/Resources/snippet/lt_LT/mollie-payments.lt-LT.json</locale>
+                <locale name="lv-LV">./../src/Resources/snippet/lv_LV/mollie-payments.lv-LV.json</locale>
+                <locale name="ro-RO">./../src/Resources/snippet/ro_RO/mollie-payments.ro-RO.json</locale>
                 <locale name="sk-SK">./../src/Resources/snippet/sk_SK/mollie-payments.sk-SK.json</locale>
             </locales>
         </set>
@@ -80,6 +94,13 @@
                 <locale name="hu-HU"></locale>
                 <locale name="fi-FI"></locale>
                 <locale name="da-DK"></locale>
+                <locale name="et-EE"></locale>
+                <locale name="el-GR"></locale>
+                <locale name="hr-HR"></locale>
+                <locale name="is-IS"></locale>
+                <locale name="lt-LT"></locale>
+                <locale name="lv-LV"></locale>
+                <locale name="ro-RO"></locale>
                 <locale name="sk-SK"></locale>
             </locales>
         </set>
