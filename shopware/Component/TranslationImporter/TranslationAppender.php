@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\TranslationImporter;
 
 final class TranslationAppender implements AppenderInterface
 {
-    public function     append(\DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult
+    public function append(\DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult
     {
         $domXpath = new \DOMXPath($config);
 
@@ -65,9 +65,7 @@ final class TranslationAppender implements AppenderInterface
                     $textElement->data = $text;
                 }
             }
-            if(str_starts_with($key,'card.refundManager')){
-                dump($key,$replaceXpathQuery);
-            }
+
             return new AppenderResult(sprintf('Replace "%s" with the key %s', $text, $key));
         }
 
@@ -102,11 +100,6 @@ final class TranslationAppender implements AppenderInterface
         if ($targetChildren->count() === 0) {
             $domElement->item(0)->appendChild($newNode);
         }
-
-        if(str_starts_with($key,'card.refundManager')){
-            dump($key,$replaceXpathQuery,$targetNodePath);
-        }
-
 
         return new AppenderResult(sprintf('Created new entry "%s" with the key %s', $text, $key));
     }
