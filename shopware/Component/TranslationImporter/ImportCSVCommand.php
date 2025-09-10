@@ -63,10 +63,6 @@ final class ImportCSVCommand extends Command
         $domDocument = new \DOMDocument();
         $domDocument->loadXML(file_get_contents($pathToConfigXml));
         $row = fgetcsv($stream, null, ';'); // skip header
-
-        $result = $this->appender->append($domDocument, 'card.logger.title', 'Logger', $localeCode);
-        $output->writeln('<' . $result->getStatus() . '>' . $result->getMessage() . '</' . $result->getStatus() . '>');
-
         while ($row = fgetcsv($stream, null, ';')) {
             $key = $row[0];
             $key = $this->keyMappings[$key] ?? $key;
@@ -74,6 +70,8 @@ final class ImportCSVCommand extends Command
             $result = $this->appender->append($domDocument, $key, $text, $localeCode);
             $output->writeln('<' . $result->getStatus() . '>' . $result->getMessage() . '</' . $result->getStatus() . '>');
         }
+        $result = $this->appender->append($domDocument, 'card.logger.title', 'Logger', $localeCode);
+        $output->writeln('<' . $result->getStatus() . '>' . $result->getMessage() . '</' . $result->getStatus() . '>');
 
         $domDocument->save($pathToConfigXml);
 
