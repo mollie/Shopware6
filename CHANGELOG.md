@@ -8,10 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Added Greek Language Support
+- Added Croatian language support
 
-
-## [4.18.0] - 2025-09-08
-
+## [4.18.0] - 2025-09-xx
 ### Added
 - Bizum Payment method is now available for Mollie Payments.
 
