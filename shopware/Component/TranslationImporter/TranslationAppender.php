@@ -19,11 +19,11 @@ final class TranslationAppender implements AppenderInterface
             $searchParts = [
                 'following-sibling::' . $keyPart, // search for the HTMLElement
                 'following::' . $keyPart, // search for the HTMLElement
-                "following::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the title which contains the key part,
-                "following::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the name which contains the key part,
+                "following::title[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on title
+                "following::name[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on name
                 'descendant::' . $keyPart, // search for the HTMLElement
-                "descendant::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the title which contains the key part,
-                "descendant::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the name which contains the key part,
+                "descendant::title[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on title
+                "descendant::name[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on name
             ];
 
             if (is_numeric($keyPart)) {

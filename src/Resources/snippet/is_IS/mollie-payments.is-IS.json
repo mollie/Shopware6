@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Valin greiðsluaðferð er ekki í boði fyrir áskriftarvörur.",
+        "mollie-payments-cart-error-mixedcart": "Versularkarfan þín inniheldur nokkra hluti í samblandi við áskriftarhluti. Vinsamlegast athugið að þú getur aðeins keypt 1 áskriftarhlut í einu.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Ekki allir greiðslumátar eru í boði þegar pantað er áskriftarvörur.",
+        "mollie-payments-cart-guest-account": "Gestaaðgangar geta ekki verið notaðar fyrir áskriftarpantanir."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Valinn greiðslumáti er ekki í boði fyrir áskriftarvörur.",
+        "mollie-payments-cart-error-mixedcart": "Innkaupakarfan þín inniheldur marga hluti í samblandi við áskriftarhluti. Vinsamlegast athugið að þú getur aðeins keypt 1 áskriftarhlut í einu.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Ekki allir greiðslumátar er ekki í boði fyrir áskriftarvörur.",
+        "mollie-payments-cart-guest-account": "Gestaaðgangar geta ekki verið notaðar fyrir áskriftarpantanir."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Gildistími",
+                "cardHolderLabel": "Nafn á korti",
+                "cardNumberLabel": "Kortanúmer",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Greiðslan er örugg og rekin af",
+                "headLine": "Sláðu inn kortaupplýsingar þínar",
+                "saveCardDetailLabel": "Vistaðu kortaupplýsingar fyrir framtíðar greiðslur"
+            },
+            "ideal": {
+                "selectBank": "Veldu banka"
+            },
+            "pos": {
+                "selectTerminal": "Veldu greiðslustöð"
+            },
+            "mandate": {
+                "sectionTitle": "Vistuð kort",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Kortinu þínu var eytt með góðum árangri",
+                "deleteErrorMessage": " Það kom upp vandamál við að fjarlægja kortið þitt.",
+                "newCard": "Nýtt kort",
+                "remove": "Fjarlægja",
+                "subscriptionBadge": "Áskrift"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Hætta við",
+                "cardSubscription": "Þetta kort er í notkun fyrir áskrift. Vinsamlegast hættu við áskriftina fyrst áður en þú fjarlægir þetta kort.",
+                "deleteButton": "Eyða",
+                "deleteConfirmation": "Ertu viss um að þú viljir eyða?",
+                "title": "Eyða staðfestingu"
+            },
+            "phoneField": {
+                "headLine": "Símanúmer",
+                "phoneErrorMessage": "Símanúmer er nauðsynlegt. Til dæmis +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Greiða með öðrum greiðslumáta",
+                "buttonReturnToShop": "Fara aftur í búðina",
+                "error": "Greiðsla mistókst",
+                "failed": "Greiðslan mistókst eða henni var hætt við. Þú verður beint aftur til Mollie, þar sem þú getur lokið greiðslunni með aðferðinni sem þú velur "
+            },
+            "redirecting": "Beinir þér til: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Hlutfall",
+                "captionTaxes": "Skattar",
+                "paymentError": "Greiðslan með Apple Pay mistókst."
+            },
+            "paypalExpress": {
+                "paymentError": "Greiðslan með Paypal Express mistókst."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "breyta reikningsfangi",
+                "btnEditShippingAddress": "breyta heimilsfangi sendingar",
+                "cancelSubscription": "Hætt var við áskrift",
+                "errorCancelSubscription": "Ekki var hægt að hætta við áskrift vegna villu. Vinsamlegast hafðu samband við stuðningsíðuna okkar.",
+                "errorPause": "Vandamál kom upp þegar áskriftin var stöðvuð",
+                "errorResume": "Vandamál kom upp þegar áskriftin var hafin á ný",
+                "errorSkip": "Vandamál kom upp þegar áskriftinni var sleppt",
+                "errorUpdateAddress": "Vandamál kom upp þegar uppfært var heimilisfang þitt",
+                "errorUpdatePayment": "Vandamál kom upp þegar uppfært var greiðslumátann þinn",
+                "headlineBillingAddress": "Reikningsfang",
+                "headlineShippingAddress": "Heimilisfang sendingar",
+                "mollieSubscriptionAmount": "Upphæð",
+                "mollieSubscriptionCancel": "Hætta við áskrift",
+                "mollieSubscriptionCancelUntil": "Hægt að hætta við þangað til",
+                "mollieSubscriptionContextMenuReorder": "Endurtaka áskrift",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Næsta greiðsla á",
+                "mollieSubscriptionPause": "Setja áskrift í hlé",
+                "mollieSubscriptionResume": "Endurheimta áskrift",
+                "mollieSubscriptionSkip": "Sleppa áskrift",
+                "mollieSubscriptionUpdatePayment": "Uppfæra greiðslu",
+                "mollieSubscriptionsHeadline": "Áskrift:",
+                "mollieSubscriptionsInfoEmpty": "Þú hefur enn engar áskriftir.",
+                "mollieSubscriptionsLink": "Áskriftir",
+                "mollieSubscriptionsTitle": "Áskriftir",
+                "mollieSubscriptionsWelcome": "Nýlegu áskriftirnar þínar:",
+                "orderActionHide": "Fela",
+                "orderActionView": "Skoða",
+                "shippingEqualToBilling": "Samsvarar reikningsfangi",
+                "successPause": "Áskriftin þín hefur verið stöðvuð",
+                "successResume": "Áskriftin þín verður nú hafin á ný",
+                "successSkip": "Þinni áskrift hefur verið sleppt",
+                "successUpdateAddress": "Heimilisfangið þitt hefur verið uppfært með góðu móti",
+                "successUpdatePayment": "Þinn greiðslumáti hefur verið uppfærður með góðu móti"
+            },
+            "options": {
+                "everyDay": "Á hverjum degi",
+                "everyDays": "Á hverjum %value% dögum",
+                "everyMonth": "Í hverjum mánuði",
+                "everyMonths": "Í hverjum %value% mánuði",
+                "everyWeek": "Í hverri viku",
+                "everyWeeks": "Í hverri %value% viku",
+                "repetitionCount": "%value% sinni/sinnum"
+            },
+            "product": {
+                "addToCartText": "Gerast áskrifandi",
+                "information": "Áskriftarvara"
+            }
+        },
+        "testMode": {
+            "label": "Prufuháttur"
+        }
+    }
+}
