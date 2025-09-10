@@ -18,6 +18,7 @@
         <title lang="da-DK"/>
         <title lang="el-GR"/>
         <title lang="hr-HR"/>
+        <title lang="et-EE"/>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
         </component>
@@ -142,6 +143,7 @@
         <title lang="da-DK">Logger</title>
         <title lang="el-GR">Logger</title>
         <title lang="hr-HR">Logger</title>
+<title lang="et-EE">Logger</title>
         <input-field type="bool">
             <name>debugMode</name>
             <label>Debug Mode</label>
@@ -909,7 +911,7 @@
             <helpText lang="da-DK">Indtast de domæner, der er tilladt for Apple Pay Direct, adskilt af kommaer. Denne indstilling er valgfri og kræves kun, hvis du bruger en headless-opsætning</helpText>
             <helpText lang="el-GR">Εισάγετε τους τομείς που επιτρέπονται για το Apple Pay Direct, διαχωρισμένους με κόμματα. Αυτή η ρύθμιση είναι προαιρετική και απαιτείται μόνο αν χρησιμοποιείτε ρύθμιση χωρίς επίβλεψη.</helpText>
             <helpText lang="hr-HR">Unesite domene dopuštene za Apple Pay Direct, odvojene zarezima. Ova postavka je opcionalna i potrebna je samo ako koristite headless postavu.</helpText>
-            <helpText lang="et-EE">Sisesta Apple Pay Directi jaoks lubatud domeenid, eraldades need komadega. See seade on valikuline ja vajalik ainult juhul, kui kasutate peata seadistust</helpText>
+            <helpText lang="et-EE">Sisesta Apple Pay Directi jaoks lubatud domeenid, eraldades need komadega. See seade on valikuline ja vajalik ainult juhul, kui kasutate peata seadistust </helpText>
         </input-field>
     </card>
 
@@ -1317,6 +1319,7 @@
             <label lang="da-DK">Opret kreditnotaer</label>
             <label lang="el-GR">Δημιουργία πιστωτικών σημειώσεων</label>
             <label lang="hr-HR">Kreiraj kreditne bilješke</label>
+<label lang="et-EE">Loo krediiditeateid</label>
             <helpText>Automatically create a credit note in Shopware when a refund is processed.</helpText>
             <helpText lang="de-DE">Erstellt automatisch eine Gutschrift in Shopware, wenn eine Rückerstattung verarbeitet wird.</helpText>
             <helpText lang="nl-NL">Maak automatisch een creditnota in Shopware wanneer een terugbetaling wordt verwerkt.</helpText>
@@ -1333,6 +1336,7 @@
             <helpText lang="da-DK">Opret automatisk en kreditnota i Shopware, når en refusion behandles.</helpText>
             <helpText lang="el-GR">Αυτόματη δημιουργία πιστωτικού σημειώματος στο Shopware κατά την επεξεργασία μιας επιστροφής χρημάτων.</helpText>
             <helpText lang="hr-HR">Automatski kreiraj kreditnu notu u Shopwareu kada se obradi povrat novca.</helpText>
+<helpText lang="et-EE">Automaatne krediiditeate loomine Shopware'is, kui tagasimakset töödeldakse.</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesPrefix</name>
