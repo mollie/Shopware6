@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie tellimus | Mollie tellimused"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": "Tellimus edukas",
+            "mollie_checkout_order_failed": "Tellimus ebaõnnestus",
+            "mollie_checkout_order_canceled": "Tellimus tühistatud",
+            "mollie_webhook_received_All": " Mollie Veebikonks Saadud (Kõik)",
+            "mollie_webhook_received_status_authorized": " Mollie Veebikonks Saadud (Volitatud)",
+            "mollie_webhook_received_status_failed": " Mollie Veebikonks Saadud (Ebaõnnestunud)",
+            "mollie_webhook_received_status_canceled": " Mollie Veebikonks Saadud (Tühistatud)",
+            "mollie_webhook_received_status_expired": " Mollie Veebikonks Saadud (Aegunud)",
+            "mollie_webhook_received_status_pending": " Mollie Veebikonks Saadud (Ootel)",
+            "mollie_webhook_received_status_paid": " Mollie Veebikonks Saadud (Makstud)",
+            "mollie_webhook_received_status_completed": " Mollie Veebikonks Saadud (Lõpetatud)",
+            "mollie_webhook_received_status_refunded": " Mollie Veebikonks Saadud (Tagastatud)",
+            "mollie_webhook_received_status_partially_refunded": " Mollie Veebikonks Saadud (Osaliselt tagastatud)",
+            "mollie_refund_started": " Mollie tagasimakse algatatud",
+            "mollie_subscription_started": " Mollie tellimus alustatud",
+            "mollie_subscription_ended": " Mollie tellimus lõpetatud",
+            "mollie_subscription_cancelled": " Mollie tellimus tühistatud",
+            "mollie_subscription_paused": " Mollie tellimus peatatud",
+            "mollie_subscription_resumed": " Mollie tellimus taaskäivitatud",
+            "mollie_subscription_skipped": " Mollie tellimus vahele jäetud",
+            "mollie_subscription_renewed": " Mollie tellimus uuendatud",
+            "mollie_subscription_renewal_reminder": " Mollie meeldetuletus tellimuse uuendamiseks"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie moodul",
+        "searchPlaceholder": "Otsi tellimusi...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie maksed",
+            "descriptionTextModule": "Mollie maksed",
+            "btnMollieActions": "Mollie tegevused",
+            "refundThroughMollie": "Tagasta läbi Mollie",
+            "shipThroughMollie": "Saada läbi Mollie",
+            "cancelMollieItem": "Tühista läbi Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Tere {userName}, Tere tulemast Molliesse!",
+                "descriptionTop": "Molliega liitumine on lihtne!",
+                "descriptionBottom": "Ongi kõik!",
+                "descriptionFooter": "Kui soovid meie pluginast rohkem teada, külasta meie ametlikku dokumentatsioonilehte.",
+                "onboardingStep1": "Registreeri Mollie konto.",
+                "onboardingStep2": "Sisesta oma API võtmed allolevas jaotises.",
+                "onboardingStep2TestMode": "Lülita sisse 'Testimisrežiim', kui soovid makseid ainult katsetada.",
+                "onboardingStep3": "Määra makseviisid oma müügikanalitele.",
+                "onboardingStep3Link": "oma müügikanalitele",
+                "btnDocumentation": "Dokumentatsioon",
+                "btnRequestSupport": "Tugi",
+                "btnTroubleshooting": "Tõrkeotsingu juhend"
+            },
+            "api": {
+                "apiLinkButton": "Hankige oma API võtmed Mollie töölaualt",
+                "testButton": "Testi API võtmeid",
+                "testApiKeys": {
+                    "title": "Mollie maksed",
+                    "apiKey": "API võti",
+                    "isValid": "kehtib",
+                    "isInvalid": "on kehtetu"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Kohatäide",
+                    "preview": "Eelvaade"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie maksed",
+                    "button": "Uuenda makseviise",
+                    "succeeded": "Makseviisid on edukalt uuendatud.",
+                    "failed": "Makseviise ei saanud uuendada."
+                },
+                "mollieLimits": {
+                    "link": "Näita makseviiside kättesaadavuse reegleid"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware võib kasutada valuuta seadeid, et arvutada, kuidas ümardada tellimuse kogusumma. See hõlmab toote hinna kümnendkohtade arvu ja lähima ümardamisintervalli, näiteks 0,50 või 1,00.",
+                "info2": "Need seaded võivad viia erineva kogusummani kui ridaelementide kogusumma. Kui Mollie kontrollib neid summasid ja leiab, et need ei klapi, tekitab see kassas vea.",
+                "info3": "Võid kasutada seda funktsiooni, et vältida ümardamise probleeme kassas. Kui see on lubatud, lisab see sinu Mollie töölauale eraldi reaelemendi tasakaaluvahe jaoks, ja sinu kliendid maksavad Shopware'i arvutatud kogusumma."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Klarna Pay now, Klarna Slice it või Klarna Pay later makseviisi kasutamine ei ole võimalik, kui teie maksetähtaeg on rohkem kui 28 päeva tulevikus, välja arvatud juhul, kui kaupmees ja Klarna on kokku leppinud teises maksimumsummas.",
+                "bankTransferDueDateLimitReached": "Tellimuse kehtivusaega ei ole võimalik määrata pikemaks kui 100 päeva."
+            },
+            "support": {
+                "modalTitle": "Palu Mollielt abi",
+                "btnCancel": "Tühista",
+                "btnConfirm": "Palu abi",
+                "btnSupport": "Rohkem meie toe kohta",
+                "form": {
+                    "name": "Sinu nimi",
+                    "email": "Sinu e-post",
+                    "recipient": "Saada taotlus aadressile",
+                    "subject": "Teema",
+                    "message": "Sõnum"
+                },
+                "data": {
+                    "header": "Molliele saadetud andmed:",
+                    "other": "Muud:",
+                    "shopwareVersion": "Shopware'i versioon",
+                    "pluginLogs": "{plugin} logifailid",
+                    "pluginConfiguration": "{plugin} konfigureerimine",
+                    "pluginConfigurationHelpText": "API võtmed on välistatud.",
+                    "paymentMethods": "Makseviisi andmed",
+                    "paymentMethodsHelpText": "Sisaldab teavet selle kohta, millised makseviisid on aktiivsed, millistele müügikanalitele need on määratud ning milline on nende staatus sinu Mollie kontol."
+                },
+                "success": "Toetuse taotlus on edukalt saadetud. Teeme oma parima, et vastata võimalikult kiiresti",
+                "error": "E-kirja saatmisel Shopware'i kaudu ilmnes probleem. Palun proovi uuesti või võta meiega otse ühendust e-posti teel."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Toode on tellimus (Mollie)",
+            "cartSubscriptionRule": "Ostukorv tellimustega (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "Järjekorras",
+                "pending": "Ootel",
+                "processing": "Töötlemisel",
+                "refunded": "Tagastatud",
+                "failed": "Ebaõnnestunud",
+                "description": {
+                    "queued": "Tagasimakse on järjekorras, kuni saldo on piisav tagasimakse töötlemiseks. Sa saad endiselt tagasimakse tühistada.",
+                    "pending": "Tagasimakse saadetakse panka järgmisel tööpäeval. Sa saad endiselt tagasimakse tühistada.",
+                    "processing": "Tagasimakse on saadetud panka. Tagastatav summa kantakse tarbija kontole niipea kui võimalik.",
+                    "refunded": "Tagasimakstud summa on kantud tarbijale.",
+                    "failed": "Tagasimakse ebaõnnestus pärast töötlemist. Näiteks on klient sulgenud oma pangakonto. Raha tagastatakse sinu kontole."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "tk."
+            },
+            "acl": {
+                "warningCreate": "Sul pole õigust tagasimakseid teha",
+                "warningCancel": "Sul pole õigust tagasimakseid tühistada"
+            },
+            "cart": {
+                "title": "Tellimus ##orderNumber##",
+                "btnSelectAll": "Vali kõik",
+                "btnResetForm": "Vormi lähtestamine",
+                "linkHowTo": "Kuidas seda vormi kasutada?",
+                "grid": {
+                    "columns": {
+                        "item": "Ese",
+                        "productNumber": "Toote number",
+                        "unitPrice": "Ühikuhind",
+                        "quantity": "Kogus",
+                        "refunded": "Tagastatud",
+                        "refundQuantity": "Tagasimakse",
+                        "totalPrice": "Kokku",
+                        "refundAmount": "Tagasimakse",
+                        "resetStock": "Lähtesta varud"
+                    },
+                    "btnResetLine": "Lähtesta read",
+                    "checkDeductPromotion": "Eemalda allahindlus",
+                    "checkRefundTax": "Tagasta käibemaks"
+                },
+                "roundDiffItemAdded": "Lisati automaatne ümardamisartikkel"
+            },
+            "instructions": {
+                "linkResetTutorials": "Juhendite lähtestamine",
+                "btnToggleTutorial": "Näita/Peida juhendid",
+                "titleFullRefund": "Täielik tagasimakse",
+                "textFullRefund": "Kasuta lihtsalt nuppu täieliku tagasimakse saamiseks. See tagab, et kõik sinu kaubad märgitakse tagastatuks ja kogu summa tagastatakse kliendile.",
+                "titleStockReset": "Varude lähtestamine",
+                "textStockReset": "Sa saad automaatselt suurendada saadaval olevaid varusid, sisestades koguse, mida soovid varudesse lisada. Lihtsalt sisesta see enne kui jätkad täis- või osalise tagasimakse tegemisega. Varude taastamist saab paindlikult kombineerida tegeliku tagasimaksete protsessiga.",
+                "titleShipping": "Saatmine",
+                "textShipping": "Saatmisartikleid saab tagastada nagu igat muud tootet. Sisesta täielik kogus või eraldi osaline summa ja jätka tagasimakset. Saate kulude hüvitamise paindlikult kombineerida toodete tegeliku tagastamisega.",
+                "titlePartialAmount": "Osaline tagasimakse (ainult summa)",
+                "textPartialAmount": "Lihtsalt sisesta osaline summa tekstivälja ja alusta tagasimakset.",
+                "titlePartialItems": "Osaline tagasimakse (artiklitega)",
+                "textPartialItems": "Kui soovid, et kogused ja esemed oleksid Mollies tagastatud, kasuta ülalolevat vormi. Sea oma kogused ja sisesta iga tagastatava toote jaoks kohandatud summa. Kogu summa kuvatakse seejärel lõpliku tagasimakse summa tekstiväljas. Pea meeles, et lõpliku summat saab enne tagasimakse algatamist endiselt muuta.",
+                "titlePartialPromotions": "Osaline tagasimakse (koos soodustustega)",
+                "textPartialPromotions": "Kui sul on ostukorvis soodustus, on soodustus eraldi rida. Kui soovid tagastada kõik allahinnatud tooted, mine edasi ja tagasta nende koguväärtused ja terve soodustuse rida. Siiski, kui soovid vaid tagastada mõned allahinnatud tooted, saad iga tulu peaautomaatsete allahindluste automaatselt maha arvata. Loomulikult saad alati väärtusi muuta, kui need ei ole õiged.",
+                "titleRoundingDiff": "Ümardamisvahe",
+                "textRoundingDiff": "Täielik tagasimakse hõlmab ümardamisest tulenevaid erinevusi"
+            },
+            "summary": {
+                "dataLoading": "Andmeid laaditakse...",
+                "headerExcludingVat": "Ilma käibemaksuta",
+                "headerIncludingVat": "Käibemaksuga",
+                "captionTotal": "Kokku",
+                "captionTotalTaxFree": "Kokku",
+                "captionPendingRefunds": "Ootab tagasimakset",
+                "captionVouchers": "Kinkekaardi summa",
+                "captionRefunded": "Tagastatud summa",
+                "captionRemaining": "Tagastatav summa",
+                "btnFixDiff": "Paranda erinevus",
+                "placeholderDescription": "Sisesta tarbija pangakonto/krediitkaardi väljavõtte kirjeldus. Max 140 tähemärki",
+                "lblDescription": "Kirjeldus (valikuline) ({characters}/140 tähemärki)",
+                "descriptionHelp": "Võimalusel kuvatakse see tarbija pangakonto või krediitkaardi väljavõttel. Sõnum kärbitakse pärast 140 tähemärki.",
+                "placeholderInternalDescription": "Sisesta oma sisekirjeldus",
+                "lblInternalDescription": "Sisekirjeldus (valikuline)",
+                "internalDescriptionHelp": "See kuvatakse haldusliideses kohaliku kirjeldusena.",
+                "checkVerification": "Olen kontrollinud tagasimakse kogusumma ja konfigureeritud tagasimakse- ja varude täiendamise kogused.",
+                "btnRefund": "Tagasimakse",
+                "btnFullRefund": "Täielik tagasimakse",
+                "roundDiffItemAdded": "Ümardamisartikkel"
+            },
+            "refunds": {
+                "title": "Tagasimaksed Mollie töölaual",
+                "linkMore": "Rohkem tagasimaksetest",
+                "grid": {
+                    "columns": {
+                        "amount": "Summa",
+                        "status": "Staatus",
+                        "description": "Kirjeldus",
+                        "internalDescription": "Sisekirjeldus",
+                        "composition": "Koostisosad",
+                        "date": "Kuupäev"
+                    },
+                    "lblNoComposition": "Koostisosade puudumine",
+                    "btnCancelRefund": "Tühista see tagasimakse"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Mollie's on loodud tagasimakse. Tagasimakse teostamine võib võtta aega kuni 2 tundi. Selle aja jooksul on sul võimalik tagasimakse tühistada.",
+                    "refund-canceled": "Ootel tagasimakse on edukalt tühistatud ja eemaldatud."
+                },
+                "error": {
+                    "low-amount": "Palun sisesta tagastatav summa.",
+                    "refund-created": "Tagasimakse loomisel tekkis viga.",
+                    "refund-canceled": "Ootel tagasimakse tühistamisel tekkis probleem. Palun proovi uuesti Mollie töölaual."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Kinkekaart",
+            "VOUCHER_INFO_TITLE": "Kinkekaardi maksed",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie võimaldab sul oma veebipoes hõlpsasti vastu võtta makseid öko-, kinkekaartide ja toidutalongidega – see on nutikas valik müügi suurendamiseks ja klientide rahulolu tagamiseks. Makseviis „kinkekaart” on nähtav ainult siis, kui ostukorvis on vähemalt 1 toode, millele on määratud kinkekaardi tüüp.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Palun pane tähele, et seda konfiguratsiooni saab redigeerida ainult sinu vaikimisi keeles. Palun muuda oma keelt, et muuta selle toote kinkekaardi tüüpi.",
+            "VOUCHER_BTN_READMORE": "Loe lähemalt",
+            "VOUCHER_TYPE_CAPTION": "Kinkekaardilaadne toode",
+            "VOUCHER_TYPE_VALUE_NONE": "Puudub",
+            "VOUCHER_TYPE_VALUE_ECO": "Öko",
+            "VOUCHER_TYPE_VALUE_MEAL": "Eine",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Kink"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Saada läbi Mollie",
+                "item": {
+                    "label": "Ese:",
+                    "noQuantity": "Palun sisesta saadetav kogus.",
+                    "shipAll": "Saada kõik",
+                    "summary": {
+                        "quantity": "Saadetav kogus",
+                        "shipped": "Saadetud kogus",
+                        "shippable": "Saatmiseks valmisolev kogus"
+                    },
+                    "success": "Tellimus on edukalt saadetud."
+                },
+                "order": {
+                    "description": "Järgmised kogused saadetakse teele.",
+                    "itemHeader": "Ese",
+                    "quantityHeader": "Kogus",
+                    "originalQuantityHeader": "Kogus (saadetav)"
+                },
+                "availableTracking": {
+                    "label": "Saadaval jälgimiskoodid",
+                    "hint": "Kliki ühele neist jälgimiskoodidest, et kõik andmed täidetaks automaatselt."
+                },
+                "showTracking": "Lisa jälgimise info selle saadetise jaoks",
+                "tracking": {
+                    "carrier": "Vedaja",
+                    "code": "Kood",
+                    "url": "URL",
+                    "invalid": "Palun sisesta nii vedaja kui ka kood"
+                },
+                "confirmButton": "Saada tellimus",
+                "cancelButton": "Tühista",
+                "selectAllButton": "Vali kõik",
+                "resetButton": "Nulli"
+            },
+            "cancel": {
+                "title": "Tühista ese Mollie kaudu",
+                "confirmButton": "Tühista ese Mollie kaudu",
+                "cancelButton": "Sulge hüpikaken",
+                "resetStock": "Taasta varud",
+                "item": {
+                    "success": "Toode on edukalt tühistatud",
+                    "failed": {
+                        "quantityZero": "Kogus on 0",
+                        "invalidLine": "Toodet ei ole tellimuses",
+                        "quantityTooHigh": "Kogus on liiga suur"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Saada tellimus (Mollie)",
+                        "description": "Saada tellimus Mollies."
+                    },
+                    "modal": {
+                        "title": "Saada tellimus",
+                        "description": "See toiming saadab tellimuse automaatselt läbi Mollie. Protsess saab tellimuse numbri ja edastab selle Mollie API-le. Edustatud ja ebaõnnestunud saadetised on nähtavad Mollie logifailides.",
+                        "warningConfig": "Palun veendu, et kõik täiendavad automatiseerimised seda tüüpi toimingutes on välja lülitatud, et vältida segadust.\nSelle pistikprogrammi järgmised aktiveeritud funktsioonid võivad seda toimingut häirida:",
+                        "noWarnings": "Hoiatusi pole"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Tagasta tellimus (Mollie)",
+                        "description": "Tagasta tellimus Mollie kaudu."
+                    },
+                    "modal": {
+                        "title": "Tagasta tellimus",
+                        "description": "See toiming alustab automaatselt tagasimakset läbi Mollie. Protsess saab tellimuse numbri ja edastab selle Mollie API-le. Edukad ja ebaõnnestunud tagasimaksed on nähtavad Mollie logifailides.",
+                        "warning": "Palun pea meeles, et tagasimaksete lõplikuks kinnitamiseks ja poes kuvamiseks võib kuluda kuni 2 tundi. Seni saate ootava tagasimakse alati tühistada kas Shopware'i tellimuste lehelt või Mollie töölaualt.",
+                        "warningConfig": "Häirete vältimiseks palun veendu, et sellist tüüpi toimingute jaoks on kõik lisafunktsioonid välja lülitatud."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Automaatne saadetis pistikprogrammi konfiguratsioonis"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "Ootel",
+                "active": "Aktiivne",
+                "canceled": "Tühistatud",
+                "suspended": "Peatatud",
+                "completed": "Täidetud",
+                "paused": "Peatatud",
+                "resumed": "Jätkatud",
+                "skipped": "Vahele jäetud"
+            },
+            "navigation": {
+                "title": "Mollie tellimused"
+            },
+            "TYPE_DAYS": "Päev(ad)",
+            "TYPE_WEEKS": "Nädal(ad)",
+            "TYPE_MONTHS": "Kuu(d)",
+            "confirm": {
+                "cancelTitle": "Lõpeta tellimus?",
+                "cancel": "Tühista oma kliendi tellimus.",
+                "pauseTitle": "Peata tellimus?",
+                "pause": "Peata tellimus, kuni soovid seda uuesti jätkata.",
+                "resumeTitle": "Jätka tellimust?",
+                "resume": "Jätka tellimust uuesti.",
+                "skipTitle": "Jäta järgmine makse vahele?",
+                "skip": "Jäta järgmine osamakse tellimusest vahele. Pärast seda jätkub tellimus automaatselt."
+            },
+            "alerts": {
+                "cancelSuccess": "Tellimus on edukalt tühistatud",
+                "pauseSuccess": "Tellimus on edukalt peatatud",
+                "resumeSuccess": "Tellimus on edukalt taastatud",
+                "skipSuccess": "Tellimus on edukalt vahele jäetud. Järgmine makse on uuendatud."
+            },
+            "list": {
+                "title": "Mollie Tellimused",
+                "columns": {
+                    "customer": "Klient",
+                    "status": "Staatus",
+                    "description": "Kirjeldus",
+                    "amount": "Summa",
+                    "nextPaymentAt": "Järgmine makse",
+                    "prePaymentReminder": "Meenutatud",
+                    "canceledAt": "Tühistatud",
+                    "createdAt": "Loodud"
+                },
+                "action": {
+                    "edit": "Muuda tellimust"
+                },
+                "deletedCustomer": "Kustutatud klient"
+            },
+            "detail": {
+                "title": "Mollie tellimus",
+                "buttonCancelSubscription": "Tühista tellimus",
+                "labelDescription": "Kirjeldus",
+                "labelAmount": "Summa",
+                "labelQuantity": "Kvantiteet",
+                "labelMollieSubscription": "Mollie tellimus",
+                "labelMollieCustomer": "Mollie klient",
+                "labelMandateId": "Mandaat",
+                "labelShopwareCustomer": "Shopware klient",
+                "labelCreatedAt": "Loodud",
+                "buttonShowShopwareOrder": "Kuva Shopware tellimus",
+                "buttonShowShopwareCustomer": "Kuva Shopware klient",
+                "cardTitleSubscription": "Tellimus",
+                "cardTitleStatus": "Staatus",
+                "labelStatus": "Staatus",
+                "labelNextPaymentAt": "Järgmine makse kell",
+                "labelLastRemindedAt": "Viimane meeldetuletus kell",
+                "labelCanceledAt": "Tühistatud",
+                "buttonPauseSubscription": "Pane tellimus pausile",
+                "buttonResumeSubscription": "Jätka tellimust",
+                "buttonSkipSubscription": "Tühista tellimus",
+                "history": {
+                    "cardTitle": "Ajalugu",
+                    "colDate": "Kuupäev",
+                    "colComment": "Kommentaar",
+                    "colStatusFrom": "Staatus (alates)",
+                    "colStatusTo": "Staatus (kuni)",
+                    "colMollieSubscription": "Mollie tellimus"
+                }
+            },
+            "product": {
+                "card-title": "Tellimus",
+                "title": "Mollie Tellimused",
+                "description": "Meie kasulike funktsioonide abil on korduvate maksete haldamine lihtsam kui kunagi varem. Vii oma äri uuele tasemele tõhusate jälgimisvõimaluste, lihtsate integratsioonide ja muude funktsioonide abil. Mollie tellimustega saad hõlpsasti luua tellimustooted ja planeerida korduvaid maksed, mis toimuvad konfigureeritud intervalli ja perioodi järel.",
+                "mollieSubscriptionProduct": "Tellimuse toode",
+                "mollieSubscriptionIntervalAmount": "Korda makset iga",
+                "mollieSubscriptionIntervalType": "Ajavahemiku ühik",
+                "mollieSubscriptionRepetitionAmount": "Korduste arv",
+                "mollieSubscriptionRepetitionPlaceholder": "Sisesta number või jäta tühjaks",
+                "infoDefaultLanguage": "Palun pane tähele, et seda konfiguratsiooni saab redigeerida ainult teie vaikimisi keeles. Palun muuda oma keelt, et muuta selle toote tellimusseadistusi.",
+                "btnReadMore": "Loe lähemalt"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Tellimus"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Krediitkaardi andmed",
+            "buttonMolliePaymentLink": "Kopeeri lõikelauale",
+            "columnRefunded": "Tagastatud",
+            "columnShipped": "Saadetud",
+            "columnCanceled": "Tühistatud",
+            "labelMollieOrderId": "Mollie tellimuse ID",
+            "labelMollieThirdPartyPaymentId": "Makse viitenumber",
+            "labelMolliePaymentLink": "Mollie Checkout URL",
+            "totalRefunds": "Tagastatud summa",
+            "totalRefundsPending": "Ootab tagastamist",
+            "totalRemaining": "Tagastatav summa",
+            "totalVouchers": "Kinkekaardi summa",
+            "totalShipments": "Saadetud summa ({quantity} toodet)",
+            "subscriptionBadge": "Tellimuse tellimine",
+            "refundManager": {
+                "title": "Mollie Tagasimakse Haldur",
+                "btnOpenRefundManager": "Ava tagasimaksete haldur",
+                "btnCloseRefundManager": "Sulge tagasimaksete haldur"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Eelistatud iDeal väljastaja"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Tagasimaksete haldur"
+            },
+            "mollie_subscription": {
+                "label": "Tellimused"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Kirjeldus"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Tagasimakse",
+            "subscription": "Tellimus",
+            "webhookReceived": "Veebikonksud",
+            "status": "Staatus",
+            "started": "Alustatud",
+            "ended": "Lõpetatud",
+            "paused": "Peatatud",
+            "renewalReminder": "Uuendamise meeldetuletus",
+            "renewed": "Uuendatud",
+            "resumed": "Jätkatud",
+            "skipped": "Vahele jäetud",
+            "all": "Kõik",
+            "canceled": "Tühistatud",
+            "expired": "Aegunud",
+            "partiallyRefunded": "Tagastatud (osaliselt)",
+            "orderSuccess": "Tellimus õnnestus",
+            "orderFailed": "Tellimus ebaõnnestus",
+            "orderCanceled": "Tellimus tühistatud"
+        }
+    }
+}

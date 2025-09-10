@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\TranslationImporter;
 
 final class TranslationAppender implements AppenderInterface
 {
-    public function append(\DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult
+    public function     append(\DOMDocument $config, string $key, string $text, string $languageCode): AppenderResult
     {
         $domXpath = new \DOMXPath($config);
 
@@ -19,11 +19,11 @@ final class TranslationAppender implements AppenderInterface
             $searchParts = [
                 'following-sibling::' . $keyPart, // search for the HTMLElement
                 'following::' . $keyPart, // search for the HTMLElement
-                "following::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the title which contains the key part,
-                "following::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the name which contains the key part,
+                "following::title[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on title
+                "following::name[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on name
                 'descendant::' . $keyPart, // search for the HTMLElement
-                "descendant::title[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the title which contains the key part,
-                "descendant::name[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz'),'" . $keyPart . "')]", // search for the name which contains the key part,
+                "descendant::title[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on title
+                "descendant::name[translate(normalize-space(text()),'ABCDEFGHIJKLMNOPQRSTUVWXYZ ','abcdefghijklmnopqrstuvwxyz')='" . $keyPart . "']", // exact match on name
             ];
 
             if (is_numeric($keyPart)) {
@@ -65,7 +65,9 @@ final class TranslationAppender implements AppenderInterface
                     $textElement->data = $text;
                 }
             }
-
+            if(str_starts_with($key,'card.refundManager')){
+                dump($key,$replaceXpathQuery);
+            }
             return new AppenderResult(sprintf('Replace "%s" with the key %s', $text, $key));
         }
 
@@ -100,6 +102,11 @@ final class TranslationAppender implements AppenderInterface
         if ($targetChildren->count() === 0) {
             $domElement->item(0)->appendChild($newNode);
         }
+
+        if(str_starts_with($key,'card.refundManager')){
+            dump($key,$replaceXpathQuery,$targetNodePath);
+        }
+
 
         return new AppenderResult(sprintf('Created new entry "%s" with the key %s', $text, $key));
     }

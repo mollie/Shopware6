@@ -2,22 +2,23 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
 
     <card>
-        <title></title>
-        <title lang="de-DE"></title>
-        <title lang="nl-NL"></title>
-        <title lang="it-IT"></title>
-        <title lang="pt-PT"></title>
-        <title lang="es-ES"></title>
-        <title lang="sv-SE"></title>
-        <title lang="nb-NO"></title>
-        <title lang="pl-PL"></title>
-        <title lang="cs-CZ"></title>
-        <title lang="sl-SL"></title>
-        <title lang="hu-HU"></title>
-        <title lang="fi-FI"></title>
-        <title lang="da-DK"></title>
-        <title lang="el-GR"></title>
-        <title lang="hr-HR"></title>
+        <title/>
+        <title lang="de-DE"/>
+        <title lang="nl-NL"/>
+        <title lang="it-IT"/>
+        <title lang="pt-PT"/>
+        <title lang="es-ES"/>
+        <title lang="sv-SE"/>
+        <title lang="nb-NO"/>
+        <title lang="pl-PL"/>
+        <title lang="cs-CZ"/>
+        <title lang="sl-SL"/>
+        <title lang="hu-HU"/>
+        <title lang="fi-FI"/>
+        <title lang="da-DK"/>
+        <title lang="el-GR"/>
+        <title lang="hr-HR"/>
+        <title lang="et-EE"/>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
         </component>
@@ -39,6 +40,7 @@
         <title lang="da-DK">API</title>
         <title lang="el-GR">API</title>
         <title lang="hr-HR">API</title>
+        <title lang="et-EE">API</title>
 
         <input-field type="password">
             <name>liveApiKey</name>
@@ -59,6 +61,7 @@
             <label lang="da-DK">Live nøgle</label>
             <label lang="el-GR">Ζωντανό Κλειδί</label>
             <label lang="hr-HR">Live ključ</label>
+            <label lang="et-EE">Reaalne võti</label>
         </input-field>
         <input-field type="password">
             <name>testApiKey</name>
@@ -79,6 +82,7 @@
             <label lang="da-DK">Testnøgle</label>
             <label lang="el-GR">Δοκιμαστικό Κλειδί</label>
             <label lang="hr-HR">Testni ključ</label>
+            <label lang="et-EE">Testvõti</label>
         </input-field>
         <input-field type="bool">
             <name>testMode</name>
@@ -98,6 +102,7 @@
             <label lang="da-DK">Testtilstand</label>
             <label lang="el-GR">Δοκιμαστική Λειτουργία</label>
             <label lang="hr-HR">Testni način rada</label>
+            <label lang="et-EE">Testrežiim</label>
             <defaultValue>true</defaultValue>
             <helpText>Enables the test mode with the Mollie Sandbox payment page. The Storefront will also show (Test Mode) next to the payment method names.</helpText>
             <helpText lang="de-DE">Aktiviert den Testmodus mit der Mollie Sandbox Zahlungsseite. In der Storefront wird (Test Modus) neben den Zahlungsarten angezeigt.</helpText>
@@ -115,6 +120,7 @@
             <helpText lang="da-DK">Aktiverer testtilstanden med Mollie Sandbox betalingsside. Butikken vil også vise (Testtilstand) ved siden af betalingsmetodenavne.</helpText>
             <helpText lang="el-GR">Ενεργοποιεί τη δοκιμαστική λειτουργία με τη σελίδα πληρωμών Mollie Sandbox. Το ηλεκτρονικό κατάστημα θα εμφανίζεται (Δοκιμαστικός Τρόπος) δίπλα στα ονόματα των μεθόδων πληρωμής.</helpText>
             <helpText lang="hr-HR">Omogućuje testni način rada s Mollie Sandbox stranicom za plaćanje. U izlogu trgovine bit će prikazano (Testni način) pored naziva metoda plaćanja.</helpText>
+            <helpText lang="et-EE">Lülitab sisse testrežiimi Mollie Sandboxi makse lehel. Kaupluse esilehel kuvatakse makseviisi nimede kõrval ka märge (Testrežiim).</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-api">
             <name>molliePluginConfigSectionApi</name>
@@ -137,6 +143,7 @@
         <title lang="da-DK">Logger</title>
         <title lang="el-GR">Logger</title>
         <title lang="hr-HR">Logger</title>
+<title lang="et-EE">Logger</title>
         <input-field type="bool">
             <name>debugMode</name>
             <label>Debug Mode</label>
@@ -155,6 +162,7 @@
             <label lang="da-DK">Fejlsøgningsmodus</label>
             <label lang="el-GR">Λειτουργία Debug</label>
             <label lang="hr-HR">Način ispravljanja grešaka</label>
+            <label lang="et-EE">Veateade</label>
             <defaultValue>false</defaultValue>
             <helpText>Mollie has a custom log file in the Shopware log directory. This feature enables the extended logs with more information that could help to solve problems.</helpText>
             <helpText lang="de-DE">Mollie hat eine eigene LOG Datei im Shopware Log Verzeichnis. Dieser Modus kümmert sich um erweiterte Informationen in diesen Log Dateien, die zusätzlich bei der Analyse von Fehlern beitragen können.</helpText>
@@ -172,6 +180,7 @@
             <helpText lang="da-DK">Mollie har en tilpasset logfil i Shopware loggmappen. Denne funktion aktiverer udvidede logs med mere information, der kan hjælpe med at løse problemer.</helpText>
             <helpText lang="el-GR">Η Mollie έχει ένα προσαρμοσμένο αρχείο καταγραφής στο φάκελο καταγραφής του Shopware. Αυτή η δυνατότητα ενεργοποιεί τα επεκταμένα αρχεία καταγραφής με περισσότερες πληροφορίες που θα μπορούσαν να βοηθήσουν στην επίλυση προβλημάτων.</helpText>
             <helpText lang="hr-HR">Mollie koristi prilagođenu log datoteku u Shopware direktoriju za zapisnike. Ova opcija omogućuje proširene zapise s dodatnim informacijama koje mogu pomoći u rješavanju problema.</helpText>
+            <helpText lang="et-EE">Mollie-l on kohandatud logifail Shopware'i logikaustas. See funktsioon võimaldab pikendatud logisid, mis sisaldavad rohkem teavet, mis võiks aidata probleemide lahendamisel.</helpText>
         </input-field>
         <input-field type="int">
             <name>logFileDays</name>
@@ -191,6 +200,7 @@
             <label lang="da-DK">Behold logfiler (dage)</label>
             <label lang="el-GR">Διατηρήστε τα αρχεία καταγραφής (ημέρες)</label>
             <label lang="hr-HR">Zadrži log datoteke (dana)</label>
+            <label lang="et-EE">Hoia logifaile (päevad)</label>
             <defaultValue>14</defaultValue>
             <helpText>Set the number of days how long log files are kept until they will be automatically deleted.</helpText>
             <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
@@ -208,6 +218,7 @@
             <helpText lang="da-DK">Indstil antallet af dage, hvor logfiler opbevares, indtil de automatisk slettes.</helpText>
             <helpText lang="el-GR">Ορίστε τον αριθμό των ημερών για το πόσο θα διατηρούνται τα αρχεία καταγραφής πριν διαγραφούν αυτόματα.</helpText>
             <helpText lang="hr-HR">Postavite broj dana koliko dugo će se zapisnici čuvati prije nego što budu automatski izbrisani.</helpText>
+            <helpText lang="et-EE">Määra päevade arv, kui kaua logifailid säilitatakse, enne kui need automaatselt kustutatakse.</helpText>
         </input-field>
     </card>
     <card>
@@ -227,6 +238,7 @@
         <title lang="da-DK">Betalinger</title>
         <title lang="el-GR">Πληρωμές</title>
         <title lang="hr-HR">Plaćanja</title>
+        <title lang="et-EE">Maksed</title>
         <input-field type="bool">
             <name>shopwareFailedPayment</name>
             <label>Use Shopware standard behaviour for failed payments</label>
@@ -245,6 +257,7 @@
             <label lang="da-DK">Brug Shopware standard adfærd for mislykkedes betalinger</label>
             <label lang="el-GR">Χρησιμοποιήστε την τυπική συμπεριφορά του Shopware για αποτυχημένες πληρωμές</label>
             <label lang="hr-HR">Koristi standardno Shopware ponašanje za neuspjela plaćanja</label>
+            <label lang="et-EE">Kasuta Shopware'i standardkäitumist ebaõnnestunud maksete puhul</label>
             <defaultValue>true</defaultValue>
             <helpText>Use the default Shopware behaviour on failed payments. If disabled, Mollie will automatically provide a way to retry the payment by redirecting the user to the Mollie payments page.</helpText>
             <helpText lang="de-DE">Aktiviert das Standardverhalten von Shopware für fehlerhafte Zahlungen. Wenn nicht aktiv, kümmert sich das Mollie Plugin um einen erneuten Versuch der Zahlung und leitet den Käufer auf die externe Mollie Zahlungsauswahl.</helpText>
@@ -262,6 +275,7 @@
             <helpText lang="da-DK">Brug den standard Shopware adfærd ved mislykkede betalinger. Hvis deaktiveret, vil Mollie automatisk give en måde at forsøge at gennemføre betalingen ved at omdirigere brugeren til Mollie betalingsside.</helpText>
             <helpText lang="el-GR">Χρησιμοποιήστε την προεπιλεγμένη συμπεριφορά του Shopware για αποτυχημένες πληρωμές. Αν είναι απενεργοποιημένο, η Mollie θα παρέχει αυτόματα έναν τρόπο για να προσπαθήσετε ξανά την πληρωμή, ανακατευθύνοντας τον χρήστη στη σελίδα πληρωμών της Mollie.</helpText>
             <helpText lang="hr-HR">Koristi zadano Shopware ponašanje za neuspjela plaćanja. Ako je onemogućeno, Mollie će automatski omogućiti ponovno pokušavanje plaćanja preusmjeravanjem korisnika na Mollie stranicu za plaćanje.</helpText>
+            <helpText lang="et-EE">Kasuta eeldatavat Shopware käitumist ebaõnnestunud maksete puhul. Kui see on välja lülitatud, annab Mollie automaatselt võimaluse makset uuesti proovida, suunates kasutaja Mollie maksete lehele.</helpText>
         </input-field>
         <input-field type="bool">
             <name>createCustomersAtMollie</name>
@@ -281,6 +295,7 @@
             <label lang="da-DK">Opret kunder hos Mollie</label>
             <label lang="el-GR">Δημιουργία πελατών στη Mollie</label>
             <label lang="hr-HR">Kreiraj korisnike u Mollie sustavu</label>
+            <label lang="et-EE">Loo kliente Mollie-s</label>
             <defaultValue>false</defaultValue>
             <helpText>Automatically have customers being created inside your Mollie Dashboard to see all payments of a specific customer.</helpText>
             <helpText lang="de-DE">Erstellt automatisch Kunden im Mollie Dashboard. Dadurch hat man einen zusätzlichen Überblick über alle Zahlungen dieses Kunden innerhalb von Mollie.</helpText>
@@ -298,6 +313,7 @@
             <helpText lang="da-DK">Automatisk oprettelse af kunder i din Mollie Dashboard for at se alle betalinger fra en specifik kunde.</helpText>
             <helpText lang="el-GR">Αυτόματη δημιουργία πελατών μέσα στο Mollie Dashboard για να δείτε όλες τις πληρωμές ενός συγκεκριμένου πελάτη.</helpText>
             <helpText lang="hr-HR">Automatski kreiraj korisnike unutar Mollie nadzorne ploče kako bi se prikazala sva njihova plaćanja.</helpText>
+            <helpText lang="et-EE">Kliendid luuakse automaatselt sinu Mollie töölauale, et näha konkreetse kliendi kõiki makseid.</helpText>
         </input-field>
         <input-field type="bool">
             <name>useMolliePaymentMethodLimits</name>
@@ -318,6 +334,7 @@
             <label lang="da-DK">Brug Mollies tilgængelighedsregler for betalingsmetoder</label>
             <label lang="el-GR">Χρησιμοποιήστε τους κανόνες διαθεσιμότητας της Mollie για τις μεθόδους πληρωμής</label>
             <label lang="hr-HR">Koristi Mollie pravila dostupnosti za metode plaćanja</label>
+            <label lang="et-EE">Kasutaa Mollie makseviiside kättesaadavuse reegleid</label>
             <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
             <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf Verfügbarkeitsregeln von Mollie. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
             <helpText lang="nl-NL">Automatische betalingsmethode wordt verborgen tijdens het afrekenen op basis van beschikbaarheidsregels van Mollie. Alleen actieve betalingsmethoden uit het Mollie-dashboard worden weergegeven. Als de betalingsmethode beperkingen heeft op de winkelwagenwaarde, valuta of factuuradres, wordt deze ook verborgen.
@@ -349,6 +366,7 @@
                 κατά την ολοκλήρωση αγοράς.
             </helpText>
             <helpText lang="hr-HR">Automatski skriva metode plaćanja tijekom naplate na temelju pravila dostupnosti. Prikazane su samo aktivne metode iz Mollie nadzorne ploče. Ako metoda ima ograničenje košarice, valute ili adrese za naplatu, bit će skrivena.</helpText>
+            <helpText lang="et-EE">Peidab automaatselt makseviisid kassas vastavalt makseviiside kättesaadavuse reeglitele. Sinu Mollie töölauas kuvatakse ainult aktiivsed makseviisid. Kui makseviisil on ostukorvipiirang, valuuta piirang või arvelduse aadressi piirang, peidetakse see kassas.</helpText>
         </input-field>
         <input-field type="text">
             <name>formatOrderNumber</name>
@@ -368,6 +386,7 @@
             <label lang="da-DK">Brugerdefineret format for Mollie ordrenumre (Dashboard, PayPal, ...)</label>
             <label lang="el-GR">Προσαρμοσμένη μορφή για τους αριθμούς παραγγελιών Mollie (Dashboard, PayPal, ...)</label>
             <label lang="hr-HR">Prilagođeni format brojeva narudžbi za Mollie (nadzorna ploča, PayPal,...)</label>
+            <label lang="et-EE">Mollie tellimusnumbrite kohandatud formaat (dashboard, PayPal jne)</label>
             <helpText>If set, this format will be used before the order number in the Mollie dashboard. This will also be passed on to PayPal as invoice number.</helpText>
             <helpText lang="de-DE">Wenn gesetzt, wird dieses Format vor der Bestellnummer im Mollie-Dashboard verwendet. Dieser Wert wird auch an PayPal als Rechnungsnummber übergeben</helpText>
             <helpText lang="nl-NL">Indien ingesteld, wordt dit formaat vóór het bestelnummer in het Mollie-dashboard gebruikt. Dit wordt ook als factuurnummer doorgegeven aan PayPal.</helpText>
@@ -384,6 +403,7 @@
             <helpText lang="da-DK">Hvis indstillet, vil dette format blive brugt før ordrenummeret i Mollie dashboardet. Dette vil også blive sendt til PayPal som fakturanummer.</helpText>
             <helpText lang="el-GR">Εάν οριστεί, αυτή η μορφή θα χρησιμοποιηθεί πριν από τον αριθμό παραγγελίας στο Mollie Dashboard. Αυτό θα μεταφερθεί επίσης στο PayPal ως αριθμός τιμολογίου.</helpText>
             <helpText lang="hr-HR">Ako je postavljeno, ovaj format će se koristiti ispred broja narudžbe na Mollie nadzornoj ploči. Također će biti proslijeđen PayPalu kao broj računa.</helpText>
+            <helpText lang="et-EE">Kui see on määratud, kasutatakse seda formaati Mollie'i töölaual tellimusnumbri ees. See edastatakse ka PayPalile arvenumbrina.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-payments-format">
             <name>molliePluginConfigSectionPaymentsFormat</name>
@@ -409,6 +429,7 @@
         <title lang="da-DK">Kreditkort</title>
         <title lang="el-GR">Πιστωτική Κάρτα</title>
         <title lang="hr-HR">Kreditna kartica</title>
+        <title lang="et-EE">Krediitkaart</title>
         <input-field type="bool">
             <name>enableCreditCardComponents</name>
             <label>Enable Credit Card Components</label>
@@ -427,6 +448,7 @@
             <label lang="da-DK">Aktiver kreditkortkomponenter</label>
             <label lang="el-GR">Ενεργοποίηση Στοιχείων Πιστωτικής Κάρτας</label>
             <label lang="hr-HR">Omogući unos kartičnih podataka unutar trgovine</label>
+            <label lang="et-EE">Aktiveeri Krediitkaardi Komponendid</label>
             <defaultValue>true</defaultValue>
             <helpText>Show credit card input fields directly within your Shopware shop. If disabled, Mollie will show
                 the forms on the Mollie payment page.
@@ -452,6 +474,7 @@
             <helpText lang="da-DK">Vis kreditkortindtastningsfelter direkte i din Shopware butik. Hvis deaktiveret, vil Mollie vise formularerne på Mollies betalingsside.</helpText>
             <helpText lang="el-GR">Εμφάνιση πεδίων εισόδου πιστωτικής κάρτας απευθείας μέσα στο κατάστημα Shopware σας. Εάν απενεργοποιηθεί, η Mollie θα εμφανίσει τις φόρμες στη σελίδα πληρωμών Mollie.</helpText>
             <helpText lang="hr-HR">Prikaži polja za unos kartičnih podataka izravno unutar Shopware trgovine. Ako je onemogućeno, Mollie će prikazati obrazac na vlastitoj stranici.</helpText>
+            <helpText lang="et-EE">Näita krediitkaardi sisestusvälju otse oma Shopware poes. Kui see on välja lülitatud, näitab Mollie sisestusvälju Mollie makse lehel.</helpText>
         </input-field>
         <input-field type="bool">
             <name>oneClickPaymentsEnabled</name>
@@ -471,6 +494,7 @@
             <label lang="da-DK">Aktiver betalninger med et klik</label>
             <label lang="el-GR">Ενεργοποίηση Πληρωμών με Ένα Κλικ</label>
             <label lang="hr-HR">Omogući plaćanje jednim klikom</label>
+            <label lang="et-EE">Luba ühe klõpsuga maksmine</label>
             <defaultValue>false</defaultValue>
             <helpText>Customers can choose to save their credit card data for repeating orders. Sensitive data will only
                 be stored on the Mollie servers and not in Shopware.
@@ -496,6 +520,7 @@
             <helpText lang="da-DK">Kunder kan vælge at gemme deres kreditkortdata til gentagne ordrer. Følsomme data vil kun blive gemt på Mollies servere og ikke i Shopware.</helpText>
             <helpText lang="el-GR">Οι πελάτες μπορούν να επιλέξουν να αποθηκεύσουν τα δεδομένα της πιστωτικής τους κάρτας για επαναλαμβανόμενες παραγγελίες. Τα ευαίσθητα δεδομένα θα αποθηκεύονται μόνο στους διακομιστές της Mollie και όχι στο Shopware.</helpText>
             <helpText lang="hr-HR">Kupci mogu spremiti podatke o kartici za buduće narudžbe. Osjetljivi podaci pohranjuju se samo na Mollie poslužiteljima, a ne u Shopware sustavu.</helpText>
+            <helpText lang="et-EE">Kliendid saavad valida, kas soovivad salvestada oma krediitkaardi andmed korduvate tellimuste jaoks. Tundlikud andmed salvestatakse ainult Mollie serverites, mitte Shopware'is.</helpText>
         </input-field>
         <input-field type="bool">
             <name>oneClickPaymentsCompactView</name>
@@ -515,6 +540,7 @@
             <label lang="da-DK">Aktiver kompakt visning for betalinger med et klik</label>
             <label lang="el-GR">Ενεργοποίηση Συμπαγούς Προβολής Πληρωμών με Ένα Κλικ</label>
             <label lang="hr-HR">Omogući kompaktni prikaz za plaćanje jednim klikom</label>
+            <label lang="et-EE">Luba ühe klõpsuga maksete kompaktne vaade</label>
             <defaultValue>false</defaultValue>
             <helpText>If enabled, the stored credit cards will not be displayed as visual cards on the checkout page.
             </helpText>
@@ -539,6 +565,7 @@
             <helpText lang="da-DK">Hvis aktiveret, vises de gemte kreditkort ikke som visuelle kort på kassesiden.</helpText>
             <helpText lang="el-GR">Εάν ενεργοποιηθεί, οι αποθηκευμένες πιστωτικές κάρτες δεν θα εμφανίζονται ως οπτικές κάρτες στη σελίδα ολοκλήρωσης αγοράς.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, spremljene kartice neće biti prikazane vizualno tijekom naplate.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, ei kuvata salvestatud krediitkaarte kassalehel visuaalsete kaartidena.</helpText>
         </input-field>
     </card>
     <!--card>
@@ -675,6 +702,7 @@
         <title lang="da-DK">Apple Pay</title>
         <title lang="el-GR">Apple Pay</title>
         <title lang="hr-HR">Apple Pay</title>
+        <title lang="et-EE">Apple Pay</title>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>
@@ -693,6 +721,7 @@
             <label lang="da-DK">Aktiver Apple Pay Direct</label>
             <label lang="el-GR">Ενεργοποίηση Apple Pay Direct</label>
             <label lang="hr-HR">Omogući Apple Pay Direct</label>
+            <label lang="et-EE">Aktiveeri Apple Pay Direct</label>
             <defaultValue>false</defaultValue>
             <helpText>Show Apple Pay buttons and payment options directly on a product detail page or listing. This feature requires the payment method Apple Pay to be assigned to your Sales Channel.</helpText>
             <helpText lang="de-DE">Zeigt Apple Pay Buttons direkt auf der Produktseite oder Kategorie Seite an. Dieses Feature setzt voraus, dass die Zahlungsart 'Apple Pay' dem Verkaufskanal zugewiesen ist.</helpText>
@@ -710,6 +739,7 @@
             <helpText lang="da-DK">Vis Apple Pay knapper og betalingsmetoder direkte på en produktside eller i en liste. Denne funktion kræver, at betalingsmetoden Apple Pay er tildelt din salgskanal.</helpText>
             <helpText lang="el-GR">Εμφάνιση κουμπιών Apple Pay και επιλογών πληρωμής απευθείας σε σελίδα λεπτομερειών προϊόντος ή καταλόγου. Αυτή η δυνατότητα απαιτεί να έχει εκχωρηθεί η μέθοδος πληρωμής Apple Pay στο Κανάλι Πωλήσεών σας.</helpText>
             <helpText lang="hr-HR">Prikazuj Apple Pay gumbe i opcije plaćanja izravno na stranicama proizvoda ili listama. Ova opcija zahtijeva da je metoda Apple Pay dodijeljena vašem prodajnom kanalu.</helpText>
+            <helpText lang="et-EE">Näita Apple Pay nuppe ja makseviise otse toote detailide lehel või nimekirjas. Selle funktsiooni kasutamiseks peab sinu müügikanalile olema määratud Apple Pay makseviis.</helpText>
         </input-field>
         <input-field type="multi-select">
             <name>applePayDirectRestrictions</name>
@@ -729,6 +759,7 @@
             <label lang="da-DK">Apple Pay visningsbegrænsninger</label>
             <label lang="el-GR">Περιορισμοί Εμφάνισης Apple Pay</label>
             <label lang="hr-HR">Ograničenja prikaza za Apple Pay</label>
+            <label lang="et-EE">Apple Pay Kuvamispiirangud</label>
             <helpText>Restrict Apple Pay Direct from being displayed on these pages.</helpText>
             <helpText lang="de-DE">Verhindere die Anzeige von Apple Pay Direct auf den hier gewählten Seiten</helpText>
             <helpText lang="nl-NL">Voorkom dat Apple Pay Direct wordt weergegeven op deze pagina's.</helpText>
@@ -745,6 +776,7 @@
             <helpText lang="da-DK">Begræns visningen af Apple Pay Direct på disse sider.</helpText>
             <helpText lang="el-GR">Περιορίστε την εμφάνιση του Apple Pay Direct σε αυτές τις σελίδες.</helpText>
             <helpText lang="hr-HR">Ograniči prikaz Apple Pay Direct opcije na sljedećim stranicama.</helpText>
+            <helpText lang="et-EE">Piira Apple Pay Direct kuvamist nendel lehtedel.</helpText>
             <options>
                 <option>
                     <id>plp</id>
@@ -764,6 +796,7 @@
                     <name lang="da-DK">Kategorisider</name>
                     <name lang="el-GR">Σελίδες κατηγοριών</name>
                     <name lang="hr-HR">Stranice kategorija</name>
+                    <name lang="et-EE">Kategoorialehed</name>
                 </option>
                 <option>
                     <id>pdp</id>
@@ -783,6 +816,7 @@
                     <name lang="da-DK">Produktsider</name>
                     <name lang="el-GR">Σελίδες προϊόντων</name>
                     <name lang="hr-HR">Stranice proizvoda</name>
+                    <name lang="et-EE">Tootelehed</name>
                 </option>
                 <option>
                     <id>offcanvas</id>
@@ -802,6 +836,7 @@
                     <name lang="da-DK">Offcanvas kurv</name>
                     <name lang="el-GR">Καλάθι Offcanvas</name>
                     <name lang="hr-HR">Košarica u bočnoj traci</name>
+                    <name lang="et-EE">Offcanvas ostukorv</name>
                 </option>
                 <option>
                     <id>cart</id>
@@ -821,6 +856,7 @@
                     <name lang="da-DK">Kurvside</name>
                     <name lang="el-GR">Σελίδα καλαθιού</name>
                     <name lang="hr-HR">Stranica košarice</name>
+                    <name lang="et-EE">Ostukorvi leht</name>
                 </option>
             </options>
         </input-field>
@@ -842,6 +878,7 @@
             <label lang="da-DK">Tilladte domæner for Apple Pay Direct</label>
             <label lang="el-GR">Επιτρεπόμενοι Τομείς για Apple Pay Direct</label>
             <label lang="hr-HR">Dopuštene domene za Apple Pay Direct</label>
+            <label lang="et-EE">Lubatud domeenid Apple Pay Direct jaoks</label>
             <helpText>
                 Enter the domains that are allowed for Apple Pay Direct, separated by commas.
                 This setting is optional and only required if you are using a headless setup
@@ -874,6 +911,7 @@
             <helpText lang="da-DK">Indtast de domæner, der er tilladt for Apple Pay Direct, adskilt af kommaer. Denne indstilling er valgfri og kræves kun, hvis du bruger en headless-opsætning</helpText>
             <helpText lang="el-GR">Εισάγετε τους τομείς που επιτρέπονται για το Apple Pay Direct, διαχωρισμένους με κόμματα. Αυτή η ρύθμιση είναι προαιρετική και απαιτείται μόνο αν χρησιμοποιείτε ρύθμιση χωρίς επίβλεψη.</helpText>
             <helpText lang="hr-HR">Unesite domene dopuštene za Apple Pay Direct, odvojene zarezima. Ova postavka je opcionalna i potrebna je samo ako koristite headless postavu.</helpText>
+            <helpText lang="et-EE">Sisesta Apple Pay Directi jaoks lubatud domeenid, eraldades need komadega. See seade on valikuline ja vajalik ainult juhul, kui kasutate peata seadistust </helpText>
         </input-field>
     </card>
 
@@ -895,6 +933,7 @@
         <title lang="da-DK">Ordrehåndtering</title>
         <title lang="el-GR">Διαχείριση Παραγγελιών</title>
         <title lang="hr-HR">Upravljanje narudžbama</title>
+        <title lang="et-EE">Tellimuse Haldus</title>
         <input-field type="int">
             <name>paymentMethodBankTransferDueDateDays</name>
             <label>Bank Transfer Due Date (Days)</label>
@@ -913,6 +952,7 @@
             <label lang="da-DK">Forfaldsdato for bankoverførsel (dage)</label>
             <label lang="el-GR">Προθεσμία Τραπεζικής Μεταφοράς (Ημέρες)</label>
             <label lang="hr-HR">Datum dospijeća za plaćanje putem bankovne transakcije (u danima)</label>
+            <label lang="et-EE">Pangaülekande maksetähtaeg (päevad)</label>
             <helpText>Assign a custom "due date" for the Bank Transfer payment method. This is the time the customer can pay until the payment expires.</helpText>
             <helpText lang="de-DE">Konfiguration eines eigenen Verfallsdatums für die Zahlungsart 'Bank Transfer'. Dies ist der Zeitraum einer möglichen Zahlung bis die Zahlungsmöglichkeit verfällt.</helpText>
             <helpText lang="nl-NL">Wijs een aangepaste "vervaldatum" toe voor de betaalmethode Bankoverschrijving. Dit is de periode dat de klant kan betalen totdat de betaling vervalt.</helpText>
@@ -929,6 +969,7 @@
             <helpText lang="da-DK">Tildel en brugerdefineret "forfaldsdato" for betalingsmetoden bankoverførsel. Dette er den tid, kunden kan betale, indtil betalingen udløber.</helpText>
             <helpText lang="el-GR">Αναθέστε μια προσαρμοσμένη "προθεσμία" για τη μέθοδο πληρωμής Τραπεζική Μεταφορά. Αυτή είναι η χρονική περίοδος που μπορεί ο πελάτης να πληρώσει μέχρι να λήξει η πληρωμή.</helpText>
             <helpText lang="hr-HR">Dodijelite prilagođeni datum dospijeća za metodu bankovnog prijenosa. To je vrijeme u kojem kupac može platiti prije nego što plaćanje istekne.</helpText>
+            <helpText lang="et-EE">Määra pangaülekande makseviisile kohandatud „tähtaeg”. See on aeg, mille jooksul klient saab makse sooritada, enne kui makse aegub.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-order-lifetime-warning">
             <name>molliePluginConfigSectionOrderLifeTimeWarning</name>
@@ -951,6 +992,7 @@
             <label lang="da-DK">Ordrelevetid dage</label>
             <label lang="el-GR">Ημέρες Διάρκειας Παραγγελίας</label>
             <label lang="hr-HR">Trajanje narudžbe (u danima)</label>
+            <label lang="et-EE">Tellimuse eluaeg (päevad)</label>
             <helpText>Configure the lifetime of an order until it expires when not paid. This applies to all payment methods.</helpText>
             <helpText lang="de-DE">Konfiguration der Lebensdauer bis eine Bestellung verfällt, sofern sie nicht bezahlt wurde. Diese Konfiguration wirkt sich auf alle Zahlungsarten aus.</helpText>
             <helpText lang="nl-NL">Configureer de levensduur van een bestelling totdat deze vervalt als er niet betaald is. Dit geldt voor alle betaalmethoden.</helpText>
@@ -967,6 +1009,7 @@
             <helpText lang="da-DK">Konfigurer levetiden for en ordre, indtil den udløber, hvis den ikke betales. Dette gælder for alle betalingsmetoder.</helpText>
             <helpText lang="el-GR">Ρυθμίστε τη διάρκεια μιας παραγγελίας μέχρι να λήξει αν δεν πληρωθεί. Αυτό ισχύει για όλες τις μεθόδους πληρωμής.</helpText>
             <helpText lang="hr-HR">Postavite trajanje narudžbe prije nego što istekne ako nije plaćena. Ovo vrijedi za sve metode plaćanja.</helpText>
+            <helpText lang="et-EE">Määrake tellimuse kehtivusaeg, kuni see aegub, kui makset ei ole sooritatud. See kehtib kõikide makseviiside puhul.</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticShipping</name>
@@ -987,6 +1030,7 @@
             <label lang="da-DK">Automatisk forsendelse</label>
             <label lang="el-GR">Αυτόματη Αποστολή</label>
             <label lang="hr-HR">Automatska dostava</label>
+            <label lang="et-EE">Automaatne saatmine</label>
             <helpText>If enabled, the plugin will automatically trigger a shipment at Mollie when the delivery status transitions to 'shipped'.</helpText>
             <helpText lang="de-DE">Sofern aktiv, schickt das Plugin automatisch eine Versand Mitteilung an Mollie, sobald der Lieferstatus auf 'verschickt' übergeleitet wird.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plugin automatisch een verzending activeren bij Mollie wanneer de leveringstatus overgaat naar ‘verzonden’.</helpText>
@@ -1003,6 +1047,7 @@
             <helpText lang="da-DK">Hvis aktiveret, vil pluginet automatisk udløse en forsendelse hos Mollie, når leveringsstatussen skifter til 'afsendt'.</helpText>
             <helpText lang="el-GR">Εάν ενεργοποιηθεί, το πρόσθετο θα ενεργοποιήσει αυτόματα μια αποστολή στην Mollie όταν η κατάσταση παράδοσης αλλάξει σε 'αποσταλεί'.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, dodatak će automatski pokrenuti narudžbu u Mollie sustavu kada se status dostave promijeni u 'isporučeno'.</helpText>
+            <helpText lang="et-EE">Kui see on aktiveeritud, käivitab plugin automaatselt saadetise Mollie's, kui tarne staatus muutub „saadetud“</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticCancellation</name>
@@ -1023,6 +1068,7 @@
             <label lang="da-DK">Automatisk annullering</label>
             <label lang="el-GR">Αυτόματη Ακύρωση</label>
             <label lang="hr-HR">Automatsko otkazivanje</label>
+            <label lang="et-EE">Automaatne tühistamine</label>
             <helpText>If enabled, the plugin will automatically cancel Mollie orders when being cancelled in Shopware. Only orders that are created, authorized or partially shipped will be cancelled. If partially shipped, only items that where not shipped will be cancelled.</helpText>
             <helpText lang="de-DE">Wenn aktiviert, storniert das Plugin Mollie-Bestellungen automatisch, wenn sie in Shopware storniert werden. Nur Bestellungen, die erstellt, autorisiert oder teilweise versandt wurden, werden storniert. Bei teilweisem Versand werden nur Artikel storniert, die nicht versendet wurden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, zal de plug-in automatisch Mollie-bestellingen annuleren wanneer ze worden geannuleerd in Shopware. Alleen bestellingen die zijn aangemaakt, geautoriseerd of gedeeltelijk zijn verzonden, worden geannuleerd. Indien gedeeltelijk verzonden, worden alleen artikelen geannuleerd die niet zijn
@@ -1042,6 +1088,7 @@
             <helpText lang="da-DK">Hvis aktiveret, vil plugin'et automatisk annullere Mollie bestillinger, når de annulleres i Shopware. Kun bestillinger, der er oprettet, godkendt eller delvist afsendt, vil blive annulleret. Hvis delvist afsendt, vil kun de varer, der ikke er sendt, blive annulleret.</helpText>
             <helpText lang="el-GR">Αν είναι ενεργοποιημένο, το πρόσθετο θα ακυρώνει αυτόματα τις παραγγελίες Mollie όταν ακυρώνονται στο Shopware. Μόνο οι παραγγελίες που δημιουργούνται, εγκρίνονται ή αποστέλλονται μερικώς θα ακυρωθούν. Αν αποσταλούν μερικώς, θα ακυρωθούν μόνο τα αντικείμενα που δεν έχουν αποσταλεί.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, dodatak će automatski otkazati Mollie narudžbe kada budu otkazane u Shopware sustavu. Samo narudžbe koje su stvorene, autorizirane ili djelomično otpremljene bit će otkazane. Ako su djelomično otpremljene, bit će otkazane samo stavke koje nisu otpremljene.</helpText>
+            <helpText lang="et-EE">Kui see on aktiveeritud, tühistab plugin automaatselt Mollie tellimused, kui need Shopware'is tühistatakse. Tühistatakse ainult loodud, kinnitatud või osaliselt saadetud tellimused. Osaliselt saadetud tellimuste puhul tühistatakse ainult need kaubad, mis ei ole veel saadetud.</helpText>
         </input-field>
         <input-field type="bool">
             <name>automaticOrderExpire</name>
@@ -1062,6 +1109,7 @@
             <label lang="da-DK">Automatisk udløb</label>
             <label lang="el-GR">Αυτόματη Λήξη</label>
             <label lang="hr-HR">Automatsko isticanje narudžbi</label>
+            <label lang="et-EE">Automaatne aegumine</label>
             <helpText>If enabled, the plugin will automatically expire orders with the payment status "In Progress".</helpText>
             <helpText lang="de-DE">Wenn aktiviert, lässt das Plugin Bestellungen mit dem Status „In Bearbeitung“ und dem Zahlungsstatus „Offen“ oder „Autorisiert“ automatisch ablaufen.</helpText>
             <helpText lang="nl-NL">Als deze optie is ingeschakeld, verlopen bestellingen met de status 'In uitvoering' en de betalingsstatus 'Open' of 'Geautoriseerd' automatisch.</helpText>
@@ -1078,6 +1126,7 @@
             <helpText lang="da-DK">Hvis aktiveret, vil pluginet automatisk udløbe ordrer med betalingsstatus "I gang".</helpText>
             <helpText lang="el-GR">Εάν ενεργοποιηθεί, το πρόσθετο θα λήξει αυτόματα τις παραγγελίες με κατάσταση πληρωμής "Σε Εξέλιξη".</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, dodatak će automatski označiti kao istekle narudžbe sa statusom plaćanja "U tijeku".</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, tühistab plugin automaatselt tellimused, mille makse staatus on „Töös“.</helpText>
         </input-field>
     </card>
     <card>
@@ -1097,6 +1146,7 @@
         <title lang="da-DK">Refusionsadministrator</title>
         <title lang="el-GR">Διαχειριστής Επιστροφών Χρημάτων</title>
         <title lang="hr-HR">Upravitelj povrata</title>
+        <title lang="et-EE">Tagasimakse haldur</title>
 
         <input-field type="bool">
             <name>refundManagerEnabled</name>
@@ -1117,6 +1167,7 @@
             <label lang="da-DK">Aktiver Refusion Manager</label>
             <label lang="el-GR">Ενεργοποίηση Διαχειριστή Επιστροφών Χρημάτων</label>
             <label lang="hr-HR">Omogući upravitelja povrata</label>
+            <label lang="et-EE">Luba tagasimakse haldur</label>
             <helpText>Enable or disable the Refund Manager in the Administration</helpText>
             <helpText lang="de-DE">Aktivieren oder deaktivieren Sie den Refund Manager in der Administration</helpText>
             <helpText lang="nl-NL">Schakel de Refund Manager in of uit in de administratie</helpText>
@@ -1133,6 +1184,7 @@
             <helpText lang="da-DK">Aktiver eller deaktiver Refusion Manager i administrationen</helpText>
             <helpText lang="el-GR">Ενεργοποιήστε ή απενεργοποιήστε τον Διαχειριστή Επιστροφών Χρημάτων στη Διαχείριση</helpText>
             <helpText lang="hr-HR">Omogući ili onemogući upravitelja povrata u administraciji</helpText>
+            <helpText lang="et-EE">Aktiveeri või deaktiveeri tagasimaksete haldur administraatoris</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerAutoStockReset</name>
@@ -1153,6 +1205,7 @@
             <label lang="da-DK">Inkluderer automatisk lagernulstilling</label>
             <label lang="el-GR">Αυτόματη συμπερίληψη επαναφοράς αποθεμάτων</label>
             <label lang="hr-HR">Automatski uključi poništavanje zaliha</label>
+            <label lang="et-EE">Automaatne aktsiate lähtestamine</label>
             <helpText>Automatically set the entered refund quantity also as the quantity to be used to increase the stock again.</helpText>
             <helpText lang="de-DE">Sofern aktiv, wird die eingegebene Rückerstattungsmenge automatisch als Menge für den Lagerbestand verwendet und dieses Feld vorbefüllt.</helpText>
             <helpText lang="nl-NL">Stel de ingevoerde restitutiehoeveelheid automatisch ook in als de hoeveelheid die moet worden gebruikt om de voorraad weer te vergroten</helpText>
@@ -1169,6 +1222,7 @@
             <helpText lang="da-DK">Automatisk indstill den indtastede refusionsmængde også som den mængde, der skal bruges til at øge lageret igen.</helpText>
             <helpText lang="el-GR">Ορίστε αυτόματα την επιστρεφόμενη ποσότητα που εισάγεται και ως ποσότητα που θα χρησιμοποιηθεί για την αύξηση του αποθέματος.</helpText>
             <helpText lang="hr-HR">Automatski postavi unesenu količinu povrata i kao količinu koja će se koristiti za ponovno povećanje zaliha.</helpText>
+            <helpText lang="et-EE">Automaatne märgitud tagasimakse kogus ka kui kogus, mida tuleks kasutada aktsiate taastamiseks.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerVerifyRefund</name>
@@ -1189,6 +1243,7 @@
             <label lang="da-DK">Verificer tilbagebetalinger</label>
             <label lang="el-GR">Επαλήθευση Επιστροφών Χρημάτων</label>
             <label lang="hr-HR">Potvrdi povrate</label>
+            <label lang="et-EE">Kontrolli tagasimakseid</label>
             <helpText>If enabled, a verification checkbox needs to be checked to proceed with the refund. We recommend this to avoid accidental refunds and stock changes.</helpText>
             <helpText lang="de-DE">Wenn aktiv, muss ein Überprüfungskästchen aktiviert werden, um mit der Rückerstattung fortzufahren. Wir empfehlen dies, um versehentliche Rückerstattungen und Bestandsänderungen zu vermeiden.</helpText>
             <helpText lang="nl-NL">Indien actief, moet een selectievakje worden geactiveerd om verder te gaan met de terugbetaling. Wij raden dit aan om onbedoelde terugbetalingen en voorraadwijzigingen te voorkomen.</helpText>
@@ -1205,6 +1260,7 @@
             <helpText lang="da-DK">Hvis aktiveret, skal en verifikationsboks krydses af for at fortsætte med refunderingen. Vi anbefaler dette for at undgå utilsigtede refunderinger og lagerændringer.</helpText>
             <helpText lang="el-GR">Εάν ενεργοποιηθεί, θα χρειαστεί να ελέγξετε ένα πλαίσιο επαλήθευσης για να προχωρήσετε με την επιστροφή χρημάτων. Συστήνουμε αυτή τη διαδικασία για να αποφευχθούν τυχαίες επιστροφές και αλλαγές αποθέματος.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, potrebno je označiti potvrdni okvir kako bi se nastavilo s povratom. Preporučujemo ovu opciju kako biste izbjegli nenamjerne povrate i promjene zaliha.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, tuleb valikukast märkida linnukesega tagasimakse tegemiseks. Soovitame seda teha, et vältida juhuslikke tagasimakseid ja varude muutusi.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerShowInstructions</name>
@@ -1225,6 +1281,7 @@
             <label lang="da-DK">Vis instruktioner</label>
             <label lang="el-GR">Εμφάνιση Οδηγιών</label>
             <label lang="hr-HR">Prikaži upute</label>
+            <label lang="et-EE">Näita juhiseid</label>
             <helpText>Shows or hides the instructions area. You can simply turn this off in case it's disturbing once you're familiar with the Refund Manager.</helpText>
             <helpText lang="de-DE">Diese Funktion kann benutzt werden, um die Anleitungen auszublenden, sofern man einmal mit dem Refund Manager vetraut ist.</helpText>
             <helpText lang="nl-NL">Toont of verbergt de handleiding. Als het storend is, kan je het direkt deactiveren als je eenmaal vertrouwd bent met de Refund Manager.</helpText>
@@ -1241,6 +1298,7 @@
             <helpText lang="da-DK">Viser eller skjuler instruktionsområdet. Du kan nemt deaktivere dette, hvis det forstyrrer, når du er blevet bekendt med Refusion Manager.</helpText>
             <helpText lang="el-GR">Εμφανίζει ή αποκρύπτει το πεδίο οδηγιών. Μπορείτε απλά να το απενεργοποιήσετε εάν σας ενοχλεί μόλις εξοικειωθείτε με τον Διαχειριστή Επιστροφής Χρημάτων.</helpText>
             <helpText lang="hr-HR">Prikazuje ili skriva područje s uputama. Možete ga jednostavno isključiti ako vam smeta nakon što se upoznate s upraviteljem povrata.</helpText>
+            <helpText lang="et-EE">Kuvab või peidab juhiste ala. Saad selle välja lülitada, kui see häirib, kui oled Tagasimakse Halduriga tuttav.</helpText>
         </input-field>
         <input-field type="bool">
             <name>refundManagerCreateCreditNotes</name>
@@ -1261,6 +1319,7 @@
             <label lang="da-DK">Opret kreditnotaer</label>
             <label lang="el-GR">Δημιουργία πιστωτικών σημειώσεων</label>
             <label lang="hr-HR">Kreiraj kreditne bilješke</label>
+<label lang="et-EE">Loo krediiditeateid</label>
             <helpText>Automatically create a credit note in Shopware when a refund is processed.</helpText>
             <helpText lang="de-DE">Erstellt automatisch eine Gutschrift in Shopware, wenn eine Rückerstattung verarbeitet wird.</helpText>
             <helpText lang="nl-NL">Maak automatisch een creditnota in Shopware wanneer een terugbetaling wordt verwerkt.</helpText>
@@ -1277,6 +1336,7 @@
             <helpText lang="da-DK">Opret automatisk en kreditnota i Shopware, når en refusion behandles.</helpText>
             <helpText lang="el-GR">Αυτόματη δημιουργία πιστωτικού σημειώματος στο Shopware κατά την επεξεργασία μιας επιστροφής χρημάτων.</helpText>
             <helpText lang="hr-HR">Automatski kreiraj kreditnu notu u Shopwareu kada se obradi povrat novca.</helpText>
+<helpText lang="et-EE">Automaatne krediiditeate loomine Shopware'is, kui tagasimakset töödeldakse.</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesPrefix</name>
@@ -1297,6 +1357,7 @@
             <label lang="da-DK">Kreditnote præfix</label>
             <label lang="el-GR">Πρόθεμα Πιστωτικού Σημειώματος</label>
             <label lang="hr-HR">Prefiks za odobrenje</label>
+            <label lang="et-EE">Krediitnota eesliide</label>
             <helpText>Prefix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="de-DE">Präfix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
             <helpText lang="nl-NL">Voorvoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
@@ -1313,6 +1374,7 @@
             <helpText lang="da-DK">Præfix for kreditnotenummeret. Kreditnoten består af præfix, original linjepostnavn og suffiks</helpText>
             <helpText lang="el-GR">Πρόθεμα για τον αριθμό του πιστωτικού σημειώματος. Το πιστωτικό σημείωμα αποτελείται από το πρόθεμα, το αρχικό όνομα αντικειμένου και το επίθημα</helpText>
             <helpText lang="hr-HR">Prefiks broja odobrenja. Broj odobrenja sastoji se od prefiksa, naziva stavke s originalnog računa i sufiksa.</helpText>
+            <helpText lang="et-EE">Eesliide krediidinotale. Krediiditeatis koosneb eesliitest, algsest kirje nimest ja järelliitest</helpText>
         </input-field>
         <input-field type="text">
             <name>refundManagerCreateCreditNotesSuffix</name>
@@ -1333,6 +1395,7 @@
             <label lang="da-DK">Kreditnote suffiks</label>
             <label lang="el-GR">Επίθημα Πιστωτικού Σημειώματος</label>
             <label lang="hr-HR">Sufiks za odobrenje</label>
+            <label lang="et-EE">Krediitnota järelliide</label>
             <helpText>Suffix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="de-DE">Suffix für die Gutschriftsnummer. Die Gutschrift besteht aus Präfix, ursprünglichem Positionsnamen und Suffix</helpText>
             <helpText lang="nl-NL">Achtervoegsel voor het creditnotanummer. De creditnota bestaat uit een voorvoegsel, de oorspronkelijke naam van het line item en een achtervoegsel.</helpText>
@@ -1349,6 +1412,7 @@
             <helpText lang="da-DK">Suffiks for kreditnotenummer. Kreditnoten består af præfiks, oprindeligt linjepostnavn og suffiks</helpText>
             <helpText lang="el-GR">Επίθημα για τον αριθμό του πιστωτικού σημειώματος. Το πιστωτικό σημείωμα αποτελείται από το πρόθεμα, το αρχικό όνομα αντικειμένου και το επίθημα</helpText>
             <helpText lang="hr-HR">Sufiks broja odobrenja. Broj odobrenja sastoji se od prefiksa, naziva stavke s originalnog računa i sufiksa.</helpText>
+            <helpText lang="et-EE">Järelliide krediitnota numbrile. Krediidinota koosneb eesliitest, algsest kirje nimest ja järelliitest</helpText>
         </input-field>
     </card>
     <card>
@@ -1368,6 +1432,7 @@
         <title lang="da-DK">Automatisering af ordrestatus</title>
         <title lang="el-GR">Αυτοματοποίηση κατάστασης παραγγελίας</title>
         <title lang="hr-HR">Automatsko postavljanje statusa narudžbe</title>
+        <title lang="et-EE">Tellimuse staatuse automatiseerimine</title>
 
         <input-field type="single-select">
             <name>orderStateWithAPaidTransaction</name>
@@ -1387,6 +1452,7 @@
             <label lang="da-DK">Ordrestatus med en betalt transaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια πληρωμένη συναλλαγή</label>
             <label lang="hr-HR">Status narudžbe za uspješno plaćenu transakciju</label>
+            <label lang="et-EE">Tellimuse staatus koos makstud tehinguga</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -1406,6 +1472,7 @@
                     <name lang="da-DK">Spring denne status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see olek vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -1425,6 +1492,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Ava</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -1444,6 +1512,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -1463,6 +1532,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -1482,6 +1552,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -1503,6 +1574,7 @@
             <label lang="da-DK">Ordrestatus med en mislykket transaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια αποτυχημένη συναλλαγή</label>
             <label lang="hr-HR">Status narudžbe za neuspjelu transakciju</label>
+            <label lang="et-EE">Tellimuse seisund, millel on ebaõnnestunud tehing</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -1522,6 +1594,7 @@
                     <name lang="da-DK">Spring denne status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see staatus vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -1541,6 +1614,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Avatud</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -1560,6 +1634,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -1579,6 +1654,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -1598,6 +1674,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -1619,6 +1696,7 @@
             <label lang="da-DK">Ordrestatus med en annulleret transaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια ακυρωμένη συναλλαγή</label>
             <label lang="hr-HR">Status narudžbe za otkazanu transakciju</label>
+            <label lang="et-EE">Tellimuse seisund, millel on tühistatud tehing</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -1638,6 +1716,7 @@
                     <name lang="da-DK">Spring denne status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see staatus vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -1657,6 +1736,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Avatud</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -1676,6 +1756,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -1695,6 +1776,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -1714,6 +1796,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -1735,6 +1818,7 @@
             <label lang="da-DK">Ordrestatus med en autoriseret transaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια εξουσιοδοτημένη συναλλαγή</label>
             <label lang="hr-HR">Status narudžbe za autoriziranu transakciju</label>
+            <label lang="et-EE">Tellimuse staatus koos autoriseeritud tehinguga</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -1754,6 +1838,7 @@
                     <name lang="da-DK">Spring status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see staatus vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -1773,6 +1858,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Avatud</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -1792,6 +1878,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -1811,6 +1898,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -1830,6 +1918,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -1851,6 +1940,7 @@
             <label lang="da-DK">Ordrestatus med en tilbagebetalingstransaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια επιστρεφόμενη συναλλαγή</label>
             <label lang="hr-HR">Status narudžbe za storniranu transakciju</label>
+            <label lang="et-EE">Tellimuse staatus tagasimakstud tehinguga</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -1870,6 +1960,7 @@
                     <name lang="da-DK">Spring denne status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see staatus vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -1889,6 +1980,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Avatud</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -1908,6 +2000,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -1927,6 +2020,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -1946,6 +2040,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -1967,6 +2062,7 @@
             <label lang="da-DK">Ordrestatus med en refunderingstransaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια συναλλαγή επιστροφής χρημάτων</label>
             <label lang="hr-HR">Status narudžbe za refundiranu transakciju</label>
+            <label lang="et-EE">Tellimuse staatus koos tagasimaksetehinguga</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -1986,6 +2082,7 @@
                     <name lang="da-DK">Spring denne status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see staatus vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -2005,6 +2102,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Avatud</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -2024,6 +2122,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -2043,6 +2142,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -2062,6 +2162,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -2083,6 +2184,7 @@
             <label lang="da-DK">Ordrestatus med en delvis refunderingstransaktion</label>
             <label lang="el-GR">Κατάσταση παραγγελίας με μια συναλλαγή μερικής επιστροφής χρημάτων</label>
             <label lang="hr-HR">Status narudžbe za djelomično refundiranu transakciju</label>
+            <label lang="et-EE">Tellimuse staatus osalise tagasimakse tehinguga</label>
             <options>
                 <option>
                     <id>skip</id>
@@ -2102,6 +2204,7 @@
                     <name lang="da-DK">Spring denne status over</name>
                     <name lang="el-GR">Παράλειψη της κατάστασης αυτής</name>
                     <name lang="hr-HR">Preskoči ovaj status</name>
+                    <name lang="et-EE">Jäta see staatus vahele</name>
                 </option>
                 <option>
                     <id>open</id>
@@ -2121,6 +2224,7 @@
                     <name lang="da-DK">Åben</name>
                     <name lang="el-GR">Ανοιχτό</name>
                     <name lang="hr-HR">Otvoreno</name>
+                    <name lang="et-EE">Avatud</name>
                 </option>
                 <option>
                     <id>in_progress</id>
@@ -2140,6 +2244,7 @@
                     <name lang="da-DK">I gang</name>
                     <name lang="el-GR">Σε εξέλιξη</name>
                     <name lang="hr-HR">U tijeku</name>
+                    <name lang="et-EE">Töös</name>
                 </option>
                 <option>
                     <id>completed</id>
@@ -2159,6 +2264,7 @@
                     <name lang="da-DK">Færdiggjort</name>
                     <name lang="el-GR">Ολοκληρώθηκε</name>
                     <name lang="hr-HR">Završeno</name>
+                    <name lang="et-EE">Lõpetatud</name>
                 </option>
                 <option>
                     <id>cancelled</id>
@@ -2178,6 +2284,7 @@
                     <name lang="da-DK">Annulleret</name>
                     <name lang="el-GR">Ακυρώθηκε</name>
                     <name lang="hr-HR">Otkazano</name>
+                    <name lang="et-EE">Tühistatud</name>
                 </option>
             </options>
         </input-field>
@@ -2200,6 +2307,7 @@
             <label lang="da-DK">Endelig ordretilstand</label>
             <label lang="el-GR">Τελική κατάσταση παραγγελίας</label>
             <label lang="hr-HR">Završni status narudžbe</label>
+            <label lang="et-EE">Lõplik tellimuse seisund</label>
             <helpText>If enabled, the plugin will not transition to a new order state, if the final state is already set in the order. Use this feature in combination with plugins and systems if their workflows do not match the one from Mollie.</helpText>
             <helpText lang="de-DE">Wenn aktiv, wechselt das Plugin nicht in einen neuen Bestellstatus, wenn der finale Status bereits in der Bestellung verwendet wird. Verwenden Sie diese Funktion in Kombination mit Plugins und -Systemen, wenn deren Workflows nicht mit denen von Mollie übereinstimmen.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, gaat de plug-in niet over naar een nieuwe bestelstatus, als de definitieve status al in de bestelling is ingesteld. Gebruik deze functie in combinatie met plug-ins en -systemen als hun workflows niet overeenkomen met die van Mollie.</helpText>
@@ -2216,6 +2324,7 @@
             <helpText lang="da-DK">Hvis aktiveret, vil plugin'et ikke overgå til en ny ordretilstand, hvis den endelige tilstand allerede er indstillet i ordren. Brug denne funktion i kombination med plugins og systemer, hvis deres arbejdsgange ikke matcher den, der er fra Mollie.</helpText>
             <helpText lang="el-GR">Αν είναι ενεργοποιημένο, το πρόσθετο δεν θα μεταβεί σε νέα κατάσταση παραγγελίας, αν η τελική κατάσταση έχει ήδη οριστεί για την παραγγελία. Χρησιμοποιήστε αυτή τη λειτουργία σε συνδυασμό με πρόσθετα και συστήματα αν οι ροές εργασίας τους δεν ταιριάζουν με εκείνη της Mollie.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, dodatak neće mijenjati status narudžbe ako je već postavljen završni status. Koristite ovu opciju u kombinaciji s dodacima i sustavima čiji radni tokovi nisu usklađeni s Mollie logikom.</helpText>
+            <helpText lang="et-EE">Kui see on aktiveeritud, ei lähe plugin üle uuele tellimuse staatusele, kui tellimuses on juba lõplik staatus määratud. Kasuta seda funktsiooni koos pluginate ja süsteemidega, kui nende töövood ei vasta Mollie omadele.</helpText>
         </component>
 
     </card>
@@ -2237,6 +2346,7 @@
         <title lang="da-DK">Abonnementer</title>
         <title lang="el-GR">Συνδρομές</title>
         <title lang="hr-HR">Pretplate</title>
+        <title lang="et-EE">Tellimised</title>
         <input-field type="bool">
             <name>subscriptionsEnabled</name>
             <defaultValue>true</defaultValue>
@@ -2256,6 +2366,7 @@
             <label lang="da-DK">Aktiver Mollie abonnementer</label>
             <label lang="el-GR">Ενεργοποίηση συνδρομών Mollie</label>
             <label lang="hr-HR">Omogući Mollie pretplate</label>
+            <label lang="et-EE">Aktiveeri Mollie tellimused</label>
             <helpText>Enables or disables the full subscription functionality. Please reload the administration after changing this setting.</helpText>
             <helpText lang="de-DE">Aktiviert oder deaktiviert die vollständige Abonnementfunktion. Bitte laden Sie die Administration neu, nachdem Sie diese Einstellung geändert haben.</helpText>
             <helpText lang="nl-NL">Schakelt de volledige abonnementsfunctionaliteit in of uit. Herlaad de administratie na het wijzigen van deze instelling.</helpText>
@@ -2272,6 +2383,7 @@
             <helpText lang="da-DK">Aktiverer eller deaktiverer den fulde abonnementsfunktionalitet. Venligst genindlæs administrationen efter ændring af denne indstilling.</helpText>
             <helpText lang="el-GR">Ενεργοποιεί ή απενεργοποιεί την πλήρη λειτουργικότητα συνδρομής. Παρακαλούμε να ανανεώσετε τη διαχείριση μετά την αλλαγή αυτής της ρύθμισης.</helpText>
             <helpText lang="hr-HR">Omogućuje ili onemogućuje punu funkcionalnost pretplata. Nakon promjene postavke potrebno je ponovno učitati administraciju.</helpText>
+            <helpText lang="et-EE">Lubab või keelab täieliku tellimuse funktsionaalsuse. Pärast selle seade muutmist palun lae haldus uuesti.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsShowIndicator</name>
@@ -2292,6 +2404,7 @@
             <label lang="da-DK">Vis abonnementsindikator</label>
             <label lang="el-GR">Εμφάνιση δείκτη συνδρομής</label>
             <label lang="hr-HR">Prikaži indikator pretplate</label>
+            <label lang="et-EE">Kuva tellimuse indikaator</label>
             <helpText>Shows a subscription indicator on the product detail page of a subscription product.</helpText>
             <helpText lang="de-DE">Zeigt einen Abonnementhinweis auf der Produktdetailseite an.</helpText>
             <helpText lang="nl-NL">Toont een abonnement indicator op de productpagina van een abonnement product.</helpText>
@@ -2308,6 +2421,7 @@
             <helpText lang="da-DK">Viser en abonnementsindikator på produktdetaljesiden for et abonnementsprodukt.</helpText>
             <helpText lang="el-GR">Εμφανίζει έναν δείκτη συνδρομής στη σελίδα λεπτομερειών ενός προϊόντος συνδρομής.</helpText>
             <helpText lang="hr-HR">Prikazuje indikator pretplate na stranici s detaljima proizvoda koji je dio pretplate.</helpText>
+            <helpText lang="et-EE">Kuvab tellimuse indikaatori tellimustootes toote detailide lehel.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowAddressEditing</name>
@@ -2328,6 +2442,7 @@
             <label lang="da-DK">Tillad kunder at redigere fakturerings- og leveringsadresser for aktive abonnementer</label>
             <label lang="el-GR">Επιτρέψτε στους πελάτες να επεξεργάζονται τις διευθύνσεις χρέωσης και αποστολής για ενεργές συνδρομές</label>
             <label lang="hr-HR">Dopusti korisnicima uređivanje adrese za naplatu i dostavu kod aktivnih pretplata</label>
+            <label lang="et-EE">Luba klientidel redigeerida arve- ja tarneadresse aktiivsete tellimuste jaoks</label>
             <helpText>If enabled, customers are allowed to edit their billing and shipping addresses in the shop. Please consider that no new shipping costs will be calculated for modified addresses. Countries are not allowed to be edited.</helpText>
             <helpText lang="de-DE">Wenn aktiv, dürfen Kunden ihre Rechnungs- und Lieferadressen im Shop bearbeiten. Bitte beachten Sie, dass für geänderte Adressen keine neuen Versandkosten berechnet werden. Länder dürfen nicht bearbeitet werden.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun factuur- en verzendadres in de shop bewerken. Houd er rekening mee dat er geen nieuwe verzendkosten worden berekend voor gewijzigde adressen. Landen mogen niet worden bewerkt.</helpText>
@@ -2344,6 +2459,7 @@
             <helpText lang="da-DK">Hvis aktiveret, kan kunder redigere deres fakturerings- og leveringsadresser i butikken. Bemærk venligst, at der ikke vil blive beregnet nye forsendelsesomkostninger for ændrede adresser. Lande må ikke redigeres.</helpText>
             <helpText lang="el-GR">Εάν ενεργοποιηθεί, επιτρέπει στους πελάτες να επεξεργάζονται τις διευθύνσεις χρέωσης και αποστολής στο κατάστημα. Παρακαλώ λάβετε υπόψη ότι δεν θα υπολογιστούν νέες χρεώσεις αποστολής για τροποποιημένες διευθύνσεις. Οι χώρες δεν επιτρέπεται να τροποποιηθούν.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, korisnici mogu uređivati adrese za naplatu i dostavu u trgovini. Imajte na umu da se za izmijenjene adrese ne izračunavaju novi troškovi dostave. Zemlju nije moguće mijenjati.</helpText>
+            <helpText lang="et-EE">Kui lubatud, saavad kliendid oma arve- ja tarneadresse poes redigeerida. Palun arvesta, et muudetud aadresside puhul uusi tarnekulusid ei arvutata. Riike ei lubata redigeerida.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowPauseResume</name>
@@ -2364,6 +2480,7 @@
             <label lang="da-DK">Tillad kunder at sætte aktive abonnementer på pause og genoptage dem</label>
             <label lang="el-GR">Επιτρέψτε στους πελάτες να παύσουν και να επανεκκινήσουν τις τρέχουσες συνδρομές</label>
             <label lang="hr-HR">Dopusti korisnicima pauziranje i ponovno aktiviranje pretplata</label>
+            <label lang="et-EE">Luba klientidel peatada ja jätkata aktiivseid tellimusi</label>
             <helpText>If enabled, customers are allowed to pause and also resume their subscriptions in their account.</helpText>
             <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden ihre Abonnements in ihrem Konto pausieren und auch fortsetzen.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten hun abonnementen onderbreken en hervatten in hun account.</helpText>
@@ -2380,6 +2497,7 @@
             <helpText lang="da-DK">Hvis aktiveret, kan kunderne sætte deres abonnementer på pause og også genoptage dem i deres konto.</helpText>
             <helpText lang="el-GR">Αν είναι ενεργοποιημένο, οι πελάτες μπορούν να παύσουν και να επανεκκινήσουν τις συνδρομές τους στον λογαριασμό τους.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, korisnici mogu pauzirati i ponovno aktivirati svoje pretplate unutar korisničkog računa.</helpText>
+            <helpText lang="et-EE">Kui lubatud, saavad kliendid oma tellimusi oma kontol peatada ja jätkata.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowSkip</name>
@@ -2400,6 +2518,7 @@
             <label lang="da-DK">Tillad kunder at springe en kommende fornyelse af abonnementet over</label>
             <label lang="el-GR">Επιτρέψτε στους πελάτες να παραλείπουν μια επερχόμενη ανανέωση συνδρομής</label>
             <label lang="hr-HR">Dopusti korisnicima preskakanje nadolazeće obnove pretplate</label>
+            <label lang="et-EE">Luba klientidel vahele jätta eelseisev tellimuse pikendamine</label>
             <helpText>If enabled, customers are allowed to skip an upcoming renewal of a running subscription. This also takes the last notice period into account.</helpText>
             <helpText lang="de-DE">Wenn diese Option aktiviert ist, können Kunden eine bevorstehende Verlängerung eines laufenden Abonnements überspringen. Dabei wird auch die letzte Kündigungsfrist berücksichtigt.</helpText>
             <helpText lang="nl-NL">Indien ingeschakeld, mogen klanten een aanstaande verlenging van een lopend abonnement overslaan. Hierbij wordt ook rekening gehouden met de laatste opzegtermijn.</helpText>
@@ -2416,6 +2535,7 @@
             <helpText lang="da-DK">Hvis aktiveret, kan kunderne springe en kommende fornyelse af et aktivt abonnement over. Dette tager også den sidste varslingsperiode i betragtning.</helpText>
             <helpText lang="el-GR">Αν είναι ενεργοποιημένο, οι πελάτες μπορούν να παραλείψουν μια επερχόμενη ανανέωση μιας τρέχουσας συνδρομής. Αυτό λαμβάνει επίσης υπόψη την τελευταία προθεσμία ειδοποίησης.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, korisnici mogu preskočiti jednu nadolazeću obnovu aktivne pretplate. U obzir se uzima i posljednji rok za otkazivanje.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, võivad kliendid jätta vahele käimasoleva tellimuse eelseisva uuendamise. See võtab arvesse ka viimast etteteatamistähtaega.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionSkipRenewalsOnFailedPayments</name>
@@ -2436,6 +2556,7 @@
             <label lang="da-DK">Spring abonnement fornyelse over, hvis betalingen mislykkes</label>
             <label lang="el-GR">Παραλείψτε την ανανέωση συνδρομής αν η πληρωμή αποτύχει</label>
             <label lang="hr-HR">Preskoči obnovu pretplate ako plaćanje ne uspije</label>
+            <label lang="et-EE">Jäta tellimuse uuendamine vahele, kui makse ebaõnnestub</label>
             <helpText>If skipped, the plugin will not create new orders on subscription renewals, if the payment was not successful. If not skipped, then a new order is created and the customer can pay again within Shopware.</helpText>
             <helpText lang="de-DE">Wenn es übersprungen wird, erstellt das Plugin keine neuen Bestellungen bei Abonnementverlängerungen, wenn die Zahlung nicht erfolgreich war. Wenn nicht übersprungen, wird eine neue Bestellung erstellt und der Kunde kann innerhalb von Shopware erneut bezahlen.</helpText>
             <helpText lang="nl-NL">Indien overgeslagen, zal de plug-in geen nieuwe bestellingen maken bij abonnementsverlengingen, als de betaling niet succesvol was. Indien niet overgeslagen, dan wordt er een nieuwe bestelling aangemaakt en kan de klant opnieuw betalen binnen Shopware.</helpText>
@@ -2452,6 +2573,7 @@
             <helpText lang="da-DK">Hvis oversprunget, vil plugin'et ikke oprette nye ordrer ved abonnement fornyelser, hvis betalingen ikke var succesfuld. Hvis ikke oversprunget, så oprettes en ny ordre, og kunden kan betale igen inden for Shopware.</helpText>
             <helpText lang="el-GR">Αν παραλειφθεί, το πρόσθετο δεν θα δημιουργήσει νέες παραγγελίες κατά την ανανέωση των συνδρομών, αν η πληρωμή δεν ήταν επιτυχής. Αν δεν παραλειφθεί, τότε δημιουργείται νέα παραγγελία και ο πελάτης μπορεί να πληρώσει ξανά στο Shopware.</helpText>
             <helpText lang="hr-HR">Ako je omogućeno, dodatak neće kreirati novu narudžbu kod obnove pretplate ako plaćanje nije bilo uspješno. Ako nije omogućeno, nova narudžba će biti kreirana i korisnik može ponovno izvršiti plaćanje putem Shopware-a.</helpText>
+            <helpText lang="et-EE">Kui see vahele jäetakse, ei loo plugin uusi tellimusi tellimuse uuendamisel, kui makse ei õnnestunud. Kui ei jäeta vahele, siis luuakse uus tellimus ja klient saab uuesti maksta Shopware'is.</helpText>
         </input-field>
         <input-field type="int">
             <name>subscriptionsReminderDays</name>
@@ -2472,6 +2594,7 @@
             <label lang="da-DK">Påmindelsesperiode før fornyelse (dage)</label>
             <label lang="el-GR">Περίοδος υπενθύμισης πριν από την ανανέωση (ημέρες)</label>
             <label lang="hr-HR">Razdoblje podsjetnika prije obnove (u danima)</label>
+            <label lang="et-EE">Meeldetuletuse periood enne uuendamist (päevad)</label>
             <helpText>Set the days in prior to the renewal for sending renewal reminder events in the system (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="de-DE">Legen Sie die Tage vor der Verlängerung für das Senden von Verlängerungs-Erinnerungsereignissen im System fest (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="nl-NL">Stel de dagen voorafgaand aan de verlenging in voor het verzenden van herinneringsgebeurtenissen in het systeem (Flow Builder, Business Events, ...)</helpText>
@@ -2488,6 +2611,7 @@
             <helpText lang="da-DK">Indstil antal dage før fornyelse for at sende påmindelsesbegivenheder i systemet (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="el-GR">Ορίστε τις ημέρες πριν από την ανανέωση για την αποστολή γεγονότων υπενθύμισης ανανέωσης στο σύστημα (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="hr-HR">Postavite broj dana unaprijed kada se šalje podsjetnik za obnovu pretplate putem sustava (Flow Builder, Business Events i sl.).</helpText>
+            <helpText lang="et-EE">Määra süsteemis (Flow Builder, Business Events jne) uuendamise meeldetuletuste saatmise päevad enne uuendamist.</helpText>
         </input-field>
         <input-field type="int">
             <name>subscriptionsCancellationDays</name>
@@ -2508,6 +2632,7 @@
             <label lang="da-DK">Seneste varslingsperiode før fornyelse (dage)</label>
             <label lang="el-GR">Τελευταία προθεσμία ειδοποίησης πριν από την ανανέωση (ημέρες)</label>
             <label lang="hr-HR">Najkasniji rok za otkazivanje prije obnove (u danima)</label>
+            <label lang="et-EE">Viimane etteteatamistähtaeg enne pikendamist (päevades)</label>
             <helpText>Set a notice period for customers before renewing the subscription. If a subscription renews on Friday and you use "2", then it can be cancelled or paused with latest Wednesday. Use "0" to always allow cancellations.</helpText>
             <helpText lang="de-DE">Legen Sie eine Kündigungsfrist für Verlänägerungen von Abonnements fest. Wenn sich ein Abonnement am Freitag verlängert und Sie "2" verwenden, kann es bis spätestens Mittwoch gekündigt oder pausiert werden. Verwenden Sie "0", um Stornierungen immer zuzulassen.</helpText>
             <helpText lang="nl-NL">Stel een opzegtermijn in voor klanten voordat ze het abonnement verlengen. Als een abonnement op vrijdag wordt verlengd en je gebruikt "2", dan kan het uiterlijk woensdag worden opgezegd of onderbroken. Gebruik "0" om annuleringen altijd toe te staan</helpText>
@@ -2524,6 +2649,7 @@
             <helpText lang="da-DK">Indstil en varslingsperiode for kunderne før fornyelse af abonnementet. Hvis et abonnement fornyes på fredag og du bruger "2", så kan det annulleres eller sættes på pause senest onsdag. Brug "0" for altid at tillade annulleringer.</helpText>
             <helpText lang="el-GR">Ορίστε μια προθεσμία ειδοποίησης για τους πελάτες πριν από την ανανέωση της συνδρομής. Αν μια συνδρομή ανανεώνεται την Παρασκευή και χρησιμοποιείτε "2", τότε μπορεί να ακυρωθεί ή να σταματήσει με την τελευταία Τετάρτη. Χρησιμοποιήστε "0" για να επιτρέψετε πάντα τις ακυρώσεις.</helpText>
             <helpText lang="hr-HR">Postavite rok do kada korisnici mogu otkazati pretplatu prije njezine obnove. Ako se pretplata obnavlja u petak, a postavite vrijednost "2", korisnik je može otkazati najkasnije do srijede. Postavite "0" za uvijek dopušteno otkazivanje.</helpText>
+            <helpText lang="et-EE">Määra etteteatamistähtaeg klientidele enne tellimuse uuendamist. Kui tellimus uuendatakse reedel ja kasutad "2", siis saab tellimuse tühistada või peatada hiljemalt kolmapäeval. Kasuta "0", et alati lubada tühistamisi.</helpText>
         </input-field>
     </card>
 
@@ -2544,6 +2670,7 @@
         <title lang="da-DK">Afrunding</title>
         <title lang="el-GR">Στρογγυλοποίηση</title>
         <title lang="hr-HR">Zaokruživanje</title>
+        <title lang="et-EE">Ümardamine</title>
         <input-field type="bool">
             <name>fixRoundingDiffEnabled</name>
             <label>Create line item in Mollie Dashboard</label>
@@ -2562,6 +2689,7 @@
             <label lang="da-DK">Opret linjepost i Mollie Dashboard</label>
             <label lang="el-GR">Δημιουργία στοιχείου γραμμής στο Mollie Dashboard</label>
             <label lang="hr-HR">Kreiraj stavku u Mollie nadzornoj ploči</label>
+            <label lang="et-EE">Loo rida Mollie töölaual</label>
             <defaultValue>false</defaultValue>
         </input-field>
         <input-field type="text">
@@ -2582,6 +2710,7 @@
             <label lang="da-DK">Navn på linjepost (valgfrit)</label>
             <label lang="el-GR">Όνομα στοιχείου γραμμής (προαιρετικό)</label>
             <label lang="hr-HR">Naziv stavke (neobavezno)</label>
+            <label lang="et-EE">Reaelemendi nimi (valikuline)</label>
             <helpText>Set a custom name for your separate line item. This helps if you need to identify it in another system.</helpText>
             <helpText lang="de-DE">Lege einen benutzerdefinierten Namen für die separate Position fest. Dies hilft, wenn diese in einem anderen System identifiert werden muss.</helpText>
             <helpText lang="nl-NL">Stel een aangepaste naam in voor uw afzonderlijke regelitem. Dit is handig als u het in een ander systeem moet identificeren.</helpText>
@@ -2598,6 +2727,7 @@
             <helpText lang="da-DK">Indstil et tilpasset navn for din separate linjepost. Dette hjælper, hvis du skal identificere den i et andet system.</helpText>
             <helpText lang="el-GR">Ορίστε ένα προσαρμοσμένο όνομα για ξεχωριστό στοιχείο γραμμής. Αυτό βοηθά αν χρειαστεί να το αναγνωρίσετε σε ένα άλλο σύστημα.</helpText>
             <helpText lang="hr-HR">Postavite prilagođeni naziv za ovu pojedinačnu stavku. Korisno za identifikaciju u drugom sustavu.</helpText>
+            <helpText lang="et-EE">Määra oma eraldi kirje jaoks kohandatud nimi. See on abiks, kui pead seda teises süsteemis identifitseerima.</helpText>
         </input-field>
         <input-field type="text">
             <name>fixRoundingDiffSKU</name>
@@ -2617,6 +2747,7 @@
             <label lang="da-DK">SKU for linjepost (valgfrit)</label>
             <label lang="el-GR">SKU στοιχείου γραμμής (προαιρετικό)</label>
             <label lang="hr-HR">SKU stavke (neobavezno)</label>
+            <label lang="et-EE">Reaelemendi SKU (valikuline)</label>
             <helpText>Set a custom SKU value for your separate line item. This helps if you need to identify it in another system.</helpText>
             <helpText lang="de-DE">Lege einen benutzerdefinierten SKU Wert für die separate Position fest. Dies hilft, wenn diese in einem anderen System identifiert werden muss.</helpText>
             <helpText lang="nl-NL">Stel een aangepaste SKU in voor uw afzonderlijke regelitem. Dit is handig als u het in een ander systeem moet identificeren.</helpText>
@@ -2633,6 +2764,7 @@
             <helpText lang="da-DK">Indstil en tilpasset SKU-værdi for din separate linjepost. Dette hjælper, hvis du skal identificere den i et andet system.</helpText>
             <helpText lang="el-GR">Ορίστε μια προσαρμοσμένη τιμή SKU για ξεχωριστό στοιχείο γραμμής. Αυτό βοηθά αν χρειαστεί να το αναγνωρίσετε σε ένα άλλο σύστημα.</helpText>
             <helpText lang="hr-HR">Postavite prilagođeni SKU za ovu pojedinačnu stavku. Korisno za identifikaciju u drugom sustavu.</helpText>
+            <helpText lang="et-EE">Määra oma eraldi reaelemendi jaoks kohandatud SKU väärtus. See aitab, kui pead seda teises süsteemis tuvastama.</helpText>
         </input-field>
         <component name="mollie-pluginconfig-section-rounding">
             <name>molliePluginConfigSectionRounding</name>
@@ -2656,6 +2788,7 @@
         <title lang="da-DK">Javascript</title>
         <title lang="el-GR">Javascript</title>
         <title lang="hr-HR">Javascript</title>
+        <title lang="et-EE">Javascript</title>
         <input-field type="bool">
             <name>useShopwareJavascript</name>
             <label>Use Shopware default Javascript in Storefront (requires manual compilation)</label>
@@ -2674,6 +2807,7 @@
             <label lang="da-DK">Brug Shopware standard Javascript i butiksvinduet (kræver manuel kompilering)</label>
             <label lang="el-GR">Χρησιμοποιήστε το προεπιλεγμένο Javascript του Shopware στο ηλεκτρονικό κατάστημα (απαιτεί χειροκίνητη μεταγλώττιση)</label>
             <label lang="hr-HR">Koristi zadani Shopware JavaScript u Storefrontu (zahtijeva ručnu kompilaciju)</label>
+            <label lang="et-EE">Kasutage Shopware'i vaikimisi Javascript'i kaupluses (vajalik käsitsi kompilatsioon)</label>
             <defaultValue>false</defaultValue>
             <helpText>You can also bring back Mollie inside the "all.js" of the theme directly. This requires that you rebuild the Storefront on your own.</helpText>
             <helpText lang="de-DE">Sie können Mollie auch direkt in die "all.js" des Themes zurückbringen. Dies erfordert, dass Sie die Storefront selbst neu erstellen.</helpText>
@@ -2691,6 +2825,7 @@
             <helpText lang="da-DK">Du kan også bringe Mollie tilbage i "all.js" i temaet direkte. Dette kræver, at du genopbygger butiksvinduet selv.</helpText>
             <helpText lang="el-GR">Μπορείτε επίσης να επαναφέρετε τη Mollie απευθείας μέσα στο "all.js" του θέματος. Αυτό απαιτεί να ξαναχτίσετε το ηλεκτρονικό κατάστημα μόνοι σας.</helpText>
             <helpText lang="hr-HR">Mollie možete uključiti i unutar "all.js" datoteke teme. Ovo zahtijeva ručnu rekonstrukciju Storefront-a.</helpText>
+            <helpText lang="et-EE">Samuti saate tagasi tuua Mollie teema "all.js"-s otse. See eeldab, et koostad Shopware'i ise ümber.</helpText>
         </input-field>
     </card>
 
