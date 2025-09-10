@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Praegu valitud makseviis ei ole saadaval tellimustootede jaoks.",
+        "mollie-payments-cart-error-mixedcart": "Sinu ostukorvis on mitu eset koos tellimustoodetega. Pane tähele, et saad korraga osta ainult 1 tellimustoote.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Kõik makseviisid ei pruugi olla saadaval tellimustootede tellimisel.",
+        "mollie-payments-cart-guest-account": "Külastajakontosid ei saa kasutada tellimuste tellimiseks."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Praegu valitud makseviis ei ole saadaval tellimustootede jaoks.",
+        "mollie-payments-cart-error-mixedcart": "Sinu ostukorvis on mitu eset koos tellimustoodetega. Pane tähele, et saad korraga osta ainult 1 tellimustoote.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Kõik makseviisid ei pruugi olla saadaval tellimustootede tellimisel.",
+        "mollie-payments-cart-guest-account": "Külastajakontosid ei saa kasutada tellimuste tellimiseks."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Aegumiskuupäev",
+                "cardHolderLabel": "Nimi kaardil",
+                "cardNumberLabel": "Kaardi number",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Makse on turvatud ja tagatud",
+                "headLine": "Sisesta oma kaardi teave",
+                "saveCardDetailLabel": "Salvesta kaardi andmed tulevaste maksete jaoks"
+            },
+            "ideal": {
+                "selectBank": "Vali pank"
+            },
+            "pos": {
+                "selectTerminal": "Vali terminal"
+            },
+            "mandate": {
+                "sectionTitle": "Salvestatud kaardid",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Sinu kaart on edukalt kustutatud",
+                "deleteErrorMessage": "Sinu kaardi eemaldamisel tekkis probleem",
+                "newCard": "Uus kaart",
+                "remove": "Eemalda",
+                "subscriptionBadge": "Telli"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Tühista",
+                "cardSubscription": "Seda kaarti kasutatakse tellimuse jaoks. Enne kaardi eemaldamist tühista palun tellimus.",
+                "deleteButton": "Kustuta",
+                "deleteConfirmation": "Kas oled kindel, et soovid kustutada?",
+                "title": "Kustutamise kinnitus"
+            },
+            "phoneField": {
+                "headLine": "Telefoninumber",
+                "phoneErrorMessage": "Telefoninumber on kohustuslik. Näiteks +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Maksa teise makseviisi kaudu",
+                "buttonReturnToShop": "Tagasi poodi",
+                "error": "Makse ebaõnnestus",
+                "failed": "Makse on ebaõnnestunud või tühistatud. Sind suunatakse Mollie lehele, kus saad oma makse lõpetada valitud meetodiga "
+            },
+            "redirecting": "Suuname sind edasi: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Vahekokkuvõte",
+                "captionTaxes": "Maksud",
+                "paymentError": "Makse Apple Pay'ga ebaõnnestus."
+            },
+            "paypalExpress": {
+                "paymentError": "Makse Paypal Expressiga ebaõnnestus."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "muuda arvete aadressi",
+                "btnEditShippingAddress": "muuda kohaletoimetamise aadressi",
+                "cancelSubscription": "Tellimus on tühistatud",
+                "errorCancelSubscription": "Tellimust ei saa tühistada, kuna ilmnes viga. Palun võta meiega ühendust.",
+                "errorPause": "Tellimuse peatamisel tekkis viga",
+                "errorResume": "Tellimuse jätkamisel tekkis viga",
+                "errorSkip": "Tellimuse vahelejätmisel tekkis viga",
+                "errorUpdateAddress": "Aadressi uuendamisel tekkis viga",
+                "errorUpdatePayment": "Makseviisi uuendamisel tekkis viga",
+                "headlineBillingAddress": "Arve aadress",
+                "headlineShippingAddress": "Kohaletoimetamise aadress",
+                "mollieSubscriptionAmount": "Summa",
+                "mollieSubscriptionCancel": "Tühista tellimus",
+                "mollieSubscriptionCancelUntil": "Tühistamine võimalik kuni",
+                "mollieSubscriptionContextMenuReorder": "Korda tellimust",
+                "mollieSubscriptionId": "ID",
+                "mollieSubscriptionNextPayment": "Järgmine makse",
+                "mollieSubscriptionPause": "Peata tellimus",
+                "mollieSubscriptionResume": "Jätka tellimust",
+                "mollieSubscriptionSkip": "Jäta tellimus vahele",
+                "mollieSubscriptionUpdatePayment": "Uuenda makset",
+                "mollieSubscriptionsHeadline": "Tellimus:",
+                "mollieSubscriptionsInfoEmpty": "Sul ei ole veel tellimusi.",
+                "mollieSubscriptionsLink": "Tellimused",
+                "mollieSubscriptionsTitle": "Tellimused",
+                "mollieSubscriptionsWelcome": "Sinu viimased tellimused:",
+                "orderActionHide": "Peida",
+                "orderActionView": "Vaata",
+                "shippingEqualToBilling": "Võrdne arve aadressiga",
+                "successPause": "Sinu tellimus on peatatud",
+                "successResume": "Sinu tellimus taastatakse nüüd",
+                "successSkip": "Sinu tellimus on vahele jäetud",
+                "successUpdateAddress": "Sinu aadress on edukalt uuendatud",
+                "successUpdatePayment": "Sinu makseviis on edukalt uuendatud"
+            },
+            "options": {
+                "everyDay": "Iga päev",
+                "everyDays": "Iga %value% päeva järel",
+                "everyMonth": "Iga kuu",
+                "everyMonths": "Iga %value% kuu järel",
+                "everyWeek": "Iga nädal",
+                "everyWeeks": "Iga %value% nädala järel",
+                "repetitionCount": "%value% kord(a)"
+            },
+            "product": {
+                "addToCartText": "Telli",
+                "information": "Tellimustooted"
+            }
+        },
+        "testMode": {
+            "label": "Testrežiim"
+        }
+    }
+}

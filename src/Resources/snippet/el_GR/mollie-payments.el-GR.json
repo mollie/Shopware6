@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Η τρέχουσα επιλεγμένη μέθοδος πληρωμής δεν είναι διαθέσιμη για προϊόντα συνδρομής.",
+        "mollie-payments-cart-error-mixedcart": "Το καλάθι σας περιέχει πολλαπλά αντικείμενα σε συνδυασμό με αντικείμενα συνδρομής. Παρακαλούμε σημειώστε ότι μπορείτε να αγοράσετε μόνο 1 αντικείμενο συνδρομής κάθε φορά.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Κάποιες μέθοδοι πληρωμής δεν είναι διαθέσιμες κατά την παραγγελία προϊόντων συνδρομής.",
+        "mollie-payments-cart-guest-account": "Οι λογαριασμοί επισκέπτη δεν μπορούν να χρησιμοποιηθούν για παραγγελίες συνδρομής."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Η τρέχουσα επιλεγμένη μέθοδος πληρωμής δεν είναι διαθέσιμη για προϊόντα συνδρομής.",
+        "mollie-payments-cart-error-mixedcart": "Το καλάθι σας περιέχει πολλαπλά αντικείμενα σε συνδυασμό με αντικείμενα συνδρομής. Παρακαλούμε σημειώστε ότι μπορείτε να αγοράσετε μόνο 1 αντικείμενο συνδρομής κάθε φορά.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Κάποιες μέθοδοι πληρωμής δεν είναι διαθέσιμες κατά την παραγγελία προϊόντων συνδρομής.",
+        "mollie-payments-cart-guest-account": "Οι λογαριασμοί επισκέπτη δεν μπορούν να χρησιμοποιηθούν για παραγγελίες συνδρομής."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Ημερομηνία λήξης",
+                "cardHolderLabel": "Όνομα στην κάρτα",
+                "cardNumberLabel": "Αριθμός κάρτας",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Η πληρωμή είναι ασφαλής και υποστηρίζεται από",
+                "headLine": "Εισάγετε τις πληροφορίες της κάρτας σας",
+                "saveCardDetailLabel": "Αποθήκευση στοιχείων κάρτας για μελλοντικές πληρωμές"
+            },
+            "ideal": {
+                "selectBank": "Επιλέξτε τράπεζα"
+            },
+            "pos": {
+                "selectTerminal": "Επιλέξτε τερματικό"
+            },
+            "mandate": {
+                "sectionTitle": "Αποθηκευμένες κάρτες",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Η κάρτα σας διαγράφηκε με επιτυχία",
+                "deleteErrorMessage": "Παρουσιάστηκε πρόβλημα κατά την αφαίρεση της κάρτας σας",
+                "newCard": "Νέα κάρτα",
+                "remove": "Αφαίρεση",
+                "subscriptionBadge": "Συνδρομή"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Ακύρωση",
+                "cardSubscription": "Αυτή η κάρτα χρησιμοποιείται για μια συνδρομή. Παρακαλούμε ακυρώστε πρώτα τη συνδρομή πριν αφαιρέσετε αυτή την κάρτα.",
+                "deleteButton": "Διαγραφή",
+                "deleteConfirmation": "Είστε σίγουροι ότι θέλετε να διαγράψετε;",
+                "title": "Επιβεβαίωση διαγραφής"
+            },
+            "phoneField": {
+                "headLine": "Αριθμός τηλεφώνου",
+                "phoneErrorMessage": "Απαιτείται αριθμός τηλεφώνου. Για παράδειγμα +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Πληρώστε με μια διαφορετική μέθοδο πληρωμής",
+                "buttonReturnToShop": "Επιστροφή στο κατάστημα",
+                "error": "Η πληρωμή απέτυχε",
+                "failed": "Η πληρωμή απέτυχε ή ακυρώθηκε. Θα ανακατευθυνθείτε στο Mollie, όπου μπορείτε να ολοκληρώσετε την πληρωμή σας με τη μέθοδο της επιλογής σας."
+            },
+            "redirecting": "Ανακατεύθυνση σε: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Υποσύνολο",
+                "captionTaxes": "Φόροι",
+                "paymentError": "Η πληρωμή με Apple Pay απέτυχε."
+            },
+            "paypalExpress": {
+                "paymentError": "Η πληρωμή με Paypal Express απέτυχε."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "Επεξεργασία διεύθυνσης χρέωσης",
+                "btnEditShippingAddress": "Επεξεργασία διεύθυνσης αποστολής",
+                "cancelSubscription": "Η συνδρομή έχει ακυρωθεί",
+                "errorCancelSubscription": "Η συνδρομή δεν μπόρεσε να ακυρωθεί λόγω σφάλματος. Παρακαλώ επικοινωνήστε με την υποστήριξή μας.",
+                "errorPause": "Προέκυψε σφάλμα κατά τη διακοπή της συνδρομής σας",
+                "errorResume": "Προέκυψε σφάλμα κατά την επαναφορά της συνδρομής σας",
+                "errorSkip": "Προέκυψε σφάλμα κατά την παράλειψη της συνδρομής σας",
+                "errorUpdateAddress": "Προέκυψε σφάλμα κατά την ενημέρωση της διεύθυνσής σας",
+                "errorUpdatePayment": "Προέκυψε σφάλμα κατά την ενημέρωση της μεθόδου πληρωμής σας",
+                "headlineBillingAddress": "Διεύθυνση χρέωσης",
+                "headlineShippingAddress": "Διεύθυνση αποστολής",
+                "mollieSubscriptionAmount": "Ποσό",
+                "mollieSubscriptionCancel": "Ακύρωση συνδρομής",
+                "mollieSubscriptionCancelUntil": "Δυνατότητα ακύρωσης μέχρι",
+                "mollieSubscriptionContextMenuReorder": "Επανάληψη συνδρομής",
+                "mollieSubscriptionId": "Αναγνωριστικό",
+                "mollieSubscriptionNextPayment": "Επόμενη πληρωμή στις",
+                "mollieSubscriptionPause": "Παύση συνδρομής",
+                "mollieSubscriptionResume": "Επαναφορά συνδρομής",
+                "mollieSubscriptionSkip": "Παράλειψη συνδρομής",
+                "mollieSubscriptionUpdatePayment": "Ενημέρωση πληρωμής",
+                "mollieSubscriptionsHeadline": "Συνδρομή:",
+                "mollieSubscriptionsInfoEmpty": "Δεν έχετε ακόμα συνδρομές.",
+                "mollieSubscriptionsLink": "Συνδρομές",
+                "mollieSubscriptionsTitle": "Συνδρομές",
+                "mollieSubscriptionsWelcome": "Οι πρόσφατες συνδρομές σας:",
+                "orderActionHide": "Απόκρυψη",
+                "orderActionView": "Προβολή",
+                "shippingEqualToBilling": "Ίδια με τη διεύθυνση χρέωσης",
+                "successPause": "Η συνδρομή σας έχει παγώσει",
+                "successResume": "Η συνδρομή σας θα συνεχιστεί τώρα",
+                "successSkip": "Η συνδρομή σας έχει παραληφθεί",
+                "successUpdateAddress": "Η διεύθυνση σας ενημερώθηκε επιτυχώς",
+                "successUpdatePayment": "Η μέθοδος πληρωμής σας ενημερώθηκε επιτυχώς"
+            },
+            "options": {
+                "everyDay": "Κάθε μέρα",
+                "everyDays": "Κάθε %value% ημέρες",
+                "everyMonth": "Κάθε μήνα",
+                "everyMonths": "Κάθε %value% μήνες",
+                "everyWeek": "Κάθε εβδομάδα",
+                "everyWeeks": "Κάθε %value% εβδομάδες",
+                "repetitionCount": "%value% φορά(ές)"
+            },
+            "product": {
+                "addToCartText": "Εγγράφομαι",
+                "information": "Προϊόν συνδρομής"
+            }
+        },
+        "testMode": {
+            "label": "Δοκιμαστική λειτουργία"
+        }
+    }
+}
