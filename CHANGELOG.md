@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added Icelandic language support
 - Added Lithuanian language support
 - Added Latvian language support
+- Added Romanian language support
 
 ## [4.18.0] - 2025-09-xx
 ### Added

@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Metoda de plată selectată în prezent nu este disponibilă pentru produsele de abonament.",
+        "mollie-payments-cart-error-mixedcart": "Coșul dvs. conține mai multe articole în combinație cu articole de abonament. Vă rugăm să rețineți că puteți achiziționa doar 1 articol de abonament per comandă.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nu toate metodele de plată sunt disponibile atunci când comandați produse de abonament.",
+        "mollie-payments-cart-guest-account": "Conturile de oaspeți nu pot fi folosite pentru comenzile de abonament."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Metoda de plată selectată în prezent nu este disponibilă pentru produsele de abonament.",
+        "mollie-payments-cart-error-mixedcart": "Coșul dvs. conține mai multe articole în combinație cu articole de abonament. Vă rugăm să rețineți că puteți achiziționa doar 1 articol de abonament deodată.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nu toate metodele de plată sunt disponibile atunci când comandați produse de abonament.",
+        "mollie-payments-cart-guest-account": "Conturile de oaspeți nu pot fi folosite pentru comenzile de abonament."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Data expirării",
+                "cardHolderLabel": "Numele de pe card",
+                "cardNumberLabel": "Numărul cardului",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Plata securizată și facilitată de",
+                "headLine": "Introduceți datele cardului",
+                "saveCardDetailLabel": "Salvați detaliile cardului pentru plăți viitoare"
+            },
+            "ideal": {
+                "selectBank": "Selectați banca"
+            },
+            "pos": {
+                "selectTerminal": "Selectați terminalul"
+            },
+            "mandate": {
+                "sectionTitle": "Carduri salvate",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Cardul dvs. a fost șters cu succes",
+                "deleteErrorMessage": "A apărut o problemă când ați încercat să ștergeți cardul dvs.",
+                "newCard": "Card nou",
+                "remove": "Eliminare",
+                "subscriptionBadge": "Abonament"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Anulați",
+                "cardSubscription": "Acest card este utilizat pentru un abonament. Vă rugăm să anulați mai întâi abonamentul înainte de a elimina acest card.",
+                "deleteButton": "Ștergeți",
+                "deleteConfirmation": "Sunteți sigur că doriți să eliminați cardul?",
+                "title": "Confirmați eliminarea"
+            },
+            "phoneField": {
+                "headLine": "Numărul de telefon",
+                "phoneErrorMessage": "Numărul de telefon este obligatoriu. De exemplu +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Plătiți cu o metodă de plată diferită",
+                "buttonReturnToShop": "Întoarceți-vă la magazin",
+                "error": "Plata a eșuat",
+                "failed": "Plata a eșuat sau a fost anulată. Veți fi redirecționat către Mollie, unde puteți finaliza plata cu metoda aleasă."
+            },
+            "redirecting": "Te redirecționăm către: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Subtotal",
+                "captionTaxes": "Taxe",
+                "paymentError": "Plata cu Apple Pay a eșuat."
+            },
+            "paypalExpress": {
+                "paymentError": "Plata cu PayPal Express a eșuat."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "editați adresa de facturare",
+                "btnEditShippingAddress": "editați adresa de livrare",
+                "cancelSubscription": "Abonamentul a fost anulat",
+                "errorCancelSubscription": "Abonamentul nu a putut fi anulat din cauza unei erori. Vă rugăm să contactați echipa noastră de suport.",
+                "errorPause": "A apărut o eroare când ați încercat să suspendați abonamentul dvs.",
+                "errorResume": "A apărut o eroare când ați încercat să reactivați abonamentul dvs.",
+                "errorSkip": "A apărut o eroare când ați încercat să amânați abonamentul dvs.",
+                "errorUpdateAddress": "A apărut o eroare când ați încercat să actualizați adresa dvs.",
+                "errorUpdatePayment": "A apărut o eroare când ați încercat să actualizați metoda de plată.",
+                "headlineBillingAddress": "Adresa de facturare",
+                "headlineShippingAddress": "Adresa de livrare",
+                "mollieSubscriptionAmount": "Sumă",
+                "mollieSubscriptionCancel": "Anulați abonamentul",
+                "mollieSubscriptionCancelUntil": "Anularea este posibilă până la",
+                "mollieSubscriptionContextMenuReorder": "Abonament repetat",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Următoarea plată pe",
+                "mollieSubscriptionPause": "Pauza abonamentului",
+                "mollieSubscriptionResume": "Reluarea abonamentului",
+                "mollieSubscriptionSkip": "Omiterea abonamentului",
+                "mollieSubscriptionUpdatePayment": "Actualizați plata",
+                "mollieSubscriptionsHeadline": "Abonament:",
+                "mollieSubscriptionsInfoEmpty": "Încă nu aveți abonamente.",
+                "mollieSubscriptionsLink": "Abonamente",
+                "mollieSubscriptionsTitle": "Abonamente",
+                "mollieSubscriptionsWelcome": "Abonamentele dvs recente:",
+                "orderActionHide": "Ascundeți",
+                "orderActionView": "Vizualizați",
+                "shippingEqualToBilling": "Egal cu adresa de facturare",
+                "successPause": "Abonamentul dvs. a fost suspendat",
+                "successResume": "Abonamentul dvs. va fi acum reluat",
+                "successSkip": "Abonamentul dvs. a fost sărit",
+                "successUpdateAddress": "Adresa dvs. a fost actualizată cu succes",
+                "successUpdatePayment": "Metoda de plată a fost actualizată cu succes"
+            },
+            "options": {
+                "everyDay": "În fiecare zi",
+                "everyDays": "La fiecare %value% zile",
+                "everyMonth": "În fiecare lună",
+                "everyMonths": "La fiecare %value% luni",
+                "everyWeek": "În fiecare săptămână",
+                "everyWeeks": "La fiecare %value% săptămâni",
+                "repetitionCount": "%value% dată(î)"
+            },
+            "product": {
+                "addToCartText": "Abonați-vă",
+                "information": "Produs de abonament"
+            }
+        },
+        "testMode": {
+            "label": "Mod de test"
+        }
+    }
+}
