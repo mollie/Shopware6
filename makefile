@@ -7,7 +7,11 @@ PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.js
 
 NODE_VERSION:=$(shell node -v)
 
-
+ifndef nossl
+	EXPORT_CMD := export NODE_OPTIONS=--openssl-legacy-provider &&
+else
+	EXPORT_CMD :=
+endif
 
 help:
 	@echo ""
@@ -37,7 +41,7 @@ prod: ##1 Installs all production dependencies
 
 dev: ##1 Installs all dev dependencies
 	@composer validate
-	composer install
+	composer install --ignore-platform-req=ext-amqp
 	npm install
 	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
@@ -65,19 +69,13 @@ build: ##2 Installs the plugin, and builds the artifacts using the Shopware buil
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
-ifndef nossl
-	# importan, first we run build wit 6.7 because it removes files from public/administration, the build before 6.7 does not removes them
+ifeq ($(use67),true)
 	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
-	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
-	cp ./config/.shopware-extension.yml .shopware-extension.yml
-	cd ../../.. && export NODE_OPTIONS=--openssl-legacy-provider && shopware-cli extension build custom/plugins/MolliePayments
+	cd ../../.. && $(EXPORT_CMD) shopware-cli extension build custom/plugins/MolliePayments
 endif
-ifeq ($(nossl),true)
-	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
-	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
 	cp ./config/.shopware-extension.yml .shopware-extension.yml
-	cd ../../.. && shopware-cli extension build custom/plugins/MolliePayments
-endif
+	cd ../../.. && $(EXPORT_CMD) shopware-cli extension build custom/plugins/MolliePayments
+
 	rm -f .shopware-extension.yml
 	# -----------------------------------------------------
 	# -----------------------------------------------------
@@ -140,6 +138,9 @@ phpunit: ##3 Starts all PHPUnit Tests
 phpintegration: ##3 Starts all PHPUnit Tests
 	#we call "real" phpunit, it seems like in sw 6.4 the vendor/bin/phpunit is overwritten by shopware
 	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
+
+behat:
+	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
