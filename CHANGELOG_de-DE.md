@@ -7,8 +7,9 @@
 - Unterstützung für die lettische Sprache hinzugefügt
 - Unterstützung für die rumänische Sprache hinzugefügt
 - Unterstützung für die slowakische Sprache hinzugefügt
+- PayByBank kann jetzt auch für Abonnements verwendet werden.
 
-## [4.18.0] - 2025-09-xx
+## [4.18.0] - 2025-09-08
 ### Hinzugefügt
 - Die Zahlungsmethode Bizum ist jetzt für Mollie Payments verfügbar.
 
