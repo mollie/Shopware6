@@ -7,7 +7,7 @@ use Kiener\MolliePayments\Service\MollieApi\OrderItemsExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Payment\Remover\PaymentMethodRemover;
 use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\shopware\Component\Payment\SubscriptionAware;
+use Mollie\Shopware\Component\Payment\SubscriptionAware;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
