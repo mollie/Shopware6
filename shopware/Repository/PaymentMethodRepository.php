@@ -10,9 +10,9 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
     private PaymentMethodCollection $paymentMethods;
 
     /**
-     * @param array<PaymentHandler> $paymentMethods
+     * @param PaymentHandler[] $paymentMethods
      */
-    public function __construct(array $paymentMethods)
+    public function __construct(iterable $paymentMethods)
     {
         $this->paymentMethods = new PaymentMethodCollection($paymentMethods);
     }
