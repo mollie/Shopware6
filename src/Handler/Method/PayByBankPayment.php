@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Handler\Method;
 
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Mollie\Api\Types\PaymentMethod;
+use Mollie\Shopware\Component\Payment\SubscriptionAware;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -12,7 +13,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 /**
  * @final
  */
-class PayByBankPayment extends PaymentHandler implements BankTransfer
+class PayByBankPayment extends PaymentHandler implements BankTransfer, SubscriptionAware
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::PAYBYBANK;
     public const PAYMENT_METHOD_DESCRIPTION = 'Pay by Bank';

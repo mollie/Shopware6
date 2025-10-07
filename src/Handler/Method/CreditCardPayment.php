@@ -9,11 +9,12 @@ use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Types\PaymentMethod;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
+use Mollie\Shopware\Component\Payment\SubscriptionAware;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class CreditCardPayment extends PaymentHandler
+class CreditCardPayment extends PaymentHandler implements SubscriptionAware
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::CREDITCARD;
     public const PAYMENT_METHOD_DESCRIPTION = 'Card';

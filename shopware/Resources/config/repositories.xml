@@ -8,6 +8,11 @@
             <argument type="service" id="order_transaction.repository"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
+        <service id="Mollie\Shopware\Repository\PaymentMethodRepository">
+            <argument type="tagged" tag="shopware.payment.method"/>
+        </service>
+
+
 
     </services>
 </container>

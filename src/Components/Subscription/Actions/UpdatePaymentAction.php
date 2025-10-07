@@ -10,7 +10,6 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRep
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
-use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
@@ -21,6 +20,7 @@ use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
@@ -40,11 +40,12 @@ class UpdatePaymentAction extends BaseAction
      * @var OrderStatusConverter
      */
     private $statusConverter;
+    private PaymentMethodRepositoryInterface $paymentMethodRepository;
 
     /**
      * @throws \Exception
      */
-    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $routingBuilder, OrderStatusConverter $orderStatusConverter)
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger, MollieOrderPriceBuilder $priceBuilder, RoutingBuilder $routingBuilder, OrderStatusConverter $orderStatusConverter, PaymentMethodRepositoryInterface $paymentMethodRepository)
     {
         parent::__construct(
             $pluginSettings,
@@ -63,6 +64,7 @@ class UpdatePaymentAction extends BaseAction
         $this->priceBuilder = $priceBuilder;
         $this->routingBuilder = $routingBuilder;
         $this->statusConverter = $orderStatusConverter;
+        $this->paymentMethodRepository = $paymentMethodRepository;
     }
 
     /**
@@ -103,11 +105,12 @@ class UpdatePaymentAction extends BaseAction
         }
 
         $webhookUrl = $this->routingBuilder->buildSubscriptionPaymentUpdatedWebhook($subscriptionId);
-
+        $paymentMethods = $this->paymentMethodRepository->getSubscriptionPaymentMethods();
+        $paymentMethodNames = $paymentMethods->getNames();
         $payload = [
             'sequenceType' => 'first',
             'customerId' => $customerId,
-            'method' => SubscriptionRemover::ALLOWED_METHODS,
+            'method' => $paymentMethodNames,
             'amount' => $this->priceBuilder->build(0, 'EUR'),
             'description' => 'Update Subscription Payment: ' . $subscription->getDescription(),
             'redirectUrl' => $redirectUrl,
