@@ -7,7 +7,7 @@
 - Added Latvian language support
 - Added Romanian language support
 - added Slovak language support
-- Enable PayByBank for Subscription products
+- PayByBank is now available for subscriptions.
 
 ## [4.18.0] - 2025-09-08
 ### Added
