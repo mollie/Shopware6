@@ -26,20 +26,11 @@ use Shopware\Core\Framework\Context;
 
 class UpdatePaymentAction extends BaseAction
 {
-    /**
-     * @var MollieOrderPriceBuilder
-     */
-    private $priceBuilder;
+    private MollieOrderPriceBuilder $priceBuilder;
 
-    /**
-     * @var RoutingBuilder
-     */
-    private $routingBuilder;
+    private RoutingBuilder $routingBuilder;
 
-    /**
-     * @var OrderStatusConverter
-     */
-    private $statusConverter;
+    private OrderStatusConverter $statusConverter;
     private PaymentMethodRepositoryInterface $paymentMethodRepository;
 
     /**
