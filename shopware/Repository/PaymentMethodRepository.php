@@ -19,8 +19,6 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 
     public function getSubscriptionPaymentMethods(): PaymentMethodCollection
     {
-        $collection = new PaymentMethodCollection($this->paymentMethods);
-
-        return $collection->getSubscriptionPaymentMethods();
+        return $this->paymentMethods->getSubscriptionPaymentMethods();
     }
 }
