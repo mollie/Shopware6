@@ -161,6 +161,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
+            <argument type="service" id="Mollie\Shopware\Repository\PaymentMethodRepository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Subscription\Actions\RenewAction">
