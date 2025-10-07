@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Handler\Method\DirectDebitPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
+use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
@@ -37,6 +38,7 @@ class SubscriptionRemover extends PaymentMethodRemover
         PayPalPayment::PAYMENT_METHOD_NAME,
         DirectDebitPayment::PAYMENT_METHOD_NAME,
         TrustlyPayment::PAYMENT_METHOD_NAME,
+        PayByBankPayment::PAYMENT_METHOD_NAME,
     ];
 
     /**
