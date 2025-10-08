@@ -12,7 +12,7 @@ class ResumeAction extends BaseAction
     /**
      * @throws \Exception
      */
-    public function resumeSubscription(string $subscriptionId, Context $context): void
+    public function resumeSubscription(string $subscriptionId, \DateTimeInterface $today, Context $context): void
     {
         $subscription = $this->getRepository()->findById($subscriptionId, $context);
 
@@ -39,10 +39,15 @@ class ResumeAction extends BaseAction
 
         $metaData = $subscription->getMetadata();
 
+        $nextPaymentDate = $subscription->getNextPaymentAt() ?? $today;
+        if ($nextPaymentDate < $today) {
+            $nextPaymentDate = $today;
+        }
+
         // TODO, what if we are in the currently (cancelled) period
         $jsonPayload = $this->getPayloadBuilder()->buildRequestPayload(
             $subscription,
-            $metaData->getStartDate(),
+            $nextPaymentDate->format('Y-m-d'),
             (string) $metaData->getInterval(),
             $metaData->getIntervalUnit(),
             (int) $metaData->getTimes(),

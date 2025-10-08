@@ -232,9 +232,9 @@ class SubscriptionManager implements SubscriptionManagerInterface
     /**
      * @throws \Exception
      */
-    public function resumeSubscription(string $subscriptionId, Context $context): void
+    public function resumeSubscription(string $subscriptionId, \DateTimeInterface $today, Context $context): void
     {
-        $this->actionResume->resumeSubscription($subscriptionId, $context);
+        $this->actionResume->resumeSubscription($subscriptionId, $today, $context);
     }
 
     /**

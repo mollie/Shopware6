@@ -262,7 +262,7 @@ class AccountControllerBase extends AbstractStoreFrontController
         }
 
         try {
-            $this->subscriptionManager->resumeSubscription($swSubscriptionId, $context->getContext());
+            $this->subscriptionManager->resumeSubscription($swSubscriptionId, new \DateTime(), $context->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successResume'));
 
