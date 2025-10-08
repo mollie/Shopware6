@@ -46,7 +46,6 @@ dev: ##1 Installs all dev dependencies
 	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt install shopware-cli -y
 
 install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
 	@make prod -B
@@ -66,6 +65,7 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf ./src/Resources/public/mollie-payments.js
 
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt update -y && sudo apt install shopware-cli -y && sudo apt autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
