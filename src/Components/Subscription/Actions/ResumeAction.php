@@ -54,10 +54,12 @@ class ResumeAction extends BaseAction
             throw new \Exception('Resuming of the subscription is not possible because of its current status!');
         }
         $gateway = $this->getMollieGateway($subscription);
+        // We assume that a subscription was cancelled long time ago, and the next possible payment date is in the past, so we set a new one from today
         $nextPaymentDate = $today;
 
         $latestSubscriptionHistory = $this->getLatestSubscriptionHistory($subscription);
 
+        // doublecheck if there is a history for the subscription
         if ($latestSubscriptionHistory instanceof SubscriptionHistoryEntity) {
             $oldMollieSubscription = $gateway->getSubscription($latestSubscriptionHistory->getMollieId(), $subscription->getMollieCustomerId());
             /** @var \DateTimeInterface $oldStartDate */
@@ -65,10 +67,10 @@ class ResumeAction extends BaseAction
             [$oldInterval, $oldIntervalUnit] = explode(' ', $oldMollieSubscription->interval);
 
             $nextInterval = $this->intervalCalculator->getNextIntervalDate($oldStartDate, (int) $oldInterval, $oldIntervalUnit);
-
+            //we calculate the next possible payment date, based on the latest history entry
             /** @var \DateTimeInterface $nextPossiblePaymentDate */
             $nextPossiblePaymentDate = \DateTime::createFromFormat('Y-m-d', $nextInterval);
-
+            //if the next possible payment date is in the future, we use this instead of today
             if ($nextPossiblePaymentDate > $today) {
                 $nextPaymentDate = $nextPossiblePaymentDate;
             }
