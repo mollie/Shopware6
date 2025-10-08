@@ -8,6 +8,8 @@
 - Added Romanian language support
 - added Slovak language support
 - PayByBank is now available for subscriptions.
+- Fixed a bug preventing subscriptions from being restarted when the next payment date was in the future.
+
 ## [4.18.0] - 2025-09-08
 ### Added
 - Bizum Payment method is now available for Mollie Payments

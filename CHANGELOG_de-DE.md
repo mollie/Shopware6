@@ -8,6 +8,7 @@
 - Unterstützung für die rumänische Sprache hinzugefügt
 - Unterstützung für die slowakische Sprache hinzugefügt
 - PayByBank kann jetzt auch für Abonnements verwendet werden.
+- Das Problem wurde behoben, dass ein Abonnement nicht neu gestartet werden konnte, wenn das nächste Zahlungsdatum in der Zukunft lag.
 
 ## [4.18.0] - 2025-09-08
 ### Hinzugefügt
