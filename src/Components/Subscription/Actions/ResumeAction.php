@@ -57,21 +57,20 @@ class ResumeAction extends BaseAction
         $nextPaymentDate = $today;
 
         $latestSubscriptionHistory = $this->getLatestSubscriptionHistory($subscription);
-        if ($latestSubscriptionHistory  instanceof SubscriptionHistoryEntity) {
+
+        if ($latestSubscriptionHistory instanceof SubscriptionHistoryEntity) {
             $oldMollieSubscription = $gateway->getSubscription($latestSubscriptionHistory->getMollieId(), $subscription->getMollieCustomerId());
             /** @var \DateTimeInterface $oldStartDate */
             $oldStartDate = \DateTime::createFromFormat('Y-m-d', (string) $oldMollieSubscription->startDate);
+            [$oldInterval, $oldIntervalUnit] = explode(' ', $oldMollieSubscription->interval);
 
-            if ($oldStartDate < $today) {
-                [$oldInterval, $oldIntervalUnit] = explode(' ', $oldMollieSubscription->interval);
+            $nextInterval = $this->intervalCalculator->getNextIntervalDate($oldStartDate, (int) $oldInterval, $oldIntervalUnit);
 
-                $nextInterval = $this->intervalCalculator->getNextIntervalDate($oldStartDate, (int) $oldInterval, $oldIntervalUnit);
-                /** @var \DateTimeInterface $nextPaymentDate */
-                $nextPaymentDate = \DateTime::createFromFormat('Y-m-d', $nextInterval);
-            }
+            /** @var \DateTimeInterface $nextPossiblePaymentDate */
+            $nextPossiblePaymentDate = \DateTime::createFromFormat('Y-m-d', $nextInterval);
 
-            if ($nextPaymentDate < $today) {
-                $nextPaymentDate = $today;
+            if ($nextPossiblePaymentDate > $today) {
+                $nextPaymentDate = $nextPossiblePaymentDate;
             }
         }
 
