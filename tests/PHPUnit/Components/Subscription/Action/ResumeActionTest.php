@@ -7,6 +7,8 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
@@ -36,9 +38,10 @@ class ResumeActionTest extends TestCase
     {
         $mollieGateWay = $this->createMock(MollieGateway::class);
         $mockGateWaySubscription = $this->createMock(Subscription::class);
-
+        $mockGateWaySubscription->startDate = '2025-08-13';
+        $mockGateWaySubscription->interval = '2 months';
         $mollieGateWayJsonPayload = [];
-
+        $mollieGateWay->method('getSubscription')->willReturn($mockGateWaySubscription);
         $mollieGateWay->method('createSubscription')->willReturnCallback(function (string $subscriptionId, array $jsonPayload) use ($mockGateWaySubscription, &$mollieGateWayJsonPayload) {
             $mollieGateWayJsonPayload = $jsonPayload;
 
@@ -62,9 +65,11 @@ class ResumeActionTest extends TestCase
     {
         $mollieGateWay = $this->createMock(MollieGateway::class);
         $mockGateWaySubscription = $this->createMock(Subscription::class);
+        $mockGateWaySubscription->startDate = '2025-08-13';
+        $mockGateWaySubscription->interval = '2 months';
 
         $mollieGateWayJsonPayload = [];
-
+        $mollieGateWay->method('getSubscription')->willReturn($mockGateWaySubscription);
         $mollieGateWay->method('createSubscription')->willReturnCallback(function (string $subscriptionId, array $jsonPayload) use ($mockGateWaySubscription, &$mollieGateWayJsonPayload) {
             $mollieGateWayJsonPayload = $jsonPayload;
 
@@ -96,7 +101,14 @@ class ResumeActionTest extends TestCase
         $fakeSubscription->setCustomer($this->createMock(CustomerEntity::class));
         $fakeSubscription->setDescription('Fake Description');
         $fakeSubscription->setMollieCustomerId('fakeCustomerId');
-        $fakeSubscription->setNextPaymentAt(new \DateTime('2025-10-13'));
+
+        $subscriptionHistoryEntries = new SubscriptionHistoryCollection();
+        $subscriptionHistory = new SubscriptionHistoryEntity();
+        $subscriptionHistory->setUniqueIdentifier('fake');
+        $subscriptionHistory->setMollieId('sub_fakenumber');
+        $subscriptionHistoryEntries->add($subscriptionHistory);
+
+        $fakeSubscription->setHistoryEntries($subscriptionHistoryEntries);
 
         $subscriptionMetadata = new SubscriptionMetadata('2025-08-13', 2, 'months', null, '');
         $fakeSubscription->setMetadata($subscriptionMetadata);

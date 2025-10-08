@@ -3,12 +3,34 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
+use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
+use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
+use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
+use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler;
+use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
+use Kiener\MolliePayments\Service\CustomerService;
+use Kiener\MolliePayments\Service\SettingsService;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
 class ResumeAction extends BaseAction
 {
+    private IntervalCalculator $intervalCalculator;
+
+    public function __construct(SettingsService $pluginSettings, SubscriptionRepository $repoSubscriptions, SubscriptionBuilder $subscriptionBuilder, MollieDataBuilder $mollieRequestBuilder, CustomerService $customers, MollieGatewayInterface $gwMollie, CancellationValidator $cancellationValidator, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SubscriptionHistoryHandler $subscriptionHistory, LoggerInterface $logger)
+    {
+        parent::__construct($pluginSettings, $repoSubscriptions, $subscriptionBuilder, $mollieRequestBuilder, $customers, $gwMollie, $cancellationValidator, $flowBuilderFactory, $flowBuilderEventFactory, $subscriptionHistory, $logger);
+        $this->intervalCalculator = new IntervalCalculator();
+    }
+
     /**
      * @throws \Exception
      */
@@ -31,6 +53,27 @@ class ResumeAction extends BaseAction
         if (! $subscription->isResumeAllowed()) {
             throw new \Exception('Resuming of the subscription is not possible because of its current status!');
         }
+        $gateway = $this->getMollieGateway($subscription);
+        $nextPaymentDate = $today;
+
+        $latestSubscriptionHistory = $this->getLatestSubscriptionHistory($subscription);
+        if ($latestSubscriptionHistory  instanceof SubscriptionHistoryEntity) {
+            $oldMollieSubscription = $gateway->getSubscription($latestSubscriptionHistory->getMollieId(), $subscription->getMollieCustomerId());
+            /** @var \DateTimeInterface $oldStartDate */
+            $oldStartDate = \DateTime::createFromFormat('Y-m-d', (string) $oldMollieSubscription->startDate);
+
+            if ($oldStartDate < $today) {
+                [$oldInterval, $oldIntervalUnit] = explode(' ', $oldMollieSubscription->interval);
+
+                $nextInterval = $this->intervalCalculator->getNextIntervalDate($oldStartDate, (int) $oldInterval, $oldIntervalUnit);
+                /** @var \DateTimeInterface $nextPaymentDate */
+                $nextPaymentDate = \DateTime::createFromFormat('Y-m-d', $nextInterval);
+            }
+
+            if ($nextPaymentDate < $today) {
+                $nextPaymentDate = $today;
+            }
+        }
 
         // -------------------------------------------------------------------------------------
 
@@ -39,12 +82,6 @@ class ResumeAction extends BaseAction
 
         $metaData = $subscription->getMetadata();
 
-        $nextPaymentDate = $subscription->getNextPaymentAt() ?? $today;
-        if ($nextPaymentDate < $today) {
-            $nextPaymentDate = $today;
-        }
-
-        // TODO, what if we are in the currently (cancelled) period
         $jsonPayload = $this->getPayloadBuilder()->buildRequestPayload(
             $subscription,
             $nextPaymentDate->format('Y-m-d'),
@@ -53,8 +90,6 @@ class ResumeAction extends BaseAction
             (int) $metaData->getTimes(),
             $subscription->getMandateId()
         );
-
-        $gateway = $this->getMollieGateway($subscription);
 
         $newMollieSubscription = $gateway->createSubscription($subscription->getMollieCustomerId(), $jsonPayload);
 
@@ -81,5 +116,16 @@ class ResumeAction extends BaseAction
         // FLOW BUILDER / BUSINESS EVENTS
         $event = $this->getFlowBuilderEventFactory()->buildSubscriptionResumedEvent($subscription->getCustomer(), $subscription, $context);
         $this->getFlowBuilderDispatcher()->dispatch($event);
+    }
+
+    private function getLatestSubscriptionHistory(SubscriptionEntity $subscription): ?SubscriptionHistoryEntity
+    {
+        $subscriptionHistories = $subscription->getHistoryEntries();
+
+        $subscriptionHistories->sort(function (SubscriptionHistoryEntity $historyA, SubscriptionHistoryEntity $historyB) {
+            return $historyB->getCreatedAt() <=> $historyA->getCreatedAt();
+        });
+
+        return $subscriptionHistories->first();
     }
 }
