@@ -185,6 +185,8 @@ ifneq (,$(findstring v12,$(NODE_VERSION)))
 	$(warning Attention, reqruires Node v14 or higher to build a release!)
 	@exit 1
 endif
+	IGNORED := '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json'
+	IGNORED_FINAL := $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
@@ -201,8 +203,8 @@ endif
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*'  '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x $(IGNORED_FINAL)
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x $(IGNORED)
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""
