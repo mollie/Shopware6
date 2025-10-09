@@ -142,13 +142,13 @@ class MollieOrderBuilder
             $orderData['amount'] = $this->priceBuilder->build($order->getAmountTotal(), $currency->getIsoCode());
         }
 
+        $orderCustomer = $order->getOrderCustomer();
         // build custom format
         // TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
         if (! empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
             $orderNumberFormatted = str_replace('{ordernumber}', (string) $order->getOrderNumber(), (string) $orderNumberFormatted);
 
-            $orderCustomer = $order->getOrderCustomer();
             if ($orderCustomer instanceof OrderCustomerEntity) {
                 $orderNumberFormatted = str_replace('{customernumber}', (string) $orderCustomer->getCustomerNumber(), (string) $orderNumberFormatted);
             }
@@ -182,9 +182,8 @@ class MollieOrderBuilder
         );
 
         // ----------------------------------------------------------------------------------------------------------------------------
-
-        $orderData['billingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getDefaultBillingAddress());
-        $orderData['shippingAddress'] = $this->addressBuilder->build($customer->getEmail(), $customer->getActiveShippingAddress());
+        $orderData['billingAddress'] = $this->addressBuilder->build($orderCustomer->getEmail(), $order->getBillingAddress());
+        $orderData['shippingAddress'] = $this->addressBuilder->build($orderCustomer->getEmail(), $order->getDeliveries()?->first()?->getShippingOrderAddress());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
