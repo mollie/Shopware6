@@ -67,6 +67,7 @@ class SubscriptionControllerBase extends AbstractController
         try {
             $this->subscriptionManager->resumeSubscription(
                 $data->get('id'),
+                new \DateTime(),
                 $context
             );
 

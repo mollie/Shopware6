@@ -243,7 +243,7 @@ class SubscriptionControllerBase
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
 
-            $this->subscriptionManager->resumeSubscription($subscriptionId, $context->getContext());
+            $this->subscriptionManager->resumeSubscription($subscriptionId, new \DateTime(), $context->getContext());
 
             return new SubscriptionResumeResponse();
         } catch (\Throwable $ex) {
