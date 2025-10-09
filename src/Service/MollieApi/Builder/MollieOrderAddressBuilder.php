@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\MollieApi\Builder;
 
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 
 class MollieOrderAddressBuilder
 {
@@ -12,9 +12,9 @@ class MollieOrderAddressBuilder
     /**
      * @return array<mixed>
      */
-    public function build(string $email, ?CustomerAddressEntity $address): array
+    public function build(string $email, ?OrderAddressEntity $address): array
     {
-        if (! $address instanceof CustomerAddressEntity) {
+        if (! $address instanceof OrderAddressEntity) {
             return [];
         }
 
