@@ -181,9 +181,11 @@ class MollieOrderBuilder
             $isVerticalTaxCalculation
         );
 
+        $email = $orderCustomer ? $orderCustomer->getEmail() : $customer->getEmail();
+        
         // ----------------------------------------------------------------------------------------------------------------------------
-        $orderData['billingAddress'] = $this->addressBuilder->build($orderCustomer->getEmail(), $order->getBillingAddress());
-        $orderData['shippingAddress'] = $this->addressBuilder->build($orderCustomer->getEmail(), $order->getDeliveries()?->first()?->getShippingOrderAddress());
+        $orderData['billingAddress'] = $this->addressBuilder->build($email, $order->getBillingAddress());
+        $orderData['shippingAddress'] = $this->addressBuilder->build($email, $order->getDeliveries()?->first()?->getShippingOrderAddress());
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
