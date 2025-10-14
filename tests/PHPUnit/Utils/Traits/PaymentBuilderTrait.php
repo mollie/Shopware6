@@ -13,9 +13,13 @@ use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -27,7 +31,7 @@ trait PaymentBuilderTrait
     /**
      * @return array<string,mixed>
      */
-    public function getExpectedTestAddress(CustomerAddressEntity $address, string $email): array
+    public function getExpectedTestAddress(OrderAddressEntity $address, string $email): array
     {
         return [
             'title' => $address->getSalutation()->getDisplayName(),
@@ -42,7 +46,7 @@ trait PaymentBuilderTrait
         ];
     }
 
-    public function getDummyAddress(): CustomerAddressEntity
+    public function getDummyAddress(): OrderAddressEntity
     {
         $salutation = 'Mr';
         $firstName = 'foo';
@@ -53,7 +57,7 @@ trait PaymentBuilderTrait
         $city = 'city';
         $country = 'DE';
 
-        return $this->getCustomerAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
+        return $this->getOrderAddressEntity($firstName, $lastName, $street, $zip, $city, $salutation, $country, $additional);
     }
 
     /**
@@ -164,17 +168,26 @@ trait PaymentBuilderTrait
         $order->setLineItems($lineItems);
         $order->setOrderNumber($orderNumber);
 
+        $order->setBillingAddress($this->getDummyAddress());
+        $deliveries = new OrderDeliveryCollection();
+        $orderDelivery = new OrderDeliveryEntity();
+        $orderDelivery->setId(Uuid::randomHex());
+        $orderDelivery->setShippingCosts(new CalculatedPrice(0.0, 0.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+        $orderDelivery->setShippingOrderAddress($this->getDummyAddress());
+        $deliveries->add($orderDelivery);
+        $order->setDeliveries($deliveries);
         $order->setSalesChannelId(Uuid::randomHex());
 
         return $order;
     }
 
-    private function getDummyCustomer(CustomerAddressEntity $billing, CustomerAddressEntity $shipping, string $email): CustomerEntity
+    private function getDummyCustomer(OrderAddressEntity $billing, OrderAddressEntity $shipping, string $email): CustomerEntity
     {
         $customer = new CustomerEntity();
         $customer->setId(Uuid::randomHex());
-        $customer->setDefaultBillingAddress($billing);
-        $customer->setDefaultShippingAddress($shipping);
+
+        // $customer->setDefaultBillingAddress($billing);
+        // $customer->setDefaultShippingAddress($shipping);
         $customer->setEmail($email);
 
         return $customer;
