@@ -6,7 +6,7 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 
 class MollieOrderAddressBuilderTest extends TestCase
 {
@@ -123,7 +123,7 @@ class MollieOrderAddressBuilderTest extends TestCase
         self::assertArrayNotHasKey('streetAdditional', $addressData);
     }
 
-    private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): CustomerAddressEntity
+    private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): OrderAddressEntity
     {
         $firstName = 'Mollie';
         $lastName = 'HQ';

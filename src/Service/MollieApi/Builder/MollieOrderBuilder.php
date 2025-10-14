@@ -182,7 +182,7 @@ class MollieOrderBuilder
         );
 
         $email = $orderCustomer ? $orderCustomer->getEmail() : $customer->getEmail();
-        
+
         // ----------------------------------------------------------------------------------------------------------------------------
         $orderData['billingAddress'] = $this->addressBuilder->build($email, $order->getBillingAddress());
         $orderData['shippingAddress'] = $this->addressBuilder->build($email, $order->getDeliveries()?->first()?->getShippingOrderAddress());

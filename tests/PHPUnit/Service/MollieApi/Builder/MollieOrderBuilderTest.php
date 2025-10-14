@@ -33,6 +33,7 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
 
         $customer = new OrderCustomerEntity();
         $customer->setCustomerNumber('5000');
+        $customer->setEmail('');
         $order->setOrderCustomer($customer);
 
         $data = $this->builder->buildOrderPayload(
