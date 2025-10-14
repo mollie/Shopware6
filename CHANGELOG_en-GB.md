@@ -1,4 +1,8 @@
-# 4.19.0
+# 4.20.0
+### Changed
+- Changed order builder to use order addresses instead of customer defaulr addresses to make sure the addres in mollie matches the order information in shopware.
+
+## [4.19.0] - 2025-10-09
 - Added Estonian Language Support
 - Added Greek Language Support
 - Added Croatian language support

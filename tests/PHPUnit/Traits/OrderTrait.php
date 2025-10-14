@@ -8,7 +8,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -28,7 +28,7 @@ use Shopware\Core\System\Salutation\SalutationEntity;
 
 trait OrderTrait
 {
-    public function getCustomerAddressEntity(
+    public function getOrderAddressEntity(
         string $firstName,
         string $lastName,
         string $street,
@@ -37,35 +37,35 @@ trait OrderTrait
         ?string $salutationName,
         ?string $countryISO,
         ?string $additional
-    ): CustomerAddressEntity {
-        $customerAddress = new CustomerAddressEntity();
-        $customerAddress->setId(Uuid::randomHex());
+    ): OrderAddressEntity {
+        $orderAddress = new OrderAddressEntity();
+        $orderAddress->setId(Uuid::randomHex());
 
         if (! empty($salutationName)) {
             $salutation = new SalutationEntity();
             $salutation->setId(Uuid::randomHex());
             $salutation->setDisplayName($salutationName);
-            $customerAddress->setSalutation($salutation);
+            $orderAddress->setSalutation($salutation);
         }
 
-        $customerAddress->setFirstName($firstName);
-        $customerAddress->setLastName($lastName);
-        $customerAddress->setStreet($street);
+        $orderAddress->setFirstName($firstName);
+        $orderAddress->setLastName($lastName);
+        $orderAddress->setStreet($street);
         if (! empty($additional)) {
-            $customerAddress->setAdditionalAddressLine1($additional);
+            $orderAddress->setAdditionalAddressLine1($additional);
         }
 
-        $customerAddress->setZipcode($zipCode);
-        $customerAddress->setCity($city);
+        $orderAddress->setZipcode($zipCode);
+        $orderAddress->setCity($city);
 
         if (! empty($countryISO)) {
             $country = new CountryEntity();
             $country->setId(Uuid::randomHex());
             $country->setIso($countryISO);
-            $customerAddress->setCountry($country);
+            $orderAddress->setCountry($country);
         }
 
-        return $customerAddress;
+        return $orderAddress;
     }
 
     public function getOrderLineItem(

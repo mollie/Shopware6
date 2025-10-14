@@ -1,4 +1,8 @@
-# 4.19.0
+# 4.20.0
+### Geändert
+- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und SHopware übereinstimmen.
+
+## [4.19.0] - 2025-10-09
 - Unterstützung für die estnische Sprache hinzugefügt
 - Unterstützung für die griechische Sprache hinzugefügt
 - Unterstützung für die kroatische Sprache hinzugefügt
