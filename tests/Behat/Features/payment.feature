@@ -15,23 +15,23 @@ Feature: Basic payment checkout
     Then i see success page
 
     Examples:
-      | paymentMethod               | productNumber | quantity | paymentStatus | billingCountry | currency |
-      | payment_mollie_paypal       | SWDEMO10007.1 | 1        | paid          | NL             | EUR      |
-      | payment_mollie_klarna       | SWDEMO10007.1 | 1        | authorize     | DE             | EUR      |
-      | payment_mollie_billie       | SWDEMO10007.1 | 1        | authorize     | DE             | EUR      |
-      | payment_mollie_riverty      | SWDEMO10007.1 | 1        | authorize     | NL             | EUR      |
-      | payment_mollie_eps          | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_przelewy24   | SWDEMO10007.1 | 1        | paid          | PL             | PLN      |
-      | payment_mollie_twint        | SWDEMO10007.1 | 1        | paid          | DE             | CHF      |
-      | payment_mollie_blik         | SWDEMO10007.1 | 1        | paid          | DE             | PLN      |
-      | payment_mollie_payconiq     | SWDEMO10007.1 | 1        | paid          | BE             | EUR      |
-      | payment_mollie_mbway        | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_swish        | SWDEMO10007.1 | 1        | paid          | SE             | SEK      |
-      | payment_mollie_multibanco   | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_trustly      | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_alma         | SWDEMO10007.1 | 5        | authorize     | FR             | EUR      |
-      | payment_mollie_eps          | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_banktransfer | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_bancontact   | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_paybybank    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | payment_mollie_satispay     | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | paymentMethod | productNumber | quantity | paymentStatus | billingCountry | currency |
+      | paypal       | SWDEMO10007.1 | 1        | paid          | NL             | EUR      |
+      | klarna       | SWDEMO10007.1 | 1        | authorize     | DE             | EUR      |
+      | billie       | SWDEMO10007.1 | 1        | authorize     | DE             | EUR      |
+      | riverty      | SWDEMO10007.1 | 1        | authorize     | NL             | EUR      |
+      | eps          | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | przelewy24   | SWDEMO10007.1 | 1        | paid          | PL             | PLN      |
+      | twint        | SWDEMO10007.1 | 1        | paid          | DE             | CHF      |
+      | blik         | SWDEMO10007.1 | 1        | paid          | DE             | PLN      |
+      | payconiq     | SWDEMO10007.1 | 1        | paid          | BE             | EUR      |
+      | mbway        | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | swish        | SWDEMO10007.1 | 1        | paid          | SE             | SEK      |
+      | multibanco   | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | trustly      | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | alma         | SWDEMO10007.1 | 5        | authorize     | FR             | EUR      |
+      | eps          | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | banktransfer | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | bancontact   | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | paybybank    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | satispay     | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
