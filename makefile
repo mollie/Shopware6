@@ -180,14 +180,15 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
+IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
+IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 ifneq (,$(findstring v12,$(NODE_VERSION)))
 	$(warning Attention, reqruires Node v14 or higher to build a release!)
 	@exit 1
 endif
-	IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
-	IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
+
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
