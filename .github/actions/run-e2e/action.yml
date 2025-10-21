@@ -31,7 +31,7 @@ inputs:
     default: ''
     required: false
   REMOVE_DEPRECATED_TESTS:
-    description: "If enabled, tests that are marked es deprecated will be removed"
+    description: "If enabled, tests that are marked as deprecated will be removed"
     default: 'false'
     required: false
   CYPRESS_RESULTS_SUFFIX:
