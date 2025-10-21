@@ -1,65 +1,28 @@
 <?php
 
 namespace Mollie\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Gherkin\Node\TableNode;
+use Mollie\Integration\Data\PaymentMethodTestBehaviour;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 
-final class PaymentContext implements Context
+final class PaymentContext extends ShopwareContext
 {
-    /**
-     * @Given user :arg1 exists
-     */
-    public function userExists($arg1): void
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given iam loggedin as user :arg1
-     */
-    public function iamLoggedinAsUser($arg1): void
-    {
-        throw new PendingException();
-    }
+    use PaymentMethodTestBehaviour;
 
     /**
      * @Given payment method :arg1 exists and active
      */
-    public function paymentMethodExistsAndActive($arg1): void
+    public function paymentMethodExistsAndActive(string $paymentMethodIdentifier): void
     {
-        throw new PendingException();
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodIdentifier, $salesChannelContext->getContext());
+        $this->activatePaymentMethod($paymentMethod, $salesChannelContext->getContext());
     }
 
-    /**
-     * @Given product :arg1 with quantity :arg2 is in cart
-     */
-    public function productWithQuantityIsInCart($arg1, $arg2): void
-    {
-        throw new PendingException();
-    }
 
-    /**
-     * @When i start checkout with payment method :arg1
-     */
-    public function iStartCheckoutWithPaymentMethod($arg1): void
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @When select payment status :arg1
-     */
-    public function selectPaymentStatus($arg1): void
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then i see success page
-     */
-    public function iSeeSuccessPage(): void
-    {
-        throw new PendingException();
-    }
 }

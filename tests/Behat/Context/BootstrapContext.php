@@ -11,6 +11,7 @@ final class BootstrapContext implements Context
      */
     public static function bootstrap()
     {
+
         require_once __DIR__.'/../../bootstrap.php'; // or just inline your bootstrapping here, depending what you need
     }
 

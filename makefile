@@ -103,6 +103,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make stan -B
 	@make phpunit -B
 	@make phpintegration -B
+	@make behat -B
 	@make vitest -B
 	@make configcheck -B
 	@make phpunuhi -B
