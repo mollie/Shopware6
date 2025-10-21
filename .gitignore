@@ -22,3 +22,5 @@ src/Resources/public/administration/assets/
 /src/Resources/public/mollie-payments.js
 /node_modules/
 /src/Resources/public/administration/.vite
+composer.lock
+package-lock.json
