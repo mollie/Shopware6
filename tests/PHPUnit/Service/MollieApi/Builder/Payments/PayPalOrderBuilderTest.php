@@ -94,6 +94,7 @@ class PayPalOrderBuilderTest extends AbstractMollieOrderBuilder
         $deliveryId = Uuid::randomHex();
 
         $delivery = $this->getOrderDelivery($deliveryId, $taxAmount, $taxRate, $totalPrice);
+        $delivery->setShippingOrderAddress($this->getDummyAddress());
         $deliveries = new OrderDeliveryCollection([$delivery]);
 
         $order->setDeliveries($deliveries);

@@ -6,7 +6,7 @@ namespace MolliePayments\Tests\Service\MollieApi\Builder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 
 class MollieOrderAddressBuilderTest extends TestCase
 {
@@ -38,9 +38,9 @@ class MollieOrderAddressBuilderTest extends TestCase
      */
     public function testBuild(): void
     {
-        $customerAddress = $this->buildFixture('Mr', 'DE', 'great street');
+        $orderAddress = $this->buildFixture('Mr', 'DE', 'great street');
 
-        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+        $addressData = $this->builder->build('test@mollie.com', $orderAddress);
 
         $expected = [
             'title' => 'Mr',
@@ -63,9 +63,9 @@ class MollieOrderAddressBuilderTest extends TestCase
      */
     public function testBuildWithMissingSalutation(): void
     {
-        $customerAddress = $this->buildFixture(null, 'DE', '');
+        $orderAddress = $this->buildFixture(null, 'DE', '');
 
-        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+        $addressData = $this->builder->build('test@mollie.com', $orderAddress);
 
         self::assertNull($addressData['title']);
     }
@@ -76,9 +76,9 @@ class MollieOrderAddressBuilderTest extends TestCase
      */
     public function testBuildWithWhitespaceSalutation(): void
     {
-        $customerAddress = $this->buildFixture('  ', 'DE', '');
+        $orderAddress = $this->buildFixture('  ', 'DE', '');
 
-        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+        $addressData = $this->builder->build('test@mollie.com', $orderAddress);
 
         self::assertEmpty($addressData['title']);
     }
@@ -89,9 +89,9 @@ class MollieOrderAddressBuilderTest extends TestCase
      */
     public function testBuildWithMissingCountry(): void
     {
-        $customerAddress = $this->buildFixture('Mr', null, '');
+        $orderAddress = $this->buildFixture('Mr', null, '');
 
-        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+        $addressData = $this->builder->build('test@mollie.com', $orderAddress);
 
         self::assertSame(MollieOrderAddressBuilder::MOLLIE_DEFAULT_COUNTRY_ISO, $addressData['country']);
     }
@@ -102,9 +102,9 @@ class MollieOrderAddressBuilderTest extends TestCase
      */
     public function testBuildWithMissingAdditionalStreetNull(): void
     {
-        $customerAddress = $this->buildFixture('Mr', 'DE', null);
+        $orderAddress = $this->buildFixture('Mr', 'DE', null);
 
-        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+        $addressData = $this->builder->build('test@mollie.com', $orderAddress);
 
         self::assertArrayNotHasKey('streetAdditional', $addressData);
     }
@@ -116,14 +116,14 @@ class MollieOrderAddressBuilderTest extends TestCase
     public function testBuildWithMissingAdditionalStreetSpace(): void
     {
         $additional = ' ';
-        $customerAddress = $this->buildFixture('Mr', 'DE', $additional);
+        $orderAddress = $this->buildFixture('Mr', 'DE', $additional);
 
-        $addressData = $this->builder->build('test@mollie.com', $customerAddress);
+        $addressData = $this->builder->build('test@mollie.com', $orderAddress);
 
         self::assertArrayNotHasKey('streetAdditional', $addressData);
     }
 
-    private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): CustomerAddressEntity
+    private function buildFixture(?string $salutation, ?string $countryISO, ?string $additional): OrderAddressEntity
     {
         $firstName = 'Mollie';
         $lastName = 'HQ';
@@ -131,7 +131,7 @@ class MollieOrderAddressBuilderTest extends TestCase
         $zip = '1015 CW';
         $city = 'Amsterdam';
 
-        return $this->getCustomerAddressEntity(
+        return $this->getOrderAddressEntity(
             $firstName,
             $lastName,
             $street,
