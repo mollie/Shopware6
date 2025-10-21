@@ -22,6 +22,7 @@ final class PaymentContext extends ShopwareContext
         $salesChannelContext = $this->getCurrentSalesChannelContext();
         $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodIdentifier, $salesChannelContext->getContext());
         $this->activatePaymentMethod($paymentMethod, $salesChannelContext->getContext());
+        $this->assignPaymentMethodToSalesChannel($paymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
     }
 
 

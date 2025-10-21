@@ -120,13 +120,13 @@ trait PaymentMethodTestBehaviour
         $repository->upsert([$data], $context);
     }
 
-    private function assignPaymentMethodToSalesChannel(PaymentMethodEntity $paymentMethod, SalesChannelEntity $salesChannel, Context $getContext)
+    private function assignPaymentMethodToSalesChannel(PaymentMethodEntity $paymentMethod, SalesChannelEntity $salesChannel, Context $context): void
     {
         $repository = $this->getContainer()->get('sales_channel_payment_method.repository');
         $data = [
             'salesChannelId' => $salesChannel->getId(),
             'paymentMethodId' => $paymentMethod->getId(),
         ];
-        $repository->upsert([$data], $getContext);
+        $repository->upsert([$data], $context);
     }
 }
