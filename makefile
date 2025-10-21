@@ -186,8 +186,8 @@ ifneq (,$(findstring v12,$(NODE_VERSION)))
 	$(warning Attention, reqruires Node v14 or higher to build a release!)
 	@exit 1
 endif
-	IGNORED := '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
-	IGNORED_FINAL := $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
+	IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
+	IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
