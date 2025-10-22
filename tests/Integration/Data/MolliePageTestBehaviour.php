@@ -5,6 +5,7 @@ namespace Mollie\Integration\Data;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 
 trait MolliePageTestBehaviour
@@ -82,6 +83,9 @@ trait MolliePageTestBehaviour
             }
             $formData[$inputName] = $inputValue;
         }
+
+        Assert::assertTrue(isset($formData['final_state']));
+        Assert::assertEquals($paymentStatus, $formData['final_state']);
 
         return $client->post($formLocation, [
             RequestOptions::FORM_PARAMS => $formData,

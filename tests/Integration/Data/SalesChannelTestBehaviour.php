@@ -27,6 +27,7 @@ trait SalesChannelTestBehaviour
         $criteria->addAssociation('domains');
         $criteria->addAssociation('language.locale');
         $criteria->addAssociation('currency');
+        $criteria->addAssociation('shippingMethods');
 
         $criteria->addFilter(new EqualsFilter('domains.url', $domain));
         $criteria->addFilter(new EqualsFilter('typeId', Defaults::SALES_CHANNEL_TYPE_STOREFRONT));
@@ -51,7 +52,31 @@ trait SalesChannelTestBehaviour
         }
 
         $salesChannel = $this->findSalesChannelByDomain($domain, $context);
+        $this->assignDefaultShippingMethod($salesChannel, $context);
 
         return $this->getSalesChannelContext($salesChannel, $options);
+    }
+
+    private function assignDefaultShippingMethod(SalesChannelEntity $salesChannel, Context $context): void
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('shipping_method.repository');
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', true));
+        $criteria->addFilter(new EqualsFilter('technicalName', 'shipping_standard'));
+
+        $searchResult = $repository->searchIds($criteria, $context);
+        if ($searchResult->getTotal() === 0) {
+            return;
+        }
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('sales_channel_shipping_method.repository');
+        $repository->upsert([
+            [
+                'salesChannelId' => $salesChannel->getId(),
+                'shippingMethodId' => $searchResult->firstId()
+            ]
+        ], $context);
     }
 }

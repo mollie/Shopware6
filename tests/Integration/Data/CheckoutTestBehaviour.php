@@ -7,11 +7,13 @@ use Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -119,5 +121,17 @@ trait CheckoutTestBehaviour
         $paymentController = $this->getContainer()->get(PaymentController::class);
 
         return $paymentController->finalizeTransaction($request);
+    }
+
+    public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('order.repository');
+        $criteria = (new Criteria([$orderId]));
+        $criteria->addAssociation('transactions.stateMachineState');
+
+        $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt'));
+
+        return $repository->search($criteria, $salesChannelContext->getContext())->first();
     }
 }

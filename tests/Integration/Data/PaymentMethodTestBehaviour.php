@@ -47,6 +47,7 @@ trait PaymentMethodTestBehaviour
 
     /**
      * We need this mapping array because technicalName is not defined in shopware 6.4
+     *
      * @var array|\class-string[]
      */
     private array $paymentMethodMapping = [

@@ -4,6 +4,7 @@ namespace Mollie\Behat;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Step\Given;
 use Mollie\Integration\Data\CustomerTestBehaviour;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 
@@ -12,9 +13,8 @@ final class CustomerContext extends ShopwareContext
 {
     use CustomerTestBehaviour;
 
-    /**
-     * @Given iam logged in as user :arg1
-     */
+
+    #[Given('iam logged in as user :arg1')]
     public function iamLoggedInAsUser(string $email): void
     {
 
@@ -22,9 +22,8 @@ final class CustomerContext extends ShopwareContext
         $this->setOptions(SalesChannelContextService::CUSTOMER_ID,$customerId);
     }
 
-    /**
-     * @Given i select :arg1 as billing country
-     */
+
+    #[Given('i select :arg1 as billing country')]
     public function iSelectAsBillingCountry(string $billingCountry): void
     {
         $salesChannelContext = $this->getCurrentSalesChannelContext();

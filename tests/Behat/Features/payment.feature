@@ -13,25 +13,26 @@ Feature: Basic payment checkout
     When i start checkout with payment method "<paymentMethod>"
     And select payment status "<paymentStatus>"
     Then i see success page
+    And order payment status is "<paymentStatus>"
 
     Examples:
       | paymentMethod | productNumber | quantity | paymentStatus | billingCountry | currency |
-      | paypal       | SWDEMO10007.1 | 1        | paid          | NL             | EUR      |
-      | klarna       | SWDEMO10007.1 | 1        | authorize     | DE             | EUR      |
-      | billie       | SWDEMO10007.1 | 1        | authorize     | DE             | EUR      |
-      | riverty      | SWDEMO10007.1 | 1        | authorize     | NL             | EUR      |
-      | eps          | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | przelewy24   | SWDEMO10007.1 | 1        | paid          | PL             | PLN      |
-      | twint        | SWDEMO10007.1 | 1        | paid          | DE             | CHF      |
-      | blik         | SWDEMO10007.1 | 1        | paid          | DE             | PLN      |
-      | payconiq     | SWDEMO10007.1 | 1        | paid          | BE             | EUR      |
-      | mbway        | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | swish        | SWDEMO10007.1 | 1        | paid          | SE             | SEK      |
-      | multibanco   | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | trustly      | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | alma         | SWDEMO10007.1 | 5        | authorize     | FR             | EUR      |
-      | eps          | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | banktransfer | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | bancontact   | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | paybybank    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | satispay     | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | paypal        | SWDEMO10007.1 | 1        | paid          | NL             | EUR      |
+      | klarna        | SWDEMO10007.1 | 1        | authorized    | DE             | EUR      |
+      | billie        | SWDEMO10007.1 | 1        | authorized    | DE             | EUR      |
+      | riverty       | SWDEMO10007.1 | 1        | authorized    | NL             | EUR      |
+      | eps           | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | przelewy24    | SWDEMO10007.1 | 1        | paid          | PL             | PLN      |
+      | twint         | SWDEMO10007.1 | 1        | paid          | DE             | CHF      |
+      | blik          | SWDEMO10007.1 | 1        | paid          | DE             | PLN      |
+      | payconiq      | SWDEMO10007.1 | 1        | paid          | BE             | EUR      |
+      | mbway         | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | swish         | SWDEMO10007.1 | 1        | paid          | SE             | SEK      |
+      | multibanco    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | trustly       | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | alma          | SWDEMO10007.1 | 5        | paid          | FR             | EUR      |
+      | eps           | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | banktransfer  | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | bancontact    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | paybybank     | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | satispay      | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |

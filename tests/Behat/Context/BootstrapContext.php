@@ -3,12 +3,11 @@
 namespace Mollie\Behat;
 
 use Behat\Behat\Context\Context;
+use Behat\Hook\BeforeSuite;
 
 final class BootstrapContext implements Context
 {
-    /**
-     * @BeforeSuite
-     */
+    #[BeforeSuite]
     public static function bootstrap()
     {
 
