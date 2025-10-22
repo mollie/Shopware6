@@ -16,6 +16,9 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
+  IMAGE:
+    description: "dockware image container."
+    required: true
   MOLLIE_APIKEY_TEST:
     description: "The Mollie Test API key. Required for the installation."
     default: ''
@@ -80,7 +83,7 @@ runs:
 
     - name: Download Docker
       shell: bash
-      run: docker pull -q dockware/play:${{ inputs.SHOPWARE }}
+      run: docker pull -q ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
 
     - name: Start Docker
       shell: bash
