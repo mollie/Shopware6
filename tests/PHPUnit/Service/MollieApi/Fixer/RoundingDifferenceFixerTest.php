@@ -129,7 +129,7 @@ class RoundingDifferenceFixerTest extends TestCase
         $diffItem = $newLines->last();
 
         $this->assertEquals('My DIFF', $diffItem->getName());
-        $this->assertEquals(OrderLineType::TYPE_PHYSICAL, $diffItem->getType());
+        $this->assertEquals(OrderLineType::PHYSICAL, $diffItem->getType());
 
         $this->assertEquals(1, $diffItem->getQuantity());
 
