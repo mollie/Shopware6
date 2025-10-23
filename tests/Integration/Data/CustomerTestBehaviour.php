@@ -12,6 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Test\TestDefaults;
 use Shopware\Storefront\Controller\RegisterController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -130,6 +131,7 @@ trait CustomerTestBehaviour
             'lastName' => 'Mollie',
             'createCustomerAccount' => true,
             'password' => 'molliemollie',
+            'groupId' => TestDefaults::FALLBACK_CUSTOMER_GROUP,
             'billingAddress' => [
                 'company' => 'Mollie Company',
                 'firstName' => 'Max',

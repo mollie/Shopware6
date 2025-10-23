@@ -69,11 +69,17 @@ trait SalesChannelTestBehaviour
         if ($searchResult->getTotal() === 0) {
             return;
         }
+        $ruleRepository = $this->getContainer()->get('rule.repository');
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', 'Always valid (Default)'));
+        $ruleSearchResult = $ruleRepository->searchIds($criteria, $context);
+
         $shippingMethods = [];
         foreach ($searchResult->getIds() as $shippingMethodId) {
             $shippingMethods[] = [
                 'id' => $shippingMethodId,
                 'active' => true,
+                'availabilityRuleId' => $ruleSearchResult->firstId(),
                 'salesChannels' => [
                     [
                         'id' => $salesChannel->getId(),

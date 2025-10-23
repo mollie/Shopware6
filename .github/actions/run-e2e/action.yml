@@ -125,14 +125,12 @@ runs:
         # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
         docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
         docker exec  shop bash -c 'mkdir -p /var/www/html/var/test/jwt && cp /var/www/html/config/jwt/*.pem /var/www/html/var/test/jwt && chmod 0660 /var/www/html/var/test/jwt/*.pem'
-        #docker exec shop bash -c 'composer require enqueue/enqueue:0.10.23' #0.10.24 is not compatible with 7.4 even if says so
-        #docker exec shop bash -c 'composer require shopware/core:${{ inputs.SHOPWARE }}' #we need to install speicific sw version
-        #docker exec shop bash -c 'composer install'
        
 
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
+        docker exec shop bash -c 'rm -rf composer.lock'
         docker exec shop bash -c 'composer require --dev phpunit/phpunit:9.* -W' # we need to install phpunit 9 with all dependencies, because of minimum php version 8.0
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
