@@ -30,7 +30,7 @@ class OrderStatusConverterTest extends TestCase
         $fakePayment = $this->createMock(Payment::class);
         $fakePayment->createdAt = date(DATE_ISO8601, strtotime('-1 hour'));
 
-        $paymentCollection = new PaymentCollection($this->createMock(MollieApiClient::class), 2, null);
+        $paymentCollection = new PaymentCollection($this->createMock(MollieApiClient::class), [], null);
         $paymentCollection->append($this->payment);
         $paymentCollection->append($fakePayment);
 

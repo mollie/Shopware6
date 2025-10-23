@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings;
 
+use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Mollie\shopware\Component\Settings\Struct\PaymentSettings;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
@@ -11,7 +13,6 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 final class SettingsService extends AbstractSettingsService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
-    private const CACHE_KEY_LOGGER = 'logger';
     private const CACHE_KEY_SHOPWARE = 'shopware';
 
     private ?SystemConfigService $systemConfigService = null;
@@ -31,18 +32,49 @@ final class SettingsService extends AbstractSettingsService
 
     public function getLoggerSettings(?string $salesChannelId = null): LoggerSettings
     {
-        $cacheKey = self::CACHE_KEY_LOGGER . '_' . ($salesChannelId ?? 'all');
+        $cacheKey = LoggerSettings::class . '_' . ($salesChannelId ?? 'all');
 
         if (isset($this->settingsCache[$cacheKey])) {
             return $this->settingsCache[$cacheKey];
         }
 
         $shopwareSettings = $this->getShopwareSettings($salesChannelId);
-        $loggerSettings = LoggerSettings::createFromShopwareArray($shopwareSettings);
-        $this->settingsCache[$cacheKey] = $loggerSettings;
+        $settings = LoggerSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
 
-        return $loggerSettings;
+        return $settings;
     }
+
+    public function getApiSettings(?string $salesChannelId = null): ApiSettings
+    {
+        $cacheKey = ApiSettings::class . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+
+        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $settings = ApiSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings
+    {
+        $cacheKey = PaymentSettings::class . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+
+        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $settings = PaymentSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
 
     private function getShopwareSettings(?string $salesChannelId = null): array
     {

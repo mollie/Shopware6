@@ -140,11 +140,11 @@ class MollieLineItemBuilderTest extends TestCase
     public function getStructureData(): array
     {
         return [
-            'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::TYPE_PHYSICAL],
-            'CREDIT Line Item is PHYSICAL' => [LineItem::CREDIT_LINE_ITEM_TYPE, OrderLineType::TYPE_STORE_CREDIT],
-            'PROMOTION Line Item is PHYSICAL' => [LineItem::PROMOTION_LINE_ITEM_TYPE, OrderLineType::TYPE_DISCOUNT],
-            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS, OrderLineType::TYPE_PHYSICAL],
-            'Fallback Line Item is DIGITAL' => ['test', OrderLineType::TYPE_DIGITAL],
+            'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::PHYSICAL],
+            'CREDIT Line Item is PHYSICAL' => [LineItem::CREDIT_LINE_ITEM_TYPE, OrderLineType::STORE_CREDIT],
+            'PROMOTION Line Item is PHYSICAL' => [LineItem::PROMOTION_LINE_ITEM_TYPE, OrderLineType::DISCOUNT],
+            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS, OrderLineType::PHYSICAL],
+            'Fallback Line Item is DIGITAL' => ['test', OrderLineType::DIGITAL],
         ];
     }
 

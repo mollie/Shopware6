@@ -205,21 +205,21 @@ class MollieLineItemBuilder
     private function getLineItemType(OrderLineItemEntity $item): string
     {
         if ($item->getType() === LineItem::PRODUCT_LINE_ITEM_TYPE) {
-            return OrderLineType::TYPE_PHYSICAL;
+            return OrderLineType::PHYSICAL;
         }
 
         if ($item->getType() === LineItem::CREDIT_LINE_ITEM_TYPE) {
-            return OrderLineType::TYPE_STORE_CREDIT;
+            return OrderLineType::STORE_CREDIT;
         }
 
         if ($item->getType() === $this->getLineItemPromotionType() || $item->getTotalPrice() < 0) {
-            return OrderLineType::TYPE_DISCOUNT;
+            return OrderLineType::DISCOUNT;
         }
 
         if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
-            return OrderLineType::TYPE_PHYSICAL;
+            return OrderLineType::PHYSICAL;
         }
 
-        return OrderLineType::TYPE_DIGITAL;
+        return OrderLineType::DIGITAL;
     }
 }

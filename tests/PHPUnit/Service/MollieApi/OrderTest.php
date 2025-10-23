@@ -142,27 +142,27 @@ class OrderTest extends TestCase
     {
         return [
             // These types are available as line items in Shopware, so test whether they need to be shipped.
-            [OrderLineType::TYPE_PHYSICAL, 0, true],
-            [OrderLineType::TYPE_PHYSICAL, 1, false],
-            [OrderLineType::TYPE_DIGITAL, 0, true],
-            [OrderLineType::TYPE_DIGITAL, 1, false],
-            [OrderLineType::TYPE_DISCOUNT, 0, true],
-            [OrderLineType::TYPE_DISCOUNT, 1, false],
-            [OrderLineType::TYPE_STORE_CREDIT, 0, true],
-            [OrderLineType::TYPE_STORE_CREDIT, 1, false],
+            [OrderLineType::PHYSICAL, 0, true],
+            [OrderLineType::PHYSICAL, 1, false],
+            [OrderLineType::DIGITAL, 0, true],
+            [OrderLineType::DIGITAL, 1, false],
+            [OrderLineType::DISCOUNT, 0, true],
+            [OrderLineType::DISCOUNT, 1, false],
+            [OrderLineType::STORE_CREDIT, 0, true],
+            [OrderLineType::STORE_CREDIT, 1, false],
 
             // These two types are not (yet) being used by the Mollie plugin, so there should not be any order lines
             // with these types in the Mollie order, and we cannot ship them using Facade/ShipmentManager::shipItem.
             // Therefore we mark the (Shopware) order completely shipped.
-            [OrderLineType::TYPE_GIFT_CARD, 0, true],
-            [OrderLineType::TYPE_GIFT_CARD, 1, true],
-            [OrderLineType::TYPE_SURCHARGE, 0, true],
-            [OrderLineType::TYPE_SURCHARGE, 1, true],
+            [OrderLineType::GIFT_CARD, 0, true],
+            [OrderLineType::GIFT_CARD, 1, true],
+            [OrderLineType::SURCHARGE, 0, true],
+            [OrderLineType::SURCHARGE, 1, true],
 
             // Shipping Fee is not a line item in Shopware, so it cannot be shipped using Facade/MollieShipmen::shipItem.
             // Therefore we mark the (Shopware) order completely shipped.
-            [OrderLineType::TYPE_SHIPPING_FEE, 0, true],
-            [OrderLineType::TYPE_SHIPPING_FEE, 1, true],
+            [OrderLineType::SHIPPING_FEE, 0, true],
+            [OrderLineType::SHIPPING_FEE, 1, true],
         ];
     }
 }
