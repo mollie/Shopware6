@@ -12,7 +12,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class BizumPayment extends PaymentHandler
 {
-    public const PAYMENT_METHOD_NAME = PaymentMethod::BIZUM;
+    public const PAYMENT_METHOD_NAME = 'bizum';
     public const PAYMENT_METHOD_DESCRIPTION = 'Bizum';
 
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
