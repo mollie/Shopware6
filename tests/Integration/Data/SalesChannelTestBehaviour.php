@@ -64,7 +64,7 @@ trait SalesChannelTestBehaviour
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', true));
-        $criteria->addFilter(new EqualsFilter('technicalName', 'shipping_standard'));
+        $criteria->addFilter(new EqualsFilter('name', 'Standard'));
 
         $searchResult = $repository->searchIds($criteria, $context);
         if ($searchResult->getTotal() === 0) {

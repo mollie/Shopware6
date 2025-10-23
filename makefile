@@ -65,7 +65,8 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf ./src/Resources/public/mollie-payments.js
 
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt update -y && sudo apt install shopware-cli -y && sudo apt autoremove -y &&  shopware-cli -v
+	sudo apt-get update --allow-releaseinfo-change -y
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
