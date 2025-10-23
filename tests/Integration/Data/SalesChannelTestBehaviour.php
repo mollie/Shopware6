@@ -52,6 +52,7 @@ trait SalesChannelTestBehaviour
         }
 
         $salesChannel = $this->findSalesChannelByDomain($domain, $context);
+
         $this->assignDefaultShippingMethod($salesChannel, $context);
 
         return $this->getSalesChannelContext($salesChannel, $options);
@@ -63,22 +64,24 @@ trait SalesChannelTestBehaviour
         $repository = $this->getContainer()->get('shipping_method.repository');
 
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('name', 'Standard'));
 
         $searchResult = $repository->searchIds($criteria, $context);
         if ($searchResult->getTotal() === 0) {
             return;
         }
-        $repository->upsert([
-            [
-                'id' => $searchResult->firstId(),
+        $shippingMethods = [];
+        foreach ($searchResult->getIds() as $shippingMethodId) {
+            $shippingMethods[] = [
+                'id' => $shippingMethodId,
                 'active' => true,
                 'salesChannels' => [
                     [
                         'id' => $salesChannel->getId(),
                     ]
                 ]
-            ]
-        ], $context);
+            ];
+        }
+
+        $repository->upsert($shippingMethods, $context);
     }
 }
