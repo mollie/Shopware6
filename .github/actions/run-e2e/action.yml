@@ -133,6 +133,7 @@ runs:
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
+        docker exec shop bash -c 'composer require --dev phpunit/phpunit:9.* -W' # we need to install phpunit 9 with all dependencies, because of minimum php version 8.0
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'

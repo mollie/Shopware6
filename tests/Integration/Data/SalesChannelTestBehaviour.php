@@ -63,19 +63,21 @@ trait SalesChannelTestBehaviour
         $repository = $this->getContainer()->get('shipping_method.repository');
 
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('active', true));
         $criteria->addFilter(new EqualsFilter('name', 'Standard'));
 
         $searchResult = $repository->searchIds($criteria, $context);
         if ($searchResult->getTotal() === 0) {
             return;
         }
-        /** @var EntityRepository $repository */
-        $repository = $this->getContainer()->get('sales_channel_shipping_method.repository');
         $repository->upsert([
             [
-                'salesChannelId' => $salesChannel->getId(),
-                'shippingMethodId' => $searchResult->firstId()
+                'id' => $searchResult->firstId(),
+                'active' => true,
+                'salesChannels' => [
+                    [
+                        'id' => $salesChannel->getId(),
+                    ]
+                ]
             ]
         ], $context);
     }
