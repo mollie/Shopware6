@@ -42,7 +42,7 @@ class MollieShippingLineItemBuilder
             $price = $this->priceCalculator->calculateLineItemPrice($shippingPrice, $totalPrice, $taxStatus, $isVerticalTaxCalculation);
 
             $mollieLineItem = new MollieLineItem(
-                OrderLineType::TYPE_SHIPPING_FEE,
+                OrderLineType::SHIPPING_FEE,
                 sprintf('Delivery costs %s', $i),
                 $qty,
                 $price,
