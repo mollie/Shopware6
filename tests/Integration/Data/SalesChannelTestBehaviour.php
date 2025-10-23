@@ -27,24 +27,11 @@ trait SalesChannelTestBehaviour
         $criteria->addAssociation('domains');
         $criteria->addAssociation('language.locale');
         $criteria->addAssociation('currency');
+        $criteria->addAssociation('shippingMethods');
 
         $criteria->addFilter(new EqualsFilter('domains.url', $domain));
-
-        return $repository->search($criteria, $context)->first();
-    }
-
-    public function findRegularSalesChannel(Context $context): SalesChannelEntity
-    {
-        /** @var EntityRepository $repository */
-        $repository = $this->getContainer()->get('sales_channel.repository');
-
-        $criteria = new Criteria();
-        $criteria->addAssociation('domains');
-        $criteria->addAssociation('language.locale');
-        $criteria->addAssociation('currency');
-        $criteria->addAssociation('type');
-
         $criteria->addFilter(new EqualsFilter('typeId', Defaults::SALES_CHANNEL_TYPE_STOREFRONT));
+        $criteria->addFilter(new EqualsFilter('active', true));
 
         return $repository->search($criteria, $context)->first();
     }
@@ -56,10 +43,51 @@ trait SalesChannelTestBehaviour
         return $salesChannelContextFactory->create(Uuid::fromStringToHex($salesChannel->getName()), $salesChannel->getId(), $options);
     }
 
-    public function getDefaultSalesChannelContext(): SalesChannelContext
+    public function getDefaultSalesChannelContext(string $domain = '', array $options = []): SalesChannelContext
     {
-        $salesChannel = $this->findRegularSalesChannel(Context::createDefaultContext());
+        $context = Context::createDefaultContext();
 
-        return $this->getSalesChannelContext($salesChannel);
+        if ($domain === '') {
+            $domain = $_ENV['APP_URL'];
+        }
+
+        $salesChannel = $this->findSalesChannelByDomain($domain, $context);
+
+        $this->assignDefaultShippingMethod($salesChannel, $context);
+
+        return $this->getSalesChannelContext($salesChannel, $options);
+    }
+
+    private function assignDefaultShippingMethod(SalesChannelEntity $salesChannel, Context $context): void
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('shipping_method.repository');
+
+        $criteria = new Criteria();
+
+        $searchResult = $repository->searchIds($criteria, $context);
+        if ($searchResult->getTotal() === 0) {
+            return;
+        }
+        $ruleRepository = $this->getContainer()->get('rule.repository');
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', 'Always valid (Default)'));
+        $ruleSearchResult = $ruleRepository->searchIds($criteria, $context);
+
+        $shippingMethods = [];
+        foreach ($searchResult->getIds() as $shippingMethodId) {
+            $shippingMethods[] = [
+                'id' => $shippingMethodId,
+                'active' => true,
+                'availabilityRuleId' => $ruleSearchResult->firstId(),
+                'salesChannels' => [
+                    [
+                        'id' => $salesChannel->getId(),
+                    ]
+                ]
+            ];
+        }
+
+        $repository->upsert($shippingMethods, $context);
     }
 }

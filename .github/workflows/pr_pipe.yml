@@ -47,18 +47,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.7.3.0'
+          - shopware: '6.7.3.1'
             php: '8.3'
+            image: 'dockware/shopware'
           - shopware: '6.6.10.5'
             php: '8.2'
+            image: 'dockware/play'
           - shopware: '6.5.8.12'
             php: '8.2'
+            image: 'dockware/play'
           - shopware: '6.5.5.2'
             php: '8.2'
+            image: 'dockware/play'
           - shopware: '6.4.20.2'
             php: '8.2'
+            image: 'dockware/play'
           - shopware: '6.4.5.0'
             php: '8.0'
+            image: 'dockware/play'
     steps:
 
       - name: Clone Code
@@ -76,6 +82,7 @@ jobs:
             # -------------------------------------------
             SHOPWARE: ${{ matrix.shopware }}
             PHP: ${{ matrix.php }}
+            IMAGE: ${{ matrix.image }}
             # -------------------------------------------
             MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
             # -------------------------------------------

@@ -16,6 +16,9 @@ inputs:
   PHP:
     description: "The PHP Version that is used for the Shopware container."
     required: true
+  IMAGE:
+    description: "dockware image container."
+    required: true
   MOLLIE_APIKEY_TEST:
     description: "The Mollie Test API key. Required for the installation."
     default: ''
@@ -80,12 +83,12 @@ runs:
 
     - name: Download Docker
       shell: bash
-      run: docker pull -q dockware/play:${{ inputs.SHOPWARE }}
+      run: docker pull -q ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
 
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d dockware/play:${{ inputs.SHOPWARE }}
+        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
         sleep 15
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
@@ -97,6 +100,7 @@ runs:
         docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "echo "APP_URL=https://${{ inputs._SHOP_DOMAIN }}" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
@@ -121,14 +125,12 @@ runs:
         # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
         docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
         docker exec  shop bash -c 'mkdir -p /var/www/html/var/test/jwt && cp /var/www/html/config/jwt/*.pem /var/www/html/var/test/jwt && chmod 0660 /var/www/html/var/test/jwt/*.pem'
-        #docker exec shop bash -c 'composer require enqueue/enqueue:0.10.23' #0.10.24 is not compatible with 7.4 even if says so
-        #docker exec shop bash -c 'composer require shopware/core:${{ inputs.SHOPWARE }}' #we need to install speicific sw version
-        #docker exec shop bash -c 'composer install'
        
 
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
+        docker exec shop bash -c 'composer require --dev phpunit/phpunit:9.* -W' # we need to install phpunit 9 with all dependencies, because of minimum php version 8.0
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
@@ -171,6 +173,11 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
+
+    - name: Functional tests
+      shell: bash
+      run: |
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}

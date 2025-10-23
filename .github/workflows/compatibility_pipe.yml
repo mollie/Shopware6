@@ -10,6 +10,9 @@ on:
       phpVersion:
         description: 'PHP Version'
         required: true
+      image:
+        description: 'Dockware image'
+        required: true
 
 jobs:
 
@@ -70,6 +73,7 @@ jobs:
           # -------------------------------------------
           SHOPWARE: ${{ github.event.inputs.swVersion }}
           PHP: ${{ github.event.inputs.phpVersion }}
+          IMAGE: ${{ github.event.inputs.image }}
           # -------------------------------------------
           MOLLIE_APIKEY_TEST: ${{ secrets.MOLLIE_APIKEY_TEST }}
           # -------------------------------------------

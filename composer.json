@@ -52,6 +52,7 @@
         "psr-4": {
             "Mollie\\Unit\\": "tests/Unit/",
             "Mollie\\Integration\\": "tests/Integration/",
+            "Mollie\\Behat\\": "tests/Behat/Context/",
             "MolliePayments\\Tests\\": "tests/PHPUnit/",
             "MolliePayments\\PHPStan\\": "tests/PHPStan/",
             "MolliePayments\\Fixtures\\": "tests/Fixtures/"
@@ -76,7 +77,9 @@
         "phpcompatibility/php-compatibility": "^9.3",
         "squizlabs/php_codesniffer": "^3",
         "boxblinkracer/phpunuhi": "dev-main",
-        "spaze/phpstan-disallowed-calls": "^4"
+        "spaze/phpstan-disallowed-calls": "^4",
+        "behat/behat": "3.15.0",
+        "behat/gherkin": "4.10.0"
     },
     "scripts": {
         "post-install-cmd": [

@@ -3,15 +3,25 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Data;
 
+use Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase;
+use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\Controller\PaymentController;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CartLineItemController;
 use Shopware\Storefront\Controller\CheckoutController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
@@ -70,10 +80,58 @@ trait CheckoutTestBehaviour
         $flashBag = $request->getSession()->getBag('flashes');
         $flashBagData = $flashBag->peekAll();
         $dangerErrors = $flashBagData['danger'] ?? [];
-        $hasFlashes = count($dangerErrors) > 0;
+        $warningErrors = $flashBagData['warning'] ?? [];
+        $hasFlashes = count($dangerErrors) > 0 || count($warningErrors) > 0;
 
-        $this->assertFalse($hasFlashes, 'Create order has error messages ' . print_r($dangerErrors, true));
+        Assert::assertFalse($hasFlashes, 'Create order has error messages ' . print_r($dangerErrors + $warningErrors, true));
 
         return $response;
+    }
+
+    public function findCurrencyByIso(string $currencyIso, SalesChannelContext $salesChannelContext): CurrencyEntity
+    {
+        /** @var EntityRepository $currencyRepository */
+        $currencyRepository = $this->getContainer()->get('currency.repository');
+        $criteria = (new Criteria())
+            ->addFilter(new EqualsFilter('isoCode', $currencyIso))
+        ;
+
+        return $currencyRepository->search($criteria, $salesChannelContext->getContext())->first();
+    }
+
+    public function finishCheckout(string $paymentUrl, SalesChannelContext $salesChannelContext): Response
+    {
+        $matches = [];
+        preg_match('/mollie\/payment\/(?<paymentId>.*)/m', $paymentUrl, $matches);
+        $paymentId = $matches['paymentId'];
+
+        $returnController = $this->getContainer()->get(ReturnControllerBase::class);
+        /** @var RedirectResponse $response */
+        $response = $returnController->payment($salesChannelContext, $paymentId);
+        $redirectLocation = $response->getTargetUrl();
+        Assert::assertSame(302, $response->getStatusCode());
+        Assert::assertStringContainsString('payment/finalize-transaction', $redirectLocation);
+
+        $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
+        $urlParameters = [];
+        parse_str($queryString, $urlParameters);
+
+        $request = $this->createStoreFrontRequest($salesChannelContext);
+        $request->request->set('_sw_payment_token', $urlParameters['_sw_payment_token']);
+        $paymentController = $this->getContainer()->get(PaymentController::class);
+
+        return $paymentController->finalizeTransaction($request);
+    }
+
+    public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('order.repository');
+        $criteria = (new Criteria([$orderId]));
+        $criteria->addAssociation('transactions.stateMachineState');
+
+        $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt'));
+
+        return $repository->search($criteria, $salesChannelContext->getContext())->first();
     }
 }

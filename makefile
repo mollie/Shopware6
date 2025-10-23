@@ -65,7 +65,8 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf ./src/Resources/public/mollie-payments.js
 
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt update -y && sudo apt install shopware-cli -y && sudo apt autoremove -y &&  shopware-cli -v
+	sudo apt-get update --allow-releaseinfo-change -y
+	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
@@ -103,6 +104,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make stan -B
 	@make phpunit -B
 	@make phpintegration -B
+	@make behat -B
 	@make vitest -B
 	@make configcheck -B
 	@make phpunuhi -B
@@ -179,12 +181,15 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
+IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
+IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 ifneq (,$(findstring v12,$(NODE_VERSION)))
 	$(warning Attention, reqruires Node v14 or higher to build a release!)
 	@exit 1
 endif
+
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
@@ -201,8 +206,8 @@ endif
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 	# -------------------------------------------------------------------------------------------------
 	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/tests*' '*/node_modules*'  '*/.phpunuhi*' '*/makefile' '*.DS_Store' 'config/*' '*.prettierignore' './package.json' './package-lock.json'
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x '*/vendor/*'  '*.git*' '*.reports*' '*/.idea*' '*/node_modules*'  '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json'
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x $(IGNORED_FINAL)
+	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x $(IGNORED)
 	# -------------------------------------------------------------------------------------------------
 	# -------------------------------------------------------------------------------------------------
 	@echo ""

@@ -1,0 +1,10 @@
+default:
+  suites:
+    default:
+      paths:
+        features: '%paths.base%/../tests/Behat/Features'
+      contexts:
+        - Mollie\Behat\BootstrapContext
+        - Mollie\Behat\PaymentContext
+        - Mollie\Behat\CustomerContext
+        - Mollie\Behat\CheckoutContext
