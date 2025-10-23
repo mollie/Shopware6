@@ -78,7 +78,8 @@
         "squizlabs/php_codesniffer": "^3",
         "boxblinkracer/phpunuhi": "dev-main",
         "spaze/phpstan-disallowed-calls": "^4",
-        "behat/behat": "^3"
+        "behat/behat": "3.15.0",
+        "behat/gherkin": "4.10.0"
     },
     "scripts": {
         "post-install-cmd": [
