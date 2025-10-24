@@ -8,7 +8,7 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run --rm --name shop --env NODE_VERSION=18 --env PHP_VERSION=8.1 -d dockware/dev:6.5.8.7
+        docker run --rm --name shop --env NODE_VERSION=22 --env PHP_VERSION=8.3 -d dockware/shopware:6.7.3.0
         sleep 20
         docker logs shop
 
@@ -23,19 +23,6 @@ runs:
         docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
         docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
 
-    # --------------------------------------------------------------------------------------------------------------------------------------
-    - name: Fix apt-get repo
-      shell: bash
-      run: |
-        docker exec -u root shop bash -c 'apt-get update --allow-releaseinfo-change'
-        
-    - name: Install Plugin
-      shell: bash
-      run: |
-        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make prod'
-        docker exec shop bash -c 'cd /var/www/html && php bin/console plugin:refresh'
-        docker exec shop bash -c 'cd /var/www/html && php bin/console plugin:install MolliePayments --activate'
-        docker exec shop bash -c 'cd /var/www/html && php bin/console cache:clear'
 
     - name: Build Plugin
       shell: bash
