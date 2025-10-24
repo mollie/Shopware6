@@ -1,2 +1,5 @@
 build:
   shopwareVersionConstraint: '6.4.5.0'
+  zip:
+    assets:
+      npm_strict: true
