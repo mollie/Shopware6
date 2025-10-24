@@ -36,22 +36,22 @@ class FakeEventDispatcher implements EventDispatcherInterface
         return $event;
     }
 
-    public function addListener(string $eventName, callable $listener, int $priority = 0)
+    public function addListener(string $eventName, callable $listener, int $priority = 0): void
     {
         // TODO: Implement addListener() method.
     }
 
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         // TODO: Implement addSubscriber() method.
     }
 
-    public function removeListener(string $eventName, callable $listener)
+    public function removeListener(string $eventName, callable $listener): void
     {
         // TODO: Implement removeListener() method.
     }
 
-    public function removeSubscriber(EventSubscriberInterface $subscriber)
+    public function removeSubscriber(EventSubscriberInterface $subscriber): void
     {
         // TODO: Implement removeSubscriber() method.
     }
