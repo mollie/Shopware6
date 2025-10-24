@@ -24,6 +24,9 @@ return $config->setRules(
         'phpdoc_align' => [
             'align' => 'left',
         ],
+        'no_superfluous_phpdoc_tags'=>[
+            'allow_mixed' => true
+        ],
         'no_useless_else' => true,
         'no_useless_return' => true,
         'no_unused_imports' => true,

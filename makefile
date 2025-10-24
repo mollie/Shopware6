@@ -33,15 +33,15 @@ help:
 
 prod: ##1 Installs all production dependencies
 	# ----------------------------------------------------------------
-	@composer validate
-	@composer install --no-dev
+	composer validate
+	composer install --no-dev
 	npm install --omit=dev
 	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
-	@composer validate
-	COMPOSER_NO_SECURITY_BLOCKING=1 composer update --ignore-platform-req=ext-amqp
+	composer validate
+	composer install --ignore-platform-req=ext-amqp
 	npm install
 	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
@@ -66,8 +66,7 @@ build: ##2 Installs the plugin, and builds the artifacts using the Shopware buil
 	sudo apt-get install zip
 	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
-	cd ./src/Resources/app/storefront && npm install -y && make build -B
-	cd ./src/Resources/app/administration && npm install -y
+	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
 ifeq ($(use67),true)
 	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
@@ -87,7 +86,7 @@ endif
 
 fixtures: ##2 Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console --no-debug cache:clear
-	cd ../../.. && php bin/console --no-debug mollie:fixtures:install
+	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
 
 pr: ##2 Prepares everything for a Pull Request
 	# -----------------------------------------------------------------
@@ -102,12 +101,11 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
+	@make phpintegration -B
+	@make behat -B
 	@make vitest -B
 	@make configcheck -B
 	@make phpunuhi -B
-	# -----------------------------------------------------------------
-	@make phpintegration -B
-	@make behat -B
 
 snippetexport: ##2 Exports all snippets
 	php vendor/bin/phpunuhi export --configuration=./config/.phpunuhi.xml --dir=./.phpunuhi
