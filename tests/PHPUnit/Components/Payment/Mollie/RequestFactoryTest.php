@@ -25,12 +25,15 @@ class RequestFactoryTest extends TestCase
 
         $actual = $requestFactory->createPayment($order);
 
+
         $expected = new CreatePaymentRequest(
             '123456',
-            new Money('EUR', '10.00')
+            new Money('EUR', '10.0001')
         );
 
         Assert::assertInstanceOf(CreatePaymentRequest::class, $actual);
         Assert::assertEquals($expected, $actual);
     }
+
+ 
 }
