@@ -11,8 +11,6 @@ final class RequestFactory implements RequestFactoryInterface
 {
     public function createPayment(OrderEntity $order): CreatePaymentRequest
     {
-
-
-        return new CreatePaymentRequest($order->getOrderNumber(), new Money($order->getCurrency()->getIsoCode(), (string)$order->getAmountNet()));
+        return new CreatePaymentRequest($order->getOrderNumber(), new Money($order->getCurrency()->getIsoCode(), (string) $order->getAmountNet()));
     }
 }

@@ -44,7 +44,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
@@ -170,7 +169,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
 
         $transactionConverter = $this->createMock(TransactionConverterInterface::class);
 
-        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
+        $routingDetector = new RoutingDetector(new RequestStack([]));
         $routingBuilder = new RoutingBuilder(
             $this->router,
             $routingDetector,

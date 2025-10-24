@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\RefundManager\Builder;
 
-use Exception;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\DeliveryItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\PromotionItem;
@@ -82,7 +81,7 @@ class RefundDataBuilder
             // we will add our database data to the Mollie metadata.composition and therefore "fake" a response of Mollie,
             // so that we can reuse the old code from below, even though Mollie does not really have a metadata.composition.
             $refunds = $this->refundService->getRefunds($order, $context);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // if we dont have a payment, then theres also no refunds
             // we still need our data, only with an empty list of refunds
             $this->logger->critical($ex->getMessage());

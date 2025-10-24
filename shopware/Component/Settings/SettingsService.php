@@ -75,7 +75,6 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
-
     private function getShopwareSettings(?string $salesChannelId = null): array
     {
         $cacheKey = self::CACHE_KEY_SHOPWARE . '_' . ($salesChannelId ?? 'all');

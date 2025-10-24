@@ -67,10 +67,10 @@ class ResumeAction extends BaseAction
             [$oldInterval, $oldIntervalUnit] = explode(' ', $oldMollieSubscription->interval);
 
             $nextInterval = $this->intervalCalculator->getNextIntervalDate($oldStartDate, (int) $oldInterval, $oldIntervalUnit);
-            //we calculate the next possible payment date, based on the latest history entry
+            // we calculate the next possible payment date, based on the latest history entry
             /** @var \DateTimeInterface $nextPossiblePaymentDate */
             $nextPossiblePaymentDate = \DateTime::createFromFormat('Y-m-d', $nextInterval);
-            //if the next possible payment date is in the future, we use this instead of today
+            // if the next possible payment date is in the future, we use this instead of today
             if ($nextPossiblePaymentDate > $today) {
                 $nextPaymentDate = $nextPossiblePaymentDate;
             }

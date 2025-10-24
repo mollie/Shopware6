@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Mollie\Shopware\Component\Settings\Struct;
 
 use Shopware\Core\Framework\Struct\Struct;
@@ -16,11 +15,6 @@ final class ApiSettings extends Struct
     private string $liveApiKey;
     private bool $testMode;
 
-    /**
-     * @param string $testApiKey
-     * @param string $liveApiKey
-     * @param bool $testMode
-     */
     public function __construct(string $testApiKey, string $liveApiKey, bool $testMode)
     {
         $this->testApiKey = $testApiKey;
@@ -33,6 +27,7 @@ final class ApiSettings extends Struct
         $testApiKey = $settings[self::KEY_TEST_API_KEY] ?? '';
         $liveApiKey = $settings[self::KEY_LIVE_API_KEY] ?? '';
         $testMode = $settings[self::KEY_TEST_MODE] ?? false;
+
         return new self($testApiKey, $liveApiKey, $testMode);
     }
 
@@ -56,6 +51,7 @@ final class ApiSettings extends Struct
         if ($this->isTestMode()) {
             return $this->testApiKey;
         }
+
         return $this->liveApiKey;
     }
 }

@@ -33,14 +33,14 @@ help:
 
 prod: ##1 Installs all production dependencies
 	# ----------------------------------------------------------------
-	@composer validate
-	@composer install --no-dev
+	composer validate
+	composer install --no-dev
 	npm install --omit=dev
 	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
-	@composer validate
+	composer validate
 	composer install --ignore-platform-req=ext-amqp
 	npm install
 	chmod a+x node_modules/.bin/prettier
@@ -66,8 +66,7 @@ build: ##2 Installs the plugin, and builds the artifacts using the Shopware buil
 	sudo apt-get install zip
 	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
-	cd ./src/Resources/app/storefront && npm install -y && make build -B
-	cd ./src/Resources/app/administration && npm install -y
+	cd ./src/Resources/app/storefront && make build -B
 	rm -f .shopware-extension.yml
 ifeq ($(use67),true)
 	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
