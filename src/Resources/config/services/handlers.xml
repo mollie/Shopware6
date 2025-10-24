@@ -144,13 +144,6 @@
             <tag name="shopware.payment.method"/>
         </service>
 
-        <!-- PayPal PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PayPalPayment" >
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
 
         <!-- PayPal Express PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\PayPalExpressPayment">

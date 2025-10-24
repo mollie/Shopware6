@@ -3,7 +3,9 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services
         https://symfony.com/schema/dic/services/services-1.0.xsd">
-
+    <imports>
+        <import resource="payment_methods.xml"/>
+    </imports>
     <services>
         <service id="Mollie\Shopware\Component\Payment\PayAction">
             <argument type="service" id="Kiener\MolliePayments\Facade\MolliePaymentDoPay"/>
@@ -17,6 +19,13 @@
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
+        <service id="Mollie\Shopware\Component\Payment\Action\Pay">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Mollie\RequestFactory"/>
+            <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Mollie\RequestFactory"/>
 
 
 

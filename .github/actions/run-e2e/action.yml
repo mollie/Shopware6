@@ -167,7 +167,7 @@ runs:
     - name: Integration analyzer
       shell: bash
       run: |
-        docker exec shop bash -c 'php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
 
     - name: Integration tests
       shell: bash
@@ -183,14 +183,6 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
       run: cd tests/Cypress && make install -B
-
-    - name: Remove deprecated Cypress Tests
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.REMOVE_DEPRECATED_TESTS == 'true' }}
-      shell: bash
-      run: |
-        # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js || true
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'false' }}
