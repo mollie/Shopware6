@@ -67,7 +67,7 @@ class MollieShippingLineItemBuilderTest extends TestCase
         $currency->setIsoCode($isoCode);
 
         $expected = [[
-            'type' => OrderLineType::SHIPPING_FEE,
+            'type' => OrderLineType::TYPE_SHIPPING_FEE,
             'name' => 'Delivery costs 1',
             'quantity' => 1,
             'unitPrice' => [
