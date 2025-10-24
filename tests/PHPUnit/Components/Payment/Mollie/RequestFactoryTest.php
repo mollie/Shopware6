@@ -20,7 +20,7 @@ class RequestFactoryTest extends TestCase
         $order = new OrderEntity();
         $currency = new CurrencyEntity();
         $currency->setIsoCode('EUR');
-        $order->setAmountNet('10.0001');
+        $order->setAmountNet(10.0001);
         $order->setCurrency($currency);
         $order->setOrderNumber('123456');
 
