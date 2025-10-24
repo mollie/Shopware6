@@ -35,5 +35,5 @@ class RequestFactoryTest extends TestCase
         Assert::assertEquals($expected, $actual);
     }
 
- 
+
 }
