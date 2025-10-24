@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Mollie\PHPUnit\Components\Payment\Mollie;
 
@@ -25,7 +26,6 @@ class RequestFactoryTest extends TestCase
 
         $actual = $requestFactory->createPayment($order);
 
-
         $expected = new CreatePaymentRequest(
             '123456',
             new Money('EUR', '10.0001')
@@ -34,6 +34,4 @@ class RequestFactoryTest extends TestCase
         Assert::assertInstanceOf(CreatePaymentRequest::class, $actual);
         Assert::assertEquals($expected, $actual);
     }
-
-
 }

@@ -10,9 +10,6 @@ final class PaymentSettings extends Struct
     public const KEY_ORDER_NUMBER_FORMAT = 'formatOrderNumber';
     private string $orderNumberFormat = '';
 
-    /**
-     * @param string $orderNumberFormat
-     */
     public function __construct(string $orderNumberFormat)
     {
         $this->orderNumberFormat = $orderNumberFormat;
@@ -29,5 +26,4 @@ final class PaymentSettings extends Struct
     {
         return $this->orderNumberFormat;
     }
-    
 }
