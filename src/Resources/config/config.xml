@@ -2,28 +2,28 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
 
     <card>
-        <title></title>
-        <title lang="de-DE"></title>
-        <title lang="nl-NL"></title>
-        <title lang="it-IT"></title>
-        <title lang="pt-PT"></title>
-        <title lang="es-ES"></title>
-        <title lang="sv-SE"></title>
-        <title lang="nb-NO"></title>
-        <title lang="pl-PL"></title>
-        <title lang="cs-CZ"></title>
-        <title lang="sl-SL"></title>
-        <title lang="hu-HU"></title>
-        <title lang="fi-FI"></title>
-        <title lang="da-DK"></title>
-        <title lang="el-GR"></title>
-        <title lang="hr-HR"></title>
-        <title lang="et-EE"></title>
-        <title lang="is-IS"></title>
-        <title lang="lt-LT"></title>
-        <title lang="lv-LV"></title>
-        <title lang="ro-RO"></title>
-        <title lang="sk-SK"></title>
+        <title> </title>
+        <title lang="de-DE"> </title>
+        <title lang="nl-NL"> </title>
+        <title lang="it-IT"> </title>
+        <title lang="pt-PT"> </title>
+        <title lang="es-ES"> </title>
+        <title lang="sv-SE"> </title>
+        <title lang="nb-NO"> </title>
+        <title lang="pl-PL"> </title>
+        <title lang="cs-CZ"> </title>
+        <title lang="sl-SL"> </title>
+        <title lang="hu-HU"> </title>
+        <title lang="fi-FI"> </title>
+        <title lang="da-DK"> </title>
+        <title lang="el-GR"> </title>
+        <title lang="hr-HR"> </title>
+        <title lang="et-EE"> </title>
+        <title lang="is-IS"> </title>
+        <title lang="lt-LT"> </title>
+        <title lang="lv-LV"> </title>
+        <title lang="ro-RO"> </title>
+        <title lang="sk-SK"> </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
         </component>
