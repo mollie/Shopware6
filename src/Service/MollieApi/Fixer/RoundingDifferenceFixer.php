@@ -42,7 +42,7 @@ class RoundingDifferenceFixer
             $sku = (! empty($sku)) ? $sku : self::DEFAULT_SKU;
 
             $mollieLineItem = new MollieLineItem(
-                OrderLineType::PHYSICAL,
+                OrderLineType::TYPE_PHYSICAL,
                 $name,
                 1,
                 $price,

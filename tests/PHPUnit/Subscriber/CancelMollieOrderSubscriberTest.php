@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Subscriber;
 
 use Kiener\MolliePayments\Subscriber\CancelOrderSubscriber;
-use Mollie\Api\Types\PaymentStatus;
+use Mollie\Api\Types\OrderStatus;
 use PHPUnit\Framework\TestCase;
 
 class CancelMollieOrderSubscriberTest extends TestCase
@@ -17,8 +17,9 @@ class CancelMollieOrderSubscriberTest extends TestCase
     public function testCancelMollieOrderStatesConstant(): void
     {
         $expected = [
-            PaymentStatus::OPEN,
-            PaymentStatus::AUTHORIZED
+            OrderStatus::STATUS_CREATED,
+            OrderStatus::STATUS_AUTHORIZED,
+            OrderStatus::STATUS_SHIPPING,
         ];
 
         self::assertSame($expected, CancelOrderSubscriber::ALLOWED_CANCELLABLE_MOLLIE_STATES);
