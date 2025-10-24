@@ -47,8 +47,6 @@ dev: ##1 Installs all dev dependencies
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
 
-install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
-	@make prod -B
 
 clean: ##1 Cleans all dependencies and files
 	rm -rf vendor/*
