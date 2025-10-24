@@ -56,13 +56,12 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf .reports | true
 	# ------------------------------------------------------
 	rm -rf ./node_modules/*
+	rm -rf config-*
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	# ------------------------------------------------------
-	rm -rf ./src/Resources/public/administration
-	rm -rf ./src/Resources/public/mollie-payments.js
+
 
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	sudo apt-get update --allow-releaseinfo-change -y
