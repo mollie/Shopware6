@@ -56,25 +56,25 @@ class RefundHydratorTest extends TestCase
                 $this->getRefund(null, null),
             ],
             'Refund with status processing' => [
-                $this->getExpectedData(12.99, -12.99, RefundStatus::PROCESSING),
-                $this->getRefund(12.99, -12.99, RefundStatus::PROCESSING),
+                $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_PROCESSING),
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_PROCESSING),
             ],
             'Refund with status pending' => [
-                $this->getExpectedData(12.99, -12.99, RefundStatus::PENDING),
-                $this->getRefund(12.99, -12.99, RefundStatus::PENDING),
+                $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_PENDING),
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_PENDING),
             ],
             'Refund with status failed' => [
-                $this->getExpectedData(12.99, -12.99, RefundStatus::FAILED),
-                $this->getRefund(12.99, -12.99, RefundStatus::FAILED),
+                $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_FAILED),
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_FAILED),
             ],
             'Refund with status refunded' => [
-                $this->getExpectedData(12.99, -12.99, RefundStatus::REFUNDED),
-                $this->getRefund(12.99, -12.99, RefundStatus::REFUNDED),
+                $this->getExpectedData(12.99, -12.99, RefundStatus::STATUS_REFUNDED),
+                $this->getRefund(12.99, -12.99, RefundStatus::STATUS_REFUNDED),
             ],
         ];
     }
 
-    private function getExpectedData(?float $amount, ?float $settlementAmount, string $status = RefundStatus::QUEUED): array
+    private function getExpectedData(?float $amount, ?float $settlementAmount, string $status = RefundStatus::STATUS_QUEUED): array
     {
         if (! is_null($amount)) {
             $amount = [
@@ -100,16 +100,16 @@ class RefundHydratorTest extends TestCase
             'internalDescription' => null,
             'createdAt' => '2015-08-01T12:34:56+0100',
             'status' => $status,
-            'isFailed' => $status == RefundStatus::FAILED,
-            'isPending' => $status == RefundStatus::PENDING,
-            'isProcessing' => $status == RefundStatus::PROCESSING,
-            'isQueued' => $status == RefundStatus::QUEUED,
-            'isTransferred' => $status == RefundStatus::REFUNDED,
+            'isFailed' => $status == RefundStatus::STATUS_FAILED,
+            'isPending' => $status == RefundStatus::STATUS_PENDING,
+            'isProcessing' => $status == RefundStatus::STATUS_PROCESSING,
+            'isQueued' => $status == RefundStatus::STATUS_QUEUED,
+            'isTransferred' => $status == RefundStatus::STATUS_REFUNDED,
             'metadata' => new \stdClass(),
         ];
     }
 
-    private function getRefund(?float $amount, ?float $settlementAmount, string $status = RefundStatus::QUEUED): Refund
+    private function getRefund(?float $amount, ?float $settlementAmount, string $status = RefundStatus::STATUS_QUEUED): Refund
     {
         if (! is_null($amount)) {
             $amount = [
@@ -128,11 +128,11 @@ class RefundHydratorTest extends TestCase
         $refundMock = $this->createConfiguredMock(
             Refund::class,
             [
-                'isQueued' => $status == RefundStatus::QUEUED,
-                'isPending' => $status == RefundStatus::PENDING,
-                'isProcessing' => $status == RefundStatus::PROCESSING,
-                'isTransferred' => $status == RefundStatus::REFUNDED,
-                'isFailed' => $status == RefundStatus::FAILED,
+                'isQueued' => $status == RefundStatus::STATUS_QUEUED,
+                'isPending' => $status == RefundStatus::STATUS_PENDING,
+                'isProcessing' => $status == RefundStatus::STATUS_PROCESSING,
+                'isTransferred' => $status == RefundStatus::STATUS_REFUNDED,
+                'isFailed' => $status == RefundStatus::STATUS_FAILED,
                 'cancel' => null,
             ]
         );

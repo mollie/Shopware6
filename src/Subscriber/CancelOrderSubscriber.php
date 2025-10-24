@@ -8,8 +8,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Mollie\Api\Exceptions\ApiException;
-
-use Mollie\Api\Types\PaymentStatus;
+use Mollie\Api\Types\OrderStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SalesChannelApiSource;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
@@ -30,9 +29,9 @@ class CancelOrderSubscriber implements EventSubscriberInterface
      * Cancellations are only done for these Mollie states.
      */
     public const ALLOWED_CANCELLABLE_MOLLIE_STATES = [
-        PaymentStatus::OPEN,
-        PaymentStatus::AUTHORIZED,
-        PaymentStatus::PENDING,
+        OrderStatus::STATUS_CREATED,
+        OrderStatus::STATUS_AUTHORIZED,
+        OrderStatus::STATUS_SHIPPING,
     ];
 
     /**

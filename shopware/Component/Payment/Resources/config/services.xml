@@ -20,9 +20,12 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
         <service id="Mollie\Shopware\Component\Payment\Action\Pay">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Mollie\RequestFactory"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Mollie\RequestFactory"/>
 
 
 

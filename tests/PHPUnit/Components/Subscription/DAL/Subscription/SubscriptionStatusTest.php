@@ -57,11 +57,11 @@ class SubscriptionStatusTest extends TestCase
     public function getMollieStatus(): array
     {
         return [
-            [SubscriptionStatus::PENDING, MollieSubscriptionStatus::PENDING],
-            [SubscriptionStatus::ACTIVE, MollieSubscriptionStatus::ACTIVE],
-            [SubscriptionStatus::SUSPENDED, MollieSubscriptionStatus::SUSPENDED],
-            [SubscriptionStatus::COMPLETED, MollieSubscriptionStatus::COMPLETED],
-            [SubscriptionStatus::CANCELED, MollieSubscriptionStatus::CANCELED],
+            [SubscriptionStatus::PENDING, MollieSubscriptionStatus::STATUS_PENDING],
+            [SubscriptionStatus::ACTIVE, MollieSubscriptionStatus::STATUS_ACTIVE],
+            [SubscriptionStatus::SUSPENDED, MollieSubscriptionStatus::STATUS_SUSPENDED],
+            [SubscriptionStatus::COMPLETED, MollieSubscriptionStatus::STATUS_COMPLETED],
+            [SubscriptionStatus::CANCELED, MollieSubscriptionStatus::STATUS_CANCELED],
         ];
     }
 
