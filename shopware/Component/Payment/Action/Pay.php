@@ -7,11 +7,11 @@ use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 use Mollie\Shopware\Component\Payment\Mollie\RequestFactoryInterface;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 
 final class Pay
 {
@@ -19,7 +19,7 @@ final class Pay
     private LoggerInterface $logger;
     private RequestFactoryInterface $requestFactory;
 
-    public function __construct(RequestFactoryInterface $requestFactory,TransactionConverterInterface $transactionConverter, LoggerInterface $logger)
+    public function __construct(RequestFactoryInterface $requestFactory, TransactionConverterInterface $transactionConverter, LoggerInterface $logger)
     {
         $this->requestFactory = $requestFactory;
         $this->transactionConverter = $transactionConverter;
