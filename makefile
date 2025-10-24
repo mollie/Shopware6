@@ -182,8 +182,8 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
-IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
-IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
+IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' 'MolliePayments/package.json' 'MolliePayments/package-lock.json' 'MolliePayments/composer.lock'
+IGNORED_FINAL = $(IGNORED)  '*/tests*' 'MolliePayments/config/*' '*/makefile'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 ifneq (,$(findstring v12,$(NODE_VERSION)))
