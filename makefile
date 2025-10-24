@@ -192,6 +192,8 @@ endif
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
 	make clean -B
+	cd src/Resources/app/administration && npm install
+	cd src/Resources/app/storefront && npm install
 	make build use67=true -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
