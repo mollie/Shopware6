@@ -44,7 +44,7 @@ class FakeRouter implements RouterInterface
     }
 
     /**
-     * @return \Symfony\Component\Routing\RouteCollection|void
+     * @return RouteCollection|void
      */
     public function getRouteCollection(): RouteCollection
     {
