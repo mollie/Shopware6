@@ -66,9 +66,11 @@ clean: ##1 Cleans all dependencies and files
 
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	sudo apt-get update --allow-releaseinfo-change -y
+	sudo apt-get install zip
 	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
-	cd ./src/Resources/app/storefront && make build -B
+	cd ./src/Resources/app/storefront && npm install -y && make build -B
+	cd ./src/Resources/app/administration && npm install -y
 	rm -f .shopware-extension.yml
 ifeq ($(use67),true)
 	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
@@ -194,12 +196,9 @@ endif
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
 	make clean -B
-	make dev -B
-	make build -B
+	make build use67=true -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
-	make prod -B
-	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# DELETE distribution file. that ones not compatible between 6.5 and 6.4
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
