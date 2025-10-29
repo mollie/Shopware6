@@ -1,58 +1,8 @@
-# unreleased
-- Behoben: Webhooks für POS-Terminal-Zahlungen funktionieren nun korrekt.
-- Behoben: Beim Express Checkout werden nun nur die ausgewählten Radio-Button-Werte übermittelt, wenn das CustomProducts-Plugin verwendet wird. Zuvor wurden alle Optionen gesendet statt nur die gewählten.
-
-# 4.23.0
-- Neu: Vipps als Zahlungsmethode hinzugefügt.
-- Neu: MobilePay als Zahlungsmethode hinzugefügt.
-- Behoben: Änderungen an den Order-Daten durch Listener des `MollieOrderBuildEvent` werden nun korrekt für den Mollie-API-Request verwendet. Bisher wurde das Event zwar ausgelöst, die modifizierten Order-Daten jedoch ignoriert.
-- Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
-- Problem behoben mit verschiedenen Set-Plugins
-- Behoben: Page Extensions werden im Checkout nun korrekt erweitert statt überschrieben, um Kompatibilität mit anderen Plugins zu gewährleisten.
-- Neu: Beim Erstatten aller Line Items im Shopware Return Manager werden Versandkosten nun automatisch mit berücksichtigt. Manuell angegebene Versandkosten werden ebenfalls übernommen.
-- Behoben: Der Apple Pay Direct Button wird im Shopping-Cart-Offcanvas korrekt angezeigt, wenn die Versandart geändert wird.
-- Behoben: Custom Fields von anderen Herstellern werden beim Aktualisieren von OrderLineItems nicht mehr überschrieben.
-- Neu: Bulgarische Übersetzungen hinzugefügt.
-- Kroatische Übersetzungen aktualisiert.
-- Litauische Übersetzungen aktualisiert.
-- Routen mit Kundennummern in der URL wurden überarbeitet. Es wird nun der aktuell eingeloggte Kunde verwendet, anstatt der Kundenummer aus der URL
-
-# 4.22.1
-- Die Verarbeitung von Positionen mit negativen Beträgen wurde behoben.
-
-# 4.22.0
-- Behebung eines falschen Warenkorbpreises bei Apple Pay Direct in Kombination mit Netto-Anzeigepreise bei Kundengruppen. Hier wurden keine Steuern miteinberechnet. 
-- Behebung eines Problems, bei dem in manchen zufälligen Fällen die Kreditkartenfelder nicht funktionieren. (mollie.js defer-sync Laden wurde entfernt).
-- Wenn ein Kunde die Zahlungsart eines Abonnements ändert, werden alle älteren, noch stornierbaren Zahlungen automatisch abgebrochen.
-- Die Kompatibilität mit dem Plugin „Zusatzoptionen/Garantien“ wurde implementiert.
-- Kunden mit bestehendem Abonnement haben nun eine Übersichtsseite in der Administration zum Kündigen ihrer Abonnements.
-- Die Darstellung der Zahlarten in älteren Shopware-Versionen wurde korrigiert.
-- Der „Test API Keys“-Button in den Plugin-Einstellungen wurde für Shopware 6.7 korrigiert.
-- Die Zahlungsstatus-Aktion wurde versionsabhängig angepasst, sodass in älteren Shopware-Versionen wieder die korrekte Action verwendet wird.
-- iDEAL wurde zu iDEAL | Wero umbenannt.
-
-# 4.21.0
-- Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig
-- Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
-- Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
-- Behoben: Versandarten wurden in Apple Pay Express angezeigt, obwohl der Versand für diese Länder in der Administration deaktiviert war.
-- Aktualisiert: Die Abhängigkeit zum Basecom Fixture Plugin wurde entfernt und durch unser eigenes Fixture Plugin ersetzt.
-- Behoben: MolliePaymentMethodAvailabilityRemover berücksichtigt nun auch Warenkörbe mit dem Preis 0, um zu vermeiden, dass alle Zahlungsmethoden entfernt werden.
-- Kompatibilität mit Click & Collect Plugin
-- Behoben: Beschreibungen von Zahlungsarten wurden beim Checkout angezeigt, obwohl diese nicht ausgewählt waren.
-- Die Profilnavigation wurde erweitert und umfasst nun die Verwaltung gespeicherter Kreditkartendaten (nur sichtbar, wenn Kreditkartendaten vorhanden sind).
-- Tracking-Parameter sind jetzt optional für alle Versand-API-Routen.
-
-# 4.20.1 
-- Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
-
-# 4.20.0 - 2025-11-19
-- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und Shopware übereinstimmen.
-- Behoben: Ein Problem, bei dem Apple Pay Direct nicht funktionierte, wenn im Shop die Telefonnummer als Pflichtfeld konfiguriert war.
-- Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben
-- Behoben: Im Admin wurden bei Bestellungen fälschlicherweise Mollie-Daten angezeigt, obwohl die finale Transaktion nicht von Mollie stammte.
-- Shopware Refunds wendet nun den korrekt erstatteten Betrag an.
-- Überschrift in der Konfiguration wurde behoben
+# 5.0.0
+- Grundlegende Zahlung über Payments API eingebaut
+# 4.20.0
+### Geändert
+- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und SHopware übereinstimmen.
 
 ## [4.19.0] - 2025-10-09
 - Unterstützung für die estnische Sprache hinzugefügt
@@ -647,7 +597,7 @@ Diese Version bietet Unterstützung für die Massenbearbeitung von Produkten in 
 - Neues `MollieOrderBuilder` Event, um eigene Metadaten zu einer Bestellung hinzufügen zu können (Feature für Entwickler).
 
 ### Verbesserungen
-- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch fehlschlug, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
+- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch scheiterte, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
 - SEPA Zahlungen bleiben nun auf "In Progress", wenn diese gestartet wurden, und springen nicht mehr zurück auf "Open".
 - Zahlungen mit Status "Created" werden nun als "fehlerhaft" erkannt.
 - Kreditkartenzahlungen mit Status "Open" werden nun als "fehlerhaft" erkannt.
@@ -812,7 +762,7 @@ Aber keine Sorge, es gibt eine neue Funktion **"Automatischer Versand"**, die st
 
 ## [1.4.3] - 2021-07-07
 ### Fehlerbehebungen
-- Fix for Backwards-Compatibility
+- Fix für Backwards-Compatibility
 
 ## [1.4.2] - 2021-07-06
 ### Fehlerbehebungen

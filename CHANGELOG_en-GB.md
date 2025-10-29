@@ -1,57 +1,8 @@
-# unreleased
-- Fixed: Webhooks for POS Terminal payments now work correctly‚.
-- Fixed: Express Checkout now correctly submits only selected radio button values when using the CustomProducts plugin, preventing all options from being sent instead of the chosen ones.
-
-# 4.23.0
-- New: Added Vipps as a payment method.
-- New: Added MobilePay as a payment method.
-- Fixed: Changes to order data made by listeners of the `MollieOrderBuildEvent` are now correctly applied to the Mollie API request. Previously, the event was dispatched but the modified order data was ignored.
-- Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
-- Fixed compatibility with set plugins.
-- Fixed: Page extensions are now correctly extended instead of overwritten during checkout to ensure compatibility with other plugins.
-- New: Shipping costs are now automatically considered for refunds via the Shopware Return Manager, including manually entered shipping costs.
-- Fixed: Apple Pay Direct button in the shopping cart offcanvas is now displayed correctly when changing the shipping method.
-- Fixed: Custom fields from other vendors are no longer overwritten when updating order line items.
-- New: Added Bulgarian translations.
-- Updated Croatian translations.
-- Updated Lithuanian translations.
-- Routes with customerIds were changed, now the customerId is used from the current logged in user instead Query parameter.
-
-# 4.22.1
-- Fixed an issue so that line items with negative amounts work again.
-
-# 4.22.0
-- Fixed wrong total amount in Apple Pay Direct when using NET display prices for customer groups. Taxes were not added in this case.
-- Fix a problem where the credit card input fields are sometimes not editable due to race conditions when loading the mollie.js file. (removed defer-async loading).
-- When a customer changes the payment method of a subscription, all older payments that can still be canceled will be automatically canceled.
-- Added support for the “Additional Options/Warranties” plugin.
-- Added an admin overview page allowing existing subscribers to cancel their subscriptions.
-- Fixed the display of payment methods in older Shopware versions.
-- Fixed the “Test API Keys” button in the plugin settings for Shopware 6.7.
-- Adjusted the payment status action based on the Shopware version to ensure compatibility with older versions.
-- iDEAL was renamed to zu iDEAL | Wero.
-
-# 4.21.0
-- Shipping costs are now considered in refunds via Shopware Return Management.
-- Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
-- Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.
-- Fixed: Shipping methods were shown in Apple Pay Express even for countries where shipping was disabled in the administration.
-- Removed: Removed dependency for the Basecom Fixture plugin and built our own fixture framework.
-- Fixed: MolliePaymentMethodAvailabilityRemover to consider carts with price 0 to avoid getting all the payment methods removed.
-– Compatibility with Click & Collect plugin
-- Fixed: Descriptions of payment methods were displayed during checkout even when they were not selected.
-- The profile navigation has been extended to include management of saved credit card details (visible only when credit card data is available).
-- Tracking parameters are now optional for all shipping API routes.
-
-# 4.20.1
-- Fixed: Order overview in Shopware 6.5 does not crash anymore
+# 5.0.0
+- Added basic payment via paypal API
 # 4.20.0
-- Changed order builder to use order addresses instead of customer default addresses to make sure the address in mollie matches the order information in shopware.
-- Fixed an issue where Apple Pay Direct did not work when the phone number was configured as a required field in the shop.
-- Fixed compatibility with shopware commercial 
-- Fixed: Resolved an issue where Mollie data was shown in the admin order view even when the final transaction was not processed via Mollie.
-- Shopware Refunds now correctly applies the refunded amount.
-- Title in the Admin Configuration was fixed 
+### Changed
+- Changed order builder to use order addresses instead of customer defaulr addresses to make sure the addres in mollie matches the order information in shopware.
 
 ## [4.19.0] - 2025-10-09
 - Added Estonian Language Support
