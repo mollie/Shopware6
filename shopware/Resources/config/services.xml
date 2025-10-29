@@ -5,7 +5,13 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
    <imports>
-       <import resource="./../../Component/**/Resources/config/**.xml"/>
+       <import resource="./../../Component/**/Resources/config/services.xml"/>
        <import resource="repositories.xml"/>
    </imports>
+    <services>
+        <service id="Mollie\Shopware\Subscriber\OrderTransactionLoadedSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+    </services>
 </container>

@@ -7,4 +7,5 @@ use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 
 final class PayPalPayment extends CompatibilityPaymentHandler
 {
+    protected string $method = 'paypal';
 }

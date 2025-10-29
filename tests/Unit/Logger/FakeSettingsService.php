@@ -5,6 +5,7 @@ namespace Mollie\Unit\Logger;
 
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\shopware\Component\Settings\Struct\PaymentSettings;
 
@@ -19,6 +20,12 @@ final class FakeSettingsService extends AbstractSettingsService
         }
         $this->settings = $settings;
     }
+
+    public function getEnvironmentSettings(): EnvironmentSettings
+    {
+        // TODO: Implement getEnvironmentSettings() method.
+    }
+
     public function getDecorated(): AbstractSettingsService
     {
         // TODO: Implement getDecorated() method.
