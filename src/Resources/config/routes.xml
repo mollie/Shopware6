@@ -4,4 +4,5 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
     <import resource="routes/**/*.xml"/>
+    <import resource="../../../shopware/Resources/config/routes.xml"/>
 </routes>

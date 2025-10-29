@@ -8,11 +8,9 @@ use Shopware\Core\Framework\Struct\Struct;
 final class PaymentSettings extends Struct
 {
     public const KEY_ORDER_NUMBER_FORMAT = 'formatOrderNumber';
-    private string $orderNumberFormat = '';
 
-    public function __construct(string $orderNumberFormat)
+    public function __construct(private string $orderNumberFormat = '')
     {
-        $this->orderNumberFormat = $orderNumberFormat;
     }
 
     public static function createFromShopwareArray(array $settings): self
