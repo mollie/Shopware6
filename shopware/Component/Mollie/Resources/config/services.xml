@@ -8,6 +8,7 @@
 
         <service id="Mollie\Shopware\Component\Mollie\CreatePaymentBuilder">
             <argument type="service" id="Mollie\Shopware\Component\Router\RouteBuilder"/>
+            <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
         </service>
 
 

@@ -4,18 +4,33 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 
 final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 {
-    public function __construct(private RouteBuilderInterface $routeBuilder)
-    {
+    public function __construct(
+        private RouteBuilderInterface $routeBuilder,
+        private AbstractSettingsService $settingsService,
+    ) {
     }
 
     public function build(PaymentTransactionStruct $transaction): CreatePayment
     {
         $order = $transaction->getOrder();
+        $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
+        $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
         $description = $order->getOrderNumber();
+
+        if (mb_strlen($orderNumberFormat) > 0) {
+            $description = str_replace([
+                '{ordernumber}',
+                '{customernumber}'
+            ], [
+                $order->getOrderNumber(),
+                $order->getOrderCustomer()->getCustomerNumber()
+            ], $orderNumberFormat);
+        }
         $currency = $order->getCurrency();
         $returnUrl = $this->routeBuilder->getReturnUrl($transaction->getOrderTransactionId());
         $webhookUrl = $this->routeBuilder->getWebhookUrl($transaction->getOrderTransactionId());

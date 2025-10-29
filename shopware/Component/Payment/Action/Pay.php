@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Payment\Action;
 
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilderInterface;
 use Mollie\shopware\Component\Mollie\Gateway\MollieGatewayInterface;
-use Mollie\Shopware\Component\Payment\Event\CreatePaymentEvent;
+use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
@@ -59,7 +59,7 @@ final class Pay
             'salesChannel' => $salesChannelName,
         ]);
 
-        $paymentEvent = new CreatePaymentEvent($createPaymentStruct, $salesChannelContext);
+        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $salesChannelContext);
         $this->eventDispatcher->dispatch($paymentEvent);
 
         $paymentResult = $this->paymentGateway->createPayment($paymentEvent->getPayment(), $transaction->getOrder()->getSalesChannelId());
