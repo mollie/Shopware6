@@ -36,6 +36,9 @@
 - Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
 - Added new event ModifyCreateSubscriptionPayloadEvent. This allows developers to modify and extend the payload for the Mollie Subscription API before a subscription is created.
 
+# 5.0.0
+- Added basic payment via paypal API
+
 # 4.23.0
 - New: Added Vipps as a payment method.
 - New: Added MobilePay as a payment method.

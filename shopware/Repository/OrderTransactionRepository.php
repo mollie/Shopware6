@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -38,6 +39,26 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
     {
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->logger = $logger;
+    }
+
+    public function saveTransactionData(OrderTransactionEntity $shopwareOrderTransaction, OrderTransaction $mollieTransactionData, Context $context): EntityWrittenContainerEvent
+    {
+        return $this->orderTransactionRepository->upsert([
+            [
+                'id' => $shopwareOrderTransaction->getId(),
+                'customFields' => [
+                    Mollie::EXTENSION => $mollieTransactionData->all()
+                ]
+            ]
+        ], $context);
+    }
+
+    public function findById(string $orderTransactionId, Context $context): ?OrderTransactionEntity
+    {
+        $criteria = new Criteria([$orderTransactionId]);
+        $criteria->addAssociation('order');
+
+        return $this->orderTransactionRepository->search($criteria, $context)->first();
     }
 
     public function findOpenTransactions(?Context $context = null): IdSearchResult
