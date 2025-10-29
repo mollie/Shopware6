@@ -6,7 +6,7 @@ namespace Mollie\Shopware\Component\Settings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
-use Mollie\shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 
 abstract class AbstractSettingsService
 {
