@@ -52,9 +52,14 @@ trait MolliePageTestBehaviour
     {
         $client = new Client();
         $response = $client->get($url, [RequestOptions::ALLOW_REDIRECTS => false]);
-        $formLocation = $response->getHeader('location')[0];
 
-        $htmlContent = file_get_contents($formLocation);
+        $formLocation = $response->getHeader('location')[0] ?? null;
+        if ($formLocation === null) {
+            $htmlContent = $response->getBody()->getContents();
+            $formLocation = $url;
+        } else {
+            $htmlContent = file_get_contents($formLocation);
+        }
 
         $dom = new \DOMDocument();
         try {
@@ -63,6 +68,7 @@ trait MolliePageTestBehaviour
         }
 
         $form = $dom->getElementById('body');
+
         $inputs = $form->getElementsByTagName('input');
 
         $formData = [

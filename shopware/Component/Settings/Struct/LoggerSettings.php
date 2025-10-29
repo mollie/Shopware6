@@ -9,13 +9,9 @@ final class LoggerSettings extends Struct
 {
     public const KEY_LOG_FILE_DAYS = 'logFileDays';
     public const KEY_DEBUG_MODE = 'debugMode';
-    private bool $isDebugMode;
-    private int $logFileDays;
 
-    public function __construct(bool $isDebugMode, int $logFileDays)
+    public function __construct(private bool $isDebugMode, private int $logFileDays)
     {
-        $this->isDebugMode = $isDebugMode;
-        $this->logFileDays = $logFileDays;
     }
 
     public static function createFromShopwareArray(array $settings): LoggerSettings
