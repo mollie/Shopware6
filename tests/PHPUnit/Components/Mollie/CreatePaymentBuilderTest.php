@@ -118,7 +118,7 @@ class CreatePaymentBuilderTest extends TestCase
                 'city' => 'Test City',
                 'country' => 'DE',
             ],
-            'captureMode' => 'automatic',
+            'captureMode' => null,
             'locale' => 'en_GB',
             'lines' => [
                 [
