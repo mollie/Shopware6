@@ -62,14 +62,7 @@
             <tag name="shopware.payment.method"/>
         </service>
 
-        <!-- Credit Card PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" >
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
+
 
         <!-- Direct Debit PaymentHandler -->
         <service id="Kiener\MolliePayments\Handler\Method\DirectDebitPayment" >

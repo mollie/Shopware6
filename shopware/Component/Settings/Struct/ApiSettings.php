@@ -21,7 +21,7 @@ final class ApiSettings extends Struct
         $liveApiKey = $settings[self::KEY_LIVE_API_KEY] ?? '';
         $testMode = $settings[self::KEY_TEST_MODE] ?? false;
 
-        return new self($testApiKey, $liveApiKey, $testMode);
+        return new self($testApiKey, $liveApiKey, (bool) $testMode);
     }
 
     public function getTestApiKey(): string

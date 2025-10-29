@@ -6,7 +6,7 @@ namespace Mollie\Shopware\Component\Payment\Event;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-final class CreatePaymentEvent
+final class ModifyCreatePaymentPayloadEvent
 {
     public function __construct(private CreatePayment $payment, private SalesChannelContext $salesChannelContext)
     {

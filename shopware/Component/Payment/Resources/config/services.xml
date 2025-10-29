@@ -24,6 +24,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
             <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
