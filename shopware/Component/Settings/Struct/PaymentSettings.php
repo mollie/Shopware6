@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\shopware\Component\Settings\Struct;
+namespace Mollie\Shopware\Component\Settings\Struct;
 
 use Shopware\Core\Framework\Struct\Struct;
 

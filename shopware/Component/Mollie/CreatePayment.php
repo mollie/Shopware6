@@ -22,6 +22,8 @@ final class CreatePayment implements \JsonSerializable
     private LineItemCollection $lines;
     private string $sequenceType;
 
+    private ?string $cardToken = null;
+
     public function __construct(string $description, string $redirectUrl, Money $amount)
     {
         $this->description = $description;
@@ -142,6 +144,16 @@ final class CreatePayment implements \JsonSerializable
     public function setCaptureMode(CaptureMode $captureMode): void
     {
         $this->captureMode = (string) $captureMode;
+    }
+
+    public function setCardToken(string $creditCardToken): void
+    {
+        $this->cardToken = $creditCardToken;
+    }
+
+    public function getCardToken(): ?string
+    {
+        return $this->cardToken;
     }
 
     public function toArray(): array
