@@ -17,6 +17,9 @@
 - Behoben: Subscription-Endpunkte in der Store API und im Kundenkonto prüfen nun, ob das angefragte Abonnement zum eingeloggten Kunden gehört.
 - Behoben: Keine Fehler-Logs mehr für nicht-Mollie-Bestellungen in der Bestellübersicht.
 
+# 5.0.0
+- Grundlegende Zahlung über Payments API eingebaut
+
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.
 - Neu: MobilePay als Zahlungsmethode hinzugefügt.
@@ -662,7 +665,7 @@ Diese Version bietet Unterstützung für die Massenbearbeitung von Produkten in 
 - Neues `MollieOrderBuilder` Event, um eigene Metadaten zu einer Bestellung hinzufügen zu können (Feature für Entwickler).
 
 ### Verbesserungen
-- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch fehlschlug, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
+- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch scheiterte, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
 - SEPA Zahlungen bleiben nun auf "In Progress", wenn diese gestartet wurden, und springen nicht mehr zurück auf "Open".
 - Zahlungen mit Status "Created" werden nun als "fehlerhaft" erkannt.
 - Kreditkartenzahlungen mit Status "Open" werden nun als "fehlerhaft" erkannt.
@@ -827,7 +830,7 @@ Aber keine Sorge, es gibt eine neue Funktion **"Automatischer Versand"**, die st
 
 ## [1.4.3] - 2021-07-07
 ### Fehlerbehebungen
-- Fix for Backwards-Compatibility
+- Fix für Backwards-Compatibility
 
 ## [1.4.2] - 2021-07-06
 ### Fehlerbehebungen

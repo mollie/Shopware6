@@ -17,6 +17,9 @@
 - Fixed: Subscription endpoints in the Store API and account area now verify that the requested subscription belongs to the logged-in customer.
 - Fixed: No more error logs for non-Mollie orders in the order admin.
 
+# 5.0.0
+- Added basic payment via paypal API
+
 # 4.23.0
 - New: Added Vipps as a payment method.
 - New: Added MobilePay as a payment method.
