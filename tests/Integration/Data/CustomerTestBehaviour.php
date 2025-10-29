@@ -106,7 +106,7 @@ trait CustomerTestBehaviour
                 'street' => 'Mollie Street 123',
                 'city' => 'Mollie City',
                 'zipcode' => '12345',
-                'phoneNumber' => '0123456789',
+                'phoneNumber' => '+390123456789',
             ];
         }
         $customerData = [
@@ -140,7 +140,7 @@ trait CustomerTestBehaviour
                 'street' => 'Mollie Street 123',
                 'city' => 'Mollie City',
                 'zipcode' => '12345',
-                'phoneNumber' => '0123456789',
+                'phoneNumber' => '+490123456789',
             ]
         ];
     }

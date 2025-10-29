@@ -11,15 +11,8 @@ final class ApiSettings extends Struct
     public const KEY_LIVE_API_KEY = 'liveApiKey';
     public const KEY_TEST_MODE = 'testMode';
 
-    private string $testApiKey;
-    private string $liveApiKey;
-    private bool $testMode;
-
-    public function __construct(string $testApiKey, string $liveApiKey, bool $testMode)
+    public function __construct(private string $testApiKey, private string $liveApiKey, private bool $testMode)
     {
-        $this->testApiKey = $testApiKey;
-        $this->liveApiKey = $liveApiKey;
-        $this->testMode = $testMode;
     }
 
     public static function createFromShopwareArray(array $settings): self

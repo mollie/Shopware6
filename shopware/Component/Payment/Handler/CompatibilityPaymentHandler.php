@@ -29,12 +29,15 @@ if (class_exists(AbstractPaymentHandler::class)) {
         {
             /** @var SalesChannelContext $salesChannelContext */
             $salesChannelContext = $request->get('sw-sales-channel-context');
+            $transaction = $this->transactionConverter->convert($transaction, $context);
 
             return $this->pay->execute($this, $transaction, new RequestDataBag($request->request->all()), $salesChannelContext);
         }
 
         public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
         {
+            $transaction = $this->transactionConverter->convert($transaction, $context);
+            $this->finalize->execute($request, $transaction, $context);
         }
     }
 
@@ -49,11 +52,15 @@ if (interface_exists(AsynchronousPaymentHandlerInterface::class) && ! class_exis
 
         public function pay(AsyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
         {
+            $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
+
             return $this->pay->execute($this, $transaction, $dataBag, $salesChannelContext);
         }
 
         public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
         {
+            $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
+            $this->finalize->execute($request, $transaction, $salesChannelContext->getContext());
         }
     }
 }

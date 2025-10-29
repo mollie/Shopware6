@@ -33,7 +33,7 @@ final class LoggerSettingsTest extends TestCase
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS, 10);
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE, false);
 
-        $settingsService = new SettingsService($this->getContainer());
+        $settingsService = new SettingsService($this->getContainer(), false, false);
 
         $actualSettings = $settingsService->getLoggerSettings();
 
@@ -43,7 +43,7 @@ final class LoggerSettingsTest extends TestCase
 
     public function testSettingsAreCachedPerSalesChannel(): void
     {
-        $settingsService = new SettingsService($this->getContainer());
+        $settingsService = new SettingsService($this->getContainer(), false, false);
 
         $expectedSettings = $settingsService->getLoggerSettings();
         $actualSettings = $settingsService->getLoggerSettings();

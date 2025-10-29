@@ -102,25 +102,34 @@ trait CheckoutTestBehaviour
     public function finishCheckout(string $paymentUrl, SalesChannelContext $salesChannelContext): Response
     {
         $matches = [];
-        preg_match('/mollie\/payment\/(?<paymentId>.*)/m', $paymentUrl, $matches);
-        $paymentId = $matches['paymentId'];
+        preg_match('/mollie\/(?<method>payment|return)\/(?<paymentId>.*)/m', $paymentUrl, $matches);
+        $paymentId = $matches['paymentId'] ?? null;
+        $isPaymentApi = $matches['method'] === 'return';
+        if ($paymentId === null) {
+            throw new \Exception('Failed to find Payment ID in ' . $paymentUrl);
+        }
+        if (! $isPaymentApi) {
+            $returnController = $this->getContainer()->get(ReturnControllerBase::class);
+            /** @var RedirectResponse $response */
+            $response = $returnController->payment($salesChannelContext, $paymentId);
+            $redirectLocation = $response->getTargetUrl();
+            Assert::assertSame(302, $response->getStatusCode());
+            Assert::assertStringContainsString('payment/finalize-transaction', $redirectLocation);
 
-        $returnController = $this->getContainer()->get(ReturnControllerBase::class);
-        /** @var RedirectResponse $response */
-        $response = $returnController->payment($salesChannelContext, $paymentId);
-        $redirectLocation = $response->getTargetUrl();
-        Assert::assertSame(302, $response->getStatusCode());
-        Assert::assertStringContainsString('payment/finalize-transaction', $redirectLocation);
+            $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
+            $urlParameters = [];
+            parse_str($queryString, $urlParameters);
 
-        $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
-        $urlParameters = [];
-        parse_str($queryString, $urlParameters);
+            $request = $this->createStoreFrontRequest($salesChannelContext);
+            $request->request->set('_sw_payment_token', $urlParameters['_sw_payment_token']);
+            $paymentController = $this->getContainer()->get(PaymentController::class);
 
-        $request = $this->createStoreFrontRequest($salesChannelContext);
-        $request->request->set('_sw_payment_token', $urlParameters['_sw_payment_token']);
-        $paymentController = $this->getContainer()->get(PaymentController::class);
+            return $paymentController->finalizeTransaction($request);
+        }
+        /** @var \Mollie\Shopware\Component\Payment\Controller\PaymentController $returnController */
+        $returnController = $this->getContainer()->get(\Mollie\Shopware\Component\Payment\Controller\PaymentController::class);
 
-        return $paymentController->finalizeTransaction($request);
+        return $returnController->return($paymentId, $salesChannelContext);
     }
 
     public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity

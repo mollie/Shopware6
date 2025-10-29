@@ -5,6 +5,7 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
     <imports>
         <import resource="payment_methods.xml"/>
+
     </imports>
     <services>
         <service id="Mollie\Shopware\Component\Payment\PayAction">
@@ -19,14 +20,46 @@
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
-        <service id="Mollie\Shopware\Component\Payment\Action\Pay">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\Mollie\RequestFactory"/>
-            <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+        <service id="Mollie\Shopware\Component\Payment\Action\Finalize">
+            <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
+            <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Mollie\Shopware\Component\Payment\Mollie\RequestFactory"/>
+        <service id="Mollie\Shopware\Component\Payment\Action\Pay">
+            <argument type="service" id="Mollie\Shopware\Component\Mollie\CreatePaymentBuilder"/>
+            <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
+            <argument type="service" id="Mollie\Shopware\Repository\OrderTransactionRepository"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+        </service>
 
+
+        <service id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway">
+            <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
+            <argument>%kernel.shopware_version%</argument>
+            <argument type="service" id="Mollie\Shopware\Repository\OrderTransactionRepository"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Controller\PaymentController">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Route\ReturnRoute"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Route\WebhookRoute"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Route\ReturnRoute" public="true">
+            <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+        </service>
+        <service id="Mollie\Shopware\Component\Payment\Route\WebhookRoute"/>
 
 
     </services>

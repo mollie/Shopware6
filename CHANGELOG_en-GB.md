@@ -1,3 +1,5 @@
+# 5.0.0
+- Added basic payment via paypal API
 # 4.20.0
 ### Changed
 - Changed order builder to use order addresses instead of customer defaulr addresses to make sure the addres in mollie matches the order information in shopware.

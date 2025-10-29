@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Settings;
 
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\shopware\Component\Settings\Struct\PaymentSettings;
 use Psr\Container\ContainerInterface;
@@ -20,7 +21,7 @@ final class SettingsService extends AbstractSettingsService
     private array $settingsCache = [];
     private ContainerInterface $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, private bool $devMode, private bool $cypressMode)
     {
         $this->container = $container;
     }
@@ -43,6 +44,11 @@ final class SettingsService extends AbstractSettingsService
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;
+    }
+
+    public function getEnvironmentSettings(): EnvironmentSettings
+    {
+        return new EnvironmentSettings($this->devMode, $this->cypressMode);
     }
 
     public function getApiSettings(?string $salesChannelId = null): ApiSettings
