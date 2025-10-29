@@ -30,6 +30,10 @@ final class OrderTransactionLoadedSubscriber implements EventSubscriberInterface
             if ($mollieCustomFields === null) {
                 continue;
             }
+            if (! isset($mollieCustomFields[OrderTransaction::PAYMENTS_API_FLAG])) {
+                continue;
+            }
+
             $orderTransaction->addExtension(Mollie::EXTENSION, new OrderTransaction(...$mollieCustomFields));
         }
     }

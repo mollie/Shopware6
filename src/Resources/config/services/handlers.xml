@@ -224,15 +224,7 @@
             <tag name="shopware.payment.method.async"/>
             <tag name="shopware.payment.method"/>
         </service>
-
-        <!-- KlanraOne PaymentHandler-->
-        <service id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
-
+        
         <!-- Palma PaymentHandler-->
         <service id="Kiener\MolliePayments\Handler\Method\AlmaPayment">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>

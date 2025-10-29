@@ -14,6 +14,14 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment" class="Mollie\Shopware\Component\Payment\Method\KlarnaPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
+            <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
 
     </services>
 </container>

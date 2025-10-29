@@ -17,7 +17,7 @@ final class CreatePayment implements \JsonSerializable
     private string $method = '';
     private Address $billingAddress;
     private Address $shippingAddress;
-    private string $captureMode = 'automatic';
+    private ?string $captureMode = null;
     private string $locale;
     private LineItemCollection $lines;
     private string $sequenceType;
@@ -128,6 +128,20 @@ final class CreatePayment implements \JsonSerializable
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getCaptureMode(): ?CaptureMode
+    {
+        if ($this->captureMode === null) {
+            return null;
+        }
+
+        return new CaptureMode($this->captureMode);
+    }
+
+    public function setCaptureMode(CaptureMode $captureMode): void
+    {
+        $this->captureMode = (string) $captureMode;
     }
 
     public function toArray(): array
