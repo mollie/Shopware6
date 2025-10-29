@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Payment\Action;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Payment\PaymentException;
@@ -18,6 +19,7 @@ final class Finalize
         private MollieGatewayInterface $mollieGateway,
         private AbstractSettingsService $settingsService,
         private OrderTransactionStateHandler $stateMachineHandler,
+        private EventDispatcherInterface $eventDispatcher,
         private LoggerInterface $logger,
     ) {
     }
@@ -49,11 +51,12 @@ final class Finalize
             'paymentId' => $payment->getId(),
         ]);
 
+        if ($paymentStatus->isCancelled()) {
+            $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $payment->getId());
+            throw PaymentException::customerCanceled($transaction->getOrderTransactionId(), $message);
+        }
+
         if ($paymentStatus->isFailed()) {
-            if ($paymentStatus->isCancelled()) {
-                $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $payment->getId());
-                throw PaymentException::customerCanceled($transaction->getOrderTransactionId(), $message);
-            }
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), 'Failed to finalize payment');
         }
     }

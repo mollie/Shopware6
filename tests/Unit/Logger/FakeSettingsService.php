@@ -7,7 +7,7 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
-use Mollie\shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
 {
@@ -38,7 +38,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings
     {
-        // TODO: Implement getPaymentSettings() method.
+        return new PaymentSettings();
     }
 
 

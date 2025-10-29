@@ -22,6 +22,14 @@
             <tag name="shopware.payment.method.async"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Mollie\Shopware\Component\Payment\Method\CardPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
+            <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
 
     </services>
 </container>
