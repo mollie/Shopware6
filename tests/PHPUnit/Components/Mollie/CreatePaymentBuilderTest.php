@@ -5,6 +5,7 @@ namespace Mollie\PHPUnit\Components\Mollie;
 
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Mollie\Unit\Logger\FakeSettingsService;
 use MolliePayments\Tests\Fakes\FakeRouteBuilder;
 use MolliePayments\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\Assert;
@@ -16,6 +17,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Defaults;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Language\LanguageEntity;
@@ -29,7 +31,8 @@ class CreatePaymentBuilderTest extends TestCase
     public function testSimpleBuild(): void
     {
         $routeBuilder = new FakeRouteBuilder('https://shop.localhost/return', 'https://shop.localhost/webhook');
-        $builder = new CreatePaymentBuilder($routeBuilder);
+        $settingsService = new FakeSettingsService();
+        $builder = new CreatePaymentBuilder($routeBuilder, $settingsService);
         $order = new OrderEntity();
 
         $country = new CountryEntity();
@@ -42,6 +45,7 @@ class CreatePaymentBuilderTest extends TestCase
         $order->setAmountNet(100.0000);
         $order->setAmountTotal(100.0000);
         $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
+        $order->setSalesChannelId(Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
         $language = new LanguageEntity();
 
         $locale = new LocaleEntity();
@@ -142,6 +146,7 @@ class CreatePaymentBuilderTest extends TestCase
                 ],
             ],
             'sequenceType' => 'oneoff',
+            'cardToken' => null,
         ];
 
         Assert::assertEquals($expected, $actual->toArray());
