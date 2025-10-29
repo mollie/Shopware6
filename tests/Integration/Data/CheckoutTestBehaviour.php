@@ -126,6 +126,7 @@ trait CheckoutTestBehaviour
 
             return $paymentController->finalizeTransaction($request);
         }
+
         /** @var \Mollie\Shopware\Component\Payment\Controller\PaymentController $returnController */
         $returnController = $this->getContainer()->get(\Mollie\Shopware\Component\Payment\Controller\PaymentController::class);
 
