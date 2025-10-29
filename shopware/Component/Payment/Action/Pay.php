@@ -53,6 +53,7 @@ final class Pay
             $contPayments = $oldMollieTransaction->getCountPayments() + 1;
             $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $contPayments);
         }
+        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $transaction->getOrder());
         $this->logger->info('Payment payload created, send data to Mollie API', [
             'payload' => $createPaymentStruct->toArray(),
             'salesChannel' => $salesChannelName,
