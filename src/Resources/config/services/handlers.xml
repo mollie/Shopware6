@@ -224,7 +224,7 @@
             <tag name="shopware.payment.method.async"/>
             <tag name="shopware.payment.method"/>
         </service>
-        
+
         <!-- Palma PaymentHandler-->
         <service id="Kiener\MolliePayments\Handler\Method\AlmaPayment">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
