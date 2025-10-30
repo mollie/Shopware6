@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
+use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -18,7 +18,7 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AbstractSettingsService $settingsService,
-        private OrderTransactionStateHandler $stateMachineHandler,
+        private WebhookRoute $webhookRoute,
     ) {
     }
 
@@ -37,12 +37,7 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
             return;
         }
         $payment = $event->getPayment();
-        $paymentStatus = $payment->getStatus();
-        $handlerMethod = $paymentStatus->getShopwareHandlerMethod();
-        if (strlen($handlerMethod) === 0) {
-            return;
-        }
         $transaction = $payment->getShopwareTransaction();
-        $this->stateMachineHandler->{$handlerMethod}($transaction->getId(), $event->getContext());
+        $this->webhookRoute->notify($transaction->getId(), $event->getContext());
     }
 }
