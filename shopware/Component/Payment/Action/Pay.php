@@ -5,11 +5,11 @@ namespace Mollie\Shopware\Component\Payment\Action;
 
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilderInterface;
 use Mollie\shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
-use Mollie\Shopware\Entity\OrderTransaction\OrderTransaction;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -42,16 +42,16 @@ final class Pay
         $context = $salesChannelContext->getContext();
 
         $oldMollieTransaction = $transaction->getOrderTransaction()->getExtension(Mollie::EXTENSION);
-        $contPayments = 1;
+        $countPayments = 1;
 
         $shopwareFinalizeUrl = $transaction->getReturnUrl();
 
         $createPaymentStruct = $this->createPaymentBuilder->build($transaction);
         $createPaymentStruct->setMethod($paymentHandler->getPaymentMethodName());
 
-        if ($oldMollieTransaction instanceof OrderTransaction) {
-            $contPayments = $oldMollieTransaction->getCountPayments() + 1;
-            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $contPayments);
+        if ($oldMollieTransaction instanceof Payment) {
+            $countPayments = $oldMollieTransaction->getCountPayments() + 1;
+            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
         }
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $transaction->getOrder());
         $this->logger->info('Payment payload created, send data to Mollie API', [
@@ -62,22 +62,24 @@ final class Pay
         $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $salesChannelContext);
         $this->eventDispatcher->dispatch($paymentEvent);
 
-        $paymentResult = $this->paymentGateway->createPayment($paymentEvent->getPayment(), $transaction->getOrder()->getSalesChannelId());
+        $payment = $this->paymentGateway->createPayment($paymentEvent->getPayment(), $transaction->getOrder()->getSalesChannelId());
 
         $this->logger->info('Payment created', [
-            'paymentId' => $paymentResult->getPaymentId(),
-            'checkoutUrl' => $paymentResult->getCheckoutUrl(),
+            'paymentId' => $payment->getId(),
+            'checkoutUrl' => $payment->getCheckoutUrl(),
         ]);
 
-        $redirectUrl = $paymentResult->getCheckoutUrl() ?? $shopwareFinalizeUrl;
+        $redirectUrl = $payment->getCheckoutUrl() ?? $shopwareFinalizeUrl;
 
-        $mollieTransactionData = new OrderTransaction($paymentResult->getPaymentId(), $shopwareFinalizeUrl, $contPayments);
+        $payment->setFinalizeUrl($shopwareFinalizeUrl);
+        $payment->setCountPayments($countPayments);
+
         $this->logger->debug('Save payment information in Order Transaction', [
             'transactionId' => $transaction->getOrderTransactionId(),
-            'data' => $mollieTransactionData->all()
+            'data' => $payment->toArray()
         ]);
 
-        $this->orderTransactionRepository->saveTransactionData($transaction->getOrderTransaction(), $mollieTransactionData, $context);
+        $this->orderTransactionRepository->savePaymentExtension($transaction->getOrderTransaction(), $payment, $context);
 
         $this->processPaymentStatus($paymentHandler, $transaction, $context);
 

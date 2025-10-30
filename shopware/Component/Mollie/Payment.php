@@ -3,20 +3,26 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
-use Mollie\Shopware\Entity\OrderTransaction\OrderTransaction;
+use Psr\Http\Message\ResponseInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
+use Shopware\Core\Framework\Struct\Struct;
 
-final class Payment implements \JsonSerializable
+final class Payment extends Struct implements \JsonSerializable
 {
     use JsonSerializableTrait;
+
     private string $status;
     private OrderTransactionEntity $shopwareTransaction;
-    private OrderTransaction $mollieTransaction;
 
-    public function __construct(private string $id, PaymentStatus $status)
+    private string $thirdPartyPaymentId;
+    private string $checkoutUrl;
+
+    private string $finalizeUrl;
+    private int $countPayments = 1;
+
+    public function __construct(private string $id, private string $method)
     {
-        $this->setStatus($status);
     }
 
     public function getId(): string
@@ -34,6 +40,26 @@ final class Payment implements \JsonSerializable
         $this->status = (string) $status;
     }
 
+    public function getFinalizeUrl(): string
+    {
+        return $this->finalizeUrl;
+    }
+
+    public function setFinalizeUrl(string $finalizeUrl): void
+    {
+        $this->finalizeUrl = $finalizeUrl;
+    }
+
+    public function getCountPayments(): int
+    {
+        return $this->countPayments;
+    }
+
+    public function setCountPayments(int $countPayments): void
+    {
+        $this->countPayments = $countPayments;
+    }
+
     public function getShopwareTransaction(): OrderTransactionEntity
     {
         return $this->shopwareTransaction;
@@ -44,18 +70,54 @@ final class Payment implements \JsonSerializable
         $this->shopwareTransaction = $shopwareTransaction;
     }
 
-    public function getMollieTransaction(): OrderTransaction
+    public function getMethod(): string
     {
-        return $this->mollieTransaction;
+        return $this->method;
     }
 
-    public function setMollieTransaction(OrderTransaction $mollieTransaction): void
+    public function getThirdPartyPaymentId(): string
     {
-        $this->mollieTransaction = $mollieTransaction;
+        return $this->thirdPartyPaymentId;
+    }
+
+    public function setThirdPartyPaymentId(string $thirdPartyPaymentId): void
+    {
+        $this->thirdPartyPaymentId = $thirdPartyPaymentId;
+    }
+
+    public static function createFromClientResponse(ResponseInterface $response): self
+    {
+        $body = json_decode($response->getBody()->getContents(), true);
+        $payment = new self($body['id'], $body['method']);
+        $payment->setStatus(new PaymentStatus($body['status']));
+        $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
+        $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
+
+        if ($thirdPartyPaymentId !== null) {
+            $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
+        }
+        if ($checkoutUrl !== null) {
+            $payment->setCheckoutUrl($checkoutUrl);
+        }
+
+        return $payment;
+    }
+
+    public function getCheckoutUrl(): string
+    {
+        return $this->checkoutUrl;
+    }
+
+    public function setCheckoutUrl(string $checkoutUrl): void
+    {
+        $this->checkoutUrl = $checkoutUrl;
     }
 
     public function toArray(): array
     {
-        return json_decode(json_encode($this), true);
+        $data = json_decode(json_encode($this), true);
+        unset($data['shopwareTransaction']);
+
+        return $data;
     }
 }

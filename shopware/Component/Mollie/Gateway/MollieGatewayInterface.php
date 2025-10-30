@@ -9,7 +9,7 @@ use Shopware\Core\Framework\Context;
 
 interface MollieGatewayInterface
 {
-    public function createPayment(CreatePayment $molliePayment, string $salesChannelId): CreatePaymentResponse;
+    public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment;
 
     public function getPayment(string $molliePaymentId, string $salesChannelId): Payment;
 
