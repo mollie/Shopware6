@@ -74,7 +74,7 @@
 
         <service id="Mollie\Shopware\Subscriber\PaymentFinalizeSubscriber">
             <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Route\WebhookRoute"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
