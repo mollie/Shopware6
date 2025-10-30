@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 final class PaymentController extends AbstractController
@@ -48,6 +49,8 @@ final class PaymentController extends AbstractController
             'transactionId' => $transactionId,
             'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
         ]);
-        $response = $this->webhookRoute->notify($transactionId, $salesChannelContext);
+        $response = $this->webhookRoute->notify($transactionId, $salesChannelContext->getContext());
+
+        return new JsonResponse($response->getObject());
     }
 }
