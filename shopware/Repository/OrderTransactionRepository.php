@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Repository;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
-use Mollie\Shopware\Entity\OrderTransaction\OrderTransaction;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -39,13 +39,13 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
         $this->logger = $logger;
     }
 
-    public function saveTransactionData(OrderTransactionEntity $shopwareOrderTransaction, OrderTransaction $mollieTransactionData, Context $context): EntityWrittenContainerEvent
+    public function savePaymentExtension(OrderTransactionEntity $orderTransactionEntity, Payment $payment, Context $context): EntityWrittenContainerEvent
     {
         return $this->orderTransactionRepository->upsert([
             [
-                'id' => $shopwareOrderTransaction->getId(),
+                'id' => $orderTransactionEntity->getId(),
                 'customFields' => [
-                    Mollie::EXTENSION => $mollieTransactionData->all()
+                    Mollie::EXTENSION => $payment->toArray()
                 ]
             ]
         ], $context);
