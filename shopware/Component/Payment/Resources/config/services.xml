@@ -22,8 +22,6 @@
         </service>
         <service id="Mollie\Shopware\Component\Payment\Action\Finalize">
             <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
-            <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
@@ -45,6 +43,10 @@
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
+        <service id="Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway" decorates="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway">
+            <argument type="service" id=".inner"/>
+        </service>
+
         <service id="Mollie\Shopware\Component\Payment\Controller\PaymentController">
             <argument type="service" id="Mollie\Shopware\Component\Payment\Route\ReturnRoute"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Route\WebhookRoute"/>
@@ -56,12 +58,24 @@
 
         </service>
 
-        <service id="Mollie\Shopware\Component\Payment\Route\ReturnRoute" public="true">
+        <service id="Mollie\Shopware\Component\Payment\Route\ReturnRoute">
             <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
-        <service id="Mollie\Shopware\Component\Payment\Route\WebhookRoute"/>
+        <service id="Mollie\Shopware\Component\Payment\Route\WebhookRoute">
+            <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+        </service>
 
+        <service id="Mollie\shopware\Component\Payment\PaymentMethodRepository">
+            <argument type="tagged" tag="mollie.payment.method"/>
+        </service>
+
+        <service id="Mollie\Shopware\Subscriber\PaymentFinalizeSubscriber">
+            <argument type="service" id="Mollie\Shopware\Component\Settings\SettingsService"/>
+            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
 
     </services>
 </container>

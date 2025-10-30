@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Payment\Controller;
 use Mollie\Shopware\Component\Payment\Route\ReturnRoute;
 use Mollie\shopware\Component\Payment\Route\WebhookRoute;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,11 +37,17 @@ final class PaymentController extends AbstractController
         $this->logger->info('Finalize transaction', [
             'transactionId' => $transactionId,
         ]);
+        $controller = sprintf('%s::%s', ShopwarePaymentController::class, 'finalizeTransaction');
 
-        return $this->forward('\Shopware\Core\Checkout\Payment\Controller\PaymentController::finalizeTransaction', [], $queryParameters);
+        return $this->forward($controller, [], $queryParameters);
     }
 
     public function webhook(string $transactionId, SalesChannelContext $salesChannelContext): Response
     {
+        $this->logger->info('Webhook received', [
+            'transactionId' => $transactionId,
+            'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
+        ]);
+        $response = $this->webhookRoute->notify($transactionId, $salesChannelContext);
     }
 }
