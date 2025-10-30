@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\Handler\Method\PayPalPayment" class="Mollie\Shopware\Component\Payment\Method\PayPalPayment">
+        <service public="true" id="Kiener\MolliePayments\Handler\Method\PayPalPayment" class="Mollie\Shopware\Component\Payment\Method\PayPalPayment">
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
@@ -15,7 +15,7 @@
             <tag name="mollie.payment.method"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment" class="Mollie\Shopware\Component\Payment\Method\KlarnaPayment">
+        <service public="true" id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment" class="Mollie\Shopware\Component\Payment\Method\KlarnaPayment">
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
@@ -24,7 +24,7 @@
             <tag name="mollie.payment.method"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Mollie\Shopware\Component\Payment\Method\CardPayment">
+        <service public="true" id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Mollie\Shopware\Component\Payment\Method\CardPayment">
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
