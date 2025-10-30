@@ -55,6 +55,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
     {
         $criteria = new Criteria([$orderTransactionId]);
         $criteria->addAssociation('order');
+        $criteria->addAssociation('paymentMethod');
 
         return $this->orderTransactionRepository->search($criteria, $context)->first();
     }

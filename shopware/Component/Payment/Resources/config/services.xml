@@ -65,6 +65,7 @@
         <service id="Mollie\Shopware\Component\Payment\Route\WebhookRoute">
             <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
+            <argument type="service" id="service_container"/>
         </service>
 
         <service id="Mollie\shopware\Component\Payment\PaymentMethodRepository">
