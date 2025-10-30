@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Subscriber;
 
-use Mollie\Shopware\Entity\OrderTransaction\OrderTransaction;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEvents;
@@ -27,14 +27,25 @@ final class OrderTransactionLoadedSubscriber implements EventSubscriberInterface
                 continue;
             }
             $mollieCustomFields = $orderTransaction->getCustomFields()[Mollie::EXTENSION] ?? null;
-            if ($mollieCustomFields === null) {
+            if ($mollieCustomFields instanceof Payment) {
                 continue;
             }
-            if (! isset($mollieCustomFields[OrderTransaction::PAYMENTS_API_FLAG])) {
+            $paymentId = $mollieCustomFields['id'] ?? null;
+            $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
+            if ($finalizeUrl === null || $paymentId === null) {
                 continue;
             }
 
-            $orderTransaction->addExtension(Mollie::EXTENSION, new OrderTransaction(...$mollieCustomFields));
+            $method = $mollieCustomFields['method'] ?? '';
+            $countPayments = $mollieCustomFields['countPayments'] ?? 1;
+            $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
+            $transactionExtension = new Payment($paymentId, $method);
+            $transactionExtension->setCountPayments($countPayments);
+            $transactionExtension->setFinalizeUrl($finalizeUrl);
+            if ($thirdPartyPaymentId !== null) {
+                $transactionExtension->setThirdPartyPaymentId($thirdPartyPaymentId);
+            }
+            $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
         }
     }
 }
