@@ -12,6 +12,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
+            <tag name="mollie.payment.method"/>
         </service>
 
         <service id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment" class="Mollie\Shopware\Component\Payment\Method\KlarnaPayment">
@@ -20,6 +21,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
+            <tag name="mollie.payment.method"/>
         </service>
 
         <service id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Mollie\Shopware\Component\Payment\Method\CardPayment">
@@ -28,6 +30,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
+            <tag name="mollie.payment.method"/>
         </service>
 
 
