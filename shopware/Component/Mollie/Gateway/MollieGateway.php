@@ -8,10 +8,8 @@ use GuzzleHttp\Exception\ClientException;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
-use Mollie\Shopware\Entity\OrderTransaction\OrderTransaction;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
@@ -29,14 +27,15 @@ final class MollieGateway implements MollieGatewayInterface
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
         $transaction = $this->orderTransactionRepository->findById($transactionId, $context);
-        /** @var ?OrderTransaction $mollieTransaction */
+        /** @var ?Payment $mollieTransaction */
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
 
         if ($mollieTransaction === null) {
             throw new \Exception('Transaction was not created by mollie');
         }
-        $payment = $this->getPayment($mollieTransaction->getPaymentId(), $transaction->getOrder()->getSalesChannelId());
-        $payment->setMollieTransaction($mollieTransaction);
+
+        $payment = $this->getPayment($mollieTransaction->getId(), $transaction->getOrder()->getSalesChannelId());
+        $payment->setFinalizeUrl($mollieTransaction->getFinalizeUrl());
         $payment->setShopwareTransaction($transaction);
 
         return $payment;
@@ -49,15 +48,14 @@ final class MollieGateway implements MollieGatewayInterface
 
         try {
             $response = $client->get('payments/' . $molliePaymentId);
-            $body = json_decode($response->getBody()->getContents(), true);
 
-            return new Payment($body['id'], new PaymentStatus($body['status']));
+            return Payment::createFromClientResponse($response);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }
     }
 
-    public function createPayment(CreatePayment $molliePayment, string $salesChannelId): CreatePaymentResponse
+    public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
         $apiSettings = $this->settings->getApiSettings($salesChannelId);
 
@@ -71,7 +69,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'form_params' => $molliePayment->toArray(),
             ]);
 
-            return CreatePaymentResponse::fromClientResponse($response);
+            return Payment::createFromClientResponse($response);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }

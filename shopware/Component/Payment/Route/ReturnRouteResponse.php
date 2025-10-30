@@ -17,7 +17,7 @@ final class ReturnRouteResponse extends StoreApiResponse
                 'paymentId' => $this->payment->getId(),
                 'status' => $this->payment->getStatus(),
                 'orderId' => $this->payment->getShopwareTransaction()->getOrderId(),
-                'finalizeUrl' => $this->payment->getMollieTransaction()->getFinalizeUrl(),
+                'finalizeUrl' => $this->payment->getFinalizeUrl(),
             ],
             'mollie_payment_return_response'
         ));
@@ -48,6 +48,6 @@ final class ReturnRouteResponse extends StoreApiResponse
 
     public function getFinalizeUrl(): string
     {
-        return $this->payment->getMollieTransaction()->getFinalizeUrl();
+        return $this->payment->getFinalizeUrl();
     }
 }

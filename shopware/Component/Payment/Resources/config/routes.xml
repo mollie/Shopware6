@@ -47,7 +47,7 @@
         <option key="seo">false</option>
     </route>
     <route id="storefront.mollie.payment.webhook"
-           path="/mollie/webhook/{transactionId}"
+           path="/mollie/webhook/notify/{transactionId}"
            methods="GET">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::webhook</default>
