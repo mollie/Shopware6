@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Payment\Action\Finalize;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 trait HandlerTrait
@@ -15,8 +16,9 @@ trait HandlerTrait
 
     public function __construct(private Pay $pay,
                                 private Finalize $finalize,
-                                private TransactionConverterInterface $transactionConverter)
-    {
+                                private TransactionConverterInterface $transactionConverter,
+                                private LoggerInterface $logger,
+    ) {
     }
 
     public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment

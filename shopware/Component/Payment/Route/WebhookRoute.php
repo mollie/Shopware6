@@ -35,11 +35,17 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $transaction = $payment->getShopwareTransaction();
         $paymentHandlerIdentifier = $transaction->getPaymentMethod()->getHandlerIdentifier();
+
         /** @var CompatibilityPaymentHandler $paymentHandler */
         $paymentHandler = $this->container->get($paymentHandlerIdentifier);
         if ($paymentHandler->getPaymentMethodName() === $payment->getMethod()) {
             return new WebhookRouteResponse();
         }
+        /** Apple Pay payment is stored as credit card on mollie side, so we do not want to switch payment method */
+        if ($paymentHandler->getPaymentMethodName() === 'applepay' && $payment->getMethod() === 'creditcard') {
+            return new WebhookRouteResponse();
+        }
+
         //TODO change payment method, but only if it snot apple pay
     }
 }

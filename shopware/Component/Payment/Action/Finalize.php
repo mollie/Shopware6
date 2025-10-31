@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Action;
 
+use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
@@ -30,6 +31,7 @@ final class Finalize
 
         $payment = $this->mollieGateway->getPaymentByTransactionId($transaction->getOrderTransactionId(), $context);
         $order = $payment->getShopwareTransaction()->getOrder();
+        $customer = $order->getOrderCustomer()->getCustomer();
         $paymentStatus = $payment->getStatus();
 
         $this->logger->info('Fetched Payment Information from Mollie', [
@@ -50,5 +52,8 @@ final class Finalize
         if ($paymentStatus->isFailed()) {
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), 'Failed to finalize payment');
         }
+
+        $paymentSuccessEvent = new SuccessEvent($payment, $order, $customer, $context);
+        $this->eventDispatcher->dispatch($paymentSuccessEvent);
     }
 }
