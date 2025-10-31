@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Action;
 
+use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilderInterface;
 use Mollie\shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -39,37 +40,14 @@ final class Pay
             'salesChannel' => $salesChannelName,
             'paymentMethod' => $paymentHandler->getPaymentMethodName()
         ]);
-        $context = $salesChannelContext->getContext();
-
-        $oldMollieTransaction = $transaction->getOrderTransaction()->getExtension(Mollie::EXTENSION);
-        $countPayments = 1;
-
         $shopwareFinalizeUrl = $transaction->getReturnUrl();
 
-        $createPaymentStruct = $this->createPaymentBuilder->build($transaction);
-        $createPaymentStruct->setMethod($paymentHandler->getPaymentMethodName());
+        $context = $salesChannelContext->getContext();
 
-        if ($oldMollieTransaction instanceof Payment) {
-            $countPayments = $oldMollieTransaction->getCountPayments() + 1;
-            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
-        }
-        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $transaction->getOrder());
-        $this->logger->info('Payment payload created, send data to Mollie API', [
-            'payload' => $createPaymentStruct->toArray(),
-            'salesChannel' => $salesChannelName,
-        ]);
+        $createPaymentStruct = $this->createPaymentStruct($transaction, $paymentHandler, $salesChannelName, $salesChannelContext);
+        $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
 
-        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $salesChannelContext);
-        $this->eventDispatcher->dispatch($paymentEvent);
-
-        $payment = $this->paymentGateway->createPayment($paymentEvent->getPayment(), $transaction->getOrder()->getSalesChannelId());
-
-        $this->logger->info('Payment created', [
-            'paymentId' => $payment->getId(),
-            'checkoutUrl' => $payment->getCheckoutUrl(),
-        ]);
-
-        $redirectUrl = $payment->getCheckoutUrl() ?? $shopwareFinalizeUrl;
+        $payment = $this->paymentGateway->createPayment($createPaymentStruct, $transaction->getOrder()->getSalesChannelId());
 
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
@@ -83,6 +61,7 @@ final class Pay
 
         $this->processPaymentStatus($paymentHandler, $transaction, $context);
 
+        $redirectUrl = $payment->getCheckoutUrl() ?? $shopwareFinalizeUrl;
         $this->logger->info('Mollie checkout finished, redirecting to payment provider', [
             'transactionId' => $transaction->getOrderTransactionId(),
             'redirectUrl' => $redirectUrl,
@@ -91,7 +70,7 @@ final class Pay
         return new RedirectResponse($redirectUrl);
     }
 
-    public function processPaymentStatus(CompatibilityPaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, Context $context): void
+    private function processPaymentStatus(CompatibilityPaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, Context $context): void
     {
         try {
             $method = 'processUnconfirmed';
@@ -106,5 +85,34 @@ final class Pay
                 'reason' => $exception->getMessage()
             ]);
         }
+    }
+
+    private function createPaymentStruct(PaymentTransactionStruct $transaction, CompatibilityPaymentHandler $paymentHandler, string $salesChannelName, SalesChannelContext $salesChannelContext): CreatePayment
+    {
+        $createPaymentStruct = $this->createPaymentBuilder->build($transaction);
+        $createPaymentStruct->setMethod($paymentHandler->getPaymentMethodName());
+
+        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $transaction->getOrder());
+        $this->logger->info('Payment payload created, send data to Mollie API', [
+            'payload' => $createPaymentStruct->toArray(),
+            'salesChannel' => $salesChannelName,
+        ]);
+
+        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $salesChannelContext);
+        $this->eventDispatcher->dispatch($paymentEvent);
+
+        return $paymentEvent->getPayment();
+    }
+
+    private function updatePaymentCounter(PaymentTransactionStruct $transaction, CreatePayment $createPaymentStruct): int
+    {
+        $countPayments = 1;
+        $oldMollieTransaction = $transaction->getOrderTransaction()->getExtension(Mollie::EXTENSION);
+        if ($oldMollieTransaction instanceof Payment) {
+            $countPayments = $oldMollieTransaction->getCountPayments() + 1;
+            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
+        }
+
+        return $countPayments;
     }
 }

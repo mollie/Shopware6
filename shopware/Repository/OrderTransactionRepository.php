@@ -54,7 +54,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
     public function findById(string $orderTransactionId, Context $context): ?OrderTransactionEntity
     {
         $criteria = new Criteria([$orderTransactionId]);
-        $criteria->addAssociation('order');
+        $criteria->addAssociation('order.orderCustomer.customer');
         $criteria->addAssociation('paymentMethod');
 
         return $this->orderTransactionRepository->search($criteria, $context)->first();
