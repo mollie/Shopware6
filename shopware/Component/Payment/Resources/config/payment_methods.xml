@@ -10,6 +10,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
             <tag name="mollie.payment.method"/>
@@ -19,6 +20,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
             <tag name="mollie.payment.method"/>
@@ -28,6 +30,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
+            <argument type="service" id="monolog.logger.mollie"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
             <tag name="mollie.payment.method"/>
