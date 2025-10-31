@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-    public const PLUGIN_VERSION = '4.23.0';
+    public const PLUGIN_VERSION = '5.0.0-beta1';
 
     /**
      * @throws \Exception
@@ -73,9 +73,9 @@ class MolliePayments extends Plugin
     {
         parent::activate($context);
 
-        $this->runDbMigrations($context->getMigrationCollection());
-
         $this->preparePlugin($context->getContext());
+
+        $this->runDbMigrations($context->getMigrationCollection());
     }
 
     public function boot(): void
