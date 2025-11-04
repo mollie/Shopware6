@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\FlowBuilder\Event\Payment;
 
-use Mollie\Shopware\Component\FlowBuilder\Event\BaseEvent;
-
-final class CancelledEvent extends BaseEvent
+final class CancelledEvent extends AbstractPaymentEvent
 {
     public const EVENT_NAME = 'mollie.payment.cancelled';
 
