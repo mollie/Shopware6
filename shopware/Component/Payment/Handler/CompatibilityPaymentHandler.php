@@ -8,15 +8,18 @@ use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
-use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Throwable;
 
+/**
+ * We have the issue that since Shopware 6.7 there is a new class AbstractPaymentHandler for Payment Methods
+ * the new Handler class does have the same methods like pay and finalize but with different parameters
+ * so depending on current Shopware Version we extend from different class
+ */
 if (class_exists(AbstractPaymentHandler::class)) {
     abstract class CompatibilityPaymentHandler extends AbstractPaymentHandler
     {
@@ -29,33 +32,16 @@ if (class_exists(AbstractPaymentHandler::class)) {
 
         public function pay(Request $request, PaymentTransactionStruct $transaction, Context $context, ?Struct $validateStruct): ?RedirectResponse
         {
-            try {
-                /** @var SalesChannelContext $salesChannelContext */
-                $salesChannelContext = $request->get('sw-sales-channel-context');
-                $transaction = $this->transactionConverter->convert($transaction, $context);
+            /** @var SalesChannelContext $salesChannelContext */
+            $salesChannelContext = $request->get('sw-sales-channel-context');
+            $dataBag = new RequestDataBag($request->request->all());
 
-                return $this->pay->execute($this, $transaction, new RequestDataBag($request->request->all()), $salesChannelContext);
-            } catch (Throwable $exception) {
-                $this->logger->critical('Mollie Payment failed', [
-                    'error' => $exception->getMessage(),
-                    'paymentMethod' => $this->getPaymentMethodName()
-                ]);
-                throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(),$exception);
-            }
+            return $this->doPay($transaction, $salesChannelContext, $dataBag);
         }
 
         public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
         {
-            try {
-                $transaction = $this->transactionConverter->convert($transaction, $context);
-                $this->finalize->execute($request, $transaction, $context);
-            } catch (Throwable $exception) {
-                $this->logger->critical('Mollie Finalize failed', [
-                    'error' => $exception->getMessage(),
-                    'paymentMethod' => $this->getPaymentMethodName()
-                ]);
-                throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(),$exception->getMessage(),$exception);
-            }
+            $this->doFinalize($transaction, $request, $context);
         }
     }
 
@@ -70,31 +56,12 @@ if (interface_exists(AsynchronousPaymentHandlerInterface::class) && ! class_exis
 
         public function pay(AsyncPaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
         {
-            try {
-                $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
-
-                return $this->pay->execute($this, $transaction, $dataBag, $salesChannelContext);
-            } catch (Throwable $exception) {
-                $this->logger->critical('Mollie Payment failed', [
-                    'error' => $exception->getMessage(),
-                    'paymentMethod' => $this->getPaymentMethodName()
-                ]);
-                throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(),$exception);
-            }
+            return $this->doPay($transaction, $salesChannelContext, $dataBag);
         }
 
         public function finalize(AsyncPaymentTransactionStruct $transaction, Request $request, SalesChannelContext $salesChannelContext): void
         {
-            try {
-                $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
-                $this->finalize->execute($request, $transaction, $salesChannelContext->getContext());
-            } catch (Throwable $exception) {
-                $this->logger->critical('Mollie Finalize failed', [
-                    'error' => $exception->getMessage(),
-                    'paymentMethod' => $this->getPaymentMethodName()
-                ]);
-                throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(),$exception->getMessage(),$exception);
-            }
+            $this->doFinalize($transaction, $request, $salesChannelContext->getContext());
         }
     }
 }

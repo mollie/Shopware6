@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Action;
 
+use Mollie\Shopware\Component\FlowBuilder\Event\Payment\CancelledEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
@@ -45,12 +47,17 @@ final class Finalize
         $this->eventDispatcher->dispatch($finalizeEvent);
 
         if ($paymentStatus->isCancelled()) {
+            $paymentCancelledEvent = new CancelledEvent($payment, $order, $customer, $context);
+            $this->eventDispatcher->dispatch($paymentCancelledEvent);
             $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $order->getOrderNumber(), $payment->getId());
             throw PaymentException::customerCanceled($transaction->getOrderTransactionId(), $message);
         }
 
         if ($paymentStatus->isFailed()) {
-            throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), 'Failed to finalize payment');
+            $paymentFailedEvent = new FailedEvent($payment, $order, $customer, $context);
+            $this->eventDispatcher->dispatch($paymentFailedEvent);
+            $message = sprintf('Payment for order %s (%s) is failed', $order->getOrderNumber(), $payment->getId());
+            throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $message);
         }
 
         $paymentSuccessEvent = new SuccessEvent($payment, $order, $customer, $context);
