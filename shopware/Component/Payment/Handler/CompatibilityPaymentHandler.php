@@ -79,7 +79,7 @@ if (interface_exists(AsynchronousPaymentHandlerInterface::class) && ! class_exis
                     'error' => $exception->getMessage(),
                     'paymentMethod' => $this->getPaymentMethodName()
                 ]);
-                throw $exception;
+                throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(),$exception);
             }
         }
 
@@ -93,7 +93,7 @@ if (interface_exists(AsynchronousPaymentHandlerInterface::class) && ! class_exis
                     'error' => $exception->getMessage(),
                     'paymentMethod' => $this->getPaymentMethodName()
                 ]);
-                throw $exception;
+                throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(),$exception->getMessage(),$exception);
             }
         }
     }
