@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -28,24 +29,36 @@ final class WebhookRoute extends AbstractWebhookRoute
     {
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
+        $this->updatePaymentStatus($payment, $transactionId, $context);
+        $this->updatePaymentMethod($payment);
+        //TODO: update order status
+        return new WebhookRouteResponse();
+    }
+
+    private function updatePaymentStatus(Payment $payment, string $transactionId, Context $context): void
+    {
         $shopwareHandlerMethod = $payment->getStatus()->getShopwareHandlerMethod();
-        if (mb_strlen($shopwareHandlerMethod) > 0) {
-            $this->stateMachineHandler->{$shopwareHandlerMethod}($transactionId, $context);
+        if (mb_strlen($shopwareHandlerMethod) === 0) {
+            return;
         }
 
+        $this->stateMachineHandler->{$shopwareHandlerMethod}($transactionId, $context);
+    }
+
+    private function updatePaymentMethod(Payment $payment): void
+    {
         $transaction = $payment->getShopwareTransaction();
         $paymentHandlerIdentifier = $transaction->getPaymentMethod()->getHandlerIdentifier();
 
         /** @var CompatibilityPaymentHandler $paymentHandler */
         $paymentHandler = $this->container->get($paymentHandlerIdentifier);
         if ($paymentHandler->getPaymentMethodName() === $payment->getMethod()) {
-            return new WebhookRouteResponse();
+            return;
         }
         /** Apple Pay payment is stored as credit card on mollie side, so we do not want to switch payment method */
         if ($paymentHandler->getPaymentMethodName() === 'applepay' && $payment->getMethod() === 'creditcard') {
-            return new WebhookRouteResponse();
+            return;
         }
-
-        //TODO change payment method, but only if it snot apple pay
+        //TODO: update payment method
     }
 }
