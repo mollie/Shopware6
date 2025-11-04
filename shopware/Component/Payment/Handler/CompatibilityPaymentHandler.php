@@ -8,6 +8,7 @@ use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AsynchronousPaymentHandlerInterface;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
+use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -39,7 +40,7 @@ if (class_exists(AbstractPaymentHandler::class)) {
                     'error' => $exception->getMessage(),
                     'paymentMethod' => $this->getPaymentMethodName()
                 ]);
-                throw $exception;
+                throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(),$exception);
             }
         }
 
@@ -53,7 +54,7 @@ if (class_exists(AbstractPaymentHandler::class)) {
                     'error' => $exception->getMessage(),
                     'paymentMethod' => $this->getPaymentMethodName()
                 ]);
-                throw $exception;
+                throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(),$exception->getMessage(),$exception);
             }
         }
     }
