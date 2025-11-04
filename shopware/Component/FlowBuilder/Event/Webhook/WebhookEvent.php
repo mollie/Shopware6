@@ -1,17 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\FlowBuilder\Event;
+namespace Mollie\Shopware\Component\FlowBuilder\Event\Webhook;
 
 use Mollie\Shopware\Component\FlowBuilder\Event\EventData\PaymentType;
+use Mollie\Shopware\Component\FlowBuilder\Event\MolliePaymentAware;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Shopware\Core\Checkout\Customer\CustomerDefinition;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\BusinessEventInterface;
-use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
@@ -20,34 +18,37 @@ use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class BaseEvent extends Event implements BusinessEventInterface, MolliePaymentAware, OrderAware, CustomerAware, MailAware, SalesChannelAware
+class WebhookEvent extends Event implements BusinessEventInterface, MolliePaymentAware, OrderAware, MailAware, SalesChannelAware
 {
-    public function __construct(private Payment $payment, private OrderEntity $order, private CustomerEntity $customer, private Context $context)
+    public function __construct(private Payment $payment, private OrderEntity $order, private Context $context)
     {
     }
 
     public static function getAvailableData(): EventDataCollection
     {
         return (new EventDataCollection())
-            ->add('customer', new EntityType(CustomerDefinition::class))
             ->add('order', new EntityType(OrderDefinition::class))
             ->add('payment', new PaymentType())
         ;
     }
 
-    public function getPaymentId(): string
+    public function getName(): string
     {
-        return $this->payment->getId();
+        return 'mollie.webhook_received.' . self::getStatus();
     }
 
-    public function getCustomerId(): string
+    public function getMailStruct(): MailRecipientStruct
     {
-        return $this->customer->getId();
-    }
+        $customer = $this->order->getOrderCustomer();
+        if ($customer === null) {
+            return new MailRecipientStruct([]);
+        }
 
-    public function getOrderId(): string
-    {
-        return $this->order->getId();
+        $customerFullName = $customer->getFirstName() . ' ' . $customer->getLastName();
+
+        return new MailRecipientStruct([
+            $customer->getEmail() => $customerFullName,
+        ]);
     }
 
     public function getSalesChannelId(): string
@@ -60,14 +61,14 @@ abstract class BaseEvent extends Event implements BusinessEventInterface, Mollie
         return $this->payment;
     }
 
-    public function getOrder(): OrderEntity
+    public function getPaymentId(): string
     {
-        return $this->order;
+        return $this->payment->getId();
     }
 
-    public function getCustomer(): CustomerEntity
+    public function getOrderId(): string
     {
-        return $this->customer;
+        return $this->order->getId();
     }
 
     public function getContext(): Context
@@ -75,12 +76,8 @@ abstract class BaseEvent extends Event implements BusinessEventInterface, Mollie
         return $this->context;
     }
 
-    public function getMailStruct(): MailRecipientStruct
+    protected static function getStatus(): string
     {
-        $customerFullName = $this->customer->getFirstName() . ' ' . $this->customer->getLastName();
-
-        return new MailRecipientStruct([
-            $this->customer->getEmail() => $customerFullName,
-        ]);
+        return 'All';
     }
 }

@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Route;
 
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookEvent;
+use Mollie\Shopware\Component\FlowBuilder\WebhookStatusEventFactory;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
@@ -16,6 +19,8 @@ final class WebhookRoute extends AbstractWebhookRoute
     public function __construct(
         private MollieGatewayInterface $mollieGateway,
         private OrderTransactionStateHandler $stateMachineHandler,
+        private WebhookStatusEventFactory $webhookStatusEventFactory,
+        private EventDispatcherInterface $eventDispatcher,
         private ContainerInterface $container,
     ) {
     }
@@ -28,6 +33,13 @@ final class WebhookRoute extends AbstractWebhookRoute
     public function notify(string $transactionId, Context $context): WebhookRouteResponse
     {
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
+        $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
+
+        $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
+        $this->eventDispatcher->dispatch($webhookEvent);
+
+        $webhookStatusEvent = $this->webhookStatusEventFactory->create($payment, $shopwareOrder, $context);
+        $this->eventDispatcher->dispatch($webhookStatusEvent);
 
         $this->updatePaymentStatus($payment, $transactionId, $context);
         $this->updatePaymentMethod($payment);
