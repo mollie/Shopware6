@@ -107,16 +107,6 @@ final class CreatePayment implements \JsonSerializable
         $this->lines = $lines;
     }
 
-    public function getCancelUrl(): string
-    {
-        return $this->cancelUrl;
-    }
-
-    public function setCancelUrl(string $cancelUrl): void
-    {
-        $this->cancelUrl = $cancelUrl;
-    }
-
     public function getWebhookUrl(): string
     {
         return $this->webhookUrl;
