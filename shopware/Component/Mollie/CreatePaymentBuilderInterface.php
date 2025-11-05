@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
-use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Shopware\Core\Checkout\Order\OrderEntity;
 
 interface CreatePaymentBuilderInterface
 {
-    public function build(PaymentTransactionStruct $transaction): CreatePayment;
+    public function build(string $transactionId, OrderEntity $order): CreatePayment;
 }

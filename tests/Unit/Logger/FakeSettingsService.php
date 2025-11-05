@@ -11,14 +11,16 @@ use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
 {
-    private LoggerSettings $settings;
 
-    public function __construct(LoggerSettings $settings = null)
+    public function __construct(private ?LoggerSettings $loggerSettings = null, private ?PaymentSettings $paymentSettings = null)
     {
-        if($settings === null) {
-            $settings = new LoggerSettings(true,0);
+        if($this->loggerSettings === null) {
+            $this->loggerSettings = new LoggerSettings(true,0);
         }
-        $this->settings = $settings;
+        if($this->paymentSettings === null) {
+            $this->paymentSettings = new PaymentSettings();
+        }
+
     }
 
     public function getEnvironmentSettings(): EnvironmentSettings
@@ -38,12 +40,12 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings
     {
-        return new PaymentSettings();
+        return $this->paymentSettings;
     }
 
 
     public function getLoggerSettings(?string $salesChannelId = null): LoggerSettings
     {
-        return $this->settings;
+        return $this->loggerSettings;
     }
 }

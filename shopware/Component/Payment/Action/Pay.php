@@ -89,10 +89,11 @@ final class Pay
 
     private function createPaymentStruct(PaymentTransactionStruct $transaction, CompatibilityPaymentHandler $paymentHandler, string $salesChannelName, SalesChannelContext $salesChannelContext): CreatePayment
     {
-        $createPaymentStruct = $this->createPaymentBuilder->build($transaction);
+        $order = $transaction->getOrder();
+        $createPaymentStruct = $this->createPaymentBuilder->build($transaction->getOrderTransactionId(), $order);
         $createPaymentStruct->setMethod($paymentHandler->getPaymentMethodName());
 
-        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $transaction->getOrder());
+        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $order);
         $this->logger->info('Payment payload created, send data to Mollie API', [
             'payload' => $createPaymentStruct->toArray(),
             'salesChannel' => $salesChannelName,
