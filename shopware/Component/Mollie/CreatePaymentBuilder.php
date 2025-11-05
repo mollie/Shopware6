@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Mollie;
 
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
-use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Shopware\Core\Checkout\Order\OrderEntity;
 
 final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 {
@@ -15,25 +15,27 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
     ) {
     }
 
-    public function build(PaymentTransactionStruct $transaction): CreatePayment
+    public function build(string $transactionId, OrderEntity $order): CreatePayment
     {
-        $order = $transaction->getOrder();
         $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
         $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
+        $orderNumber = $order->getOrderNumber();
+        $customer = $order->getOrderCustomer();
         $description = $order->getOrderNumber();
+        $deliveries = $order->getDeliveries();
 
         if (mb_strlen($orderNumberFormat) > 0) {
             $description = str_replace([
                 '{ordernumber}',
                 '{customernumber}'
             ], [
-                $order->getOrderNumber(),
-                $order->getOrderCustomer()->getCustomerNumber()
+                $orderNumber,
+                $customer->getCustomerNumber()
             ], $orderNumberFormat);
         }
         $currency = $order->getCurrency();
-        $returnUrl = $this->routeBuilder->getReturnUrl($transaction->getOrderTransactionId());
-        $webhookUrl = $this->routeBuilder->getWebhookUrl($transaction->getOrderTransactionId());
+        $returnUrl = $this->routeBuilder->getReturnUrl($transactionId);
+        $webhookUrl = $this->routeBuilder->getWebhookUrl($transactionId);
 
         $lineItemCollection = new LineItemCollection();
         $oderLineItems = $order->getLineItems();
@@ -44,11 +46,11 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
             }
         }
 
-        $shippingAddress = Address::fromAddress($order->getOrderCustomer(), $order->getDeliveries()->first()->getShippingOrderAddress());
+        $shippingAddress = Address::fromAddress($customer, $deliveries->first()->getShippingOrderAddress());
 
-        foreach ($order->getDeliveries() as $delivery) {
+        foreach ($deliveries as $delivery) {
             if (method_exists($order, 'getPrimaryOrderDeliveryId') && $order->getPrimaryOrderDeliveryId() !== null && $delivery->getId() === $order->getPrimaryOrderDeliveryId()) {
-                $shippingAddress = Address::fromAddress($order->getOrderCustomer(), $delivery->getShippingOrderAddress());
+                $shippingAddress = Address::fromAddress($customer, $delivery->getShippingOrderAddress());
             }
 
             if ($delivery->getShippingCosts()->getTotalPrice() <= 0) {
@@ -59,9 +61,10 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
             $lineItemCollection->add($lineItem);
         }
 
-        $billingAddress = Address::fromAddress($order->getOrderCustomer(), $order->getBillingAddress());
+        $billingAddress = Address::fromAddress($customer, $order->getBillingAddress());
 
         $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order));
+        $payment->setCaptureMode(new CaptureMode(CaptureMode::AUTOMATIC));
         $payment->setBillingAddress($billingAddress);
         $payment->setShippingAddress($shippingAddress);
         $payment->setLines($lineItemCollection);

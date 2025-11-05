@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Controller;
 
-use Mollie\Shopware\Component\Payment\Route\ReturnRoute;
-use Mollie\shopware\Component\Payment\Route\WebhookRoute;
+use Mollie\Shopware\Component\Payment\Route\AbstractReturnRoute;
+use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PaymentController extends AbstractController
 {
-    public function __construct(private ReturnRoute $returnRoute,
-                                private WebhookRoute $webhookRoute,
+    public function __construct(private AbstractReturnRoute $returnRoute,
+                                private AbstractWebhookRoute $webhookRoute,
                                 private LoggerInterface $logger,
     ) {
     }
