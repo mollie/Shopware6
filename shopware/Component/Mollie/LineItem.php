@@ -170,9 +170,4 @@ final class LineItem implements \JsonSerializable
     {
         $this->productUrl = $productUrl;
     }
-
-    public function toArray(): array
-    {
-        return json_decode(json_encode($this), true);
-    }
 }
