@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes;
+namespace Mollie\Unit\Mollie\Fake;
 
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 
 final class FakeRouteBuilder implements RouteBuilderInterface
 {
-    public function __construct(private string $returnUrl, private string $webhookUrl)
+    public function __construct(private string $returnUrl = '', private string $webhookUrl = '')
+
     {
     }
 

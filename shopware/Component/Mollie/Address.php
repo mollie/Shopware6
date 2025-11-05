@@ -34,39 +34,39 @@ final class Address implements \JsonSerializable
         $this->country = $country;
     }
 
-    public static function fromAddress(?OrderCustomerEntity $customer, ?OrderAddressEntity $billingAddress): self
+    public static function fromAddress(?OrderCustomerEntity $customer, ?OrderAddressEntity $orderAddress): self
     {
         if ($customer === null) {
             throw new \InvalidArgumentException('Customer cannot be null');
         }
-        if ($billingAddress === null) {
-            throw new \InvalidArgumentException('Billing address should not be null.');
+        if ($orderAddress === null) {
+            throw new \InvalidArgumentException('Address should not be null');
         }
         $address = new self($customer->getEmail(),
             $customer->getSalutation()->getDisplayName(),
-            $billingAddress->getFirstName(),
-            $billingAddress->getLastName(),
-            $billingAddress->getStreet(),
-            $billingAddress->getZipcode(),
-            $billingAddress->getCity(),
-            $billingAddress->getCountry()->getIso()
+            $orderAddress->getFirstName(),
+            $orderAddress->getLastName(),
+            $orderAddress->getStreet(),
+            $orderAddress->getZipcode(),
+            $orderAddress->getCity(),
+            $orderAddress->getCountry()->getIso()
         );
 
-        if ($billingAddress->getPhoneNumber() !== null) {
-            $address->setPhone($billingAddress->getPhoneNumber());
+        if ($orderAddress->getPhoneNumber() !== null) {
+            $address->setPhone($orderAddress->getPhoneNumber());
         }
-        $additionalAddressLine = '';
-        if ($billingAddress->getAdditionalAddressLine1()) {
-            $additionalAddressLine .= $billingAddress->getAdditionalAddressLine1();
+        $additionalAddressLines = [];
+        if ($orderAddress->getAdditionalAddressLine1()) {
+            $additionalAddressLines[] = $orderAddress->getAdditionalAddressLine1();
         }
-        if ($billingAddress->getAdditionalAddressLine2()) {
-            $additionalAddressLine .= $billingAddress->getAdditionalAddressLine2();
+        if ($orderAddress->getAdditionalAddressLine2()) {
+            $additionalAddressLines[] = $orderAddress->getAdditionalAddressLine2();
         }
-        if (mb_strlen($additionalAddressLine) > 0) {
-            $address->setStreetAdditional($additionalAddressLine);
+        if (count($additionalAddressLines) > 0) {
+            $address->setStreetAdditional(implode(' ', $additionalAddressLines));
         }
-        if ($billingAddress->getCompany() !== null) {
-            $billingAddress->setCompany($billingAddress->getCompany());
+        if ($orderAddress->getCompany() !== null) {
+            $address->setOrganizationName($orderAddress->getCompany());
         }
 
         return $address;

@@ -3,13 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
@@ -17,8 +13,7 @@ use Shopware\Core\Framework\Context;
 
 final class MollieGateway implements MollieGatewayInterface
 {
-    public function __construct(private SettingsService $settings,
-                                private string $shopwareVersion,
+    public function __construct(private ClientFactoryInterface $clientFactory,
                                 private OrderTransactionRepositoryInterface $orderTransactionRepository,
                                 private LoggerInterface $logger)
     {
@@ -43,8 +38,7 @@ final class MollieGateway implements MollieGatewayInterface
 
     public function getPayment(string $molliePaymentId, string $salesChannelId): Payment
     {
-        $apiSettings = $this->settings->getApiSettings($salesChannelId);
-        $client = $this->getApiClient($apiSettings);
+        $client = $this->clientFactory->create($salesChannelId);
 
         try {
             $response = $client->get('payments/' . $molliePaymentId);
@@ -57,9 +51,7 @@ final class MollieGateway implements MollieGatewayInterface
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
-        $apiSettings = $this->settings->getApiSettings($salesChannelId);
-
-        $client = $this->getApiClient($apiSettings);
+        $client = $this->clientFactory->create($salesChannelId);
         $formParams = $molliePayment->toArray();
         $this->logger->debug('Create payment via Payments API', [
             'formParams' => $formParams,
@@ -85,21 +77,5 @@ final class MollieGateway implements MollieGatewayInterface
         ]);
 
         return new ApiException($exception->getCode(), $body['title'] ?? '', $body['detail'] ?? '', $body['field'] ?? '');
-    }
-
-    private function getApiClient(ApiSettings $settings): Client
-    {
-        $userAgent = implode(' ', [
-            'Shopware/' . $this->shopwareVersion,
-            'MollieShopware6/' . MolliePayments::PLUGIN_VERSION,
-        ]);
-
-        return new Client([
-            'base_uri' => 'https://api.mollie.com/v2/',
-            'headers' => [
-                'Authorization' => 'Bearer ' . $settings->getApiKey(),
-                'User-Agent' => $userAgent
-            ]
-        ]);
     }
 }
