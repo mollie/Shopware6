@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory;
+use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\LineItemFactoryInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
@@ -28,7 +28,7 @@ class CartService implements CartServiceInterface
     private $contextSwitcher;
 
     /**
-     * @var ProductLineItemFactory
+     * @var LineItemFactoryInterface
      */
     private $productItemFactory;
 
@@ -39,7 +39,7 @@ class CartService implements CartServiceInterface
 
     private SalesChannelContextServiceInterface $contextService;
 
-    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, ProductLineItemFactory $productItemFactory, SalesChannelContextServiceInterface $contextService, ApplePayShippingAddressFaker $shippingAddressFaker)
+    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, LineItemFactoryInterface $productItemFactory, SalesChannelContextServiceInterface $contextService, ApplePayShippingAddressFaker $shippingAddressFaker)
     {
         $this->swCartService = $swCartService;
         $this->contextSwitcher = $contextSwitcher;
