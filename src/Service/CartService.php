@@ -29,7 +29,7 @@ class CartService implements CartServiceInterface
     private $contextSwitcher;
 
     /**
-     * @var ProductLineItemFactory
+     * @var LineItemFactoryInterface
      */
     private $productItemFactory;
 
