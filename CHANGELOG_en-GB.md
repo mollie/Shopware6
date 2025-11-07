@@ -1,6 +1,7 @@
 # 4.20.0
 - Changed order builder to use order addresses instead of customer default addresses to make sure the address in mollie matches the order information in shopware.
 - Fixed an issue where Apple Pay Direct did not work when the phone number was configured as a required field in the shop.
+- Fixed compatibility with shopware commercial 
 
 ## [4.19.0] - 2025-10-09
 - Added Estonian Language Support
