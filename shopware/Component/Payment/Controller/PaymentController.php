@@ -7,8 +7,8 @@ use Mollie\Shopware\Component\Payment\Route\AbstractReturnRoute;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\ShopwareHttpException;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,15 +22,14 @@ final class PaymentController extends AbstractController
     ) {
     }
 
-    public function return(Request $request, SalesChannelContext $salesChannelContext): Response
+    public function return(Request $request, Context $context): Response
     {
         $transactionId = $request->get('transactionId');
 
         $this->logger->info('Returning from Payment Provider', [
             'transactionId' => $transactionId,
-            'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
         ]);
-        $response = $this->returnRoute->return($request, $salesChannelContext);
+        $response = $this->returnRoute->return($request, $context);
         $paymentStatus = $response->getPaymentStatus();
 
         if ($paymentStatus->isFailed()) {
@@ -47,15 +46,14 @@ final class PaymentController extends AbstractController
         return $this->forward($controller, [], $queryParameters);
     }
 
-    public function webhook(Request $request, SalesChannelContext $salesChannelContext): Response
+    public function webhook(Request $request, Context $context): Response
     {
         $transactionId = $request->get('transactionId');
         try {
             $this->logger->info('Webhook received', [
                 'transactionId' => $transactionId,
-                'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
             ]);
-            $response = $this->webhookRoute->notify($request, $salesChannelContext->getContext());
+            $response = $this->webhookRoute->notify($request, $context);
 
             return new JsonResponse($response->getObject());
         } catch (ShopwareHttpException $exception) {
@@ -63,7 +61,6 @@ final class PaymentController extends AbstractController
                 'Webhook request failed with warning',
                 [
                     'transactionId' => $transactionId,
-                    'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
                     'message' => $exception->getMessage(),
                 ]
             );
@@ -74,7 +71,6 @@ final class PaymentController extends AbstractController
                 'Webhook request failed',
                 [
                     'transactionId' => $transactionId,
-                    'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
                     'message' => $exception->getMessage(),
                 ]
             );
