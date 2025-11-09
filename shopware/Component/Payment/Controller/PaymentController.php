@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Payment\Route\AbstractReturnRoute;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
+use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -49,12 +50,36 @@ final class PaymentController extends AbstractController
     public function webhook(Request $request, SalesChannelContext $salesChannelContext): Response
     {
         $transactionId = $request->get('transactionId');
-        $this->logger->info('Webhook received', [
-            'transactionId' => $transactionId,
-            'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
-        ]);
-        $response = $this->webhookRoute->notify($request, $salesChannelContext->getContext());
+        try {
+            $this->logger->info('Webhook received', [
+                'transactionId' => $transactionId,
+                'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
+            ]);
+            $response = $this->webhookRoute->notify($request, $salesChannelContext->getContext());
 
-        return new JsonResponse($response->getObject());
+            return new JsonResponse($response->getObject());
+        } catch (ShopwareHttpException $exception) {
+            $this->logger->warning(
+                'Webhook request failed with warning',
+                [
+                    'transactionId' => $transactionId,
+                    'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
+                    'message' => $exception->getMessage(),
+                ]
+            );
+
+            return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], $exception->getStatusCode());
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                'Webhook request failed',
+                [
+                    'transactionId' => $transactionId,
+                    'salesChannel' => $salesChannelContext->getSalesChannel()->getName(),
+                    'message' => $exception->getMessage(),
+                ]
+            );
+
+            return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], 422);
+        }
     }
 }

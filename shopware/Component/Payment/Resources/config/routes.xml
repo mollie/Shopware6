@@ -4,25 +4,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
     <import resource="legacy_routes.xml" />
-    <route id="store-api.mollie.payment.return"
-           path="/store-api/mollie/payment/return/{transactionId}"
-           methods="GET">
-        <requirement key="transactionId">.*</requirement>
-        <default key="_controller">Mollie\Shopware\Component\Payment\Route\ReturnRoute::return</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-        <default key="auth_required"><bool>false</bool></default>
-        <option key="seo">false</option>
-    </route>
 
-    <route id="store-api.mollie.payment.webhook"
-           path="/store-api/mollie/payment/webhook/{transactionId}"
-           methods="GET">
-        <requirement key="transactionId">.*</requirement>
-        <default key="_controller">Mollie\Shopware\Component\Payment\Route\WebhookRoute::notify</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-        <default key="auth_required"><bool>false</bool></default>
-        <option key="seo">false</option>
-    </route>
 
 
     <route id="storefront.mollie.payment.return"
