@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePayme
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class PaymentController extends AbstractController
@@ -20,13 +21,15 @@ final class PaymentController extends AbstractController
     ) {
     }
 
-    public function return(string $transactionId, SalesChannelContext $salesChannelContext): Response
+    public function return(Request $request, SalesChannelContext $salesChannelContext): Response
     {
+        $transactionId = $request->get('transactionId');
+
         $this->logger->info('Returning from Payment Provider', [
             'transactionId' => $transactionId,
             'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
         ]);
-        $response = $this->returnRoute->return($transactionId, $salesChannelContext);
+        $response = $this->returnRoute->return($request, $salesChannelContext);
         $paymentStatus = $response->getPaymentStatus();
 
         if ($paymentStatus->isFailed()) {
@@ -43,13 +46,14 @@ final class PaymentController extends AbstractController
         return $this->forward($controller, [], $queryParameters);
     }
 
-    public function webhook(string $transactionId, SalesChannelContext $salesChannelContext): Response
+    public function webhook(Request $request, SalesChannelContext $salesChannelContext): Response
     {
+        $transactionId = $request->get('transactionId');
         $this->logger->info('Webhook received', [
             'transactionId' => $transactionId,
             'salesChannel' => $salesChannelContext->getSalesChannel()->getName()
         ]);
-        $response = $this->webhookRoute->notify($transactionId, $salesChannelContext->getContext());
+        $response = $this->webhookRoute->notify($request, $salesChannelContext->getContext());
 
         return new JsonResponse($response->getObject());
     }

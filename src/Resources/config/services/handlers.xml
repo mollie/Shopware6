@@ -14,7 +14,7 @@
         </service>
 
         <!-- Apple Pay PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\ApplePayPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\ApplePayPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -22,7 +22,7 @@
         </service>
 
         <!-- BanContact PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BanContactPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\BanContactPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -30,7 +30,7 @@
         </service>
 
         <!-- Bank Transfer PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BankTransferPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\BankTransferPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
@@ -39,7 +39,7 @@
         </service>
 
         <!-- Belfius PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BelfiusPayment" >
+        <service id="Kiener\MolliePayments\Handler\Method\BelfiusPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -47,7 +47,7 @@
         </service>
 
         <!-- Billie PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BilliePayment">
+        <service id="Kiener\MolliePayments\Handler\Method\BilliePayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -55,7 +55,7 @@
         </service>
 
         <!-- Bizum PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BizumPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\BizumPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -65,7 +65,7 @@
 
 
         <!-- Direct Debit PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\DirectDebitPayment" >
+        <service id="Kiener\MolliePayments\Handler\Method\DirectDebitPayment" public="true" >
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -73,7 +73,7 @@
         </service>
 
         <!-- Eps PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\EpsPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\EpsPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -81,7 +81,7 @@
         </service>
 
         <!-- Gift Card PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\GiftCardPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\GiftCardPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -90,7 +90,7 @@
 
 
         <!-- iDeal PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\iDealPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\iDealPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -98,7 +98,7 @@
         </service>
 
         <!-- ING HomePay PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\IngHomePayPayment" >
+        <service id="Kiener\MolliePayments\Handler\Method\IngHomePayPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -106,7 +106,7 @@
         </service>
 
         <!-- KBC PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\KbcPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\KbcPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -114,7 +114,7 @@
         </service>
 
         <!-- Klarna Pay Later PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -122,7 +122,7 @@
         </service>
 
         <!-- Klarna Pay Now PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment" >
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -130,7 +130,7 @@
         </service>
 
         <!-- Klarna Slice It PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -139,7 +139,7 @@
 
 
         <!-- PayPal Express PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PayPalExpressPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\PayPalExpressPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -147,7 +147,7 @@
         </service>
 
         <!-- PaySafeCard PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -155,7 +155,7 @@
         </service>
 
         <!-- Przelewy24 PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\Przelewy24Payment" >
+        <service id="Kiener\MolliePayments\Handler\Method\Przelewy24Payment" public="true" >
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -163,7 +163,7 @@
         </service>
 
         <!-- TWINT PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\TwintPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\TwintPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -171,7 +171,7 @@
         </service>
 
         <!-- Sofort PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\SofortPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\SofortPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -179,7 +179,7 @@
         </service>
 
         <!-- Voucher PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\VoucherPayment" >
+        <service id="Kiener\MolliePayments\Handler\Method\VoucherPayment" public="true" >
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -187,7 +187,7 @@
         </service>
 
         <!-- in3 PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\In3Payment">
+        <service id="Kiener\MolliePayments\Handler\Method\In3Payment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -195,7 +195,7 @@
         </service>
 
         <!-- POS Terminal PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PosPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\PosPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -203,7 +203,7 @@
         </service>
 
         <!-- Blick PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BlikPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\BlikPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -211,7 +211,7 @@
         </service>
 
         <!-- Bancomat PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BancomatPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\BancomatPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -219,7 +219,7 @@
         </service>
 
         <!-- Palma PaymentHandler-->
-        <service id="Kiener\MolliePayments\Handler\Method\AlmaPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\AlmaPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -228,7 +228,7 @@
 
 
         <!-- MyBank PaymentHandler-->
-        <service id="Kiener\MolliePayments\Handler\Method\MyBankPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\MyBankPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -236,7 +236,7 @@
         </service>
 
         <!-- Trustly PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\TrustlyPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\TrustlyPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -244,7 +244,7 @@
         </service>
 
         <!-- Payconiq PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PayconiqPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\PayconiqPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -252,7 +252,7 @@
         </service>
 
         <!-- Riverty PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\RivertyPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\RivertyPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -260,7 +260,7 @@
         </service>
 
         <!-- Satispay PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\SatispayPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\SatispayPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -268,7 +268,7 @@
         </service>
 
         <!-- Pay by Bank PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PayByBankPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\PayByBankPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -276,7 +276,7 @@
         </service>
 
         <!-- Swish PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\SwishPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\SwishPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -285,7 +285,7 @@
 
 
         <!-- MB Way PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\MbWayPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\MbWayPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>
@@ -293,7 +293,7 @@
         </service>
       
         <!-- Multibanco PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\MultibancoPayment">
+        <service id="Kiener\MolliePayments\Handler\Method\MultibancoPayment" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
             <tag name="shopware.payment.method.async"/>

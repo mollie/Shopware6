@@ -9,11 +9,9 @@
            methods="GET">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Route\ReturnRoute::return</default>
-        <default key="_routeScope">
-            <list>
-                <string>store-api</string>
-            </list>
-        </default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
+        <default key="auth_required"><bool>false</bool></default>
+        <option key="seo">false</option>
     </route>
 
     <route id="store-api.mollie.payment.webhook"
@@ -21,38 +19,34 @@
            methods="GET">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Route\WebhookRoute::notify</default>
-        <default key="_routeScope">
-            <list>
-                <string>store-api</string>
-            </list>
-        </default>
+        <default key="_routeScope"><list><string>store-api</string></list></default>
+        <default key="auth_required"><bool>false</bool></default>
+        <option key="seo">false</option>
     </route>
 
+
     <route id="storefront.mollie.payment.return"
-           path="/mollie/return/{transactionId}"
-           methods="GET">
+           path="/mollie/payment/{transactionId}"
+           methods="GET|POST">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::return</default>
         <default key="csrf_protected"><bool>false</bool></default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
-    <route id="storefront.mollie.payment.cancel"
-           path="/mollie/cancel/{transactionId}"
-           methods="GET">
-        <requirement key="transactionId">.*</requirement>
-        <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::cancel</default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <option key="seo">false</option>
-    </route>
+
+
+
     <route id="storefront.mollie.payment.webhook"
-           path="/mollie/webhook/notify/{transactionId}"
-           methods="GET">
+           path="/mollie/webhook/{transactionId}"
+           methods="GET|POST">
         <requirement key="transactionId">.*</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::webhook</default>
         <default key="csrf_protected"><bool>false</bool></default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>
     </route>
+
+    <route id="frontend.mollie.payment" alias="storefront.mollie.payment.return"/>
+    <route id="frontend.mollie.webhook" alias="storefront.mollie.payment.webhook"/>
 </routes>

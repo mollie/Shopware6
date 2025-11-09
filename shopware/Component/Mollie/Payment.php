@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
-use Psr\Http\Message\ResponseInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
@@ -85,9 +84,8 @@ final class Payment extends Struct implements \JsonSerializable
         $this->thirdPartyPaymentId = $thirdPartyPaymentId;
     }
 
-    public static function createFromClientResponse(ResponseInterface $response): self
+    public static function createFromClientResponse(array $body): self
     {
-        $body = json_decode($response->getBody()->getContents(), true);
         $payment = new self($body['id'], $body['method']);
         $payment->setStatus(new PaymentStatus($body['status']));
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
