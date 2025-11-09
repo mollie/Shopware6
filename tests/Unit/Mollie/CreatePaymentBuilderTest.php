@@ -34,83 +34,76 @@ final class CreatePaymentBuilderTest extends TestCase
 
         $expected = [
             'description' => 'test_10000-100',
-            'amount' =>
-                [
-                    'currency' => 'EUR',
-                    'value' => '100.00',
-                ],
+            'amount' => [
+                'currency' => 'EUR',
+                'value' => '100.00',
+            ],
             'redirectUrl' => '',
             'cancelUrl' => '',
             'webhookUrl' => '',
             'method' => 'paypal',
-            'billingAddress' =>
-                [
-                    'title' => 'Not specified',
-                    'givenName' => 'Tester',
-                    'familyName' => 'Test',
-                    'streetAndNumber' => 'Test Street',
-                    'postalCode' => '12345',
-                    'email' => 'fake@unit.test',
-                    'city' => 'Test City',
-                    'country' => 'DE',
-                ],
-            'shippingAddress' =>
-                [
-                    'title' => 'Not specified',
-                    'givenName' => 'Tester',
-                    'familyName' => 'Test',
-                    'streetAndNumber' => 'Test Street',
-                    'postalCode' => '12345',
-                    'email' => 'fake@unit.test',
-                    'city' => 'Test City',
-                    'country' => 'DE',
-                ],
+            'billingAddress' => [
+                'title' => 'Not specified',
+                'givenName' => 'Tester',
+                'familyName' => 'Test',
+                'streetAndNumber' => 'Test Street',
+                'postalCode' => '12345',
+                'email' => 'fake@unit.test',
+                'city' => 'Test City',
+                'country' => 'DE',
+            ],
+            'shippingAddress' => [
+                'title' => 'Not specified',
+                'givenName' => 'Tester',
+                'familyName' => 'Test',
+                'streetAndNumber' => 'Test Street',
+                'postalCode' => '12345',
+                'email' => 'fake@unit.test',
+                'city' => 'Test City',
+                'country' => 'DE',
+            ],
             'captureMode' => 'automatic',
             'locale' => 'en_GB',
-            'lines' =>
+            'lines' => [
                 [
-                    [
-                        'type' => 'digital',
-                        'vatRate' => '19',
-                        'vatAmount' => [
-                            'currency' => 'EUR',
-                            'value' => '2.09',
-                        ],
-                        'sku' => 'SW1000',
-                        'description' => 'Fake product',
-                        'quantity' => 1,
-                        'unitPrice' => [
-                            'currency' => 'EUR',
-                            'value' => '10.99',
-                        ],
-                        'totalAmount' => [
-                            'currency' => 'EUR',
-                            'value' => '10.99',
-                        ]
+                    'type' => 'digital',
+                    'vatRate' => '19',
+                    'vatAmount' => [
+                        'currency' => 'EUR',
+                        'value' => '2.09',
                     ],
-                    [
-                        'type' => 'shipping_fee',
-                        'vatRate' => '19',
-                        'vatAmount' =>
-                            [
-                                'currency' => 'EUR',
-                                'value' => '0.95',
-                            ],
-                        'sku' => 'mol-delivery-fake-shipping-method-id',
-                        'description' => 'DHL',
-                        'quantity' => 1,
-                        'unitPrice' =>
-                            [
-                                'currency' => 'EUR',
-                                'value' => '4.99',
-                            ],
-                        'totalAmount' =>
-                            [
-                                'currency' => 'EUR',
-                                'value' => '4.99',
-                            ],
+                    'sku' => 'SW1000',
+                    'description' => 'Fake product',
+                    'quantity' => 1,
+                    'unitPrice' => [
+                        'currency' => 'EUR',
+                        'value' => '10.99',
+                    ],
+                    'totalAmount' => [
+                        'currency' => 'EUR',
+                        'value' => '10.99',
+                    ]
+                ],
+                [
+                    'type' => 'shipping_fee',
+                    'vatRate' => '19',
+                    'vatAmount' => [
+                        'currency' => 'EUR',
+                        'value' => '0.95',
+                    ],
+                    'sku' => 'mol-delivery-fake-shipping-method-id',
+                    'description' => 'DHL',
+                    'quantity' => 1,
+                    'unitPrice' => [
+                        'currency' => 'EUR',
+                        'value' => '4.99',
+                    ],
+                    'totalAmount' => [
+                        'currency' => 'EUR',
+                        'value' => '4.99',
                     ],
                 ],
+            ],
             'sequenceType' => 'oneoff',
             'cardToken' => 'testCard',
         ];
@@ -121,21 +114,21 @@ final class CreatePaymentBuilderTest extends TestCase
         $this->assertInstanceOf(Address::class, $actual->getShippingAddress());
         $this->assertInstanceOf(Address::class, $actual->getBillingAddress());
         $this->assertInstanceOf(LineItemCollection::class, $actual->getLines());
-        $this->assertEquals(new Money(100.00,'EUR'),$actual->getAmount());
+        $this->assertEquals(new Money(100.00, 'EUR'), $actual->getAmount());
         $this->assertSame($expected['method'], $actual->getMethod());
-        $this->assertEquals($expected['locale'], (string)$actual->getLocale());
+        $this->assertEquals($expected['locale'], (string) $actual->getLocale());
         $this->assertSame($expected['webhookUrl'], $actual->getWebhookUrl());
         $this->assertSame($expected['redirectUrl'], $actual->getRedirectUrl());
-        $this->assertSame($expected['sequenceType'], (string)$actual->getSequenceType());
-        $this->assertSame($expected['captureMode'], (string)$actual->getCaptureMode());
+        $this->assertSame($expected['sequenceType'], (string) $actual->getSequenceType());
+        $this->assertSame($expected['captureMode'], (string) $actual->getCaptureMode());
     }
 
-    public function testSetters():void
+    public function testSetters(): void
     {
-        $createPayment = new CreatePayment('test','',new Money(10.00,'EUR'));
+        $createPayment = new CreatePayment('test', '', new Money(10.00, 'EUR'));
         $createPayment->setDescription('test2');
 
-        $this->assertSame(null,$createPayment->getCaptureMode());
-        $this->assertSame('test2',$createPayment->getDescription());
+        $this->assertSame(null, $createPayment->getCaptureMode());
+        $this->assertSame('test2', $createPayment->getDescription());
     }
 }

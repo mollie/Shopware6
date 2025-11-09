@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-
 #[CoversClass(PluginSettingsHandler::class)]
 /**
  * @coversDefaultClass \Mollie\Shopware\Component\Logger\PluginSettingsHandler
@@ -24,7 +23,7 @@ final class PluginSettingsHandlerTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('isConnected')->willReturn(false);
 
-        $handler = new PluginSettingsHandler($fakeSettingsService,$connection,'');
+        $handler = new PluginSettingsHandler($fakeSettingsService, $connection, '');
         $record = [
             'message' => 'test'
         ];
@@ -32,6 +31,7 @@ final class PluginSettingsHandlerTest extends TestCase
 
         $this->assertFalse($result);
     }
+
     public function testHandleIsFalseForDifferentChannel(): void
     {
         $fakeSettingsService = new FakeSettingsService();
@@ -39,7 +39,7 @@ final class PluginSettingsHandlerTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('isConnected')->willReturn(true);
 
-        $handler = new PluginSettingsHandler($fakeSettingsService,$connection,'');
+        $handler = new PluginSettingsHandler($fakeSettingsService, $connection, '');
         $record = [
             'message' => 'test',
             'channel' => 'test'
@@ -48,45 +48,47 @@ final class PluginSettingsHandlerTest extends TestCase
 
         $this->assertFalse($result);
     }
+
     public function testHandleIsFalseFowLowerLogLevel(): void
     {
-        $loggerSettings = new LoggerSettings(false,0);
+        $loggerSettings = new LoggerSettings(false, 0);
         $fakeSettingsService = new FakeSettingsService($loggerSettings);
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('isConnected')->willReturn(true);
 
-        $handler = new PluginSettingsHandler($fakeSettingsService,$connection,'');
+        $handler = new PluginSettingsHandler($fakeSettingsService, $connection, '');
         $record = [
             'message' => 'test',
             'channel' => 'mollie',
             'level' => LogLevel::DEBUG,
 
-            'extra'=>[],
-            'context'=>[],
-            'datetime'=>new \DateTime()
+            'extra' => [],
+            'context' => [],
+            'datetime' => new \DateTime()
         ];
         $result = $handler->handle($record);
 
         $this->assertFalse($result);
     }
-    public function testHandleIsWorking():void
+
+    public function testHandleIsWorking(): void
     {
-        $loggerSettings = new LoggerSettings(true,0);
+        $loggerSettings = new LoggerSettings(true, 0);
         $fakeSettingsService = new FakeSettingsService($loggerSettings);
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('isConnected')->willReturn(true);
 
-        $handler = new PluginSettingsHandler($fakeSettingsService,$connection,'',false);
+        $handler = new PluginSettingsHandler($fakeSettingsService, $connection, '', false);
         $record = [
             'message' => 'test',
             'channel' => 'mollie',
             'level' => LogLevel::DEBUG,
 
-            'extra'=>[],
-            'context'=>[],
-            'datetime'=>new \DateTime()
+            'extra' => [],
+            'context' => [],
+            'datetime' => new \DateTime()
         ];
         $result = $handler->handle($record);
 

@@ -4,6 +4,7 @@ $finder = \PhpCsFixer\Finder::create()->in([
     __DIR__ . '/../src',
     __DIR__ . '/../shopware',
     __DIR__.'/../tests/PHPUnit',
+    __DIR__.'/../tests/Unit',
     __DIR__.'/../tests/Integration',
 ]);
 
