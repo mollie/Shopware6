@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Data;
 
-use Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Controller\PaymentController;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -21,7 +19,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CartLineItemController;
 use Shopware\Storefront\Controller\CheckoutController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
@@ -102,35 +100,19 @@ trait CheckoutTestBehaviour
     public function finishCheckout(string $paymentUrl, SalesChannelContext $salesChannelContext): Response
     {
         $matches = [];
-        preg_match('/mollie\/(?<method>payment|return)\/(?<paymentId>.*)/m', $paymentUrl, $matches);
+        preg_match('/mollie\/payment\/(?<paymentId>.*)/m', $paymentUrl, $matches);
         $paymentId = $matches['paymentId'] ?? null;
-        $isPaymentApi = $matches['method'] === 'return';
+
         if ($paymentId === null) {
             throw new \Exception('Failed to find Payment ID in ' . $paymentUrl);
-        }
-        if (! $isPaymentApi) {
-            $returnController = $this->getContainer()->get(ReturnControllerBase::class);
-            /** @var RedirectResponse $response */
-            $response = $returnController->payment($salesChannelContext, $paymentId);
-            $redirectLocation = $response->getTargetUrl();
-            Assert::assertSame(302, $response->getStatusCode());
-            Assert::assertStringContainsString('payment/finalize-transaction', $redirectLocation);
-
-            $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
-            $urlParameters = [];
-            parse_str($queryString, $urlParameters);
-
-            $request = $this->createStoreFrontRequest($salesChannelContext);
-            $request->request->set('_sw_payment_token', $urlParameters['_sw_payment_token']);
-            $paymentController = $this->getContainer()->get(PaymentController::class);
-
-            return $paymentController->finalizeTransaction($request);
         }
 
         /** @var \Mollie\Shopware\Component\Payment\Controller\PaymentController $returnController */
         $returnController = $this->getContainer()->get(\Mollie\Shopware\Component\Payment\Controller\PaymentController::class);
+        $request = new Request();
+        $request->attributes->set('transactionId', $paymentId);
 
-        return $returnController->return($paymentId, $salesChannelContext);
+        return $returnController->return($request, $salesChannelContext);
     }
 
     public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
