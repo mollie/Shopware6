@@ -24,6 +24,9 @@ final class LoggerSettingsTest extends TestCase
          * @var SystemConfigService $systemConfigService
          */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
+        $oldLogFileDays = $systemConfigService->get(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS);
+        $oldDebugMode = $systemConfigService->get(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE);
+
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS, 10);
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE, false);
 
@@ -32,6 +35,9 @@ final class LoggerSettingsTest extends TestCase
         $settingsService = new SettingsService($this->getContainer(), $devMode, $cypressMode);
 
         $actualSettings = $settingsService->getLoggerSettings();
+
+        $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS, $oldLogFileDays);
+        $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE, $oldDebugMode);
 
         $this->assertSame(10, $actualSettings->getLogFileDays());
         $this->assertFalse($actualSettings->isDebugMode());
