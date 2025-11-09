@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
-use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
+use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * We do not want to change the payment status in production,
@@ -18,7 +19,7 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AbstractSettingsService $settingsService,
-        private WebhookRoute $webhookRoute,
+        private AbstractWebhookRoute $webhookRoute,
     ) {
     }
 
@@ -38,6 +39,8 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
         }
         $payment = $event->getPayment();
         $transaction = $payment->getShopwareTransaction();
-        $this->webhookRoute->notify($transaction->getId(), $event->getContext());
+        $request = new Request();
+        $request->attributes->set('transactionId', $transaction->getId());
+        $this->webhookRoute->notify($request, $event->getContext());
     }
 }

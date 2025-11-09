@@ -36,7 +36,7 @@ trait HandlerTrait
         return $payment;
     }
 
-    public function getPaymentMethodName(): string
+    public function getPaymentMethod(): string
     {
         return $this->method;
     }
@@ -53,13 +53,13 @@ trait HandlerTrait
             //Catch Shopware Exceptions to show edit order page
             $this->logger->error('Payment is aborted or failed', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethodName()
+                'paymentMethod' => $this->getPaymentMethod()
             ]);
             throw $exception;
         } catch (Throwable $exception) {
             $this->logger->error('Payment failed unexpected', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethodName()
+                'paymentMethod' => $this->getPaymentMethod()
             ]);
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
@@ -77,7 +77,7 @@ trait HandlerTrait
         } catch (Throwable $exception) {
             $this->logger->error('Mollie Pay Process Failed', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethodName()
+                'paymentMethod' => $this->getPaymentMethod()
             ]);
             throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
