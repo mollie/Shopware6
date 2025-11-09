@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Data;
 
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -49,6 +50,21 @@ trait OrderTestBehaviour
         }
 
         return $searchResult->getIds()[0];
+    }
+
+    public function getOrder(string $orderId, Context $context): ?OrderEntity
+    {
+        /** @var EntityRepository $orderRepository */
+        $orderRepository = $this->getContainer()->get('order.repository');
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('transactions');
+        $searchResult = $orderRepository->search($criteria, $context);
+
+        if ($searchResult->getTotal() === 0) {
+            return null;
+        }
+
+        return $searchResult->first();
     }
 
     public function updateOrder(string $orderId, array $data, Context $context): void
