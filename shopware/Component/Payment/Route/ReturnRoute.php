@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Payment\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Symfony\Component\HttpFoundation\Request;
 
