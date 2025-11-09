@@ -112,7 +112,7 @@ trait CheckoutTestBehaviour
         $request = new Request();
         $request->attributes->set('transactionId', $paymentId);
 
-        return $returnController->return($request, $salesChannelContext);
+        return $returnController->return($request, $salesChannelContext->getContext());
     }
 
     public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
