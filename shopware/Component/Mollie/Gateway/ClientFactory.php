@@ -29,11 +29,12 @@ final class ClientFactory implements ClientFactoryInterface
             $message = sprintf('API key is empty. SalesChannelId: %s, TestMode: %s', $salesChannelId, $apiSettings->isTestMode() ? 'true' : 'false');
             throw new ApiKeyException($message);
         }
+        $authorizationValue = sprintf('Bearer %s', $apiSettings->getApiKey());
 
         return new Client([
             'base_uri' => self::MOLLIE_BASE_URL,
             'headers' => [
-                'Authorization' => 'Bearer ' . $apiSettings->getApiKey(),
+                'Authorization' => $authorizationValue,
                 'User-Agent' => $userAgent
             ]
         ]);

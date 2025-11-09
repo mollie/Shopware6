@@ -21,11 +21,13 @@ final class PaymentSettingsTest extends TestCase
          * @var SystemConfigService $systemConfigService
          */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
+        $oldNumberFormat = $systemConfigService->get(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT);
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT, 'test_{ordernumber}_{customernumber}');
         $devMode = (bool) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', false);
         $cypressMode = (bool) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', false);
         $settingsService = new SettingsService($this->getContainer(), $devMode, $cypressMode);
         $paymentSettings = $settingsService->getPaymentSettings();
+        $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT, $oldNumberFormat);
         $this->assertSame('test_{ordernumber}_{customernumber}', $paymentSettings->getOrderNumberFormat());
     }
 
