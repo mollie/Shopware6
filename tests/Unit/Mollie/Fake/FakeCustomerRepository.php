@@ -8,7 +8,7 @@ use Shopware\Core\System\Salutation\SalutationEntity;
 
 final class FakeCustomerRepository
 {
-    public function getDefaultOrderCustomer():OrderCustomerEntity
+    public function getDefaultOrderCustomer(): OrderCustomerEntity
     {
         $salutation = new SalutationEntity();
         $salutation->setDisplayName('Not specified');
@@ -18,6 +18,7 @@ final class FakeCustomerRepository
         $orderCustomer->setEmail('fake@unit.test');
         $orderCustomer->setFirstName('Tester');
         $orderCustomer->setLastName('Test');
+
         return $orderCustomer;
     }
 }
