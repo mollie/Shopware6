@@ -24,9 +24,9 @@ trait HandlerTrait
     protected string $method;
 
     public function __construct(private Pay $pay,
-                                private Finalize $finalize,
-                                private TransactionConverterInterface $transactionConverter,
-                                private LoggerInterface $logger,
+        private Finalize $finalize,
+        private TransactionConverterInterface $transactionConverter,
+        private LoggerInterface $logger,
     ) {
     }
 
