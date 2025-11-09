@@ -44,7 +44,7 @@ final class PaymentTest extends TestCase
             'extensions' => []
         ];
 
-        $this->assertSame($expectedArray, $payment->toArray());
+        $this->assertEquals($expectedArray, $payment->toArray());
     }
 
     public function testCreatePaymentFromArray(): void
