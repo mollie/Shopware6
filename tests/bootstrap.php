@@ -16,6 +16,9 @@ $envFilePath = [
 ];
 
 foreach ($envFilePath as $file) {
+    if(!file_exists($file)) {
+        continue;
+    }
     (new Dotenv())->usePutenv()->bootEnv($file);
 }
 

@@ -15,8 +15,8 @@ use Shopware\Core\Framework\Context;
 final class MollieGateway implements MollieGatewayInterface
 {
     public function __construct(private ClientFactoryInterface $clientFactory,
-                                private OrderTransactionRepositoryInterface $orderTransactionRepository,
-                                private LoggerInterface $logger)
+        private OrderTransactionRepositoryInterface $orderTransactionRepository,
+        private LoggerInterface $logger)
     {
     }
 

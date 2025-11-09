@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 final class PaymentController extends AbstractController
 {
     public function __construct(private AbstractReturnRoute $returnRoute,
-                                private AbstractWebhookRoute $webhookRoute,
-                                private LoggerInterface $logger,
+        private AbstractWebhookRoute $webhookRoute,
+        private LoggerInterface $logger,
     ) {
     }
 
