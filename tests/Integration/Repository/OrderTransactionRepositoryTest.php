@@ -16,6 +16,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Api\Context\SystemSource;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -35,6 +37,7 @@ class OrderTransactionRepositoryTest extends TestCase
     /** This test make sure that only valid open orders are found */
     public function testMollieTransactionsAreLoaded(): void
     {
+        $this->createdOrders = [];
         $this->createTestOrders();
         $salesChannelContext = $this->getDefaultSalesChannelContext();
 
@@ -42,10 +45,13 @@ class OrderTransactionRepositoryTest extends TestCase
         $searchResult = $orderTransactionRepository->findOpenTransactions($salesChannelContext->getContext());
 
         $this->assertSame(1, $searchResult->getTotal());
+        $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
     }
 
     public function testFindByTransactionIdReturnsOrderTransaction(): void
     {
+        $this->createdOrders = [];
+
         $salesChannelContext = $this->getSalesChannelContestWithCustomer();
         $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
         $latestOrderId = $this->createdOrders[0];
@@ -56,6 +62,7 @@ class OrderTransactionRepositoryTest extends TestCase
         $transaction = $orderTransactionRepository->findById($transactionId, $salesChannelContext->getContext());
         $this->assertInstanceOf(OrderTransactionEntity::class, $transaction);
         $this->assertSame($transaction->getId(), $transactionId);
+        $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
     }
 
     /**
@@ -77,11 +84,12 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->assertNotNull($salesChannelContext->getCustomer());
 
         $salesChannelContext = $this->createMollieOrderWithPaymentMethod($paypalPaymentMethod, $salesChannelContext);
-
+        $latestOrderId = $this->getLatestOrderId($salesChannelContext->getContext());
+        $this->createdOrders[] = $latestOrderId;
         $salesChannelContext = $this->createMollieOrderWithPaymentMethod($paypalPaymentMethod, $salesChannelContext);
 
         $latestOrderId = $this->getLatestOrderId($salesChannelContext->getContext());
-
+        $this->createdOrders[] = $latestOrderId;
         $this->updateOrder($latestOrderId, [
             'orderDateTime' => (new \DateTime())->modify('-10 minutes')->format(Defaults::STORAGE_DATE_TIME_FORMAT),
         ], $salesChannelContext->getContext());

@@ -15,21 +15,14 @@ trait OrderTestBehaviour
 {
     use IntegrationTestBehaviour;
 
-    public function deleteAllOrders(Context $context): ?EntityWrittenContainerEvent
+    public function deleteAllOrders(array $ids, Context $context): ?EntityWrittenContainerEvent
     {
         /** @var EntityRepository $orderRepository */
         $orderRepository = $this->getContainer()->get('order.repository');
 
-        $criteria = new Criteria();
-
-        $searchResult = $orderRepository->searchIds($criteria, $context);
-
-        if ($searchResult->getTotal() === 0) {
-            return null;
-        }
         $ids = array_map(function (string $orderId) {
             return ['id' => $orderId];
-        }, $searchResult->getIds());
+        }, $ids);
 
         return $orderRepository->delete($ids, $context);
     }
