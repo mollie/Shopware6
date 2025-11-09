@@ -12,8 +12,8 @@ use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 final class FakeSettingsService extends AbstractSettingsService
 {
     public function __construct(private ?LoggerSettings $loggerSettings = null,
-                                private ?PaymentSettings $paymentSettings = null,
-                                private ?ApiSettings $apiSettings = null,
+        private ?PaymentSettings $paymentSettings = null,
+        private ?ApiSettings $apiSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);

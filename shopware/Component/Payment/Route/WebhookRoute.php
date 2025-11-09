@@ -34,6 +34,7 @@ final class WebhookRoute extends AbstractWebhookRoute
     public function notify(Request $request, Context $context): WebhookRouteResponse
     {
         $transactionId = $request->get('transactionId');
+
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
