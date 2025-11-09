@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Context;
 
 final class MollieGateway implements MollieGatewayInterface
@@ -26,7 +27,10 @@ final class MollieGateway implements MollieGatewayInterface
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
 
         if ($mollieTransaction === null) {
-            throw new \Exception('Transaction was not created by mollie');
+            $mollieTransaction = $this->repairLegacyTransaction($transaction, $context);
+            if ($mollieTransaction === null) {
+                throw new \Exception('Transaction was not created by mollie');
+            }
         }
 
         $payment = $this->getPayment($mollieTransaction->getId(), $transaction->getOrder()->getSalesChannelId());
@@ -42,8 +46,9 @@ final class MollieGateway implements MollieGatewayInterface
 
         try {
             $response = $client->get('payments/' . $molliePaymentId);
+            $body = json_decode($response->getBody()->getContents(), true);
 
-            return Payment::createFromClientResponse($response);
+            return Payment::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }
@@ -60,8 +65,29 @@ final class MollieGateway implements MollieGatewayInterface
             $response = $client->post('payments', [
                 'form_params' => $molliePayment->toArray(),
             ]);
+            $body = json_decode($response->getBody()->getContents(), true);
 
-            return Payment::createFromClientResponse($response);
+            return Payment::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
+    private function getPaymentByMollieOrderId(string $mollieOrderId, string $salesChannelId): Payment
+    {
+        $client = $this->clientFactory->create($salesChannelId);
+
+        try {
+            $response = $client->get('orders/' . $mollieOrderId, [
+                'query' => [
+                    'embed' => 'payments',
+                ]
+            ]);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            $paymentsBody = $body['_embedded']['payments'][0] ?? [];
+
+            return Payment::createFromClientResponse($paymentsBody);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }
@@ -77,5 +103,26 @@ final class MollieGateway implements MollieGatewayInterface
         ]);
 
         return new ApiException($exception->getCode(), $body['title'] ?? '', $body['detail'] ?? '', $body['field'] ?? '');
+    }
+
+    private function repairLegacyTransaction(OrderTransactionEntity $transaction, Context $context): ?Payment
+    {
+        $order = $transaction->getOrder();
+        $salesChannelId = $order->getSalesChannelId();
+        $customFields = $order->getCustomFields()[Mollie::EXTENSION] ?? null;
+        if ($customFields === null) {
+            return null;
+        }
+        $mollieOrderId = $customFields['order_id'] ?? null;
+        $returnUrl = $customFields['transactionReturnUrl'] ?? null;
+        if ($mollieOrderId === null || $returnUrl === null) {
+            return null;
+        }
+
+        $payment = $this->getPaymentByMollieOrderId($mollieOrderId, $salesChannelId);
+        $payment->setFinalizeUrl($returnUrl);
+        $this->orderTransactionRepository->savePaymentExtension($transaction, $payment, $context);
+
+        return $payment;
     }
 }
