@@ -29,8 +29,6 @@ return $config->setRules(
             'allow_mixed' => true
         ],
         'method_argument_space' =>false,
-        'multiline_promoted_properties' => false,
-        'statement_indentation' => false,
         'no_useless_else' => true,
         'no_useless_return' => true,
         'no_unused_imports' => true,

@@ -25,11 +25,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 final class Pay
 {
     public function __construct(private CreatePaymentBuilderInterface $createPaymentBuilder,
-                                private MollieGatewayInterface $paymentGateway,
-                                private OrderTransactionRepositoryInterface $orderTransactionRepository,
-                                private OrderTransactionStateHandler $stateMachineHandler,
-                                private EventDispatcherInterface $eventDispatcher,
-                                private LoggerInterface $logger)
+        private MollieGatewayInterface $paymentGateway,
+        private OrderTransactionRepositoryInterface $orderTransactionRepository,
+        private OrderTransactionStateHandler $stateMachineHandler,
+        private EventDispatcherInterface $eventDispatcher,
+        private LoggerInterface $logger)
     {
     }
 
