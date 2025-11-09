@@ -22,7 +22,7 @@ final class MoneyTest extends TestCase
         $orderEntity->setAmountTotal(25.00);
         $money = Money::fromOrder($orderEntity);
 
-        $this->assertSame('19.99',$money->getValue());
-        $this->assertSame('EUR',$money->getCurrency());
+        $this->assertSame('19.99', $money->getValue());
+        $this->assertSame('EUR', $money->getCurrency());
     }
 }

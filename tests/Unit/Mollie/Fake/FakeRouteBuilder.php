@@ -8,7 +8,6 @@ use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 final class FakeRouteBuilder implements RouteBuilderInterface
 {
     public function __construct(private string $returnUrl = '', private string $webhookUrl = '')
-
     {
     }
 

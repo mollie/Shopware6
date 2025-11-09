@@ -10,7 +10,7 @@ final class TranslationAppenderTest extends TestCase
 {
     public function testAppendOnRoot(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -19,8 +19,7 @@ final class TranslationAppenderTest extends TestCase
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -30,10 +29,8 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.title', 'Test', 'de-DE');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -42,7 +39,7 @@ XML;
 
     public function testReplaceOldValue(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -51,8 +48,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -63,10 +59,8 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.title', 'Test', 'de-DE');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -75,7 +69,7 @@ XML;
 
     public function testAppendTitle(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -88,8 +82,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -103,10 +96,8 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.api.title', 'API', 'pt-PT');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -115,7 +106,7 @@ XML;
 
     public function testReplaceMultipleOldValues(): void
     {
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
   <card>
@@ -164,7 +155,6 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.api.title', 'API', 'pt-PT');
         $result = $appender->append($dom, 'card.api.liveApiKey.label', 'Chave ativa', 'pt-PT');
@@ -172,16 +162,14 @@ XML;
         $result = $appender->append($dom, 'card.api.testMode.label', 'Modo de Teste', 'pt-PT');
         $result = $appender->append($dom, 'card.api.testMode.helpText', 'Ativa o modo de teste com a página de pagamento do Mollie Sandbox. A loja também será mostrada (Modo de teste) ao lado dos nomes dos métodos de pagamento.', 'pt-PT');
 
-
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
-
     }
 
     public function testReplaceOldValuesInOptions(): void
     {
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
   <card>
@@ -244,11 +232,10 @@ XML;
 </config>
 XML;
 
-$expectedXML = $exampleXML;
+        $expectedXML = $exampleXML;
 
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
-
 
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithPartialRefundTransaction.label', 'Estado da encomenda com uma transação de reembolso parcial', 'pt-PT');
@@ -265,7 +252,7 @@ $expectedXML = $exampleXML;
 
     public function testReplaceOldValueByNameOrTitle(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -278,8 +265,7 @@ $expectedXML = $exampleXML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -294,10 +280,8 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.api.liveApiKey.label', 'New Key', 'de-DE');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -306,7 +290,7 @@ XML;
 
     public function testFindByNameAndAppendNewTitle(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -317,8 +301,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -330,10 +313,8 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.api.title', 'Test', 'de-DE');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -342,8 +323,7 @@ XML;
 
     public function testFindByChildNameAndAppendNewLabel(): void
     {
-
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -366,8 +346,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -391,10 +370,8 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.api.liveApiKey.label', 'Live Key', 'de-DE');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -403,7 +380,7 @@ XML;
 
     public function testAppendOptionsInArray(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
   <card>
@@ -479,8 +456,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
   <card>
@@ -556,20 +532,17 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.applePay.applePayDirectRestrictions.options.2.name', 'Produktseiten', 'de-DE');
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
-
     }
 
     public function testAppendElementToTheLastElementOfTheSameType(): void
     {
-
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -593,8 +566,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -619,7 +591,6 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.api.liveApiKey.label', 'Live Key', 'de-DE');
 
@@ -630,7 +601,7 @@ XML;
 
     public function testAppendMultipleTexts(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -698,8 +669,7 @@ XML;
 </config>
 XML;
 
-
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <card>
@@ -766,12 +736,10 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.payments.title', 'Pagamentos', 'pt-PT');
         $result = $appender->append($dom, 'card.payments.shopwareFailedPayment.label', 'Utilizar o comportamento padrão do Shopware para pagamentos falhados', 'pt-PT');
         $result = $appender->append($dom, 'card.payments.shopwareFailedPayment.helpText', 'Utilizar o comportamento padrão do Shopware em pagamentos falhados. Se este estiver desativado, a Mollie fornecerá automaticamente uma maneira de tentar novamente o pagamento redirecionando o utilizador para a página de pagamentos da Mollie.', 'pt-PT');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
@@ -780,7 +748,7 @@ XML;
 
     public function testFindOptionInComplexXML(): void
     {
-        $expectedXML = <<<XML
+        $expectedXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
         <card>
@@ -1115,7 +1083,7 @@ XML;
 </config>
 XML;
 
-        $exampleXML = <<<XML
+        $exampleXML = <<<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
         <card>
@@ -1452,14 +1420,11 @@ XML;
         $dom = new \DOMDocument();
         $dom->loadXML($exampleXML);
 
-
         $appender = new TranslationAppender();
         $result = $appender->append($dom, 'card.orderStateAutomation.orderStateWithAPaidTransaction.options.1.name', 'Ignorar este estado', 'pt-PT');
-
 
         $expectedXML = preg_replace('/\s+/', '', $expectedXML);
         $actualXML = preg_replace('/\s+/', '', $dom->saveXML());
         $this->assertEquals($expectedXML, $actualXML);
-
     }
 }
