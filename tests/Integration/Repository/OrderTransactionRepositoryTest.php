@@ -12,6 +12,7 @@ use Mollie\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Integration\Data\ProductTestBehaviour;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
@@ -43,6 +44,20 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->assertSame(1, $searchResult->getTotal());
     }
 
+    public function testFindByTransactionIdReturnsOrderTransaction(): void
+    {
+        $salesChannelContext = $this->getSalesChannelContestWithCustomer();
+        $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
+        $latestOrderId = $this->createdOrders[0];
+        $orderEntity = $this->getOrder($latestOrderId, $salesChannelContext->getContext());
+        $transactionId = $orderEntity->getTransactions()->first()->getId();
+
+        $orderTransactionRepository = $this->getContainer()->get(OrderTransactionRepository::class);
+        $transaction = $orderTransactionRepository->findById($transactionId, $salesChannelContext->getContext());
+        $this->assertInstanceOf(OrderTransactionEntity::class, $transaction);
+        $this->assertSame($transaction->getId(), $transactionId);
+    }
+
     /**
      * create a non mollie order, a normal mollie order and order which is older than 10 minutes.
      * when we search for open orders, we will find this one which is older than 10 minutes
@@ -55,11 +70,8 @@ class OrderTransactionRepositoryTest extends TestCase
 
         $this->activatePaymentMethod($paypalPaymentMethod, $salesChannelContext->getContext());
         $this->assignPaymentMethodToSalesChannel($paypalPaymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
-        $customerId = $this->loginOrCreateAccount('test@mollie.com', $salesChannelContext);
 
-        $salesChannelContext = $this->getDefaultSalesChannelContext(options: [
-            SalesChannelContextService::CUSTOMER_ID => $customerId
-        ]);
+        $salesChannelContext = $this->getSalesChannelContestWithCustomer($salesChannelContext);
 
         $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
         $this->assertNotNull($salesChannelContext->getCustomer());
@@ -73,6 +85,19 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->updateOrder($latestOrderId, [
             'orderDateTime' => (new \DateTime())->modify('-10 minutes')->format(Defaults::STORAGE_DATE_TIME_FORMAT),
         ], $salesChannelContext->getContext());
+    }
+
+    private function getSalesChannelContestWithCustomer(?SalesChannelContext $salesChannelContext = null): SalesChannelContext
+    {
+        if ($salesChannelContext === null) {
+            $salesChannelContext = $this->getDefaultSalesChannelContext();
+        }
+
+        $customerId = $this->loginOrCreateAccount('test@mollie.com', $salesChannelContext);
+
+        return $this->getDefaultSalesChannelContext(options: [
+            SalesChannelContextService::CUSTOMER_ID => $customerId
+        ]);
     }
 
     private function createMollieOrderWithPaymentMethod(PaymentMethodEntity $paymentMethod, SalesChannelContext $salesChannelContext): SalesChannelContext
