@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Mollie\Unit\StatsUpdate;
 
@@ -10,7 +11,6 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
-
 
 class UpdateStatusActionTest extends TestCase
 {
