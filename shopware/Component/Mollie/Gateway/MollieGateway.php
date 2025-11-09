@@ -23,6 +23,9 @@ final class MollieGateway implements MollieGatewayInterface
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
         $transaction = $this->orderTransactionRepository->findById($transactionId, $context);
+        if ($transaction === null) {
+            throw new \Exception('Transaction ' . $transactionId . ' not found in Shopware');
+        }
         /** @var ?Payment $mollieTransaction */
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
 
