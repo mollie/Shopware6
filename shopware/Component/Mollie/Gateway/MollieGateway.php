@@ -42,9 +42,8 @@ final class MollieGateway implements MollieGatewayInterface
 
     public function getPayment(string $molliePaymentId, string $salesChannelId): Payment
     {
-        $client = $this->clientFactory->create($salesChannelId);
-
         try {
+            $client = $this->clientFactory->create($salesChannelId);
             $response = $client->get('payments/' . $molliePaymentId);
             $body = json_decode($response->getBody()->getContents(), true);
 
@@ -56,12 +55,12 @@ final class MollieGateway implements MollieGatewayInterface
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
-        $client = $this->clientFactory->create($salesChannelId);
-        $formParams = $molliePayment->toArray();
-        $this->logger->debug('Create payment via Payments API', [
-            'formParams' => $formParams,
-        ]);
         try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $formParams = $molliePayment->toArray();
+            $this->logger->debug('Create payment via Payments API', [
+                'formParams' => $formParams,
+            ]);
             $response = $client->post('payments', [
                 'form_params' => $molliePayment->toArray(),
             ]);
@@ -75,9 +74,8 @@ final class MollieGateway implements MollieGatewayInterface
 
     private function getPaymentByMollieOrderId(string $mollieOrderId, string $salesChannelId): Payment
     {
-        $client = $this->clientFactory->create($salesChannelId);
-
         try {
+            $client = $this->clientFactory->create($salesChannelId);
             $response = $client->get('orders/' . $mollieOrderId, [
                 'query' => [
                     'embed' => 'payments',
