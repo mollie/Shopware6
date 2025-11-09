@@ -33,7 +33,7 @@ final class PaymentController extends AbstractController
         $paymentStatus = $response->getPaymentStatus();
 
         if ($paymentStatus->isFailed()) {
-            //TODO mollie failure mode
+            // TODO mollie failure mode
         }
         $query = parse_url($response->getFinalizeUrl(), PHP_URL_QUERY);
         $queryParameters = [];

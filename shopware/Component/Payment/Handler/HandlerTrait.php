@@ -18,7 +18,6 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Throwable;
 
 trait HandlerTrait
 {
@@ -50,13 +49,13 @@ trait HandlerTrait
             $transaction = $this->transactionConverter->convert($transaction, $context);
             $this->finalize->execute($request, $transaction, $context);
         } catch (HttpException $exception) {
-            //Catch Shopware Exceptions to show edit order page
+            // Catch Shopware Exceptions to show edit order page
             $this->logger->error('Payment is aborted or failed', [
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()
             ]);
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->error('Payment failed unexpected', [
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()
@@ -74,7 +73,7 @@ trait HandlerTrait
             $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
 
             return $this->pay->execute($this, $transaction, $dataBag, $salesChannelContext);
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->error('Mollie Pay Process Failed', [
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()
