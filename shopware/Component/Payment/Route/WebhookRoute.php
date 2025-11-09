@@ -46,7 +46,8 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $this->updatePaymentStatus($payment, $transactionId, $context);
         $this->updatePaymentMethod($payment);
-        //TODO: update order status
+
+        // TODO: update order status
         return new WebhookRouteResponse();
     }
 
@@ -74,6 +75,6 @@ final class WebhookRoute extends AbstractWebhookRoute
         if ($paymentHandler->getPaymentMethod() === 'applepay' && $payment->getMethod() === 'creditcard') {
             return;
         }
-        //TODO: update payment method
+        // TODO: update payment method
     }
 }
