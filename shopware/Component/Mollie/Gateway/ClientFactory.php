@@ -25,6 +25,10 @@ final class ClientFactory implements ClientFactoryInterface
             'Shopware/' . $this->shopwareVersion,
             'MollieShopware6/' . MolliePayments::PLUGIN_VERSION,
         ]);
+        if (mb_strlen($apiSettings->getApiKey()) === 0) {
+            $message = sprintf('API key is empty. SalesChannelId: %s, TestMode: %s', $salesChannelId, $apiSettings->isTestMode() ? 'true' : 'false');
+            throw new ApiKeyException($message);
+        }
 
         return new Client([
             'base_uri' => self::MOLLIE_BASE_URL,
