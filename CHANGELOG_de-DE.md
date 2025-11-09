@@ -1,8 +1,9 @@
 # 5.0.0
 - Grundlegende Zahlung über Payments API eingebaut
 # 4.20.0
-### Geändert
 - Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und SHopware übereinstimmen.
+- Behoben: Ein Problem, bei dem Apple Pay Direct nicht funktionierte, wenn im Shop die Telefonnummer als Pflichtfeld konfiguriert war.
+- Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben 
 
 ## [4.19.0] - 2025-10-09
 - Unterstützung für die estnische Sprache hinzugefügt

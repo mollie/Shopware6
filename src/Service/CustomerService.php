@@ -649,6 +649,7 @@ class CustomerService implements CustomerServiceInterface
         $shippingAddressData->set('additionalAddressLine1', $shippingAddress->getStreetAdditional());
         $shippingAddressData->set('zipcode', $shippingAddress->getZipCode());
         $shippingAddressData->set('city', $shippingAddress->getCity());
+        $shippingAddressData->set('phoneNumber', $shippingAddress->getPhone());
         $shippingAddressData->set('countryId', $countryId);
         $customFields = new RequestDataBag();
         $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
@@ -662,10 +663,13 @@ class CustomerService implements CustomerServiceInterface
             $countryId = $this->getCountryId($billingAddress->getCountryCode(), $context->getContext());
 
             $billingAddressData = new RequestDataBag();
+            $billingAddressData->set('firstName', $billingAddress->getFirstName());
+            $billingAddressData->set('lastName', $billingAddress->getLastName());
             $billingAddressData->set('street', $billingAddress->getStreet());
             $billingAddressData->set('additionalAddressLine1', $billingAddress->getStreetAdditional());
             $billingAddressData->set('zipcode', $billingAddress->getZipCode());
             $billingAddressData->set('city', $billingAddress->getCity());
+            $billingAddressData->set('phoneNumber', $billingAddress->getPhone());
             $billingAddressData->set('countryId', $countryId);
             $customFields = new RequestDataBag();
             $customFields->set(CustomerAddressDefinition::ENTITY_NAME, [
