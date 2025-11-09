@@ -154,6 +154,8 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
+        # clean settings inheritance
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@ namespace Mollie\Unit\Mollie\Gateway;
 
 use GuzzleHttp\Psr7\Uri;
 use Kiener\MolliePayments\MolliePayments;
+use Mollie\Shopware\Component\Mollie\Gateway\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Unit\Logger\FakeSettingsService;
@@ -53,5 +54,17 @@ final class ClientFactoryTest extends TestCase
         $this->assertSame($expectedAuthorization, $headers['Authorization']);
         $this->assertSame($expectedUserAgent, $headers['User-Agent']);
         $this->assertSame($expectedUrl, (string) $baseUri);
+    }
+
+    public function testExceptionIsThrownIfApiKeyIsEmpty(): void
+    {
+        $this->expectException(ApiKeyException::class);
+        $shopwareVersion = '6.7.4.0';
+
+        $apiSettings = new ApiSettings('test_key', '', false);
+        $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
+        $factory = new ClientFactory($fakeSettings, $shopwareVersion);
+
+        $client = $factory->create(TestDefaults::SALES_CHANNEL);
     }
 }
