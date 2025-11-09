@@ -38,7 +38,7 @@ final class Pay
         $salesChannelName = (string) $salesChannelContext->getSalesChannel()->getName();
         $this->logger->info('Start Mollie checkout', [
             'salesChannel' => $salesChannelName,
-            'paymentMethod' => $paymentHandler->getPaymentMethodName()
+            'paymentMethod' => $paymentHandler->getPaymentMethod()
         ]);
         $shopwareFinalizeUrl = $transaction->getReturnUrl();
 
@@ -91,7 +91,7 @@ final class Pay
     {
         $order = $transaction->getOrder();
         $createPaymentStruct = $this->createPaymentBuilder->build($transaction->getOrderTransactionId(), $order);
-        $createPaymentStruct->setMethod($paymentHandler->getPaymentMethodName());
+        $createPaymentStruct->setMethod($paymentHandler->getPaymentMethod());
 
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $order);
         $this->logger->info('Payment payload created, send data to Mollie API', [

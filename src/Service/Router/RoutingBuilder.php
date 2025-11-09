@@ -12,13 +12,13 @@ class RoutingBuilder
      * This has to match the parameter from the Return Route annotations.
      * Otherwise, an exception is being thrown.
      */
-    private const ROUTE_PARAM_RETURN_ID = 'swTransactionId';
+    private const ROUTE_PARAM_RETURN_ID = 'transactionId';
 
     /**
      * This has to match the parameter from the Webhook Route annotations.
      * Otherwise, an exception is being thrown.
      */
-    private const ROUTE_PARAM_WEBHOOK_ID = 'swTransactionId';
+    private const ROUTE_PARAM_WEBHOOK_ID = 'transactionId';
 
     /**
      * This has to match the parameter from the Subscription Renewal Route annotations.
