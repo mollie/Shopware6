@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Repository;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
@@ -82,7 +81,12 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
 
         $criteria->addFilter(new OrFilter($orFilterArray));
 
-        $criteria->addFilter(new ContainsFilter('order.customFields', CustomFieldsInterface::MOLLIE_KEY));
+        $customFieldsFilter = [
+            new ContainsFilter('order.customFields', Mollie::EXTENSION),
+            new ContainsFilter('customFields', Mollie::EXTENSION)
+        ];
+
+        $criteria->addFilter(new OrFilter($customFieldsFilter));
         $criteria->addFilter(new RangeFilter('order.orderDateTime', [
             RangeFilter::GTE => $start->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             RangeFilter::LTE => $end->format(Defaults::STORAGE_DATE_TIME_FORMAT)]));

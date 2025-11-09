@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Integration\Repository;
 
-use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Mollie\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Integration\Data\CustomerTestBehaviour;
@@ -16,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -30,61 +29,12 @@ class OrderTransactionRepositoryTest extends TestCase
     use PaymentMethodTestBehaviour;
     use MolliePageTestBehaviour;
     use OrderTestBehaviour;
+    private array $createdOrders = [];
 
-    protected function setUp(): void
-    {
-        $versionCompare = $this->getContainer()->get(VersionCompare::class);
-        if ($versionCompare->lt('6.5')) {
-            $this->markTestSkipped(
-                'We have issues with shopware version below 6.5, we skip the tests for now'
-            );
-        }
-        if (method_exists($this, 'disableNestTransactionsWithSavepointsForNextTest')) {
-            $this->disableNestTransactionsWithSavepointsForNextTest();
-        }
-
-        $salesChannelContext = $this->getDefaultSalesChannelContext();
-
-        $paypalPaymentMethod = $this->getPaymentMethodByIdentifier(PayPalPayment::class, $salesChannelContext->getContext());
-
-        $this->activatePaymentMethod($paypalPaymentMethod, $salesChannelContext->getContext());
-        $this->assignPaymentMethodToSalesChannel($paypalPaymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
-
-        $salesChannelContext = $this->loginOrCreateAccount('test@mollie.com', $salesChannelContext);
-
-        $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
-        $this->assertNotNull($salesChannelContext->getCustomer());
-
-        $salesChannelContext = $this->createMollieOrderWithPaymentMethod('paid', $paypalPaymentMethod, $salesChannelContext);
-
-        $salesChannelContext = $this->createMollieOrderWithPaymentMethod('paid', $paypalPaymentMethod, $salesChannelContext);
-
-        $latestOrderId = $this->getLatestOrderId($salesChannelContext->getContext());
-        $this->updateOrder($latestOrderId, [
-            'orderDateTime' => (new \DateTime())->modify('-10 minutes')->format(Defaults::STORAGE_DATE_TIME_FORMAT),
-        ], $salesChannelContext->getContext());
-    }
-
-    protected function tearDown(): void
-    {
-        $versionCompare = $this->getContainer()->get(VersionCompare::class);
-        if ($versionCompare->lt('6.5')) {
-            $this->markTestSkipped(
-                'We have issues with shopware version below 6.5, we skip the tests for now'
-            );
-        }
-        $result = $this->deleteAllOrders(Context::createDefaultContext());
-        $this->assertNotNull($result);
-    }
-
+    /** This test make sure that only valid open orders are found */
     public function testMollieTransactionsAreLoaded(): void
     {
-        $versionCompare = $this->getContainer()->get(VersionCompare::class);
-        if ($versionCompare->lt('6.5')) {
-            $this->markTestSkipped(
-                'We have issues with shopware version below 6.5, we skip the tests for now'
-            );
-        }
+        $this->createTestOrders();
         $salesChannelContext = $this->getDefaultSalesChannelContext();
 
         $orderTransactionRepository = $this->getContainer()->get(OrderTransactionRepository::class);
@@ -93,7 +43,39 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->assertSame(1, $searchResult->getTotal());
     }
 
-    private function createMollieOrderWithPaymentMethod(string $status, PaymentMethodEntity $paymentMethod, SalesChannelContext $salesChannelContext): SalesChannelContext
+    /**
+     * create a non mollie order, a normal mollie order and order which is older than 10 minutes.
+     * when we search for open orders, we will find this one which is older than 10 minutes
+     */
+    private function createTestOrders(): void
+    {
+        $salesChannelContext = $this->getDefaultSalesChannelContext();
+
+        $paypalPaymentMethod = $this->getPaymentMethodByIdentifier(PayPalPayment::class, $salesChannelContext->getContext());
+
+        $this->activatePaymentMethod($paypalPaymentMethod, $salesChannelContext->getContext());
+        $this->assignPaymentMethodToSalesChannel($paypalPaymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
+        $customerId = $this->loginOrCreateAccount('test@mollie.com', $salesChannelContext);
+
+        $salesChannelContext = $this->getDefaultSalesChannelContext(options: [
+            SalesChannelContextService::CUSTOMER_ID => $customerId
+        ]);
+
+        $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
+        $this->assertNotNull($salesChannelContext->getCustomer());
+
+        $salesChannelContext = $this->createMollieOrderWithPaymentMethod($paypalPaymentMethod, $salesChannelContext);
+
+        $salesChannelContext = $this->createMollieOrderWithPaymentMethod($paypalPaymentMethod, $salesChannelContext);
+
+        $latestOrderId = $this->getLatestOrderId($salesChannelContext->getContext());
+
+        $this->updateOrder($latestOrderId, [
+            'orderDateTime' => (new \DateTime())->modify('-10 minutes')->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+        ], $salesChannelContext->getContext());
+    }
+
+    private function createMollieOrderWithPaymentMethod(PaymentMethodEntity $paymentMethod, SalesChannelContext $salesChannelContext): SalesChannelContext
     {
         $salesChannelContext = $this->setPaymentMethod($paymentMethod, $salesChannelContext);
         $this->assertNotNull($salesChannelContext->getCustomer());
@@ -103,8 +85,6 @@ class OrderTransactionRepositoryTest extends TestCase
         $response = $this->startCheckout($salesChannelContext);
 
         $this->assertStringContainsString('mollie.com', $response->getTargetUrl());
-
-        $this->selectMolliePaymentStatus($status, $response->getTargetUrl());
 
         return $salesChannelContext;
     }
@@ -120,6 +100,10 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
         /** @var RedirectResponse $response */
         $response = $this->startCheckout($salesChannelContext);
+        $urlParts = [];
+        $queryString = parse_url($response->getTargetUrl(), PHP_URL_QUERY);
+        parse_str($queryString, $urlParts);
+        $this->createdOrders[] = $urlParts['orderId'];
 
         return $salesChannelContext;
     }

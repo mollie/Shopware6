@@ -18,7 +18,6 @@
     <testsuites>
         <testsuite name="integration">
             <directory>./../tests/Integration</directory>
-            <exclude>./../tests/Integration/Repository/OrderTransactionRepositoryTest.php</exclude>
         </testsuite>
     </testsuites>
 
