@@ -10,7 +10,7 @@
     <route id="storefront.mollie.payment.return"
            path="/mollie/payment/{transactionId}"
            methods="GET|POST">
-        <requirement key="transactionId">.*</requirement>
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::return</default>
         <default key="csrf_protected"><bool>false</bool></default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
@@ -22,7 +22,7 @@
     <route id="storefront.mollie.payment.webhook"
            path="/mollie/webhook/{transactionId}"
            methods="GET|POST">
-        <requirement key="transactionId">.*</requirement>
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::webhook</default>
         <default key="csrf_protected"><bool>false</bool></default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
