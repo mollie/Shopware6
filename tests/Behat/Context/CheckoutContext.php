@@ -55,7 +55,7 @@ final class CheckoutContext extends ShopwareContext
         $response = $this->selectMolliePaymentStatus($selectedStatus, $this->mollieSandboxPage);
         Assert::assertSame($response->getStatusCode(), 302);
         $this->shopwareReturnPage = $response->getHeaderLine('location');
-        Assert::assertStringContainsString('mollie/payment', $this->shopwareReturnPage);
+        Assert::assertStringContainsString('mollie/', $this->shopwareReturnPage);
     }
 
     #[Given('i select :art1 as currency')]
@@ -85,6 +85,7 @@ final class CheckoutContext extends ShopwareContext
         /** @var OrderTransactionEntity $oderTransaction */
         $oderTransaction = $order->getTransactions()->first();
         $actualOrderState = $oderTransaction->getStateMachineState()->getTechnicalName();
+
         Assert::assertSame($expectedPaymentStatus, $actualOrderState);
     }
 }

@@ -51,7 +51,7 @@ class OrderCreateService
         DataValidationFactoryInterface $orderValidationFactory,
         EventDispatcherInterface $eventDispatcher,
         CartService $cartService,
-                                       $paymentMethodRepository
+        $paymentMethodRepository
     ) {
         $this->dataValidator = $dataValidator;
         $this->orderValidationFactory = $orderValidationFactory;

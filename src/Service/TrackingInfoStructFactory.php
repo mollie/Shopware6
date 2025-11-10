@@ -10,7 +10,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Throwable;
 
 class TrackingInfoStructFactory
 {
@@ -79,7 +78,7 @@ class TrackingInfoStructFactory
                 (string) $trackingCodes[0],
                 (string) $shippingMethod->getTrackingUrl()
             );
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->error($exception->getMessage());
 
             return null;

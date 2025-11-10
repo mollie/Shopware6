@@ -154,6 +154,8 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
+        # clean settings inheritance
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
         docker exec shop bash -c 'php bin/console cache:clear'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
@@ -167,7 +169,7 @@ runs:
     - name: Integration analyzer
       shell: bash
       run: |
-        docker exec shop bash -c 'php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
 
     - name: Integration tests
       shell: bash
@@ -183,14 +185,6 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
       run: cd tests/Cypress && make install -B
-
-    - name: Remove deprecated Cypress Tests
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.REMOVE_DEPRECATED_TESTS == 'true' }}
-      shell: bash
-      run: |
-        # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js || true
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'false' }}

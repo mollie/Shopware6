@@ -4,6 +4,7 @@ $finder = \PhpCsFixer\Finder::create()->in([
     __DIR__ . '/../src',
     __DIR__ . '/../shopware',
     __DIR__.'/../tests/PHPUnit',
+    __DIR__.'/../tests/Unit',
     __DIR__.'/../tests/Integration',
 ]);
 
@@ -24,6 +25,10 @@ return $config->setRules(
         'phpdoc_align' => [
             'align' => 'left',
         ],
+        'no_superfluous_phpdoc_tags'=>[
+            'allow_mixed' => true
+        ],
+        'method_argument_space' =>false,
         'no_useless_else' => true,
         'no_useless_return' => true,
         'no_unused_imports' => true,

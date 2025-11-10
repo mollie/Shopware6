@@ -5,6 +5,7 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Shopware\Core\Framework\Routing\Annotation\RouteScope;
+use Shopware\Core\Framework\Routing\KernelListenerPriorities;
 use Shopware\Core\PlatformRequest;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -25,7 +26,7 @@ class KernelSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => 'onModifyRouteScope',
+            KernelEvents::CONTROLLER => ['onModifyRouteScope', KernelListenerPriorities::KERNEL_CONTROLLER_EVENT_SCOPE_VALIDATE_PRE],
         ];
     }
 
@@ -51,11 +52,13 @@ class KernelSubscriber implements EventSubscriberInterface
         if ($routeScope === null) {
             return;
         }
+
         if ($routeScope instanceof RouteScope) {
             return;
         }
 
         $routeScope = new RouteScope(['scopes' => $routeScope]);
+
         $attributes->set(PlatformRequest::ATTRIBUTE_ROUTE_SCOPE, $routeScope);
     }
 }
