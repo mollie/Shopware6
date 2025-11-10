@@ -7,7 +7,7 @@
     <route id="frontend.mollie.payment"
            path="/mollie/payment/{transactionId}"
            methods="GET|POST">
-        <requirement key="transactionId">.*</requirement>
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::return</default>
         <default key="csrf_protected"><bool>false</bool></default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
@@ -17,7 +17,7 @@
     <route id="frontend.mollie.webhook"
            path="/mollie/webhook/{transactionId}"
            methods="GET|POST">
-        <requirement key="transactionId">.*</requirement>
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::webhook</default>
         <default key="csrf_protected"><bool>false</bool></default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
@@ -25,6 +25,7 @@
     </route>
 
     <route id="api.mollie.webhook" path="/api/mollie/webhook/{transactionId}"  methods="GET|POST">
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::webhook</default>
         <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>false</bool></default>
@@ -32,6 +33,7 @@
     </route>
 
     <route id="api.mollie.webhook-legacy" path="/api/v{version}/mollie/webhook/{transactionId}" methods="GET|POST">
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::webhook</default>
         <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>false</bool></default>
@@ -39,6 +41,7 @@
     </route>
 
     <route id="api.mollie.payment-return" path="/api/mollie/payment/return/{transactionId}" methods="GET|POST">
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::return</default>
         <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>false</bool></default>
@@ -46,6 +49,7 @@
     </route>
 
     <route id="api.mollie.payment-return-legacy" path="/api/v{version}/mollie/payment/return/{transactionId}" methods="GET|POST">
+        <requirement key="transactionId">\w+</requirement>
         <default key="_controller">Mollie\Shopware\Component\Payment\Controller\PaymentController::return</default>
         <default key="_routeScope"><list><string>api</string></list></default>
         <default key="auth_required"><bool>false</bool></default>
