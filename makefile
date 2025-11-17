@@ -41,7 +41,7 @@ prod: ##1 Installs all production dependencies
 
 dev: ##1 Installs all dev dependencies
 	@composer validate
-	COMPOSER_NO_SECURITY_BLOCKING=1 && composer update --ignore-platform-req=ext-amqp
+	COMPOSER_NO_SECURITY_BLOCKING=1 && composer update --ignore-platform-req=ext-amqp --no-security-blocking
 	npm install
 	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
