@@ -11,10 +11,24 @@ export default class OrderAttributes {
         this._swSubscriptionId = '';
         this._creditCardAttributes = null;
         this._paymentRef = null;
-
+        this._isMolliePayments = false;
         if (orderEntity === null) {
             return;
         }
+
+        orderEntity.transactions.sort(function (transactionA, transactionB) {
+            return new Date(transactionB.createdAt) - new Date(transactionA.createdAt);
+        });
+        const latestTransaction = orderEntity?.transactions?.first()?.paymentMethod?.handlerIdentifier;
+        if (!latestTransaction) {
+            return;
+        }
+        const isMolliePayments = latestTransaction.match(/Mollie/g);
+
+        if (!isMolliePayments) {
+            return;
+        }
+        this._isMolliePayments = true;
 
         this.customFields = orderEntity.customFields;
 
@@ -40,7 +54,7 @@ export default class OrderAttributes {
      * @returns {boolean}
      */
     isMollieOrder() {
-        return this.customFields !== null && 'mollie_payments' in this.customFields;
+        return this._isMolliePayments && this.customFields !== null && 'mollie_payments' in this.customFields;
     }
 
     /**

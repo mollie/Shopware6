@@ -37,8 +37,6 @@ class CancelItemResponse
 
     /**
      * @param array<mixed> $data
-     *
-     * @return $this
      */
     public function withData(array $data): self
     {
