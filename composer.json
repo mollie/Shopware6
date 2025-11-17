@@ -39,9 +39,6 @@
             "infection/extension-installer": true,
             "php-http/discovery": true,
             "symfony/runtime": true
-        },
-        "audit": {
-            "block-insecure": false
         }
     },
     "autoload": {
