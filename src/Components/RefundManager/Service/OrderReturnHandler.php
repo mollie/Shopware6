@@ -82,7 +82,8 @@ class OrderReturnHandler
         );
         /** @var OrderReturnLineItemEntity $item */
         foreach ($orderReturn->getLineItems() as $item) {
-            $refundRequestItem = new RefundRequestItem($item->getOrderLineItemId(), $item->getPrice()->getUnitPrice(), $item->getQuantity(), 0);
+            $price = $item->getRefundAmount() / $item->getQuantity();
+            $refundRequestItem = new RefundRequestItem($item->getOrderLineItemId(), $price, $item->getQuantity(), 0);
             $request->addItem($refundRequestItem);
         }
 
