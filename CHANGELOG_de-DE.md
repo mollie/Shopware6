@@ -1,5 +1,5 @@
 # 4.20.0
-- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und SHopware übereinstimmen.
+- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und Shopware übereinstimmen.
 - Behoben: Ein Problem, bei dem Apple Pay Direct nicht funktionierte, wenn im Shop die Telefonnummer als Pflichtfeld konfiguriert war.
 - Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben
 - Behoben: Im Admin wurden bei Bestellungen fälschlicherweise Mollie-Daten angezeigt, obwohl die finale Transaktion nicht von Mollie stammte.
