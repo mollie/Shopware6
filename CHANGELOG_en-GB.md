@@ -4,6 +4,7 @@
 - Fixed compatibility with shopware commercial 
 - Fixed: Resolved an issue where Mollie data was shown in the admin order view even when the final transaction was not processed via Mollie.
 - Shopware Refunds now correctly applies the refunded amount.
+- Title in the Admin Configuration was fixed 
 
 ## [4.19.0] - 2025-10-09
 - Added Estonian Language Support
