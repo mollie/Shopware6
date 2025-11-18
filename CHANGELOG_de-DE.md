@@ -4,6 +4,7 @@
 - Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben
 - Behoben: Im Admin wurden bei Bestellungen fälschlicherweise Mollie-Daten angezeigt, obwohl die finale Transaktion nicht von Mollie stammte.
 - Shopware Refunds wendet nun den korrekt erstatteten Betrag an.
+- Überschrift in der Konfiguration wurde behoben
 
 ## [4.19.0] - 2025-10-09
 - Unterstützung für die estnische Sprache hinzugefügt
