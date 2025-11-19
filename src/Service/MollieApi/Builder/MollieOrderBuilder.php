@@ -18,6 +18,8 @@ use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttribut
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
@@ -182,10 +184,19 @@ class MollieOrderBuilder
         );
 
         $email = $orderCustomer ? $orderCustomer->getEmail() : $customer->getEmail();
+        $shippingAddress = $customer->getActiveShippingAddress();
+        $deliveries = $order->getDeliveries();
+        if ($deliveries instanceof OrderDeliveryCollection && $deliveries->count() > 0) {
+            $firstDelivery = $deliveries->first();
+
+            if ($firstDelivery instanceof OrderDeliveryEntity) {
+                $shippingAddress = $firstDelivery->getShippingOrderAddress();
+            }
+        }
 
         // ----------------------------------------------------------------------------------------------------------------------------
         $orderData['billingAddress'] = $this->addressBuilder->build($email, $order->getBillingAddress());
-        $orderData['shippingAddress'] = $this->addressBuilder->build($email, $order->getDeliveries()?->first()?->getShippingOrderAddress());
+        $orderData['shippingAddress'] = $this->addressBuilder->build($email, $shippingAddress);
 
         // set order lifetime like configured
         $dueDate = $settings->getOrderLifetimeDate();
