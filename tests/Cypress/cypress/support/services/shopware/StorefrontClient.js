@@ -24,8 +24,8 @@ export default class StorefrontClient {
     get(url, params = {}) {
         return this.request({
             method: 'get',
-            url,
-            params
+            url: url,
+            params: params
         });
     }
 
@@ -39,9 +39,9 @@ export default class StorefrontClient {
     post(url, data, params = {}) {
         return this.request({
             method: 'post',
-            url,
-            data,
-            params
+            url:url,
+            data:data,
+            params: params
         });
     }
 
@@ -54,8 +54,8 @@ export default class StorefrontClient {
     delete(url, params = {}) {
         return this.request({
             method: 'delete',
-            url,
-            params
+            url:url,
+            params:params
         });
     }
 
@@ -69,8 +69,8 @@ export default class StorefrontClient {
     head(url, params = {}) {
         return this.request({
             method: 'head',
-            url,
-            params
+            url:url,
+            params:params
         });
     }
 
@@ -83,8 +83,8 @@ export default class StorefrontClient {
     options(url, params = {}) {
         return this.request({
             method: 'options',
-            url,
-            params
+            url:url,
+            params:params
         });
     }
 
@@ -98,9 +98,9 @@ export default class StorefrontClient {
     put(url, data, params = {}) {
         return this.request({
             method: 'put',
-            data,
-            url,
-            params
+            data:data,
+            url:url,
+            params:params
         });
     }
 
@@ -114,9 +114,9 @@ export default class StorefrontClient {
     patch(url, data, params = {}) {
         return this.request({
             method: 'patch',
-            data,
-            url,
-            params
+            data:data,
+            url:url,
+            params: params
         });
     }
 
@@ -132,10 +132,10 @@ export default class StorefrontClient {
 
         const requestConfig = {
             headers: this.getHeaders(),
-            url,
-            method,
-            params,
-            data
+            url: url,
+            method: method,
+            params: params,
+            data: data
         };
 
         return this.client.request(requestConfig)

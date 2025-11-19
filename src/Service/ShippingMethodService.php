@@ -11,6 +11,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -52,10 +53,16 @@ class ShippingMethodService
         $request = new Request();
         $request->query->set('onlyAvailable', '1');
 
+        $orFilter = new OrFilter([
+            new EqualsAnyFilter('availabilityRuleId', $salesChannelContext->getRuleIds()),
+            new EqualsFilter('availabilityRuleId', null)
+        ]
+        );
+
         $criteria = (new Criteria())
             ->addFilter(new EqualsFilter('active', true))
             ->addFilter(new EqualsFilter('salesChannels.id', $salesChannelContext->getSalesChannel()->getId()))
-            ->addFilter(new EqualsAnyFilter('availabilityRuleId', $salesChannelContext->getRuleIds()))
+            ->addFilter($orFilter)
             ->addAssociation('prices')
             ->addAssociation('salesChannels')
         ;
