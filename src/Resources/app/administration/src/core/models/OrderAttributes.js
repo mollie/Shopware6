@@ -16,14 +16,22 @@ export default class OrderAttributes {
             return;
         }
 
-        orderEntity.transactions.sort(function (transactionA, transactionB) {
-            return new Date(transactionB.createdAt) - new Date(transactionA.createdAt);
-        });
-        const latestTransaction = orderEntity?.transactions?.first()?.paymentMethod?.handlerIdentifier;
+        const transactions = orderEntity.transactions;
+        let latestTransaction = transactions?.first();
+
+        if (transactions.length > 1) {
+            transactions.forEach(function (transaction) {
+                if (transaction.createdAt > latestTransaction.createdAt) {
+                    latestTransaction = transaction;
+                }
+            });
+        }
+
         if (!latestTransaction) {
             return;
         }
-        const isMolliePayments = latestTransaction.match(/Mollie/g);
+
+        const isMolliePayments = latestTransaction.paymentMethod?.handlerIdentifier.match(/Mollie/g);
 
         if (!isMolliePayments) {
             return;

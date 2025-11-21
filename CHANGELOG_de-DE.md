@@ -1,4 +1,7 @@
-# 4.20.0
+# 4.20.1 
+- Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
+
+# 4.20.0 - 2025-11-19
 - Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und Shopware übereinstimmen.
 - Behoben: Ein Problem, bei dem Apple Pay Direct nicht funktionierte, wenn im Shop die Telefonnummer als Pflichtfeld konfiguriert war.
 - Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben
