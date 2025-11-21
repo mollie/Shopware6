@@ -3,7 +3,6 @@ import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 // eslint-disable-next-line no-undef
 const { Component } = Shopware;
-const { Criteria } = Shopware.Data;
 
 Component.override('sw-order-list', {
     template,
@@ -12,7 +11,6 @@ Component.override('sw-order-list', {
         orderCriteria() {
             const baseCriteria = this.$super('orderCriteria');
             baseCriteria.addAssociation('transactions.paymentMethod');
-            baseCriteria.getAssociation('transactions').addSorting(Criteria.sort('createdAt'));
             return baseCriteria;
         },
     },

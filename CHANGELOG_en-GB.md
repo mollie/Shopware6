@@ -1,3 +1,5 @@
+# 4.20.1
+- Fixed: Order overview in Shopware 6.5 does not crash anymore
 # 4.20.0
 - Changed order builder to use order addresses instead of customer default addresses to make sure the address in mollie matches the order information in shopware.
 - Fixed an issue where Apple Pay Direct did not work when the phone number was configured as a required field in the shop.
