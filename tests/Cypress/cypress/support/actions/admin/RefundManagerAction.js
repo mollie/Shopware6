@@ -21,7 +21,6 @@ export default class RefundManagerAction {
      * @param privateDesc
      */
     fullRefund(publicDesc, privateDesc) {
-        cy.intercept('**').as('page')
         repoRefundManager.getDescription().clear(forceOption).type(publicDesc, forceOption);
 
         if (privateDesc !== null && privateDesc.trim() !== '') {
@@ -34,7 +33,7 @@ export default class RefundManagerAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     /**
@@ -43,7 +42,6 @@ export default class RefundManagerAction {
      * @param description
      */
     partialAmountRefund(amount, description) {
-        cy.intercept('**').as('page')
         repoRefundManager.getAmountField().clear(forceOption).type(amount, forceOption);
         repoRefundManager.getDescription().clear(forceOption).type(description, forceOption);
         repoRefundManager.getVerifyCheckbox().click(forceOption);
@@ -51,20 +49,19 @@ export default class RefundManagerAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     /**
      *
      */
     cancelPendingRefund() {
-        cy.intercept('**').as('page')
         repoRefundManager.getFirstRefundContextButton().click(forceOption);
         repoRefundManager.getFirstRefundCancelButton().click(forceOption);
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait('@page');
+        cy.wait(4000);
     }
 
     /**
