@@ -12,7 +12,7 @@
 
 
     {% if page.enable_credit_card_components == true %}
-        <script src="https://js.mollie.com/v1/mollie.js"></script>
+        <script src="https://js.mollie.com/v1/mollie.js" defer async></script>
     {% endif %}
     {{ parent() }}
 {% endblock %}
