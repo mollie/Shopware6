@@ -31,7 +31,7 @@ export default class OrderAttributes {
             return;
         }
 
-        const isMolliePayments = latestTransaction.paymentMethod?.handlerIdentifier.match(/Mollie/g);
+        const isMolliePayments = latestTransaction.paymentMethod?.customFields?.mollie_payment_method_name ?? null;
 
         if (!isMolliePayments) {
             return;
