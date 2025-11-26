@@ -48,11 +48,14 @@ class ApplePayDomainVerificationService
         if ($response->getStatusCode() < Response::HTTP_OK || $response->getStatusCode() >= Response::HTTP_MULTIPLE_CHOICES) {
             return;
         }
+        
+        try {
+            if ($this->filesystem->has(self::LOCAL_FILE)) {
+                $this->filesystem->delete(self::LOCAL_FILE);
+            }
 
-        if ($this->filesystem->fileExists(self::LOCAL_FILE)) {
-            $this->filesystem->delete(self::LOCAL_FILE);
+            $this->filesystem->write(self::LOCAL_FILE, $response->getBody(), ['ContentType' => 'text/plain']);
+        } catch (\Throwable $e) {
         }
-
-        $this->filesystem->write(self::LOCAL_FILE, $response->getBody(), ['ContentType' => 'text/plain']);
     }
 }
