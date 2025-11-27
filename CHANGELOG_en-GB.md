@@ -1,3 +1,6 @@
+## [Unreleased]
+- Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
+
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore
 # 4.20.0
