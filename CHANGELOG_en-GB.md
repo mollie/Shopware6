@@ -1,3 +1,6 @@
+##[Unreleased]
+- Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.
+
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore
 # 4.20.0
