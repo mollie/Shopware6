@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/applepay/validate/createPaymentSession": {
+    "/mollie/applepay/validate": {
       "post": {
         "tags": [
           "Mollie",
