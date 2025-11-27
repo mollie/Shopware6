@@ -1,3 +1,6 @@
+##[Unreleased]
+- Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
+
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
 
