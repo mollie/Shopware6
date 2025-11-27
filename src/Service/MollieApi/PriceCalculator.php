@@ -92,7 +92,6 @@ class PriceCalculator
             foreach ($taxCollection->getElements() as $tax) {
                 $vatAmount += $tax->getTax();
             }
-            $roundedVatAmount = round($vatAmount, self::MOLLIE_PRICE_PRECISION);
 
             // now calculate our fake tax rate
             // from the final price and vat amount value
@@ -107,6 +106,11 @@ class PriceCalculator
             }
 
             $roundedVatRate = round($fakeTaxRate, 2);
+
+            // Recalculate VAT amount using the correct formula with the fake tax rate
+            // This ensures consistency with Mollie's expected calculation:
+            // vatAmount = grossPrice × (taxRate / (100 + taxRate))
+            $roundedVatAmount = round($roundedLineItemTotalPrice * ($roundedVatRate / (100 + $roundedVatRate)), self::MOLLIE_PRICE_PRECISION);
 
             // if we have a net price, then the calculated gross price is wrong.
             // we now have a new mixed vat rate, which doesn't match our already calculated gross price.
