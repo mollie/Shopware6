@@ -1,4 +1,5 @@
-##[Unreleased]
+## [Unreleased]
+- Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
 - Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
 
 # 4.20.1 
