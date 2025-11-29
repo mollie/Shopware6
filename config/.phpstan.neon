@@ -21,8 +21,6 @@ parameters:
           message: 'use some logger instead'
         - function: 'putenv()'
           message: 'might overwrite existing variables'
-    scanDirectories:
-      - ../polyfill/Shopware
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
