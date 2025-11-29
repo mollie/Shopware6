@@ -1,9 +1,20 @@
 # 5.0.0
 - Grundlegende Zahlung über Payments API eingebaut
-# 4.20.0
-- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und SHopware übereinstimmen.
+- 
+## [Unreleased]
+- Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
+- Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
+
+# 4.20.1 
+- Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
+
+# 4.20.0 - 2025-11-19
+- Order builder wurde angepasst, sodass Bestell-Adressen statt Standard-Kunden-Adressen verwendet werden. So wird sichergestellt, dass die Adressinformationen in Mollie und Shopware übereinstimmen.
 - Behoben: Ein Problem, bei dem Apple Pay Direct nicht funktionierte, wenn im Shop die Telefonnummer als Pflichtfeld konfiguriert war.
-- Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben 
+- Kompatiblitätsprobleme mit Shopware Commercial Plugin behoben
+- Behoben: Im Admin wurden bei Bestellungen fälschlicherweise Mollie-Daten angezeigt, obwohl die finale Transaktion nicht von Mollie stammte.
+- Shopware Refunds wendet nun den korrekt erstatteten Betrag an.
+- Überschrift in der Konfiguration wurde behoben
 
 ## [4.19.0] - 2025-10-09
 - Unterstützung für die estnische Sprache hinzugefügt

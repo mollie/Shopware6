@@ -7,6 +7,13 @@ const { Component } = Shopware;
 Component.override('sw-order-list', {
     template,
 
+    computed: {
+        orderCriteria() {
+            const baseCriteria = this.$super('orderCriteria');
+            baseCriteria.addAssociation('transactions.paymentMethod');
+            return baseCriteria;
+        },
+    },
     methods: {
         /**
          *
