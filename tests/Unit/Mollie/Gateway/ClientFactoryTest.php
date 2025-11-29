@@ -9,9 +9,11 @@ use Mollie\Shopware\Component\Mollie\Gateway\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Test\TestDefaults;
 
+#[CoversClass(ClientFactory::class)]
 final class ClientFactoryTest extends TestCase
 {
     public function testClientIsCreatedWithTestApiKey(): void

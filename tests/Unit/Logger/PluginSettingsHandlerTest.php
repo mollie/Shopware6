@@ -13,9 +13,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
 #[CoversClass(PluginSettingsHandler::class)]
-/**
- * @coversDefaultClass \Mollie\Shopware\Component\Logger\PluginSettingsHandler
- */
 final class PluginSettingsHandlerTest extends TestCase
 {
     public function testHandleIsFalseWithoutConnection(): void

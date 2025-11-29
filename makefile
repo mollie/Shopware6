@@ -123,10 +123,10 @@ phpmin: ##3 Starts the PHP compatibility checks
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
+	php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
 endif
 ifeq ($(mode), fix)
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
+	php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
 endif
 
 stan: ##3 Starts the PHPStan Analyser
