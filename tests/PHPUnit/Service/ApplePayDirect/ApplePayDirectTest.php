@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Service\ApplePayDirect;
+namespace MolliePayments\Shopware\Tests\Service\ApplePayDirect;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainAllowListCanNotBeEmptyException;

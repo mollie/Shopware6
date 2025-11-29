@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Unit\TranslationImporter;
+namespace Mollie\Shopware\Unit\TranslationImporter;
 
 use Mollie\Shopware\Component\TranslationImporter\TranslationAppender;
 use PHPUnit\Framework\TestCase;

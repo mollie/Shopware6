@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PHPUnit\Components\CancelManager;
+namespace MolliePayments\Shopware\Tests\Components\CancelManager;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
 use MolliePayments\Shopware\Tests\Fakes\CancelItemFacadeBuilder;
