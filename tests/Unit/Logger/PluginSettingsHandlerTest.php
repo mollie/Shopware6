@@ -6,6 +6,8 @@ namespace Mollie\Unit\Logger;
 use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Logger\PluginSettingsHandler;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Monolog\Level;
+use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -44,6 +46,9 @@ final class PluginSettingsHandlerTest extends TestCase
             'message' => 'test',
             'channel' => 'test'
         ];
+        if (class_exists(LogRecord::class)) {
+            $record = new LogRecord(new \DateTimeImmutable(),'test',Level::Info,'test');
+        }
         $result = $handler->handle($record);
 
         $this->assertFalse($result);
@@ -67,6 +72,9 @@ final class PluginSettingsHandlerTest extends TestCase
             'context' => [],
             'datetime' => new \DateTime()
         ];
+        if (class_exists(LogRecord::class)) {
+            $record = new LogRecord(new \DateTimeImmutable(),'mollie',Level::Debug,'test');
+        }
         $result = $handler->handle($record);
 
         $this->assertFalse($result);
@@ -90,6 +98,9 @@ final class PluginSettingsHandlerTest extends TestCase
             'context' => [],
             'datetime' => new \DateTime()
         ];
+        if (class_exists(LogRecord::class)) {
+            $record = new LogRecord(new \DateTimeImmutable(),'mollie',Level::Debug,'test');
+        }
         $result = $handler->handle($record);
 
         $this->assertTrue($result);

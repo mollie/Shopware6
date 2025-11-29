@@ -21,6 +21,7 @@ use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
 use MolliePayments\Tests\Fakes\Repositories\FakeRefundRepository;
 use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
 use MolliePayments\Tests\Traits\MockTrait;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -186,12 +187,11 @@ class RefundManagerTest extends TestCase
      *  The test will start a request with a quantity of 0 and a valid price, and we verify that the DAL create function gets a
      *  correct payload, including the refund item.
      *
-     * @testWith [ 0, 19.99 ]
-     *            [ 1, 0 ]
-     *            [ 0, -5 ]
-     *
      * @throws \Mollie\Api\Exceptions\ApiException
      */
+    #[TestWith([0, 19.99])]
+    #[TestWith([1, 0])]
+    #[TestWith([0, -5])]
     public function testValidItemsAreAdded(int $qty, float $itemPrice): void
     {
         $order = $this->buildValidOrder();
@@ -222,13 +222,12 @@ class RefundManagerTest extends TestCase
      * We have a strict definition on what is valid or invalid.
      * So we build invalid items and make sure no refundItems are saved into the database.
      *
-     * @testWith [ 0, 0 ]
-     *           [ -1, 20 ]
-     *
      * @throws \Mollie\Api\Exceptions\ApiException
      * @throws \Mollie\Api\Exceptions\ApiException
      *                                             /
      */
+    #[TestWith([0, 0])]
+    #[TestWith([-1, 20])]
     public function testInvalidItemsAreNotAdded(int $qty, float $itemPrice): void
     {
         $order = $this->buildValidOrder();

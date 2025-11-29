@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Service\Mollie;
 
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MolliePaymentStatusTest extends TestCase
@@ -13,9 +14,8 @@ class MolliePaymentStatusTest extends TestCase
      * correct list of valid payment status entry in it.
      * It is used to define what payment status entries are valid and
      * thus can be continued to finish a successful order in Shopware.
-     *
-     * @dataProvider getIsApprovedData
      */
+    #[DataProvider('getIsApprovedData')]
     public function testApprovedStatus(bool $expected, string $status): void
     {
         $isApproved = MolliePaymentStatus::isApprovedStatus($status);
@@ -26,7 +26,7 @@ class MolliePaymentStatusTest extends TestCase
     /**
      * @return array[]
      */
-    public function getIsApprovedData()
+    public static function getIsApprovedData()
     {
         return [
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED],
@@ -47,9 +47,8 @@ class MolliePaymentStatusTest extends TestCase
      * This test verifies that our failed payment can be successfully recognized.
      * Failed means, that no valid order has been created, and the whole
      * process should get aborted or cancelled.
-     *
-     * @dataProvider getIsFailedData
      */
+    #[DataProvider('getIsFailedData')]
     public function testFailedStatus(bool $expected, string $status): void
     {
         $isApproved = MolliePaymentStatus::isFailedStatus('', $status);
@@ -60,7 +59,7 @@ class MolliePaymentStatusTest extends TestCase
     /**
      * @return array[]
      */
-    public function getIsFailedData()
+    public static function getIsFailedData()
     {
         return [
             [true, MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED],
