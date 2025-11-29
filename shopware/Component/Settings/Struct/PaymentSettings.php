@@ -13,6 +13,9 @@ final class PaymentSettings extends Struct
     {
     }
 
+    /**
+     * @param array<string,mixed> $settings
+     */
     public static function createFromShopwareArray(array $settings): self
     {
         $orderNumberFormat = $settings[self::KEY_ORDER_NUMBER_FORMAT] ?? '';

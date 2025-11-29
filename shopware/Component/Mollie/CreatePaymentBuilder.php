@@ -5,7 +5,13 @@ namespace Mollie\Shopware\Component\Mollie;
 
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\Language\LanguageEntity;
 
 final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 {
@@ -19,21 +25,36 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
     {
         $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
         $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
-        $orderNumber = $order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
         $customer = $order->getOrderCustomer();
-        $description = $order->getOrderNumber();
-        $deliveries = $order->getDeliveries();
 
+        if (! $customer instanceof OrderCustomerEntity) {
+            throw new \Exception('Order without customer');
+        }
+        $customerNumber = (string) $customer->getCustomerNumber();
+        $description = (string) $order->getOrderNumber();
+        $deliveries = $order->getDeliveries();
+        $language = $order->getLanguage();
+
+        if (! $deliveries instanceof OrderDeliveryCollection) {
+            throw new \Exception('Order without deliveries');
+        }
+        if (! $language instanceof LanguageEntity) {
+            throw new \Exception('Order without language');
+        }
         if (mb_strlen($orderNumberFormat) > 0) {
             $description = str_replace([
                 '{ordernumber}',
                 '{customernumber}'
             ], [
                 $orderNumber,
-                $customer->getCustomerNumber()
+                $customerNumber
             ], $orderNumberFormat);
         }
         $currency = $order->getCurrency();
+        if (! $currency instanceof CurrencyEntity) {
+            throw new \Exception('Order does not have a currency'); // TODO:
+        }
         $returnUrl = $this->routeBuilder->getReturnUrl($transactionId);
         $webhookUrl = $this->routeBuilder->getWebhookUrl($transactionId);
 
@@ -46,7 +67,15 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
             }
         }
 
-        $shippingAddress = Address::fromAddress($customer, $deliveries->first()->getShippingOrderAddress());
+        $firstDeliveryLine = $deliveries->first();
+        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
+            throw new \Exception('Order does not have a delivery line');
+        }
+        $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
+        if (! $shippingOrderAddress instanceof OrderAddressEntity) {
+            throw new \Exception('Order does not have a shipping address');
+        }
+        $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
 
         foreach ($deliveries as $delivery) {
             if (method_exists($order, 'getPrimaryOrderDeliveryId') && $order->getPrimaryOrderDeliveryId() !== null && $delivery->getId() === $order->getPrimaryOrderDeliveryId()) {
@@ -68,7 +97,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $payment->setBillingAddress($billingAddress);
         $payment->setShippingAddress($shippingAddress);
         $payment->setLines($lineItemCollection);
-        $payment->setLocale(Locale::fromLanguage($order->getLanguage()));
+        $payment->setLocale(Locale::fromLanguage($language));
         $payment->setWebhookUrl($webhookUrl);
 
         return $payment;

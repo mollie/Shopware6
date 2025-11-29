@@ -9,7 +9,6 @@ use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionService;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -30,11 +29,10 @@ final class PayAction
         $this->transactionConverter = $transactionConverter;
     }
 
-    /** @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction */
-    public function pay(PaymentHandler $paymentHandler, $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
+    public function pay(PaymentHandler $paymentHandler,PaymentTransactionStruct $shopWareTransaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
         try {
-            $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
+            $transaction = $this->transactionConverter->convert($shopWareTransaction, $salesChannelContext->getContext());
             $this->logger->info(
                 'Starting Checkout for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $paymentHandler->getPaymentMethod(),
                 [
@@ -63,7 +61,7 @@ final class PayAction
                 ]
             );
 
-            throw new PaymentUrlException($transaction->getOrderTransaction()->getId(), $exception->getMessage());
+            throw new PaymentUrlException($shopWareTransaction->getOrderTransactionId(), $exception->getMessage());
         }
 
         try {

@@ -9,7 +9,7 @@
     <services>
 
         <service id="Mollie\Shopware\Component\Settings\SettingsService">
-            <argument type="service" id="service_container"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="string">%env(default:false:MOLLIE_DEV_MODE)%</argument>
             <argument type="string">%env(default:false:MOLLIE_CYPRESS_MODE)%</argument>
         </service>

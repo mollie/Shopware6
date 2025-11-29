@@ -12,6 +12,9 @@ final class SequenceType extends AbstractEnum
         parent::__construct($value);
     }
 
+    /**
+     * @return string[]
+     */
     protected function getPossibleValues(): array
     {
         return [
