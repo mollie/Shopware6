@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace PHPUnit\Components\CancelManager;
 
+use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
 use MolliePayments\Tests\Fakes\CancelItemFacadeBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 
-/**
- * @coversDefaultClass \Kiener\MolliePayments\Components\CancelManager\CancelItemFacade
- */
+#[CoversClass(CancelItemFacade::class)]
 class CancelItemFacadeTest extends TestCase
 {
     private CancelItemFacadeBuilder $cancelManagerBuilder;

@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use MolliePayments\Tests\Fakes\FakeEntityRepository;
 use MolliePayments\Tests\Fakes\FakeOrderTransitionService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -96,9 +97,8 @@ class OrderStateServiceTest extends TestCase
 
     /**
      * Tests if the expected methods of OrderTransitionHelper are called
-     *
-     * @dataProvider provideOrderState
      */
+    #[DataProvider('provideOrderState')]
     public function testSetOrderStateCallsCorrectFunctionsAtOrderTransitionHelper(string $orderState): void
     {
         $stateMachineState = new StateMachineStateEntity();
@@ -116,7 +116,7 @@ class OrderStateServiceTest extends TestCase
         $this->assertEquals([$orderState], $this->orderTransitionService->states);
     }
 
-    public function provideOrderState(): array
+    public static function provideOrderState(): array
     {
         return [
             [OrderStates::STATE_OPEN],

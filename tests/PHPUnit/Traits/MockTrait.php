@@ -13,8 +13,6 @@ trait MockTrait
         return $testCase->getMockBuilder($originalClassName)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->getMock()
         ;
     }

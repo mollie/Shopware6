@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Service\UrlParsingService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class UrlParsingServiceTest extends TestCase
@@ -15,15 +16,13 @@ class UrlParsingServiceTest extends TestCase
         $this->service = new UrlParsingService();
     }
 
-    /**
-     * @dataProvider urlProvider
-     */
+    #[DataProvider('urlProvider')]
     public function testIsUrl(string $url, bool $expected)
     {
         $this->assertEquals($expected, $this->service->isUrl($url));
     }
 
-    public function urlProvider(): array
+    public static function urlProvider(): array
     {
         return [
             ['https://www.example.com', true],
@@ -33,15 +32,13 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider queryParameterProvider
-     */
+    #[DataProvider('queryParameterProvider')]
     public function testParseTrackingCodeQueryParameter(string $input, array $expected)
     {
         $this->assertEquals($expected, $this->service->parseTrackingCodeFromUrl($input));
     }
 
-    public function queryParameterProvider(): array
+    public static function queryParameterProvider(): array
     {
         return [
             ['https://www.example.com/product?code=12345&postal_code=123', ['code=12345&postal_code=123', 'https://www.example.com/product?%s']],
@@ -52,15 +49,13 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider hashProvider
-     */
+    #[DataProvider('hashProvider')]
     public function testParseTrackingCodeHash(string $input, array $expected)
     {
         $this->assertEquals($expected, $this->service->parseTrackingCodeFromUrl($input));
     }
 
-    public function hashProvider(): array
+    public static function hashProvider(): array
     {
         return [
             ['https://www.example.com/product#code=12345', ['code=12345', 'https://www.example.com/product#%s']],
@@ -70,15 +65,13 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider notFoundProvider
-     */
+    #[DataProvider('notFoundProvider')]
     public function testParseTrackingCodeNotFound(string $input, array $expected)
     {
         $this->assertEquals($expected, $this->service->parseTrackingCodeFromUrl($input));
     }
 
-    public function notFoundProvider(): array
+    public static function notFoundProvider(): array
     {
         return [
             ['https://www.example.com/product', ['https://www.example.com/product', '']],
@@ -86,15 +79,13 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider encodePathAndQueryProvider
-     */
+    #[DataProvider('encodePathAndQueryProvider')]
     public function testEncodePathAndQuery(string $input, string $expected)
     {
         $this->assertEquals($expected, $this->service->encodePathAndQuery($input));
     }
 
-    public function encodePathAndQueryProvider(): array
+    public static function encodePathAndQueryProvider(): array
     {
         return [
             ['https://www.example.com/path/to/resource', 'https://www.example.com/path/to/resource'],
@@ -104,15 +95,13 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sanitizeQueryProvider
-     */
+    #[DataProvider('sanitizeQueryProvider')]
     public function testSanitizeQuery(array $input, array $expected)
     {
         $this->assertEquals($expected, $this->service->sanitizeQuery($input));
     }
 
-    public function sanitizeQueryProvider(): array
+    public static function sanitizeQueryProvider(): array
     {
         return [
             [['key=value'], ['key=value']],
@@ -122,15 +111,13 @@ class UrlParsingServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sanitizeQueryPartProvider
-     */
+    #[DataProvider('sanitizeQueryPartProvider')]
     public function testSanitizeQueryPart(string $input, string $expected)
     {
         $this->assertEquals($expected, $this->service->sanitizeQueryPart($input));
     }
 
-    public function sanitizeQueryPartProvider(): array
+    public static function sanitizeQueryPartProvider(): array
     {
         return [
             ['key=value', 'key=value'],

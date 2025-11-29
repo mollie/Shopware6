@@ -9,6 +9,7 @@ use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\SettingsService;
 use MolliePayments\Tests\Fakes\FakeTranslator;
 use MolliePayments\Tests\Fakes\Repositories\FakeCustomerRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
@@ -82,9 +83,7 @@ class CustomerServiceTest extends TestCase
         $this->assertEquals($actual, $expected);
     }
 
-    /**
-     * @dataProvider setMollieCustomerIdTestData
-     */
+    #[DataProvider('setMollieCustomerIdTestData')]
     public function testSetMollieCustomerId(
         string $customerId,
         string $mollieCustomerId,
@@ -126,7 +125,7 @@ class CustomerServiceTest extends TestCase
      * customerRepository::update, and this does mean it is consolidated with the existing customFields.
      * Normally, this is something the EntityRepository takes care of.
      */
-    public function setMollieCustomerIdTestData()
+    public static function setMollieCustomerIdTestData()
     {
         return [
             'New Mollie customer, live' => [

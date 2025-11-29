@@ -10,6 +10,7 @@ use MolliePayments\Tests\Traits\FlowBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Event\FlowEvent;
 
 class RefundOrderActionTest extends TestCase
 {
@@ -51,7 +52,11 @@ class RefundOrderActionTest extends TestCase
         // build our action and
         // start the handling process with our prepared data
         $action = new RefundOrderAction($fakeOrderService, $fakeRefundManager, new NullLogger());
-        $action->handle($flowEvent);
+        if (class_exists(FlowEvent::class) && $flowEvent instanceof FlowEvent) {
+            $action->handle($flowEvent);
+        } else {
+            $action->handleFlow($flowEvent);
+        }
 
         // verify the passed request object
         $this->assertEquals('ord-123', $fakeRefundManager->getRefundRequest()->getOrderNumber());

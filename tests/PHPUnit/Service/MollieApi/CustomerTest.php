@@ -11,6 +11,7 @@ use Mollie\Api\Endpoints\CustomerEndpoint;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 
@@ -95,9 +96,7 @@ class CustomerTest extends TestCase
         $this->customerApiService->createCustomerAtMollie($customerMock, 'buzz');
     }
 
-    /**
-     * @dataProvider isLegacyCustomerValidTestData
-     */
+    #[DataProvider('isLegacyCustomerValidTestData')]
     public function testIsLegacyCustomerValid(
         ?string $mollieCustomerId,
         bool $expectedValue
@@ -108,7 +107,7 @@ class CustomerTest extends TestCase
         $this->assertSame($expectedValue, $actualValue);
     }
 
-    public function isLegacyCustomerValidTestData(): array
+    public static function isLegacyCustomerValidTestData(): array
     {
         return [
             'Customer exists in Mollie' => ['foo', true],

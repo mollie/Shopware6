@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -15,10 +16,9 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
      * Mollie should then have this being set in the order number
      * of the payload for our request.
      *
-     * @dataProvider getFormatValues
-     *
      * @throws \Exception
      */
+    #[DataProvider('getFormatValues')]
     public function testOrderNumberFormat(string $expected, string $format): void
     {
         // set a custom format for
@@ -51,7 +51,7 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
     /**
      * @return string[][]
      */
-    public function getFormatValues()
+    public static function getFormatValues()
     {
         return
             [

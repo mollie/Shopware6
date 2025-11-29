@@ -35,8 +35,6 @@ class PriceCalculatorTest extends TestCase
 
     /**
      * test that taxAmount is calculated like mollie expects it in api
-     *
-     * @dataProvider getVatAmountTestData
      */
     //    public function testRecalculationTaxAmount(string $expected, string $orderTaxType, string $currencyCode, OrderLineItemEntity $lineItem): void
     //    {
