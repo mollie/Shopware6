@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\TranslationImporter;
 
 use Mollie\Shopware\Component\TranslationImporter\TranslationAppender;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TranslationAppender::class)]
 final class TranslationAppenderTest extends TestCase
 {
     public function testAppendOnRoot(): void

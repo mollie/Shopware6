@@ -6,10 +6,12 @@ namespace Mollie\Shopware\Unit\Mollie;
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 
+#[CoversClass(Address::class)]
 final class AddressTest extends TestCase
 {
     private FakeCustomerRepository $customerRepository;

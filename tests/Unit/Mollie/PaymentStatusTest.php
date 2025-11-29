@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(PaymentStatus::class)]
 final class PaymentStatusTest extends TestCase
 {
     public function testFailedStatus(): void
