@@ -6,12 +6,14 @@ namespace Mollie\Shopware\Unit\StatsUpdate;
 use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
 use Mollie\Shopware\Component\StatusUpdate\UpdateStatusAction;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
+#[CoversClass(UpdateStatusAction::class)]
 class UpdateStatusActionTest extends TestCase
 {
     public function testNothingToUpdate(): void
