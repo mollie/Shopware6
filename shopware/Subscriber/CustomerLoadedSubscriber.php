@@ -19,6 +19,9 @@ final class CustomerLoadedSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param EntityLoadedEvent<CustomerEntity> $event
+     */
     public function onCustomerLoaded(EntityLoadedEvent $event): void
     {
         /** @var CustomerEntity $customerEntity */

@@ -19,6 +19,9 @@ final class OrderTransactionLoadedSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param EntityLoadedEvent<OrderTransactionEntity> $event
+     */
     public function onOrderTransaction(EntityLoadedEvent $event): void
     {
         /** @var OrderTransactionEntity $orderTransaction */
