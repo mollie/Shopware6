@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Service\Transition;
+namespace MolliePayments\Shopware\Tests\Service\Transition;
 
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransitionService;

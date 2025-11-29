@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Hydrator;
+namespace MolliePayments\Shopware\Tests\Hydrator;
 
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Mollie\Api\Resources\Refund;
