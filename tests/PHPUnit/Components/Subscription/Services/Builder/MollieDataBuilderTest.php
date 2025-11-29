@@ -5,7 +5,7 @@ namespace PHPUnit\Components\Subscription\Services\Builder;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
-use MolliePayments\Tests\Traits\BuilderTestTrait;
+use MolliePayments\Shopware\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\Currency\CurrencyEntity;
 

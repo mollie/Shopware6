@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Order;
+namespace MolliePayments\Shopware\Tests\Service\Order;
 
 use Exception;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
-use MolliePayments\Tests\Fakes\FakeEntityRepository;
-use MolliePayments\Tests\Fakes\FakeOrderTransitionService;
+use MolliePayments\Shopware\Tests\Fakes\FakeEntityRepository;
+use MolliePayments\Shopware\Tests\Fakes\FakeOrderTransitionService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

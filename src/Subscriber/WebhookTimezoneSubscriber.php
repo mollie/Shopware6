@@ -39,7 +39,7 @@ class WebhookTimezoneSubscriber implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // Route gets matched in a subscriber with priority 32, so we need to have a lower priority than that.

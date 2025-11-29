@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Service\TokenAnonymizer;
 use PHPUnit\Framework\Attributes\DataProvider;

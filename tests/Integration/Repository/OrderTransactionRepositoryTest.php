@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Repository;
+namespace Mollie\Shopware\Integration\Repository;
 
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
-use Mollie\Integration\Data\CheckoutTestBehaviour;
-use Mollie\Integration\Data\CustomerTestBehaviour;
-use Mollie\Integration\Data\MolliePageTestBehaviour;
-use Mollie\Integration\Data\OrderTestBehaviour;
-use Mollie\Integration\Data\PaymentMethodTestBehaviour;
-use Mollie\Integration\Data\ProductTestBehaviour;
+use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
+use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
+use Mollie\Shopware\Integration\Data\MolliePageTestBehaviour;
+use Mollie\Shopware\Integration\Data\OrderTestBehaviour;
+use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
+use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;

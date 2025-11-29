@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Mollie;
+namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use PHPUnit\Framework\TestCase;

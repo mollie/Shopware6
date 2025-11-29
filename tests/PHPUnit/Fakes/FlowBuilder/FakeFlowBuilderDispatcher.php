@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes\FlowBuilder;
+namespace MolliePayments\Shopware\Tests\Fakes\FlowBuilder;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 

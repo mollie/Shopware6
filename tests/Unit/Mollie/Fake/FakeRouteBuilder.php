@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Mollie\Fake;
+namespace Mollie\Shopware\Unit\Mollie\Fake;
 
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 

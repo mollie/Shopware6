@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes\StockUpdater;
+namespace MolliePayments\Shopware\Tests\Fakes\StockUpdater;
 
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;

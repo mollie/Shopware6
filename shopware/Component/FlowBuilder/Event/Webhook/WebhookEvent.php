@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
@@ -18,7 +17,7 @@ use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class WebhookEvent extends Event implements BusinessEventInterface, MolliePaymentAware, OrderAware, MailAware, SalesChannelAware
+class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, MailAware, SalesChannelAware
 {
     public function __construct(private Payment $payment, private OrderEntity $order, private Context $context)
     {

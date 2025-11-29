@@ -1,82 +1,67 @@
 <?php
-declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Fixtures\Handler\Product\Traits;
+namespace MolliePayments\Shopware\Fixtures\Product\Traits;
 
-use Kiener\MolliePayments\Components\Fixtures\FixtureUtils;
-use Shopware\Core\Content\Media\Aggregate\MediaFolder\MediaFolderEntity;
-use Shopware\Core\Content\Product\ProductCollection;
+use Basecom\FixturePlugin\FixtureHelper;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
-use Shopware\Core\System\Tax\TaxEntity;
 
 trait ProductFixtureTrait
 {
-    private FixtureUtils $utils;
-
     /**
-     * @param array<mixed> $customFields
-     * @param EntityRepository<ProductCollection> $repoProducts
+     * @param string $id
+     * @param string $name
+     * @param string $number
+     * @param string $categoryName
+     * @param string $description
+     * @param float $price
+     * @param string $image
+     * @param bool $shippingFree
+     * @param array $customFields
+     * @param EntityRepository $repoProducts
+     * @param FixtureHelper $helper
+     * @return void
      */
-    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, $repoProducts, FixtureUtils $fixtureUtils): void
+    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, EntityRepository $repoProducts, FixtureHelper $helper): void
     {
-        $this->utils = $fixtureUtils;
-
-        // just reuse the product one ;)
+        # just reuse the product one ;)
         $mediaId = $id;
         $visibilityID = $id;
         $coverId = $id;
 
-        // we have to avoid duplicate images (shopware has a problem with it in media)
-        // so lets copy it for our id
+        # we have to avoid duplicate images (shopware has a problem with it in media)
+        # so lets copy it for our id
         $imageSource = __DIR__ . '/../Assets/' . $image;
         $imagePath = __DIR__ . '/../Assets/' . $id . '_' . $image;
         copy($imageSource, $imagePath);
 
-        $defaultFolder = $this->utils->getMedia()->getDefaultFolder('product');
 
-        if (! $defaultFolder instanceof MediaFolderEntity) {
-            throw new \RuntimeException('Could not find default media folder for products.');
-        }
-
-        $this->utils->getMedia()->upload(
+        $helper->Media()->upload(
             $mediaId,
-            $defaultFolder->getId(),
+            $helper->Media()->getDefaultFolder('product')->getId(),
             $imagePath,
             'png',
             'image/png',
         );
 
-        // delete our temp file again
+        # delete our temp file again
         unlink($imagePath);
-
-        $salesChannel = $this->utils->getSalesChannels()->getStorefrontSalesChannel();
-
-        if (! $salesChannel instanceof SalesChannelEntity) {
-            throw new \RuntimeException('Could not find storefront sales channel.');
-        }
-
-        $taxRate = $this->utils->getTaxes()->getTax19();
-
-        if (! $taxRate instanceof TaxEntity) {
-            throw new \RuntimeException('Could not find 19% tax rate for products.');
-        }
 
         $repoProducts->upsert(
             [
                 [
                     'id' => $id,
                     'name' => $name,
-                    'taxId' => $taxRate->getId(),
+                    'taxId' => $helper->Tax()->getTax19()->getId(),
                     'productNumber' => $number,
                     'description' => $description,
                     'visibilities' => [
                         [
                             'id' => $visibilityID,
-                            'salesChannelId' => $salesChannel->getId(),
+                            'salesChannelId' => $helper->SalesChannel()->getStorefrontSalesChannel()->getId(),
                             'visibility' => 30,
                         ]
                     ],

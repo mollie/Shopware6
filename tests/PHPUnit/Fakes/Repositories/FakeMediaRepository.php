@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes\Repositories;
+namespace MolliePayments\Shopware\Tests\Fakes\Repositories;
 
 use Kiener\MolliePayments\Repository\MediaRepository;
 
