@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Struct\MollieApi;
+namespace MolliePayments\Shopware\Tests\Struct\MollieApi;
 
 use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use PHPUnit\Framework\TestCase;
