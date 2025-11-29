@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes;
+namespace MolliePayments\Shopware\Tests\Fakes;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;
 use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;

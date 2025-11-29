@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Data;
+namespace Mollie\Shopware\Integration\Data;
 
+use Mollie\Shopware\Component\Payment\Controller\PaymentController;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -107,8 +108,8 @@ trait CheckoutTestBehaviour
             throw new \Exception('Failed to find Payment ID in ' . $paymentUrl);
         }
 
-        /** @var \Mollie\Shopware\Component\Payment\Controller\PaymentController $returnController */
-        $returnController = $this->getContainer()->get(\Mollie\Shopware\Component\Payment\Controller\PaymentController::class);
+        /** @var PaymentController $returnController */
+        $returnController = $this->getContainer()->get(PaymentController::class);
         $request = new Request();
         $request->attributes->set('transactionId', $paymentId);
 
@@ -123,7 +124,8 @@ trait CheckoutTestBehaviour
         $criteria->addAssociation('transactions.stateMachineState');
 
         $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt'));
+        $searchResult = $repository->search($criteria, $salesChannelContext->getContext());
 
-        return $repository->search($criteria, $salesChannelContext->getContext())->first();
+        return $searchResult->first();
     }
 }

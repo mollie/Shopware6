@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundExceptions;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;

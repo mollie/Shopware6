@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CustomerLoadedSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CustomerEvents::CUSTOMER_LOADED_EVENT => 'onCustomerLoaded',

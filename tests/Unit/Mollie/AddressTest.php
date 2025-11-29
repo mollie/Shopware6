@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Mollie;
+namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Address;
-use Mollie\Unit\Mollie\Fake\FakeCustomerRepository;
-use Mollie\Unit\Mollie\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;

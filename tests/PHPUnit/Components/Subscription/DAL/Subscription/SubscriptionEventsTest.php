@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
 use PHPUnit\Framework\TestCase;

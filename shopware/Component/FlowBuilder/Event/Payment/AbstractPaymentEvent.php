@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
@@ -21,7 +20,7 @@ use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class AbstractPaymentEvent extends Event implements BusinessEventInterface, MolliePaymentAware, OrderAware, CustomerAware, MailAware, SalesChannelAware
+abstract class AbstractPaymentEvent extends Event implements MolliePaymentAware, OrderAware, CustomerAware, MailAware, SalesChannelAware
 {
     public function __construct(private Payment $payment, private OrderEntity $order, private CustomerEntity $customer, private Context $context)
     {

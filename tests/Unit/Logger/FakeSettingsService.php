@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Logger;
+namespace Mollie\Shopware\Unit\Logger;
 
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionReminder;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\SubscriptionReminder;
 
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionReminder\ReminderValidator;
 use PHPUnit\Framework\Attributes\Group;
