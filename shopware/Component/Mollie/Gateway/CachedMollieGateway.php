@@ -9,7 +9,13 @@ use Shopware\Core\Framework\Context;
 
 final class CachedMollieGateway implements MollieGatewayInterface
 {
+    /**
+     * @var array<string, Payment>
+     */
     private array $paymentCache = [];
+    /**
+     * @var array<string, Payment>
+     */
     private array $transactionCache = [];
 
     public function __construct(private MollieGatewayInterface $decorated)

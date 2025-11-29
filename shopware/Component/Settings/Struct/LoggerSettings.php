@@ -14,12 +14,15 @@ final class LoggerSettings extends Struct
     {
     }
 
-    public static function createFromShopwareArray(array $settings): LoggerSettings
+    /**
+     * @param array<string,mixed> $settings
+     */
+    public static function createFromShopwareArray(array $settings): self
     {
         $logFileDays = $settings[self::KEY_LOG_FILE_DAYS] ?? 0;
         $debugMode = $settings[self::KEY_DEBUG_MODE] ?? false;
 
-        return new LoggerSettings((bool) $debugMode, (int) $logFileDays);
+        return new self((bool) $debugMode, (int) $logFileDays);
     }
 
     public function isDebugMode(): bool

@@ -10,6 +10,7 @@ use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
 final class MollieGateway implements MollieGatewayInterface
@@ -26,17 +27,21 @@ final class MollieGateway implements MollieGatewayInterface
         if ($transaction === null) {
             throw new \Exception('Transaction ' . $transactionId . ' not found in Shopware');
         }
+        $transactionOrder = $transaction->getOrder();
+        if (! $transactionOrder instanceof OrderEntity) {
+            throw new \Exception('Transaction ' . $transactionId . ' without order');
+        }
         /** @var ?Payment $mollieTransaction */
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
 
         if ($mollieTransaction === null) {
-            $mollieTransaction = $this->repairLegacyTransaction($transaction, $context);
+            $mollieTransaction = $this->repairLegacyTransaction($transaction,$transactionOrder, $context);
             if ($mollieTransaction === null) {
                 throw new \Exception('Transaction was not created by mollie');
             }
         }
 
-        $payment = $this->getPayment($mollieTransaction->getId(), $transaction->getOrder()->getSalesChannelId());
+        $payment = $this->getPayment($mollieTransaction->getId(),$transactionOrder->getSalesChannelId());
         $payment->setFinalizeUrl($mollieTransaction->getFinalizeUrl());
         $payment->setShopwareTransaction($transaction);
 
@@ -106,9 +111,8 @@ final class MollieGateway implements MollieGatewayInterface
         return new ApiException($exception->getCode(), $body['title'] ?? '', $body['detail'] ?? '', $body['field'] ?? '');
     }
 
-    private function repairLegacyTransaction(OrderTransactionEntity $transaction, Context $context): ?Payment
+    private function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
     {
-        $order = $transaction->getOrder();
         $salesChannelId = $order->getSalesChannelId();
         $customFields = $order->getCustomFields()[Mollie::EXTENSION] ?? null;
         if ($customFields === null) {

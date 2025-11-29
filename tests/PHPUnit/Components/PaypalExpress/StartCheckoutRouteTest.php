@@ -147,6 +147,6 @@ class StartCheckoutRouteTest extends TestCase
         $this->assertInstanceOf(ArrayStruct::class, $cartExtension);
         $this->assertNotNull($response->getSessionId());
         $this->assertSame('fakeSessionId', $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_SESSION_ID_KEY]);
-        $this->assertSame(1, $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION]);
+        $this->assertEquals(1, $cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION]);
     }
 }

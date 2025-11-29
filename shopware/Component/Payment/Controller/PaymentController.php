@@ -35,7 +35,7 @@ final class PaymentController extends AbstractController
         if ($paymentStatus->isFailed()) {
             // TODO mollie failure mode
         }
-        $query = parse_url($response->getFinalizeUrl(), PHP_URL_QUERY);
+        $query = (string) parse_url($response->getFinalizeUrl(), PHP_URL_QUERY);
         $queryParameters = [];
         parse_str($query, $queryParameters);
         $this->logger->info('Finalize transaction', [

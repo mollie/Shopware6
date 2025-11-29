@@ -26,6 +26,7 @@ final class ReturnRoute extends AbstractReturnRoute
     {
         $transactionId = $request->get('transactionId');
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
+        $this->logger->debug('Return route opened');
 
         return new ReturnRouteResponse($payment);
     }

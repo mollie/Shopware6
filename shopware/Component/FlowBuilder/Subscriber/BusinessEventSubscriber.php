@@ -13,6 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class BusinessEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var class-string[]
+     */
     private array $flowEventList = [
         SuccessEvent::class,
         FailedEvent::class,

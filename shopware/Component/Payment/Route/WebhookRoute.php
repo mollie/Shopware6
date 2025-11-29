@@ -38,6 +38,10 @@ final class WebhookRoute extends AbstractWebhookRoute
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
+        if ($shopwareOrder === null) {
+            // TODO: use custom execption
+            throw new \Exception('Shopware order not found for TransactionId: ' . $transactionId);
+        }
 
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
@@ -65,7 +69,12 @@ final class WebhookRoute extends AbstractWebhookRoute
     private function updatePaymentMethod(Payment $payment): void
     {
         $transaction = $payment->getShopwareTransaction();
-        $paymentHandlerIdentifier = $transaction->getPaymentMethod()->getHandlerIdentifier();
+        $paymentMethod = $transaction->getPaymentMethod();
+        if ($paymentMethod === null) {
+            // TODO: use custom exception
+            throw new \Exception('Payment method not found for TransactionId: ' . $transaction->getId());
+        }
+        $paymentHandlerIdentifier = $paymentMethod->getHandlerIdentifier();
 
         /** @var CompatibilityPaymentHandler $paymentHandler */
         $paymentHandler = $this->container->get($paymentHandlerIdentifier);

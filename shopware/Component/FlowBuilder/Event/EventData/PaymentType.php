@@ -8,6 +8,9 @@ use Shopware\Core\Framework\Event\EventData\EventDataType;
 final class PaymentType implements EventDataType
 {
     public const TYPE = 'payment';
+    /**
+     * @var array<mixed>
+     */
     private array $data;
 
     public function __construct()

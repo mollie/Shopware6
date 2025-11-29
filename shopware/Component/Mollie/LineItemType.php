@@ -48,6 +48,9 @@ final class LineItemType extends AbstractEnum
         return new self($type);
     }
 
+    /**
+     * @return string[]
+     */
     protected function getPossibleValues(): array
     {
         return self::POSSIBLE_TYPES;

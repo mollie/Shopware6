@@ -3,13 +3,16 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
+use Mollie\Shopware\Component\Transaction\TransactionNotFoundException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class TransactionService
@@ -17,23 +20,19 @@ class TransactionService
     /**
      * @var EntityRepository<EntityCollection<OrderTransactionEntity>>
      */
-    private $orderTransactionRepository;
+    private EntityRepository $orderTransactionRepository;
 
     /**
      * Creates a new instance of the transaction service.
      *
      * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
-    public function __construct($orderTransactionRepository)
+    public function __construct(EntityRepository $orderTransactionRepository)
     {
         $this->orderTransactionRepository = $orderTransactionRepository;
     }
 
-    /**
-     * @param string $transactionId
-     * @param null|string $versionId
-     */
-    public function getTransactionById($transactionId, $versionId = null, ?Context $context = null): ?OrderTransactionEntity
+    public function getTransactionById(string $transactionId,?string $versionId = null, ?Context $context = null): OrderTransactionEntity
     {
         $transactionCriteria = new Criteria();
         $transactionCriteria->addFilter(new EqualsFilter('id', $transactionId));
@@ -46,17 +45,22 @@ class TransactionService
         $transactionCriteria->addAssociation('order.lineItems');
         $transactionCriteria->addAssociation('order.stateMachineState');
 
-        /** @var OrderTransactionCollection $transactions */
+        /** @var EntitySearchResult<OrderTransactionCollection<OrderTransactionEntity>> $transactions */
         $transactions = $this->orderTransactionRepository->search(
             $transactionCriteria,
-            $context ?? Context::createDefaultContext()
+            $context ?? new Context(new SystemSource()),
         );
 
         if ($transactions->count() === 0) {
-            return null;
+            throw new TransactionNotFoundException($transactionId);
         }
 
-        return $transactions->first();
+        $transaction = $transactions->first();
+        if ($transaction === null) {
+            throw new TransactionNotFoundException($transactionId);
+        }
+
+        return $transaction;
     }
 
     /**

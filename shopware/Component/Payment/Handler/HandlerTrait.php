@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
@@ -40,13 +39,10 @@ trait HandlerTrait
         return $this->method;
     }
 
-    /**
-     * @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction
-     */
-    public function doFinalize($transaction, Request $request, Context $context): void
+    public function doFinalize(PaymentTransactionStruct $shopwareTransaction, Request $request, Context $context): void
     {
         try {
-            $transaction = $this->transactionConverter->convert($transaction, $context);
+            $transaction = $this->transactionConverter->convert($shopwareTransaction, $context);
             $this->finalize->execute($request, $transaction, $context);
         } catch (HttpException $exception) {
             // Catch Shopware Exceptions to show edit order page
@@ -60,17 +56,14 @@ trait HandlerTrait
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()
             ]);
-            throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
+            throw PaymentException::asyncFinalizeInterrupted($shopwareTransaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
     }
 
-    /**
-     * @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction
-     */
-    private function doPay($transaction, SalesChannelContext $salesChannelContext, RequestDataBag $dataBag): RedirectResponse
+    private function doPay(PaymentTransactionStruct $shopwareTransaction, SalesChannelContext $salesChannelContext, RequestDataBag $dataBag): RedirectResponse
     {
         try {
-            $transaction = $this->transactionConverter->convert($transaction, $salesChannelContext->getContext());
+            $transaction = $this->transactionConverter->convert($shopwareTransaction, $salesChannelContext->getContext());
 
             return $this->pay->execute($this, $transaction, $dataBag, $salesChannelContext);
         } catch (\Throwable $exception) {
@@ -78,7 +71,7 @@ trait HandlerTrait
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()
             ]);
-            throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
+            throw PaymentException::asyncProcessInterrupted($shopwareTransaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
     }
 }

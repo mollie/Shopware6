@@ -15,6 +15,9 @@ final class ImportCSVCommand extends Command
     private Filesystem $fileSystem;
     private AppenderInterface $appender;
     private Plugin $plugin;
+    /**
+     * @var array<string,string>
+     */
     private array $keyMappings = [
         'card.payments.shopwareFailedPayments.label' => 'card.payments.shopwareFailedPayment.label',
         'card.payments.shopwareFailedPayments.helpText' => 'card.payments.shopwareFailedPayment.helpText',
@@ -58,15 +61,22 @@ final class ImportCSVCommand extends Command
 
             return Command::FAILURE;
         }
+        $fileContent = file_get_contents($pathToConfigXml);
+
+        if ($fileContent === false) {
+            $output->writeln('<error>Config file not found: ' . $path . '</error>');
+
+            return Command::FAILURE;
+        }
 
         $stream = $this->fileSystem->readStream($path);
         $domDocument = new \DOMDocument();
-        $domDocument->loadXML(file_get_contents($pathToConfigXml));
+        $domDocument->loadXML($fileContent);
         $row = fgetcsv($stream, null, ';'); // skip header
         while ($row = fgetcsv($stream, null, ';')) {
-            $key = $row[0];
+            $key = (string) $row[0];
             $key = $this->keyMappings[$key] ?? $key;
-            $text = $row[2];
+            $text = (string) $row[2];
             $result = $this->appender->append($domDocument, $key, $text, $localeCode);
             $output->writeln('<' . $result->getStatus() . '>' . $result->getMessage() . '</' . $result->getStatus() . '>');
         }
