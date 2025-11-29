@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct\Product;
+namespace MolliePayments\Shopware\Tests\Struct\Product;
 
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;

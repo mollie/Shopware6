@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct\OrderLineItemEntity;
+namespace MolliePayments\Shopware\Tests\Struct\OrderLineItemEntity;
 
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;

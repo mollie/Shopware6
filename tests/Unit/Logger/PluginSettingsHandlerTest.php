@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Logger;
+namespace Mollie\Shopware\Unit\Logger;
 
 use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Logger\PluginSettingsHandler;

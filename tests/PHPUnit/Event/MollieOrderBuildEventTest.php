@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Event;
+namespace MolliePayments\Shopware\Tests\Event;
 
 use Kiener\MolliePayments\Event\MollieOrderBuildEvent;
 use PHPUnit\Framework\TestCase;

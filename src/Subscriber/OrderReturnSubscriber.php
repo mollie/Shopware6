@@ -16,7 +16,7 @@ class OrderReturnSubscriber implements EventSubscriberInterface
         $this->orderReturnHandler = $orderReturnHandler;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'state_enter.order_return.state.done' => ['onOrderReturnFinished', 10],

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service\Transition;
+namespace Kiener\MolliePayments\Shopware\Tests\Service\Transition;
 
 use Kiener\MolliePayments\Service\Transition\TransitionService;
 use PHPUnit\Framework\TestCase;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\StatsUpdate;
+namespace Mollie\Shopware\Unit\StatsUpdate;
 
 use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
 use Mollie\Shopware\Component\StatusUpdate\UpdateStatusAction;

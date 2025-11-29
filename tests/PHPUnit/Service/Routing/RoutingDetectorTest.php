@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Routing;
+namespace MolliePayments\Shopware\Tests\Service\Routing;
 
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use PHPUnit\Framework\Attributes\TestWith;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\RefundManager\DAL\RefundItem;
+namespace MolliePayments\Shopware\Tests\Components\RefundManager\DAL\RefundItem;
 
 use Kiener\MolliePayments\Components\RefundManager\DAL\RefundItem\RefundItemEntity;
 use PHPUnit\Framework\TestCase;
