@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\System\Locale\LocaleEntity;
 
 final class Locale extends AbstractEnum
 {
@@ -32,14 +33,22 @@ final class Locale extends AbstractEnum
 
     public static function fromLanguage(LanguageEntity $language): self
     {
-        $languageLocale = $language->getLocale()->getCode() ?? 'en-GB';
-        $languageLocale = str_replace('-', '_', $languageLocale);
+        $locale = $language->getLocale();
+        $code = 'en-GB';
+        if ($locale instanceof LocaleEntity) {
+            $code = $locale->getCode();
+        }
+
+        $languageLocale = str_replace('-', '_', $code);
 
         $mollieLocale = self::AVAILABLE_LOCALES[$languageLocale] ?? 'en_GB';
 
         return new self($mollieLocale);
     }
 
+    /**
+     * @return string[]
+     */
     protected function getPossibleValues(): array
     {
         return self::AVAILABLE_LOCALES;

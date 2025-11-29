@@ -11,6 +11,9 @@ use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +36,17 @@ final class Finalize
 
         $payment = $this->mollieGateway->getPaymentByTransactionId($transaction->getOrderTransactionId(), $context);
         $order = $payment->getShopwareTransaction()->getOrder();
-        $customer = $order->getOrderCustomer()->getCustomer();
+        if (! $order instanceof OrderEntity) {
+            throw new \Exception('Order not found'); // TODO: custom execption
+        }
+        $orderCustomer = $order->getOrderCustomer();
+        if (! $orderCustomer instanceof OrderCustomerEntity) {
+            throw new \Exception('Order customer not found');
+        }
+        $customer = $orderCustomer->getCustomer();
+        if (! $customer instanceof CustomerEntity) {
+            throw new \Exception('Customer not found');
+        }
         $paymentStatus = $payment->getStatus();
 
         $this->logger->info('Fetched Payment Information from Mollie', [

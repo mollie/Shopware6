@@ -7,10 +7,16 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 
 final class Customer extends ArrayStruct
 {
+    /**
+     * @var string[]
+     */
     private array $customerIds = [];
     private string $creditCardToken = '';
     private bool $shouldSaveCardDetail = false;
 
+    /**
+     * @param array<string> $customer_ids
+     */
     public function __construct(array $customer_ids = [], string $credit_card_token = '', bool $shouldSaveCardDetail = false)
     {
         $this->customerIds = $customer_ids;
@@ -22,6 +28,9 @@ final class Customer extends ArrayStruct
         ], 'mollie_customer');
     }
 
+    /**
+     * @return string[]
+     */
     public function getCustomerIds(): array
     {
         return $this->customerIds;

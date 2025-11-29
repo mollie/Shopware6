@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Mollie;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
+use Shopware\Core\System\Currency\CurrencyEntity;
 
 final class Money implements \JsonSerializable
 {
@@ -33,11 +34,15 @@ final class Money implements \JsonSerializable
     public static function fromOrder(OrderEntity $order): self
     {
         $value = $order->getAmountTotal();
-        if ($order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
+        if ((string) $order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $value = $order->getAmountNet();
         }
+        $currency = $order->getCurrency();
+        if (! $currency instanceof CurrencyEntity) {
+            throw new \Exception('currency is not exists'); // todo: custom execption
+        }
 
-        return new self($value, $order->getCurrency()->getIsoCode());
+        return new self($value, $currency->getIsoCode());
     }
 
     private function formatValue(float $value): string

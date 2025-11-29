@@ -25,14 +25,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 final class OrderTransactionRepository implements OrderTransactionRepositoryInterface
 {
-    /** @var EntityRepository<EntityCollection<OrderTransactionEntity> */
-    private $orderTransactionRepository;
+    /** @var EntityRepository<EntityCollection<OrderTransactionEntity>> */
+    private EntityRepository $orderTransactionRepository;
     private LoggerInterface $logger;
 
     /**
-     * @param EntityRepository<EntityCollection<OrderTransactionEntity> $orderTransactionRepository
+     * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
-    public function __construct($orderTransactionRepository, LoggerInterface $logger)
+    public function __construct(EntityRepository $orderTransactionRepository, LoggerInterface $logger)
     {
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->logger = $logger;

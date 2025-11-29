@@ -7,6 +7,8 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
 use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Mollie;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
 final class CardPayment extends CompatibilityPaymentHandler
@@ -15,9 +17,17 @@ final class CardPayment extends CompatibilityPaymentHandler
 
     public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment
     {
-        $shopCustomer = $orderEntity->getOrderCustomer()->getCustomer();
+        $orderCustomer = $orderEntity->getOrderCustomer();
+
+        if (! $orderCustomer instanceof OrderCustomerEntity) {
+            return $payment;
+        }
+        $customerEntity = $orderCustomer->getCustomer();
+        if (! $customerEntity instanceof CustomerEntity) {
+            return $payment;
+        }
         /** @var ?Customer $mollieCustomer */
-        $mollieCustomer = $shopCustomer->getExtension(Mollie::EXTENSION);
+        $mollieCustomer = $customerEntity->getExtension(Mollie::EXTENSION);
         if ($mollieCustomer === null) {
             return $payment;
         }
