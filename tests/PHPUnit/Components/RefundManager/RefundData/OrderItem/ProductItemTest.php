@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\RefundManager\RefundData\OrderItem;
+namespace MolliePayments\Shopware\Tests\Components\RefundManager\RefundData\OrderItem;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
-use MolliePayments\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 

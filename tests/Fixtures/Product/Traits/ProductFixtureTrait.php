@@ -1,6 +1,6 @@
 <?php
 
-namespace MolliePayments\Fixtures\Product\Traits;
+namespace MolliePayments\Shopware\Fixtures\Product\Traits;
 
 use Basecom\FixturePlugin\FixtureHelper;
 use Shopware\Core\Defaults;

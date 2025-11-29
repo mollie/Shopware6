@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Order;
+namespace MolliePayments\Shopware\Tests\Service\Order;
 
 use Kiener\MolliePayments\Service\Order\OrderTimeService;
 use PHPUnit\Framework\Attributes\DataProvider;

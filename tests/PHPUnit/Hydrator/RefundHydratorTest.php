@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Hydrator;
+namespace Kiener\MolliePayments\Shopware\Tests\Hydrator;
 
 use Kiener\MolliePayments\Hydrator\RefundHydrator;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Types\RefundStatus;
-use MolliePayments\Tests\Fakes\FakeMollieRefund;
+use MolliePayments\Shopware\Tests\Fakes\FakeMollieRefund;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\OrderEntity;

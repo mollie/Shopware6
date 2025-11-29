@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes;
+namespace MolliePayments\Shopware\Tests\Fakes;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
 use Kiener\MolliePayments\Components\RefundManager\Integrators\StockManagerInterface;
@@ -12,8 +12,8 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
-use MolliePayments\Tests\Fakes\Repositories\FakeOrderLineItemRepository;
-use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeOrderLineItemRepository;
+use MolliePayments\Shopware\Tests\Fakes\StockUpdater\FakeStockManager;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;

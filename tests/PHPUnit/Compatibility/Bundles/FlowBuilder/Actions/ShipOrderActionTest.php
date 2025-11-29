@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
+namespace Kiener\MolliePayments\Shopware\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction;
-use MolliePayments\Tests\Fakes\FakeOrderService;
-use MolliePayments\Tests\Fakes\FakeShipmentManager;
-use MolliePayments\Tests\Traits\FlowBuilderTestTrait;
+use MolliePayments\Shopware\Tests\Fakes\FakeOrderService;
+use MolliePayments\Shopware\Tests\Fakes\FakeShipmentManager;
+use MolliePayments\Shopware\Tests\Traits\FlowBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;

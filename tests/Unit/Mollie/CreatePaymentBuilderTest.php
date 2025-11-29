@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Mollie;
+namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
@@ -9,9 +9,9 @@ use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
-use Mollie\Unit\Logger\FakeSettingsService;
-use Mollie\Unit\Mollie\Fake\FakeOrderRepository;
-use Mollie\Unit\Mollie\Fake\FakeRouteBuilder;
+use Mollie\Shopware\Unit\Logger\FakeSettingsService;
+use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use PHPUnit\Framework\TestCase;
 
 final class CreatePaymentBuilderTest extends TestCase

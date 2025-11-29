@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\Rule;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Rule;
 
 use Kiener\MolliePayments\Components\Subscription\Rule\LineItemSubscriptionRule;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;

@@ -58,7 +58,7 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
         $this->mollieCartService = $mollieCartService;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StorefrontRenderEvent::class => 'onStorefrontRender',

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct\PaymentMethod;
+namespace MolliePayments\Shopware\Tests\Struct\PaymentMethod;
 
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;

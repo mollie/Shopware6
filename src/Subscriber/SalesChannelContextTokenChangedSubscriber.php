@@ -19,7 +19,7 @@ class SalesChannelContextTokenChangedSubscriber implements EventSubscriberInterf
         $this->cartBackupService = $cartBackupService;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SalesChannelContextTokenChangeEvent::class => 'onTokenChange',

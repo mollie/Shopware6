@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Data;
+namespace Mollie\Shopware\Integration\Data;
 
 use Kiener\MolliePayments\Handler\Method\AlmaPayment;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;

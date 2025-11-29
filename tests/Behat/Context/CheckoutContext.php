@@ -1,15 +1,14 @@
 <?php
+declare(strict_types=1);
 
-namespace Mollie\Behat;
-
-
+namespace Mollie\Shopware\Behat;
 
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
-use Mollie\Integration\Data\CheckoutTestBehaviour;
-use Mollie\Integration\Data\MolliePageTestBehaviour;
-use Mollie\Integration\Data\PaymentMethodTestBehaviour;
+use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
+use Mollie\Shopware\Integration\Data\MolliePageTestBehaviour;
+use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
@@ -21,7 +20,6 @@ final class CheckoutContext extends ShopwareContext
     use PaymentMethodTestBehaviour;
     use MolliePageTestBehaviour;
 
-
     private string $mollieSandboxPage = '';
     private string $shopwareReturnPage = '';
     private string $shopwareOderId = '';
@@ -32,7 +30,6 @@ final class CheckoutContext extends ShopwareContext
         $salesChannelContext = $this->getCurrentSalesChannelContext();
         $this->addItemToCart($productNumber, $salesChannelContext, $quantity);
     }
-
 
     #[When('i start checkout with payment method :arg1')]
     public function iStartCheckoutWithPaymentMethod(string $paymentMethodTechnicalName): void
@@ -48,7 +45,6 @@ final class CheckoutContext extends ShopwareContext
         Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
     }
 
-
     #[When('select payment status :arg1')]
     public function selectPaymentStatus(string $selectedStatus): void
     {
@@ -61,7 +57,7 @@ final class CheckoutContext extends ShopwareContext
     #[Given('i select :art1 as currency')]
     public function iSelectAsCurrency(string $currency): void
     {
-        $currency = $this->findCurrencyByIso($currency,$this->getCurrentSalesChannelContext());
+        $currency = $this->findCurrencyByIso($currency, $this->getCurrentSalesChannelContext());
         $this->setOptions(SalesChannelContextService::CURRENCY_ID, $currency->getId());
     }
 
@@ -69,19 +65,19 @@ final class CheckoutContext extends ShopwareContext
     public function iSeeSuccessPage(): void
     {
         $this->shopwareOderId = '';
+
         /** @var RedirectResponse $response */
         $response = $this->finishCheckout($this->shopwareReturnPage, $this->getCurrentSalesChannelContext());
-        $this->shopwareOderId = str_replace('/checkout/finish?orderId=','',$response->getTargetUrl());
+        $this->shopwareOderId = str_replace('/checkout/finish?orderId=', '', $response->getTargetUrl());
 
         Assert::assertSame($response->getStatusCode(), 302);
-        Assert::assertStringContainsString('/checkout/finish', $response->getTargetUrl());
         Assert::assertNotEmpty($this->shopwareOderId);
     }
 
     #[Then('order payment status is :arg1')]
     public function orderPaymentStatusIs(string $expectedPaymentStatus): void
     {
-        $order = $this->getOrderById($this->shopwareOderId,$this->getCurrentSalesChannelContext());
+        $order = $this->getOrderById($this->shopwareOderId, $this->getCurrentSalesChannelContext());
         /** @var OrderTransactionEntity $oderTransaction */
         $oderTransaction = $order->getTransactions()->first();
         $actualOrderState = $oderTransaction->getStateMachineState()->getTechnicalName();

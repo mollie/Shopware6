@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MolliePayments\Fixtures\Category;
+namespace MolliePayments\Shopware\Fixtures\Category;
 
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;

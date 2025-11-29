@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Cart\Voucher;
+namespace MolliePayments\Shopware\Tests\Service\Cart\Voucher;
 
 use Kiener\MolliePayments\Service\Cart\Voucher\VoucherService;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;
-use MolliePayments\Tests\Fakes\Repositories\FakeProductRepository;
-use MolliePayments\Tests\Traits\MockTrait;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeProductRepository;
+use MolliePayments\Shopware\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;

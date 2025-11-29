@@ -48,7 +48,7 @@ class RefundOrderAction extends FlowAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            self::getName() => 'handle',
+            self::getName() => 'handleFlow',
         ];
     }
 

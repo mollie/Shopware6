@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service;
+namespace Kiener\MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\AlmaPayment;
@@ -42,9 +42,9 @@ use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\PayPalExpressConfig;
-use MolliePayments\Tests\Fakes\FakeHttpClient;
-use MolliePayments\Tests\Fakes\Repositories\FakeMediaRepository;
-use MolliePayments\Tests\Fakes\Repositories\FakePaymentMethodRepository;
+use MolliePayments\Shopware\Tests\Fakes\FakeHttpClient;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeMediaRepository;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakePaymentMethodRepository;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaDefinition;

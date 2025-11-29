@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder;
@@ -14,8 +14,8 @@ use Kiener\MolliePayments\Service\UrlParsingService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
-use MolliePayments\Tests\Traits\OrderTrait;
-use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;

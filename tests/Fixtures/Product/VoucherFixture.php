@@ -1,11 +1,11 @@
 <?php
 
-namespace MolliePayments\Fixtures\Product;
+namespace MolliePayments\Shopware\Fixtures\Product;
 
 use Basecom\FixturePlugin\Fixture;
 use Basecom\FixturePlugin\FixtureBag;
 use Basecom\FixturePlugin\FixtureHelper;
-use MolliePayments\Fixtures\Product\Traits\ProductFixtureTrait;
+use MolliePayments\Shopware\Fixtures\Product\Traits\ProductFixtureTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 

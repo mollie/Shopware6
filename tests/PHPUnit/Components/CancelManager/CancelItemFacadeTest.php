@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace PHPUnit\Components\CancelManager;
 
 use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
-use MolliePayments\Tests\Fakes\CancelItemFacadeBuilder;
+use MolliePayments\Shopware\Tests\Fakes\CancelItemFacadeBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;

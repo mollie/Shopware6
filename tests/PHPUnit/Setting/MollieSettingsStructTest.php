@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Setting;
+namespace MolliePayments\Shopware\Tests\Setting;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;

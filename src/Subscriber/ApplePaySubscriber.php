@@ -19,7 +19,7 @@ class ApplePaySubscriber implements EventSubscriberInterface
         $this->applePay = $applePay;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StorefrontRenderEvent::class => 'onStorefrontRender',

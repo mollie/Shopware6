@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Mollie;
+namespace MolliePayments\Shopware\Tests\Service\Mollie;
 
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Mollie\Gateway;
+namespace Mollie\Shopware\Unit\Mollie\Gateway;
 
 use GuzzleHttp\Psr7\Uri;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\Gateway\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
-use Mollie\Unit\Logger\FakeSettingsService;
+use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Test\TestDefaults;
 

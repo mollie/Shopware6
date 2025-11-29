@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\RefundManager\Request;
+namespace MolliePayments\Shopware\Tests\Components\RefundManager\Request;
 
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;

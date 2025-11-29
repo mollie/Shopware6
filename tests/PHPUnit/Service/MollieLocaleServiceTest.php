@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service;
+namespace Kiener\MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Service\MollieLocaleService;
-use MolliePayments\Tests\Fakes\Repositories\FakeLanguageRepository;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeLanguageRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\Language\LanguageEntity;

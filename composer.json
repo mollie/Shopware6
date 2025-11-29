@@ -50,12 +50,12 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Mollie\\Unit\\": "tests/Unit/",
-            "Mollie\\Integration\\": "tests/Integration/",
-            "Mollie\\Behat\\": "tests/Behat/Context/",
-            "MolliePayments\\Tests\\": "tests/PHPUnit/",
-            "MolliePayments\\PHPStan\\": "tests/PHPStan/",
-            "MolliePayments\\Fixtures\\": "tests/Fixtures/"
+            "Mollie\\Shopware\\Unit\\": "tests/Unit/",
+            "Mollie\\Shopware\\Integration\\": "tests/Integration/",
+            "Mollie\\Shopware\\Behat\\": "tests/Behat/Context/",
+            "MolliePayments\\Shopware\\Tests\\": "tests/PHPUnit/",
+            "MolliePayments\\Shopware\\PHPStan\\": "tests/PHPStan/",
+            "MolliePayments\\Shopware\\Fixtures\\": "tests/Fixtures/"
         }
     },
     "suggest": {

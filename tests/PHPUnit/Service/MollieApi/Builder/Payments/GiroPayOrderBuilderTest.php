@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder\Payments;
 
 use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Mollie\Api\Types\PaymentMethod;
-use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
+use MolliePayments\Shopware\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;

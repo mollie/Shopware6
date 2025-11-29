@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Validator;
+namespace MolliePayments\Shopware\Tests\Validator;
 
 use Kiener\MolliePayments\Validator\IsOrderTotalRoundingActivated;
 use PHPUnit\Framework\TestCase;

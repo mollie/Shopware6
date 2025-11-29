@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace MolliePayments\PHPStan\Rules;
+namespace MolliePayments\Shopware\PHPStan\Rules;
 
 use PhpParser\Comment\Doc;
 use PhpParser\Node;
