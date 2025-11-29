@@ -8,6 +8,9 @@ use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends  StoreApiResponse<ArrayStruct>
+ */
 final class ReturnRouteResponse extends StoreApiResponse
 {
     public function __construct(private Payment $payment)
