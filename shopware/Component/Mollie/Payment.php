@@ -84,6 +84,9 @@ final class Payment extends Struct implements \JsonSerializable
         $this->thirdPartyPaymentId = $thirdPartyPaymentId;
     }
 
+    /**
+     * @param array<mixed> $body
+     */
     public static function createFromClientResponse(array $body): self
     {
         $payment = new self($body['id'], $body['method']);
@@ -111,9 +114,12 @@ final class Payment extends Struct implements \JsonSerializable
         $this->checkoutUrl = $checkoutUrl;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function toArray(): array
     {
-        $data = json_decode(json_encode($this), true);
+        $data = json_decode((string) json_encode($this), true);
         unset($data['shopwareTransaction']);
 
         return $data;

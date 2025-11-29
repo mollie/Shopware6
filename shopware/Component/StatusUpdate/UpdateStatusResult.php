@@ -5,6 +5,9 @@ namespace Mollie\Shopware\Component\StatusUpdate;
 
 final class UpdateStatusResult
 {
+    /**
+     * @var array<string>
+     */
     private array $updateTransactionIds = [];
 
     public function getUpdated(): int

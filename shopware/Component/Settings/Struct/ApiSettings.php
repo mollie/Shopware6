@@ -15,6 +15,9 @@ final class ApiSettings extends Struct
     {
     }
 
+    /**
+     * @param array<string,mixed> $settings
+     */
     public static function createFromShopwareArray(array $settings): self
     {
         $testApiKey = $settings[self::KEY_TEST_API_KEY] ?? '';

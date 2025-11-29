@@ -43,6 +43,9 @@ final class PaymentStatus extends AbstractEnum
         return $statusMapping[$mollieStatus] ?? '';
     }
 
+    /**
+     * @return string[]
+     */
     protected function getPossibleValues(): array
     {
         return [

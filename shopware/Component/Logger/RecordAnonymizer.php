@@ -11,26 +11,21 @@ final class RecordAnonymizer implements ProcessorInterface
 {
     private const URL_SLUG = '/payment/finalize-transaction';
 
-    /**
-     * We need to define types here because shopware 6.4 uses old monologger where LogRecord does not exists.
-     *
-     * @param array|LogRecord $record
-     *
-     * @return array|LogRecord
-     */
-    public function __invoke($record)
+    public function __invoke(LogRecord $record): LogRecord
     {
-        /* @phpstan-ignore-next-line */
-        if (isset($record['extra'])) {
-            if (array_key_exists('ip', $record['extra'])) {
-                // replace it with our anonymous IP
-                $record['extra']['ip'] = IpUtils::anonymize(trim($record['extra']['ip']));
-            }
+        $recordArray = $record->toArray();
 
-            if (array_key_exists('url', $record['extra'])) {
-                $record['extra']['url'] = $this->anonymize($record['extra']['url']);
-            }
+        /** @var array<mixed> $extraData */
+        $extraData = $recordArray['extra'] ?? [];
+        if (isset($extraData['ip'])) {
+            // replace it with our anonymous IP
+            $extraData['ip'] = IpUtils::anonymize(trim((string) $extraData['ip']));
         }
+
+        if (isset($extraData['url'])) {
+            $extraData['url'] = $this->anonymize((string) $extraData['url']);
+        }
+        $record['extra'] = $extraData;
 
         return $record;
     }

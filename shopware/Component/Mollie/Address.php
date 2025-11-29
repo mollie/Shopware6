@@ -42,14 +42,22 @@ final class Address implements \JsonSerializable
         if ($orderAddress === null) {
             throw new \InvalidArgumentException('Address should not be null');
         }
+        $salutation = $customer->getSalutation();
+        if ($salutation === null) {
+            throw new \InvalidArgumentException('Salutation cannot be null');
+        }
+        $country = $orderAddress->getCountry();
+        if ($country === null) {
+            throw new \InvalidArgumentException('Country cannot be null');
+        }
         $address = new self($customer->getEmail(),
-            $customer->getSalutation()->getDisplayName(),
+            (string) $salutation->getDisplayName(),
             $orderAddress->getFirstName(),
             $orderAddress->getLastName(),
             $orderAddress->getStreet(),
-            $orderAddress->getZipcode(),
+            (string) $orderAddress->getZipcode(),
             $orderAddress->getCity(),
-            $orderAddress->getCountry()->getIso()
+            (string) $country->getIso()
         );
 
         if ($orderAddress->getPhoneNumber() !== null) {
