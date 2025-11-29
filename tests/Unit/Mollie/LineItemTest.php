@@ -5,8 +5,10 @@ namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(LineItem::class)]
 final class LineItemTest extends TestCase
 {
     public function testSettersAndGetters(): void

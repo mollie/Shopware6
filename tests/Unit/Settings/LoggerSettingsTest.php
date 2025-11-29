@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Settings;
 
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(LoggerSettings::class)]
 final class LoggerSettingsTest extends TestCase
 {
     public function testCanCreateApiSettingsFromArray(): void

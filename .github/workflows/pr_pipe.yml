@@ -51,7 +51,7 @@ jobs:
             php: '8.3'
             image: 'dockware/shopware'
           - shopware: '6.6.10.9'
-            php: '8.2'
+            php: '8.3'
             image: 'dockware/shopware'
     steps:
 
