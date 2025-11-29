@@ -35,6 +35,7 @@ parameters:
     		- identifier: parameter.unresolvableType
     		- identifier: varTag.unresolvableType
     		- identifier: attribute.notFound
+    		- identifier: function.alreadyNarrowedType
 
 services:
     - class: MolliePayments\Shopware\PHPStan\Rules\NoManufacturerRule
