@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\RefundManager;
+namespace MolliePayments\Shopware\Tests\Components\RefundManager;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Refund\RefundStarted\RefundStartedEvent;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
@@ -14,13 +14,13 @@ use Kiener\MolliePayments\Service\MollieApi\Order;
 use Kiener\MolliePayments\Service\Refund\RefundCreditNoteService;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
-use MolliePayments\Tests\Fakes\FakeOrderService;
-use MolliePayments\Tests\Fakes\FakeRefundService;
-use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
-use MolliePayments\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
-use MolliePayments\Tests\Fakes\Repositories\FakeRefundRepository;
-use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
-use MolliePayments\Tests\Traits\MockTrait;
+use MolliePayments\Shopware\Tests\Fakes\FakeOrderService;
+use MolliePayments\Shopware\Tests\Fakes\FakeRefundService;
+use MolliePayments\Shopware\Tests\Fakes\FlowBuilder\FakeFlowBuilderDispatcher;
+use MolliePayments\Shopware\Tests\Fakes\FlowBuilder\FakeFlowBuilderFactory;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeRefundRepository;
+use MolliePayments\Shopware\Tests\Fakes\StockUpdater\FakeStockManager;
+use MolliePayments\Shopware\Tests\Traits\MockTrait;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

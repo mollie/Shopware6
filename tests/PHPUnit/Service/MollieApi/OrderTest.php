@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
@@ -17,7 +17,7 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Types\OrderLineType;
-use MolliePayments\Tests\Traits\BuilderTestTrait;
+use MolliePayments\Shopware\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;

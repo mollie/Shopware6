@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionCancellation;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\SubscriptionCancellation;
 
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
 use PHPUnit\Framework\Attributes\Group;

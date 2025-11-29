@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
+namespace Kiener\MolliePayments\Shopware\Tests\Service\ApplePayDirect\Models;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
-use MolliePayments\Tests\Fakes\FakeTranslator;
+use MolliePayments\Shopware\Tests\Fakes\FakeTranslator;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\HttpFoundation\RequestStack;

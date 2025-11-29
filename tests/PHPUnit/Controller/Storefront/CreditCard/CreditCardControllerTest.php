@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Controller\Storefront\CreditCard;
+namespace MolliePayments\Shopware\Tests\Controller\Storefront\CreditCard;
 
 use Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase;
-use MolliePayments\Tests\Fakes\FakeCustomerService;
-use MolliePayments\Tests\Fakes\FakeMandateService;
+use MolliePayments\Shopware\Tests\Fakes\FakeCustomerService;
+use MolliePayments\Shopware\Tests\Fakes\FakeMandateService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;

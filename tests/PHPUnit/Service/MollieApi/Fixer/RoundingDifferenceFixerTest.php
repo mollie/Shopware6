@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Fixer;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Fixer;
 
 use Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer;
 use Kiener\MolliePayments\Struct\LineItemPriceStruct;

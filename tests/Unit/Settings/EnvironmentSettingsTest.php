@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Unit\Settings;
+namespace Mollie\Shopware\Unit\Settings;
 
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use PHPUnit\Framework\TestCase;

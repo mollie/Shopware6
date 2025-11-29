@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
@@ -30,10 +30,10 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
-use MolliePayments\Tests\Fakes\FakeEventDispatcher;
-use MolliePayments\Tests\Fakes\FakePluginSettings;
-use MolliePayments\Tests\Traits\OrderTrait;
-use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
+use MolliePayments\Shopware\Tests\Fakes\FakeEventDispatcher;
+use MolliePayments\Shopware\Tests\Fakes\FakePluginSettings;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

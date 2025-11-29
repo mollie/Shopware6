@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct\LineItem;
+namespace MolliePayments\Shopware\Tests\Struct\LineItem;
 
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Voucher\VoucherType;

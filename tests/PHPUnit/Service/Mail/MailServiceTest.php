@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Mail;
+namespace MolliePayments\Shopware\Tests\Service\Mail;
 
 use Kiener\MolliePayments\Service\Mail\MailService;
 use League\Flysystem\FilesystemInterface;

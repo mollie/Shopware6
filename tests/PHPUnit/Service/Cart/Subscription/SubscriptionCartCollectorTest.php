@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Cart\Subscription;
+namespace MolliePayments\Shopware\Tests\Service\Cart\Subscription;
 
 use Kiener\MolliePayments\Event\MollieSubscriptionCartItemAddedEvent;
 use Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionCartCollector;
