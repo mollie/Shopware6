@@ -28,12 +28,7 @@ final class PluginSettingsHandler extends AbstractHandler
         $this->settingsService = $settingsService;
     }
 
-    /**
-     * We need to define types here because shopware 6.4 uses old monologger where LogRecord does not exists.
-     *
-     * @param array|LogRecord $record
-     */
-    public function handle($record): bool
+    public function handle(LogRecord $record): bool
     {
         if ($this->isConnected() === false) {
             return false;

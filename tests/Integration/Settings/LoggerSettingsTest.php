@@ -32,7 +32,7 @@ final class LoggerSettingsTest extends TestCase
 
         $devMode = (bool) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', false);
         $cypressMode = (bool) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', false);
-        $settingsService = new SettingsService($this->getContainer(), $devMode, $cypressMode);
+        $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
 
         $actualSettings = $settingsService->getLoggerSettings();
 

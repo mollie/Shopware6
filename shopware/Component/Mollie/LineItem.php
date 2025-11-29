@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -32,12 +34,20 @@ final class LineItem implements \JsonSerializable
 
     public static function fromDelivery(OrderDeliveryEntity $delivery, CurrencyEntity $currency): self
     {
-        $shippingCosts = $delivery->getShippingCosts();
         $shippingMethod = $delivery->getShippingMethod();
+        if (! $shippingMethod instanceof ShippingMethodEntity) {
+            throw new \Exception('Shipping method is not exists');
+        }
+        $shippingCosts = $delivery->getShippingCosts();
+
         /** @var CalculatedTax $calculatedTax */
         $calculatedTax = $shippingCosts->getCalculatedTaxes()->first();
 
-        $lineItem = new self($shippingMethod->getName(), $shippingCosts->getQuantity(), new Money($shippingCosts->getUnitPrice(), $currency->getIsoCode()), new Money($shippingCosts->getTotalPrice(), $currency->getIsoCode()));
+        if (! $calculatedTax instanceof CalculatedTax) {
+            throw new \Exception('Shipping costs not exists');
+        }
+
+        $lineItem = new self((string) $shippingMethod->getName(), $shippingCosts->getQuantity(), new Money($shippingCosts->getUnitPrice(), $currency->getIsoCode()), new Money($shippingCosts->getTotalPrice(), $currency->getIsoCode()));
         $lineItem->setType(new LineItemType(LineItemType::SHIPPING));
         $lineItem->setVatAmount(new Money($calculatedTax->getTax(), $currency->getIsoCode()));
         $lineItem->setVatRate((string) $calculatedTax->getTaxRate());
@@ -52,6 +62,9 @@ final class LineItem implements \JsonSerializable
 
         $product = $orderLineItem->getProduct();
         $linItemPrice = $orderLineItem->getPrice();
+        if (! $linItemPrice instanceof CalculatedPrice) {
+            throw new \Exception('Line item price is not set'); // TODO: custom exception
+        }
         /** @var CalculatedTax $taxes */
         $taxes = $linItemPrice->getCalculatedTaxes()->first();
 

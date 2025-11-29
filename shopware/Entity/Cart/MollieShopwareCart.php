@@ -6,18 +6,18 @@ namespace Mollie\Shopware\Entity\Cart;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Framework\Struct\ArrayStruct;
-use Shopware\Core\Framework\Struct\Struct;
 
 class MollieShopwareCart
 {
     private Cart $cart;
 
-    private ?Struct $cartExtension;
+    private ArrayStruct $cartExtension;
 
     public function __construct(Cart $cart)
     {
         $this->cart = $cart;
-        $this->cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
+        $extension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY) ?? new ArrayStruct();
+        $this->cartExtension = new ArrayStruct($extension->getVars());
     }
 
     public function getCart(): Cart
@@ -42,7 +42,7 @@ class MollieShopwareCart
 
     public function setDataProtectionAccepted(int $accepted): void
     {
-        $this->cartExtension[CustomFieldsInterface::ACCEPTED_DATA_PROTECTION] = $accepted;
+        $this->setExtensionKey(CustomFieldsInterface::ACCEPTED_DATA_PROTECTION, (string) $accepted);
     }
 
     // <editor-fold desc="paypal-express">
@@ -100,12 +100,13 @@ class MollieShopwareCart
 
     // </editor-fold>
 
+    /**
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
     private function getExtensionKey(string $key, $defaultValue)
     {
-        if (! $this->cartExtension instanceof Struct) {
-            return $defaultValue;
-        }
-
         if (! array_key_exists($key, $this->cartExtension->getVars())) {
             return $defaultValue;
         }
@@ -113,7 +114,7 @@ class MollieShopwareCart
         return $this->cartExtension[$key];
     }
 
-    private function setExtensionKey(string $key, string $value): void
+    private function setExtensionKey(string $key,string $value): void
     {
         $this->prepareExtension();
 
@@ -122,10 +123,6 @@ class MollieShopwareCart
 
     private function clearExtensionKey(string $key): void
     {
-        if (! $this->cartExtension instanceof Struct) {
-            return;
-        }
-
         if (! array_key_exists($key, $this->cartExtension->getVars())) {
             return;
         }
@@ -135,12 +132,6 @@ class MollieShopwareCart
 
     private function prepareExtension(): void
     {
-        if ($this->cartExtension instanceof Struct) {
-            return;
-        }
-
-        $this->cartExtension = new ArrayStruct([]);
-
         $this->cart->addExtension(CustomFieldsInterface::MOLLIE_KEY, $this->cartExtension);
     }
 }
