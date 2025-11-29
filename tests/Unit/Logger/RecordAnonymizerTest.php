@@ -7,9 +7,6 @@ use Mollie\Shopware\Component\Logger\RecordAnonymizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \Mollie\Shopware\Component\Logger\RecordAnonymizer
- */
 #[CoversClass(RecordAnonymizer::class)]
 final class RecordAnonymizerTest extends TestCase
 {

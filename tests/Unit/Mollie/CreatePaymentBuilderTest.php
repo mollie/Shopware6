@@ -12,8 +12,10 @@ use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(CreatePaymentBuilder::class)]
 final class CreatePaymentBuilderTest extends TestCase
 {
     public function testBuild(): void

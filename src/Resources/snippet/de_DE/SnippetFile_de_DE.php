@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Resources\snippet\de_DE;
 
-use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
+use Shopware\Core\System\Snippet\Files\AbstractSnippetFile;
 
-class SnippetFile_de_DE implements SnippetFileInterface
+class SnippetFile_de_DE extends AbstractSnippetFile
 {
     public function getName(): string
     {
