@@ -38,7 +38,7 @@ parameters:
     		- identifier: attribute.notFound
 
 services:
-    - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
+    - class: MolliePayments\Shopware\PHPStan\Rules\NoManufacturerRule
       tags:
         - phpstan.rules.rule
 

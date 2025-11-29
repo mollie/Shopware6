@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\AlmaPayment;

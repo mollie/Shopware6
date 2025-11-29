@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Service\ApplePayDirect\Models;
+namespace MolliePayments\Shopware\Tests\Service\ApplePayDirect\Models;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use PHPUnit\Framework\TestCase;
