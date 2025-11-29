@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PHPUnit\Components\Subscription\Services\Builder;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\Builder;
 
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
 use PHPUnit\Framework\Attributes\TestWith;
