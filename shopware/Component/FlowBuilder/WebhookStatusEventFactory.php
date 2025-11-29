@@ -18,6 +18,9 @@ use Shopware\Core\Framework\Context;
 
 final class WebhookStatusEventFactory
 {
+    /**
+     * @return array<int,class-string>
+     */
     public function getEventList(): array
     {
         return array_values($this->getMapping());
@@ -26,6 +29,7 @@ final class WebhookStatusEventFactory
     public function create(Payment $payment, OrderEntity $order, Context $context): WebhookEvent
     {
         $mapping = $this->getMapping();
+        /** @var ?WebhookEvent $class */
         $class = $mapping[(string) $payment->getStatus()] ?? null;
         if (null === $class) {
             throw new InvalidWebhookStatusMapping((string) $payment->getStatus());
@@ -34,6 +38,9 @@ final class WebhookStatusEventFactory
         return new $class($payment, $order, $context);
     }
 
+    /**
+     * @return array<string,class-string>
+     */
     private function getMapping(): array
     {
         return [

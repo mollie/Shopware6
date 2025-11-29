@@ -10,6 +10,9 @@ final class PaymentMethodRepository
     /** @var CompatibilityPaymentHandler[] */
     private array $paymentMethods;
 
+    /**
+     * @param CompatibilityPaymentHandler[] $paymentMethods
+     */
     public function __construct(array $paymentMethods)
     {
         foreach ($paymentMethods as $paymentMethod) {
@@ -20,5 +23,13 @@ final class PaymentMethodRepository
     public function addPaymentMethod(CompatibilityPaymentHandler $paymentMethod): void
     {
         $this->paymentMethods[] = $paymentMethod;
+    }
+
+    /**
+     * @return CompatibilityPaymentHandler[]
+     */
+    public function getPaymentMethods(): array
+    {
+        return $this->paymentMethods;
     }
 }

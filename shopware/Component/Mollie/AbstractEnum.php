@@ -20,5 +20,8 @@ abstract class AbstractEnum implements \Stringable
         return $this->value;
     }
 
+    /**
+     * @return array<mixed>
+     */
     abstract protected function getPossibleValues(): array;
 }

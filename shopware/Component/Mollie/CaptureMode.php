@@ -8,6 +8,9 @@ final class CaptureMode extends AbstractEnum
     public const MANUAL = 'manual';
     public const AUTOMATIC = 'automatic';
 
+    /**
+     * @return string[]
+     */
     protected function getPossibleValues(): array
     {
         return [

@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Payment\Action;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilderInterface;
-use Mollie\shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
@@ -61,7 +61,11 @@ final class Pay
 
         $this->processPaymentStatus($paymentHandler, $transaction, $context);
 
-        $redirectUrl = $payment->getCheckoutUrl() ?? $shopwareFinalizeUrl;
+        $redirectUrl = $payment->getCheckoutUrl();
+        if (mb_strlen($redirectUrl) === 0) {
+            $redirectUrl = $shopwareFinalizeUrl;
+        }
+
         $this->logger->info('Mollie checkout finished, redirecting to payment provider', [
             'transactionId' => $transaction->getOrderTransactionId(),
             'redirectUrl' => $redirectUrl,
