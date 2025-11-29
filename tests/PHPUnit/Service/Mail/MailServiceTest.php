@@ -123,7 +123,7 @@ class MailServiceTest extends TestCase
             ],
             '2. German support, binary attachment' => [
                 [
-                   'expectedTo' => self::RECIPIENT_DE,
+                    'expectedTo' => self::RECIPIENT_DE,
                 ],
                 self::buildMailArrayData(
                     'Help needed',
