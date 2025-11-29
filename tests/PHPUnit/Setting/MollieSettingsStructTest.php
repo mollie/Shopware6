@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Setting;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MollieSettingsStructTest extends TestCase
@@ -12,10 +13,9 @@ final class MollieSettingsStructTest extends TestCase
     /**
      * test to get a maximum range of order life time days
      *
-     * @dataProvider orderLifeTimeDaysData
-     *
      * @param mixed $lifeTimeDays
      */
+    #[DataProvider('orderLifeTimeDaysData')]
     public function testGetOrderLifetimeDays($lifeTimeDays, ?int $realLifeTimeDays)
     {
         $settingsStruct = new MollieSettingStruct();
@@ -30,12 +30,11 @@ final class MollieSettingsStructTest extends TestCase
     /**
      * test get the correct calculation based on oderLifetimeDays config
      *
-     * @dataProvider orderLifeTimeDaysData
-     *
      * @param mixed $lifeTimeDays
      *
      * @throws \Exception
      */
+    #[DataProvider('orderLifeTimeDaysData')]
     public function testGetOrderLifetimeDate($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
         $settingsStruct = new MollieSettingStruct();
@@ -47,7 +46,7 @@ final class MollieSettingsStructTest extends TestCase
         $this->assertSame($expectedDateString, $actualValue);
     }
 
-    public function orderLifeTimeDaysData()
+    public static function orderLifeTimeDaysData()
     {
         $today = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'));
 
@@ -64,10 +63,9 @@ final class MollieSettingsStructTest extends TestCase
     /**
      * test get the correct calculation based on paymentMethodBankTransferDueDateDays config
      *
-     * @dataProvider orderBankTransferDueDays
-     *
      * @param mixed $lifeTimeDays
      */
+    #[DataProvider('orderBankTransferDueDays')]
     public function testBankTransferDueDays($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
         $settingsStruct = new MollieSettingStruct();
@@ -82,12 +80,11 @@ final class MollieSettingsStructTest extends TestCase
     /**
      * test to get correct value range based on paymentMethodBankTransferDueDateDays config
      *
-     * @dataProvider orderBankTransferDueDays
-     *
      * @param mixed $lifeTimeDays
      *
      * @throws \Exception
      */
+    #[DataProvider('orderBankTransferDueDays')]
     public function testBankTransferDueDate($lifeTimeDays, ?int $realLifeTimeDays, ?string $expectedDateString)
     {
         $settingsStruct = new MollieSettingStruct();
@@ -100,7 +97,7 @@ final class MollieSettingsStructTest extends TestCase
         $this->assertSame($expectedDateString, $actualValue);
     }
 
-    public function orderBankTransferDueDays()
+    public static function orderBankTransferDueDays()
     {
         $today = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'));
 
