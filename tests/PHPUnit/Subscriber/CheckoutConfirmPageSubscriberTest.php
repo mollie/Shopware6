@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
@@ -170,9 +171,8 @@ class CheckoutConfirmPageSubscriberTest extends TestCase
 
     /**
      * Test if subscribed events contains checkout confirm page loaded event.
-     *
-     * @testdox Subscriber has the expected subscribed events.
      */
+    #[TestDox('Subscriber has the expected subscribed events.')]
     public function testSubscribedEvents(): void
     {
         $expected = CheckoutConfirmPageLoadedEvent::class;

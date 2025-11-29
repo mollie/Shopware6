@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;
 use Kiener\MolliePayments\Struct\MollieLineItemCollection;
 use Mollie\Api\Types\OrderLineType;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class RoundingDifferenceFixerTest extends TestCase
@@ -103,12 +104,11 @@ class RoundingDifferenceFixerTest extends TestCase
      * This test verifies that the new sum of the cart amount is the
      * one that we told the fixe when running it.
      * So we add a diff, and then make sure the sum of all items is correct.
-     *
-     * @testWith       [  0.50 ]
-     *                 [ -0.50 ]
-     *                 [  0.01 ]
-     *                 [ -0.01 ]
      */
+    #[TestWith([0.50])]
+    #[TestWith([-0.50])]
+    #[TestWith([0.01])]
+    #[TestWith([-0.01])]
     public function testDiffItemLeadsToCorrectItemSum(float $diff): void
     {
         $newLines = $this->fixer->fixAmountDiff($this->orderTotal + $diff, $this->cartItems, '', '');

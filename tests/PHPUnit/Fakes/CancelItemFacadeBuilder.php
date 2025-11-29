@@ -14,6 +14,7 @@ use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use MolliePayments\Tests\Fakes\Repositories\FakeOrderLineItemRepository;
 use MolliePayments\Tests\Fakes\StockUpdater\FakeStockManager;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -40,14 +41,14 @@ class CancelItemFacadeBuilder
     {
         $this->testCase = $testCase;
 
-        $this->mollieClient = $testCase->getMockBuilder(MollieApiClient::class)->disableOriginalConstructor()->getMock();
+        $this->mollieClient = $this->getMockBuilder(MollieApiClient::class)->disableOriginalConstructor()->getMock();
         $this->itemCollection = new OrderLineItemCollection();
         $this->stockManager = new FakeStockManager();
     }
 
     public function withInvalidOrder(): self
     {
-        $mockOrderEndpoint = $this->testCase->getMockBuilder(OrderEndpoint::class)->disableOriginalConstructor()->getMock();
+        $mockOrderEndpoint = $this->getMockBuilder(OrderEndpoint::class)->disableOriginalConstructor()->getMock();
         $mockOrderEndpoint->method('get')->willThrowException(new ApiException('Invalid order'));
 
         $this->mollieClient->orders = $mockOrderEndpoint;
@@ -57,17 +58,17 @@ class CancelItemFacadeBuilder
 
     public function withDefaultOrder(): self
     {
-        $mockOrderLine = $this->testCase->getMockBuilder(OrderLine::class)->disableOriginalConstructor()->getMock();
+        $mockOrderLine = $this->getMockBuilder(OrderLine::class)->disableOriginalConstructor()->getMock();
         $mockOrderLine->cancelableQuantity = 2;
         $mockOrderLine->id = 'valid';
 
         $oderLineCollection = new OrderLineCollection(1, null);
         $oderLineCollection[0] = $mockOrderLine;
 
-        $mockOrder = $this->testCase->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $mockOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $mockOrder->method('lines')->willReturn($oderLineCollection);
 
-        $mockOrderEndpoint = $this->testCase->getMockBuilder(OrderEndpoint::class)->disableOriginalConstructor()->getMock();
+        $mockOrderEndpoint = $this->getMockBuilder(OrderEndpoint::class)->disableOriginalConstructor()->getMock();
         $mockOrderEndpoint->method('get')->willReturn($mockOrder);
 
         $this->mollieClient->orders = $mockOrderEndpoint;
@@ -98,11 +99,16 @@ class CancelItemFacadeBuilder
     public function bild(): CancelItemFacade
     {
         /** @var MollieApiFactory $mollieFactory */
-        $mollieFactory = $this->testCase->getMockBuilder(MollieApiFactory::class)->disableOriginalConstructor()->getMock();
+        $mollieFactory = $this->getMockBuilder(MollieApiFactory::class)->disableOriginalConstructor()->getMock();
         $mollieFactory->method('getClient')->willReturn($this->mollieClient);
-        $dispatcher = $this->testCase->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $orderLineRepository = new FakeOrderLineItemRepository($this->itemCollection);
 
         return new CancelItemFacade($mollieFactory, $orderLineRepository, $this->stockManager, $dispatcher, new NullLogger());
+    }
+
+    private function getMockBuilder(string $className): MockBuilder
+    {
+        return new MockBuilder($this->testCase, $className);
     }
 }

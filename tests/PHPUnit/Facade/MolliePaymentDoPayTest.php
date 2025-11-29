@@ -15,6 +15,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use MolliePayments\Tests\Fakes\FakeSubscriptionManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -100,9 +101,8 @@ class MolliePaymentDoPayTest extends TestCase
     /**
      * @throws CouldNotCreateMollieCustomerException
      * @throws CustomerCouldNotBeFoundException
-     *
-     * @dataProvider createMollieCustomerIsCalledTestData
      */
+    #[DataProvider('createMollieCustomerIsCalledTestData')]
     public function testIfCreateMollieCustomerIsCalled(
         bool $customerIsGuest,
         bool $createCustomersAtMollie,
@@ -127,7 +127,7 @@ class MolliePaymentDoPayTest extends TestCase
         $this->payFacade->createCustomerAtMollie($this->order, $this->salesChannelContext);
     }
 
-    public function createMollieCustomerIsCalledTestData()
+    public static function createMollieCustomerIsCalledTestData()
     {
         return [
             'customer is not a guest, create customers on => create customer' => [

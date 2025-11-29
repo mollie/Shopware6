@@ -71,7 +71,7 @@ class SubscriptionCartCollectorTest extends TestCase
     private function createLineItemMockWithPayloadValue($value): CheckoutCartLineItem
     {
         return (new CheckoutCartLineItem(
-            Uuid::randomBytes(),
+            Uuid::randomHex(),
             'product'
         ))->setPayload(['customFields' => $value]);
     }

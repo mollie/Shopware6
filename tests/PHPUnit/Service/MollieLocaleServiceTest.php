@@ -5,10 +5,13 @@ namespace Kiener\MolliePayments\Tests\Service;
 
 use Kiener\MolliePayments\Service\MollieLocaleService;
 use MolliePayments\Tests\Fakes\Repositories\FakeLanguageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Shopware\Core\Test\TestDefaults;
 
 class MollieLocaleServiceTest extends TestCase
 {
@@ -25,6 +28,10 @@ class MollieLocaleServiceTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
+        $fakeSalesChannel = new SalesChannelEntity();
+        $fakeSalesChannel->setId(TestDefaults::SALES_CHANNEL);
+        $fakeSalesChannel->setLanguageId('test');
+        $this->fakeSalesChannelContext->method('getSalesChannel')->willReturn($fakeSalesChannel);
     }
 
     /**
@@ -47,9 +54,8 @@ class MollieLocaleServiceTest extends TestCase
      * This test verifies that a locale is correctly returned from a sales channel if available.
      * We fake the repository that returns us a given locale for our sales channel.
      * That locale is in the list of available locales and should therefore be correctly returned in our function.
-     *
-     * @dataProvider getAvailableLocales
      */
+    #[DataProvider('getAvailableLocales')]
     public function testAvailableLocalesAreFound(string $locale): void
     {
         $scLanguage = $this->buildSalesChannelLanguage($locale);
@@ -66,7 +72,7 @@ class MollieLocaleServiceTest extends TestCase
     /**
      * @return string[]
      */
-    public function getAvailableLocales(): array
+    public static function getAvailableLocales(): array
     {
         return [
             ['en_US'],
@@ -124,9 +130,7 @@ class MollieLocaleServiceTest extends TestCase
         $this->assertEquals('en_GB', $detectedLocale);
     }
 
-    /**
-     * @dataProvider mollieLocaleDataProvider
-     */
+    #[DataProvider('mollieLocaleDataProvider')]
     public function testProvidesMollieLocale(string $input, string $expected): void
     {
         $service = new MollieLocaleService(new FakeLanguageRepository(null));
@@ -134,7 +138,7 @@ class MollieLocaleServiceTest extends TestCase
         $this->assertEquals($expected, $service->getMollieLocale($input));
     }
 
-    public function mollieLocaleDataProvider(): array
+    public static function mollieLocaleDataProvider(): array
     {
         return [
             'en_US' => ['en-US', 'en_US'],
