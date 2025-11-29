@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Components\ApplePayDirect\Services;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomainSanitizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ApplePayDirectDomainSanitizerTest extends TestCase
@@ -15,9 +16,7 @@ class ApplePayDirectDomainSanitizerTest extends TestCase
         $this->sanitizer = new ApplePayDirectDomainSanitizer();
     }
 
-    /**
-     * @dataProvider sanitationTestDataProvider
-     */
+    #[DataProvider('sanitationTestDataProvider')]
     public function testProvidesSanitizedDomain(string $url, string $expected): void
     {
         $sanitizedUrl = $this->sanitizer->sanitizeDomain($url);
@@ -25,7 +24,7 @@ class ApplePayDirectDomainSanitizerTest extends TestCase
         $this->assertEquals($expected, $sanitizedUrl);
     }
 
-    public function sanitationTestDataProvider(): array
+    public static function sanitationTestDataProvider(): array
     {
         return [
             'removes http value if provided' => ['http://example.com', 'example.com'],

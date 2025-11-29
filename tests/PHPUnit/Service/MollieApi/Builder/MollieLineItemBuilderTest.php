@@ -16,6 +16,7 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Api\Types\OrderLineType;
 use MolliePayments\Tests\Traits\OrderTrait;
 use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -74,9 +75,8 @@ class MollieLineItemBuilderTest extends TestCase
     /**
      * This test verifies that our structure of a single line item is correct
      * and working for the Mollie API as payload.
-     *
-     * @dataProvider getStructureData
      */
+    #[DataProvider('getStructureData')]
     public function testLineItemStructure(string $itemType, string $mollieLineType): void
     {
         $item1 = $this->getOrderLineItem(
@@ -137,7 +137,7 @@ class MollieLineItemBuilderTest extends TestCase
     /**
      * @return array<mixed>[]
      */
-    public function getStructureData(): array
+    public static function getStructureData(): array
     {
         return [
             'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::TYPE_PHYSICAL],
@@ -196,10 +196,9 @@ class MollieLineItemBuilderTest extends TestCase
      * and depending on our fixing configuration, a new (diff) line item is then added or not.
      * In the end the sum of the line items has to match our expected orderTotal amount.
      *
-     * @dataProvider getRoundingFixerData
-     *
      * @return void
      */
+    #[DataProvider('getRoundingFixerData')]
     public function testRoundingFixerIsUsedCorrectly(bool $fixRoundingIssues, float $swItemUnitPrice, float $swOrderTotal, int $lineItemCount, float $expectedOrderSum)
     {
         $settings = new MollieSettingStruct();
@@ -246,7 +245,7 @@ class MollieLineItemBuilderTest extends TestCase
     /**
      * @return array[]
      */
-    public function getRoundingFixerData(): array
+    public static function getRoundingFixerData(): array
     {
         return [
             'Enable Fixing, but not difference, items remain the same' => [true, 2.73, 2.73, 1, 2.73],

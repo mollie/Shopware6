@@ -119,7 +119,7 @@ phpcheck: ##3 Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
 phpmin: ##3 Starts the PHP compatibility checks
-	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.0 ./src ./shopware
+	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.2 ./src ./shopware
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
