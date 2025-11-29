@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace MolliePayments\Tests\Components\Installer;
 
+use Doctrine\DBAL\Cache\ArrayResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Result;
 use Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
@@ -12,6 +13,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -106,21 +108,37 @@ class MailTemplateInstallerTest extends TestCase
 
         $enLangId = 'foo';
         $deLangId = 'bar';
+        $defaultLanguageId = Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM);
 
         $this->setupConnection($enLangId, $deLangId);
-
+        $matcher = $this->exactly(4);
         $this->connection
-            ->expects($this->exactly(4))
+            ->expects($matcher)
             ->method('insert')
-            ->withConsecutive(
-                [$this->equalTo('mail_template_type'), $this->isType(IsType::TYPE_ARRAY)],
-                [$this->equalTo('mail_template_type_translation'), $this->containsEqual($enLangId)],
-                [$this->equalTo('mail_template_type_translation'), $this->containsEqual($deLangId)],
-                [
-                    $this->equalTo('mail_template_type_translation'),
-                    $this->containsEqual(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM)),
-                ],
-            )
+            ->willReturnCallback(function (string $tableName,array $data) use ($matcher,$enLangId,$deLangId,$defaultLanguageId) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals('mail_template_type',$tableName);
+                    $this->assertIsArray($data);
+
+                    return 1;
+                }
+                $this->assertEquals('mail_template_type_translation',$tableName);
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertContainsEquals($enLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertContainsEquals($deLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 4) {
+                    $this->assertContainsEquals($defaultLanguageId,$data);
+
+                    return 1;
+                }
+            })
         ;
 
         $this->repoMailTypes
@@ -148,15 +166,30 @@ class MailTemplateInstallerTest extends TestCase
         $deLangId = 'bar';
 
         $this->setupConnection($enLangId, $deLangId);
+        $matcher = $this->exactly(3);
 
         $this->connection
-            ->expects($this->exactly(3))
+            ->expects($matcher)
             ->method('insert')
-            ->withConsecutive(
-                [$this->equalTo('mail_template_type'), $this->isType(IsType::TYPE_ARRAY)],
-                [$this->equalTo('mail_template_type_translation'), $this->containsEqual($enLangId)],
-                [$this->equalTo('mail_template_type_translation'), $this->containsEqual($deLangId)],
-            )
+            ->willReturnCallback(function (string $tableName,array $data) use ($matcher,$enLangId,$deLangId) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals('mail_template_type',$tableName);
+                    $this->assertIsArray($data);
+
+                    return 1;
+                }
+                $this->assertEquals('mail_template_type_translation',$tableName);
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertContainsEquals($enLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertContainsEquals($deLangId,$data);
+
+                    return 1;
+                }
+            })
         ;
 
         $this->repoMailTypes
@@ -184,15 +217,29 @@ class MailTemplateInstallerTest extends TestCase
         $deLangId = Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM);
 
         $this->setupConnection($enLangId, $deLangId);
+        $matcher = $this->exactly(3);
 
         $this->connection
-            ->expects($this->exactly(3))
+            ->expects($matcher)
             ->method('insert')
-            ->withConsecutive(
-                [$this->equalTo('mail_template_type'), $this->isType(IsType::TYPE_ARRAY)],
-                [$this->equalTo('mail_template_type_translation'), $this->containsEqual($enLangId)],
-                [$this->equalTo('mail_template_type_translation'), $this->containsEqual($deLangId)],
-            )
+            ->willReturnCallback(function (string $tableName,array $data) use ($matcher,$enLangId,$deLangId) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertSame('mail_template_type',$tableName);
+
+                    return 1;
+                }
+                $this->assertSame('mail_template_type_translation',$tableName);
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertContainsEquals($enLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertContainsEquals($deLangId,$data);
+
+                    return 1;
+                }
+            })
         ;
 
         $this->repoMailTypes
@@ -220,21 +267,38 @@ class MailTemplateInstallerTest extends TestCase
 
         $enLangId = 'foo';
         $deLangId = 'bar';
+        $defaultLanguageId = Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM);
 
         $this->setupConnection($enLangId, $deLangId);
-
+        $matcher = $this->exactly(4);
         $this->connection
-            ->expects($this->exactly(4))
+            ->expects($matcher)
             ->method('insert')
-            ->withConsecutive(
-                [$this->equalTo('mail_template'), $this->isType(IsType::TYPE_ARRAY)],
-                [$this->equalTo('mail_template_translation'), $this->containsEqual($enLangId)],
-                [$this->equalTo('mail_template_translation'), $this->containsEqual($deLangId)],
-                [
-                    $this->equalTo('mail_template_translation'),
-                    $this->containsEqual(Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM)),
-                ],
-            )
+            ->willReturnCallback(function (string $tableName,array $data) use ($matcher,$enLangId,$deLangId,$defaultLanguageId) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertSame('mail_template',$tableName);
+                    $this->assertIsArray($data);
+
+                    return 1;
+                }
+
+                $this->assertSame('mail_template_translation',$tableName);
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertContainsEquals($enLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertContainsEquals($deLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 4) {
+                    $this->assertContainsEquals($defaultLanguageId,$data);
+
+                    return 1;
+                }
+            })
         ;
 
         $this->repoMailTypes
@@ -262,15 +326,29 @@ class MailTemplateInstallerTest extends TestCase
         $deLangId = 'bar';
 
         $this->setupConnection($enLangId, $deLangId);
-
+        $matcher = $this->exactly(3);
         $this->connection
-            ->expects($this->exactly(3))
+            ->expects($matcher)
             ->method('insert')
-            ->withConsecutive(
-                [$this->equalTo('mail_template'), $this->isType(IsType::TYPE_ARRAY)],
-                [$this->equalTo('mail_template_translation'), $this->containsEqual($enLangId)],
-                [$this->equalTo('mail_template_translation'), $this->containsEqual($deLangId)],
-            )
+            ->willReturnCallback(function (string $tableName,array $data) use ($matcher,$enLangId,$deLangId) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertSame('mail_template',$tableName);
+                    $this->assertIsArray($data);
+
+                    return 1;
+                }
+                $this->assertSame('mail_template_translation',$tableName);
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertContainsEquals($enLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertContainsEquals($deLangId,$data);
+
+                    return 1;
+                }
+            })
         ;
 
         $this->repoMailTypes
@@ -298,15 +376,29 @@ class MailTemplateInstallerTest extends TestCase
         $deLangId = Uuid::fromHexToBytes(Defaults::LANGUAGE_SYSTEM);
 
         $this->setupConnection($enLangId, $deLangId);
-
+        $matcher = $this->exactly(3);
         $this->connection
-            ->expects($this->exactly(3))
+            ->expects($matcher)
             ->method('insert')
-            ->withConsecutive(
-                [$this->equalTo('mail_template'), $this->isType(IsType::TYPE_ARRAY)],
-                [$this->equalTo('mail_template_translation'), $this->containsEqual($enLangId)],
-                [$this->equalTo('mail_template_translation'), $this->containsEqual($deLangId)],
-            )
+            ->willReturnCallback(function (string $tableName,array $data) use ($matcher,$enLangId,$deLangId) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertSame($tableName,'mail_template');
+                    $this->assertIsArray($data);
+
+                    return 1;
+                }
+                $this->assertEquals('mail_template_translation',$tableName);
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertContainsEquals($enLangId,$data);
+
+                    return 1;
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertContains($deLangId,$data);
+
+                    return 1;
+                }
+            })
         ;
 
         $this->repoMailTypes
@@ -321,32 +413,30 @@ class MailTemplateInstallerTest extends TestCase
     // ----Connection----------------------------------------
     private function setupConnection($enLangId, $deLangId)
     {
-        $enResult = $this->createConfiguredMock(Result::class, [
-            'fetchColumn' => $enLangId,
-            'fetchOne' => $enLangId,
-        ]);
-        $deResult = $this->createConfiguredMock(Result::class, [
-            'fetchColumn' => $deLangId,
-            'fetchOne' => $deLangId,
-        ]);
+        $enResult = new Result(new ArrayResult([],[[$enLangId]]),$this->createMock(Connection::class));
+        $deResult = new Result(new ArrayResult([],[[$deLangId]]),$this->createMock(Connection::class));
 
+        $matcher = $this->atLeast(2);
         $this->connection
-            ->expects($this->atLeast(2))
+            ->expects($matcher)
             ->method('executeQuery')
-            ->withConsecutive(
-                [$this->isType(IsType::TYPE_STRING), $this->containsEqual('en-GB')],
-                [$this->isType(IsType::TYPE_STRING), $this->containsEqual('de-DE')],
-            )
-            ->willReturnOnConsecutiveCalls($enResult, $deResult)
+            ->willReturnCallback(function (string $sql,array $parameters) use ($enResult, $deResult) {
+                $code = $parameters['code'];
+
+                if ($code === 'en-GB') {
+                    return $enResult;
+                }
+                if ($code === 'de-DE') {
+                    return $deResult;
+                }
+            })
         ;
     }
 
     // ----MailType----------------------------------------
     private function setupMailTypeRepoWithoutData()
     {
-        $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds' => [],
-        ]);
+        $result = new IdSearchResult(0,[],new Criteria(),Context::createDefaultContext());
 
         $this->repoMailTypes->method('searchIds')->willReturn($result);
         $this->repoMailTypes->expects($this->once())->method('searchIds');
@@ -354,10 +444,13 @@ class MailTemplateInstallerTest extends TestCase
 
     private function setupMailTypeRepoWithExistingData($id)
     {
-        $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds' => [$id],
-            'firstId' => $id,
-        ]);
+        $data = [
+            'primaryKey' => $id,
+            'data' => [
+                'id' => $id,
+            ]
+        ];
+        $result = new IdSearchResult(1,[$data],new Criteria(),Context::createDefaultContext());
 
         $this->repoMailTypes->method('searchIds')->willReturn($result);
         $this->repoMailTypes->expects($this->once())->method('searchIds');
@@ -366,9 +459,7 @@ class MailTemplateInstallerTest extends TestCase
     // ----MailTemplate----------------------------------------
     private function setupMailTemplateRepoWithoutData()
     {
-        $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds' => [],
-        ]);
+        $result = new IdSearchResult(0,[],new Criteria(),Context::createDefaultContext());
 
         $this->repoMailTemplates->method('searchIds')->willReturn($result);
         $this->repoMailTemplates->expects($this->once())->method('searchIds');
@@ -376,11 +467,13 @@ class MailTemplateInstallerTest extends TestCase
 
     private function setupMailTemplateRepoWithExistingData($id)
     {
-        $result = $this->createConfiguredMock(IdSearchResult::class, [
-            'getIds' => [$id],
-            'firstId' => $id,
-        ]);
-
+        $data = [
+            'primaryKey' => $id,
+            'data' => [
+                'id' => $id,
+            ]
+        ];
+        $result = new IdSearchResult(1,[$data],new Criteria(),Context::createDefaultContext());
         $this->repoMailTemplates->method('searchIds')->willReturn($result);
         $this->repoMailTemplates->expects($this->once())->method('searchIds');
     }

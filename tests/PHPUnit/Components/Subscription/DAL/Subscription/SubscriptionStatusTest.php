@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Mollie\Api\Types\SubscriptionStatus as MollieSubscriptionStatus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionStatusTest extends TestCase
@@ -13,9 +14,8 @@ class SubscriptionStatusTest extends TestCase
      * This test verifies that our plugin status enum values
      * have the correct string values and that these are not
      * touched without recognizing it.
-     *
-     * @dataProvider getStatusStrings
      */
+    #[DataProvider('getStatusStrings')]
     public function testStatusValues(string $expected, string $status): void
     {
         static::assertSame($expected, $status);
@@ -24,7 +24,7 @@ class SubscriptionStatusTest extends TestCase
     /**
      * @return array[]
      */
-    public function getStatusStrings(): array
+    public static function getStatusStrings(): array
     {
         return [
             ['pending', SubscriptionStatus::PENDING],
@@ -41,9 +41,8 @@ class SubscriptionStatusTest extends TestCase
     /**
      * This test verifies that a status from the Mollie enum is
      * correctly converted into our advanced plugin status enum.
-     *
-     * @dataProvider getMollieStatus
      */
+    #[DataProvider('getMollieStatus')]
     public function testFromMollieStatus(string $expected, string $mollieStatus): void
     {
         $convertedStatus = SubscriptionStatus::fromMollieStatus($mollieStatus);
@@ -54,7 +53,7 @@ class SubscriptionStatusTest extends TestCase
     /**
      * @return array[]
      */
-    public function getMollieStatus(): array
+    public static function getMollieStatus(): array
     {
         return [
             [SubscriptionStatus::PENDING, MollieSubscriptionStatus::STATUS_PENDING],

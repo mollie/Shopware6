@@ -10,6 +10,7 @@ use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateCollection;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionEntity;
@@ -51,7 +52,6 @@ class OrderTransitionServiceTest extends TestCase
         $order->setId('orderId');
 
         $context = $this->createMock(Context::class);
-
         $this->stateMachineRegistry->expects($this->once())
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
@@ -146,10 +146,19 @@ class OrderTransitionServiceTest extends TestCase
             StateMachineTransitionActions::ACTION_REOPEN,
             'stateId'
         );
-
-        $this->stateMachineRegistry->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $this->stateMachineRegistry->expects($matcher)
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+            ->willReturnCallback(function (Transition $transition) use ($matcher,$expectedTransition1, $expectedTransition2) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+
+                return new StateMachineStateCollection();
+            })
         ;
 
         $this->orderTransitionService->openOrder($order, $context);
@@ -267,10 +276,20 @@ class OrderTransitionServiceTest extends TestCase
             StateMachineTransitionActions::ACTION_PROCESS,
             'stateId'
         );
+        $matcher = $this->exactly(2);
 
         $this->stateMachineRegistry->expects($this->exactly(2))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+            ->willReturnCallback(function (Transition $transition) use ($matcher, $expectedTransition1, $expectedTransition2) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+
+                return new StateMachineStateCollection();
+            })
         ;
 
         $this->orderTransitionService->processOrder($order, $context);
@@ -368,11 +387,12 @@ class OrderTransitionServiceTest extends TestCase
         $order->setStateMachineState($stateMachineState);
 
         $context = $this->createMock(Context::class);
-
-        $this->stateMachineRegistry->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $this->stateMachineRegistry->expects($matcher)
             ->method('getAvailableTransitions')
             ->with(OrderDefinition::ENTITY_NAME, 'orderId', 'stateId', $context)
-            ->willReturnOnConsecutiveCalls([$transition1], [$transition1])
+
+            ->willReturn([$transition1])
         ;
 
         $expectedTransition1 = new Transition(
@@ -388,10 +408,19 @@ class OrderTransitionServiceTest extends TestCase
             StateMachineTransitionActions::ACTION_COMPLETE,
             'stateId'
         );
-
-        $this->stateMachineRegistry->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $this->stateMachineRegistry->expects($matcher)
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+            ->willReturnCallback(function (Transition $transition) use ($matcher, $expectedTransition1, $expectedTransition2) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+
+                return new StateMachineStateCollection();
+            })
         ;
 
         $this->orderTransitionService->completeOrder($order, $context);
@@ -444,10 +473,22 @@ class OrderTransitionServiceTest extends TestCase
             StateMachineTransitionActions::ACTION_COMPLETE,
             'stateId'
         );
-
+        $matcher = $this->exactly(3);
         $this->stateMachineRegistry->expects($this->exactly(3))
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context], [$expectedTransition3, $context])
+            ->willReturnCallback(function (Transition $transition) use ($matcher,$expectedTransition1,$expectedTransition2,$expectedTransition3) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertEquals($expectedTransition3, $transition);
+                }
+
+                return new StateMachineStateCollection();
+            })
         ;
 
         $this->orderTransitionService->completeOrder($order, $context);
@@ -565,10 +606,19 @@ class OrderTransitionServiceTest extends TestCase
             StateMachineTransitionActions::ACTION_CANCEL,
             'stateId'
         );
-
-        $this->stateMachineRegistry->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $this->stateMachineRegistry->expects($matcher)
             ->method('transition')
-            ->withConsecutive([$expectedTransition1, $context], [$expectedTransition2, $context])
+            ->willReturnCallback(function (Transition $transition) use ($matcher,$expectedTransition1, $expectedTransition2) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+
+                return new StateMachineStateCollection();
+            })
         ;
 
         $this->orderTransitionService->cancelOrder($order, $context);

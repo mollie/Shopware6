@@ -60,14 +60,14 @@ final class AddressTest extends TestCase
 
     public function testExpectExceptionOnEmptyCustomer(): void
     {
-        $this->expectErrorMessage('Customer cannot be null');
+        $this->expectExceptionMessage('Customer cannot be null');
         $orderAddress = new OrderAddressEntity();
         $actual = Address::fromAddress(null, $orderAddress);
     }
 
     public function testExpectExceptionOnEmptyOrderAddress()
     {
-        $this->expectErrorMessage('Address should not be null');
+        $this->expectExceptionMessage('Address should not be null');
         $customer = new OrderCustomerEntity();
         $actual = Address::fromAddress($customer, null);
     }

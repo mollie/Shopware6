@@ -44,7 +44,7 @@ class MailService extends AbstractMailService
             $this->buildContents($data),
             [],
             [], // Additional data, but doesn't work properly.
-/** @phpstan-ignore argument.type */ $attachments
+            /** @phpstan-ignore argument.type */ $attachments
         );
 
         $mail->addReplyTo(...$this->formatMailAddresses([$data['replyToEmail'] => $data['replyToName']]));

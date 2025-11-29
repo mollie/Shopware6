@@ -5,6 +5,7 @@ namespace MolliePayments\Tests\Service\Mail;
 
 use Kiener\MolliePayments\Service\Mail\MailService;
 use League\Flysystem\FilesystemInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Content\Mail\Service\MailFactory;
 use Shopware\Core\Content\Mail\Service\MailSender;
@@ -36,7 +37,11 @@ class MailServiceTest extends TestCase
         $validator = $this->createConfiguredMock(ValidatorInterface::class, [
             'validate' => (new ConstraintViolationList()),
         ]);
+        if (! interface_exists(FilesystemInterface::class)) {
+            $this->mailFactory = new MailFactory($validator);
 
+            return;
+        }
         $fileSystem = $this->createConfiguredMock(FilesystemInterface::class, [
             'getMimetype' => 'application/fake',
         ]);
@@ -52,14 +57,13 @@ class MailServiceTest extends TestCase
      * This test verifies that we send the correct mail data
      * to the mail server.
      *
-     * @dataProvider getMailData
-     *
      * @param mixed $expectedData
      * @param mixed $mailData
      * @param mixed $attachments
      *
      * @return void
      */
+    #[DataProvider('getMailData')]
     public function testMailSenderGetsCorrectData($expectedData, $mailData, $attachments)
     {
         $expectedMail = $this->buildExpectedMailObject(
@@ -100,14 +104,14 @@ class MailServiceTest extends TestCase
         $mailService->send($mailData, $attachments);
     }
 
-    public function getMailData(): array
+    public static function getMailData(): array
     {
         return [
             '1. German support, no attachments' => [
                 [
                     'expectedTo' => self::RECIPIENT_DE,
                 ],
-                $this->buildMailArrayData(
+                self::buildMailArrayData(
                     'Help needed',
                     'localhost',
                     'de-DE',
@@ -119,9 +123,9 @@ class MailServiceTest extends TestCase
             ],
             '2. German support, binary attachment' => [
                 [
-                    'expectedTo' => self::RECIPIENT_DE,
+                   'expectedTo' => self::RECIPIENT_DE,
                 ],
-                $this->buildMailArrayData(
+                self::buildMailArrayData(
                     'Help needed',
                     'localhost',
                     'de-DE',
@@ -141,7 +145,7 @@ class MailServiceTest extends TestCase
                 [
                     'expectedTo' => self::RECIPIENT_INTL,
                 ],
-                $this->buildMailArrayData(
+                self::buildMailArrayData(
                     'Help needed',
                     'localhost',
                     'en-GB',
@@ -155,7 +159,7 @@ class MailServiceTest extends TestCase
                 [
                     'expectedTo' => self::RECIPIENT_INTL,
                 ],
-                $this->buildMailArrayData(
+                self::buildMailArrayData(
                     'Help needed',
                     'localhost',
                     '',
@@ -171,7 +175,7 @@ class MailServiceTest extends TestCase
     /**
      * @return string[]
      */
-    private function buildMailArrayData(string $subject, string $host, string $locale, string $html, string $replyName, string $replyMail)
+    private static function buildMailArrayData(string $subject, string $host, string $locale, string $html, string $replyName, string $replyMail)
     {
         return [
             'subject' => $subject,
