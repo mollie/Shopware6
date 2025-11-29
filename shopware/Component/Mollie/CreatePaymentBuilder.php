@@ -78,7 +78,6 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
 
         foreach ($deliveries as $delivery) {
-            /** @phpstan-ignore assert.alreadyNarrowedType */
             if (method_exists($order, 'getPrimaryOrderDeliveryId') && $order->getPrimaryOrderDeliveryId() !== null && $delivery->getId() === $order->getPrimaryOrderDeliveryId()) {
                 $shippingAddress = Address::fromAddress($customer, $delivery->getShippingOrderAddress());
             }
