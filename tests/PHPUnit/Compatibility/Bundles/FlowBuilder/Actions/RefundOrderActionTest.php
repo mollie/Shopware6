@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Shopware\Tests\Compatibility\Bundles\FlowBuilder\Actions;
+namespace MolliePayments\Shopware\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\RefundOrderAction;
 use MolliePayments\Shopware\Tests\Fakes\FakeOrderService;

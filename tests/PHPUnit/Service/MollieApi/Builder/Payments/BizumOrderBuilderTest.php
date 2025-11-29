@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PHPUnit\Service\MollieApi\Builder\Payments;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder\Payments;
 
 use Kiener\MolliePayments\Handler\Method\BizumPayment;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
