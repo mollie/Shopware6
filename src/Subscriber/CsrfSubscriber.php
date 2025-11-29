@@ -19,7 +19,7 @@ class CsrfSubscriber implements EventSubscriberInterface
         $this->versionCompare = new VersionCompare($shopwareVersion);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StorefrontRenderEvent::class => 'onStorefrontRender',

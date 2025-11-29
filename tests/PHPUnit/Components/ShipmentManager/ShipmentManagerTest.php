@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\ShipmentManager;
+namespace MolliePayments\Shopware\Tests\Components\ShipmentManager;
 
 use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundException;
 use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoLineItemsProvidedException;
@@ -15,8 +15,8 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Kiener\MolliePayments\Service\UrlParsingService;
-use MolliePayments\Tests\Fakes\FakeShipment;
-use MolliePayments\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Fakes\FakeShipment;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Refund\Item;
+namespace MolliePayments\Shopware\Tests\Service\Refund\Item;
 
 use Kiener\MolliePayments\Service\Refund\Item\RefundItemType;
 use PHPUnit\Framework\TestCase;

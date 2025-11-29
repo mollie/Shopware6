@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct;
+namespace MolliePayments\Shopware\Tests\Struct;
 
 use Kiener\MolliePayments\Struct\CustomerStruct;
 use PHPUnit\Framework\Attributes\DataProvider;

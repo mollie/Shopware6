@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect;
+namespace Kiener\MolliePayments\Shopware\Tests\Service\ApplePayDirect;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Kiener\MolliePayments\Components\ApplePayDirect\Exceptions\ApplePayDirectDomainAllowListCanNotBeEmptyException;
@@ -24,8 +24,8 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
 use Mollie\Api\Endpoints\WalletEndpoint;
 use Mollie\Api\MollieApiClient;
-use MolliePayments\Tests\Fakes\FakeCartService;
-use MolliePayments\Tests\Traits\MockTrait;
+use MolliePayments\Shopware\Tests\Fakes\FakeCartService;
+use MolliePayments\Shopware\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;

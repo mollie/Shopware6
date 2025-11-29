@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\PaypalExpress;
+namespace MolliePayments\Shopware\Tests\Components\PaypalExpress;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
 use Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute;

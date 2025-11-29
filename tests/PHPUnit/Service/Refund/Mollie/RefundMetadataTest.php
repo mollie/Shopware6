@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Refund\Mollie;
+namespace MolliePayments\Shopware\Tests\Service\Refund\Mollie;
 
 use Kiener\MolliePayments\Service\Refund\Item\RefundItem;
 use Kiener\MolliePayments\Service\Refund\Mollie\RefundMetadata;
