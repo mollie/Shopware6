@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment;
 
-use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 
 final class PaymentMethodRepository
 {
-    /** @var CompatibilityPaymentHandler[] */
+    /** @var AbstractMolliePaymentHandler[] */
     private array $paymentMethods;
 
     /**
-     * @param CompatibilityPaymentHandler[] $paymentMethods
+     * @param AbstractMolliePaymentHandler[] $paymentMethods
      */
     public function __construct(array $paymentMethods)
     {
@@ -20,13 +20,13 @@ final class PaymentMethodRepository
         }
     }
 
-    public function addPaymentMethod(CompatibilityPaymentHandler $paymentMethod): void
+    public function addPaymentMethod(AbstractMolliePaymentHandler $paymentMethod): void
     {
         $this->paymentMethods[] = $paymentMethod;
     }
 
     /**
-     * @return CompatibilityPaymentHandler[]
+     * @return AbstractMolliePaymentHandler[]
      */
     public function getPaymentMethods(): array
     {
