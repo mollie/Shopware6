@@ -14,13 +14,13 @@ final class CreatePayment implements \JsonSerializable
     private string $redirectUrl = '';
     private string $cancelUrl = '';
     private string $webhookUrl = '';
-    private string $method = '';
+    private PaymentMethod $method;
     private Address $billingAddress;
     private Address $shippingAddress;
-    private ?string $captureMode = null;
-    private string $locale;
+    private CaptureMode $captureMode;
+    private Locale $locale;
     private LineItemCollection $lines;
-    private string $sequenceType;
+    private SequenceType $sequenceType;
 
     private ?string $cardToken = null;
 
@@ -34,7 +34,8 @@ final class CreatePayment implements \JsonSerializable
         $this->description = $description;
         $this->redirectUrl = $redirectUrl;
         $this->amount = $amount;
-        $this->setSequenceType(new SequenceType());
+        $this->setSequenceType(SequenceType::ONEOFF);
+        $this->setCaptureMode(CaptureMode::AUTOMATIC);
     }
 
     public function getBillingAddress(): Address
@@ -72,12 +73,12 @@ final class CreatePayment implements \JsonSerializable
         return $this->redirectUrl;
     }
 
-    public function getMethod(): string
+    public function getMethod(): PaymentMethod
     {
         return $this->method;
     }
 
-    public function setMethod(string $method): void
+    public function setMethod(PaymentMethod $method): void
     {
         $this->method = $method;
     }
@@ -89,22 +90,22 @@ final class CreatePayment implements \JsonSerializable
 
     public function getLocale(): Locale
     {
-        return new Locale($this->locale);
+        return $this->locale;
     }
 
     public function setLocale(Locale $locale): void
     {
-        $this->locale = (string) $locale;
+        $this->locale = $locale;
     }
 
     public function setSequenceType(SequenceType $sequenceType): void
     {
-        $this->sequenceType = (string) $sequenceType;
+        $this->sequenceType = $sequenceType;
     }
 
     public function getSequenceType(): SequenceType
     {
-        return new SequenceType($this->sequenceType);
+        return $this->sequenceType;
     }
 
     public function setLines(LineItemCollection $lines): void
@@ -127,18 +128,14 @@ final class CreatePayment implements \JsonSerializable
         $this->description = $description;
     }
 
-    public function getCaptureMode(): ?CaptureMode
+    public function getCaptureMode(): CaptureMode
     {
-        if ($this->captureMode === null) {
-            return null;
-        }
-
-        return new CaptureMode($this->captureMode);
+        return $this->captureMode;
     }
 
     public function setCaptureMode(CaptureMode $captureMode): void
     {
-        $this->captureMode = (string) $captureMode;
+        $this->captureMode = $captureMode;
     }
 
     public function setCardToken(string $creditCardToken): void

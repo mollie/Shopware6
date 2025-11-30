@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Address;
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
@@ -30,7 +32,7 @@ final class CreatePaymentBuilderTest extends TestCase
 
         $actual = $builder->build('test', $orderRepository->getDefaultOrder());
         $actual->setCardToken('testCard');
-        $actual->setMethod('paypal');
+        $actual->setMethod(PaymentMethod::PAYPAL);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
 
@@ -108,7 +110,9 @@ final class CreatePaymentBuilderTest extends TestCase
             ],
             'sequenceType' => 'oneoff',
             'cardToken' => 'testCard',
-            'shopwareOrderNumber' => '10000'
+            'metadata' => [
+                'shopwareOrderNumber' => '10000'
+            ]
         ];
         $this->assertSame($expected, $actual->toArray());
 
@@ -118,13 +122,13 @@ final class CreatePaymentBuilderTest extends TestCase
         $this->assertInstanceOf(Address::class, $actual->getBillingAddress());
         $this->assertInstanceOf(LineItemCollection::class, $actual->getLines());
         $this->assertEquals(new Money(100.00, 'EUR'), $actual->getAmount());
-        $this->assertSame($expected['method'], $actual->getMethod());
-        $this->assertEquals($expected['locale'], (string) $actual->getLocale());
+        $this->assertSame($expected['method'], $actual->getMethod()->value);
+        $this->assertEquals($expected['locale'],$actual->getLocale()->value);
         $this->assertSame($expected['webhookUrl'], $actual->getWebhookUrl());
         $this->assertSame($expected['redirectUrl'], $actual->getRedirectUrl());
-        $this->assertSame($expected['sequenceType'], (string) $actual->getSequenceType());
-        $this->assertSame($expected['captureMode'], (string) $actual->getCaptureMode());
-        $this->assertSame($expected['shopwareOrderNumber'], $actual->getShopwareOrderNumber());
+        $this->assertSame($expected['sequenceType'], $actual->getSequenceType()->value);
+        $this->assertSame($expected['captureMode'], $actual->getCaptureMode()->value);
+        $this->assertSame($expected['metadata']['shopwareOrderNumber'], $actual->getShopwareOrderNumber());
     }
 
     public function testSetters(): void
@@ -132,7 +136,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $createPayment = new CreatePayment('test', '', new Money(10.00, 'EUR'));
         $createPayment->setDescription('test2');
 
-        $this->assertSame(null, $createPayment->getCaptureMode());
+        $this->assertSame(CaptureMode::AUTOMATIC, $createPayment->getCaptureMode());
         $this->assertSame('test2', $createPayment->getDescription());
     }
 }

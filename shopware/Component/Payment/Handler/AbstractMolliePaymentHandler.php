@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Handler;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Action\Finalize;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
 {
-    protected string $method;
+    protected PaymentMethod $method;
 
     public function __construct(private Pay $pay,
         private Finalize $finalize,
@@ -51,7 +52,7 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         } catch (\Throwable $exception) {
             $this->logger->error('Mollie Pay Process Failed', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethod()
+                'paymentMethod' => $this->getPaymentMethod()->value
             ]);
             throw PaymentException::asyncProcessInterrupted($shopwareTransaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
@@ -66,13 +67,13 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         } catch (HttpException $exception) {
             $this->logger->error('Payment is aborted or failed', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethod()
+                'paymentMethod' => $this->getPaymentMethod()->value
             ]);
             throw $exception;
         } catch (\Throwable $exception) {
             $this->logger->error('Payment failed unexpected', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethod()
+                'paymentMethod' => $this->getPaymentMethod()->value
             ]);
             throw PaymentException::asyncFinalizeInterrupted($shopwareTransaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
@@ -83,7 +84,7 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         return $payment;
     }
 
-    public function getPaymentMethod(): string
+    public function getPaymentMethod(): PaymentMethod
     {
         return $this->method;
     }
