@@ -9,6 +9,6 @@ final class WebhookStatusExpiredEvent extends WebhookEvent
 {
     protected static function getStatus(): string
     {
-        return PaymentStatus::EXPIRED;
+        return PaymentStatus::EXPIRED->value;
     }
 }

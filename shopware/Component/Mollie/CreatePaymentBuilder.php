@@ -93,7 +93,6 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $billingAddress = Address::fromAddress($customer, $order->getBillingAddress());
 
         $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order));
-        $payment->setCaptureMode(new CaptureMode(CaptureMode::AUTOMATIC));
         $payment->setBillingAddress($billingAddress);
         $payment->setShippingAddress($shippingAddress);
         $payment->setLines($lineItemCollection);
