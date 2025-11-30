@@ -29,7 +29,7 @@ final class LineItemTest extends TestCase
         $this->assertSame(1, $lineItem->getQuantity());
         $this->assertEquals($price, $lineItem->getUnitPrice());
         $this->assertEquals($price, $lineItem->getTotalAmount());
-        $this->assertSame('physical', (string) $lineItem->getType());
+        $this->assertSame('physical', $lineItem->getType()->value);
         $this->assertSame('pc', $lineItem->getQuantityUnit());
         $this->assertEquals($discountAmount, $lineItem->getDiscountAmount());
         $this->assertEquals($vatAmount, $lineItem->getVatAmount());

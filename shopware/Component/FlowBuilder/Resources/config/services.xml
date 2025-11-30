@@ -12,10 +12,8 @@
 
         <service id="Mollie\Shopware\Component\FlowBuilder\Subscriber\BusinessEventSubscriber">
             <argument type="service" id="Shopware\Core\Framework\Event\BusinessEventCollector"/>
-            <argument type="service" id="Mollie\Shopware\Component\FlowBuilder\WebhookStatusEventFactory"/>
             <tag name="kernel.event_subscriber"/>
         </service>
-        <service id="Mollie\Shopware\Component\FlowBuilder\WebhookStatusEventFactory"/>
 
     </services>
 </container>

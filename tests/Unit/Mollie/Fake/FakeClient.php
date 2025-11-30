@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Psr\Http\Message\ResponseInterface;
 
 final class FakeClient extends Client
@@ -15,7 +16,7 @@ final class FakeClient extends Client
 
     public function __construct(private ?string $id = null,
         private ?string $status = 'failed',
-        private ?string $method = 'fake',
+        private ?PaymentMethod $method = PaymentMethod::PAYPAL,
         private ?bool $embed = false)
     {
         if ($id === null) {
@@ -27,7 +28,7 @@ final class FakeClient extends Client
 
             return;
         }
-        $body = ['id' => $id, 'status' => $status, 'method' => $method];
+        $body = ['id' => $id, 'status' => $status, 'method' => $method->value];
 
         if ($embed) {
             $body['_embedded']['payments'][0] = $body;

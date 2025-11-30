@@ -69,7 +69,6 @@
         <service id="Mollie\Shopware\Component\Payment\Route\WebhookRoute" public="true">
             <argument type="service" id="Mollie\Shopware\Component\Mollie\Gateway\MollieGateway"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
-            <argument type="service" id="Mollie\Shopware\Component\FlowBuilder\WebhookStatusEventFactory"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="service_container"/>
         </service>

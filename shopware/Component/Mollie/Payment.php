@@ -11,7 +11,7 @@ final class Payment extends Struct implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
-    private string $status;
+    private PaymentStatus $status;
     private OrderTransactionEntity $shopwareTransaction;
 
     private string $thirdPartyPaymentId;
@@ -20,7 +20,7 @@ final class Payment extends Struct implements \JsonSerializable
     private string $finalizeUrl;
     private int $countPayments = 1;
 
-    public function __construct(private string $id, private string $method)
+    public function __construct(private string $id, private PaymentMethod $method)
     {
     }
 
@@ -31,12 +31,12 @@ final class Payment extends Struct implements \JsonSerializable
 
     public function getStatus(): PaymentStatus
     {
-        return new PaymentStatus($this->status);
+        return $this->status;
     }
 
     public function setStatus(PaymentStatus $status): void
     {
-        $this->status = (string) $status;
+        $this->status = $status;
     }
 
     public function getFinalizeUrl(): string
@@ -69,7 +69,7 @@ final class Payment extends Struct implements \JsonSerializable
         $this->shopwareTransaction = $shopwareTransaction;
     }
 
-    public function getMethod(): string
+    public function getMethod(): PaymentMethod
     {
         return $this->method;
     }
@@ -89,8 +89,8 @@ final class Payment extends Struct implements \JsonSerializable
      */
     public static function createFromClientResponse(array $body): self
     {
-        $payment = new self($body['id'], $body['method']);
-        $payment->setStatus(new PaymentStatus($body['status']));
+        $payment = new self($body['id'], PaymentMethod::from($body['method']));
+        $payment->setStatus(PaymentStatus::from($body['status']));
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
         $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
 

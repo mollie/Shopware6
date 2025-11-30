@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEvents;
@@ -42,7 +43,7 @@ final class OrderTransactionLoadedSubscriber implements EventSubscriberInterface
             $method = $mollieCustomFields['method'] ?? '';
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
-            $transactionExtension = new Payment($paymentId, $method);
+            $transactionExtension = new Payment($paymentId, PaymentMethod::from($method));
             $transactionExtension->setCountPayments($countPayments);
             $transactionExtension->setFinalizeUrl($finalizeUrl);
             if ($thirdPartyPaymentId !== null) {

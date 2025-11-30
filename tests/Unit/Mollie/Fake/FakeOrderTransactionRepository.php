@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie\Fake;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -92,7 +93,7 @@ final class FakeOrderTransactionRepository implements OrderTransactionRepository
             $transaction->setOrder($order);
         }
         if ($this->withPayment) {
-            $payment = new Payment('testMollieId','fakePayment');
+            $payment = new Payment('testMollieId',PaymentMethod::CREDIT_CARD);
             $payment->setFinalizeUrl('payment/finalize');
             $transaction->addExtension(Mollie::EXTENSION,$payment);
         }
