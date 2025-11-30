@@ -4,6 +4,7 @@
     "version": "v5.0.0-beta2",
     "type": "shopware-platform-plugin",
     "license": "MIT",
+    "minimum-stability": "alpha",
     "authors": [
         {
             "name": "Mollie B.V."
@@ -38,7 +39,8 @@
         "allow-plugins": {
             "infection/extension-installer": true,
             "php-http/discovery": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "autoload": {
@@ -73,8 +75,8 @@
         "phpunit/phpunit": "^11",
         "phpstan/phpstan": "^2",
         "friendsofphp/php-cs-fixer": "^3",
-        "phpcompatibility/php-compatibility": "^9.3",
-        "squizlabs/php_codesniffer": "^3",
+        "phpcompatibility/php-compatibility": "^10",
+        "squizlabs/php_codesniffer": "^4",
         "boxblinkracer/phpunuhi": "dev-main",
         "spaze/phpstan-disallowed-calls": "^4",
         "behat/behat": "^3",
