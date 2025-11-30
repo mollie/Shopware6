@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Mollie;
@@ -13,7 +14,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 final class CardPayment extends AbstractMolliePaymentHandler
 {
-    protected string $method = 'creditcard';
+    protected PaymentMethod $method = PaymentMethod::CREDIT_CARD;
 
     public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment
     {

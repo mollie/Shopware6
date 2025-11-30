@@ -39,8 +39,8 @@ final class MollieGatewayTest extends TestCase
         $actual = $gateway->getPaymentByTransactionId('test', $context);
 
         $this->assertInstanceOf(Payment::class, $actual);
-        $this->assertSame($actual->getId(), 'mollieTestId');
-        $this->assertSame((string) $actual->getStatus(), 'paid');
+        $this->assertSame('mollieTestId',$actual->getId());
+        $this->assertSame('paid', $actual->getStatus()->value);
     }
 
     public function testPaymentIsLoadedByOrderEntity(): void
@@ -58,8 +58,8 @@ final class MollieGatewayTest extends TestCase
         $actual = $gateway->getPaymentByTransactionId('test', $context);
 
         $this->assertInstanceOf(Payment::class, $actual);
-        $this->assertSame($actual->getId(), 'mollieTestId');
-        $this->assertSame((string) $actual->getStatus(), 'paid');
+        $this->assertSame('mollieTestId',$actual->getId());
+        $this->assertSame('paid',$actual->getStatus()->value);
     }
 
     public function testLoadingPaymentByOrderThrowsException(): void
@@ -179,7 +179,7 @@ final class MollieGatewayTest extends TestCase
         $payment = $gateway->createPayment($createPayment,Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
         $this->assertInstanceOf(Payment::class, $payment);
         $this->assertSame('mollieTestId',$payment->getId());
-        $this->assertSame('paid',(string) $payment->getStatus());
+        $this->assertSame('paid',$payment->getStatus()->value);
     }
 
     public function testCreatePaymentHandledApiException(): void

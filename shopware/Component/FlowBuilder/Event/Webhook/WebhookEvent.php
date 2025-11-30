@@ -77,6 +77,6 @@ class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, Mail
 
     protected static function getStatus(): string
     {
-        return 'All';
+        return 'all';
     }
 }

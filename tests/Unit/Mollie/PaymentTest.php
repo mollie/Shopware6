@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -14,8 +15,8 @@ final class PaymentTest extends TestCase
 {
     public function testSettersAndGetters(): void
     {
-        $payment = new Payment('tr_test', 'test');
-        $payment->setStatus(new PaymentStatus(PaymentStatus::PENDING));
+        $payment = new Payment('tr_test', PaymentMethod::PAYPAL);
+        $payment->setStatus(PaymentStatus::PENDING);
         $payment->setFinalizeUrl('http://test.finalize');
         $payment->setCheckoutUrl('http://test.checkout');
         $payment->setCountPayments(2);
@@ -23,8 +24,8 @@ final class PaymentTest extends TestCase
         $payment->setShopwareTransaction(new OrderTransactionEntity());
 
         $this->assertSame('tr_test', $payment->getId());
-        $this->assertSame('test', $payment->getMethod());
-        $this->assertSame(PaymentStatus::PENDING, (string) $payment->getStatus());
+        $this->assertSame(PaymentMethod::PAYPAL, $payment->getMethod());
+        $this->assertSame(PaymentStatus::PENDING,  $payment->getStatus());
         $this->assertSame('http://test.finalize', $payment->getFinalizeUrl());
         $this->assertSame('http://test.checkout', $payment->getCheckoutUrl());
         $this->assertSame(2, $payment->getCountPayments());
@@ -34,15 +35,15 @@ final class PaymentTest extends TestCase
 
     public function testShopwareTransactionIsRemovedInData(): void
     {
-        $payment = new Payment('tr_test', 'test');
-        $payment->setStatus(new PaymentStatus(PaymentStatus::PENDING));
+        $payment = new Payment('tr_test', PaymentMethod::PAYPAL);
+        $payment->setStatus(PaymentStatus::PENDING);
         $payment->setShopwareTransaction(new OrderTransactionEntity());
 
         $expectedArray = [
             'status' => 'pending',
             'countPayments' => 1,
             'id' => 'tr_test',
-            'method' => 'test',
+            'method' => PaymentMethod::PAYPAL->value,
             'extensions' => []
         ];
 
@@ -53,8 +54,8 @@ final class PaymentTest extends TestCase
     {
         $data = [
             'id' => 'tr_test',
-            'method' => 'test',
-            'status' => PaymentStatus::PAID,
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
             'details' => [
                 'paypalReference' => 'thirdPartyPaymentId',
             ],
@@ -68,7 +69,7 @@ final class PaymentTest extends TestCase
         $payment = Payment::createFromClientResponse($data);
 
         $this->assertSame('tr_test', $payment->getId());
-        $this->assertSame('paid', (string) $payment->getStatus());
+        $this->assertSame('paid', $payment->getStatus()->value);
         $this->assertSame('thirdPartyPaymentId', $payment->getThirdPartyPaymentId());
         $this->assertSame('http://test.checkout', $payment->getCheckoutUrl());
     }

@@ -3,19 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
-final class CaptureMode extends AbstractEnum
+enum CaptureMode: string
 {
-    public const MANUAL = 'manual';
-    public const AUTOMATIC = 'automatic';
-
-    /**
-     * @return string[]
-     */
-    protected function getPossibleValues(): array
-    {
-        return [
-            self::MANUAL,
-            self::AUTOMATIC,
-        ];
-    }
+    case MANUAL = 'manual';
+    case AUTOMATIC = 'automatic';
 }
