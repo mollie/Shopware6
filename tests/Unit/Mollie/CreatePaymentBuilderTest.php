@@ -108,6 +108,7 @@ final class CreatePaymentBuilderTest extends TestCase
             ],
             'sequenceType' => 'oneoff',
             'cardToken' => 'testCard',
+            'shopwareOrderNumber' => '10000'
         ];
         $this->assertSame($expected, $actual->toArray());
 
@@ -123,6 +124,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $this->assertSame($expected['redirectUrl'], $actual->getRedirectUrl());
         $this->assertSame($expected['sequenceType'], (string) $actual->getSequenceType());
         $this->assertSame($expected['captureMode'], (string) $actual->getCaptureMode());
+        $this->assertSame($expected['shopwareOrderNumber'], $actual->getShopwareOrderNumber());
     }
 
     public function testSetters(): void
