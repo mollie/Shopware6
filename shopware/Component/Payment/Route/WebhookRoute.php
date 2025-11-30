@@ -7,7 +7,7 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookEvent;
 use Mollie\Shopware\Component\FlowBuilder\WebhookStatusEventFactory;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
@@ -76,7 +76,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
         $paymentHandlerIdentifier = $paymentMethod->getHandlerIdentifier();
 
-        /** @var CompatibilityPaymentHandler $paymentHandler */
+        /** @var AbstractMolliePaymentHandler $paymentHandler */
         $paymentHandler = $this->container->get($paymentHandlerIdentifier);
         if ($paymentHandler->getPaymentMethod() === $payment->getMethod()) {
             return;
