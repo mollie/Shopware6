@@ -12,11 +12,7 @@ final class CachedMollieGateway implements MollieGatewayInterface
     /**
      * @var array<string, Payment>
      */
-    private array $paymentCache = [];
-    /**
-     * @var array<string, Payment>
-     */
-    private array $transactionCache = [];
+    private array $cache = [];
 
     public function __construct(private MollieGatewayInterface $decorated)
     {
@@ -27,26 +23,14 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->decorated->createPayment($molliePayment, $salesChannelId);
     }
 
-    public function getPayment(string $molliePaymentId, string $salesChannelId): Payment
-    {
-        $key = sprintf('%s/%s', $salesChannelId, $molliePaymentId);
-
-        if (isset($this->paymentCache[$key])) {
-            return $this->paymentCache[$key];
-        }
-        $this->paymentCache[$key] = $this->decorated->getPayment($molliePaymentId, $salesChannelId);
-
-        return $this->paymentCache[$key];
-    }
-
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
         $key = sprintf('%s', $transactionId);
-        if (isset($this->transactionCache[$key])) {
-            return $this->transactionCache[$key];
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
         }
-        $this->transactionCache[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
+        $this->cache[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
 
-        return $this->transactionCache[$key];
+        return $this->cache[$key];
     }
 }
