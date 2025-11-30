@@ -5,11 +5,12 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 
-final class PayPalPayment extends AbstractMolliePaymentHandler
+final class MultiBancoPayment extends AbstractMolliePaymentHandler implements BankTransferAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {
-        return PaymentMethod::PAYPAL;
+        return PaymentMethod::MULTI_BANCO;
     }
 }
