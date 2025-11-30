@@ -65,7 +65,7 @@ final class Finalize
 
         $this->logger->debug('PaymentFinalizeEvent fired', $logData);
 
-        if ($paymentStatus->isCancelled()) {
+        if ($paymentStatus->isCanceled()) {
             $paymentCancelledEvent = new CancelledEvent($payment, $order, $customer, $context);
             $this->eventDispatcher->dispatch($paymentCancelledEvent);
             $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $orderNumber, $payment->getId());

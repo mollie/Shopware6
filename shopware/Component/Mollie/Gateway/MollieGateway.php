@@ -83,7 +83,7 @@ final class MollieGateway implements MollieGatewayInterface
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannelId,
             'molliePaymentId' => $payment->getId(),
-            'paymentStatus' => (string) $payment->getStatus(),
+            'paymentStatus' => $payment->getStatus()->value,
         ]);
 
         return $payment;

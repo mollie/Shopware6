@@ -16,7 +16,7 @@ final class LineItem implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
-    private string $type;
+    private LineItemType $type;
 
     private string $quantityUnit;
     private Money $discountAmount;
@@ -29,7 +29,7 @@ final class LineItem implements \JsonSerializable
 
     public function __construct(private string $description, private int $quantity, private Money $unitPrice, private Money $totalAmount)
     {
-        $this->type = (string) (new LineItemType());
+        $this->type = LineItemType::PHYSICAL;
     }
 
     public static function fromDelivery(OrderDeliveryEntity $delivery, CurrencyEntity $currency): self
@@ -48,7 +48,7 @@ final class LineItem implements \JsonSerializable
         }
 
         $lineItem = new self((string) $shippingMethod->getName(), $shippingCosts->getQuantity(), new Money($shippingCosts->getUnitPrice(), $currency->getIsoCode()), new Money($shippingCosts->getTotalPrice(), $currency->getIsoCode()));
-        $lineItem->setType(new LineItemType(LineItemType::SHIPPING));
+        $lineItem->setType(LineItemType::SHIPPING);
         $lineItem->setVatAmount(new Money($calculatedTax->getTax(), $currency->getIsoCode()));
         $lineItem->setVatRate((string) $calculatedTax->getTaxRate());
         $lineItem->setSku(sprintf('mol-delivery-%s', $shippingMethod->getId()));
@@ -106,12 +106,12 @@ final class LineItem implements \JsonSerializable
 
     public function getType(): LineItemType
     {
-        return new LineItemType($this->type);
+        return $this->type;
     }
 
     public function setType(LineItemType $type): void
     {
-        $this->type = (string) $type;
+        $this->type = $type;
     }
 
     public function getQuantityUnit(): string

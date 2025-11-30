@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Route;
 
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookEvent;
-use Mollie\Shopware\Component\FlowBuilder\WebhookStatusEventFactory;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -20,7 +20,6 @@ final class WebhookRoute extends AbstractWebhookRoute
     public function __construct(
         private MollieGatewayInterface $mollieGateway,
         private OrderTransactionStateHandler $stateMachineHandler,
-        private WebhookStatusEventFactory $webhookStatusEventFactory,
         private EventDispatcherInterface $eventDispatcher,
         private ContainerInterface $container,
     ) {
@@ -45,8 +44,8 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
-
-        $webhookStatusEvent = $this->webhookStatusEventFactory->create($payment, $shopwareOrder, $context);
+        $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
+        $webhookStatusEvent = new $webhookStatusEventClass($payment,$shopwareOrder,$context);
         $this->eventDispatcher->dispatch($webhookStatusEvent);
 
         $this->updatePaymentStatus($payment, $transactionId, $context);
@@ -82,7 +81,7 @@ final class WebhookRoute extends AbstractWebhookRoute
             return;
         }
         /** Apple Pay payment is stored as credit card on mollie side, so we do not want to switch payment method */
-        if ($paymentHandler->getPaymentMethod() === 'applepay' && $payment->getMethod() === 'creditcard') {
+        if ($paymentHandler->getPaymentMethod() === PaymentMethod::APPLEPAY && $payment->getMethod() === PaymentMethod::CREDIT_CARD) {
             return;
         }
         // TODO: update payment method

@@ -3,59 +3,80 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
-final class PaymentStatus extends AbstractEnum
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusAuthorizedEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusCancelledEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusExpiredEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusFailedEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusOpenEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPendingEvent;
+
+enum PaymentStatus: string
 {
-    public const OPEN = 'open';
-    public const PENDING = 'pending';
-    public const AUTHORIZED = 'authorized';
-    public const PAID = 'paid';
-    public const FAILED = 'failed';
-    public const CANCELED = 'canceled';
-    public const EXPIRED = 'expired';
+    case OPEN = 'open';
+    case PENDING = 'pending';
+    case AUTHORIZED = 'authorized';
+    case PAID = 'paid';
+    case FAILED = 'failed';
+    case CANCELED = 'canceled';
+    case EXPIRED = 'expired';
 
     public function isFailed(): bool
     {
-        $list = [
-            self::CANCELED,
+        $failedStatus = [
             self::FAILED,
+            self::CANCELED,
             self::EXPIRED,
         ];
-        $value = (string) $this;
 
-        return in_array($value, $list, true);
+        return in_array($this, $failedStatus, true);
     }
 
-    public function isCancelled(): bool
+    public function isCanceled(): bool
     {
-        return (string) $this === self::CANCELED;
+        return $this === self::CANCELED;
+    }
+
+    /**
+     * @return class-string[]
+     */
+    public static function getAllWebhookEvents(): array
+    {
+        return [
+            WebhookStatusOpenEvent::class,
+            WebhookStatusPendingEvent::class,
+            WebhookStatusAuthorizedEvent::class,
+            WebhookStatusPaidEvent::class,
+            WebhookStatusCancelledEvent::class,
+            WebhookStatusExpiredEvent::class,
+            WebhookStatusFailedEvent::class,
+        ];
+    }
+
+    /**
+     * @return class-string
+     */
+    public function getWebhookEventClass(): string
+    {
+        return match ($this) {
+            self::OPEN => WebhookStatusOpenEvent::class,
+            self::PENDING => WebhookStatusPendingEvent::class,
+            self::AUTHORIZED => WebhookStatusAuthorizedEvent::class,
+            self::PAID => WebhookStatusPaidEvent::class,
+            self::CANCELED => WebhookStatusCancelledEvent::class,
+            self::EXPIRED => WebhookStatusExpiredEvent::class,
+            self::FAILED => WebhookStatusFailedEvent::class
+        };
     }
 
     public function getShopwareHandlerMethod(): string
     {
-        $statusMapping = [
+        return match ($this) {
             self::PAID => 'paid',
             self::CANCELED => 'cancel',
             self::AUTHORIZED => 'authorize',
             self::FAILED => 'fail',
-        ];
-        $mollieStatus = (string) $this;
-
-        return $statusMapping[$mollieStatus] ?? '';
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getPossibleValues(): array
-    {
-        return [
-            self::OPEN,
-            self::PENDING,
-            self::AUTHORIZED,
-            self::PAID,
-            self::CANCELED,
-            self::EXPIRED,
-            self::FAILED,
-        ];
+            default => '',
+        };
     }
 }
