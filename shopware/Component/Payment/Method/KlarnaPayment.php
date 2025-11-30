@@ -11,12 +11,15 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 final class KlarnaPayment extends AbstractMolliePaymentHandler
 {
-    protected PaymentMethod $method = PaymentMethod::KLARNA;
-
     public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment
     {
         $payment->setCaptureMode(CaptureMode::MANUAL);
 
         return $payment;
+    }
+
+    public function getPaymentMethod(): PaymentMethod
+    {
+        return PaymentMethod::KLARNA;
     }
 }

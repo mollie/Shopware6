@@ -14,8 +14,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 final class CardPayment extends AbstractMolliePaymentHandler
 {
-    protected PaymentMethod $method = PaymentMethod::CREDIT_CARD;
-
     public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment
     {
         $orderCustomer = $orderEntity->getOrderCustomer();
@@ -35,5 +33,10 @@ final class CardPayment extends AbstractMolliePaymentHandler
         $payment->setCardToken($mollieCustomer->getCreditCardToken());
 
         return $payment;
+    }
+
+    public function getPaymentMethod(): PaymentMethod
+    {
+        return PaymentMethod::CREDIT_CARD;
     }
 }

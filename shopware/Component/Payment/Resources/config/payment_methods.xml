@@ -5,35 +5,185 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-
-        <service public="true" id="Kiener\MolliePayments\Handler\Method\PayPalPayment" class="Mollie\Shopware\Component\Payment\Method\PayPalPayment">
+        <service id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade">
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="shopware.payment.method"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="mollie.payment.method"/>
         </service>
 
-        <service public="true" id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment" class="Mollie\Shopware\Component\Payment\Method\KlarnaPayment">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
-            <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
-            <argument type="service" id="monolog.logger.mollie"/>
+        <service public="true" id="Mollie\Shopware\Component\Payment\Method\AlmaPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
             <tag name="shopware.payment.method"/>
-            <tag name="shopware.payment.method.async"/>
             <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\BanContactPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\BelfiusPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+        <service id="Mollie\Shopware\Component\Payment\Method\BilliePayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\BizumPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\BlikPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
         </service>
 
         <service public="true" id="Kiener\MolliePayments\Handler\Method\CreditCardPayment" class="Mollie\Shopware\Component\Payment\Method\CardPayment">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>
-            <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
-            <argument type="service" id="monolog.logger.mollie"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
             <tag name="shopware.payment.method"/>
             <tag name="shopware.payment.method.async"/>
             <tag name="mollie.payment.method"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\DirectDebitPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\EpsPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\GiftCardPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\IdealPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\In3Payment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\KbcPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service public="true" id="Kiener\MolliePayments\Handler\Method\KlarnaOnePayment" class="Mollie\Shopware\Component\Payment\Method\KlarnaPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+            <tag name="mollie.payment.method"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\MbWayPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\MultiBancoPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\MyBankPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\PayByBankPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service public="true" id="Kiener\MolliePayments\Handler\Method\PayPalPayment" class="Mollie\Shopware\Component\Payment\Method\PayPalPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+            <tag name="mollie.payment.method"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\Przelewy24Payment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\RivertyPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\SatisPayPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\SwishPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\TrustlyPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
+        </service>
+
+        <service id="Mollie\Shopware\Component\Payment\Method\TwintPayment">
+            <argument type="service" id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade"/>
+            <tag name="shopware.payment.method"/>
+            <tag name="mollie.payment.method"/>
+            <tag name="shopware.payment.method.async"/>
         </service>
 
 
