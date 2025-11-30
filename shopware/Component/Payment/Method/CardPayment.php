@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
-use Mollie\Shopware\Component\Payment\Handler\CompatibilityPaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
-final class CardPayment extends CompatibilityPaymentHandler
+final class CardPayment extends AbstractMolliePaymentHandler
 {
     protected string $method = 'creditcard';
 
