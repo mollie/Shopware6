@@ -99,6 +99,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $payment->setLines($lineItemCollection);
         $payment->setLocale(Locale::fromLanguage($language));
         $payment->setWebhookUrl($webhookUrl);
+        $payment->setShopwareOrderNumber($orderNumber);
 
         return $payment;
     }

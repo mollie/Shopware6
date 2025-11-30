@@ -11,7 +11,5 @@ interface MollieGatewayInterface
 {
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment;
 
-    public function getPayment(string $molliePaymentId, string $salesChannelId): Payment;
-
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment;
 }
