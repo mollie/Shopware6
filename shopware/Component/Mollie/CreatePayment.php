@@ -23,7 +23,11 @@ final class CreatePayment implements \JsonSerializable
     private string $sequenceType;
 
     private ?string $cardToken = null;
-    private string $shopwareOrderNumber;
+
+    /**
+     * @var array<mixed>
+     */
+    private array $metadata = [];
 
     public function __construct(string $description, string $redirectUrl, Money $amount)
     {
@@ -162,11 +166,11 @@ final class CreatePayment implements \JsonSerializable
 
     public function setShopwareOrderNumber(string $orderNumber): void
     {
-        $this->shopwareOrderNumber = $orderNumber;
+        $this->metadata['shopwareOrderNumber'] = $orderNumber;
     }
 
     public function getShopwareOrderNumber(): string
     {
-        return $this->shopwareOrderNumber;
+        return $this->metadata['shopwareOrderNumber'];
     }
 }

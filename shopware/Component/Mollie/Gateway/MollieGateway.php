@@ -91,20 +91,26 @@ final class MollieGateway implements MollieGatewayInterface
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
+        $shopwareOrderNumber = $molliePayment->getShopwareOrderNumber();
         try {
             $client = $this->clientFactory->create($salesChannelId);
             $formParams = $molliePayment->toArray();
-            $this->logger->debug('Create payment via Payments API', [
-                'formParams' => $formParams,
-            ]);
+
             $response = $client->post('payments', [
                 'form_params' => $molliePayment->toArray(),
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
+            $this->logger->info('Mollie Payment created', [
+                'requestParameter' => $formParams,
+                'responseParameter' => $body,
+                'orderNumber' => $shopwareOrderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
             return Payment::createFromClientResponse($body);
         } catch (ClientException $exception) {
-            throw $this->convertException($exception, $molliePayment->getShopwareOrderNumber());
+            throw $this->convertException($exception,$shopwareOrderNumber);
         }
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Repository;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
+use Mollie\Shopware\Component\Mollie\Gateway\TransactionWithoutOrderException;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
@@ -40,6 +41,22 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
 
     public function savePaymentExtension(OrderTransactionEntity $orderTransactionEntity, Payment $payment, Context $context): EntityWrittenContainerEvent
     {
+        $transactionId = $orderTransactionEntity->getId();
+        $order = $orderTransactionEntity->getOrder();
+        if (! $order) {
+            throw new TransactionWithoutOrderException($transactionId);
+        }
+
+        $salesChannel = $order->getSalesChannelId();
+        $orderNumber = $order->getOrderNumber();
+
+        $this->logger->debug('Save payment information in Order Transaction', [
+            'transactionId' => $transactionId,
+            'data' => $payment->toArray(),
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannel,
+        ]);
+
         return $this->orderTransactionRepository->upsert([
             [
                 'id' => $orderTransactionEntity->getId(),
@@ -53,7 +70,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
     public function findById(string $orderTransactionId, Context $context): ?OrderTransactionEntity
     {
         $criteria = new Criteria([$orderTransactionId]);
-        $criteria->addAssociation('order.orderCustomer.customer');
+        $criteria->addAssociation('order');
         $criteria->addAssociation('paymentMethod');
 
         return $this->orderTransactionRepository->search($criteria, $context)->first();
