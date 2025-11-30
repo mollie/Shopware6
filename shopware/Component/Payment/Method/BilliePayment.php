@@ -6,10 +6,10 @@ namespace Mollie\Shopware\Component\Payment\Method;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 
-final class PayPalPayment extends AbstractMolliePaymentHandler
+final class BilliePayment extends AbstractMolliePaymentHandler
 {
     public function getPaymentMethod(): PaymentMethod
     {
-        return PaymentMethod::PAYPAL;
+        return PaymentMethod::BILLIE;
     }
 }
