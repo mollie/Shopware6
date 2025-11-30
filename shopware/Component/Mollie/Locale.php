@@ -6,30 +6,28 @@ namespace Mollie\Shopware\Component\Mollie;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 
-final class Locale extends AbstractEnum
+enum Locale: string
 {
-    private const AVAILABLE_LOCALES = [
-        'en_US',
-        'en_GB',
-        'nl_NL',
-        'fr_FR',
-        'it_IT',
-        'de_DE',
-        'de_AT',
-        'de_CH',
-        'es_ES',
-        'ca_ES',
-        'nb_NO',
-        'pt_PT',
-        'sv_SE',
-        'fi_FI',
-        'da_DK',
-        'is_IS',
-        'hu_HU',
-        'pl_PL',
-        'lv_LV',
-        'lt_LT',
-    ];
+    case enGB = 'en_GB';
+    case enUS = 'en_US';
+    case nlNL = 'nl_NL';
+    case frFR = 'fr_FR';
+    case itIT = 'it_IT';
+    case deDE = 'de_DE';
+    case deAT = 'de_AT';
+    case deCH = 'de_CH';
+    case esES = 'es_ES';
+    case caES = 'ca_ES';
+    case nbNO = 'nb_NO';
+    case ptPT = 'pt_PT';
+    case svSE = 'sv_SE';
+    case fiFI = 'fi_FI';
+    case daDK = 'da_DK';
+    case isIS = 'is_IS';
+    case huHU = 'hu_HU';
+    case plPL = 'pl_PL';
+    case lvLV = 'lv_LV';
+    case ltLT = 'lt_LT';
 
     public static function fromLanguage(LanguageEntity $language): self
     {
@@ -41,16 +39,6 @@ final class Locale extends AbstractEnum
 
         $languageLocale = str_replace('-', '_', $code);
 
-        $mollieLocale = self::AVAILABLE_LOCALES[$languageLocale] ?? 'en_GB';
-
-        return new self($mollieLocale);
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getPossibleValues(): array
-    {
-        return self::AVAILABLE_LOCALES;
+        return self::from($languageLocale);
     }
 }
