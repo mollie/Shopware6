@@ -30,6 +30,9 @@ enum PaymentMethod: string
     case PAY_BY_BANK = 'paybybank';
     case PAYPAL = 'paypal';
     case PAY_SAFE_CARD = 'paysafecard';
+
+    case PAYCONIQ = 'payconiq';
+
     case POS = 'pointofsale';
     case PRZELEWY24 = 'przelewy24';
     case RIVERTY = 'riverty';
