@@ -17,7 +17,9 @@ final class TransactionConverter implements TransactionConverterInterface
     private OrderService $orderService;
     private TransactionService $transactionService;
 
-    public function __construct(OrderService $orderService, TransactionService $transactionService)
+    public function __construct(
+        OrderService $orderService,
+        TransactionService $transactionService)
     {
         $this->orderService = $orderService;
         $this->transactionService = $transactionService;

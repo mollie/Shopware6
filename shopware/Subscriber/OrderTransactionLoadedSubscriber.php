@@ -9,9 +9,8 @@ use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-#[AutoconfigureTag('kernel.event_subscriber')]
+
 final class OrderTransactionLoadedSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array

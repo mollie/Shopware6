@@ -8,10 +8,8 @@ use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\CustomerEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-#[AutoconfigureTag('kernel.event_subscriber')]
 final class CustomerLoadedSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
