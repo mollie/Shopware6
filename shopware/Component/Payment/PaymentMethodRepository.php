@@ -23,11 +23,6 @@ final class PaymentMethodRepository
         }
     }
 
-    public function addPaymentMethod(AbstractMolliePaymentHandler $paymentMethod): void
-    {
-        $this->paymentMethods[] = $paymentMethod;
-    }
-
     /**
      * @return AbstractMolliePaymentHandler[]
      */
@@ -56,5 +51,10 @@ final class PaymentMethodRepository
         }
 
         return null;
+    }
+
+    private function addPaymentMethod(AbstractMolliePaymentHandler $paymentMethod): void
+    {
+        $this->paymentMethods[] = $paymentMethod;
     }
 }

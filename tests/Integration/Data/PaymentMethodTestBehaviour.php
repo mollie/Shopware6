@@ -56,7 +56,7 @@ trait PaymentMethodTestBehaviour
         $repository = $this->getContainer()->get('payment_method.repository');
         $criteria = new Criteria();
 
-        $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', addslashes($handlerIdentifier)));
         $searchResult = $repository->search($criteria, $context);
         $firstPaymentMethod = $searchResult->first();
         if ($firstPaymentMethod === null) {
