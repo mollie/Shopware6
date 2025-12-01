@@ -12,4 +12,9 @@ final class PayconiqPayment extends AbstractMolliePaymentHandler
     {
         return PaymentMethod::PAYCONIQ;
     }
+
+    public function getName(): string
+    {
+        return 'Payconiq';
+    }
 }
