@@ -24,11 +24,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 
-final class PaymentMethodInstaller extends Command
+final class PaymentMethodInstaller
 {
     /**
      * @param EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $shopwarePaymentMethodRepository
