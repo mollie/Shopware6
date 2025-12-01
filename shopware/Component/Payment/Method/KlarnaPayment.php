@@ -13,4 +13,14 @@ final class KlarnaPayment extends AbstractMolliePaymentHandler implements Manual
     {
         return PaymentMethod::KLARNA;
     }
+
+    public function getName(): string
+    {
+        return 'Klarna';
+    }
+
+    public function getDescription(): string
+    {
+        return 'Increase conversion rates, order values, and customer loyalty by offering your customers a range of flexible ways to pay – all through Klarna payments. Combine all Klarna payment options into one seamless method and let your customers pick the payment type and terms they prefer.';
+    }
 }
