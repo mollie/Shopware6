@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Repository;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Mollie\Shopware\Component\Mollie\Gateway\TransactionWithoutOrderException;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -23,6 +23,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class OrderTransactionRepository implements OrderTransactionRepositoryInterface
 {
@@ -33,7 +34,11 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
     /**
      * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
-    public function __construct(EntityRepository $orderTransactionRepository, LoggerInterface $logger)
+    public function __construct(
+        #[Autowire(service: 'order_transaction.repository')]
+        EntityRepository $orderTransactionRepository,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        LoggerInterface $logger)
     {
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->logger = $logger;

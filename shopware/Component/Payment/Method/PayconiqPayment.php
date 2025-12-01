@@ -5,12 +5,11 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
-use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 
-final class RivertyPayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface
+final class PayconiqPayment extends AbstractMolliePaymentHandler
 {
     public function getPaymentMethod(): PaymentMethod
     {
-        return PaymentMethod::RIVERTY;
+        return PaymentMethod::PAYCONIQ;
     }
 }

@@ -5,7 +5,11 @@ namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
+use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,8 +22,12 @@ use Symfony\Component\HttpFoundation\Request;
 final class PaymentFinalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
+        #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
+        #[Autowire(service: WebhookRoute::class)]
         private AbstractWebhookRoute $webhookRoute,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -33,10 +41,10 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
     public function handleFinalizeEvent(PaymentFinalizeEvent $event): void
     {
         $environmentSettings = $this->settingsService->getEnvironmentSettings();
-
         if (! $environmentSettings->isDevMode() && ! $environmentSettings->isCypressMode()) {
             return;
         }
+        $this->logger->warning('Executing Webhook in Dev mode');
         $payment = $event->getPayment();
         $transaction = $payment->getShopwareTransaction();
         $request = new Request();

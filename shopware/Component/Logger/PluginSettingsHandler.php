@@ -26,7 +26,7 @@ final class PluginSettingsHandler extends AbstractHandler
         #[Autowire(service: SettingsService::class)]
         AbstractSettingsService $settingsService,
         Connection $connection,
-        #[Autowire(value:'%kernel.logs_dir%/mollie_%kernel.environment%.log')]
+        #[Autowire(value: '%kernel.logs_dir%/mollie_%kernel.environment%.log')]
         string $filePath,
         bool $bubble = true)
     {
