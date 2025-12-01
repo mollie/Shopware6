@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Payment\Handler;
 
 use Mollie\Shopware\Component\Payment\Action\Finalize;
 use Mollie\Shopware\Component\Payment\Action\Pay;
+use Mollie\Shopware\Component\Transaction\TransactionConverter;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
@@ -14,14 +15,20 @@ use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 final readonly class MolliePaymentFacade
 {
-    public function __construct(private Pay $pay,
+    public function __construct(
+        #[Autowire(service: Pay::class)]
+        private Pay $pay,
+        #[Autowire(service: Finalize::class)]
         private Finalize $finalize,
+        #[Autowire(service: TransactionConverter::class)]
         private TransactionConverterInterface $transactionConverter,
+        #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
     }
@@ -46,7 +53,7 @@ final readonly class MolliePaymentFacade
         }
     }
 
-    public function finalize(AbstractMolliePaymentHandler $paymentHandler,Request $request, PaymentTransactionStruct $transaction, Context $context): void
+    public function finalize(AbstractMolliePaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, Context $context): void
     {
         $shopwareTransaction = $transaction;
         try {

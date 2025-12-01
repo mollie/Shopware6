@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Payment\Action;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\CancelledEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Payment\CustomerEntityNotExistsException;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
@@ -17,12 +18,16 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class Finalize
 {
     public function __construct(
+        #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
+        #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
     }
