@@ -3,21 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Method;
 
-use Mollie\Shopware\Component\Mollie\CaptureMode;
-use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
-use Shopware\Core\Checkout\Order\OrderEntity;
+use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 
-final class KlarnaPayment extends AbstractMolliePaymentHandler
+final class KlarnaPayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface
 {
-    public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment
-    {
-        $payment->setCaptureMode(CaptureMode::MANUAL);
-
-        return $payment;
-    }
-
     public function getPaymentMethod(): PaymentMethod
     {
         return PaymentMethod::KLARNA;

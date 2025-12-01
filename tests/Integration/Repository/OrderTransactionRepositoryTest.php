@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Integration\Repository;
 
-use Kiener\MolliePayments\Handler\Method\PayPalPayment;
+
+use Mollie\Shopware\Component\Payment\Method\PayPalPayment;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
 use Mollie\Shopware\Integration\Data\MolliePageTestBehaviour;

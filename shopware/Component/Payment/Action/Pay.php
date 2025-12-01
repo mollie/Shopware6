@@ -3,15 +3,20 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Action;
 
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilderInterface;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Repository\OrderTransactionRepository;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -20,16 +25,23 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class Pay
 {
     public function __construct(
+        #[Autowire(service: CreatePaymentBuilder::class)]
         private CreatePaymentBuilderInterface $createPaymentBuilder,
+        #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $paymentGateway,
+        #[Autowire(service: OrderTransactionRepository::class)]
         private OrderTransactionRepositoryInterface $orderTransactionRepository,
+        #[Autowire(service: OrderTransactionStateHandler::class)]
         private OrderTransactionStateHandler $stateMachineHandler,
+        #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
     }
@@ -44,12 +56,14 @@ final class Pay
 
         $context = $salesChannelContext->getContext();
 
-        $this->logger->info('Start Mollie checkout', [
+        $logData = [
             'salesChannel' => $salesChannelName,
-            'paymentMethod' => $paymentHandler->getPaymentMethod(),
+            'paymentMethod' => $paymentHandler->getPaymentMethod()->value,
             'orderNumber' => $orderNumber,
             'transactionId' => $transactionId,
-        ]);
+        ];
+
+        $this->logger->info('Start Mollie checkout', $logData);
 
         $createPaymentStruct = $this->createPaymentStruct($transaction, $paymentHandler, $salesChannelName, $salesChannelContext);
         $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
@@ -68,12 +82,7 @@ final class Pay
             $redirectUrl = $shopwareFinalizeUrl;
         }
 
-        $this->logger->info('Mollie checkout finished, redirecting to payment provider', [
-            'transactionId' => $transactionId,
-            'redirectUrl' => $redirectUrl,
-            'salesChannelName' => $salesChannelName,
-            'orderNumber' => $orderNumber,
-        ]);
+        $this->logger->info('Mollie checkout finished, redirecting to payment provider', $logData);
 
         return new RedirectResponse($redirectUrl);
     }
@@ -111,6 +120,9 @@ final class Pay
         $createPaymentStruct = $this->createPaymentBuilder->build($transaction->getOrderTransactionId(), $order);
         $createPaymentStruct->setMethod($paymentHandler->getPaymentMethod());
 
+        if ($paymentHandler instanceof ManualCaptureModeAwareInterface) {
+            $createPaymentStruct->setCaptureMode(CaptureMode::MANUAL);
+        }
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $order);
         $this->logger->info('Payment payload created for mollie API', [
             'payload' => $createPaymentStruct->toArray(),

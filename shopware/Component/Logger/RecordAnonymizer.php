@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Logger;
 
+use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\IpUtils;
 
+#[AsMonologProcessor(channel: 'mollie')]
 final class RecordAnonymizer implements ProcessorInterface
 {
     private const URL_SLUG = '/payment/finalize-transaction';

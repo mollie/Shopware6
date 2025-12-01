@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\StatusUpdate;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('shopware.scheduled.task')]
 final class UpdateStatusScheduledTask extends ScheduledTask
 {
     protected const MINUTELY = 60;
