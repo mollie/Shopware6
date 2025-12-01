@@ -3,13 +3,19 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\TranslationImporter;
 
+use Kiener\MolliePayments\MolliePayments;
 use League\Flysystem\Filesystem;
 use Shopware\Core\Framework\Plugin;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
+#[AsCommand('mollie:translation:import')]
+#[When(env: 'dev')]
 final class ImportCSVCommand extends Command
 {
     private Filesystem $fileSystem;
@@ -29,9 +35,15 @@ final class ImportCSVCommand extends Command
         'card.subscriptions.subscriptionsSkipRenewalsOnFailedPayments.helpText' => 'card.subscriptions.subscriptionSkipRenewalsOnFailedPayments.helpText',
     ];
 
-    public function __construct(Filesystem $fileSystem, AppenderInterface $appender, Plugin $plugin)
+    public function __construct(
+        #[Autowire(service: 'shopware.filesystem.private')]
+        Filesystem $fileSystem,
+        #[Autowire(service: TranslationAppender::class)]
+        AppenderInterface $appender,
+        #[Autowire(service: MolliePayments::class)]
+        Plugin $plugin)
     {
-        parent::__construct('mollie:translation:import');
+        parent::__construct();
         $this->fileSystem = $fileSystem;
         $this->appender = $appender;
         $this->plugin = $plugin;

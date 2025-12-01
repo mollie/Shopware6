@@ -66,11 +66,11 @@
     "require": {
         "php": ">=8.2",
         "ext-curl": "*",
-        "shopware/core": ">=6.6.10.0",
+        "shopware/core": ">=6.6.10.0 <6.8",
         "ext-mbstring": "*"
     },
     "require-dev": {
-        "shopware/storefront": ">=6.6.10.0",
+        "shopware/storefront": ">=6.6.10.0 <6.8",
         "phpunit/phpunit": "^11",
         "phpstan/phpstan": "^2",
         "friendsofphp/php-cs-fixer": "^3",

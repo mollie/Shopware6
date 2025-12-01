@@ -7,7 +7,9 @@ use Mollie\Shopware\Component\FlowBuilder\Event\MolliePaymentAware;
 use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
 use Shopware\Core\Content\Flow\Dispatching\Storer\FlowStorer;
 use Shopware\Core\Framework\Event\FlowEventAware;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('flow.storer')]
 final class PaymentDataStorer extends FlowStorer
 {
     public function store(FlowEventAware $event, array $stored): array

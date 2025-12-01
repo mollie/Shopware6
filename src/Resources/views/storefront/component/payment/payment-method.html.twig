@@ -14,7 +14,7 @@
 {% block component_payment_method_description %}
 
 
-    {% if "MolliePayments" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
+    {% if "Mollie" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
         <div class="payment-method-description">
             <strong>{{ payment.translated.name }} ({{ "molliePayments.testMode.label"|trans }})</strong>
             {% if payment.translated.description %}

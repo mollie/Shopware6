@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -12,11 +14,14 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Language\LanguageEntity;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 {
     public function __construct(
+        #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
+        #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
     ) {
     }

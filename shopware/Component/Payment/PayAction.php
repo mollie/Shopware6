@@ -7,11 +7,13 @@ use Kiener\MolliePayments\Exception\PaymentUrlException;
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionService;
+use Mollie\Shopware\Component\Transaction\TransactionConverter;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class PayAction
@@ -21,7 +23,14 @@ final class PayAction
     private TransactionTransitionService $transactionTransitionService;
     private TransactionConverterInterface $transactionConverter;
 
-    public function __construct(MolliePaymentDoPay $payFacade, TransactionConverterInterface $transactionConverter, TransactionTransitionService $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(
+        MolliePaymentDoPay $payFacade,
+        #[Autowire(service: TransactionConverter::class)]
+        TransactionConverterInterface $transactionConverter,
+        #[Autowire(service: TransactionTransitionService::class)]
+        TransactionTransitionService $transactionTransitionService,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        LoggerInterface $logger)
     {
         $this->payFacade = $payFacade;
         $this->transactionTransitionService = $transactionTransitionService;

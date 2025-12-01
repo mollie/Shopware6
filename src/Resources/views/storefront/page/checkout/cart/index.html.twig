@@ -23,7 +23,7 @@
                         {% if payment.id == context.paymentMethod.id %} selected="selected"{% endif %}>
                     {{ payment.translated.name }}
 
-                    {% if "MolliePayments" in payment.handlerIdentifier and page.isMollieTestMode == true %}
+                    {% if "Mollie" in payment.handlerIdentifier and page.isMollieTestMode == true %}
                         ({{ "molliePayments.testMode.label"|trans }})
                     {% endif %}
                 </option>

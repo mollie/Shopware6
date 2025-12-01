@@ -6,13 +6,17 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Client;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ClientFactory implements ClientFactoryInterface
 {
     private const MOLLIE_BASE_URL = 'https://api.mollie.com/v2/';
 
     public function __construct(
+        #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settings,
+        #[Autowire(value: '%kernel.shopware_version%')]
         private string $shopwareVersion,
     ) {
     }

@@ -24,13 +24,11 @@
         <import resource="services/snippets.xml"/>
         <import resource="services/repositories.xml"/>
         <import resource="packages/**/*.xml"/>
-
+        <import resource="../../../shopware/Resources/config/services.xml"/>
     </imports>
 
 
     <services>
-        <defaults autowire="true" autoconfigure="true"/>
-        <prototype namespace="Mollie\Shopware\" resource="../../../shopware" exclude="../../../shopware/{Resources,Migration,*.php}"/>
         <!-- Configuration -->
         <service id="Kiener\MolliePayments\Service\ConfigService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>

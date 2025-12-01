@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SettingsService extends AbstractSettingsService
 {
@@ -20,8 +21,13 @@ final class SettingsService extends AbstractSettingsService
      */
     private array $settingsCache = [];
 
-    public function __construct(private SystemConfigService $systemConfigService, private bool $devMode, private bool $cypressMode)
-    {
+    public function __construct(
+        private SystemConfigService $systemConfigService,
+        #[Autowire(env: 'MOLLIE_DEV_MODE', )]
+        private bool $devMode = false,
+        #[Autowire(env: 'MOLLIE_CYPRESS_MODE')]
+        private bool $cypressMode = false,
+    ) {
     }
 
     public function getDecorated(): AbstractSettingsService

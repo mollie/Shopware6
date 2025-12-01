@@ -4,42 +4,18 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
-use Kiener\MolliePayments\Handler\Method\AlmaPayment;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\BancomatPayment;
-use Kiener\MolliePayments\Handler\Method\BanContactPayment;
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Kiener\MolliePayments\Handler\Method\BelfiusPayment;
-use Kiener\MolliePayments\Handler\Method\BilliePayment;
-use Kiener\MolliePayments\Handler\Method\BizumPayment;
-use Kiener\MolliePayments\Handler\Method\BlikPayment;
-use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
-use Kiener\MolliePayments\Handler\Method\EpsPayment;
-use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
-use Kiener\MolliePayments\Handler\Method\iDealPayment;
-use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
-use Kiener\MolliePayments\Handler\Method\KbcPayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
-use Kiener\MolliePayments\Handler\Method\MbWayPayment;
-use Kiener\MolliePayments\Handler\Method\MultibancoPayment;
-use Kiener\MolliePayments\Handler\Method\MyBankPayment;
-use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
-use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
 use Kiener\MolliePayments\Handler\Method\PosPayment;
-use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
-use Kiener\MolliePayments\Handler\Method\RivertyPayment;
-use Kiener\MolliePayments\Handler\Method\SatispayPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
-use Kiener\MolliePayments\Handler\Method\SwishPayment;
-use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
-use Kiener\MolliePayments\Handler\Method\TwintPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Repository\MediaRepository;
@@ -112,6 +88,10 @@ class PaymentMethodService
         // we still need the min the database
         // but always disable them :)
         $this->disablePaymentMethod(IngHomePayPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaPayLaterPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaPayNowPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaSliceItPayment::class, $context);
+        $this->disablePaymentMethod(SofortPayment::class, $context);
 
         if (! $this->payPalExpressConfig->isEnabled()) {
             $this->disablePaymentMethod(PayPalExpressPayment::class, $context);
@@ -386,40 +366,11 @@ class PaymentMethodService
     {
         $paymentHandlers = [
             ApplePayPayment::class,
-            BanContactPayment::class,
             BankTransferPayment::class,
-            BilliePayment::class,
-            BelfiusPayment::class,
-            CreditCardPayment::class,
-            EpsPayment::class,
-            GiftCardPayment::class,
-            iDealPayment::class,
-            KbcPayment::class,
-            KlarnaPayLaterPayment::class,
-            KlarnaPayNowPayment::class,
-            KlarnaSliceItPayment::class,
-            KlarnaOnePayment::class,
-            PayPalPayment::class,
             PaySafeCardPayment::class,
-            Przelewy24Payment::class,
-            SofortPayment::class,
             VoucherPayment::class,
-            In3Payment::class,
             PosPayment::class,
-            TwintPayment::class,
-            BlikPayment::class,
             BancomatPayment::class,
-            MyBankPayment::class,
-            AlmaPayment::class,
-            TrustlyPayment::class,
-            PayconiqPayment::class,
-            RivertyPayment::class,
-            SatispayPayment::class,
-            PayByBankPayment::class,
-            MbWayPayment::class,
-            MultibancoPayment::class,
-            SwishPayment::class,
-            BizumPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];

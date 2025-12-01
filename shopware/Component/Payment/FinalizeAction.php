@@ -6,23 +6,23 @@ namespace Mollie\Shopware\Component\Payment;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
 use Kiener\MolliePayments\Handler\PaymentHandler;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
+use Mollie\Shopware\Component\Transaction\TransactionConverter;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class FinalizeAction
 {
-    private LoggerInterface $logger;
-    private MolliePaymentFinalize $finalizeFacade;
-    private TransactionConverterInterface $transactionConverter;
-
-    public function __construct(MolliePaymentFinalize $finalizeFacade, TransactionConverterInterface $transactionConverter, LoggerInterface $logger)
+    public function __construct(
+        private MolliePaymentFinalize $finalizeFacade,
+        #[Autowire(service: TransactionConverter::class)]
+        private TransactionConverterInterface $transactionConverter,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private LoggerInterface $logger)
     {
-        $this->finalizeFacade = $finalizeFacade;
-        $this->logger = $logger;
-        $this->transactionConverter = $transactionConverter;
     }
 
     public function finalize(PaymentHandler $paymentHandler,PaymentTransactionStruct $shopwareTransaction, Context $context): void

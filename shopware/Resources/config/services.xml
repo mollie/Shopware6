@@ -4,17 +4,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
-   <imports>
-       <import resource="./../../Component/**/Resources/config/services.xml"/>
-       <import resource="repositories.xml"/>
-   </imports>
     <services>
         <defaults autowire="true" autoconfigure="true"/>
-        <service id="Mollie\Shopware\Subscriber\OrderTransactionLoadedSubscriber">
-            <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="Mollie\Shopware\Subscriber\CustomerLoadedSubscriber">
-            <tag name="kernel.event_subscriber"/>
-        </service>
+        <prototype namespace="Mollie\Shopware\" resource="../../" exclude="../../../{Resources,Migration,*.php}"/>
     </services>
 </container>
