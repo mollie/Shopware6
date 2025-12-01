@@ -11,12 +11,19 @@ use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Struct\Struct;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-
+#[AutoconfigureTag('shopware.payment.method')]
+#[AutoconfigureTag('shopware.payment.method.async')]
+#[AutoconfigureTag('mollie.payment.method')]
 abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
 {
-    public function __construct(private MolliePaymentFacade $paymentFacade)
+    public function __construct(
+        #[Autowire(service: MolliePaymentFacade::class)]
+        private MolliePaymentFacade $paymentFacade
+    )
     {
     }
 
@@ -32,7 +39,7 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
 
     public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
     {
-        $this->paymentFacade->finalize($this, $request, $transaction, $context);
+        $this->paymentFacade->finalize($this, $transaction, $context);
     }
 
     public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment

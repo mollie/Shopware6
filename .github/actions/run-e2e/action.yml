@@ -117,20 +117,11 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
-
-    - name: Legacy fixes
-      if: ${{ startsWith(inputs.SHOPWARE,'6.4') }}
-      shell: bash
-      run: |
-        # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
-        docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
-        docker exec  shop bash -c 'mkdir -p /var/www/html/var/test/jwt && cp /var/www/html/config/jwt/*.pem /var/www/html/var/test/jwt && chmod 0660 /var/www/html/var/test/jwt/*.pem'
-       
+  
 
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:9.* -W' # we need to install phpunit 9 with all dependencies, because of minimum php version 8.0
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
