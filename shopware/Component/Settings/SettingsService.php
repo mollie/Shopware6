@@ -23,9 +23,9 @@ final class SettingsService extends AbstractSettingsService
 
     public function __construct(
         private SystemConfigService $systemConfigService,
-        #[Autowire(env: 'MOLLIE_DEV_MODE', )]
+        #[Autowire(env: 'bool:default:false:MOLLIE_DEV_MODE')]
         private bool $devMode = false,
-        #[Autowire(env: 'MOLLIE_CYPRESS_MODE')]
+        #[Autowire(env: 'bool:default:false:MOLLIE_CYPRESS_MODE')]
         private bool $cypressMode = false,
     ) {
     }
