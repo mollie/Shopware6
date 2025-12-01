@@ -12,4 +12,14 @@ final class AlmaPayment extends AbstractMolliePaymentHandler
     {
         return PaymentMethod::ALMA;
     }
+
+    public function getName(): string
+    {
+        return 'Alma';
+    }
+
+    public function getDescription(): string
+    {
+        return 'Offer a flexible and accessible payment method with Alma, France’s leading buy now, pay later solution. Consumers prefer Alma as it allows them to defer payments and provides more financial flexibility.';
+    }
 }

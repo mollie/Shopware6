@@ -93,5 +93,17 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         return $payment;
     }
 
+    public function getIconFileName(): string
+    {
+        return $this->getPaymentMethod()->value . '-icon';
+    }
+
+    public function getDescription(): string
+    {
+        return $this->getName() . ' | Mollie Payments';
+    }
+
     abstract public function getPaymentMethod(): PaymentMethod;
+
+    abstract public function getName(): string;
 }
