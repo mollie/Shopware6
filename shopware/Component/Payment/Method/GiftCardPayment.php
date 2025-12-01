@@ -12,4 +12,14 @@ final class GiftCardPayment extends AbstractMolliePaymentHandler
     {
         return PaymentMethod::GIFT_CARD;
     }
+
+    public function getName(): string
+    {
+        return 'Gift cards';
+    }
+
+    public function getDescription(): string
+    {
+        return 'Mollie allows you to quickly and easily accepts payment by gift card from the most used suppliers. It only takes 10 minutes to start receiving gift card payments with no hidden fees involved‚ you only pay for successful transactions.';
+    }
 }

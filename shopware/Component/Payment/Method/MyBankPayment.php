@@ -13,4 +13,9 @@ final class MyBankPayment extends AbstractMolliePaymentHandler implements BankTr
     {
         return PaymentMethod::MY_BANK;
     }
+
+    public function getName(): string
+    {
+        return 'MyBank';
+    }
 }

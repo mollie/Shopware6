@@ -13,4 +13,14 @@ final class RivertyPayment extends AbstractMolliePaymentHandler implements Manua
     {
         return PaymentMethod::RIVERTY;
     }
+
+    public function getName(): string
+    {
+        return 'Riverty';
+    }
+
+    public function getDescription(): string
+    {
+        return 'With Riverty, your customers enjoy the flexibility of a 30-day payment delay, allowing them to receive and even try their products before paying. Meanwhile, you, the merchant, get paid upfront and in full by Mollie. Riverty handles all the payment processing, including financial risk and collections, so you can focus on growing your business without any hassle.';
+    }
 }

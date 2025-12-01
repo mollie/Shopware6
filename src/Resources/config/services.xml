@@ -40,6 +40,7 @@
         <service id="Kiener\MolliePayments\Components\Installer\PluginInstaller" public="true" >
             <argument type="service" id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\PaymentMethodInstaller"/>
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller"/>
         </service>
