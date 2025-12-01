@@ -5,10 +5,12 @@ namespace Mollie\Shopware\Component\Logger;
 
 use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class PluginSettingsHandler extends AbstractHandler
 {
@@ -20,7 +22,13 @@ final class PluginSettingsHandler extends AbstractHandler
 
     private AbstractSettingsService $settingsService;
 
-    public function __construct(AbstractSettingsService $settingsService, Connection $connection, string $filePath, bool $bubble = true)
+    public function __construct(
+        #[Autowire(service: SettingsService::class)]
+        AbstractSettingsService $settingsService,
+        Connection $connection,
+        #[Autowire(value:'%kernel.logs_dir%/mollie_%kernel.environment%.log')]
+        string $filePath,
+        bool $bubble = true)
     {
         parent::__construct(LogLevel::DEBUG, $bubble);
         $this->connection = $connection;
