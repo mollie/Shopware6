@@ -6,17 +6,24 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Repository\OrderTransactionRepository;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class MollieGateway implements MollieGatewayInterface
 {
-    public function __construct(private ClientFactoryInterface $clientFactory,
+    public function __construct(
+        #[Autowire(service: ClientFactory::class)]
+        private ClientFactoryInterface $clientFactory,
+        #[Autowire(service: OrderTransactionRepository::class)]
         private OrderTransactionRepositoryInterface $orderTransactionRepository,
+        #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger)
     {
     }

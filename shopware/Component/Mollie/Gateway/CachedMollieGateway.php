@@ -6,7 +6,9 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 
+#[AsDecorator(decorates: MollieGateway::class)]
 final class CachedMollieGateway implements MollieGatewayInterface
 {
     /**
@@ -14,8 +16,9 @@ final class CachedMollieGateway implements MollieGatewayInterface
      */
     private array $cache = [];
 
-    public function __construct(private MollieGatewayInterface $decorated)
-    {
+    public function __construct(
+        private MollieGatewayInterface $decorated
+    ) {
     }
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
