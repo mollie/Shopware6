@@ -45,7 +45,6 @@ final class PaymentMethodInstaller
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
-
     }
 
     public function install(Context $context): EntityWrittenContainerEvent
