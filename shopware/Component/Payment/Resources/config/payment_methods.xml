@@ -5,6 +5,7 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults autowire="true" autoconfigure="true" public="true"/>
         <service id="Mollie\Shopware\Component\Payment\Handler\MolliePaymentFacade">
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Pay"/>
             <argument type="service" id="Mollie\Shopware\Component\Payment\Action\Finalize"/>

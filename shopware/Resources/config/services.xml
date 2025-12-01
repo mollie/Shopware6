@@ -9,12 +9,12 @@
        <import resource="repositories.xml"/>
    </imports>
     <services>
+        <defaults autowire="true" autoconfigure="true"/>
         <service id="Mollie\Shopware\Subscriber\OrderTransactionLoadedSubscriber">
             <tag name="kernel.event_subscriber"/>
         </service>
         <service id="Mollie\Shopware\Subscriber\CustomerLoadedSubscriber">
             <tag name="kernel.event_subscriber"/>
         </service>
-
     </services>
 </container>
