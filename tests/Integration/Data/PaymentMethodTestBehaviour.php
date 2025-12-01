@@ -34,10 +34,6 @@ trait PaymentMethodTestBehaviour
 
     public function getPaymentMethodByTechnicalName(string $technicalName, Context $context): PaymentMethodEntity
     {
-        /** @var EntityRepository $repository */
-        $repository = $this->getContainer()->get('payment_method.repository');
-        $criteria = new Criteria();
-
         /** @var PaymentMethodRepository $molliePaymentMethods */
         $molliePaymentMethods = $this->getContainer()->get(PaymentMethodRepository::class);
         $handler = $molliePaymentMethods->findByPaymentMethod($technicalName);
@@ -51,14 +47,7 @@ trait PaymentMethodTestBehaviour
             $handler = get_class($handler);
         }
 
-        $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handler));
-        $searchResult = $repository->search($criteria, $context);
-        $firstPaymentMethod = $searchResult->first();
-        if ($firstPaymentMethod === null) {
-            throw new \RuntimeException(sprintf('Payment method not found for technical name "%s"', $technicalName));
-        }
-
-        return $firstPaymentMethod;
+        return $this->getPaymentMethodByIdentifier($handler,$context);
     }
 
     public function getPaymentMethodByIdentifier(string $handlerIdentifier, Context $context): PaymentMethodEntity
@@ -68,8 +57,13 @@ trait PaymentMethodTestBehaviour
         $criteria = new Criteria();
 
         $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
+        $searchResult = $repository->search($criteria, $context);
+        $firstPaymentMethod = $searchResult->first();
+        if ($firstPaymentMethod === null) {
+            throw new \RuntimeException(sprintf('Payment method not found for handler "%s"', $handlerIdentifier));
+        }
 
-        return $repository->search($criteria, $context)->first();
+        return $firstPaymentMethod;
     }
 
     public function activatePaymentMethod(PaymentMethodEntity $paymentMethod, Context $context): void
