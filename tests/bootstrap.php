@@ -28,7 +28,7 @@ $dataBaseUrl = getenv('DATABASE_URL');
 $testBootstrapper = new TestBootstrapper();
 $testBootstrapper->setProjectDir($projectDir);
 $testBootstrapper->setDatabaseUrl($dataBaseUrl);
-$testBootstrapper->addActivePlugins('MolliePayments');
+$testBootstrapper->addCallingPlugin(realpath(__DIR__.'/../composer.json'));
 $testBootstrapper->setLoadEnvFile(false);
 $testBootstrapper->bootstrap();
 
