@@ -11,7 +11,7 @@ use Shopware\Core\Checkout\Order\OrderEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class OrderTransactionLoadedSubscriber implements EventSubscriberInterface
+final class OrderTransactionSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

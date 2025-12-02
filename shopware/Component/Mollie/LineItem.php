@@ -27,6 +27,11 @@ final class LineItem implements \JsonSerializable
     private string $imageUrl;
     private string $productUrl;
 
+    /**
+     * @var array<VoucherCategory>
+     */
+    private array $categories;
+
     public function __construct(private string $description, private int $quantity, private Money $unitPrice, private Money $totalAmount)
     {
         $this->type = LineItemType::PHYSICAL;
@@ -75,6 +80,21 @@ final class LineItem implements \JsonSerializable
         $lineItem->setSku($sku);
 
         if ($product instanceof ProductEntity) {
+            $voucherCategories = $product->getCustomFields()['mollie_payments_product_voucher_type'] ?? null;
+
+            if ($voucherCategories !== null) {
+                if (! is_array($voucherCategories)) {
+                    $voucherCategories = [$voucherCategories];
+                }
+                foreach ($voucherCategories as $voucherCategoryValue) {
+                    $voucherCategory = VoucherCategory::tryFromNumber((int)$voucherCategoryValue);
+                    if (! $voucherCategory instanceof VoucherCategory) {
+                        continue;
+                    }
+                    $lineItem->addCategory($voucherCategory);
+                }
+            }
+
             $lineItem->setSku($product->getProductNumber());
         }
 
@@ -179,8 +199,23 @@ final class LineItem implements \JsonSerializable
         return $this->productUrl;
     }
 
+    public function getCategories(): array
+    {
+        return $this->categories;
+    }
+
+    public function setCategories(array $categories): void
+    {
+        $this->categories = $categories;
+    }
+
     public function setProductUrl(string $productUrl): void
     {
         $this->productUrl = $productUrl;
+    }
+
+    private function addCategory(VoucherCategory $voucherCategory): void
+    {
+        $this->categories[] = $voucherCategory;
     }
 }
