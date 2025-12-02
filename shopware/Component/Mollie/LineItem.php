@@ -28,7 +28,7 @@ final class LineItem implements \JsonSerializable
     private string $productUrl;
 
     /**
-     * @var array<VoucherCategory>
+     * @var VoucherCategory[]
      */
     private array $categories;
 
@@ -87,7 +87,7 @@ final class LineItem implements \JsonSerializable
                     $voucherCategories = [$voucherCategories];
                 }
                 foreach ($voucherCategories as $voucherCategoryValue) {
-                    $voucherCategory = VoucherCategory::tryFromNumber((int)$voucherCategoryValue);
+                    $voucherCategory = VoucherCategory::tryFromNumber((int) $voucherCategoryValue);
                     if (! $voucherCategory instanceof VoucherCategory) {
                         continue;
                     }
@@ -199,14 +199,12 @@ final class LineItem implements \JsonSerializable
         return $this->productUrl;
     }
 
+    /**
+     * @return VoucherCategory[]
+     */
     public function getCategories(): array
     {
         return $this->categories;
-    }
-
-    public function setCategories(array $categories): void
-    {
-        $this->categories = $categories;
     }
 
     public function setProductUrl(string $productUrl): void
