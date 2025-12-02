@@ -79,25 +79,20 @@ final class PaymentMethodInstaller
                 continue;
             }
             $paymentMethod = $paymentHandler->getPaymentMethod();
-            $paymentMethodTechnicalName = $paymentMethod->value;
-            $paymentMethodName = $paymentHandler->getName();
 
+            $paymentMethodName = $paymentHandler->getName();
+            $paymentMethodTechnicalName = $paymentHandler->getTechnicalName();
             $mapping[$handlerIdentifier] = [
                 'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentMethodTechnicalName),
                 'pluginId' => $pluginId,
                 'afterOrderEnabled' => true,
-                'technicalName' => 'payment_mollie_' . $paymentMethodTechnicalName,
+                'technicalName' =>  $paymentMethodTechnicalName,
                 'handlerIdentifier' => $handlerIdentifier,
                 'name' => $paymentMethodName,
                 'translations' => [
                     Defaults::LANGUAGE_SYSTEM => [
                         'name' => $paymentMethodName,
                     ],
-                ],
-                'customFields' => [
-                    Mollie::EXTENSION => [
-                        'payment_method' => $paymentMethodTechnicalName,
-                    ]
                 ],
                 'active' => true
             ];
