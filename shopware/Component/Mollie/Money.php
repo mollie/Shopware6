@@ -31,15 +31,11 @@ final class Money implements \JsonSerializable
         return $this->value;
     }
 
-    public static function fromOrder(OrderEntity $order): self
+    public static function fromOrder(OrderEntity $order,CurrencyEntity $currency): self
     {
         $value = $order->getAmountTotal();
         if ((string) $order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
             $value = $order->getAmountNet();
-        }
-        $currency = $order->getCurrency();
-        if (! $currency instanceof CurrencyEntity) {
-            throw new \Exception('currency is not exists'); // todo: custom execption
         }
 
         return new self($value, $currency->getIsoCode());

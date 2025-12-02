@@ -8,14 +8,12 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
-use Mollie\Shopware\Component\Payment\CustomerEntityNotExistsException;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
-use Mollie\Shopware\Component\Payment\OrderCustomerNotExistsException;
-use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Mollie\Shopware\Component\Transaction\TransactionDataLoader;
+use Mollie\Shopware\Component\Transaction\TransactionDataLoaderInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -23,6 +21,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class Finalize
 {
     public function __construct(
+        #[Autowire(service: TransactionDataLoader::class)]
+        private TransactionDataLoaderInterface $transactionDataLoader,
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: 'event_dispatcher')]
@@ -34,10 +34,13 @@ final class Finalize
 
     public function execute(PaymentTransactionStruct $transaction, Context $context): void
     {
-        $order = $transaction->getOrder();
+        $transactionId = $transaction->getOrderTransactionId();
+        $transactionData = $this->transactionDataLoader->findById($transactionId,$context);
+
+        $order = $transactionData->getOrder();
         $orderNumber = (string) $order->getOrderNumber();
         $salesChannelId = $order->getSalesChannelId();
-        $transactionId = $transaction->getOrderTransactionId();
+        $customer = $transactionData->getCustomer();
 
         $logData = [
             'transactionId' => $transactionId,
@@ -46,15 +49,6 @@ final class Finalize
         ];
 
         $this->logger->info('Returned from payment page back to shop, start finalizing payment', $logData);
-
-        $orderCustomer = $order->getOrderCustomer();
-        if (! $orderCustomer instanceof OrderCustomerEntity) {
-            throw new OrderCustomerNotExistsException($transactionId);
-        }
-        $customer = $orderCustomer->getCustomer();
-        if (! $customer instanceof CustomerEntity) {
-            throw new CustomerEntityNotExistsException($orderCustomer->getId(),$transactionId);
-        }
 
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
