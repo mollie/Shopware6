@@ -17,9 +17,4 @@ final class SwishPayment extends AbstractMolliePaymentHandler
     {
         return 'Swish';
     }
-
-    public function getDescription(): string
-    {
-        return 'Swish payments has over 8 million users and is a member of the European Mobile Payment Systems Association. The Swish payment method offers convenience by allowing customers to authenticate and approve payments using the Swish mobile app and the Swedish BankID mobile app.';
-    }
 }

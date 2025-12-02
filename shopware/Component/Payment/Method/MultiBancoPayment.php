@@ -18,9 +18,4 @@ final class MultiBancoPayment extends AbstractMolliePaymentHandler implements Ba
     {
         return 'Multibanco';
     }
-
-    public function getDescription(): string
-    {
-        return "Tap into Portugal's thriving ecommerce scene with Multibanco, one of the most trusted payment methods in the country. With over 30% market share and 900 million annual transactions, accepting Multibanco might just be your key to reaching Portuguese consumers.";
-    }
 }

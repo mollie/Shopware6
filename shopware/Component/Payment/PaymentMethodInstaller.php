@@ -6,6 +6,9 @@ namespace Mollie\Shopware\Component\Payment;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
+use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
@@ -39,6 +42,8 @@ final class PaymentMethodInstaller
         private EntityRepository $shopwarePaymentMethodRepository,
         #[Autowire(service: 'media.repository')]
         private EntityRepository $mediaRepository,
+        #[Autowire(service: SettingsService::class)]
+        private AbstractSettingsService $settingsService,
         private MediaService $mediaService,
         private FileFetcher $fileFetcher,
         private PluginIdProvider $pluginIdProvider,
@@ -61,16 +66,22 @@ final class PaymentMethodInstaller
     {
         $molliePaymentMethods = $this->molliePaymentMethodRepository->getPaymentMethods();
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
+        $paypalExpressSettings = $this->settingsService->getPaypalExpressSettings();
 
         $mapping = [];
         $iconMapping = [];
+        $handlers = [];
         /** @var AbstractMolliePaymentHandler $paymentHandler */
         foreach ($molliePaymentMethods as $paymentHandler) {
             $handlerIdentifier = get_class($paymentHandler);
-            $paymentMethodTechnicalName = $paymentHandler->getPaymentMethod()->value;
+
+            if ($paymentHandler instanceof PayPalExpressPayment && ! $paypalExpressSettings->isEnabled()) {
+                continue;
+            }
+            $paymentMethod = $paymentHandler->getPaymentMethod();
+            $paymentMethodTechnicalName = $paymentMethod->value;
             $paymentMethodName = $paymentHandler->getName();
-            $paymentMethodDescription = $paymentHandler->getDescription();
-            $isDeprecatedMethod = $paymentHandler instanceof DeprecatedMethodAwareInterface;
+
             $mapping[$handlerIdentifier] = [
                 'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentMethodTechnicalName),
                 'pluginId' => $pluginId,
@@ -78,11 +89,9 @@ final class PaymentMethodInstaller
                 'technicalName' => 'payment_mollie_' . $paymentMethodTechnicalName,
                 'handlerIdentifier' => $handlerIdentifier,
                 'name' => $paymentMethodName,
-                'description' => $paymentMethodDescription,
                 'translations' => [
                     Defaults::LANGUAGE_SYSTEM => [
                         'name' => $paymentMethodName,
-                        'description' => $paymentMethodDescription,
                     ],
                 ],
                 'customFields' => [
@@ -90,8 +99,9 @@ final class PaymentMethodInstaller
                         'payment_method' => $paymentMethodTechnicalName,
                     ]
                 ],
-                'active' => ! $isDeprecatedMethod,
+                'active' => true
             ];
+            $handlers[$handlerIdentifier] = $paymentHandler;
             $iconMapping[$paymentHandler->getIconFileName()] = $handlerIdentifier;
         }
 
@@ -157,6 +167,12 @@ final class PaymentMethodInstaller
                     }
                 }
 
+                $handler = $handlers[$paymentMethodEntity->getHandlerIdentifier()] ?? null;
+
+                if ($handler instanceof DeprecatedMethodAwareInterface) {
+                    $changedData['active'] = false;
+                }
+
                 $mapping[$paymentMethodEntity->getHandlerIdentifier()] = array_replace($mapping[$paymentMethodEntity->getHandlerIdentifier()], $changedData);
             }
         }
@@ -176,7 +192,7 @@ final class PaymentMethodInstaller
                 return $this->fileFetcher->fetchFileFromURL($request, $fileName);
             } catch (MediaException $e) {
                 $message = sprintf('Failed to load icon from url');
-                $this->logger->warning($message,[
+                $this->logger->warning($message, [
                     'exception' => $e->getMessage(),
                     'file' => $fileName,
                     'url' => $url,
@@ -184,7 +200,7 @@ final class PaymentMethodInstaller
             }
         }
 
-        $this->logger->error('Failed to load payment method icon, PNG and SVG',[
+        $this->logger->error('Failed to load payment method icon, PNG and SVG', [
             'file' => $fileName,
             'url' => $url,
         ]);
