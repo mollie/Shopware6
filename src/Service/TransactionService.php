@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Mollie\Shopware\Component\Transaction\TransactionNotFoundException;
+use Mollie\Shopware\Component\Transaction\TransactionDataException;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
@@ -52,12 +52,12 @@ class TransactionService
         );
 
         if ($transactions->count() === 0) {
-            throw new TransactionNotFoundException($transactionId);
+            throw TransactionDataException::transactionNotFound($transactionId);
         }
 
         $transaction = $transactions->first();
         if ($transaction === null) {
-            throw new TransactionNotFoundException($transactionId);
+            throw TransactionDataException::transactionNotFound($transactionId);
         }
 
         return $transaction;

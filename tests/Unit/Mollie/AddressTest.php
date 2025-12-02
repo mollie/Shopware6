@@ -8,8 +8,7 @@ use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 
 #[CoversClass(Address::class)]
 final class AddressTest extends TestCase
@@ -25,7 +24,7 @@ final class AddressTest extends TestCase
 
     public function testCanCreateFromEntity(): void
     {
-        $customer = $this->customerRepository->getDefaultOrderCustomer();
+        $customer = $this->customerRepository->getDefaultCustomer();
         $orderAddress = $this->orderRepository->getOrderAddress($customer);
         $orderAddress->setPhoneNumber('+1234567890');
         $orderAddress->setAdditionalAddressLine1('Appartment 2');
@@ -60,17 +59,10 @@ final class AddressTest extends TestCase
         $this->assertSame($expected['title'], $actual->getTitle());
     }
 
-    public function testExpectExceptionOnEmptyCustomer(): void
-    {
-        $this->expectExceptionMessage('Customer cannot be null');
-        $orderAddress = new OrderAddressEntity();
-        $actual = Address::fromAddress(null, $orderAddress);
-    }
-
     public function testExpectExceptionOnEmptyOrderAddress()
     {
         $this->expectExceptionMessage('Address should not be null');
-        $customer = new OrderCustomerEntity();
+        $customer = new CustomerEntity();
         $actual = Address::fromAddress($customer, null);
     }
 }

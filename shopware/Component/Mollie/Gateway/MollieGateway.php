@@ -6,7 +6,8 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Exception\TransactionWithoutOrderException;
+use Mollie\Shopware\Component\Transaction\TransactionDataLoader;
+use Mollie\Shopware\Component\Transaction\TransactionDataLoaderInterface;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
@@ -21,6 +22,8 @@ final class MollieGateway implements MollieGatewayInterface
     public function __construct(
         #[Autowire(service: ClientFactory::class)]
         private ClientFactoryInterface $clientFactory,
+        #[Autowire(service: TransactionDataLoader::class)]
+        private TransactionDataLoaderInterface $transactionDataLoader,
         #[Autowire(service: OrderTransactionRepository::class)]
         private OrderTransactionRepositoryInterface $orderTransactionRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -34,21 +37,10 @@ final class MollieGateway implements MollieGatewayInterface
             'transactionId' => $transactionId,
         ]);
 
-        $transaction = $this->orderTransactionRepository->findById($transactionId, $context);
-        if ($transaction === null) {
-            $this->logger->error('Transaction not found', [
-                'transactionId' => $transactionId,
-            ]);
+        $transactionData = $this->transactionDataLoader->findById($transactionId, $context);
+        $transaction = $transactionData->getTransaction();
+        $transactionOrder = $transactionData->getOrder();
 
-            throw new TransactionNotFoundException($transactionId);
-        }
-        $transactionOrder = $transaction->getOrder();
-        if (! $transactionOrder instanceof OrderEntity) {
-            $this->logger->error('Transaction found, but OrderEntity is missing', [
-                'transactionId' => $transactionId,
-            ]);
-            throw new TransactionWithoutOrderException($transactionId);
-        }
         $orderNumber = (string) $transactionOrder->getOrderNumber();
         $salesChannelId = $transactionOrder->getSalesChannelId();
         $this->logger->info('Loading mollie payment data', [
