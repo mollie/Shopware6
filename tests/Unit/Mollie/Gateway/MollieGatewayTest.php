@@ -10,7 +10,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\TransactionNotFoundException;
 use Mollie\Shopware\Component\Mollie\Gateway\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\shopware\Exception\TransactionWithoutOrderException;
+use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderTransactionRepository;

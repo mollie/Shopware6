@@ -22,7 +22,7 @@ final class MoneyTest extends TestCase
         $orderEntity->setTaxStatus(CartPrice::TAX_STATE_FREE);
         $orderEntity->setAmountNet(19.99);
         $orderEntity->setAmountTotal(25.00);
-        $money = Money::fromOrder($orderEntity);
+        $money = Money::fromOrder($orderEntity,$currency);
 
         $this->assertSame('19.99', $money->getValue());
         $this->assertSame('EUR', $money->getCurrency());
