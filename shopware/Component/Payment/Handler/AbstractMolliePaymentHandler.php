@@ -31,6 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
 {
     private const TECHNICAL_NAME_PREFIX = 'payment_mollie_';
+
     public function __construct(
         #[Autowire(service: Pay::class)]
         private Pay $pay,
@@ -103,8 +104,8 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
 
     abstract public function getName(): string;
 
-    public function getTechnicalName():string
+    public function getTechnicalName(): string
     {
-        return self::TECHNICAL_NAME_PREFIX.$this->getPaymentMethod()->value;
+        return self::TECHNICAL_NAME_PREFIX . $this->getPaymentMethod()->value;
     }
 }

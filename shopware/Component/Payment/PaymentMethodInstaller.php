@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -86,7 +85,7 @@ final class PaymentMethodInstaller
                 'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentMethodTechnicalName),
                 'pluginId' => $pluginId,
                 'afterOrderEnabled' => true,
-                'technicalName' =>  $paymentMethodTechnicalName,
+                'technicalName' => $paymentMethodTechnicalName,
                 'handlerIdentifier' => $handlerIdentifier,
                 'name' => $paymentMethodName,
                 'translations' => [
