@@ -3,77 +3,28 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
-use Kiener\MolliePayments\Repository\MediaRepository;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
 class PaymentMethodService
 {
     public const TECHNICAL_NAME_PREFIX = 'payment_mollie_';
 
-    /**
-     * @var MediaService
-     */
-    private $mediaService;
-
-    /**
-     * @var PaymentMethodRepository
-     */
-    private $paymentRepository;
-
-    /**
-     * @var PluginIdProvider
-     */
-    private $pluginIdProvider;
-
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
-
-    /**
-     * @var VersionCompare
-     */
-    private $versionCompare;
-    private PayPalExpressConfig $payPalExpressConfig;
-
-    public function __construct(VersionCompare $versionCompare,
-        MediaService $mediaService,
-        MediaRepository $mediaRepository,
-        PaymentMethodRepository $paymentRepository,
-        PluginIdProvider $pluginIdProvider,
-        HttpClientInterface $httpClient,
-        PayPalExpressConfig $payPalExpressConfig)
-    {
-        $this->mediaService = $mediaService;
-        $this->mediaRepository = $mediaRepository;
-        $this->paymentRepository = $paymentRepository;
-        $this->pluginIdProvider = $pluginIdProvider;
-        $this->httpClient = $httpClient;
-
-        $this->versionCompare = $versionCompare;
-        $this->payPalExpressConfig = $payPalExpressConfig;
+    public function __construct(
+        private PaymentMethodRepository $paymentRepository,
+    ) {
     }
 
     public function installAndActivatePaymentMethods(Context $context): void

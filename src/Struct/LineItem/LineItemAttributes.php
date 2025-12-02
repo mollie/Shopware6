@@ -14,9 +14,9 @@ class LineItemAttributes
     private $productNumber;
 
     /**
-     * @var string
+     * @var ?string[]
      */
-    private $voucherType;
+    private ?array $voucherType;
 
     /**
      * @var bool
@@ -51,7 +51,6 @@ class LineItemAttributes
     public function __construct(LineItem $lineItem)
     {
         $this->productNumber = '';
-        $this->voucherType = null;
 
         $payload = $lineItem->getPayload();
 
@@ -61,7 +60,7 @@ class LineItemAttributes
 
         $this->isPromotionProduct = array_key_exists('promotionId', $payload);
 
-      //  $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
+        $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
         $this->subscriptionProduct = (bool) $this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int) $this->getCustomFieldValue($lineItem, 'subscription_interval');
@@ -95,14 +94,20 @@ class LineItemAttributes
         return $this->isPromotionProduct;
     }
 
-    public function getVoucherType(): string
+    /**
+     * @return ?string[]
+     */
+    public function getVoucherTypes(): ?array
     {
         return $this->voucherType;
     }
 
-    public function setVoucherType(string $voucherType): void
+    /**
+     * @param string[] $voucherTypes
+     */
+    public function setVoucherType(array $voucherTypes): void
     {
-        $this->voucherType = $voucherType;
+        $this->voucherType = $voucherTypes;
     }
 
     public function isSubscriptionProduct(): bool
@@ -183,9 +188,12 @@ class LineItemAttributes
         return $mollieData;
     }
 
-    private function getCustomFieldValue(LineItem $lineItem, string $keyName): string
+    /**
+     * @return mixed|string
+     */
+    private function getCustomFieldValue(LineItem $lineItem, string $keyName)
     {
-        $foundValue = '';
+        $foundValue = null;
 
         if (count($lineItem->getPayload()) > 0) {
             // check if we have customFields in our payload
@@ -197,7 +205,10 @@ class LineItemAttributes
                 // search in new structure
                 if (is_array($customFields)) {
                     $fullKey = 'mollie_payments_product_' . $keyName;
-                    $foundValue = (array_key_exists($fullKey, $customFields)) ? (string) $customFields[$fullKey] : '';
+                    $foundValue = $customFields[$fullKey] ?? null;
+                    if ($foundValue && $keyName === 'voucher_type' && ! is_array($foundValue)) {
+                        $foundValue = [$foundValue];
+                    }
                 }
 
                 // ---------------------------------------------------------------------------
