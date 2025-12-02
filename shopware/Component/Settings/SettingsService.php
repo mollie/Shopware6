@@ -31,9 +31,9 @@ final class SettingsService extends AbstractSettingsService
         #[Autowire('%env(bool:default:false:MOLLIE_PAYPAL_EXPRESS_BETA)')]
         private bool $paypalExpressEanbled = false,
         #[Autowire('%env(int:default:1:MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE)')]
-        private int $paypalExpressStyle = 1,
-        #[Autowire('%env(int:default:1:MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE)')]
-        private int $paypalExpressShape = 1,
+        private string $paypalExpressStyle = "1",
+        #[Autowire('%env(int:default:1MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE)')]
+        private string $paypalExpressShape = "1",
         #[Autowire('%env(string:default:"":MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS)')]
         private string $paypalExpressRestrictions = ''
     ) {
@@ -62,8 +62,8 @@ final class SettingsService extends AbstractSettingsService
     public function getPaypalExpressSettings(): PayPalExpressSettings
     {
         $settings = new PayPalExpressSettings($this->paypalExpressEanbled);
-        $settings->setStyle($this->paypalExpressStyle);
-        $settings->setShape($this->paypalExpressShape);
+        $settings->setStyle((int)$this->paypalExpressStyle);
+        $settings->setShape((int)$this->paypalExpressShape);
         $settings->setRestrictions(explode(' ', trim($this->paypalExpressRestrictions)));
 
         return $settings;
