@@ -10,7 +10,7 @@ use Shopware\Core\Checkout\Customer\CustomerEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CustomerLoadedSubscriber implements EventSubscriberInterface
+final class CustomerSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
