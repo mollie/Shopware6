@@ -25,4 +25,10 @@ final class PayPalExpressPayment extends AbstractMolliePaymentHandler
         // TODO authenticationId
         return $payment;
     }
+
+    public function getTechnicalName(): string
+    {
+        return parent::getTechnicalName().'express';
+    }
+
 }
