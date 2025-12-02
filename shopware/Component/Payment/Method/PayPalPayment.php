@@ -17,9 +17,4 @@ final class PayPalPayment extends AbstractMolliePaymentHandler
     {
         return 'PayPal';
     }
-
-    public function getDescription(): string
-    {
-        return 'Grow your business with PayPal’s worldwide brand recognition and Mollie’s seamless integration. With Mollie, you can add PayPal to your website in minutes. No hidden costs, monthly, or setup fees. Only pay when you get paid.';
-    }
 }

@@ -17,9 +17,4 @@ final class In3Payment extends AbstractMolliePaymentHandler
     {
         return 'iDeal IN3';
     }
-
-    public function getDescription(): string
-    {
-        return 'iDEAL in3 is a buy now, pay later payment method with guaranteed payouts. With iDEAL in3, your customers in the Netherlands can pay in three interest-free instalments over 60 days via iDEAL.';
-    }
 }

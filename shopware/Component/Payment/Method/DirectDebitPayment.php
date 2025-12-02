@@ -18,9 +18,4 @@ final class DirectDebitPayment extends AbstractMolliePaymentHandler implements D
     {
         return 'SEPA Direct Debit';
     }
-
-    public function getDescription(): string
-    {
-        return 'Mollie allows you to quickly and easily collect recurring payments through SEPA Direct Debit. It only takes 10 minutes to start receiving payments through SEPA Direct Debit and there are no hidden fees involved.';
-    }
 }

@@ -18,9 +18,4 @@ final class BilliePayment extends AbstractMolliePaymentHandler implements Manual
     {
         return 'Billie';
     }
-
-    public function getDescription(): string
-    {
-        return "Integrate Europe's leading B2B buy now‚ pay later payment method, Billie. With Billie payments‚ business buyers get flexible payment terms while merchants receive a guaranteed payout.";
-    }
 }

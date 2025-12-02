@@ -127,7 +127,19 @@ class ApplePayDirect
     /**
      * @param EntityRepository<EntityCollection<OrderAddressEntity>> $repoOrderAdresses
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
+    public function __construct(
+        ApplePayDomainVerificationService $domainFileDownloader,
+        ApplePayPayment $paymentHandler,
+        MolliePaymentDoPay $molliePayments,
+        CartServiceInterface $cartService,
+        ApplePayFormatter $formatter,
+        ApplePayShippingBuilder $shippingBuilder,
+        SettingsService $pluginSettings,
+        CustomerService $customerService,
+        PaymentMethodRepository $repoPaymentMethods,
+        CartBackupService $cartBackupService,
+        MollieApiFactory $mollieApiFactory,
+        ShopService $shopService, OrderService $orderService, $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;

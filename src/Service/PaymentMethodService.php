@@ -5,18 +5,13 @@ namespace Kiener\MolliePayments\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Handler\Method\BancomatPayment;
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
-use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
-use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
-use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Repository\MediaRepository;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
@@ -371,12 +366,6 @@ class PaymentMethodService
     public function getPaymentHandlers(): array
     {
         $paymentHandlers = [
-            ApplePayPayment::class,
-            BankTransferPayment::class,
-            PaySafeCardPayment::class,
-            VoucherPayment::class,
-            PosPayment::class,
-            BancomatPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];

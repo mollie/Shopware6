@@ -17,9 +17,4 @@ final class TrustlyPayment extends AbstractMolliePaymentHandler
     {
         return 'Trustly';
     }
-
-    public function getDescription(): string
-    {
-        return 'A global leader in Open Banking, the Trustly payment method is an account-to-account payment platform that lets consumers pay businesses directly from their bank accounts. It’s a fast, secure payment method that benefits both businesses and consumers.';
-    }
 }
