@@ -28,7 +28,6 @@ final class PayPalExpressPayment extends AbstractMolliePaymentHandler
 
     public function getTechnicalName(): string
     {
-        return parent::getTechnicalName().'express';
+        return parent::getTechnicalName() . 'express';
     }
-
 }
