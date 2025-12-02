@@ -7,13 +7,7 @@ use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\System\Currency\CurrencyEntity;
-use Shopware\Core\System\Language\LanguageEntity;
+use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
@@ -26,41 +20,20 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
     ) {
     }
 
-    public function build(string $transactionId, OrderEntity $order): CreatePayment
+    public function build(TransactionDataStruct $transactionData): CreatePayment
     {
-        $customer = $order->getOrderCustomer();
-        if (! $customer instanceof OrderCustomerEntity) {
-            throw new \Exception('Order without customer');
-        }
-
-        $deliveries = $order->getDeliveries();
-        if (! $deliveries instanceof OrderDeliveryCollection) {
-            throw new \Exception('Order without deliveries');
-        }
-        $language = $order->getLanguage();
-        if (! $language instanceof LanguageEntity) {
-            throw new \Exception('Order without language');
-        }
-
-        $currency = $order->getCurrency();
-        if (! $currency instanceof CurrencyEntity) {
-            throw new \Exception('Order does not have a currency'); // TODO:
-        }
-
-        $firstDeliveryLine = $deliveries->first();
-        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
-            throw new \Exception('Order does not have a delivery line');
-        }
-
-        $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
-        if (! $shippingOrderAddress instanceof OrderAddressEntity) {
-            throw new \Exception('Order does not have a shipping address');
-        }
+        $transactionId = $transactionData->getTransaction()->getId();
+        $order = $transactionData->getOrder();
+        $customer = $transactionData->getCustomer();
+        $currency = $transactionData->getCurrency();
+        $language = $transactionData->getLanguage();
+        $shippingOrderAddress = $transactionData->getShippingOrderAddress();
+        $deliveries = $transactionData->getDeliveries();
 
         $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
         $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
 
-        $customerNumber = (string) $customer->getCustomerNumber();
+        $customerNumber = $customer->getCustomerNumber();
         $description = (string) $order->getOrderNumber();
         $orderNumber = (string) $order->getOrderNumber();
 
@@ -103,7 +76,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 
         $billingAddress = Address::fromAddress($customer, $order->getBillingAddress());
 
-        $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order));
+        $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order,$currency));
         $payment->setBillingAddress($billingAddress);
         $payment->setShippingAddress($shippingAddress);
         $payment->setLines($lineItemCollection);

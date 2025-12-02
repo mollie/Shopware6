@@ -7,8 +7,6 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Action\Finalize;
 use Mollie\Shopware\Component\Payment\Action\Pay;
-use Mollie\Shopware\Component\Transaction\TransactionConverter;
-use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
@@ -37,8 +35,6 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         private Pay $pay,
         #[Autowire(service: Finalize::class)]
         private Finalize $finalize,
-        #[Autowire(service: TransactionConverter::class)]
-        private TransactionConverterInterface $transactionConverter,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -51,8 +47,6 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
             /** @var SalesChannelContext $salesChannelContext */
             $salesChannelContext = $request->get('sw-sales-channel-context');
             $dataBag = new RequestDataBag($request->request->all());
-
-            $transaction = $this->transactionConverter->convert($shopwareTransaction, $salesChannelContext->getContext());
 
             return $this->pay->execute($this, $transaction, $dataBag, $salesChannelContext);
         } catch (\Throwable $exception) {
@@ -68,7 +62,6 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
     {
         $shopwareTransaction = $transaction;
         try {
-            $transaction = $this->transactionConverter->convert($shopwareTransaction, $context);
             $this->finalize->execute($transaction, $context);
         } catch (HttpException $exception) {
             $this->logger->error('Payment is aborted or failed', [

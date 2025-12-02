@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
@@ -29,8 +30,8 @@ final class CreatePaymentBuilderTest extends TestCase
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);
 
         $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService);
-
-        $actual = $builder->build('test', $orderRepository->getDefaultOrder());
+        $transactionData = new TransactionDataStruct();
+        $actual = $builder->build($transactionData);
         $actual->setCardToken('testCard');
         $actual->setMethod(PaymentMethod::PAYPAL);
 
