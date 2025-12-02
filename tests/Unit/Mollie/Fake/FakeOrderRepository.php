@@ -8,8 +8,8 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -34,7 +34,7 @@ final class FakeOrderRepository
 
     public function getDefaultOrder(): OrderEntity
     {
-        $customer = $this->customerRepository->getDefaultOrderCustomer();
+        $customer = $this->customerRepository->getDefaultCustomer();
         $currency = new CurrencyEntity();
         $currency->setIsoCode('EUR');
         $locale = new LocaleEntity();
@@ -45,7 +45,7 @@ final class FakeOrderRepository
         $order->setOrderNumber('10000');
         $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
         $order->setBillingAddress($this->getOrderAddress($customer));
-        $order->setOrderCustomer($customer);
+
         $order->setDeliveries($this->getOrderDeliveries($customer));
         $order->setCurrency($currency);
         $order->setAmountTotal(100.00);
@@ -59,7 +59,7 @@ final class FakeOrderRepository
         return $order;
     }
 
-    public function getOrderAddress(OrderCustomerEntity $customerEntity): OrderAddressEntity
+    public function getOrderAddress(CustomerEntity $customerEntity): OrderAddressEntity
     {
         $country = new CountryEntity();
         $country->setIso('DE');
@@ -102,7 +102,7 @@ final class FakeOrderRepository
         return new CalculatedPrice($totalPrice, $unitPrice, new CalculatedTaxCollection([$calculatedTax]), new TaxRuleCollection(), $quantity);
     }
 
-    private function getOrderDeliveries(OrderCustomerEntity $customer): OrderDeliveryCollection
+    private function getOrderDeliveries(CustomerEntity $customer): OrderDeliveryCollection
     {
         $collection = new OrderDeliveryCollection();
 
