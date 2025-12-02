@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -27,6 +28,14 @@ final class SettingsService extends AbstractSettingsService
         private bool $devMode = false,
         #[Autowire('%env(bool:default:false:MOLLIE_CYPRESS_MODE)')]
         private bool $cypressMode = false,
+        #[Autowire('%env(bool:default:false:MOLLIE_PAYPAL_EXPRESS_BETA)')]
+        private bool $paypalExpressEanbled = false,
+        #[Autowire('%env(int:default:1:MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE)')]
+        private int $paypalExpressStyle = 1,
+        #[Autowire('%env(int:default:1:MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE)')]
+        private int $paypalExpressShape = 1,
+        #[Autowire('%env(string:default:"":MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS)')]
+        private string $paypalExpressRestrictions = ''
     ) {
     }
 
@@ -46,6 +55,16 @@ final class SettingsService extends AbstractSettingsService
         $shopwareSettings = $this->getShopwareSettings($salesChannelId);
         $settings = LoggerSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getPaypalExpressSettings(): PayPalExpressSettings
+    {
+        $settings = new PayPalExpressSettings($this->paypalExpressEanbled);
+        $settings->setStyle($this->paypalExpressStyle);
+        $settings->setShape($this->paypalExpressShape);
+        $settings->setRestrictions(explode(' ', trim($this->paypalExpressRestrictions)));
 
         return $settings;
     }
@@ -86,8 +105,8 @@ final class SettingsService extends AbstractSettingsService
     }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
      *
      * @return array<mixed[]>
      */

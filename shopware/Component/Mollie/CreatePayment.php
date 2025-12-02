@@ -23,7 +23,9 @@ final class CreatePayment implements \JsonSerializable
     private SequenceType $sequenceType;
 
     private ?string $cardToken = null;
+    private ?string $applePayPaymentToken = null;
 
+    private ?\DateTimeInterface $dueDate = null;
     /**
      * @var array<mixed>
      */
@@ -158,7 +160,12 @@ final class CreatePayment implements \JsonSerializable
      */
     public function toArray(): array
     {
-        return json_decode((string) json_encode($this), true);
+        $createPaymentBody = json_decode((string) json_encode($this), true);
+
+        // Remove all entries with null values
+        return array_filter($createPaymentBody, function ($entry) {
+            return $entry !== null;
+        });
     }
 
     public function setShopwareOrderNumber(string $orderNumber): void
@@ -169,5 +176,25 @@ final class CreatePayment implements \JsonSerializable
     public function getShopwareOrderNumber(): string
     {
         return $this->metadata['shopwareOrderNumber'];
+    }
+
+    public function setApplePayPaymentToken(?string $applePayPaymentToken): void
+    {
+        $this->applePayPaymentToken = $applePayPaymentToken;
+    }
+
+    public function getApplePayPaymentToken(): ?string
+    {
+        return $this->applePayPaymentToken;
+    }
+
+    public function getDueDate(): ?\DateTimeInterface
+    {
+        return $this->dueDate;
+    }
+
+    public function setDueDate(?\DateTimeInterface $dueDate): void
+    {
+        $this->dueDate = $dueDate;
     }
 }
