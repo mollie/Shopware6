@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
 
 abstract class AbstractSettingsService
 {
@@ -19,4 +20,6 @@ abstract class AbstractSettingsService
     abstract public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings;
 
     abstract public function getEnvironmentSettings(): EnvironmentSettings;
+
+    abstract public function getPaypalExpressSettings(): PayPalExpressSettings;
 }

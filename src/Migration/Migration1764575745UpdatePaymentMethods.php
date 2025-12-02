@@ -46,6 +46,12 @@ class Migration1764575745UpdatePaymentMethods extends MigrationStep
             'Kiener\MolliePayments\Handler\Method\TrustlyPayment' => \Mollie\Shopware\Component\Payment\Method\TrustlyPayment::class,
             'Kiener\MolliePayments\Handler\Method\TwintPayment' => \Mollie\Shopware\Component\Payment\Method\TwintPayment::class,
             'Kiener\MolliePayments\Handler\Method\PayconiqPayment' => \Mollie\Shopware\Component\Payment\Method\PayconiqPayment::class,
+            'Kiener\MolliePayments\Handler\Method\ApplePayPayment' => \Mollie\Shopware\Component\Payment\Method\ApplePayPayment::class,
+            'Kiener\MolliePayments\Handler\Method\BankTransferPayment' => \Mollie\Shopware\Component\Payment\Method\BankTransferPayment::class,
+            'Kiener\MolliePayments\Handler\Method\BancomatPayment' => \Mollie\Shopware\Component\Payment\Method\BancomatPayPayment::class,
+            'Kiener\MolliePayments\Handler\Method\PaySafeCardPayment' => \Mollie\Shopware\Component\Payment\Method\PaySafeCardPayment::class,
+            'Kiener\MolliePayments\Handler\Method\PosPayment' => \Mollie\Shopware\Component\Payment\Method\PosPayment::class,
+            'Kiener\MolliePayments\Handler\Method\VoucherPayment' => \Mollie\Shopware\Component\Payment\Method\VoucherPayment::class,
         ];
         foreach ($replacementClasses as $class => $replacementClass) {
             $replacementClass = addslashes($replacementClass);

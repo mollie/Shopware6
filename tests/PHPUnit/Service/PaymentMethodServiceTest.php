@@ -4,13 +4,6 @@ declare(strict_types=1);
 namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Handler\Method\BancomatPayment;
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
-use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
-use Kiener\MolliePayments\Handler\Method\PosPayment;
-use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\PayPalExpressConfig;
 use MolliePayments\Shopware\Tests\Fakes\FakeHttpClient;
@@ -77,26 +70,5 @@ class PaymentMethodServiceTest extends TestCase
     public function testTechnicalPaymentMethodPrefix(): void
     {
         $this->assertEquals('payment_mollie_', PaymentMethodService::TECHNICAL_NAME_PREFIX);
-    }
-
-    /**
-     * This test verifies that our list of officially supported payment
-     * methods is not touched without recognizing it.
-     */
-    public function testSupportedMethods(): void
-    {
-        $expected = [
-            ApplePayPayment::class,
-            BankTransferPayment::class,
-            PaySafeCardPayment::class,
-            VoucherPayment::class,
-            PosPayment::class,
-            BancomatPayment::class,
-            PayPalExpressPayment::class,
-        ];
-
-        $handlers = $this->paymentMethodService->getPaymentHandlers();
-
-        $this->assertEquals($expected, $handlers);
     }
 }

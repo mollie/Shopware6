@@ -17,9 +17,4 @@ final class EpsPayment extends AbstractMolliePaymentHandler
     {
         return 'EPS';
     }
-
-    public function getDescription(): string
-    {
-        return 'Easily accept EPS as a payment method‚ developed by various Austrian banks. Highly popular with Austrian shoppers, this is the main bank transfer method used in Austria.';
-    }
 }

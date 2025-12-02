@@ -28,25 +28,42 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 
     public function build(string $transactionId, OrderEntity $order): CreatePayment
     {
-        $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
-        $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
-        $orderNumber = (string) $order->getOrderNumber();
         $customer = $order->getOrderCustomer();
-
         if (! $customer instanceof OrderCustomerEntity) {
             throw new \Exception('Order without customer');
         }
-        $customerNumber = (string) $customer->getCustomerNumber();
-        $description = (string) $order->getOrderNumber();
-        $deliveries = $order->getDeliveries();
-        $language = $order->getLanguage();
 
+        $deliveries = $order->getDeliveries();
         if (! $deliveries instanceof OrderDeliveryCollection) {
             throw new \Exception('Order without deliveries');
         }
+        $language = $order->getLanguage();
         if (! $language instanceof LanguageEntity) {
             throw new \Exception('Order without language');
         }
+
+        $currency = $order->getCurrency();
+        if (! $currency instanceof CurrencyEntity) {
+            throw new \Exception('Order does not have a currency'); // TODO:
+        }
+
+        $firstDeliveryLine = $deliveries->first();
+        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
+            throw new \Exception('Order does not have a delivery line');
+        }
+
+        $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
+        if (! $shippingOrderAddress instanceof OrderAddressEntity) {
+            throw new \Exception('Order does not have a shipping address');
+        }
+
+        $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
+        $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
+
+        $customerNumber = (string) $customer->getCustomerNumber();
+        $description = (string) $order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
+
         if (mb_strlen($orderNumberFormat) > 0) {
             $description = str_replace([
                 '{ordernumber}',
@@ -56,10 +73,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
                 $customerNumber
             ], $orderNumberFormat);
         }
-        $currency = $order->getCurrency();
-        if (! $currency instanceof CurrencyEntity) {
-            throw new \Exception('Order does not have a currency'); // TODO:
-        }
+
         $returnUrl = $this->routeBuilder->getReturnUrl($transactionId);
         $webhookUrl = $this->routeBuilder->getWebhookUrl($transactionId);
 
@@ -72,14 +86,6 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
             }
         }
 
-        $firstDeliveryLine = $deliveries->first();
-        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
-            throw new \Exception('Order does not have a delivery line');
-        }
-        $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
-        if (! $shippingOrderAddress instanceof OrderAddressEntity) {
-            throw new \Exception('Order does not have a shipping address');
-        }
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
 
         foreach ($deliveries as $delivery) {

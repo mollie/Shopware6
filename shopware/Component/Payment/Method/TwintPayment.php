@@ -17,9 +17,4 @@ final class TwintPayment extends AbstractMolliePaymentHandler
     {
         return 'TWINT';
     }
-
-    public function getDescription(): string
-    {
-        return 'TWINT is the most popular mobile payment method in Switzerland. It lets users connect their bank accounts or cards to the Twint app for secure payments using their smartphones.';
-    }
 }

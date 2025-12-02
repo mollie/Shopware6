@@ -17,9 +17,4 @@ final class BelfiusPayment extends AbstractMolliePaymentHandler
     {
         return 'Belfius';
     }
-
-    public function getDescription(): string
-    {
-        return 'With Mollie‚ you can easily and quickly accept payments with the Belfius Pay Button‚ the online payment method of one of Belgium’s biggest banks. It only takes 10 minutes to start receiving Belfius payments and there are no hidden fees involved‚ you only pay for successful transactions.';
-    }
 }
