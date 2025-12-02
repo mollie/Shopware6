@@ -52,6 +52,7 @@ class Migration1764575745UpdatePaymentMethods extends MigrationStep
             'Kiener\MolliePayments\Handler\Method\PaySafeCardPayment' => \Mollie\Shopware\Component\Payment\Method\PaySafeCardPayment::class,
             'Kiener\MolliePayments\Handler\Method\PosPayment' => \Mollie\Shopware\Component\Payment\Method\PosPayment::class,
             'Kiener\MolliePayments\Handler\Method\VoucherPayment' => \Mollie\Shopware\Component\Payment\Method\VoucherPayment::class,
+            'Kiener\MolliePayments\Handler\Method\PayPalExpressPayment' => \Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment::class,
         ];
         foreach ($replacementClasses as $class => $replacementClass) {
             $replacementClass = addslashes($replacementClass);
