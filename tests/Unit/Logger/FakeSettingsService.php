@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
 {
@@ -19,11 +20,16 @@ final class FakeSettingsService extends AbstractSettingsService
             $this->loggerSettings = new LoggerSettings(true, 0);
         }
         if ($this->paymentSettings === null) {
-            $this->paymentSettings = new PaymentSettings();
+            $this->paymentSettings = new PaymentSettings('',0);
         }
         if ($this->apiSettings === null) {
             $this->apiSettings = new ApiSettings('test_key', 'live_key', true);
         }
+    }
+
+    public function getPaypalExpressSettings(): PayPalExpressSettings
+    {
+        // TODO: Implement getPaypalExpressSettings() method.
     }
 
     public function getEnvironmentSettings(): EnvironmentSettings
