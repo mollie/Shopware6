@@ -39,12 +39,14 @@ final class TransactionDataLoader implements TransactionDataLoaderInterface
     {
         $criteria = new Criteria([$transactionId]);
         $criteria->addAssociation('order.orderCustomer.salutation');
-        $criteria->addAssociation('order.orderCustomer.customer');
+        $criteria->addAssociation('order.orderCustomer.customer.salutation');
+        $criteria->addAssociation('order.orderCustomer.customer.country');
         $criteria->addAssociation('order.addresses.country');
-        $criteria->addAssociation('order.deliveries.shippingAddress');
+        $criteria->addAssociation('order.deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('order.billingAddress.country');
         $criteria->addAssociation('order.language.locale');
         $criteria->addAssociation('order.customer');
+        $criteria->addAssociation('order.currency');
         $criteria->addAssociation('order.salesChannel');
         $criteria->addAssociation('order.lineItems.product.media');
         $criteria->addAssociation('paymentMethod');
