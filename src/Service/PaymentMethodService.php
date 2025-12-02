@@ -9,24 +9,17 @@ use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
-use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
-use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
-use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Repository\MediaRepository;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
 use Kiener\MolliePayments\Service\HttpClient\HttpClientInterface;
 use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaService;
-use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
-use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 
@@ -93,7 +86,6 @@ class PaymentMethodService
         $this->disablePaymentMethod(KlarnaPayNowPayment::class, $context);
         $this->disablePaymentMethod(KlarnaSliceItPayment::class, $context);
         $this->disablePaymentMethod(SofortPayment::class, $context);
-
     }
 
     public function disablePaymentMethod(string $handlerName, Context $context): void
@@ -124,8 +116,6 @@ class PaymentMethodService
             $context
         );
     }
-
-
 
     public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder): bool
     {
@@ -167,5 +157,4 @@ class PaymentMethodService
 
         return $paymentMethod;
     }
-    
 }
