@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
 final class Address implements \JsonSerializable
@@ -34,11 +34,8 @@ final class Address implements \JsonSerializable
         $this->country = $country;
     }
 
-    public static function fromAddress(?OrderCustomerEntity $customer, ?OrderAddressEntity $orderAddress): self
+    public static function fromAddress(CustomerEntity $customer, ?OrderAddressEntity $orderAddress): self
     {
-        if ($customer === null) {
-            throw new \InvalidArgumentException('Customer cannot be null');
-        }
         if ($orderAddress === null) {
             throw new \InvalidArgumentException('Address should not be null');
         }
