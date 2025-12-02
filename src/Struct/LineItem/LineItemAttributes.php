@@ -51,7 +51,7 @@ class LineItemAttributes
     public function __construct(LineItem $lineItem)
     {
         $this->productNumber = '';
-        $this->voucherType = '';
+        $this->voucherType = null;
 
         $payload = $lineItem->getPayload();
 
@@ -61,7 +61,7 @@ class LineItemAttributes
 
         $this->isPromotionProduct = array_key_exists('promotionId', $payload);
 
-        $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
+      //  $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
 
         $this->subscriptionProduct = (bool) $this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int) $this->getCustomFieldValue($lineItem, 'subscription_interval');
