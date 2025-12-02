@@ -44,9 +44,4 @@ final class CardPayment extends AbstractMolliePaymentHandler
     {
         return 'Card';
     }
-
-    public function getDescription(): string
-    {
-        return 'Mollie allows you to quickly and easily accept card payments online, both credit and debit‚ the most widely used online payment method in the world. It only takes 10 minutes to start receiving payments through credit and debit card and there are no hidden fees involved. You only pay for successful transactions.';
-    }
 }

@@ -14,6 +14,8 @@ use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
@@ -39,6 +41,8 @@ final class Pay
         private OrderTransactionRepositoryInterface $orderTransactionRepository,
         #[Autowire(service: OrderTransactionStateHandler::class)]
         private OrderTransactionStateHandler $stateMachineHandler,
+        #[Autowire(service: SettingsService::class)]
+        private AbstractSettingsService $settingsService,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -117,12 +121,20 @@ final class Pay
         $order = $transaction->getOrder();
         $transactionId = $transaction->getOrderTransactionId();
         $orderNumber = (string) $order->getOrderNumber();
+        $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelContext->getSalesChannelId());
         $createPaymentStruct = $this->createPaymentBuilder->build($transaction->getOrderTransactionId(), $order);
         $createPaymentStruct->setMethod($paymentHandler->getPaymentMethod());
 
         if ($paymentHandler instanceof ManualCaptureModeAwareInterface) {
             $createPaymentStruct->setCaptureMode(CaptureMode::MANUAL);
         }
+
+        if ($paymentHandler instanceof BankTransferAwareInterface && $paymentSettings->getDueDateDays() > 0) {
+            $dueDate = new \DateTime('now', new \DateTimeZone('UTC'));
+            $dueDate->modify('+' . $paymentSettings->getDueDateDays() . ' days');
+            $createPaymentStruct->setDueDate($dueDate);
+        }
+
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $order);
         $this->logger->info('Payment payload created for mollie API', [
             'payload' => $createPaymentStruct->toArray(),

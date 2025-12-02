@@ -17,9 +17,4 @@ final class KbcPayment extends AbstractMolliePaymentHandler
     {
         return 'KBC/CBC Payment';
     }
-
-    public function getDescription(): string
-    {
-        return 'Mollie allows you to quickly and easily accept payments through the KBC/CBC Payment Button. It only takes 10 minutes to start receiving KBC/CBC payments with no hidden fees involved‚ as you only pay for successful transactions.';
-    }
 }

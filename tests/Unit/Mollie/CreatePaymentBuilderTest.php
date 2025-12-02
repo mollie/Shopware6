@@ -25,7 +25,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $orderRepository = new FakeOrderRepository();
 
         $fakeRouteBuilder = new FakeRouteBuilder();
-        $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}');
+        $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}',0);
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);
 
         $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService);
