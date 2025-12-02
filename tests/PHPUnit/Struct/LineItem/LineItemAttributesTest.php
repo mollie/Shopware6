@@ -68,7 +68,7 @@ class LineItemAttributesTest extends TestCase
         $item = new LineItem('', '');
         $attributes = new LineItemAttributes($item);
 
-        $this->assertEquals('', $attributes->getVoucherType());
+        $this->assertEquals('', $attributes->getVoucherTypes());
     }
 
     /**
@@ -84,7 +84,7 @@ class LineItemAttributesTest extends TestCase
 
         $attributes = new LineItemAttributes($item);
 
-        $this->assertEquals('', $attributes->getVoucherType());
+        $this->assertEquals(null, $attributes->getVoucherTypes());
     }
 
     /**
@@ -100,7 +100,7 @@ class LineItemAttributesTest extends TestCase
 
         $attributes = new LineItemAttributes($item);
 
-        $this->assertEquals('', $attributes->getVoucherType());
+        $this->assertEquals(null, $attributes->getVoucherTypes());
     }
 
     /**
@@ -118,7 +118,7 @@ class LineItemAttributesTest extends TestCase
 
         $attributes = new LineItemAttributes($item);
 
-        $this->assertEquals(VoucherType::TYPE_MEAL, $attributes->getVoucherType());
+        $this->assertEquals([VoucherType::TYPE_MEAL], $attributes->getVoucherTypes());
     }
 
     /**
@@ -137,7 +137,7 @@ class LineItemAttributesTest extends TestCase
         $attributes = new LineItemAttributes($item);
 
         $expected = [
-            'mollie_payments_product_voucher_type' => VoucherType::TYPE_MEAL,
+            'mollie_payments_product_voucher_type' => [VoucherType::TYPE_MEAL],
         ];
 
         $this->assertEquals($expected, $attributes->toArray());

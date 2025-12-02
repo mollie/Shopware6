@@ -77,7 +77,7 @@ class VoucherCartCollector implements CartDataCollectorInterface
                     // load current custom fields data of mollie
                     // and overwrite the voucher type that we just searched
                     $attributes = new LineItemAttributes($item);
-                    $attributes->setVoucherType($voucherType);
+                    $attributes->setVoucherType([$voucherType]);
 
                     $customFields = $item->getPayload()['customFields'];
                     $customFields[CustomFieldsInterface::MOLLIE_KEY] = $attributes->toArray();

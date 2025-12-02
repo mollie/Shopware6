@@ -90,9 +90,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         voucherTypes() {
             return [
-                {value: 1, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO')},
-                {value: 2, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL')},
-                {value: 3, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER')},
+                { value: 1, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_ECO') },
+                { value: 2, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_MEAL') },
+                { value: 3, label: this.$tc('mollie-payments.vouchers.VOUCHER_TYPE_VALUE_VOUCHER') },
             ];
         },
 
@@ -110,9 +110,9 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         subscriptionIntervalTypes() {
             return [
-                {value: 'days', label: this.$tc('mollie-payments.subscriptions.TYPE_DAYS')},
-                {value: 'weeks', label: this.$tc('mollie-payments.subscriptions.TYPE_WEEKS')},
-                {value: 'months', label: this.$tc('mollie-payments.subscriptions.TYPE_MONTHS')},
+                { value: 'days', label: this.$tc('mollie-payments.subscriptions.TYPE_DAYS') },
+                { value: 'weeks', label: this.$tc('mollie-payments.subscriptions.TYPE_WEEKS') },
+                { value: 'months', label: this.$tc('mollie-payments.subscriptions.TYPE_MONTHS') },
             ];
         },
 
@@ -134,11 +134,10 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 if (this.product.customFields.mollie_payments_product_voucher_type) {
                     if (!Array.isArray(this.product.customFields.mollie_payments_product_voucher_type)) {
                         this.product.customFields.mollie_payments_product_voucher_type = [
-                            this.product.customFields.mollie_payments_product_voucher_type
-                        ]
+                            this.product.customFields.mollie_payments_product_voucher_type,
+                        ];
                     }
                 }
-
             }
             if (this.parentProduct) {
                 if (!this.parentProduct.customFields) {
@@ -147,8 +146,8 @@ Shopware.Component.register('sw-product-detail-mollie', {
                 if (this.parentProduct.customFields.mollie_payments_product_voucher_type) {
                     if (!Array.isArray(this.parentProduct.customFields.mollie_payments_product_voucher_type)) {
                         this.parentProduct.customFields.mollie_payments_product_voucher_type = [
-                            this.parentProduct.customFields.mollie_payments_product_voucher_type
-                        ]
+                            this.parentProduct.customFields.mollie_payments_product_voucher_type,
+                        ];
                     }
                 }
             }
