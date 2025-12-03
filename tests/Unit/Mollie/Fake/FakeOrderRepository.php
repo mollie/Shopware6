@@ -18,39 +18,20 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\Country\CountryEntity;
-use Shopware\Core\System\Currency\CurrencyEntity;
-use Shopware\Core\System\Language\LanguageEntity;
-use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\Test\TestDefaults;
 
 final class FakeOrderRepository
 {
-    private FakeCustomerRepository $customerRepository;
-
-    public function __construct()
+    public function getDefaultOrder($customer): OrderEntity
     {
-        $this->customerRepository = new FakeCustomerRepository();
-    }
-
-    public function getDefaultOrder(): OrderEntity
-    {
-        $customer = $this->customerRepository->getDefaultCustomer();
-        $currency = new CurrencyEntity();
-        $currency->setIsoCode('EUR');
-        $locale = new LocaleEntity();
-        $locale->setCode('en-GB');
-        $language = new LanguageEntity();
-        $language->setLocale($locale);
         $order = new OrderEntity();
         $order->setOrderNumber('10000');
         $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
         $order->setBillingAddress($this->getOrderAddress($customer));
 
         $order->setDeliveries($this->getOrderDeliveries($customer));
-        $order->setCurrency($currency);
         $order->setAmountTotal(100.00);
         $order->setTaxStatus(CartPrice::TAX_STATE_NET);
-        $order->setLanguage($language);
         $order->setLineItems($this->getLineItems());
         if (method_exists($order, 'getPrimaryOrderDeliveryId')) {
             $order->getPrimaryOrderDeliveryId('fake-delivery-id');
@@ -73,6 +54,32 @@ final class FakeOrderRepository
         $orderAddress->setCountry($country);
 
         return $orderAddress;
+    }
+
+    public function getOrderDeliveries(CustomerEntity $customer): OrderDeliveryCollection
+    {
+        $collection = new OrderDeliveryCollection();
+
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('DHL');
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId('fake-delivery-id');
+        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
+        $delivery->setShippingCosts($this->getPrice(4.99, 19.0));
+        $delivery->setShippingMethod($shippingMethod);
+
+        $collection->add($delivery);
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId('fake-free-delivery-id');
+        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
+        $delivery->setShippingCosts($this->getPrice(0.0, 19.0));
+        $delivery->setShippingMethod($shippingMethod);
+        $collection->add($delivery);
+
+        return $collection;
     }
 
     private function getLineItems(): OrderLineItemCollection
@@ -100,31 +107,5 @@ final class FakeOrderRepository
         $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $unitPrice);
 
         return new CalculatedPrice($totalPrice, $unitPrice, new CalculatedTaxCollection([$calculatedTax]), new TaxRuleCollection(), $quantity);
-    }
-
-    private function getOrderDeliveries(CustomerEntity $customer): OrderDeliveryCollection
-    {
-        $collection = new OrderDeliveryCollection();
-
-        $shippingMethod = new ShippingMethodEntity();
-        $shippingMethod->setId('fake-shipping-method-id');
-        $shippingMethod->setName('DHL');
-
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId('fake-delivery-id');
-        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
-        $delivery->setShippingCosts($this->getPrice(4.99, 19.0));
-        $delivery->setShippingMethod($shippingMethod);
-
-        $collection->add($delivery);
-
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId('fake-free-delivery-id');
-        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
-        $delivery->setShippingCosts($this->getPrice(0.0, 19.0));
-        $delivery->setShippingMethod($shippingMethod);
-        $collection->add($delivery);
-
-        return $collection;
     }
 }
