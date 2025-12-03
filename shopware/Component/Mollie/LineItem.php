@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -68,7 +69,7 @@ final class LineItem implements \JsonSerializable
         $product = $orderLineItem->getProduct();
         $linItemPrice = $orderLineItem->getPrice();
         if (! $linItemPrice instanceof CalculatedPrice) {
-            throw new \Exception('Line item price is not set'); // TODO: custom exception
+            throw new MissingLineItemPriceException($orderLineItem->getLabel());
         }
         /** @var CalculatedTax $taxes */
         $taxes = $linItemPrice->getCalculatedTaxes()->first();

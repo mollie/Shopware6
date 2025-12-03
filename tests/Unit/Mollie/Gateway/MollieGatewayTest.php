@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie\Gateway;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
-use Mollie\Shopware\Component\Mollie\Gateway\ApiException;
+use Mollie\Shopware\Component\Mollie\Exception\ApiException;
+use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
-use Mollie\Shopware\Component\Mollie\Gateway\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;

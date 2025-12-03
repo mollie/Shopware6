@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Unit\Mollie\Gateway;
 
 use GuzzleHttp\Psr7\Uri;
 use Kiener\MolliePayments\MolliePayments;
-use Mollie\Shopware\Component\Mollie\Gateway\ApiKeyException;
+use Mollie\Shopware\Component\Mollie\Exception\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;

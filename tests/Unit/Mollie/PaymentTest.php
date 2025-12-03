@@ -43,8 +43,7 @@ final class PaymentTest extends TestCase
             'status' => 'pending',
             'countPayments' => 1,
             'id' => 'tr_test',
-            'method' => PaymentMethod::PAYPAL->value,
-            'extensions' => []
+            'method' => PaymentMethod::PAYPAL->value
         ];
 
         $this->assertEquals($expectedArray, $payment->toArray());

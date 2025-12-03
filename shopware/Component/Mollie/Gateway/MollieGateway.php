@@ -5,6 +5,8 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\Exception\ApiException;
+use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;

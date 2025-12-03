@@ -14,10 +14,10 @@ final class Payment extends Struct implements \JsonSerializable
     private PaymentStatus $status;
     private OrderTransactionEntity $shopwareTransaction;
 
-    private string $thirdPartyPaymentId;
-    private string $checkoutUrl;
+    private string $thirdPartyPaymentId = '';
+    private string $checkoutUrl = '';
 
-    private string $finalizeUrl;
+    private string $finalizeUrl = '';
     private int $countPayments = 1;
 
     public function __construct(private string $id, private PaymentMethod $method)
@@ -122,6 +122,6 @@ final class Payment extends Struct implements \JsonSerializable
         $data = json_decode((string) json_encode($this), true);
         unset($data['shopwareTransaction']);
 
-        return $data;
+        return array_filter($data);
     }
 }
