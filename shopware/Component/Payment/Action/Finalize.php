@@ -9,8 +9,8 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
-use Mollie\Shopware\Component\Transaction\TransactionDataLoader;
-use Mollie\Shopware\Component\Transaction\TransactionDataLoaderInterface;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
@@ -21,8 +21,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class Finalize
 {
     public function __construct(
-        #[Autowire(service: TransactionDataLoader::class)]
-        private TransactionDataLoaderInterface $transactionDataLoader,
+        #[Autowire(service: TransactionService::class)]
+        private TransactionServiceInterface $transactionDataLoader,
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: 'event_dispatcher')]
