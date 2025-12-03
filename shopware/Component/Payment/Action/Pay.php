@@ -16,12 +16,10 @@ use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Component\Transaction\TransactionDataLoader;
-use Mollie\Shopware\Component\Transaction\TransactionDataLoaderInterface;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
-use Mollie\Shopware\Repository\OrderTransactionRepository;
-use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -37,14 +35,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 final class Pay
 {
     public function __construct(
-        #[Autowire(service: TransactionDataLoader::class)]
-        private TransactionDataLoaderInterface $transactionDataLoader,
+        #[Autowire(service: TransactionService::class)]
+        private TransactionServiceInterface $transactionService,
         #[Autowire(service: CreatePaymentBuilder::class)]
         private CreatePaymentBuilderInterface $createPaymentBuilder,
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $paymentGateway,
-        #[Autowire(service: OrderTransactionRepository::class)]
-        private OrderTransactionRepositoryInterface $orderTransactionRepository,
         #[Autowire(service: OrderTransactionStateHandler::class)]
         private OrderTransactionStateHandler $stateMachineHandler,
         #[Autowire(service: SettingsService::class)]
@@ -59,10 +55,10 @@ final class Pay
     public function execute(AbstractMolliePaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
     {
         $transactionId = $transaction->getOrderTransactionId();
-        $shopwareFinalizeUrl = (string)$transaction->getReturnUrl();
+        $shopwareFinalizeUrl = (string) $transaction->getReturnUrl();
         $context = $salesChannelContext->getContext();
 
-        $transactionDataStruct = $this->transactionDataLoader->findById($transactionId, $context);
+        $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
         $transaction = $transactionDataStruct->getTransaction();
@@ -87,7 +83,7 @@ final class Pay
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
 
-        $this->orderTransactionRepository->savePaymentExtension($transaction, $payment, $context);
+        $this->transactionService->savePaymentExtension($transactionId,$order, $payment, $context);
 
         $this->processPaymentStatus($paymentHandler, $transactionId, $orderNumber, $context);
 
@@ -164,7 +160,6 @@ final class Pay
         $countPayments = 1;
         $oldMollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
         if ($oldMollieTransaction instanceof Payment) {
-
             $countPayments = $oldMollieTransaction->getCountPayments() + 1;
             $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
         }
