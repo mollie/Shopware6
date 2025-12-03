@@ -284,9 +284,18 @@ class ApplePayDirect
      */
     public function getShippingMethods(string $countryCode, SalesChannelContext $context): array
     {
-        $currentMethodID = $context->getShippingMethod()->getId();
+        $criteria = new Criteria();
+        $criteria->addAssociation('salesChannels');
+        $criteria->addFilter(new EqualsFilter('active', 1));
+        $criteria->addFilter(new EqualsFilter('shippingAvailable', 1));
+        $criteria->addFilter(new EqualsFilter('salesChannels.id', $context->getSalesChannelId()));
 
-        $countryID = (string) $this->customerService->getCountryId($countryCode, $context->getContext());
+        $currentMethodID = $context->getShippingMethod()->getId();
+        $countryID = $this->customerService->getCountryId($countryCode, $context->getContext(), $criteria);
+
+        if (empty($countryID)) {
+            throw new \Exception(sprintf('Country with code "%s" not found!', $countryCode));
+        }
 
         // get all available shipping methods of
         // our current country for Apple Pay

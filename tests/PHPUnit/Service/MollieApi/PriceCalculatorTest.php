@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace MolliePayments\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
+use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRule;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Tax\TaxCollection;
@@ -168,6 +170,46 @@ class PriceCalculatorTest extends TestCase
             //                $this->createOrderLineItemEntity(1, 1.1368, 13.68, 1.88, 16)
             //            ],
         ];
+    }
+
+    /**
+     * Test calculateLineItemPrice with multiple tax rates
+     * Formula: vatAmount = grossPrice × (taxRate / (100 + taxRate))
+     *
+     * Real-world case from error message:
+     * Expected VAT amount to be -€154.29 (-€1,096.20 × (16.38 / 116.38))
+     */
+    public function testCalculateLineItemPriceWithMultipleTaxRatesVatAmountRecalculation(): void
+    {
+        $priceCalculator = new PriceCalculator();
+
+        $taxCollection = new CalculatedTaxCollection([
+            new CalculatedTax(-120.11, 20, -720.69),
+            new CalculatedTax(-34.14, 10, -375.51),
+        ]);
+
+        $taxRuleCollection = new TaxRuleCollection([
+            new TaxRule(20, 65.743944636678),
+            new TaxRule(10, 34.256055363322),
+        ]);
+
+        $calculatedPrice = new CalculatedPrice(
+            unitPrice: -1096.2,
+            totalPrice: -1096.2,
+            calculatedTaxes: $taxCollection,
+            taxRules: $taxRuleCollection,
+            quantity: 1
+        );
+
+        $result = $priceCalculator->calculateLineItemPrice(
+            $calculatedPrice,
+            -1096.2,
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        $this->assertSame(16.38, $result->getVatRate());
+
+        $this->assertSame(-154.29, $result->getVatAmount());
     }
 
     /**
