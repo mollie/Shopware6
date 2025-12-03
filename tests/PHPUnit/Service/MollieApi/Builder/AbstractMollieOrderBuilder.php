@@ -30,7 +30,7 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
-use MolliePayments\Shopware\Tests\Fakes\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
 use MolliePayments\Shopware\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Shopware\Tests\Traits\OrderTrait;
 use MolliePayments\Shopware\Tests\Utils\Traits\PaymentBuilderTrait;
