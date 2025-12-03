@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Repository;
 
 use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -15,7 +13,6 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -42,43 +39,6 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
     {
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->logger = $logger;
-    }
-
-    public function savePaymentExtension(OrderTransactionEntity $orderTransactionEntity, Payment $payment, Context $context): EntityWrittenContainerEvent
-    {
-        $transactionId = $orderTransactionEntity->getId();
-        $order = $orderTransactionEntity->getOrder();
-        if (! $order) {
-            throw new TransactionWithoutOrderException($transactionId);
-        }
-
-        $salesChannel = $order->getSalesChannelId();
-        $orderNumber = $order->getOrderNumber();
-
-        $this->logger->debug('Save payment information in Order Transaction', [
-            'transactionId' => $transactionId,
-            'data' => $payment->toArray(),
-            'orderNumber' => $orderNumber,
-            'salesChannelId' => $salesChannel,
-        ]);
-
-        return $this->orderTransactionRepository->upsert([
-            [
-                'id' => $orderTransactionEntity->getId(),
-                'customFields' => [
-                    Mollie::EXTENSION => $payment->toArray()
-                ]
-            ]
-        ], $context);
-    }
-
-    public function findById(string $orderTransactionId, Context $context): ?OrderTransactionEntity
-    {
-        $criteria = new Criteria([$orderTransactionId]);
-        $criteria->addAssociation('order');
-        $criteria->addAssociation('paymentMethod');
-
-        return $this->orderTransactionRepository->search($criteria, $context)->first();
     }
 
     public function findOpenTransactions(?Context $context = null): IdSearchResult
