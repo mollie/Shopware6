@@ -6,11 +6,9 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Transaction\TransactionDataLoader;
-use Mollie\Shopware\Component\Transaction\TransactionDataLoaderInterface;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
-use Mollie\Shopware\Repository\OrderTransactionRepository;
-use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -22,10 +20,8 @@ final class MollieGateway implements MollieGatewayInterface
     public function __construct(
         #[Autowire(service: ClientFactory::class)]
         private ClientFactoryInterface $clientFactory,
-        #[Autowire(service: TransactionDataLoader::class)]
-        private TransactionDataLoaderInterface $transactionDataLoader,
-        #[Autowire(service: OrderTransactionRepository::class)]
-        private OrderTransactionRepositoryInterface $orderTransactionRepository,
+        #[Autowire(service: TransactionService::class)]
+        private TransactionServiceInterface $transactionService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger)
     {
@@ -37,7 +33,7 @@ final class MollieGateway implements MollieGatewayInterface
             'transactionId' => $transactionId,
         ]);
 
-        $transactionData = $this->transactionDataLoader->findById($transactionId, $context);
+        $transactionData = $this->transactionService->findById($transactionId, $context);
         $transaction = $transactionData->getTransaction();
         $transactionOrder = $transactionData->getOrder();
 
@@ -210,7 +206,7 @@ final class MollieGateway implements MollieGatewayInterface
         $payment = $this->getPaymentByMollieOrderId($mollieOrderId, $orderNumber, $salesChannelId);
         $payment->setFinalizeUrl($returnUrl);
 
-        $this->orderTransactionRepository->savePaymentExtension($transaction, $payment, $context);
+        $this->transactionService->savePaymentExtension($transactionId,$order, $payment, $context);
 
         return $payment;
     }

@@ -6,14 +6,12 @@ namespace Mollie\Shopware\Unit\Mollie\Gateway;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Gateway\ApiException;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
-use Mollie\Shopware\Component\Mollie\Gateway\TransactionNotFoundException;
 use Mollie\Shopware\Component\Mollie\Gateway\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderTransactionRepository;
+use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -28,11 +26,10 @@ final class MollieGatewayTest extends TestCase
     {
         $fakeClient = new FakeClient('mollieTestId', 'paid');
         $fakeClientFactory = new FakeClientFactory($fakeClient);
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->createValidTransaction();
-
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $context = new Context(new SystemSource());
 
@@ -48,10 +45,13 @@ final class MollieGatewayTest extends TestCase
         $fakeClient = new FakeClient('mollieTestId', 'paid', embed: true);
         $fakeClientFactory = new FakeClientFactory($fakeClient);
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->createLegacyTransaction();
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderCustomFields([
+            'order_id' => 'mollieTestId',
+            'transactionReturnUrl' => 'payment/finalize',
+        ]);
 
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new NullLogger());
 
         $context = new Context(new SystemSource());
 
@@ -67,42 +67,16 @@ final class MollieGatewayTest extends TestCase
         $this->expectException(ApiException::class);
         $fakeClient = new FakeClient();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderCustomFields([
+            'order_id' => 'mollieTestId',
+            'transactionReturnUrl' => 'payment/finalize',
+        ]);
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->createLegacyTransaction();
-
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
-
-        $context = new Context(new SystemSource());
-
-        $gateway->getPaymentByTransactionId('test', $context);
-    }
-
-    public function testTransactionNotFoundExceptionIsThrown(): void
-    {
-        $this->expectException(TransactionNotFoundException::class);
-        $fakeClient = new FakeClient();
-        $fakeClientFactory = new FakeClientFactory($fakeClient);
-
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $context = new Context(new SystemSource());
-        $gateway->getPaymentByTransactionId('test', $context);
-    }
 
-    public function testTransactionWithoutOrderExceptionIsThrown(): void
-    {
-        $this->expectException(TransactionWithoutOrderException::class);
-        $fakeClient = new FakeClient();
-        $fakeClientFactory = new FakeClientFactory($fakeClient);
-
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->createTransactionWithoutOrder();
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
-
-        $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
     }
 
@@ -111,10 +85,9 @@ final class MollieGatewayTest extends TestCase
         $this->expectException(TransactionWithoutMollieDataException::class);
         $fakeClient = new FakeClient();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
+        $transactionService = new FakeTransactionService();
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->createValidTransactionWithoutPaymentData();
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
@@ -125,12 +98,11 @@ final class MollieGatewayTest extends TestCase
         $this->expectException(TransactionWithoutMollieDataException::class);
         $fakeClient = new FakeClient();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
-
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->withOrderCustomFields([
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderCustomFields([
             'transactionReturnUrl' => 'payment/finalize',
         ]);
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
@@ -141,12 +113,12 @@ final class MollieGatewayTest extends TestCase
         $this->expectException(TransactionWithoutMollieDataException::class);
         $fakeClient = new FakeClient();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
+        $transactionService = new FakeTransactionService();
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->withOrderCustomFields([
+        $transactionService->withOrderCustomFields([
             'order_id' => 'test',
         ]);
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
@@ -157,10 +129,11 @@ final class MollieGatewayTest extends TestCase
         $this->expectException(ApiException::class);
 
         $fakeClient = new FakeClient();
+        $transactionService = new FakeTransactionService();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-        $fakeOrderTransactionRepository->createValidTransaction();
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+
+        $transactionService->createValidStruct();
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
     }
@@ -169,10 +142,9 @@ final class MollieGatewayTest extends TestCase
     {
         $fakeClient = new FakeClient('mollieTestId', 'paid');
         $fakeClientFactory = new FakeClientFactory($fakeClient);
+        $transactionService = new FakeTransactionService();
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $createPayment = new CreatePayment('test','test',new Money(10.00,'EUR'));
         $createPayment->setShopwareOrderNumber('10000');
@@ -188,9 +160,8 @@ final class MollieGatewayTest extends TestCase
         $fakeClient = new FakeClient();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
 
-        $fakeOrderTransactionRepository = new FakeOrderTransactionRepository();
-
-        $gateway = new MollieGateway($fakeClientFactory, $fakeOrderTransactionRepository, new NullLogger());
+        $transactionService = new FakeTransactionService();
+        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
 
         $createPayment = new CreatePayment('test','test',new Money(10.00,'EUR'));
         $createPayment->setShopwareOrderNumber('10000');

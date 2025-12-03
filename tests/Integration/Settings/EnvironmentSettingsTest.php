@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Integration\Settings;
 
 use Mollie\Shopware\Component\Settings\SettingsService;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
+#[CoversClass(SettingsService::class)]
 final class EnvironmentSettingsTest extends TestCase
 {
     use IntegrationTestBehaviour;
