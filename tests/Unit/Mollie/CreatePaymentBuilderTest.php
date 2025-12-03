@@ -11,26 +11,27 @@ use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
-use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
+use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Framework\Api\Context\SystemSource;
+use Shopware\Core\Framework\Context;
 
 #[CoversClass(CreatePaymentBuilder::class)]
 final class CreatePaymentBuilderTest extends TestCase
 {
     public function testBuild(): void
     {
-        $orderRepository = new FakeOrderRepository();
-
         $fakeRouteBuilder = new FakeRouteBuilder();
         $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}',0);
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);
 
         $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService);
-        $transactionData = new TransactionDataStruct();
+
+        $fakeTransactionDataLoader = new FakeTransactionService();
+        $transactionData = $fakeTransactionDataLoader->findById('test',new Context(new SystemSource()));
         $actual = $builder->build($transactionData);
         $actual->setCardToken('testCard');
         $actual->setMethod(PaymentMethod::PAYPAL);

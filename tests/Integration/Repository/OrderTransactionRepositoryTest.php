@@ -11,6 +11,7 @@ use Mollie\Shopware\Integration\Data\OrderTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
@@ -23,6 +24,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+#[CoversClass(OrderTransactionRepository::class)]
 class OrderTransactionRepositoryTest extends TestCase
 {
     use IntegrationTestBehaviour;
