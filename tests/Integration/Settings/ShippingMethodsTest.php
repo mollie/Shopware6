@@ -50,10 +50,6 @@ final class ShippingMethodsTest extends TestCase
         $shippingMethods = $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
 
         $this->assertNotEmpty($shippingMethods);
-        /*
-        $countryRepository->delete([[
-            'id' => $countryId
-        ]], $context);*/
     }
 
     /**
@@ -109,11 +105,6 @@ final class ShippingMethodsTest extends TestCase
             $this->assertArrayHasKey('label', $method);
             $this->assertArrayHasKey('amount', $method);
         }
-
-        /*
-      $countryRepository->delete([[
-          'id' => $countryId
-      ]], $context);*/
     }
 
     /**
@@ -146,11 +137,6 @@ final class ShippingMethodsTest extends TestCase
         $this->expectException(\Exception::class);
 
         $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
-
-        /*
-         $countryRepository->delete([[
-             'id' => $countryId
-         ]], $context);*/
     }
 
     /**
@@ -182,10 +168,5 @@ final class ShippingMethodsTest extends TestCase
         $this->expectException(\Exception::class);
 
         $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
-
-        /*
-         $countryRepository->delete([[
-             'id' => $countryId
-         ]], $context);*/
     }
 }
