@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Event;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Framework\Context;
 
 final class ModifyCreatePaymentPayloadEvent
 {
-    public function __construct(private CreatePayment $payment, private SalesChannelContext $salesChannelContext)
+    public function __construct(private CreatePayment $payment, private Context $context)
     {
     }
 
@@ -17,8 +17,8 @@ final class ModifyCreatePaymentPayloadEvent
         return $this->payment;
     }
 
-    public function getSalesChannelContext(): SalesChannelContext
+    public function getContext(): Context
     {
-        return $this->salesChannelContext;
+        return $this->context;
     }
 }
