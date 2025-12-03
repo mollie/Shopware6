@@ -17,7 +17,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -42,25 +41,21 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
 
     public function pay(Request $request, PaymentTransactionStruct $transaction, Context $context, ?Struct $validateStruct): RedirectResponse
     {
-        $shopwareTransaction = $transaction;
         try {
-            /** @var SalesChannelContext $salesChannelContext */
-            $salesChannelContext = $request->get('sw-sales-channel-context');
             $dataBag = new RequestDataBag($request->request->all());
 
-            return $this->pay->execute($this, $transaction, $dataBag, $salesChannelContext);
+            return $this->pay->execute($this, $transaction, $dataBag, $context);
         } catch (\Throwable $exception) {
             $this->logger->error('Mollie Pay Process Failed', [
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()->value
             ]);
-            throw PaymentException::asyncProcessInterrupted($shopwareTransaction->getOrderTransactionId(), $exception->getMessage(), $exception);
+            throw PaymentException::asyncProcessInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
     }
 
     public function finalize(Request $request, PaymentTransactionStruct $transaction, Context $context): void
     {
-        $shopwareTransaction = $transaction;
         try {
             $this->finalize->execute($transaction, $context);
         } catch (HttpException $exception) {
@@ -74,7 +69,7 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
                 'error' => $exception->getMessage(),
                 'paymentMethod' => $this->getPaymentMethod()->value
             ]);
-            throw PaymentException::asyncFinalizeInterrupted($shopwareTransaction->getOrderTransactionId(), $exception->getMessage(), $exception);
+            throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
     }
 

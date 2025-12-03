@@ -17,8 +17,9 @@ final class FakeClient extends Client
     public function __construct(private ?string $id = null,
         private ?string $status = 'failed',
         private ?PaymentMethod $method = PaymentMethod::PAYPAL,
-        private ?bool $embed = false)
-    {
+        private ?bool $embed = false,
+        private ?string $checkoutUrl = null,
+    ) {
         if ($id === null) {
             $this->response = new Response(status: 500, body: json_encode([
                 'title' => 'Failed Response',
@@ -29,7 +30,9 @@ final class FakeClient extends Client
             return;
         }
         $body = ['id' => $id, 'status' => $status, 'method' => $method->value];
-
+        if ($this->checkoutUrl !== null) {
+            $body['_links']['checkout']['href'] = $this->checkoutUrl;
+        }
         if ($embed) {
             $body['_embedded']['payments'][0] = $body;
         }

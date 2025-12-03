@@ -27,7 +27,6 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStat
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -52,18 +51,17 @@ final class Pay
     ) {
     }
 
-    public function execute(AbstractMolliePaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, RequestDataBag $dataBag, SalesChannelContext $salesChannelContext): RedirectResponse
+    public function execute(AbstractMolliePaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, RequestDataBag $dataBag, Context $context): RedirectResponse
     {
         $transactionId = $transaction->getOrderTransactionId();
         $shopwareFinalizeUrl = (string) $transaction->getReturnUrl();
-        $context = $salesChannelContext->getContext();
 
         $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
         $transaction = $transactionDataStruct->getTransaction();
         $orderNumber = (string) $order->getOrderNumber();
-        $salesChannel = $salesChannelContext->getSalesChannel();
+        $salesChannel = $transactionDataStruct->getSalesChannel();
         $salesChannelName = (string) $salesChannel->getName();
 
         $logData = [
@@ -75,7 +73,7 @@ final class Pay
 
         $this->logger->info('Start - Mollie payment', $logData);
 
-        $createPaymentStruct = $this->createPaymentStruct($transactionDataStruct, $paymentHandler, $salesChannelName, $salesChannelContext);
+        $createPaymentStruct = $this->createPaymentStruct($transactionDataStruct, $paymentHandler, $salesChannelName, $context);
         $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
 
         $payment = $this->paymentGateway->createPayment($createPaymentStruct, $salesChannel->getId());
@@ -120,13 +118,13 @@ final class Pay
         }
     }
 
-    private function createPaymentStruct(TransactionDataStruct $transaction, AbstractMolliePaymentHandler $paymentHandler, string $salesChannelName, SalesChannelContext $salesChannelContext): CreatePayment
+    private function createPaymentStruct(TransactionDataStruct $transaction, AbstractMolliePaymentHandler $paymentHandler, string $salesChannelName, Context $context): CreatePayment
     {
         $order = $transaction->getOrder();
         $transactionId = $transaction->getTransaction()->getId();
         $orderNumber = (string) $order->getOrderNumber();
 
-        $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelContext->getSalesChannelId());
+        $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
 
         $createPaymentStruct = $this->createPaymentBuilder->build($transaction);
         $createPaymentStruct->setMethod($paymentHandler->getPaymentMethod());
@@ -149,7 +147,7 @@ final class Pay
             'orderNumber' => $orderNumber,
         ]);
 
-        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $salesChannelContext);
+        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $context);
         $this->eventDispatcher->dispatch($paymentEvent);
 
         return $paymentEvent->getPayment();
