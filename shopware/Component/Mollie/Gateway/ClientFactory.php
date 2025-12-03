@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Client;
 use Kiener\MolliePayments\MolliePayments;
+use Mollie\Shopware\Component\Mollie\Exception\ApiKeyException;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
