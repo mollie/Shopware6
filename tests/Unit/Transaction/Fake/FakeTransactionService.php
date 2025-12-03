@@ -71,39 +71,7 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->createTransaction();
     }
 
-    private function getDefaultCurrency(): CurrencyEntity
-    {
-        $currency = new CurrencyEntity();
-        $currency->setIsoCode('EUR');
-
-        return $currency;
-    }
-
-    private function getDefaultLocale(): LocaleEntity
-    {
-        $locale = new LocaleEntity();
-        $locale->setCode('en-GB');
-
-        return $locale;
-    }
-
-    private function getDefaultLanguage(): LanguageEntity
-    {
-        $language = new LanguageEntity();
-        $language->setLocale($this->getDefaultLocale());
-
-        return $language;
-    }
-
-    private function getDefaultCountry(): CountryEntity
-    {
-        $country = new CountryEntity();
-        $country->setIso('DE');
-
-        return $country;
-    }
-
-    private function getDefaultSalesChannelEntity(): SalesChannelEntity
+    public function getDefaultSalesChannelEntity(): SalesChannelEntity
     {
         $salesChannel = new SalesChannelEntity();
         $salesChannel->setId(Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
@@ -111,7 +79,7 @@ final class FakeTransactionService implements TransactionServiceInterface
         return $salesChannel;
     }
 
-    private function createTransaction(): void
+    public function createTransaction(): void
     {
         $transaction = new OrderTransactionEntity();
         $currency = $this->getDefaultCurrency();
@@ -145,5 +113,37 @@ final class FakeTransactionService implements TransactionServiceInterface
             $language,
             $this->orderRepository->getOrderDeliveries($customer)
         );
+    }
+
+    private function getDefaultCurrency(): CurrencyEntity
+    {
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('EUR');
+
+        return $currency;
+    }
+
+    private function getDefaultLocale(): LocaleEntity
+    {
+        $locale = new LocaleEntity();
+        $locale->setCode('en-GB');
+
+        return $locale;
+    }
+
+    private function getDefaultLanguage(): LanguageEntity
+    {
+        $language = new LanguageEntity();
+        $language->setLocale($this->getDefaultLocale());
+
+        return $language;
+    }
+
+    private function getDefaultCountry(): CountryEntity
+    {
+        $country = new CountryEntity();
+        $country->setIso('DE');
+
+        return $country;
     }
 }
