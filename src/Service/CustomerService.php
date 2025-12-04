@@ -388,10 +388,13 @@ class CustomerService implements CustomerServiceInterface
     /**
      * Returns a country id by its iso code.
      */
-    public function getCountryId(string $countryCode, Context $context): ?string
+    public function getCountryId(string $countryCode, Context $context, ?Criteria $criteria = null): ?string
     {
         try {
-            $criteria = new Criteria();
+            if ($criteria === null) {
+                $criteria = new Criteria();
+            }
+
             $criteria->addFilter(new EqualsFilter('iso', strtoupper($countryCode)));
 
             // Get countries

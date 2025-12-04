@@ -4,6 +4,7 @@
 ## [Unreleased]
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
 - Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
+- Behoben: Versandarten wurden in Apple Pay Express angezeigt, obwohl der Versand für diese Länder in der Administration deaktiviert war.
 
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
