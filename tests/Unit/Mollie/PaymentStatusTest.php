@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie;
 
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusAuthorizedEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusCancelledEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusExpiredEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusFailedEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusOpenEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPendingEvent;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -56,5 +63,35 @@ final class PaymentStatusTest extends TestCase
         $this->assertSame('cancel', $canceledStatus->getShopwareHandlerMethod());
         $this->assertSame('fail', $failedStatus->getShopwareHandlerMethod());
         $this->assertSame('', $expiredStatus->getShopwareHandlerMethod());
+    }
+
+    public function testGetAllWebhookEvents(): void
+    {
+        $events = PaymentStatus::getAllWebhookEvents();
+
+        $expected = [
+            WebhookStatusOpenEvent::class,
+            WebhookStatusPendingEvent::class,
+            WebhookStatusAuthorizedEvent::class,
+            WebhookStatusPaidEvent::class,
+            WebhookStatusCancelledEvent::class,
+            WebhookStatusExpiredEvent::class,
+            WebhookStatusFailedEvent::class,
+        ];
+
+        $this->assertIsArray($events);
+        $this->assertCount(7, $events);
+        $this->assertSame($expected, $events);
+    }
+
+    public function testGetWebhookEventClass(): void
+    {
+        $this->assertSame(WebhookStatusOpenEvent::class, PaymentStatus::OPEN->getWebhookEventClass());
+        $this->assertSame(WebhookStatusPendingEvent::class, PaymentStatus::PENDING->getWebhookEventClass());
+        $this->assertSame(WebhookStatusAuthorizedEvent::class, PaymentStatus::AUTHORIZED->getWebhookEventClass());
+        $this->assertSame(WebhookStatusPaidEvent::class, PaymentStatus::PAID->getWebhookEventClass());
+        $this->assertSame(WebhookStatusCancelledEvent::class, PaymentStatus::CANCELED->getWebhookEventClass());
+        $this->assertSame(WebhookStatusExpiredEvent::class, PaymentStatus::EXPIRED->getWebhookEventClass());
+        $this->assertSame(WebhookStatusFailedEvent::class, PaymentStatus::FAILED->getWebhookEventClass());
     }
 }

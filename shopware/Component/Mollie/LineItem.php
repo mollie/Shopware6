@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Mollie\Exception\MissingCalculatedTaxException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
+use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -42,7 +44,7 @@ final class LineItem implements \JsonSerializable
     {
         $shippingMethod = $delivery->getShippingMethod();
         if (! $shippingMethod instanceof ShippingMethodEntity) {
-            throw new \Exception('Shipping method is not exists');
+            throw new MissingShippingMethodException();
         }
         $shippingCosts = $delivery->getShippingCosts();
 
@@ -50,7 +52,7 @@ final class LineItem implements \JsonSerializable
         $calculatedTax = $shippingCosts->getCalculatedTaxes()->first();
 
         if (! $calculatedTax instanceof CalculatedTax) {
-            throw new \Exception('Shipping costs not exists');
+            throw new MissingCalculatedTaxException();
         }
 
         $lineItem = new self((string) $shippingMethod->getName(), $shippingCosts->getQuantity(), new Money($shippingCosts->getUnitPrice(), $currency->getIsoCode()), new Money($shippingCosts->getTotalPrice(), $currency->getIsoCode()));

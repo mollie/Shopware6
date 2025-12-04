@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Settings;
+namespace Mollie\Shopware\Integration\Settings;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
-use Mollie\Integration\Data\SalesChannelTestBehaviour;
+use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
