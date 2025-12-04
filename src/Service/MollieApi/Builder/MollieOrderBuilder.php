@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -192,10 +193,10 @@ class MollieOrderBuilder
             if ($firstDelivery instanceof OrderDeliveryEntity) {
                 $firstDeliveryAddress = $firstDelivery->getShippingOrderAddress();
 
-                if ($firstDeliveryAddress->getFirstName() === '-') {
+                if ($shippingAddress instanceof CustomerAddressEntity && $firstDeliveryAddress->getFirstName() === '-') {
                     $firstDeliveryAddress->setFirstName($shippingAddress->getFirstName());
                 }
-                if ($firstDeliveryAddress->getLastName() === '-') {
+                if ($shippingAddress instanceof CustomerAddressEntity && $firstDeliveryAddress->getLastName() === '-') {
                     $firstDeliveryAddress->setLastName($shippingAddress->getLastName());
                 }
 
