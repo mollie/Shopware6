@@ -29,6 +29,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $currency = $transactionData->getCurrency();
         $language = $transactionData->getLanguage();
         $shippingOrderAddress = $transactionData->getShippingOrderAddress();
+        $billingOrderAddress = $transactionData->getBillingOrderAddress();
         $deliveries = $transactionData->getDeliveries();
 
         $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
@@ -63,13 +64,12 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
 
         foreach ($deliveries as $delivery) {
-            $deliveryOrderShippingAddress =  $delivery->getShippingOrderAddress();
-            if (method_exists($order, 'getPrimaryOrderDeliveryId') &&
-                $deliveryOrderShippingAddress instanceof OrderAddressEntity &&
-                $order->getPrimaryOrderDeliveryId() !== null &&
-                $delivery->getId() === $order->getPrimaryOrderDeliveryId()
-            )
-            {
+            $deliveryOrderShippingAddress = $delivery->getShippingOrderAddress();
+            if (method_exists($order, 'getPrimaryOrderDeliveryId')
+                && $deliveryOrderShippingAddress instanceof OrderAddressEntity
+                && $order->getPrimaryOrderDeliveryId() !== null
+                && $delivery->getId() === $order->getPrimaryOrderDeliveryId()
+            ) {
                 $shippingAddress = Address::fromAddress($customer,$deliveryOrderShippingAddress);
             }
 
@@ -81,7 +81,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
             $lineItemCollection->add($lineItem);
         }
 
-        $billingAddress = Address::fromAddress($customer, $order->getBillingAddress());
+        $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
 
         $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order,$currency));
         $payment->setBillingAddress($billingAddress);
