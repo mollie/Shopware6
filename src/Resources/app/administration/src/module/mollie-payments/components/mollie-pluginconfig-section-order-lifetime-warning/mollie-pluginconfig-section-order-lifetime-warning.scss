@@ -1,0 +1,18 @@
+.bankTransferDueDateKlarnaLimitReached {
+  border-color: rgb(251, 175, 24);
+  background-color: rgb(251, 175, 24,0.2);
+
+  > [class*="-icon"] {
+    color: rgb(251, 175, 24)
+  }
+}
+
+.bankTransferDueDateLimitReached {
+  border-color: rgb(226, 38, 42);
+  background-color: rgb(226, 38, 42,0.2);
+
+
+  > [class*="-icon"] {
+    color: rgb(226, 38, 42)
+  }
+}
