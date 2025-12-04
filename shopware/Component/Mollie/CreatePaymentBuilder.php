@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
@@ -62,8 +63,14 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
 
         foreach ($deliveries as $delivery) {
-            if (method_exists($order, 'getPrimaryOrderDeliveryId') && $order->getPrimaryOrderDeliveryId() !== null && $delivery->getId() === $order->getPrimaryOrderDeliveryId()) {
-                $shippingAddress = Address::fromAddress($customer, $delivery->getShippingOrderAddress());
+            $deliveryOrderShippingAddress =  $delivery->getShippingOrderAddress();
+            if (method_exists($order, 'getPrimaryOrderDeliveryId') &&
+                $deliveryOrderShippingAddress instanceof OrderAddressEntity &&
+                $order->getPrimaryOrderDeliveryId() !== null &&
+                $delivery->getId() === $order->getPrimaryOrderDeliveryId()
+            )
+            {
+                $shippingAddress = Address::fromAddress($customer,$deliveryOrderShippingAddress);
             }
 
             if ($delivery->getShippingCosts()->getTotalPrice() <= 0) {

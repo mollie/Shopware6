@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\Country\CountryEntity;
+use Shopware\Core\System\Salutation\SalutationEntity;
 use Shopware\Core\Test\TestDefaults;
 
 final class FakeOrderRepository
@@ -33,8 +34,8 @@ final class FakeOrderRepository
         $order->setAmountTotal(100.00);
         $order->setTaxStatus(CartPrice::TAX_STATE_NET);
         $order->setLineItems($this->getLineItems());
-        if (method_exists($order, 'getPrimaryOrderDeliveryId')) {
-            $order->getPrimaryOrderDeliveryId('fake-delivery-id');
+        if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
+            $order->setPrimaryOrderDeliveryId('fake-delivery-id');
         }
 
         return $order;
@@ -42,16 +43,25 @@ final class FakeOrderRepository
 
     public function getOrderAddress(CustomerEntity $customerEntity): OrderAddressEntity
     {
+        $orderAddress = $this->getOrderAddressWithoutCountry($customerEntity);
         $country = new CountryEntity();
         $country->setIso('DE');
+        $orderAddress->setCountry($country);
+
+        return $orderAddress;
+    }
+
+    public function getOrderAddressWithoutCountry(CustomerEntity $customerEntity): OrderAddressEntity
+    {
         $orderAddress = new OrderAddressEntity();
-        $orderAddress->setSalutation($customerEntity->getSalutation());
+        if ($customerEntity->getSalutation() instanceof SalutationEntity) {
+            $orderAddress->setSalutation($customerEntity->getSalutation());
+        }
         $orderAddress->setFirstName($customerEntity->getFirstName());
         $orderAddress->setLastName($customerEntity->getLastName());
         $orderAddress->setStreet('Test Street');
         $orderAddress->setZipCode('12345');
         $orderAddress->setCity('Test City');
-        $orderAddress->setCountry($country);
 
         return $orderAddress;
     }
