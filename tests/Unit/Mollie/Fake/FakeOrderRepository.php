@@ -92,20 +92,74 @@ final class FakeOrderRepository
         return $collection;
     }
 
-    private function getLineItems(): OrderLineItemCollection
-    {
-        $collection = new OrderLineItemCollection();
 
-        $product = new ProductEntity();
-        $product->setProductNumber('SW1000');
+    public function getOrderDeliveryWithoutShippingCosts(): OrderDeliveryEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('DHL');
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId('fake-delivery-without-costs');
+        $delivery->setShippingMethod($shippingMethod);
+        $shippingCosts = new CalculatedPrice(4.99, 4.99, new CalculatedTaxCollection(), new TaxRuleCollection(), 1);
+        $delivery->setShippingCosts($shippingCosts);
+
+        return $delivery;
+    }
+
+    public function getOrderLineItemWithoutPrice(): OrderLineItemEntity
+    {
         $orderLineItem = new OrderLineItemEntity();
         $orderLineItem->setId('fake-line-item-id');
-        $orderLineItem->setPrice($this->getPrice(10.99, 19));
         $orderLineItem->setLabel('Fake product');
-        $orderLineItem->setProduct($product);
+
+        return $orderLineItem;
+    }
+
+    public function getLineItems(): OrderLineItemCollection
+    {
+        $collection = new OrderLineItemCollection();
+        $orderLineItem = $this->createOrderLineItem('fake-line-item-id', 'SW1000', 'Fake product', 10.99);
         $collection->add($orderLineItem);
 
         return $collection;
+    }
+
+    public function getLineItemWithVoucherCategory(): OrderLineItemEntity
+    {
+        return $this->createOrderLineItem('fake-line-item-voucher-id', 'SW1001', 'Voucher product', 25.00, [1, 2]);
+    }
+
+    public function getLineItemWithSingleVoucherCategory(): OrderLineItemEntity
+    {
+        return $this->createOrderLineItem(
+            'fake-line-item-single-voucher-id', 'SW1002', 'Single voucher product', 30.00, 1);
+    }
+
+    public function getLineItemWithMixedVoucherCategories(): OrderLineItemEntity
+    {
+        return $this->createOrderLineItem('fake-line-item-mixed-voucher-id', 'SW1003', 'Mixed voucher product', 35.00, [1, 99, 2]);
+    }
+
+    private function createOrderLineItem(string $id, string $productNumber, string $label, float $price, $voucherCategories = null): OrderLineItemEntity
+    {
+        $product = new ProductEntity();
+        $product->setProductNumber($productNumber);
+        
+        if ($voucherCategories !== null) {
+            $product->setCustomFields([
+                'mollie_payments_product_voucher_type' => $voucherCategories
+            ]);
+        }
+
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId($id);
+        $orderLineItem->setPrice($this->getPrice($price, 19));
+        $orderLineItem->setLabel($label);
+        $orderLineItem->setProduct($product);
+
+        return $orderLineItem;
     }
 
     private function getPrice(float $unitPrice, float $taxRate, int $quantity = 1): CalculatedPrice
