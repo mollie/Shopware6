@@ -98,9 +98,9 @@ class MollieOrderBuilder
     /**
      * @param array<mixed> $paymentData
      *
+     * @return array<mixed>
      * @throws \Exception
      *
-     * @return array<mixed>
      */
     public function buildPaymentsPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
@@ -119,9 +119,9 @@ class MollieOrderBuilder
     /**
      * @param array<mixed> $paymentData
      *
+     * @return array<mixed>
      * @throws CustomerCouldNotBeFoundException
      *
-     * @return array<mixed>
      */
     public function buildOrderPayload(OrderEntity $order, string $transactionId, string $paymentMethod, SalesChannelContext $salesChannelContext, ?PaymentHandler $handler, array $paymentData = []): array
     {
@@ -147,12 +147,12 @@ class MollieOrderBuilder
         $orderCustomer = $order->getOrderCustomer();
         // build custom format
         // TODO this is just inline code, but it's unit tested, but maybe we should move it to a separate class too, and switch to unit tests + integration tests
-        if (! empty(trim($settings->getFormatOrderNumber()))) {
+        if (!empty(trim($settings->getFormatOrderNumber()))) {
             $orderNumberFormatted = $settings->getFormatOrderNumber();
-            $orderNumberFormatted = str_replace('{ordernumber}', (string) $order->getOrderNumber(), (string) $orderNumberFormatted);
+            $orderNumberFormatted = str_replace('{ordernumber}', (string)$order->getOrderNumber(), (string)$orderNumberFormatted);
 
             if ($orderCustomer instanceof OrderCustomerEntity) {
-                $orderNumberFormatted = str_replace('{customernumber}', (string) $orderCustomer->getCustomerNumber(), (string) $orderNumberFormatted);
+                $orderNumberFormatted = str_replace('{customernumber}', (string)$orderCustomer->getCustomerNumber(), (string)$orderNumberFormatted);
             }
         } else {
             $orderNumberFormatted = $order->getOrderNumber();
@@ -190,7 +190,16 @@ class MollieOrderBuilder
             $firstDelivery = $deliveries->first();
 
             if ($firstDelivery instanceof OrderDeliveryEntity) {
-                $shippingAddress = $firstDelivery->getShippingOrderAddress();
+                $firstDeliveryAddress = $firstDelivery->getShippingOrderAddress();
+
+                if ($firstDeliveryAddress->getFirstName() === '-') {
+                    $firstDeliveryAddress->setFirstName($shippingAddress->getFirstName());
+                }
+                if ($firstDeliveryAddress->getLastName() === '-') {
+                    $firstDeliveryAddress->setLastName($shippingAddress->getLastName());
+                }
+
+                $shippingAddress = $firstDeliveryAddress;
             }
         }
 
@@ -250,14 +259,14 @@ class MollieOrderBuilder
         /** @var MollieOrderBuildEvent|object $event */
         $event = $this->eventDispatcher->dispatch($event);
 
-        if (! $event instanceof MollieOrderBuildEvent) {
+        if (!$event instanceof MollieOrderBuildEvent) {
             throw new \Exception('Event Dispatcher did not return a MollieOrderBuilder event. No mollie order data is available');
         }
 
         // now check if we have metadata
         // and add it to our order if existing
-        if (! empty($event->getMetadata())) {
-            $orderData['metadata'] = (string) json_encode($event->getMetadata());
+        if (!empty($event->getMetadata())) {
+            $orderData['metadata'] = (string)json_encode($event->getMetadata());
         }
 
         return $orderData;
@@ -266,8 +275,8 @@ class MollieOrderBuilder
     private function isVerticalTaxCalculation(SalesChannelContext $salesChannelContext): bool
     {
         $salesChannel = $salesChannelContext->getSalesChannel();
-        /** @phpstan-ignore-next-line  */
-        if (! method_exists($salesChannel, 'getTaxCalculationType')) {
+        /** @phpstan-ignore-next-line */
+        if (!method_exists($salesChannel, 'getTaxCalculationType')) {
             return false;
         }
 
