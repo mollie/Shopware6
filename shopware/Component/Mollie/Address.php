@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
+use Mollie\Shopware\Component\Mollie\Exception\MissingOrderAddressException;
+use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
@@ -34,18 +37,15 @@ final class Address implements \JsonSerializable
         $this->country = $country;
     }
 
-    public static function fromAddress(CustomerEntity $customer, ?OrderAddressEntity $orderAddress): self
+    public static function fromAddress(CustomerEntity $customer, OrderAddressEntity $orderAddress): self
     {
-        if ($orderAddress === null) {
-            throw new \InvalidArgumentException('Address should not be null');
-        }
         $salutation = $customer->getSalutation();
         if ($salutation === null) {
-            throw new \InvalidArgumentException('Salutation cannot be null');
+            throw new MissingSalutationException();
         }
         $country = $orderAddress->getCountry();
         if ($country === null) {
-            throw new \InvalidArgumentException('Country cannot be null');
+            throw new MissingCountryException();
         }
         $address = new self($customer->getEmail(),
             (string) $salutation->getDisplayName(),
