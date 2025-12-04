@@ -3,7 +3,7 @@ import OrderLifeTimeLimitsDetectorService from './services/OderLifeTimeLimitDete
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
-import './mollie-pluginconfig-section-order-lifetime-warning.scss'
+import './mollie-pluginconfig-section-order-lifetime-warning.scss';
 
 Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
     template,
