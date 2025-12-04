@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
-use Mollie\Shopware\Component\Mollie\Exception\MissingOrderAddressException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
