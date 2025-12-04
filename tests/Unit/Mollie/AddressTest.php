@@ -5,14 +5,11 @@ namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
-use Mollie\Shopware\Component\Mollie\Exception\MissingOrderAddressException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\System\Salutation\SalutationEntity;
 
 #[CoversClass(Address::class)]
 final class AddressTest extends TestCase
@@ -62,7 +59,6 @@ final class AddressTest extends TestCase
         $this->assertSame($expected['country'], $actual->getCountry());
         $this->assertSame($expected['title'], $actual->getTitle());
     }
-
 
     public function testExpectExceptionOnEmptySalutation()
     {
