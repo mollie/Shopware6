@@ -4,11 +4,15 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Address;
+use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
+use Mollie\Shopware\Component\Mollie\Exception\MissingOrderAddressException;
+use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\System\Salutation\SalutationEntity;
 
 #[CoversClass(Address::class)]
 final class AddressTest extends TestCase
@@ -59,10 +63,20 @@ final class AddressTest extends TestCase
         $this->assertSame($expected['title'], $actual->getTitle());
     }
 
-    public function testExpectExceptionOnEmptyOrderAddress()
+
+    public function testExpectExceptionOnEmptySalutation()
     {
-        $this->expectExceptionMessage('Address should not be null');
-        $customer = new CustomerEntity();
-        $actual = Address::fromAddress($customer, null);
+        $customer = $this->customerRepository->getDefaultCustomerWithoutSalutation();
+        $orderAddress = $this->orderRepository->getOrderAddress($customer);
+        $this->expectException(MissingSalutationException::class);
+        Address::fromAddress($customer, $orderAddress);
+    }
+
+    public function testExpectExceptionOnEmptyCountry()
+    {
+        $customer = $this->customerRepository->getDefaultCustomer();
+        $orderAddress = $this->orderRepository->getOrderAddressWithoutCountry($customer);
+        $this->expectException(MissingCountryException::class);
+        Address::fromAddress($customer, $orderAddress);
     }
 }
