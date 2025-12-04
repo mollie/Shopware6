@@ -92,7 +92,6 @@ final class FakeOrderRepository
         return $collection;
     }
 
-
     public function getOrderDeliveryWithoutShippingCosts(): OrderDeliveryEntity
     {
         $shippingMethod = new ShippingMethodEntity();
@@ -146,7 +145,7 @@ final class FakeOrderRepository
     {
         $product = new ProductEntity();
         $product->setProductNumber($productNumber);
-        
+
         if ($voucherCategories !== null) {
             $product->setCustomFields([
                 'mollie_payments_product_voucher_type' => $voucherCategories
