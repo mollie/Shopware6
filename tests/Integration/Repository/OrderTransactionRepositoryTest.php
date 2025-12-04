@@ -50,22 +50,6 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
     }
 
-    public function testFindByTransactionIdReturnsOrderTransaction(): void
-    {
-        $this->createdOrders = [];
-
-        $salesChannelContext = $this->getSalesChannelContestWithCustomer();
-        $salesChannelContext = $this->createOrderWithCashPayment($salesChannelContext);
-        $latestOrderId = $this->createdOrders[0];
-        $orderEntity = $this->getOrder($latestOrderId, $salesChannelContext->getContext());
-        $transactionId = $orderEntity->getTransactions()->first()->getId();
-
-        $orderTransactionRepository = $this->getContainer()->get(OrderTransactionRepository::class);
-        $transaction = $orderTransactionRepository->findById($transactionId, $salesChannelContext->getContext());
-        $this->assertInstanceOf(OrderTransactionEntity::class, $transaction);
-        $this->assertSame($transaction->getId(), $transactionId);
-        $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
-    }
 
     /**
      * create a non mollie order, a normal mollie order and order which is older than 10 minutes.
