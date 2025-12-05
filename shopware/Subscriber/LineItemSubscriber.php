@@ -33,6 +33,10 @@ final class LineItemSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param EntityLoadedEvent<OrderLineItemEntity> $event
+     * @return void
+     */
     public function onOrderLineItemLoaded(EntityLoadedEvent $event): void
     {
         /** @var OrderLineItemEntity $lineItem */
