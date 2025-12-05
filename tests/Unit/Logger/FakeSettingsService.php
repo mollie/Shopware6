@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Logger;
 
+use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
@@ -23,7 +24,7 @@ final class FakeSettingsService extends AbstractSettingsService
             $this->paymentSettings = new PaymentSettings('',0);
         }
         if ($this->apiSettings === null) {
-            $this->apiSettings = new ApiSettings('test_key', 'live_key', true);
+            $this->apiSettings = new ApiSettings('test_key', 'live_key', Mode::TEST);
         }
     }
 
