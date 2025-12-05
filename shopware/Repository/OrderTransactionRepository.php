@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Repository;
 
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -48,7 +47,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
         }
 
         $date = new \DateTimeImmutable();
-        $start = $date->modify(sprintf('-%d days', BankTransferPayment::DUE_DATE_MAX_DAYS + 1));
+        $start = $date->modify(sprintf('-%d days', 101));
         $end = $date->modify('-5 minutes');
         $orFilterArray = [
             new EqualsFilter('stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),

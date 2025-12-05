@@ -9,9 +9,6 @@ final class CreatePayment implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
-    private string $description = '';
-    private Money $amount;
-    private string $redirectUrl = '';
     private string $cancelUrl = '';
     private string $webhookUrl = '';
     private PaymentMethod $method;
@@ -25,17 +22,16 @@ final class CreatePayment implements \JsonSerializable
     private ?string $cardToken = null;
     private ?string $applePayPaymentToken = null;
 
+    private ?string $customerReference = null;
+
     private ?\DateTimeInterface $dueDate = null;
     /**
      * @var array<mixed>
      */
     private array $metadata = [];
 
-    public function __construct(string $description, string $redirectUrl, Money $amount)
+    public function __construct(private string $description,private string $redirectUrl,private Money $amount)
     {
-        $this->description = $description;
-        $this->redirectUrl = $redirectUrl;
-        $this->amount = $amount;
         $this->setSequenceType(SequenceType::ONEOFF);
         $this->setCaptureMode(CaptureMode::AUTOMATIC);
     }
@@ -196,5 +192,15 @@ final class CreatePayment implements \JsonSerializable
     public function setDueDate(?\DateTimeInterface $dueDate): void
     {
         $this->dueDate = $dueDate;
+    }
+
+    public function setCustomerReference(string $customerReference): void
+    {
+        $this->customerReference = $customerReference;
+    }
+
+    public function getCustomerReference(): ?string
+    {
+        return $this->customerReference;
     }
 }

@@ -73,7 +73,7 @@ final class Pay
 
         $this->logger->info('Start - Mollie payment', $logData);
 
-        $createPaymentStruct = $this->createPaymentStruct($transactionDataStruct, $paymentHandler, $salesChannelName, $context);
+        $createPaymentStruct = $this->createPaymentStruct($transactionDataStruct, $paymentHandler, $dataBag,$salesChannelName, $context);
         $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
 
         $payment = $this->paymentGateway->createPayment($createPaymentStruct, $salesChannel->getId());
@@ -118,11 +118,12 @@ final class Pay
         }
     }
 
-    private function createPaymentStruct(TransactionDataStruct $transaction, AbstractMolliePaymentHandler $paymentHandler, string $salesChannelName, Context $context): CreatePayment
+    private function createPaymentStruct(TransactionDataStruct $transaction, AbstractMolliePaymentHandler $paymentHandler,RequestDataBag $dataBag, string $salesChannelName, Context $context): CreatePayment
     {
         $order = $transaction->getOrder();
         $transactionId = $transaction->getTransaction()->getId();
         $orderNumber = (string) $order->getOrderNumber();
+        $customer = $transaction->getCustomer();
 
         $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
 
@@ -139,7 +140,7 @@ final class Pay
             $createPaymentStruct->setDueDate($dueDate);
         }
 
-        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $order);
+        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct,$dataBag, $order,$customer);
         $this->logger->info('Payment payload created for mollie API', [
             'payload' => $createPaymentStruct->toArray(),
             'salesChannel' => $salesChannelName,
