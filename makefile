@@ -88,7 +88,7 @@ endif
 
 fixtures: ##2 Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console --no-debug cache:clear
-	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
+	cd ../../.. && php bin/console --no-debug mollie:fixtures:install
 
 pr: ##2 Prepares everything for a Pull Request
 	# -----------------------------------------------------------------
