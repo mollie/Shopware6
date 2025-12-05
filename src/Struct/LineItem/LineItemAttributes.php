@@ -14,11 +14,6 @@ class LineItemAttributes
     private $productNumber;
 
     /**
-     * @var ?string[]
-     */
-    private ?array $voucherType;
-
-    /**
      * @var bool
      */
     private $subscriptionProduct;
@@ -60,8 +55,6 @@ class LineItemAttributes
 
         $this->isPromotionProduct = array_key_exists('promotionId', $payload);
 
-        $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
-
         $this->subscriptionProduct = (bool) $this->getCustomFieldValue($lineItem, 'subscription_enabled');
         $this->subscriptionInterval = (int) $this->getCustomFieldValue($lineItem, 'subscription_interval');
         $this->subscriptionIntervalUnit = $this->getCustomFieldValue($lineItem, 'subscription_interval_unit');
@@ -75,7 +68,6 @@ class LineItemAttributes
     public static function getKeyList(): array
     {
         return [
-            'mollie_payments_product_voucher_type',
             'mollie_payments_product_subscription_enabled',
             'mollie_payments_product_subscription_interval',
             'mollie_payments_product_subscription_interval_unit',
@@ -92,22 +84,6 @@ class LineItemAttributes
     public function isPromotionProduct(): bool
     {
         return $this->isPromotionProduct;
-    }
-
-    /**
-     * @return ?string[]
-     */
-    public function getVoucherTypes(): ?array
-    {
-        return $this->voucherType;
-    }
-
-    /**
-     * @param string[] $voucherTypes
-     */
-    public function setVoucherType(array $voucherTypes): void
-    {
-        $this->voucherType = $voucherTypes;
     }
 
     public function isSubscriptionProduct(): bool
@@ -160,9 +136,6 @@ class LineItemAttributes
 
         // lets save some space and only store
         // what is existing
-        if ($this->voucherType !== null) {
-            $mollieData[$prefix . 'voucher_type'] = $this->voucherType;
-        }
 
         // only save if it's a subscription product
         if ($this->subscriptionProduct) {
@@ -205,10 +178,7 @@ class LineItemAttributes
                 // search in new structure
                 if (is_array($customFields)) {
                     $fullKey = 'mollie_payments_product_' . $keyName;
-                    $foundValue = $customFields[$fullKey] ?? null;
-                    if ($foundValue && $keyName === 'voucher_type' && ! is_array($foundValue)) {
-                        $foundValue = [$foundValue];
-                    }
+                    $foundValue = (array_key_exists($fullKey, $customFields)) ? (string) $customFields[$fullKey] : '';
                 }
 
                 // ---------------------------------------------------------------------------
