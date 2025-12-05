@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Entity\Product\Product;
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\Event\CartLoadedEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEvents;
@@ -25,6 +26,9 @@ final class LineItemSubscriber implements EventSubscriberInterface
         $cart = $event->getCart();
 
         foreach ($cart->getLineItems() as $lineItem) {
+            if ($lineItem->hasExtension(Mollie::EXTENSION)) {
+                continue;
+            }
             $customFields = $lineItem->getPayloadValue('customFields');
             if ($customFields === null) {
                 continue;
@@ -40,6 +44,9 @@ final class LineItemSubscriber implements EventSubscriberInterface
     {
         /** @var OrderLineItemEntity $lineItem */
         foreach ($event->getEntities() as $lineItem) {
+            if ($lineItem->hasExtension(Mollie::EXTENSION)) {
+                continue;
+            }
             $customFields = $lineItem->getPayload()['customFields'] ?? null;
             if ($customFields === null) {
                 continue;

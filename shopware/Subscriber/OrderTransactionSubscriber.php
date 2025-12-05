@@ -30,7 +30,10 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             if (! $orderTransaction instanceof OrderTransactionEntity) {
                 continue;
             }
-            $mollieCustomFields = $orderTransaction->getCustomFields()[Mollie::EXTENSION] ?? null;
+            if ($orderTransaction->hasExtension(Mollie::EXTENSION)) {
+                continue;
+            }
+            $mollieCustomFields = $orderTransaction->getTranslated()['customFields'][Mollie::EXTENSION] ?? null;
             if ($mollieCustomFields instanceof Payment) {
                 continue;
             }

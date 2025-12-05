@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Entity\Product\Product;
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Content\Product\ProductEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
@@ -25,7 +26,10 @@ final class ProductSubscriber implements EventSubscriberInterface
     {
         /** @var ProductEntity $product */
         foreach ($event->getEntities() as $product) {
-            $customFields = $product->getCustomFields();
+            if ($product->hasExtension(Mollie::EXTENSION)) {
+                continue;
+            }
+            $customFields = $product->getTranslated()['customFields'];
             if ($customFields === null) {
                 continue;
             }

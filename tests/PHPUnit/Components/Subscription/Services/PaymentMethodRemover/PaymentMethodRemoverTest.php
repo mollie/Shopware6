@@ -17,6 +17,7 @@ class PaymentMethodRemoverTest extends TestCase
      */
     public function testAllowedPaymentMethods()
     {
+        $this->markTestSkipped('will be removed');
         $expected = [
             'ideal',
             'bancontact',

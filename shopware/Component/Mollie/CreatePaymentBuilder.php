@@ -70,7 +70,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
                 && $order->getPrimaryOrderDeliveryId() !== null
                 && $delivery->getId() === $order->getPrimaryOrderDeliveryId()
             ) {
-                $shippingAddress = Address::fromAddress($customer,$deliveryOrderShippingAddress);
+                $shippingAddress = Address::fromAddress($customer, $deliveryOrderShippingAddress);
             }
 
             if ($delivery->getShippingCosts()->getTotalPrice() <= 0) {
@@ -83,7 +83,7 @@ final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 
         $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
 
-        $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order,$currency));
+        $payment = new CreatePayment($description, $returnUrl, Money::fromOrder($order, $currency));
         $payment->setBillingAddress($billingAddress);
         $payment->setShippingAddress($shippingAddress);
         $payment->setLines($lineItemCollection);

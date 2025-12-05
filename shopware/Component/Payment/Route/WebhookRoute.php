@@ -8,13 +8,20 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
-use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
-use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
+use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Exception\TransactionWithoutOrderException;
+use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -22,13 +29,20 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class WebhookRoute extends AbstractWebhookRoute
 {
+    /**
+     * @param EntityRepository<OrderTransactionCollection<OrderTransactionEntity>> $orderTransactionRepository
+     * @param EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $paymentMethodRepository
+     */
     public function __construct(
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
         private OrderTransactionStateHandler $stateMachineHandler,
+        #[Autowire(service: 'order_transaction.repository')]
+        private EntityRepository $orderTransactionRepository,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
-        private PaymentMethodRepository $paymentMethodRepository,
+        #[Autowire(service: 'payment_method.repository')]
+        private EntityRepository $paymentMethodRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -58,20 +72,20 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->eventDispatcher->dispatch($webhookStatusEvent);
 
         $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
-        $this->updatePaymentMethod($payment,$orderNumber);
+        $this->updatePaymentMethod($payment, $orderNumber, $context);
 
         // TODO: update order status
         return new WebhookRouteResponse();
     }
 
-    private function updatePaymentStatus(Payment $payment, string $transactionId, string $shopwareOrder, Context $context): void
+    private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void
     {
         $shopwareHandlerMethod = $payment->getStatus()->getShopwareHandlerMethod();
         $logData = [
             'transactionId' => $transactionId,
             'paymentStatus' => $payment->getStatus()->value,
             'shopwareMethod' => $shopwareHandlerMethod,
-            'shopwareOrder' => $shopwareOrder,
+            'shopwareOrder' => $orderNumber,
         ];
         $this->logger->info('Change payment status', $logData);
         if (mb_strlen($shopwareHandlerMethod) === 0) {
@@ -89,16 +103,17 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
     }
 
-    private function updatePaymentMethod(Payment $payment,string $shopwareOrder): void
+    private function updatePaymentMethod(Payment $payment, string $orderNumber, Context $context): void
     {
         $transaction = $payment->getShopwareTransaction();
         $transactionId = $transaction->getId();
         $paymentMethod = $transaction->getPaymentMethod();
+        $molliePaymentMethod = $payment->getMethod()->value;
 
         $logData = [
             'transactionId' => $transactionId,
-            'molliePaymentMethod' => $payment->getMethod()->value,
-            'shopwareOrder' => $shopwareOrder,
+            'molliePaymentMethod' => $molliePaymentMethod,
+            'shopwareOrder' => $orderNumber,
         ];
 
         $this->logger->info('Change payment method if changed', $logData);
@@ -106,20 +121,48 @@ final class WebhookRoute extends AbstractWebhookRoute
         if ($paymentMethod === null) {
             throw new TransactionWithoutOrderException($transactionId);
         }
+        /** @var ?PaymentMethodExtension $molliePaymentMethodExtension */
+        $molliePaymentMethodExtension = $paymentMethod->getExtension(Mollie::EXTENSION);
 
-        $paymentHandlerIdentifier = $paymentMethod->getHandlerIdentifier();
-        /** @var AbstractMolliePaymentHandler $paymentHandler */
-        $paymentHandler = $this->paymentMethodRepository->findByIdentifier($paymentHandlerIdentifier);
+        if ($molliePaymentMethodExtension === null) {
+            throw new \Exception('Mollie payment method not found for TransactionId: ' . $transactionId);
+        }
+        $logData['shopwarePaymentMethod'] = $molliePaymentMethodExtension->getPaymentMethod()->value;
 
-        $this->logger->debug('Start to compare payment');
+        $this->logger->debug('Start to compare payment', $logData);
 
-        if ($paymentHandler->getPaymentMethod() === $payment->getMethod()) {
+        if ($molliePaymentMethodExtension->getPaymentMethod() === $payment->getMethod()) {
+            $this->logger->debug('Payment methods are the same', $logData);
+
             return;
         }
-        /** Apple Pay payment is stored as credit card on mollie side, so we do not want to switch payment method */
-        if ($paymentHandler->getPaymentMethod() === PaymentMethod::APPLEPAY && $payment->getMethod() === PaymentMethod::CREDIT_CARD) {
+
+        if ($molliePaymentMethodExtension->getPaymentMethod() === PaymentMethod::APPLEPAY && $payment->getMethod() === PaymentMethod::CREDIT_CARD) {
+            $this->logger->debug('Apple Pay payment methods are stored as credit card in mollie, no change needed', $logData);
+
             return;
         }
-        // TODO: update payment method
+
+        $this->logger->debug('Payment methods are different, try to find payment method based on mollies payment method name', $logData);
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('technicalName', 'payment_mollie_' . $molliePaymentMethod));
+        $criteria->setLimit(1);
+
+        $searchResult = $this->paymentMethodRepository->searchIds($criteria, $context);
+        $newPaymentMethodId = $searchResult->firstId();
+
+        if ($newPaymentMethodId === null) {
+            throw new \Exception('Payment method not found for TransactionId: ' . $transactionId);
+        }
+
+        $this->orderTransactionRepository->upsert([
+            [
+                'id' => $transactionId,
+                'paymentMethodId' => $newPaymentMethodId
+            ]
+        ], $context);
+
+        $this->logger->info('Changed payment methods for transaction', $logData);
     }
 }

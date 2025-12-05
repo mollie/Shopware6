@@ -48,15 +48,6 @@
 
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\PaymentMethod\PaymentMethodControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
