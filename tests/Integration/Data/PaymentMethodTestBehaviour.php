@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Integration\Data;
 
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
-use Kiener\MolliePayments\Handler\Method\BancomatPayment;
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
@@ -20,29 +16,12 @@ trait PaymentMethodTestBehaviour
 {
     use IntegrationTestBehaviour;
 
-    /**
-     * We need this mapping array because technicalName is not defined in shopware 6.4
-     *
-     * @var array|\class-string[]
-     */
-    private array $paymentMethodMapping = [
-        ApplePayPayment::PAYMENT_METHOD_NAME => ApplePayPayment::class,
-        BankTransferPayment::PAYMENT_METHOD_NAME => BankTransferPayment::class,
-        VoucherPayment::PAYMENT_METHOD_NAME => VoucherPayment::class,
-        BancomatPayment::PAYMENT_METHOD_NAME => BancomatPayment::class,
-    ];
-
     public function getPaymentMethodByTechnicalName(string $technicalName, Context $context): PaymentMethodEntity
     {
         /** @var PaymentMethodRepository $molliePaymentMethods */
         $molliePaymentMethods = $this->getContainer()->get(PaymentMethodRepository::class);
         $handler = $molliePaymentMethods->findByPaymentMethod($technicalName);
-        if ($handler === null) {
-            $handler = $this->paymentMethodMapping[$technicalName];
-            if ($handler === null) {
-                throw new \RuntimeException(sprintf('Handler not found for technical name "%s"', $technicalName));
-            }
-        }
+
         if (! is_string($handler)) {
             $handler = get_class($handler);
         }

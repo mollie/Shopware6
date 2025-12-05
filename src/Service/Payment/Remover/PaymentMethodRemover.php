@@ -11,7 +11,6 @@ use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
-use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -177,22 +176,6 @@ abstract class PaymentMethodRemover implements PaymentMethodRemoverInterface, Ca
             $attributes = new OrderLineItemEntityAttributes($lineItem);
 
             if ($attributes->isSubscriptionProduct()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function isVoucherOrder(OrderEntity $order, Context $context): bool
-    {
-        $lineItems = $this->orderDataExtractor->extractLineItems($order);
-
-        /** @var OrderLineItemEntity $lineItem */
-        foreach ($lineItems as $lineItem) {
-            $attributes = new OrderLineItemEntityAttributes($lineItem);
-
-            if (VoucherType::isVoucherProduct($attributes->getVoucherType())) {
                 return true;
             }
         }
