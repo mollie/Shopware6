@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie\Fake;
 
+use Mollie\Shopware\Component\Mollie\VoucherCategory;
+use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
+use Mollie\Shopware\Entity\Product\Product;
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
@@ -133,7 +137,7 @@ final class FakeOrderRepository
     public function getLineItemWithSingleVoucherCategory(): OrderLineItemEntity
     {
         return $this->createOrderLineItem(
-            'fake-line-item-single-voucher-id', 'SW1002', 'Single voucher product', 30.00, 1);
+            'fake-line-item-single-voucher-id', 'SW1002', 'Single voucher product', 30.00, [1]);
     }
 
     public function getLineItemWithMixedVoucherCategories(): OrderLineItemEntity
@@ -145,11 +149,18 @@ final class FakeOrderRepository
     {
         $product = new ProductEntity();
         $product->setProductNumber($productNumber);
-
+        $extension = new Product();
         if ($voucherCategories !== null) {
-            $product->setCustomFields([
-                'mollie_payments_product_voucher_type' => $voucherCategories
-            ]);
+            $voucherCategoriesCollection = new VoucherCategoryCollection();
+            foreach ($voucherCategories as $voucherCategory) {
+                $voucherCategory = VoucherCategory::tryFromNumber($voucherCategory);
+                if ($voucherCategory === null) {
+                    continue;
+                }
+                $voucherCategoriesCollection->add($voucherCategory);
+            }
+            $extension->setVoucherCategories($voucherCategoriesCollection);
+            $product->addExtension(Mollie::EXTENSION,$extension);
         }
 
         $orderLineItem = new OrderLineItemEntity();

@@ -62,7 +62,7 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 
         $parts = $event->getParts();
         $cacheParts = [];
-        $cacheParts = $this->addVoucherKey($cart, $cacheParts);
+        // s  $cacheParts = $this->addVoucherKey($cart, $cacheParts);
         $cacheParts = $this->addMollieLimitsKey($cacheParts);
         $cacheParts = $this->addSubscriptionKey($cart, $cacheParts);
         $cacheParts = $this->addCartAmountKey($cart, $cacheParts);
@@ -77,9 +77,12 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      * @param array<mixed> $parts
      *
      * @return array<mixed>
+     *
+     * @phpstan-ignore method.unused
      */
     private function addVoucherKey(Cart $cart, array $parts): array
     {
+        // TODO: check cache key for cart!!
         $voucherPermitted = (bool) $cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
 
         if ($voucherPermitted) {
