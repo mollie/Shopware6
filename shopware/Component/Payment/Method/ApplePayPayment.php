@@ -6,9 +6,12 @@ namespace Mollie\Shopware\Component\Payment\Method;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-final class ApplePayPayment extends AbstractMolliePaymentHandler
+final class ApplePayPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface
 {
     private ?string $applePayPaymentToken = null;
 
@@ -22,7 +25,7 @@ final class ApplePayPayment extends AbstractMolliePaymentHandler
         return 'Apple Pay';
     }
 
-    public function applyPaymentSpecificParameters(CreatePayment $payment, OrderEntity $orderEntity): CreatePayment
+    public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, OrderEntity $orderEntity,CustomerEntity $customer): CreatePayment
     {
         $payment->setApplePayPaymentToken($this->applePayPaymentToken);
 

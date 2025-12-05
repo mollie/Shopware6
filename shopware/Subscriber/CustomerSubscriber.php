@@ -29,7 +29,7 @@ final class CustomerSubscriber implements EventSubscriberInterface
             if ($customerEntity->hasExtension(Mollie::EXTENSION)) {
                 continue;
             }
-            $mollieCustomFields = $customerEntity->getCustomFields()[Mollie::EXTENSION] ?? null;
+            $mollieCustomFields = $customerEntity->getTranslated()['customFields'][Mollie::EXTENSION] ?? null;
             if ($mollieCustomFields === null) {
                 continue;
             }

@@ -116,7 +116,7 @@ final class CreatePaymentBuilderTest extends TestCase
                 'shopwareOrderNumber' => '10000'
             ]
         ];
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertEquals($expected, $actual->toArray());
 
         $this->assertSame($expected['cardToken'], $actual->getCardToken());
         $this->assertSame($expected['description'], $actual->getDescription());
