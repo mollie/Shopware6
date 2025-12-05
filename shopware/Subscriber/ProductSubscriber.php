@@ -20,7 +20,6 @@ final class ProductSubscriber implements EventSubscriberInterface
 
     /**
      * @param EntityLoadedEvent<ProductEntity> $event
-     * @return void
      */
     public function onProductLoaded(EntityLoadedEvent $event): void
     {
