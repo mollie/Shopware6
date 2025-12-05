@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Installer;
 
-use Kiener\MolliePayments\Struct\Voucher\VoucherType;
+use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -94,7 +94,7 @@ class CustomFieldsInstaller
                                         'de_DE' => 'Öko',
                                         'nl-NL' => 'Eco',
                                     ],
-                                    'value' => VoucherType::TYPE_ECO,
+                                    'value' => VoucherCategory::ECO->value,
                                 ],
                                 [
                                     'label' => [
@@ -102,7 +102,7 @@ class CustomFieldsInstaller
                                         'de_DE' => 'Mahlzeit',
                                         'nl-NL' => 'Meal',
                                     ],
-                                    'value' => VoucherType::TYPE_MEAL,
+                                    'value' => VoucherCategory::MEAL->value,
                                 ],
                                 [
                                     'label' => [
@@ -110,7 +110,7 @@ class CustomFieldsInstaller
                                         'de_DE' => 'Geschenk',
                                         'nl-NL' => 'Geschenk',
                                     ],
-                                    'value' => VoucherType::TYPE_GIFT,
+                                    'value' => VoucherCategory::GIFT->value,
                                 ],
                             ],
                         ],

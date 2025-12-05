@@ -6,6 +6,8 @@ namespace Mollie\Shopware\Component\Mollie;
 use Mollie\Shopware\Component\Mollie\Exception\MissingCalculatedTaxException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
+use Mollie\Shopware\Entity\Product\Product;
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -83,17 +85,10 @@ final class LineItem implements \JsonSerializable
         $lineItem->setSku($sku);
 
         if ($product instanceof ProductEntity) {
-            $voucherCategories = $product->getCustomFields()['mollie_payments_product_voucher_type'] ?? null;
-
-            if ($voucherCategories !== null) {
-                if (! is_array($voucherCategories)) {
-                    $voucherCategories = [$voucherCategories];
-                }
-                foreach ($voucherCategories as $voucherCategoryValue) {
-                    $voucherCategory = VoucherCategory::tryFromNumber((int) $voucherCategoryValue);
-                    if (! $voucherCategory instanceof VoucherCategory) {
-                        continue;
-                    }
+            $mollieProduct = $product->getExtension(Mollie::EXTENSION);
+            if ($mollieProduct instanceof Product) {
+                $voucherCategories = $mollieProduct->getVoucherCategories();
+                foreach ($voucherCategories as $voucherCategory) {
                     $lineItem->addCategory($voucherCategory);
                 }
             }

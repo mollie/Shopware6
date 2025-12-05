@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Struct\OrderLineItemEntity;
 
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
-use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 class OrderLineItemEntityAttributes
@@ -18,11 +17,6 @@ class OrderLineItemEntityAttributes
      * @var string
      */
     private $productNumber;
-
-    /**
-     * @var string
-     */
-    private $voucherType;
 
     /**
      * @var bool
@@ -66,7 +60,6 @@ class OrderLineItemEntityAttributes
             $this->productNumber = (string) $payload['productNumber'];
         }
 
-        $this->voucherType = $this->getCustomFieldValue($lineItem, 'voucher_type');
         $this->mollieOrderLineID = $this->getCustomFieldValue($lineItem, 'order_line_id');
 
         $this->isPromotionProduct = $lineItem->getType() === 'promotion';
@@ -80,25 +73,6 @@ class OrderLineItemEntityAttributes
     public function getProductNumber(): string
     {
         return (string) $this->productNumber;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVoucherType()
-    {
-        $availableTypes = [
-            VoucherType::TYPE_NONE,
-            VoucherType::TYPE_ECO,
-            VoucherType::TYPE_MEAL,
-            VoucherType::TYPE_GIFT,
-        ];
-
-        if (! in_array($this->voucherType, $availableTypes)) {
-            return VoucherType::TYPE_NOTSET;
-        }
-
-        return $this->voucherType;
     }
 
     public function getMollieOrderLineID(): string

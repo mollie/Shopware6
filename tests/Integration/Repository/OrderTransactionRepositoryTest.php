@@ -13,7 +13,6 @@ use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\CashPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
@@ -49,7 +48,6 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->assertSame(1, $searchResult->getTotal());
         $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
     }
-
 
     /**
      * create a non mollie order, a normal mollie order and order which is older than 10 minutes.
