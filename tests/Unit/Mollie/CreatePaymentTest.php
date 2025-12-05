@@ -140,5 +140,4 @@ final class CreatePaymentTest extends TestCase
         $this->assertArrayNotHasKey('applePayPaymentToken', $array);
         $this->assertArrayNotHasKey('dueDate', $array);
     }
-
 }
