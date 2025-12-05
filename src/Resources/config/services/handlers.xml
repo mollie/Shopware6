@@ -22,14 +22,7 @@
         </service>
 
 
-        <!-- Bank Transfer PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BankTransferPayment" public="true">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
+
 
 
 
@@ -42,13 +35,6 @@
             <tag name="shopware.payment.method"/>
         </service>
 
-        <!-- PaySafeCard PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PaySafeCardPayment" public="true">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
 
 
         <!-- POS Terminal PaymentHandler -->
@@ -61,13 +47,6 @@
 
 
 
-        <!-- Bancomat PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\BancomatPayment" public="true">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
 
 
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Mollie\Shopware\Component\Mollie\Mode;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class ApiSettings extends Struct
@@ -11,7 +12,7 @@ final class ApiSettings extends Struct
     public const KEY_LIVE_API_KEY = 'liveApiKey';
     public const KEY_TEST_MODE = 'testMode';
 
-    public function __construct(private string $testApiKey, private string $liveApiKey, private bool $testMode)
+    public function __construct(private string $testApiKey, private string $liveApiKey, private Mode $mode)
     {
     }
 
@@ -22,9 +23,11 @@ final class ApiSettings extends Struct
     {
         $testApiKey = $settings[self::KEY_TEST_API_KEY] ?? '';
         $liveApiKey = $settings[self::KEY_LIVE_API_KEY] ?? '';
-        $testMode = $settings[self::KEY_TEST_MODE] ?? false;
+        $testMode = $settings[self::KEY_TEST_MODE] ?? 'true';
 
-        return new self($testApiKey, $liveApiKey, (bool) $testMode);
+        $mode = (bool) $testMode === true ? Mode::TEST : Mode::LIVE;
+
+        return new self($testApiKey, $liveApiKey, $mode);
     }
 
     public function getTestApiKey(): string
@@ -39,7 +42,7 @@ final class ApiSettings extends Struct
 
     public function isTestMode(): bool
     {
-        return $this->testMode === true;
+        return $this->mode === Mode::TEST;
     }
 
     public function getApiKey(): string
@@ -49,5 +52,10 @@ final class ApiSettings extends Struct
         }
 
         return $this->liveApiKey;
+    }
+
+    public function getMode(): Mode
+    {
+        return $this->mode;
     }
 }
