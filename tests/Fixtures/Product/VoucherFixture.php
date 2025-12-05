@@ -52,15 +52,15 @@ class VoucherFixture extends Fixture
         $description = 'Mollie Voucher Product for testing purpose in development environment.';
 
         $customFieldsEco = [
-            'mollie_payments_product_voucher_type' => '1',
+            'mollie_payments_product_voucher_type' => 1,
         ];
 
         $customFieldsMeal = [
-            'mollie_payments_product_voucher_type' => '2',
+            'mollie_payments_product_voucher_type' => 2,
         ];
 
         $customFieldsGift = [
-            'mollie_payments_product_voucher_type' => '3',
+            'mollie_payments_product_voucher_type' => 3,
         ];
 
         $this->createProduct('4d1eeedd6d22436385580e2ff42431b9', 'Voucher ECO', 'MOL_VOUCHER_1', $category, $description, 19, $image, false, $customFieldsEco, $this->repoProducts, $this->helper);
