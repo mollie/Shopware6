@@ -7,6 +7,7 @@ use GuzzleHttp\Psr7\Uri;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\Exception\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
+use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,7 +21,7 @@ final class ClientFactoryTest extends TestCase
     {
         $shopwareVersion = '6.7.4.0';
         $key = 'test_key';
-        $apiSettings = new ApiSettings($key, '', true);
+        $apiSettings = new ApiSettings($key, '', Mode::TEST);
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
         $factory = new ClientFactory($fakeSettings, $shopwareVersion);
 
@@ -41,7 +42,7 @@ final class ClientFactoryTest extends TestCase
     {
         $shopwareVersion = '6.7.4.0';
         $key = 'live_key';
-        $apiSettings = new ApiSettings('test_key', $key, false);
+        $apiSettings = new ApiSettings('test_key', $key, Mode::LIVE);
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
         $factory = new ClientFactory($fakeSettings, $shopwareVersion);
 
@@ -63,7 +64,7 @@ final class ClientFactoryTest extends TestCase
         $this->expectException(ApiKeyException::class);
         $shopwareVersion = '6.7.4.0';
 
-        $apiSettings = new ApiSettings('test_key', '', false);
+        $apiSettings = new ApiSettings('test_key', '', Mode::LIVE);
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
         $factory = new ClientFactory($fakeSettings, $shopwareVersion);
 

@@ -37,6 +37,11 @@ enum Locale: string
             $code = $locale->getCode();
         }
 
+        return self::fromLocaleCode($code);
+    }
+
+    public static function fromLocaleCode(string $code): self
+    {
         $languageLocale = str_replace('-', '_', $code);
 
         return self::from($languageLocale);

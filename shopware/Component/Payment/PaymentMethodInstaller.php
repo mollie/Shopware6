@@ -93,6 +93,9 @@ final class PaymentMethodInstaller
                         'name' => $paymentMethodName,
                     ],
                 ],
+                'customFields' => [
+                    'mollie_payment_method_name' => $paymentMethod->value,
+                ],
                 'active' => true
             ];
             $handlers[$handlerIdentifier] = $paymentHandler;
@@ -143,7 +146,6 @@ final class PaymentMethodInstaller
                     'name' => $paymentMethodEntity->getName(),
                     'description' => $paymentMethodEntity->getDescription(),
                     'active' => $paymentMethodEntity->getActive(),
-                    'customFields' => $paymentMethodEntity->getCustomFields(),
                 ];
                 $translations = $paymentMethodEntity->getTranslations();
 
