@@ -1,3 +1,6 @@
+# 5.0.0
+- Added basic payment via paypal API
+
 ## [Unreleased]
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
 - Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.
@@ -6,7 +9,8 @@
 
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore
-# 4.20.0
+
+# 4.20.0 - 2025-11-19
 - Changed order builder to use order addresses instead of customer default addresses to make sure the address in mollie matches the order information in shopware.
 - Fixed an issue where Apple Pay Direct did not work when the phone number was configured as a required field in the shop.
 - Fixed compatibility with shopware commercial 

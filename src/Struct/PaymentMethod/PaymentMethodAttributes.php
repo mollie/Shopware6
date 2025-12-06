@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\PaymentMethod;
 
-use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 class PaymentMethodAttributes
 {
-    public const MOLLIE_PAYMENT_HANDLER_NAMESPACE = 'Kiener\MolliePayments\Handler\Method';
+    public const MOLLIE_PAYMENT_HANDLER_NAMESPACE = 'Mollie\Shopware\Component\Payment\Method';
 
     /**
      * @var string
@@ -18,11 +17,6 @@ class PaymentMethodAttributes
     public function __construct(PaymentMethodEntity $paymentMethod)
     {
         $this->handlerIdentifier = (string) $paymentMethod->getHandlerIdentifier();
-    }
-
-    public function isVoucherMethod(): bool
-    {
-        return $this->handlerIdentifier === VoucherPayment::class;
     }
 
     public function isMolliePayment(): bool

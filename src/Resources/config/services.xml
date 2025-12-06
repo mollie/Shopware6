@@ -30,7 +30,6 @@
 
 
     <services>
-
         <!-- Configuration -->
         <service id="Kiener\MolliePayments\Service\ConfigService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
@@ -42,6 +41,7 @@
         <service id="Kiener\MolliePayments\Components\Installer\PluginInstaller" public="true" >
             <argument type="service" id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller"/>
             <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\PaymentMethodInstaller"/>
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Installer\MailTemplateInstaller"/>
         </service>
@@ -101,13 +101,7 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\PaymentMethodService">
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\VersionCompare"/>
-            <argument type="service" id="Shopware\Core\Content\Media\MediaService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\MediaRepository"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
-            <argument type="service" id="Shopware\Core\Framework\Plugin\Util\PluginIdProvider"/>
-            <argument type="service" id="kiener.mollie_payments.http.client"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PayPalExpressConfig"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\ProductService">

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder\Payments;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder\Payments;
 
 use Kiener\MolliePayments\Handler\Method\PosPayment;
-use MolliePayments\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
+use MolliePayments\Shopware\Tests\Service\MollieApi\Builder\AbstractMollieOrderBuilder;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 

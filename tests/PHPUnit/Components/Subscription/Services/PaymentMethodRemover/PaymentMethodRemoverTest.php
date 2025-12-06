@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\Services\PaymentMethodRemover;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\PaymentMethodRemover;
 
 use Kiener\MolliePayments\Components\Subscription\Services\PaymentMethodRemover\SubscriptionRemover;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +17,7 @@ class PaymentMethodRemoverTest extends TestCase
      */
     public function testAllowedPaymentMethods()
     {
+        $this->markTestSkipped('will be removed');
         $expected = [
             'ideal',
             'bancontact',

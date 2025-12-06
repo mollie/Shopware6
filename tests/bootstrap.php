@@ -10,17 +10,25 @@ $_ENV['APP_SECRET'] = '+g1fbgB/u0y45NSqftvvfvIksdBJUKSLjmxiNPDRyhGs6X+O625znsPHR
 
 $projectDir = realpath(__DIR__ . '/../../../../');
 
-$envFilePath = $projectDir . '/.env';
+$envFilePath = [
+    $projectDir . '/.env',
+    $projectDir . '/.env.local',
+];
 
-if (\is_file($envFilePath) || \is_file($envFilePath . '.dist') || \is_file($envFilePath . '.local.php')) {
-    (new Dotenv())->usePutenv()->bootEnv($envFilePath);
+foreach ($envFilePath as $file) {
+    if(!file_exists($file)) {
+        continue;
+    }
+    (new Dotenv())->usePutenv()->bootEnv($file);
 }
+
 $dataBaseUrl = getenv('DATABASE_URL');
 
 
 $testBootstrapper = new TestBootstrapper();
 $testBootstrapper->setProjectDir($projectDir);
 $testBootstrapper->setDatabaseUrl($dataBaseUrl);
-$testBootstrapper->addActivePlugins('MolliePayments');
+$testBootstrapper->addCallingPlugin(realpath(__DIR__.'/../composer.json'));
+$testBootstrapper->setLoadEnvFile(false);
 $testBootstrapper->bootstrap();
 

@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Storefront\Struct\TestModePageExtensionStruct;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoadedEvent;
-use Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent;
 use Shopware\Storefront\Page\PageLoadedEvent;
@@ -27,12 +26,10 @@ class TestModeNotificationSubscriber implements EventSubscriberInterface
         $this->settingsService = $settingsService;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             AccountOverviewPageLoadedEvent::class => 'addTestModeInformationToPages',
-            /** @phpstan-ignore class.notFound */
-            AccountPaymentMethodPageLoadedEvent::class => 'addTestModeInformationToPages',
             AccountEditOrderPageLoadedEvent::class => 'addTestModeInformationToPages',
             CheckoutConfirmPageLoadedEvent::class => 'addTestModeInformationToPages',
             CheckoutFinishPageLoadedEvent::class => 'addTestModeInformationToPages',

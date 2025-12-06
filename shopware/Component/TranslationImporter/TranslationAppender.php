@@ -35,7 +35,9 @@ final class TranslationAppender implements AppenderInterface
 
             foreach ($searchParts as $searchPart) {
                 $result = $domXpath->query($path . '/' . $searchPart);
-
+                if ($result === false) {
+                    continue;
+                }
                 if ($result->count() === 0) {
                     continue;
                 }
@@ -46,20 +48,20 @@ final class TranslationAppender implements AppenderInterface
 
         $replaceXpathQuery = $path . '/' . $lastKeyPart . '[@lang="' . $languageCode . '"]';
         $domElement = $domXpath->query($replaceXpathQuery);
-        if ($domElement->count() === 0) {
+        if ($domElement !== false && $domElement->count() === 0) {
             $replaceXpathQuery = $path . '/following-sibling::' . $lastKeyPart . '[@lang="' . $languageCode . '"]';
             $domElement = $domXpath->query($replaceXpathQuery);
 
-            if ($domElement->count() === 0) {
+            if ($domElement !== false && $domElement->count() === 0) {
                 $replaceXpathQuery = $path . '/following::' . $lastKeyPart . '[@lang="' . $languageCode . '"]';
                 $domElement = $domXpath->query($replaceXpathQuery);
             }
         }
 
-        if ($domElement->count() === 1) {
+        if ($domElement !== false && $domElement->count() === 1) {
             $oldElement = $domElement->item(0);
 
-            if ($oldElement !== null) {
+            if ($oldElement instanceof \DOMNode) {
                 $textElement = $oldElement->firstChild;
                 if ($textElement instanceof \DOMText) {
                     $textElement->data = $text;
@@ -72,7 +74,7 @@ final class TranslationAppender implements AppenderInterface
         $domElement = $domXpath->query($path);
 
         // we expect to find exactly one node, not multiple
-        if ($domElement->count() === 0) {
+        if ($domElement === false || $domElement->count() === 0) {
             return new AppenderResult(sprintf('Failed to find entry for key "%s" with the path "%s"', $key, $path), AppenderResult::STATUS_ERROR);
         }
 
@@ -84,21 +86,26 @@ final class TranslationAppender implements AppenderInterface
 
         $targetChildren = $domXpath->query($targetNodePath);
 
-        if ($targetChildren->count() === 0) {
+        if ($targetChildren !== false && $targetChildren->count() === 0) {
             $targetNodePath = $path . '/following-sibling::' . $lastKeyPart . '[last()]';
         }
 
         $targetChildren = $domXpath->query($targetNodePath);
 
-        if ($targetChildren->count() === 1) {
+        if ($targetChildren !== false && $targetChildren->count() === 1) {
+            /** @var \DOMNode $targetNode */
             $targetNode = $targetChildren->item(0);
-            $targetNode->parentNode->insertBefore($newNode, $targetNode->nextSibling);
+            /** @var \DOMNode $parentNode */
+            $parentNode = $targetNode->parentNode;
+            $parentNode->insertBefore($newNode, $targetNode->nextSibling);
 
             return new AppenderResult(sprintf('Appended "%s" with the key %s', $text, $key));
         }
 
-        if ($targetChildren->count() === 0) {
-            $domElement->item(0)->appendChild($newNode);
+        if ($targetChildren !== false && $targetChildren->count() === 0) {
+            /** @var \DOMNode $firstNode */
+            $firstNode = $domElement->item(0);
+            $firstNode->appendChild($newNode);
         }
 
         return new AppenderResult(sprintf('Created new entry "%s" with the key %s', $text, $key));
