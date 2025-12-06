@@ -10,10 +10,7 @@ use Shopware\Core\Framework\Struct\Collection;
  */
 final class MandateCollection extends Collection
 {
-    /**
-     * @return Collection<Mandate>
-     */
-    public function filterByPaymentMethod(PaymentMethod $paymentMethod): Collection
+    public function filterByPaymentMethod(PaymentMethod $paymentMethod): self
     {
         return $this->filter(function (Mandate $mandate) use ($paymentMethod) {
             return $mandate->getMethod() === $paymentMethod;
