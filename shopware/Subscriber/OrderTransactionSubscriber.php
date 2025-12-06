@@ -34,9 +34,13 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 continue;
             }
             $mollieCustomFields = $orderTransaction->getTranslated()['customFields'][Mollie::EXTENSION] ?? null;
-            if ($mollieCustomFields instanceof Payment) {
+            if ($mollieCustomFields === null) {
+                $mollieCustomFields = $orderTransaction->getCustomFields()[Mollie::EXTENSION] ?? null;
+            }
+            if ($mollieCustomFields === null) {
                 continue;
             }
+
             $paymentId = $mollieCustomFields['id'] ?? null;
             $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
             if ($finalizeUrl === null || $paymentId === null) {

@@ -14,7 +14,7 @@ final class CreatePayment implements \JsonSerializable
     private PaymentMethod $method;
     private Address $billingAddress;
     private Address $shippingAddress;
-    private CaptureMode $captureMode;
+    private ?CaptureMode $captureMode = null;
     private Locale $locale;
     private LineItemCollection $lines;
     private SequenceType $sequenceType;
@@ -23,8 +23,11 @@ final class CreatePayment implements \JsonSerializable
     private ?string $applePayPaymentToken = null;
 
     private ?string $customerReference = null;
-
+    private ?string $customerId = null;
+    private ?string $mandateId = null;
     private ?\DateTimeInterface $dueDate = null;
+
+    private ?string $profileId = null;
     /**
      * @var array<mixed>
      */
@@ -33,7 +36,6 @@ final class CreatePayment implements \JsonSerializable
     public function __construct(private string $description,private string $redirectUrl,private Money $amount)
     {
         $this->setSequenceType(SequenceType::ONEOFF);
-        $this->setCaptureMode(CaptureMode::AUTOMATIC);
     }
 
     public function getBillingAddress(): Address
@@ -126,7 +128,7 @@ final class CreatePayment implements \JsonSerializable
         $this->description = $description;
     }
 
-    public function getCaptureMode(): CaptureMode
+    public function getCaptureMode(): ?CaptureMode
     {
         return $this->captureMode;
     }
@@ -202,5 +204,35 @@ final class CreatePayment implements \JsonSerializable
     public function getCustomerReference(): ?string
     {
         return $this->customerReference;
+    }
+
+    public function getCustomerId(): ?string
+    {
+        return $this->customerId;
+    }
+
+    public function setCustomerId(string $customerId): void
+    {
+        $this->customerId = $customerId;
+    }
+
+    public function getMandateId(): ?string
+    {
+        return $this->mandateId;
+    }
+
+    public function setMandateId(string $mandateId): void
+    {
+        $this->mandateId = $mandateId;
+    }
+
+    public function getProfileId(): ?string
+    {
+        return $this->profileId;
+    }
+
+    public function setProfileId(string $profileId): void
+    {
+        $this->profileId = $profileId;
     }
 }
