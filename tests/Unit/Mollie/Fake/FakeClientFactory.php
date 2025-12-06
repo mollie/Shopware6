@@ -12,7 +12,7 @@ final class FakeClientFactory implements ClientFactoryInterface
     {
     }
 
-    public function create(string $salesChannelId): Client
+    public function create(?string $salesChannelId = null): Client
     {
         return $this->client;
     }

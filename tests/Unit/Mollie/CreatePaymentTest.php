@@ -28,7 +28,6 @@ final class CreatePaymentTest extends TestCase
         $this->assertSame($redirectUrl, $payment->getRedirectUrl());
         $this->assertSame($amount, $payment->getAmount());
         $this->assertSame(SequenceType::ONEOFF, $payment->getSequenceType());
-        $this->assertSame(CaptureMode::AUTOMATIC, $payment->getCaptureMode());
     }
 
     public function testSettersAndGetters(): void

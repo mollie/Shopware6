@@ -5,8 +5,9 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 
-final class BelfiusPayment extends AbstractMolliePaymentHandler
+final class BelfiusPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

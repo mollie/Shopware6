@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Logger;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -24,7 +25,7 @@ final class FakeSettingsService extends AbstractSettingsService
             $this->paymentSettings = new PaymentSettings('',0);
         }
         if ($this->apiSettings === null) {
-            $this->apiSettings = new ApiSettings('test_key', 'live_key', Mode::TEST);
+            $this->apiSettings = new ApiSettings('test_key', 'live_key', Mode::TEST,'');
         }
     }
 
@@ -41,6 +42,11 @@ final class FakeSettingsService extends AbstractSettingsService
     public function getDecorated(): AbstractSettingsService
     {
         // TODO: Implement getDecorated() method.
+    }
+
+    public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings
+    {
+        // TODO: Implement getCreditCardSettings() method.
     }
 
     public function getApiSettings(?string $salesChannelId = null): ApiSettings
