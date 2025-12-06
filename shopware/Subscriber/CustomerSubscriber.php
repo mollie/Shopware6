@@ -31,10 +31,17 @@ final class CustomerSubscriber implements EventSubscriberInterface
             }
             $mollieCustomFields = $customerEntity->getTranslated()['customFields'][Mollie::EXTENSION] ?? null;
             if ($mollieCustomFields === null) {
+                $mollieCustomFields = $customerEntity->getCustomFields()[Mollie::EXTENSION] ?? null;
+                if ($mollieCustomFields === null) {
+                    continue;
+                }
+            }
+            $customerIds = $mollieCustomFields['customer_ids'] ?? null;
+            if ($customerIds === null) {
                 continue;
             }
 
-            $customerEntity->addExtension(Mollie::EXTENSION, new Customer(...$mollieCustomFields));
+            $customerEntity->addExtension(Mollie::EXTENSION, new Customer($customerIds));
         }
     }
 }

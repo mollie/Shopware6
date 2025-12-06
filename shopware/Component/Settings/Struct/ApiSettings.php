@@ -12,7 +12,9 @@ final class ApiSettings extends Struct
     public const KEY_LIVE_API_KEY = 'liveApiKey';
     public const KEY_TEST_MODE = 'testMode';
 
-    public function __construct(private string $testApiKey, private string $liveApiKey, private Mode $mode)
+    public const KEY_PROFILE_ID = 'profileId';
+
+    public function __construct(private string $testApiKey, private string $liveApiKey, private Mode $mode,private string $profileId)
     {
     }
 
@@ -23,11 +25,12 @@ final class ApiSettings extends Struct
     {
         $testApiKey = $settings[self::KEY_TEST_API_KEY] ?? '';
         $liveApiKey = $settings[self::KEY_LIVE_API_KEY] ?? '';
+        $profileId = $settings[self::KEY_PROFILE_ID] ?? '';
         $testMode = $settings[self::KEY_TEST_MODE] ?? 'true';
 
         $mode = (bool) $testMode === true ? Mode::TEST : Mode::LIVE;
 
-        return new self($testApiKey, $liveApiKey, $mode);
+        return new self($testApiKey, $liveApiKey, $mode,$profileId);
     }
 
     public function getTestApiKey(): string
@@ -52,6 +55,11 @@ final class ApiSettings extends Struct
         }
 
         return $this->liveApiKey;
+    }
+
+    public function getProfileId(): string
+    {
+        return $this->profileId;
     }
 
     public function getMode(): Mode
