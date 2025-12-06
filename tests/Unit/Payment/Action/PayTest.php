@@ -12,6 +12,7 @@ use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
+use Mollie\Shopware\Unit\Payment\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
@@ -64,13 +65,13 @@ final class PayTest extends TestCase
         $fakeRouteBuilder = new FakeRouteBuilder();
         $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);
-
+        $fakeCustomerRepository = new FakeCustomerRepository();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
         $fakeOrderTransactionStateHandler = new FakeOrderTransactionStateHandler();
 
         $gateway = new MollieGateway($fakeClientFactory, $transactionService, $logger);
         $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService);
 
-        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $settingsService, $eventDispatcher, $logger);
+        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $settingsService,$fakeCustomerRepository, $eventDispatcher, $logger);
     }
 }

@@ -20,13 +20,12 @@ final class FakeCustomerRepository
 
     public function getDefaultCustomerWithoutSalutation(): CustomerEntity
     {
-        $salutation = new SalutationEntity();
-        $salutation->setDisplayName('Not specified');
         $orderCustomer = new CustomerEntity();
         $orderCustomer->setCustomerNumber('100');
         $orderCustomer->setEmail('fake@unit.test');
         $orderCustomer->setFirstName('Tester');
         $orderCustomer->setLastName('Test');
+        $orderCustomer->setGuest(false);
 
         return $orderCustomer;
     }

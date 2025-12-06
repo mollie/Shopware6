@@ -21,7 +21,7 @@ final class ClientFactoryTest extends TestCase
     {
         $shopwareVersion = '6.7.4.0';
         $key = 'test_key';
-        $apiSettings = new ApiSettings($key, '', Mode::TEST);
+        $apiSettings = new ApiSettings($key, '', Mode::TEST,'');
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
         $factory = new ClientFactory($fakeSettings, $shopwareVersion);
 
@@ -42,7 +42,7 @@ final class ClientFactoryTest extends TestCase
     {
         $shopwareVersion = '6.7.4.0';
         $key = 'live_key';
-        $apiSettings = new ApiSettings('test_key', $key, Mode::LIVE);
+        $apiSettings = new ApiSettings('test_key', $key, Mode::LIVE,'');
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
         $factory = new ClientFactory($fakeSettings, $shopwareVersion);
 
@@ -64,7 +64,7 @@ final class ClientFactoryTest extends TestCase
         $this->expectException(ApiKeyException::class);
         $shopwareVersion = '6.7.4.0';
 
-        $apiSettings = new ApiSettings('test_key', '', Mode::LIVE);
+        $apiSettings = new ApiSettings('test_key', '', Mode::LIVE,'');
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
         $factory = new ClientFactory($fakeSettings, $shopwareVersion);
 
