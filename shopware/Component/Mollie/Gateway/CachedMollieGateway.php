@@ -4,7 +4,11 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\Customer;
+use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\Profile;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 
@@ -14,11 +18,27 @@ final class CachedMollieGateway implements MollieGatewayInterface
     /**
      * @var array<string, Payment>
      */
-    private array $cache = [];
+    private array $transactionPayments = [];
+
+    /**
+     * @var array<string, Profile>
+     */
+    private array $profiles = [];
 
     public function __construct(
         private MollieGatewayInterface $decorated
     ) {
+    }
+
+    public function getCurrentProfile(?string $salesChannelId = null): Profile
+    {
+        $cacheKey = $salesChannelId ?? 'all';
+        if (isset($this->profiles[$cacheKey])) {
+            return $this->profiles[$cacheKey];
+        }
+        $this->profiles[$cacheKey] = $this->decorated->getCurrentProfile($salesChannelId);
+
+        return $this->profiles[$cacheKey];
     }
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
@@ -29,11 +49,22 @@ final class CachedMollieGateway implements MollieGatewayInterface
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
         $key = sprintf('%s', $transactionId);
-        if (isset($this->cache[$key])) {
-            return $this->cache[$key];
+        if (isset($this->transactionPayments[$key])) {
+            return $this->transactionPayments[$key];
         }
-        $this->cache[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
+        $this->transactionPayments[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
 
-        return $this->cache[$key];
+        return $this->transactionPayments[$key];
+    }
+
+    public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer
+    {
+        return $this->decorated->createCustomer($customer, $salesChannelId);
+    }
+
+    public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection
+    {
+        // TODO save in array
+        return $this->decorated->listMandates($mollieCustomerId, $salesChannelId);
     }
 }

@@ -51,7 +51,7 @@ final class TransactionService implements TransactionServiceInterface
         $criteria->addAssociation('order.deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('order.billingAddress.country');
         $criteria->addAssociation('order.language.locale');
-        $criteria->addAssociation('order.customer');
+        $criteria->addAssociation('order.customer.language');
         $criteria->addAssociation('order.currency');
         $criteria->addAssociation('order.salesChannel');
         $criteria->addAssociation('order.lineItems.product.media');

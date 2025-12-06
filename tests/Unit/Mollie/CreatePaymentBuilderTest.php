@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Address;
-use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
@@ -68,7 +67,6 @@ final class CreatePaymentBuilderTest extends TestCase
                 'city' => 'Test City',
                 'country' => 'DE',
             ],
-            'captureMode' => 'automatic',
             'locale' => 'en_GB',
             'lines' => [
                 [
@@ -129,7 +127,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $this->assertSame($expected['webhookUrl'], $actual->getWebhookUrl());
         $this->assertSame($expected['redirectUrl'], $actual->getRedirectUrl());
         $this->assertSame($expected['sequenceType'], $actual->getSequenceType()->value);
-        $this->assertSame($expected['captureMode'], $actual->getCaptureMode()->value);
+
         $this->assertSame($expected['metadata']['shopwareOrderNumber'], $actual->getShopwareOrderNumber());
     }
 
@@ -138,7 +136,6 @@ final class CreatePaymentBuilderTest extends TestCase
         $createPayment = new CreatePayment('test', '', new Money(10.00, 'EUR'));
         $createPayment->setDescription('test2');
 
-        $this->assertSame(CaptureMode::AUTOMATIC, $createPayment->getCaptureMode());
         $this->assertSame('test2', $createPayment->getDescription());
     }
 }
