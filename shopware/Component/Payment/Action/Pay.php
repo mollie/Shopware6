@@ -10,12 +10,14 @@ use Mollie\Shopware\Component\Mollie\CreatePaymentBuilderInterface;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
@@ -157,6 +159,7 @@ final class Pay
             'transactionId' => $transactionId,
             'orderNumber' => $orderNumber,
         ];
+
         if ($paymentHandler instanceof ManualCaptureModeAwareInterface) {
             $createPaymentStruct->setCaptureMode(CaptureMode::MANUAL);
         }
@@ -168,7 +171,7 @@ final class Pay
         }
 
         $mollieCustomerExtension = $customer->getExtension(Mollie::EXTENSION);
-
+        $mollieCustomerId = null;
         if ($mollieCustomerExtension instanceof CustomerExtension) {
             $mollieCustomerId = $mollieCustomerExtension->getForProfileId($profileId);
             if ($mollieCustomerId !== null) {
@@ -180,8 +183,17 @@ final class Pay
         if (! $customer->getGuest() && $savePaymentDetails) {
             $createPaymentStruct->setSequenceType(SequenceType::FIRST);
         }
+        $mandateId = $dataBag->get('mollieCreditCardMandate');
 
-        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $order, $customer);
+        if (! $customer->getGuest() && $mollieCustomerId && $mandateId && $paymentHandler instanceof RecurringAwareInterface) {
+            $mandates = $this->mollieGateway->listMandates($mollieCustomerId,$salesChannelId);
+            $paymentMethodMandates = $mandates->filterByPaymentMethod($paymentHandler->getPaymentMethod());
+            $mandate = $paymentMethodMandates->get($mandateId);
+            if ($mandate instanceof Mandate) {
+                $createPaymentStruct->setMandateId($mandateId);
+                $createPaymentStruct->setSequenceType(SequenceType::RECURRING);
+            }
+        }
 
         if (! $customer->getGuest() && $createPaymentStruct->getSequenceType() !== SequenceType::ONEOFF && $createPaymentStruct->getCustomerId() === null) {
             $mollieCustomer = $this->mollieGateway->createCustomer($customer, $salesChannelId);
@@ -190,6 +202,8 @@ final class Pay
             $customer = $this->saveCustomerId($customer, $mollieCustomer, $profileId, $context);
             $this->logger->info('Mollie customer created and assigned to shopware customer', $logData);
         }
+
+        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $order, $customer);
 
         $logData['payload'] = $createPaymentStruct->toArray();
         $this->logger->info('Payment payload created for mollie API', $logData);
