@@ -154,7 +154,8 @@ final class MollieGateway implements MollieGatewayInterface
             $body = json_decode($response->getBody()->getContents(), true);
             $collection = new MandateCollection();
             foreach ($body['_embedded']['mandates'] as $mandateData) {
-                $collection->add(Mandate::fromClientResponse($mandateData));
+                $mandate = Mandate::fromClientResponse($mandateData);
+                $collection->set($mandate->getId(), $mandate);
             }
 
             return $collection;
