@@ -3,29 +3,15 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Entity\Customer;
 
-use Shopware\Core\Framework\Struct\ArrayStruct;
+use Shopware\Core\Framework\Struct\Struct;
 
-final class Customer extends ArrayStruct
+final class Customer extends Struct
 {
     /**
-     * @var string[]
+     * @param array<string> $customerIds
      */
-    private array $customerIds = [];
-    private string $creditCardToken = '';
-    private bool $shouldSaveCardDetail = false;
-
-    /**
-     * @param array<string> $customer_ids
-     */
-    public function __construct(array $customer_ids = [], string $credit_card_token = '', bool $shouldSaveCardDetail = false)
+    public function __construct(private array $customerIds = [])
     {
-        $this->customerIds = $customer_ids;
-        $this->creditCardToken = $credit_card_token;
-        $this->shouldSaveCardDetail = $shouldSaveCardDetail;
-        parent::__construct([
-            'customer_ids' => $this->customerIds,
-            'credit_card_token' => $this->creditCardToken,
-        ], 'mollie_customer');
     }
 
     /**
@@ -36,13 +22,23 @@ final class Customer extends ArrayStruct
         return $this->customerIds;
     }
 
-    public function getCreditCardToken(): string
+    public function setCustomerId(string $profileId, string $customerId): void
     {
-        return $this->creditCardToken;
+        $this->customerIds[$profileId] = $customerId;
     }
 
-    public function isShouldSaveCardDetail(): bool
+    public function getForProfileId(string $profileId): ?string
     {
-        return $this->shouldSaveCardDetail;
+        return $this->customerIds[$profileId] ?? null;
+    }
+
+    /**
+     * @return array<string, array<string>>
+     */
+    public function toArray(): array
+    {
+        return [
+            'customer_ids' => $this->customerIds,
+        ];
     }
 }

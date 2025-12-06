@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Settings;
 
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -104,15 +105,29 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
+    public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings
+    {
+        $cacheKey = CreditCardSettings::class . '_' . ($salesChannelId ?? 'all');
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+
+        $settings = CreditCardSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
     /**
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      *
      * @return array<mixed[]>
      */
-    private function getShopwareSettings(?string $salesChannelId = 'all'): array
+    private function getShopwareSettings(?string $salesChannelId = null): array
     {
-        $cacheKey = self::CACHE_KEY_SHOPWARE . '_' . $salesChannelId;
+        $cacheKey = self::CACHE_KEY_SHOPWARE . '_' . ($salesChannelId ?? 'all');
 
         if (isset($this->settingsCache[$cacheKey])) {
             return $this->settingsCache[$cacheKey];
