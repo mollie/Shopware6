@@ -1,7 +1,11 @@
 <?php
 declare(strict_types=1);
 
+<<<<<<<< HEAD:shopware/Component/Payment/Mandate/Route/ListMandatesRoute.php
 namespace Mollie\Shopware\Component\Payment\Mandate\Route;
+========
+namespace Mollie\Shopware\Component\Payment\Mandate;
+>>>>>>>> 8c770ca6 (add terminals and refactor some classes):shopware/Component/Payment/Mandate/ListMandatesRoute.php
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
