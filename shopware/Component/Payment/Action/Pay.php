@@ -12,6 +12,9 @@ use Mollie\Shopware\Component\Payment\CreatePaymentBuilderInterface;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
+use Mollie\Shopware\Component\Payment\Method\PosPayment;
+use Mollie\Shopware\Component\Router\RouteBuilder;
+use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
@@ -37,6 +40,8 @@ final class Pay
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: OrderTransactionStateHandler::class)]
         private OrderTransactionStateHandler $stateMachineHandler,
+        #[Autowire(service: RouteBuilder::class)]
+        private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -86,6 +91,9 @@ final class Pay
         $this->processPaymentStatus($paymentHandler, $transactionId, $orderNumber, $context);
 
         $redirectUrl = $payment->getCheckoutUrl();
+        if ($paymentHandler instanceof PosPayment) {
+            $redirectUrl = $this->routeBuilder->getPosCheckoutUrl($payment,$transactionId,$orderNumber);
+        }
         if (mb_strlen($redirectUrl) === 0) {
             $redirectUrl = $shopwareFinalizeUrl;
         }
