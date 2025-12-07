@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 
@@ -22,4 +23,6 @@ interface MollieGatewayInterface
     public function createCustomer(CustomerEntity $customer,string $salesChannelId): Customer;
 
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection;
+
+    public function listTerminals(string $salesChannelId): TerminalCollection;
 }
