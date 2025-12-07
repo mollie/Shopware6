@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Order;
 
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -109,7 +108,7 @@ class OrderExpireService
             if ($this->orderUsesSepaPayment($lastTransaction)) {
                 $bankTransferDueDays = $settings->getPaymentMethodBankTransferDueDateDays();
                 if ($bankTransferDueDays === null) {
-                    $bankTransferDueDays = BankTransferPayment::DUE_DATE_MAX_DAYS;
+                    $bankTransferDueDays = 100;
                 }
                 $finalizeTransactionTimeInMinutes = 60 * 60 * 24 * $bankTransferDueDays;
             }
@@ -149,6 +148,6 @@ class OrderExpireService
             return false;
         }
 
-        return $paymentMethod->getHandlerIdentifier() === BankTransferPayment::class;
+        return $paymentMethod->getHandlerIdentifier() === 'Kiener\MolliePayments\Handler\Method\BankTransferPayment';
     }
 }

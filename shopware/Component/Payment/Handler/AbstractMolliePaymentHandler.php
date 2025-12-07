@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Payment\Action\Finalize;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
@@ -79,7 +78,7 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         return false;
     }
 
-    public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, OrderEntity $orderEntity,CustomerEntity $customer): CreatePayment
+    public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
     {
         return $payment;
     }

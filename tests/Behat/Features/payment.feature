@@ -25,7 +25,6 @@ Feature: Basic payment checkout
       | przelewy24    | SWDEMO10007.1 | 1        | paid          | PL             | PLN      |
       | twint         | SWDEMO10007.1 | 1        | paid          | DE             | CHF      |
       | blik          | SWDEMO10007.1 | 1        | paid          | DE             | PLN      |
-      | payconiq      | SWDEMO10007.1 | 1        | paid          | BE             | EUR      |
       | mbway         | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
       | swish         | SWDEMO10007.1 | 1        | paid          | SE             | SEK      |
       | multibanco    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |

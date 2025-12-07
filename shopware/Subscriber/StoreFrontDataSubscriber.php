@@ -3,18 +3,16 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Subscriber;
 
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Mollie\Route\AbstractListMandatesRoute;
+use Mollie\Shopware\Component\Mollie\Route\ListMandatesRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
-use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\SalesChannel\Context\LanguageInfo;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
@@ -29,8 +27,8 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settings,
-        #[Autowire(service: MollieGateway::class)]
-        private MollieGatewayInterface $mollieGateway,
+        #[Autowire(service: ListMandatesRoute::class)]
+        private AbstractListMandatesRoute $listMandatesRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -68,7 +66,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
 
             $this->addTestMode($page, $apiSettings);
             $this->addProfileId($page, $apiSettings);
-            $this->addCreditCardSettings($page, $mollieExtension, $apiSettings, $salesChannelContext);
+            $this->addCreditCardSettings($page, $mollieExtension, $salesChannelContext);
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to assign custom template data to pages', [
                 'error' => $exception->getMessage(),
@@ -77,28 +75,19 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addCreditCardSettings(Page $page, PaymentMethodExtension $paymentMethod, ApiSettings $apiSettings, SalesChannelContext $salesChannelContext): void
+    private function addCreditCardSettings(Page $page, PaymentMethodExtension $paymentMethod, SalesChannelContext $salesChannelContext): void
     {
         if ($paymentMethod->getPaymentMethod() !== PaymentMethod::CREDIT_CARD) {
             return;
         }
+        $listMandatesResponse = $this->listMandatesRoute->list('',$salesChannelContext);
+        $mandates = $listMandatesResponse->getMandates();
+        $creditCardMandates = $mandates->filterByPaymentMethod(PaymentMethod::CREDIT_CARD);
+
         $salesChannelId = $salesChannelContext->getSalesChannelId();
         $creditCardSettings = $this->settings->getCreditCardSettings($salesChannelId);
-        if ($creditCardSettings->isOneClickPayment()) {
-            $customer = $salesChannelContext->getCustomer();
-            if ($customer instanceof CustomerEntity) {
-                $customerExtension = $customer->getExtension(Mollie::EXTENSION);
-                if ($customerExtension instanceof Customer) {
-                    $mollieProfileId = $apiSettings->getProfileId();
-                    $mollieCustomerId = $customerExtension->getForProfileId($mollieProfileId);
-                    if ($mollieCustomerId !== null) {
-                        $mandates = $this->mollieGateway->listMandates($mollieCustomerId, $salesChannelId);
-                        $creditCardMandates = $mandates->filterByPaymentMethod(PaymentMethod::CREDIT_CARD);
-                        $page->addExtension('MollieCreditCardMandateCollection', $creditCardMandates);
-                    }
-                }
-            }
-        }
+
+        $page->addExtension('MollieCreditCardMandateCollection', $creditCardMandates);
 
         $page->assign([
             'enable_credit_card_components' => $creditCardSettings->isCreditCardComponentsEnabled(),
