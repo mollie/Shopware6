@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
@@ -66,5 +67,10 @@ final class CachedMollieGateway implements MollieGatewayInterface
     {
         // TODO save in array
         return $this->decorated->listMandates($mollieCustomerId, $salesChannelId);
+    }
+
+    public function listTerminals(string $salesChannelId): TerminalCollection
+    {
+        return $this->decorated->listTerminals($salesChannelId);
     }
 }

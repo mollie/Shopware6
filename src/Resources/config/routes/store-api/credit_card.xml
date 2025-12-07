@@ -12,10 +12,5 @@
         <default key="_routeScope"><list><string>store-api</string></list></default>
     </route>
 
-    <route id="store-api.mollie.mandates"
-           path="/store-api/mollie/mandates/{customerId}"
-           methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase::getMandates</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
+
 </routes>
