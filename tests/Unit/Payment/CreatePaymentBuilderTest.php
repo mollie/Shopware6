@@ -1,22 +1,27 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Unit\Mollie;
+namespace Mollie\Shopware\Unit\Payment;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
-use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
+use Mollie\Shopware\Unit\Payment\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 #[CoversClass(CreatePaymentBuilder::class)]
 final class CreatePaymentBuilderTest extends TestCase
@@ -26,12 +31,17 @@ final class CreatePaymentBuilderTest extends TestCase
         $fakeRouteBuilder = new FakeRouteBuilder();
         $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}',0);
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);
-
-        $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService);
+        $fakePaymentHandler = new FakePaymentMethodHandler();
+        $fakeCustomerRepository = new FakeCustomerRepository();
+        $requestDataBag = new RequestDataBag();
+        $context = new Context(new SystemSource());
+        $logger = new NullLogger();
+        $gateway = new FakeGateway('test');
+        $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService,$gateway,$fakeCustomerRepository,$logger);
 
         $fakeTransactionDataLoader = new FakeTransactionService();
-        $transactionData = $fakeTransactionDataLoader->findById('test',new Context(new SystemSource()));
-        $actual = $builder->build($transactionData);
+        $transactionData = $fakeTransactionDataLoader->findById('test',$context);
+        $actual = $builder->build($transactionData,$fakePaymentHandler,$requestDataBag,$context);
         $actual->setCardToken('testCard');
         $actual->setMethod(PaymentMethod::PAYPAL);
 

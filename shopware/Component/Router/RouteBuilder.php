@@ -19,10 +19,10 @@ final class RouteBuilder implements RouteBuilderInterface
 
     public function getReturnUrl(string $transactionId): string
     {
-        $routeName = 'storefront.mollie.payment.return';
+        $routeName = 'frontend.mollie.payment';
 
         if ($this->isStoreApiRequest()) {
-            $routeName = 'store-api.mollie.payment.return';
+            $routeName = 'api.mollie.payment-return';
         }
 
         return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
@@ -30,9 +30,9 @@ final class RouteBuilder implements RouteBuilderInterface
 
     public function getWebhookUrl(string $transactionId): string
     {
-        $routeName = 'storefront.mollie.payment.webhook';
+        $routeName = 'frontend.mollie.webhook';
         if ($this->isStoreApiRequest()) {
-            $routeName = 'store-api.mollie.payment.webhook';
+            $routeName = 'api.mollie.webhook';
         }
 
         return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
