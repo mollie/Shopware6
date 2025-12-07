@@ -44,7 +44,10 @@ final class Pay
     ) {
     }
 
-    public function execute(AbstractMolliePaymentHandler $paymentHandler, PaymentTransactionStruct $transaction, RequestDataBag $dataBag, Context $context): RedirectResponse
+    public function execute(AbstractMolliePaymentHandler $paymentHandler,
+        PaymentTransactionStruct $transaction,
+        RequestDataBag $dataBag,
+        Context $context): RedirectResponse
     {
         $transactionId = $transaction->getOrderTransactionId();
         $shopwareFinalizeUrl = (string) $transaction->getReturnUrl();

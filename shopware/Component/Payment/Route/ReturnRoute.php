@@ -30,11 +30,10 @@ final class ReturnRoute extends AbstractReturnRoute
     #[Route(path: '/api/mollie/payment/return/{transactionId}',name: 'api.mollie.payment-return', methods: ['GET', 'POST'])]
     public function return(string $transactionId, Context $context): ReturnRouteResponse
     {
-        $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
-
         $this->logger->debug('Return route opened',[
             'transactionId' => $transactionId,
         ]);
+        $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         return new ReturnRouteResponse($payment);
     }

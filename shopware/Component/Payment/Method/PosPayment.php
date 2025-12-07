@@ -23,7 +23,11 @@ final class PosPayment extends AbstractMolliePaymentHandler
 
     public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
     {
-        // TODO terminalId
+        $terminalId = $dataBag->get('terminalId');
+        if ($terminalId !== null) {
+            $payment->setTerminalId($terminalId);
+        }
+
         return $payment;
     }
 }
