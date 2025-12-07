@@ -13,6 +13,8 @@ use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\Terminal;
+use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
@@ -156,6 +158,24 @@ final class MollieGateway implements MollieGatewayInterface
             foreach ($body['_embedded']['mandates'] as $mandateData) {
                 $mandate = Mandate::fromClientResponse($mandateData);
                 $collection->set($mandate->getId(), $mandate);
+            }
+
+            return $collection;
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
+    public function listTerminals(string $salesChannelId): TerminalCollection
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $response = $client->get('terminals');
+            $body = json_decode($response->getBody()->getContents(), true);
+            $collection = new TerminalCollection();
+            foreach ($body['_embedded']['terminals'] as $terminalData) {
+                $terminal = Terminal::fromClientResponse($terminalData);
+                $collection->set($terminal->getId(), $terminalData);
             }
 
             return $collection;
