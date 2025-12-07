@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Mollie\Route;
+namespace Mollie\Shopware\Component\Payment\CreditCard;
 
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;

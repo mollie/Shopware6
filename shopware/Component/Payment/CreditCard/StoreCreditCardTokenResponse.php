@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Mollie\Route;
+namespace Mollie\Shopware\Component\Payment\CreditCard;
 
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;

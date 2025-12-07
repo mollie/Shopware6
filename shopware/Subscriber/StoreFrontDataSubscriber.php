@@ -5,8 +5,10 @@ namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
-use Mollie\Shopware\Component\Mollie\Route\AbstractListMandatesRoute;
-use Mollie\Shopware\Component\Mollie\Route\ListMandatesRoute;
+use Mollie\Shopware\Component\Payment\Mandate\AbstractListMandatesRoute;
+use Mollie\Shopware\Component\Payment\Mandate\ListMandatesRoute;
+use Mollie\Shopware\Component\Payment\PointOfSale\AbstractListTerminalsRoute;
+use Mollie\Shopware\Component\Payment\PointOfSale\ListTerminalsRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
@@ -29,6 +31,8 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         private AbstractSettingsService $settings,
         #[Autowire(service: ListMandatesRoute::class)]
         private AbstractListMandatesRoute $listMandatesRoute,
+        #[Autowire(service: ListTerminalsRoute::class)]
+        private AbstractListTerminalsRoute $listTerminalsRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -67,6 +71,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
             $this->addTestMode($page, $apiSettings);
             $this->addProfileId($page, $apiSettings);
             $this->addCreditCardSettings($page, $mollieExtension, $salesChannelContext);
+            $this->addPosTerminals($page, $mollieExtension, $salesChannelContext);
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to assign custom template data to pages', [
                 'error' => $exception->getMessage(),
@@ -80,7 +85,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         if ($paymentMethod->getPaymentMethod() !== PaymentMethod::CREDIT_CARD) {
             return;
         }
-        $listMandatesResponse = $this->listMandatesRoute->list('',$salesChannelContext);
+        $listMandatesResponse = $this->listMandatesRoute->list('', $salesChannelContext);
         $mandates = $listMandatesResponse->getMandates();
         $creditCardMandates = $mandates->filterByPaymentMethod(PaymentMethod::CREDIT_CARD);
 
@@ -93,6 +98,18 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
             'enable_credit_card_components' => $creditCardSettings->isCreditCardComponentsEnabled(),
             'enable_one_click_payments' => $creditCardSettings->isOneClickPayment(),
             'enable_one_click_payments_compact_view' => $creditCardSettings->isOneClickCompactView()
+        ]);
+    }
+
+    private function addPosTerminals(Page $page, PaymentMethodExtension $paymentMethod, SalesChannelContext $salesChannelContext): void
+    {
+        if ($paymentMethod->getPaymentMethod() !== PaymentMethod::POS) {
+            return;
+        }
+        $listTerminalsResponse = $this->listTerminalsRoute->list($salesChannelContext);
+        $terminals = $listTerminalsResponse->getTerminals();
+        $page->assign([
+            'mollie_terminals' => $terminals
         ]);
     }
 

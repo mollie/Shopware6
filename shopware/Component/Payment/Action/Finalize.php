@@ -48,14 +48,14 @@ final class Finalize
             'salesChannelId' => $salesChannelId,
         ];
 
-        $this->logger->info('Returned from payment page back to shop, start finalizing payment', $logData);
+        $this->logger->info('Start - Payment finalize', $logData);
 
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $paymentStatus = $payment->getStatus();
 
         $logData['paymentId'] = $payment->getId();
-        $logData['paymentStatus'] = $paymentStatus;
+        $logData['paymentStatus'] = $paymentStatus->value;
 
         $this->logger->info('Fetched Payment Information from Mollie', $logData);
 
@@ -68,7 +68,7 @@ final class Finalize
             $paymentCancelledEvent = new CancelledEvent($payment, $order, $customer, $context);
             $this->eventDispatcher->dispatch($paymentCancelledEvent);
             $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $orderNumber, $payment->getId());
-            $this->logger->warning('Finalize finished, payment was cancelled, CancelledEvent fired', $logData);
+            $this->logger->warning('Finished - Payment finalize. Payment was cancelled, CancelledEvent fired', $logData);
             throw PaymentException::customerCanceled($transaction->getOrderTransactionId(), $message);
         }
 
@@ -77,7 +77,7 @@ final class Finalize
             $this->eventDispatcher->dispatch($paymentFailedEvent);
             $message = sprintf('Payment for order %s (%s) is failed', $orderNumber, $payment->getId());
 
-            $this->logger->warning('Finalize finished, payment is failed, FailedEvent fired', $logData);
+            $this->logger->warning('Finished - Payment finalize. Payment is failed, FailedEvent fired', $logData);
 
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $message);
         }
@@ -85,6 +85,6 @@ final class Finalize
         $paymentSuccessEvent = new SuccessEvent($payment, $order, $customer, $context);
         $this->eventDispatcher->dispatch($paymentSuccessEvent);
 
-        $this->logger->info('Finalize finished, Payment is successful, SuccessEvent fired', $logData);
+        $this->logger->info('Finished - Payment finalize. Payment is successful, SuccessEvent fired', $logData);
     }
 }
