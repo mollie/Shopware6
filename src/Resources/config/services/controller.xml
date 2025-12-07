@@ -181,18 +181,7 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="Shopware\Storefront\Framework\Routing\Router"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\OrderTransactionRepository"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
+
 
         <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
@@ -265,11 +254,7 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\POS\PosControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <tag name="controller.service_arguments"/>
-        </service>
+
 
         <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

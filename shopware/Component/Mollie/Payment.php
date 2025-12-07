@@ -19,6 +19,7 @@ final class Payment extends Struct implements \JsonSerializable
 
     private string $finalizeUrl = '';
     private int $countPayments = 1;
+    private string $changePaymentStateUrl;
 
     public function __construct(private string $id, private PaymentMethod $method)
     {
@@ -93,12 +94,16 @@ final class Payment extends Struct implements \JsonSerializable
         $payment->setStatus(PaymentStatus::from($body['status']));
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
         $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
+        $changePaymentStateUrl = $body['_links']['changePaymentState']['href'] ?? null;
 
         if ($thirdPartyPaymentId !== null) {
             $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
         }
         if ($checkoutUrl !== null) {
             $payment->setCheckoutUrl($checkoutUrl);
+        }
+        if ($changePaymentStateUrl !== null) {
+            $payment->setChangePaymentStateUrl($changePaymentStateUrl);
         }
 
         return $payment;
@@ -123,5 +128,15 @@ final class Payment extends Struct implements \JsonSerializable
         unset($data['shopwareTransaction']);
 
         return array_filter($data);
+    }
+
+    public function getChangePaymentStateUrl(): string
+    {
+        return $this->changePaymentStateUrl;
+    }
+
+    private function setChangePaymentStateUrl(string $changePaymentStateUrl): void
+    {
+        $this->changePaymentStateUrl = $changePaymentStateUrl;
     }
 }

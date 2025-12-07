@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Router;
 
+use Mollie\Shopware\Component\Mollie\Payment;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
@@ -36,6 +37,20 @@ final class RouteBuilder implements RouteBuilderInterface
         }
 
         return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
+    }
+
+    public function getPosCheckoutUrl(Payment $payment,string $transactionId, string $orderNumber): string
+    {
+        $parameters = [
+            'transactionId' => $transactionId,
+            'orderNumber' => $orderNumber
+        ];
+        $changePaymentStatusUrl = $payment->getChangePaymentStateUrl();
+        if (mb_strlen($changePaymentStatusUrl) > 0) {
+            $parameters['changePaymentStateUrl'] = $changePaymentStatusUrl;
+        }
+
+        return $this->router->generate('frontend.mollie.pos.checkout', $parameters, RouterInterface::ABSOLUTE_URL);
     }
 
     private function isStoreApiRequest(): bool

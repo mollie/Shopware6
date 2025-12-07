@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 
@@ -45,5 +46,10 @@ final class FakeGateway implements MollieGatewayInterface
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection
     {
         // TODO: Implement listMandates() method.
+    }
+
+    public function listTerminals(string $salesChannelId): TerminalCollection
+    {
+        // TODO: Implement listTerminals() method.
     }
 }
