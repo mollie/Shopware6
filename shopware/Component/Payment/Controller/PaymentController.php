@@ -14,9 +14,10 @@ use Shopware\Core\Framework\ShopwareHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
+#[Route(defaults: ['_routeScope' => ['storefront'], 'csrf_protected' => false])]
 final class PaymentController extends AbstractController
 {
     public function __construct(
@@ -29,14 +30,13 @@ final class PaymentController extends AbstractController
     ) {
     }
 
-    public function return(Request $request, Context $context): Response
+    #[Route(path: '/mollie/payment/{transactionId}', name: 'frontend.mollie.payment', methods: ['GET', 'POST'], options: ['seo' => false])]
+    public function return(string $transactionId, Context $context): Response
     {
-        $transactionId = $request->get('transactionId');
-
         $this->logger->info('Returning from Payment Provider', [
             'transactionId' => $transactionId,
         ]);
-        $response = $this->returnRoute->return($request, $context);
+        $response = $this->returnRoute->return($transactionId, $context);
         $paymentStatus = $response->getPaymentStatus();
 
         if ($paymentStatus->isFailed()) {
@@ -45,7 +45,7 @@ final class PaymentController extends AbstractController
         $query = (string) parse_url($response->getFinalizeUrl(), PHP_URL_QUERY);
         $queryParameters = [];
         parse_str($query, $queryParameters);
-        $this->logger->info('Finalize transaction', [
+        $this->logger->info('Call shopware finalize transaction', [
             'transactionId' => $transactionId,
         ]);
         $controller = sprintf('%s::%s', ShopwarePaymentController::class, 'finalizeTransaction');
@@ -53,14 +53,14 @@ final class PaymentController extends AbstractController
         return $this->forward($controller, [], $queryParameters);
     }
 
-    public function webhook(Request $request, Context $context): Response
+    #[Route(path: '/mollie/webhook/{transactionId}', name: 'frontend.mollie.webhook', methods: ['GET', 'POST'], options: ['seo' => false])]
+    public function webhook(string $transactionId, Context $context): Response
     {
-        $transactionId = $request->get('transactionId');
         try {
             $this->logger->info('Webhook received', [
                 'transactionId' => $transactionId,
             ]);
-            $response = $this->webhookRoute->notify($request, $context);
+            $response = $this->webhookRoute->notify($transactionId, $context);
 
             return new JsonResponse($response->getObject());
         } catch (ShopwareHttpException $exception) {

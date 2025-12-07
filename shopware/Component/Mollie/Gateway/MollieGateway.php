@@ -38,11 +38,6 @@ final class MollieGateway implements MollieGatewayInterface
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
-        $logData = [
-            'transactionId' => $transactionId,
-        ];
-        $this->logger->info('Loading transaction data', $logData);
-
         $transactionData = $this->transactionService->findById($transactionId, $context);
 
         $transaction = $transactionData->getTransaction();
@@ -50,9 +45,14 @@ final class MollieGateway implements MollieGatewayInterface
 
         $orderNumber = (string) $transactionOrder->getOrderNumber();
         $salesChannelId = $transactionOrder->getSalesChannelId();
-        $logData['orderNumber'] = $orderNumber;
-        $logData['salesChannelId'] = $salesChannelId;
-        $this->logger->info('Loading mollie payment data', $logData);
+
+        $logData = [
+            'transactionId' => $transactionId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+
+        $this->logger->info('Start - load payment data by transaction id', $logData);
 
         /** @var ?Payment $mollieTransaction */
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
@@ -76,7 +76,7 @@ final class MollieGateway implements MollieGatewayInterface
         $payment->setShopwareTransaction($transaction);
         $logData['molliePaymentId'] = $payment->getId();
         $logData['paymentStatus'] = $payment->getStatus()->value;
-        $this->logger->info('Payment data were loaded by transaction', $logData);
+        $this->logger->info('Finished - load payment data by transaction id', $logData);
 
         return $payment;
     }
