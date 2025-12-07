@@ -1,5 +1,15 @@
 # 5.0.0
-- Grundlegende Zahlung über Payments API eingebaut
+- Zahlungsarten verwenden jetzt die Mollie Payments API.
+- Die minimale PHP-Version ist 8.2.
+- Die minimale Shopware-Version ist 6.6.10.x.
+- Order Events und Flows werden nicht mehr ausgelöst.
+- Neue Payment Flows wurden hinzugefügt.
+- Das Event ModifyCreatePaymentPayloadEvent wurde eingeführt, um die Anfrage vor der Erstellung einer Mollie-Zahlung anzupassen.
+- Alle zahlungsbezogenen Logs enthalten nun die Shopware-orderNumber.
+- Die URL zum Speichern des Kreditkarten-Tokens wird nicht mehr verwendet; übergebe stattdessen creditCardToken in der Checkout-Anfrage.
+- Die URL zum Speichern der Mandats-ID ist veraltet; übergebe mandateId als Body-Parameter in der Checkout-Anfrage.
+- Die URL zum Speichern der POS-Terminal-ID ist veraltet; übergebe terminalId als Body-Parameter in der Checkout-Anfrage.
+- Ein Produkt kann nun mehreren Gutschein-Kategorien zugeordnet werden.
 
 ## [Unreleased]
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.

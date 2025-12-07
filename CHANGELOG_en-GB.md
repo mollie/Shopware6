@@ -1,5 +1,15 @@
 # 5.0.0
-- Added basic payment via paypal API
+- Payment methods now use the Mollie Payments API.
+- Minimum PHP version is 8.2.
+- Minimum Shopware version is 6.6.10.x.
+- Order Events and Flows are no longer triggered.
+- New payment flows have been added.
+- Added the ModifyCreatePaymentPayloadEvent to modify the request before creating a payment in Mollie.
+- All payment-related logs now include the Shopware orderNumber.
+- The URL for saving the credit card token is no longer used; provide creditCardToken in the checkout request.
+- The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.
+- The URL for saving the POS terminal ID is deprecated; provide terminalId as a body parameter in the checkout request.
+- A product can now have multiple voucher categories.
 
 ## [Unreleased]
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
