@@ -67,6 +67,6 @@ final class PayTest extends TestCase
         $gateway = new FakeGateway($checkoutUrl);
         $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService,$gateway,$fakeCustomerRepository,$logger);
 
-        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $eventDispatcher, $logger);
+        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $fakeRouteBuilder,$eventDispatcher, $logger);
     }
 }
