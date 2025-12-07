@@ -25,8 +25,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 
+#[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
 final class WebhookRoute extends AbstractWebhookRoute
 {
     /**
@@ -53,10 +54,13 @@ final class WebhookRoute extends AbstractWebhookRoute
         throw new DecorationPatternException(self::class);
     }
 
-    public function notify(Request $request, Context $context): WebhookRouteResponse
+    #[Route(path: '/api/mollie/webhook/{transactionId}',name: 'api.mollie.webhook', methods: ['GET', 'POST'])]
+    public function notify(string $transactionId, Context $context): WebhookRouteResponse
     {
-        $transactionId = $request->get('transactionId');
-
+        $logData = [
+            'transactionId' => $transactionId,
+        ];
+        $this->logger->info('Webhook route opened',$logData);
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
@@ -85,7 +89,7 @@ final class WebhookRoute extends AbstractWebhookRoute
             'transactionId' => $transactionId,
             'paymentStatus' => $payment->getStatus()->value,
             'shopwareMethod' => $shopwareHandlerMethod,
-            'shopwareOrder' => $orderNumber,
+            'orderNumber' => $orderNumber,
         ];
         $this->logger->info('Change payment status', $logData);
         if (mb_strlen($shopwareHandlerMethod) === 0) {
@@ -113,7 +117,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $logData = [
             'transactionId' => $transactionId,
             'molliePaymentMethod' => $molliePaymentMethod,
-            'shopwareOrder' => $orderNumber,
+            'orderNumber' => $orderNumber,
         ];
 
         $this->logger->info('Change payment method if changed', $logData);

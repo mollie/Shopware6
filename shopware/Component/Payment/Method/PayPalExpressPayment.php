@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 final class PayPalExpressPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface
@@ -24,7 +23,7 @@ final class PayPalExpressPayment extends AbstractMolliePaymentHandler implements
         return 'PayPal Express';
     }
 
-    public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, OrderEntity $orderEntity, CustomerEntity $customer): CreatePayment
+    public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
     {
         // TODO authenticationId
         return $payment;

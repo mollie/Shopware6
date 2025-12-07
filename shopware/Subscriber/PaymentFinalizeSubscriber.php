@@ -11,7 +11,6 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * We do not want to change the payment status in production,
@@ -47,8 +46,6 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
         $this->logger->warning('Executing Webhook in Dev mode');
         $payment = $event->getPayment();
         $transaction = $payment->getShopwareTransaction();
-        $request = new Request();
-        $request->attributes->set('transactionId', $transaction->getId());
-        $this->webhookRoute->notify($request, $event->getContext());
+        $this->webhookRoute->notify($transaction->getId(), $event->getContext());
     }
 }

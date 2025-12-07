@@ -11,7 +11,7 @@ export default class MollieCreditCardMandate extends Plugin {
     static options = {
         newCardMandateOption: null,
         mollieCreditCardFormClass: '.mollie-components-credit-card',
-        mollieCreditCardMandateInput: 'input[name="mollieCreditCardMandate"]',
+        mollieCreditCardMandateInput: 'input[name="mandateId"]',
         mollieShouldSaveCardDetailInput: 'input[name="mollieShouldSaveCardDetail"]',
     };
 
