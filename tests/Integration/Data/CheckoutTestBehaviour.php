@@ -20,7 +20,6 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CartLineItemController;
 use Shopware\Storefront\Controller\CheckoutController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
@@ -110,10 +109,8 @@ trait CheckoutTestBehaviour
 
         /** @var PaymentController $returnController */
         $returnController = $this->getContainer()->get(PaymentController::class);
-        $request = new Request();
-        $request->attributes->set('transactionId', $paymentId);
 
-        return $returnController->return($request, $salesChannelContext->getContext());
+        return $returnController->return($paymentId, $salesChannelContext->getContext());
     }
 
     public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
