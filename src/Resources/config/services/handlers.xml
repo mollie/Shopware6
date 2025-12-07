@@ -37,14 +37,6 @@
 
 
 
-        <!-- POS Terminal PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\PosPayment" public="true">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
-
 
 
 
