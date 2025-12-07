@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Setting;
 
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Shopware\Core\Framework\Struct\Struct;
 
 class MollieSettingStruct extends Struct
@@ -476,10 +475,10 @@ class MollieSettingStruct extends Struct
 
         return min(
             max(
-                BankTransferPayment::DUE_DATE_MIN_DAYS,
+                1,
                 $this->paymentMethodBankTransferDueDateDays
             ),
-            BankTransferPayment::DUE_DATE_MAX_DAYS
+            100
         );
     }
 

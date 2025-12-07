@@ -3,16 +3,14 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Payment\Action;
 
-use Mollie\Shopware\Component\Mollie\CreatePaymentBuilder;
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Payment\Action\Pay;
+use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
@@ -33,9 +31,8 @@ final class PayTest extends TestCase
         $transactionService = new FakeTransactionService();
         $transactionService->createTransaction();
         $expectedUrl = 'https://mollie.com/checkout=token=123';
-        $fakeClient = new FakeClient('mollieTestId', 'paid', checkoutUrl: 'https://mollie.com/checkout=token=123');
 
-        $payAction = $this->getPayAction($transactionService, $fakeClient);
+        $payAction = $this->getPayAction($transactionService, $expectedUrl);
 
         $response = $payAction->execute(new FakePaymentMethodHandler(), new PaymentTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
 
@@ -48,9 +45,8 @@ final class PayTest extends TestCase
         $transactionService = new FakeTransactionService();
         $transactionService->createTransaction();
         $expectedUrl = 'returnUrl';
-        $fakeClient = new FakeClient('mollieTestId', 'paid');
 
-        $payAction = $this->getPayAction($transactionService, $fakeClient);
+        $payAction = $this->getPayAction($transactionService, $expectedUrl);
 
         $response = $payAction->execute(new FakePaymentMethodHandler(), new PaymentTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
 
@@ -58,20 +54,19 @@ final class PayTest extends TestCase
         $this->assertSame($expectedUrl, $response->getTargetUrl());
     }
 
-    private function getPayAction(FakeTransactionService $transactionService, FakeClient $fakeClient): Pay
+    private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl): Pay
     {
-        $logger = new NullLogger();
         $eventDispatcher = new FakeEventDispatcher();
         $fakeRouteBuilder = new FakeRouteBuilder();
         $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);
-        $fakeCustomerRepository = new FakeCustomerRepository();
-        $fakeClientFactory = new FakeClientFactory($fakeClient);
+
         $fakeOrderTransactionStateHandler = new FakeOrderTransactionStateHandler();
+        $fakeCustomerRepository = new FakeCustomerRepository();
+        $logger = new NullLogger();
+        $gateway = new FakeGateway($checkoutUrl);
+        $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService,$gateway,$fakeCustomerRepository,$logger);
 
-        $gateway = new MollieGateway($fakeClientFactory, $transactionService, $logger);
-        $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService);
-
-        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $settingsService,$fakeCustomerRepository, $eventDispatcher, $logger);
+        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $eventDispatcher, $logger);
     }
 }
