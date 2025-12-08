@@ -36,18 +36,18 @@ final class PaymentMethodInstaller
      * @param EntityRepository<MediaCollection<MediaEntity>> $mediaRepository
      */
     public function __construct(
-        private PaymentMethodRepository $molliePaymentMethodRepository,
+        private PaymentHandlerLocator   $paymentHandlerLocator,
         #[Autowire(service: 'payment_method.repository')]
-        private EntityRepository $shopwarePaymentMethodRepository,
+        private EntityRepository        $shopwarePaymentMethodRepository,
         #[Autowire(service: 'media.repository')]
-        private EntityRepository $mediaRepository,
+        private EntityRepository        $mediaRepository,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
-        private MediaService $mediaService,
-        private FileFetcher $fileFetcher,
-        private PluginIdProvider $pluginIdProvider,
+        private MediaService            $mediaService,
+        private FileFetcher             $fileFetcher,
+        private PluginIdProvider        $pluginIdProvider,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger,
+        private LoggerInterface         $logger,
     ) {
     }
 
@@ -63,7 +63,7 @@ final class PaymentMethodInstaller
      */
     private function loadPaymentMethodMapping(Context $context): array
     {
-        $molliePaymentMethods = $this->molliePaymentMethodRepository->getPaymentMethods();
+        $molliePaymentMethods = $this->paymentHandlerLocator->getPaymentMethods();
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
         $paypalExpressSettings = $this->settingsService->getPaypalExpressSettings();
 

@@ -6,7 +6,7 @@ namespace Mollie\Shopware\Component\Payment;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-final class PaymentMethodRepository
+final class PaymentHandlerLocator
 {
     /** @var AbstractMolliePaymentHandler[] */
     private array $paymentMethods = [];
