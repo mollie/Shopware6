@@ -7,6 +7,9 @@ use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class ListTerminalsResponse extends StoreApiResponse
 {
     public function __construct(private TerminalCollection $terminals)

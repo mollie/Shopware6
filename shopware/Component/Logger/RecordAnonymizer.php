@@ -27,9 +27,21 @@ final class RecordAnonymizer implements ProcessorInterface
         if (isset($extraData['url'])) {
             $extraData['url'] = $this->anonymize((string) $extraData['url']);
         }
-        $record['extra'] = $extraData;
+        $recordArray['extra'] = $extraData;
 
-        return $record;
+        if (isset($recordArray['context']) && is_array($recordArray['context'])) {
+            $recordArray['context'] = $this->maskPersonalDataInArray($recordArray['context']);
+        }
+
+        return new LogRecord(
+            datetime: $record->datetime,
+            channel: $record->channel,
+            level: $record->level,
+            message: $record->message,
+            context: $recordArray['context'] ?? [],
+            extra: $recordArray['extra'] ?? [],
+            formatted: $record->formatted,
+        );
     }
 
     private function anonymize(string $url): string
@@ -43,5 +55,38 @@ final class RecordAnonymizer implements ProcessorInterface
         }
 
         return (string) $url;
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return array<mixed>
+     */
+    private function maskPersonalDataInArray(array $data): array
+    {
+        $sensitiveFields = ['givenName', 'familyName', 'organizationName', 'email', 'phone', 'streetAndNumber', 'postalCode'];
+        $urlFields = ['redirectUrl', 'webhookUrl', 'cancelUrl', 'href', 'checkoutUrl', 'finalizeUrl'];
+
+        foreach ($data as $key => &$value) {
+            if (in_array($key, $sensitiveFields, true) && is_string($value)) {
+                $value = substr($value, 0, 2) . '**';
+                continue;
+            }
+
+            if (in_array($key, $urlFields, true) && is_string($value)) {
+                $value = preg_replace_callback(
+                    '/(?:token|_sw_payment_token)=([a-z0-9._\-]+?)(?:\*{2})?(?=[&"]|$)/i',
+                    fn ($m) => (strpos($m[0], '_sw_payment_token') !== false ? '_sw_payment_token=' : 'token=') . substr($m[1], 0, 2) . '**',
+                    $value
+                );
+                continue;
+            }
+
+            if (is_array($value)) {
+                $value = $this->maskPersonalDataInArray($value);
+            }
+        }
+
+        return $data;
     }
 }
