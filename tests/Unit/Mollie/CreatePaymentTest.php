@@ -69,6 +69,11 @@ final class CreatePaymentTest extends TestCase
         $payment->setDescription('Test');
         $payment->setLines($lineItems);
         $payment->setShopwareOrderNumber('SW-ORDER-123456');
+        $payment->setCustomerReference('SW-CUSTOMER-123456');
+        $payment->setCustomerId('SW-CUSTOMER-123');
+        $payment->setMandateId('SW-MANDATOR-123456');
+        $payment->setProfileId('SW-PROFILE-123456');
+        $payment->setTerminalId('SW-TERMINAL-123456');
 
         $this->assertSame('Test', $payment->getDescription());
         $this->assertSame('https://example.com', $payment->getRedirectUrl());
@@ -86,6 +91,11 @@ final class CreatePaymentTest extends TestCase
         $this->assertSame($dueDate, $payment->getDueDate());
         $this->assertSame($lineItems, $payment->getLines());
         $this->assertSame('SW-ORDER-123456', $payment->getShopwareOrderNumber());
+        $this->assertSame('SW-CUSTOMER-123456', $payment->getCustomerReference());
+        $this->assertSame('SW-CUSTOMER-123', $payment->getCustomerId());
+        $this->assertSame('SW-MANDATOR-123456', $payment->getMandateId());
+        $this->assertSame('SW-PROFILE-123456', $payment->getProfileId());
+        $this->assertSame('SW-TERMINAL-123456', $payment->getTerminalId());
     }
 
     public function testApplePayPaymentTokenCanBeSetToNull(): void
