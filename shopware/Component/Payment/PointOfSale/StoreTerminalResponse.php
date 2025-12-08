@@ -6,6 +6,9 @@ namespace Mollie\Shopware\Component\Payment\PointOfSale;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class StoreTerminalResponse extends StoreApiResponse
 {
     public function __construct()
