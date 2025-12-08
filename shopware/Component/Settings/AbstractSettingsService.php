@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings;
 
+use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
@@ -25,4 +27,8 @@ abstract class AbstractSettingsService
     abstract public function getPaypalExpressSettings(): PayPalExpressSettings;
 
     abstract public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings;
+
+    abstract public function getAccountSettings(?string $salesChannelId = null): AccountSettings;
+
+    abstract public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings;
 }
