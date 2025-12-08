@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie;
@@ -22,15 +23,17 @@ final class PaymentTest extends TestCase
         $payment->setCountPayments(2);
         $payment->setThirdPartyPaymentId('test_thirdPartyPaymentId');
         $payment->setShopwareTransaction(new OrderTransactionEntity());
+        $payment->setChangePaymentStateUrl('http://test.payment');
 
         $this->assertSame('tr_test', $payment->getId());
         $this->assertSame(PaymentMethod::PAYPAL, $payment->getMethod());
-        $this->assertSame(PaymentStatus::PENDING,  $payment->getStatus());
+        $this->assertSame(PaymentStatus::PENDING, $payment->getStatus());
         $this->assertSame('http://test.finalize', $payment->getFinalizeUrl());
         $this->assertSame('http://test.checkout', $payment->getCheckoutUrl());
         $this->assertSame(2, $payment->getCountPayments());
         $this->assertSame('test_thirdPartyPaymentId', $payment->getThirdPartyPaymentId());
         $this->assertInstanceOf(OrderTransactionEntity::class, $payment->getShopwareTransaction());
+        $this->assertSame('http://test.payment', $payment->getChangePaymentStateUrl());
     }
 
     public function testShopwareTransactionIsRemovedInData(): void
@@ -51,7 +54,7 @@ final class PaymentTest extends TestCase
 
     public function testCreatePaymentFromArray(): void
     {
-        $data = [
+        $body = [
             'id' => 'tr_test',
             'method' => PaymentMethod::PAYPAL->value,
             'status' => PaymentStatus::PAID->value,
@@ -61,15 +64,19 @@ final class PaymentTest extends TestCase
             '_links' => [
                 'checkout' => [
                     'href' => 'http://test.checkout',
+                ],
+                'changePaymentState' => [
+                    'href' => 'http://test.payment'
                 ]
             ]
         ];
 
-        $payment = Payment::createFromClientResponse($data);
+        $payment = Payment::createFromClientResponse($body);
 
         $this->assertSame('tr_test', $payment->getId());
         $this->assertSame('paid', $payment->getStatus()->value);
         $this->assertSame('thirdPartyPaymentId', $payment->getThirdPartyPaymentId());
         $this->assertSame('http://test.checkout', $payment->getCheckoutUrl());
+        $this->assertSame('http://test.payment', $payment->getChangePaymentStateUrl());
     }
 }
