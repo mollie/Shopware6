@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Integration\Data;
 
-use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -18,8 +18,8 @@ trait PaymentMethodTestBehaviour
 
     public function getPaymentMethodByTechnicalName(string $technicalName, Context $context): PaymentMethodEntity
     {
-        /** @var PaymentMethodRepository $molliePaymentMethods */
-        $molliePaymentMethods = $this->getContainer()->get(PaymentMethodRepository::class);
+        /** @var PaymentHandlerLocator $molliePaymentMethods */
+        $molliePaymentMethods = $this->getContainer()->get(PaymentHandlerLocator::class);
         $handler = $molliePaymentMethods->findByPaymentMethod($technicalName);
 
         if (! is_string($handler)) {

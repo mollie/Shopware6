@@ -11,17 +11,15 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Repository\PaymentMethodRepository;
+use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
-use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,7 +30,6 @@ final class WebhookRoute extends AbstractWebhookRoute
 {
     /**
      * @param EntityRepository<OrderTransactionCollection<OrderTransactionEntity>> $orderTransactionRepository
-     * @param EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $paymentMethodRepository
      */
     public function __construct(
         #[Autowire(service: MollieGateway::class)]
@@ -42,8 +39,8 @@ final class WebhookRoute extends AbstractWebhookRoute
         private EntityRepository $orderTransactionRepository,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
-        #[Autowire(service: 'payment_method.repository')]
-        private EntityRepository $paymentMethodRepository,
+        #[Autowire(service: PaymentMethodRepository::class)]
+        private PaymentMethodRepositoryInterface $paymentMethodRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -54,13 +51,13 @@ final class WebhookRoute extends AbstractWebhookRoute
         throw new DecorationPatternException(self::class);
     }
 
-    #[Route(path: '/api/mollie/webhook/{transactionId}',name: 'api.mollie.webhook', methods: ['GET', 'POST'])]
+    #[Route(path: '/api/mollie/webhook/{transactionId}', name: 'api.mollie.webhook', methods: ['GET', 'POST'])]
     public function notify(string $transactionId, Context $context): WebhookRouteResponse
     {
         $logData = [
             'transactionId' => $transactionId,
         ];
-        $this->logger->info('Webhook route opened',$logData);
+        $this->logger->info('Webhook route opened', $logData);
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
@@ -76,7 +73,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->eventDispatcher->dispatch($webhookStatusEvent);
 
         $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
-        $this->updatePaymentMethod($payment, $orderNumber, $context);
+        $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
 
         // TODO: update order status
         return new WebhookRouteResponse();
@@ -107,7 +104,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
     }
 
-    private function updatePaymentMethod(Payment $payment, string $orderNumber, Context $context): void
+    private function updatePaymentMethod(Payment $payment, string $orderNumber, string $salesChannelId, Context $context): void
     {
         $transaction = $payment->getShopwareTransaction();
         $transactionId = $transaction->getId();
@@ -149,12 +146,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $this->logger->debug('Payment methods are different, try to find payment method based on mollies payment method name', $logData);
 
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('technicalName', 'payment_mollie_' . $molliePaymentMethod));
-        $criteria->setLimit(1);
-
-        $searchResult = $this->paymentMethodRepository->searchIds($criteria, $context);
-        $newPaymentMethodId = $searchResult->firstId();
+        $newPaymentMethodId = $this->paymentMethodRepository->getIdForPaymentMethod($payment->getMethod(), $salesChannelId, $context);
 
         if ($newPaymentMethodId === null) {
             throw new \Exception('Payment method not found for TransactionId: ' . $transactionId);

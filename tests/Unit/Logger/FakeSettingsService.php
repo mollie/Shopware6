@@ -5,7 +5,9 @@ namespace Mollie\Shopware\Unit\Logger;
 
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
@@ -62,5 +64,15 @@ final class FakeSettingsService extends AbstractSettingsService
     public function getLoggerSettings(?string $salesChannelId = null): LoggerSettings
     {
         return $this->loggerSettings;
+    }
+
+    public function getAccountSettings(?string $salesChannelId = null): AccountSettings
+    {
+        // TODO: Implement getAccountSettings() method.
+    }
+
+    public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings
+    {
+        // TODO: Implement getApplePaySettings() method.
     }
 }

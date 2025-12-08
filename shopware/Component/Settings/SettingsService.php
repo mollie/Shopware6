@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings;
 
+use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
@@ -16,6 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class SettingsService extends AbstractSettingsService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
+    private const CACHE_KEY_MOLLIE = 'mollie';
     private const CACHE_KEY_SHOPWARE = 'shopware';
 
     /**
@@ -53,7 +56,7 @@ final class SettingsService extends AbstractSettingsService
             return $this->settingsCache[$cacheKey];
         }
 
-        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
         $settings = LoggerSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
@@ -83,7 +86,7 @@ final class SettingsService extends AbstractSettingsService
             return $this->settingsCache[$cacheKey];
         }
 
-        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
         $settings = ApiSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
@@ -98,7 +101,7 @@ final class SettingsService extends AbstractSettingsService
             return $this->settingsCache[$cacheKey];
         }
 
-        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
         $settings = PaymentSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
@@ -111,9 +114,36 @@ final class SettingsService extends AbstractSettingsService
         if (isset($this->settingsCache[$cacheKey])) {
             return $this->settingsCache[$cacheKey];
         }
-        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
 
         $settings = CreditCardSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getAccountSettings(?string $salesChannelId = null): AccountSettings
+    {
+        $cacheKey = AccountSettings::class . '_' . ($salesChannelId ?? 'all');
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getShopwareSettings($salesChannelId);
+        $settings = AccountSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings
+    {
+        $cacheKey = ApplePaySettings::class . '_' . ($salesChannelId ?? 'all');
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+
+        $settings = ApplePaySettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;
@@ -125,6 +155,26 @@ final class SettingsService extends AbstractSettingsService
      *
      * @return array<mixed[]>
      */
+    private function getMollieSettings(?string $salesChannelId = null): array
+    {
+        $cacheKey = self::CACHE_KEY_MOLLIE . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+
+        $shopwareSettingsArray = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
+        if (! is_array($shopwareSettingsArray)) {
+            return [];
+        }
+        $this->settingsCache[$cacheKey] = $shopwareSettingsArray;
+
+        return $shopwareSettingsArray;
+    }
+
+    /**
+     * @return array<mixed[]>
+     */
     private function getShopwareSettings(?string $salesChannelId = null): array
     {
         $cacheKey = self::CACHE_KEY_SHOPWARE . '_' . ($salesChannelId ?? 'all');
@@ -133,7 +183,8 @@ final class SettingsService extends AbstractSettingsService
             return $this->settingsCache[$cacheKey];
         }
 
-        $shopwareSettingsArray = $this->systemConfigService->get(self::SYSTEM_CONFIG_DOMAIN, $salesChannelId);
+        $shopwareSettingsArray = $this->systemConfigService->get('core', $salesChannelId);
+
         if (! is_array($shopwareSettingsArray)) {
             return [];
         }
