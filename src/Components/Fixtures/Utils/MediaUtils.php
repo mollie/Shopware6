@@ -18,12 +18,12 @@ class MediaUtils
     /**
      * @var EntityRepository<MediaCollection>
      */
-    private EntityRepository $mediaRepository;
+    private $mediaRepository;
 
     /**
      * @var EntityRepository<MediaFolderCollection>
      */
-    private EntityRepository $mediaFolderRepository;
+    private $mediaFolderRepository;
 
     private FileSaver $fileSaver;
     private FileFetcher $fileFetcher;
@@ -33,8 +33,8 @@ class MediaUtils
      * @param EntityRepository<MediaFolderCollection> $mediaFolderRepository
      */
     public function __construct(
-        EntityRepository $mediaRepository,
-        EntityRepository $mediaFolderRepository,
+        $mediaRepository,
+        $mediaFolderRepository,
         FileSaver $fileSaver,
         FileFetcher $fileFetcher
     ) {

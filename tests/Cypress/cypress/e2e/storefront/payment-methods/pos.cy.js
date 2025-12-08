@@ -7,6 +7,8 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -26,7 +28,14 @@ const scenarioDummyBasket = new DummyBasketScenario(1);
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         devices.setDevice(device);
-        configAction.setupShop(true, false, false);
+
+        const shopConfig = new ShopConfiguration();
+        const pluginConfig = new PluginConfiguration();
+
+        pluginConfig.setMollieFailureMode(true);
+
+        configAction.configureEnvironment(shopConfig, pluginConfig);
+
         session.resetBrowserSession();
     });
 }

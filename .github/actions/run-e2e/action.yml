@@ -156,6 +156,11 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
         docker exec shop bash -c 'php bin/console cache:clear'
 
+    - name: Install Fixtures
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console mollie:fixtures:install --force'
+
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: DAL Validate

@@ -13,6 +13,8 @@ import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCar
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -45,10 +47,14 @@ function beforeEachComponents() {
     cy.wrap(null).then(() => {
         if (!beforeAllCalledComponents) {
             devices.setDevice(devices.getFirstDevice());
-            // we need the Shopware failure mode for some tests in this file
-            // so let's just do this here once
-            configAction.setupShop(false, true, false);
-            configAction.updateProducts('', false, 0, '');
+
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            pluginConfig.setCreditCardComponents(true);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             beforeAllCalledComponents = true;
         }
         devices.setDevice(devices.getFirstDevice());
@@ -268,9 +274,14 @@ describe('Status Tests', () => {
 
         // BEFORE
         devices.setDevice(devices.getFirstDevice());
-        // turn off credit card components
-        // to speed up a few  things
-        configAction.setupPlugin(false, false, false, false, []);
+
+        const shopConfig = new ShopConfiguration()
+        const pluginConfig = new PluginConfiguration();
+
+        // turn off credit card components to speed up a few things
+        pluginConfig.setCreditCardComponents(false);
+
+        configAction.configureEnvironment(shopConfig, pluginConfig);
 
         // BEFORE (EACH)
         devices.setDevice(devices.getFirstDevice());
@@ -309,7 +320,9 @@ describe('Administration Tests', () => {
 
         // BEFORE
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupPlugin(false, false, false, false, []);
+        const shopConfig = new ShopConfiguration()
+        const pluginConfig = new PluginConfiguration();
+        configAction.configureEnvironment(shopConfig, pluginConfig);
 
         // BEFORE (EACH)
         devices.setDevice(devices.getFirstDevice());

@@ -13,6 +13,8 @@ import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsReposi
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -38,8 +40,10 @@ let beforeAllCalled = false;
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
-            configAction.setupShop(false, false, false);
-            configAction.updateProducts('', false, 0, '');
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
             beforeAllCalled = true;
         }
         devices.setDevice(device);

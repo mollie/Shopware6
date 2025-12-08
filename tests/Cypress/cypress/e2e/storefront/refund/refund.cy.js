@@ -15,6 +15,8 @@ import RefundManagerRepository from "Repositories/admin/refund-manager/RefundMan
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -34,7 +36,7 @@ const refundManager = new RefundManagerAction();
 
 const repoRefundManager = new RefundManagerRepository();
 
-const scenarioDummyBasket = new DummyBasketScenario(1);
+const scenarioDummyBasket = new DummyBasketScenario(10);
 
 const device = devices.getFirstDevice();
 
@@ -44,8 +46,10 @@ let beforeAllCalled = false;
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
-            configAction.setupShop(false, false, false);
-            configAction.updateProducts('', false, 0, '');
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
             beforeAllCalled = true;
         }
         session.resetBrowserSession();
@@ -79,8 +83,6 @@ context("Order Refunds", () => {
 
             // now start the partial refund
             refundManager.fullRefund(REFUND_DESCRIPTION, REFUND_INTERNAL_DESCRIPTION);
-
-
 
             // // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -118,7 +120,6 @@ context("Order Refunds", () => {
 
             // now start the partial refund
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
-
 
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
@@ -158,15 +159,13 @@ context("Order Refunds", () => {
             // now start the partial refund with a custom amount
             refundManager.partialAmountRefund(2, REFUND_DESCRIPTION);
 
-
-
             // -------------------------------------------------------------------------------
 
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
             repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
 
             // verify that we have a valid composition (meaning item information)
-            repoRefundManager.getFirstRefundCompositionLabel().contains('1 x');
+            repoRefundManager.getFirstRefundCompositionLabel().contains('10 x');
 
             // verify our custom amount has been used
             elementHelper.assertContainsTexts(
@@ -206,8 +205,6 @@ context("Order Refunds", () => {
             // now start the full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
-
-
             // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
             repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
@@ -224,7 +221,6 @@ context("Order Refunds", () => {
 
             // now start another full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
-
 
             cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
 

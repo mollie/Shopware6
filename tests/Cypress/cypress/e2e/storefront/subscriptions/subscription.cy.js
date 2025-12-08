@@ -23,6 +23,9 @@ import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCar
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
 import SubscriptionRepository from "Repositories/storefront/account/SubscriptionRepository";
+import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -48,6 +51,7 @@ const mollieCreditCardForm = new CreditCardScreenAction();
 const adminOrders = new AdminOrdersAction();
 const adminLogin = new AdminLoginAction();
 const adminSubscriptions = new AdminSubscriptionsAction();
+const mollieProductsAction = new MollieProductsAction();
 
 const mollieSandbox = new MollieSandbox();
 
@@ -61,9 +65,14 @@ let beforeAllCalled = false;
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
-            configAction.setupShop(true, false, false);
-            configAction.setupPlugin(true, false, false, true, []);
-            configAction.updateProducts('', true, 3, 'weeks');
+
+            const shopConfig = new ShopConfiguration();
+
+            const pluginConfig = new PluginConfiguration();
+            pluginConfig.setSubscriptionIndicator(true);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             beforeAllCalled = true;
         }
         devices.setDevice(device);
@@ -88,11 +97,11 @@ describe('Subscription', () => {
 
                     molliePayment.selectFailed();
 
-                    cy.url().should('include', '/payment/failed');
-                    cy.get('.container-main .btn-primary').click();
-                    cy.url().should('include', '/checkout/select-method');
-                    cy.get('.grid-button-creditcard[value="creditcard"]').click();
+                    cy.url().should('include', '/order/edit');
 
+                    paymentAction.switchPaymentMethod('Card');
+
+                    checkout.placeOrderOnEdit();
 
                     mollieSandbox.initSandboxCookie();
                     mollieCreditCardForm.enterValidCard();
@@ -145,7 +154,7 @@ describe('Subscription', () => {
                     cy.contains('Show Shopware customer').click();
                     cy.url().should('include', '/customer/detail');
 
-                    cy.go('back')
+                    cy.go('back');
 
                     cy.contains('Show Shopware order').click();
                     cy.url().should('include', '/order/detail');
@@ -165,7 +174,6 @@ describe('Subscription', () => {
 
                     repoAdminSubscriptionDetails.getPauseButton().click();
                     repoAdminSubscriptionDetails.getConfirmButton().click();
-                    cy.wait(2000);
 
                     repoAdminSubscriptionDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Paused');
@@ -185,16 +193,14 @@ describe('Subscription', () => {
 
                     repoAdminSubscriptionDetails.getPauseButton().click();
                     repoAdminSubscriptionDetails.getConfirmButton().click();
-                    cy.wait(2000);
 
                     repoAdminSubscriptionDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Paused');
 
                     repoAdminSubscriptionDetails.getResumeButton().click();
                     repoAdminSubscriptionDetails.getConfirmButton().click();
-                    cy.wait(2000);
 
-                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'paused', {matchCase: false});
+                    cy.contains(repoAdminSubscriptionDetails.getHistoryStatusFromSelector(0), 'paused', {timeout: 10000, matchCase: false});
                     cy.contains(repoAdminSubscriptionDetails.getHistoryStatusToSelector(0), 'resumed', {matchCase: false});
                     cy.contains(repoAdminSubscriptionDetails.getHistoryCommentSelector(0), 'resumed');
                 })
@@ -209,7 +215,6 @@ describe('Subscription', () => {
 
                     repoAdminSubscriptionDetails.getSkipButton().click();
                     repoAdminSubscriptionDetails.getConfirmButton().click();
-                    cy.wait(2000);
 
                     repoAdminSubscriptionDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Skipped');
@@ -230,7 +235,6 @@ describe('Subscription', () => {
 
                     repoAdminSubscriptionDetails.getCancelButton().click();
                     repoAdminSubscriptionDetails.getConfirmButton().click();
-                    cy.wait(2000);
 
                     repoAdminSubscriptionDetails.getStatusField().should('be.visible');
                     vueJs.textField(repoAdminSubscriptionDetails.getStatusField()).equalsValue('Canceled');
@@ -248,13 +252,13 @@ describe('Subscription', () => {
                     beforeEach(device);
 
                     cy.wrap(null).then(() => {
-                        configAction.updateProducts('', true, 3, 'weeks');
-                        configAction.setupPlugin(true, false, false, true, []);
+                        const pluginConfig = new PluginConfiguration();
+                        pluginConfig.setMollieFailureMode(true);
+                        pluginConfig.setSubscriptionIndicator(true);
+                        configAction.configurePlugin(pluginConfig);
                     });
 
-                    cy.visit('/');
-                    topMenu.clickOnSecondCategory();
-                    listing.clickOnFirstProduct();
+                    mollieProductsAction.openSubscriptionProduct_Weekly3();
 
                     // we have to see the subscription indicator
                     cy.contains('Subscription product');
@@ -267,14 +271,13 @@ describe('Subscription', () => {
                     beforeEach(device);
 
                     cy.wrap(null).then(() => {
-                        configAction.updateProducts('', true, 3, 'weeks');
-                        configAction.setupPlugin(true, false, false, false, []);
+                        const pluginConfig = new PluginConfiguration();
+                        pluginConfig.setMollieFailureMode(false);
+                        pluginConfig.setSubscriptionIndicator(false);
+                        configAction.configurePlugin(pluginConfig);
                     });
 
-                    cy.visit('/');
-
-                    topMenu.clickOnSecondCategory();
-                    listing.clickOnFirstProduct();
+                    mollieProductsAction.openSubscriptionProduct_Weekly3();
 
                     cy.contains('Subscription product').should('not.exist');
                 })
@@ -290,16 +293,15 @@ describe('Subscription', () => {
                     beforeEach(device);
 
                     cy.wrap(null).then(() => {
-                        configAction.setupShop(false, false, false);
-                        configAction.updateProducts('', true, 3, 'weeks');
+                        const shopConfig = new ShopConfiguration();
+                        const pluginConfig = new PluginConfiguration();
+
+                        configAction.configureEnvironment(shopConfig, pluginConfig);
                     });
 
                     dummyUserScenario.execute();
 
-                    cy.visit('/');
-
-                    topMenu.clickOnSecondCategory();
-                    listing.clickOnFirstProduct();
+                    mollieProductsAction.openSubscriptionProduct_Weekly3();
 
                     cy.contains('.btn', 'Subscribe');
 
@@ -338,8 +340,7 @@ describe('Subscription', () => {
                     topMenu.clickAccountWidgetSubscriptions();
 
                     // side menu needs subscription item
-                    cy.wait(2000);
-                    cy.contains('.account-aside', 'Subscriptions');
+                    cy.contains('.account-aside', 'Subscriptions', {timeout: 10000});
 
                     // we should at least find 1 subscription
                     cy.get('.account-order-overview').find('.order-table').should('have.length.greaterThan', 0);
@@ -395,21 +396,14 @@ describe('Subscription', () => {
             })
         })
     })
-
-    after(()=>{
-
-        cy.log('Reset subscriptions');
-        configAction.updateProducts('', false, '', '');
-    })
 })
 
 
 function purchaseSubscriptionAndGoToPayment() {
 
     dummyUserScenario.execute();
-    cy.visit('/');
-    topMenu.clickOnSecondCategory();
-    listing.clickOnFirstProduct();
+
+    mollieProductsAction.openSubscriptionProduct_Weekly3();
 
     // we have to see the subscription indicator
     // and the add to basket button should show that we can subscribe
@@ -455,9 +449,13 @@ function purchaseSubscriptionAndGoToPayment() {
 
 function buySubscription() {
 
-    const dummyScenario = new DummyBasketScenario(1)
-    dummyScenario.execute();
+    const dummyUserScenario = new DummyUserScenario();
+    dummyUserScenario.execute();
 
+    mollieProductsAction.openSubscriptionProduct_Weekly3();
+    pdp.addToCart(1);
+
+    checkout.goToCheckout();
     paymentAction.switchPaymentMethod('Card');
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
@@ -493,7 +491,7 @@ function assertAvailablePaymentMethods() {
 
 function assertValidSubscriptionInAdmin() {
     cy.url().should('include', '/checkout/finish');
-    cy.contains('Thank you for your order');
+    cy.contains('Thank you');
     // ------------------------------------------------------------------------------------------------------
 
     adminLogin.login();

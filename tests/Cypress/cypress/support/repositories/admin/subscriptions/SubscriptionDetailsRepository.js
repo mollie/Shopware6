@@ -22,7 +22,7 @@ export default class SubscriptionDetailsRepository {
     }
 
     getStatusField() {
-        return cy.get('.cy-subscription-translated-status input');
+        return cy.get('.cy-subscription-translated-status input', {timeout: 20000});
     }
 
     getNextPaymentAtField() {

@@ -1,15 +1,17 @@
 import Shopware from "Services/shopware/Shopware";
 import RefundManagerRepository from "Repositories/admin/refund-manager/RefundManagerRepository";
+import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 
 const shopware = new Shopware();
 
+const adminOrders = new AdminOrdersAction();
 
 const repoRefundManager = new RefundManagerRepository();
 
 // we have to force it
 // because due to scrolling it might not
 // always be visible
-const forceOption = {force: true,timeout:10000};
+const forceOption = {force: true, timeout: 10000};
 
 
 export default class RefundManagerAction {
@@ -33,7 +35,14 @@ export default class RefundManagerAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
+        cy.wait(5000);
+        // refunds are loaded directly without a page reload,
+        // in some cypress browser this does not work properly
+        // so we reload the page
+        cy.reload();
+        adminOrders.openRefundManager();
+        // this wait is also necessary somehow
+        cy.wait(2000);
     }
 
     /**
@@ -49,7 +58,14 @@ export default class RefundManagerAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
+        cy.wait(5000);
+        // refunds are loaded directly without a page reload,
+        // in some cypress browser this does not work properly
+        // so we reload the page
+        cy.reload();
+        adminOrders.openRefundManager();
+        // this wait is also necessary somehow
+        cy.wait(2000);
     }
 
     /**
@@ -61,7 +77,7 @@ export default class RefundManagerAction {
 
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
+        cy.wait(5000);
     }
 
     /**

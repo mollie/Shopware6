@@ -54,3 +54,25 @@ ifndef storeApiKey
 	storeApiKey=''
 endif
 	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) CYPRESS_STORE_APIKEY=$(storeApiKey) ./node_modules/.bin/cypress run --headless --env filters="$(filters)"
+
+parallel: ## Runs all E2E tests for Shopware in parallel
+	@echo ""
+	@echo "*********************************************************************************************************"
+	@echo "ATTENTION, please enable MOLLIE_CYPRESS_MODE=1 in your .env to allow subscriptions without webhooks, if you cant provide webhooks!"
+	@echo "*********************************************************************************************************"
+	@echo ""
+ifndef url
+	$(warning Please provide the URL argument to Start Cypress!)
+	@exit 1
+endif
+ifndef shopware
+	$(warning Please provide the Shopware Version as argument to Start Cypress!)
+	@exit 1
+endif
+ifndef storeApiKey
+	storeApiKey=''
+endif
+	CYPRESS_BASE_URL=$(url) CYPRESS_SHOPWARE=$(shopware) CYPRESS_STORE_APIKEY=$(storeApiKey) npx concurrently \
+		"./node_modules/.bin/cypress run --headless --env filters=\"$(filters)\",split=3,splitIndex=0" \
+		"./node_modules/.bin/cypress run --headless --env filters=\"$(filters)\",split=3,splitIndex=1" \
+		"./node_modules/.bin/cypress run --headless --env filters=\"$(filters)\",split=3,splitIndex=2"

@@ -6,7 +6,6 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
-import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
@@ -16,6 +15,12 @@ import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
 import CreditCardScreen from "cypress-mollie/src/actions/screens/CreditCardScreen";
 import IDealScreen from "cypress-mollie/src/actions/screens/IDealScreen";
+import DummyUserScenario from "Scenarios/DummyUserScenario";
+import ListingAction from "Actions/storefront/products/ListingAction";
+import PDPAction from "Actions/storefront/products/PDPAction";
+import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -25,6 +30,9 @@ const shopware = new Shopware();
 const configAction = new ShopConfigurationAction();
 const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
+const listingAction = new ListingAction();
+const pdpAction = new PDPAction();
+const mollieProductsAction = new MollieProductsAction();
 
 const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentScreenAction();
@@ -35,7 +43,7 @@ const mollieGiftCards = new GiftCardsScreenAction();
 const molliePaymentMethods = new PaymentMethodsScreenAction();
 const mollieCreditCard = new CreditCardScreen();
 
-const scenarioDummyBasket = new DummyBasketScenario(4);
+const scenarioDummyUser = new DummyUserScenario();
 
 
 const device = devices.getFirstDevice();
@@ -56,7 +64,6 @@ const payments = [
     {caseId: 'C4121', key: 'giftcard', name: 'Gift cards', sanity: false},
     {caseId: 'C4143', key: 'voucher', name: 'Voucher', sanity: false},
     {caseId: 'C3362894', key: 'trustly', name: 'Trustly', sanity: false},
-    {caseId: 'C3362897', key: 'payconiq', name: 'Payconiq', sanity: false},
     {caseId: 'C3713510', key: 'riverty', name: 'Riverty', sanity: false},
     {caseId: 'C3713512', key: 'satispay', name: 'Satispay', sanity: false},
     {caseId: 'C4212005', key: 'paybybank', name: 'Pay by Bank', sanity: false},
@@ -75,10 +82,14 @@ let beforeAllCalled = false;
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
-            // configure our shop
-            configAction.setupShop(true, false, false);
-            // configure our products for vouchers
-            configAction.updateProducts('eco', false, '', '');
+
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            pluginConfig.setMollieFailureMode(true);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             devices.setDevice(device);
             beforeAllCalled = true;
         }
@@ -101,15 +112,24 @@ context("Checkout Tests", () => {
 
                     beforeEach(device);
 
-                    scenarioDummyBasket.execute();
+                    scenarioDummyUser.execute();
+
+                    // we just always use a voucher product
+                    // because we also want to test voucher payment methods
+                    mollieProductsAction.openEcoProduct();
+                    pdpAction.addToCart(4);
+                    checkout.goToCheckout();
+
 
                     if (payment.key === 'payconiq') {
                         checkout.changeBillingCountry('Belgium');
+                    } else if (payment.key === 'bizum') {
+                        checkout.changeBillingCountry('Spain');
+                    } else {
+                        checkout.changeBillingCountry('Germany');
                     }
 
-                    if (payment.key === 'bizum') {
-                        checkout.changeBillingCountry('Spain');
-                    }
+                    checkout.changeToMollieShippingMethod();
 
                     paymentAction.switchPaymentMethod(payment.name);
 
