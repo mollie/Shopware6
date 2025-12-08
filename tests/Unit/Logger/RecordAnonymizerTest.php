@@ -71,4 +71,50 @@ final class RecordAnonymizerTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testPersonalDataInContextIsAnonymized(): void
+    {
+        $anonymizer = new RecordAnonymizer();
+        $now = new \DateTimeImmutable();
+        $record = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [
+            'payload' => [
+                'billingAddress' => [
+                    'givenName' => 'Maximilian',
+                    'familyName' => 'Mollie',
+                    'organizationName' => 'Mollie Company',
+                    'email' => 'test@mollie.com',
+                    'phone' => '+490123456789',
+                    'streetAndNumber' => 'Mollie Street 123',
+                    'postalCode' => '12345',
+                ]
+            ]
+        ]);
+
+        $result = $anonymizer($record);
+
+        $this->assertEquals('Ma**', $result['context']['payload']['billingAddress']['givenName']);
+        $this->assertEquals('Mo**', $result['context']['payload']['billingAddress']['familyName']);
+        $this->assertEquals('Mo**', $result['context']['payload']['billingAddress']['organizationName']);
+        $this->assertEquals('te**', $result['context']['payload']['billingAddress']['email']);
+        $this->assertEquals('+4**', $result['context']['payload']['billingAddress']['phone']);
+        $this->assertEquals('Mo**', $result['context']['payload']['billingAddress']['streetAndNumber']);
+        $this->assertEquals('12**', $result['context']['payload']['billingAddress']['postalCode']);
+    }
+
+    public function testTokenParametersInUrlsAreAnonymized(): void
+    {
+        $anonymizer = new RecordAnonymizer();
+        $now = new \DateTimeImmutable();
+        $record = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [
+            'checkoutUrl' => 'https://www.mollie.com/checkout/test-mode?method=alma&token=6.balale',
+            'finalizeUrl' => 'https://mollie-local.diwc.de/payment/finalize-transaction?_sw_payment_token=eyeo555n4777nclr771n5zcidj6ym96m3456'
+        ]);
+
+        $result = $anonymizer($record);
+
+        $this->assertStringContainsString('token=6.**', $result['context']['checkoutUrl']);
+        $this->assertStringNotContainsString('balale', $result['context']['checkoutUrl']);
+        $this->assertStringContainsString('_sw_payment_token=ey**', $result['context']['finalizeUrl']);
+        $this->assertStringNotContainsString('eyeo555n4777nclr771n5zcidj6ym96m3456', $result['context']['finalizeUrl']);
+    }
 }

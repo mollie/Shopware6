@@ -6,6 +6,9 @@ namespace Mollie\Shopware\Component\Payment\Mandate;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class StoreMandateIdResponse extends StoreApiResponse
 {
     public function __construct()
