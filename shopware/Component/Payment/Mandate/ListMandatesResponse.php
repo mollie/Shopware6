@@ -7,6 +7,9 @@ use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class ListMandatesResponse extends StoreApiResponse
 {
     public function __construct(private MandateCollection $mandates)

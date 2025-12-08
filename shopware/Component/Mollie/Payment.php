@@ -135,7 +135,7 @@ final class Payment extends Struct implements \JsonSerializable
         return $this->changePaymentStateUrl;
     }
 
-    private function setChangePaymentStateUrl(string $changePaymentStateUrl): void
+    public function setChangePaymentStateUrl(string $changePaymentStateUrl): void
     {
         $this->changePaymentStateUrl = $changePaymentStateUrl;
     }
