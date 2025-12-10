@@ -11,6 +11,15 @@
         <monolog:channel>mollie</monolog:channel>
 
         <monolog:handler
+                name="mollie_order_file"
+                channel="mollie"
+                type="service"
+                id="Mollie\Shopware\Component\Logger\OrderFileHandler"
+                level="debug"
+                bubble="false"
+        />
+
+        <monolog:handler
                 name="mollie_rotation_file"
                 channel="mollie"
                 type="service"
