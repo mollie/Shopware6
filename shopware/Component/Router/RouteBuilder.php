@@ -39,6 +39,26 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
     }
 
+    public function getPaypalExpressRedirectUrl(): string
+    {
+        $routeName = 'frontend.mollie.paypal-express.finish';
+        if ($this->isStoreApiRequest()) {
+            $routeName = 'astore-api.mollie.paypal-express.checkout.finish';
+        }
+
+        return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
+    }
+
+    public function getPaypalExpressCancelUrl(): string
+    {
+        $routeName = 'frontend.mollie.paypal-express.cancel';
+        if ($this->isStoreApiRequest()) {
+            $routeName = 'store-api.mollie.paypal-express.checkout.cancel';
+        }
+
+        return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
+    }
+
     public function getPosCheckoutUrl(Payment $payment,string $transactionId, string $orderNumber): string
     {
         $parameters = [

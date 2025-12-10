@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\ApplePayDirect;
+namespace Mollie\Shopware\Component\Payment\PayPalExpress;
 
-use Mollie\Shopware\Component\Payment\Method\ApplePayPayment;
+use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Repository\PaymentMethodRepository;
@@ -13,7 +13,7 @@ use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ApplePayStoreFrontSubscriber implements EventSubscriberInterface
+final class PayPalExpressStoreFrontSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         #[Autowire(service: PaymentMethodRepository::class)]
@@ -38,23 +38,18 @@ final class ApplePayStoreFrontSubscriber implements EventSubscriberInterface
         $salesChannel = $salesChannelContext->getSalesChannel();
         $salesChannelId = $salesChannel->getId();
         try {
-            $applePayMethodId = $this->paymentMethodRepository->getIdForPaymentMethod(ApplePayPayment::class, $salesChannelId, $salesChannelContext->getContext());
-
-            if ($applePayMethodId === null) {
+            $paypalExpressMethodId = $this->paymentMethodRepository->getIdForPaymentMethod(PayPalExpressPayment::class, $salesChannelId,$salesChannelContext->getContext());
+            if ($paypalExpressMethodId === null) {
                 return;
             }
-            $accountSettings = $this->settings->getAccountSettings($salesChannelId);
-            $applePaySettings = $this->settings->getApplePaySettings($salesChannelId);
-            $shoPhoneNumberField = $accountSettings->isPhoneFieldShown() || $accountSettings->isPhoneFieldRequired();
-            $isNotLoggedIn = $salesChannelContext->getCustomer() === null;
+            $paypalExpressSettings = $this->settings->getPaypalExpressSettings();
+            $event->setParameter('mollie_paypalexpress_enabled', $paypalExpressSettings->isEnabled());
 
-            $event->setParameter('apple_pay_payment_method_id', $applePayMethodId);
-            $event->setParameter('mollie_applepaydirect_phonenumber_required', (int) $shoPhoneNumberField);
-            $event->setParameter('mollie_applepaydirect_enabled', $applePaySettings->isApplePayDirectEnabled());
-            $event->setParameter('mollie_applepaydirect_restrictions', $applePaySettings->getVisibilityRestrictions());
-            $event->setParameter('mollie_express_required_data_protection', $isNotLoggedIn && $accountSettings->isDataProtectionEnabled());
+            $event->setParameter('mollie_paypalexpress_style', $paypalExpressSettings->getStyle());
+            $event->setParameter('mollie_paypalexpress_shape', $paypalExpressSettings->getShape());
+            $event->setParameter('mollie_paypalexpress_restrictions', $paypalExpressSettings->getRestrictions());
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to assign apple pay direct data to storefront', [
+            $this->logger->error('Failed to assign paypal express data to storefront', [
                 'error' => $exception->getMessage(),
                 'salesChannelId' => $salesChannelId,
             ]);

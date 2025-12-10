@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Repository;
 
-use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
@@ -22,10 +21,10 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
     ) {
     }
 
-    public function getIdForPaymentMethod(PaymentMethod $paymentMethod, string $salesChannelId, Context $context): ?string
+    public function getIdForPaymentMethod(string $handlerIdentifier, string $salesChannelId, Context $context): ?string
     {
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('technicalName', 'payment_mollie_' . $paymentMethod->value));
+        $criteria->addFilter(new EqualsFilter('handlerIdentifier', $handlerIdentifier));
         $criteria->addFilter(new EqualsFilter('active', true));
         $criteria->addFilter(new EqualsFilter('salesChannels.id', $salesChannelId));
         $criteria->setLimit(1);
