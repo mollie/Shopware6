@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\PaypalExpress\Route;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
-use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Shopware\Component\Payment\PayPalExpress\AbstractStartCheckoutRoute;
+use Mollie\Shopware\Component\Payment\PayPalExpress\PaypalExpressException;
 use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
