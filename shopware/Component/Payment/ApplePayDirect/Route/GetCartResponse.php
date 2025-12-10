@@ -1,0 +1,26 @@
+<?php
+declare(strict_types=1);
+
+namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
+
+use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayCart;
+use Shopware\Core\Checkout\Cart\Cart as ShopwareCart;
+use Shopware\Core\System\SalesChannel\StoreApiResponse;
+
+final class GetCartResponse extends StoreApiResponse
+{
+    public function __construct(private ApplePayCart $cart, private ShopwareCart $shopwareCart)
+    {
+        parent::__construct($this->cart);
+    }
+
+    public function getCart(): ApplePayCart
+    {
+        return $this->cart;
+    }
+
+    public function getShopwareCart(): ShopwareCart
+    {
+        return $this->shopwareCart;
+    }
+}
