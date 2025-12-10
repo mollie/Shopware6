@@ -44,7 +44,7 @@ final class Finalize
 
         $logData = [
             'transactionId' => $transactionId,
-            'oderNumber' => $orderNumber,
+            'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannelId,
         ];
 
