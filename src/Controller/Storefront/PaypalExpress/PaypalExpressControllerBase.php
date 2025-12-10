@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Controller\Storefront\PaypalExpress;
 
 use Kiener\MolliePayments\Components\PaypalExpress\Route\AbstractCancelCheckoutRoute;
-use Kiener\MolliePayments\Components\PaypalExpress\Route\AbstractFinishCheckoutRoute;
-use Kiener\MolliePayments\Components\PaypalExpress\Route\AbstractStartCheckoutRoute;
 use Kiener\MolliePayments\Traits\Storefront\RedirectTrait;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Shopware\Component\Payment\PayPalExpress\AbstractFinishCheckoutRoute;
+use Mollie\Shopware\Component\Payment\PayPalExpress\AbstractStartCheckoutRoute;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;

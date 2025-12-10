@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\PaypalExpress;
+namespace Mollie\Shopware\Component\Payment\PayPalExpress;
 
 use Shopware\Core\Framework\HttpException;
 use Symfony\Component\HttpFoundation\Response;

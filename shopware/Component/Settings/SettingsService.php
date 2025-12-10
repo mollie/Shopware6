@@ -63,11 +63,12 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
-    public function getPaypalExpressSettings(): PayPalExpressSettings
+    public function getPaypalExpressSettings(?string $salesChannelid = null): PayPalExpressSettings
     {
         $settings = new PayPalExpressSettings($this->paypalExpressEanbled);
         $settings->setStyle((int) $this->paypalExpressStyle);
         $settings->setShape((int) $this->paypalExpressShape);
+
         $settings->setRestrictions(explode(' ', trim($this->paypalExpressRestrictions)));
 
         return $settings;
