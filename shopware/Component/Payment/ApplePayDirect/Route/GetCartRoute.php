@@ -1,0 +1,120 @@
+<?php
+declare(strict_types=1);
+
+namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
+
+use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayAmount;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayCart;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayLineItem;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
+use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
+use Shopware\Core\Framework\Adapter\Translation\AbstractTranslator;
+use Shopware\Core\Framework\Adapter\Translation\Translator;
+use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
+use Shopware\Core\System\SalesChannel\Context\LanguageInfo;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route(defaults: ['_routeScope' => ['store-api']])]
+final class GetCartRoute extends AbstractGetCartRoute
+{
+    public function __construct(
+        private CartService $cartService,
+        #[Autowire(service: SettingsService::class)]
+        private AbstractSettingsService $settingsService,
+        #[Autowire(service: Translator::class)]
+        private AbstractTranslator $translator,
+    ) {
+    }
+
+    public function getDecorated(): AbstractGetCartRoute
+    {
+        throw new DecorationPatternException(self::class);
+    }
+
+    #[Route(name: 'store-api.mollie.apple-pay.cart', path: '/store-api/mollie/applepay/cart', methods: ['GET'])]
+    public function cart(Request $request, SalesChannelContext $salesChannelContext): GetCartResponse
+    {
+        $localeCode = '';
+        $languageInfo = $salesChannelContext->getLanguageInfo();
+        if ($languageInfo instanceof LanguageInfo) {
+            $localeCode = $languageInfo->localeCode;
+        }
+        $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+
+        $apiSettings = $this->settingsService->getApiSettings($salesChannelContext->getSalesChannelId());
+        $shopName = (string) $salesChannelContext->getSalesChannel()->getName();
+        $isTestMode = $apiSettings->isTestMode();
+
+        $this->translator->injectSettings($salesChannelContext->getSalesChannelId(), $salesChannelContext->getLanguageId(), $localeCode, $salesChannelContext->getContext());
+
+        $testModeLabel = $this->translator->trans('molliePayments.testMode.label');
+        if (mb_strlen($testModeLabel) === 0) {
+            $testModeLabel = 'Test mode';
+        }
+        $subTotalLabel = $this->translator->trans('molliePayments.payments.applePayDirect.captionSubtotal');
+        if (mb_strlen($subTotalLabel) === 0) {
+            $subTotalLabel = 'Subtotal';
+        }
+        $taxLabel = $this->translator->trans('molliePayments.payments.applePayDirect.captionTaxes');
+        if (mb_strlen($taxLabel) === 0) {
+            $taxLabel = 'Taxes';
+        }
+
+        if ($isTestMode) {
+            $shopName = sprintf('%s (%s)', $shopName, $testModeLabel);
+        }
+        $price = $cart->getPrice();
+
+        $applePayCart = new ApplePayCart($shopName, new ApplePayAmount($price->getTotalPrice()));
+
+        $taxAmount = 0.0;
+        $subTotal = 0.0;
+
+        foreach ($cart->getLineItems() as $lineItem) {
+            $totalPrice = 0.0;
+
+            $price = $lineItem->getPrice();
+            if ($price instanceof CalculatedPrice) {
+                $totalPrice = $price->getTotalPrice();
+                /** @var CalculatedTax $tax */
+                foreach ($price->getCalculatedTaxes() as $tax) {
+                    $taxAmount += $tax->getTax();
+                }
+            }
+            $subTotal += $totalPrice;
+            $item = new ApplePayLineItem((string) $lineItem->getLabel(), new ApplePayAmount($totalPrice));
+            $applePayCart->addItem($item);
+        }
+
+        $taxItem = new ApplePayLineItem($subTotalLabel, new ApplePayAmount($subTotal));
+        $applePayCart->addItem($taxItem);
+
+        /** @var Delivery $delivery */
+        foreach ($cart->getDeliveries() as $delivery) {
+            $shippingCosts = $delivery->getShippingCosts();
+            $deliveryTaxes = $shippingCosts->getCalculatedTaxes();
+
+            /** @var CalculatedTax $tax */
+            foreach ($deliveryTaxes as $tax) {
+                $taxAmount += $tax->getTax();
+            }
+
+            $item = new ApplePayLineItem((string) $delivery->getShippingMethod()->getName(), new ApplePayAmount($shippingCosts->getTotalPrice()));
+            $applePayCart->addItem($item);
+        }
+
+        if ($taxAmount > 0) {
+            $taxItem = new ApplePayLineItem($taxLabel, new ApplePayAmount($taxAmount));
+            $applePayCart->addItem($taxItem);
+        }
+
+        return new GetCartResponse($applePayCart, $cart);
+    }
+}

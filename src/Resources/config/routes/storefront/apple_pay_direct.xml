@@ -25,20 +25,6 @@
         <option key="seo">false</option>
     </route>
 
-    <route id="frontend.mollie.apple-pay.validate" path="/mollie/apple-pay/validate" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::createPaymentSession</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <option key="seo">false</option>
-    </route>
-
-    <route id="frontend.mollie.apple-pay.shipping-methods" path="/mollie/apple-pay/shipping-methods" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::getShippingMethods</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <default key="XmlHttpRequest"><bool>true</bool></default>
-        <option key="seo">false</option>
-    </route>
 
     <route id="frontend.mollie.apple-pay.set-shipping" path="/mollie/apple-pay/set-shipping" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::setShippingMethod</default>
