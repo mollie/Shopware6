@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\PaypalExpress;
 
-use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
 use Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute;
+use Mollie\Shopware\Component\Payment\PayPalExpress\PaypalExpressException;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;

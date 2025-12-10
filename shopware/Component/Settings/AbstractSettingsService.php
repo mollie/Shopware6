@@ -24,7 +24,7 @@ abstract class AbstractSettingsService
 
     abstract public function getEnvironmentSettings(): EnvironmentSettings;
 
-    abstract public function getPaypalExpressSettings(): PayPalExpressSettings;
+    abstract public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings;
 
     abstract public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings;
 

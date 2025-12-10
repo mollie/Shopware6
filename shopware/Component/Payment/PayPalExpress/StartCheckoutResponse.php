@@ -1,17 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\PaypalExpress\Route;
+namespace Mollie\Shopware\Component\Payment\PayPalExpress;
 
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 /**
  * @extends StoreApiResponse<ArrayStruct<array{sessionId:string,redirectUrl:null|string}>>
- *
- * @final
  */
-class StartCheckoutResponse extends StoreApiResponse
+final class StartCheckoutResponse extends StoreApiResponse
 {
     private string $sessionId;
     private ?string $redirectUrl;
