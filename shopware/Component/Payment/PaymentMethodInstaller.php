@@ -36,18 +36,18 @@ final class PaymentMethodInstaller
      * @param EntityRepository<MediaCollection<MediaEntity>> $mediaRepository
      */
     public function __construct(
-        private PaymentHandlerLocator   $paymentHandlerLocator,
+        private PaymentHandlerLocator $paymentHandlerLocator,
         #[Autowire(service: 'payment_method.repository')]
-        private EntityRepository        $shopwarePaymentMethodRepository,
+        private EntityRepository $shopwarePaymentMethodRepository,
         #[Autowire(service: 'media.repository')]
-        private EntityRepository        $mediaRepository,
+        private EntityRepository $mediaRepository,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
-        private MediaService            $mediaService,
-        private FileFetcher             $fileFetcher,
-        private PluginIdProvider        $pluginIdProvider,
+        private MediaService $mediaService,
+        private FileFetcher $fileFetcher,
+        private PluginIdProvider $pluginIdProvider,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface         $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

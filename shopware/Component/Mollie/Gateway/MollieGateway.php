@@ -6,7 +6,6 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
-use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
@@ -28,6 +27,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class MollieGateway implements MollieGatewayInterface
 {
+    use ExceptionTrait;
+
     public function __construct(
         #[Autowire(service: ClientFactory::class)]
         private ClientFactoryInterface $clientFactory,
@@ -226,22 +227,6 @@ final class MollieGateway implements MollieGatewayInterface
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
-    }
-
-    private function convertException(ClientException $exception, ?string $orderNumber = null): ApiException
-    {
-        $body = json_decode($exception->getResponse()->getBody()->getContents(), true);
-        $logData = [
-            'title' => $body['title'] ?? 'no title',
-            'error' => $body['detail'] ?? 'no details',
-            'field' => $body['field'] ?? 'no field',
-        ];
-        if ($orderNumber !== null) {
-            $logData['orderNumber'] = $orderNumber;
-        }
-        $this->logger->error('There was an error from Mollies API', $logData);
-
-        return new ApiException($exception->getCode(), $body['title'] ?? '', $body['detail'] ?? '', $body['field'] ?? '');
     }
 
     private function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment

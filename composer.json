@@ -55,8 +55,7 @@
             "Mollie\\Shopware\\Integration\\": "tests/Integration/",
             "Mollie\\Shopware\\Behat\\": "tests/Behat/Context/",
             "MolliePayments\\Shopware\\Tests\\": "tests/PHPUnit/",
-            "MolliePayments\\Shopware\\PHPStan\\": "tests/PHPStan/",
-            "MolliePayments\\Shopware\\Fixtures\\": "tests/Fixtures/"
+            "MolliePayments\\Shopware\\PHPStan\\": "tests/PHPStan/"
         }
     },
     "suggest": {
