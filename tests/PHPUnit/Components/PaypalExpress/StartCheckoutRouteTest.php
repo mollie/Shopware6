@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace MolliePayments\Shopware\Tests\Components\PaypalExpress;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
-use Kiener\MolliePayments\Components\PaypalExpress\PaypalExpressException;
-use Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute;
 use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Api\Resources\Session;
+use Mollie\Shopware\Component\Payment\PayPalExpress\PaypalExpressException;
+use Mollie\Shopware\Component\Payment\PayPalExpress\StartCheckoutRoute;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
