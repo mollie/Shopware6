@@ -22,7 +22,7 @@ final class ClientFactory implements ClientFactoryInterface
     ) {
     }
 
-    public function create(?string $salesChannelId = null): Client
+    public function create(?string $salesChannelId = null,bool $forceLive = false): Client
     {
         $apiSettings = $this->settings->getApiSettings($salesChannelId);
 
@@ -30,11 +30,17 @@ final class ClientFactory implements ClientFactoryInterface
             'Shopware/' . $this->shopwareVersion,
             'MollieShopware6/' . MolliePayments::PLUGIN_VERSION,
         ]);
-        if (mb_strlen($apiSettings->getApiKey()) === 0) {
-            $message = sprintf('API key is empty. SalesChannelId: %s, TestMode: %s', $salesChannelId, $apiSettings->isTestMode() ? 'true' : 'false');
+        $apiKey = $apiSettings->getApiKey();
+        $testMode = $apiSettings->isTestMode();
+        if ($forceLive) {
+            $apiKey = $apiSettings->getLiveApiKey();
+            $testMode = false;
+        }
+        if (mb_strlen($apiKey) === 0) {
+            $message = sprintf('API key is empty. SalesChannelId: %s, TestMode: %s', $salesChannelId, $testMode ? 'true' : 'false');
             throw new ApiKeyException($message);
         }
-        $authorizationValue = sprintf('Bearer %s', $apiSettings->getApiKey());
+        $authorizationValue = sprintf('Bearer %s', $apiKey);
 
         return new Client([
             'base_uri' => self::MOLLIE_BASE_URL,
