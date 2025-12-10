@@ -6,19 +6,8 @@
 
 
 
-    <route id="store-api.mollie.paypal-express.checkout.start"
-           path="/store-api/mollie/paypal-express/start"
-           methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute::startCheckout</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
 
-    <route id="store-api.mollie.paypal-express.checkout.finish"
-           path="/store-api/mollie/paypal-express/finish"
-           methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Components\PaypalExpress\Route\FinishCheckoutRoute::finishCheckout</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
+
 
     <route id="store-api.mollie.paypal-express.checkout.cancel"
            path="/store-api/mollie/paypal-express/cancel"
