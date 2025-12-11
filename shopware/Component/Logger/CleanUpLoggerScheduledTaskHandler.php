@@ -82,7 +82,7 @@ final class CleanUpLoggerScheduledTaskHandler extends ScheduledTaskHandler
 
             closedir($handle);
 
-            $this->logger->info('Cleanup logger task executed', [
+            $this->logger->debug('Cleanup logger task executed', [
                 'filesDeleted' => $deletedCount,
                 'daysToKeep' => $daysToKeep,
                 'maxPerRun' => self::MAX_DELETE_PER_RUN,

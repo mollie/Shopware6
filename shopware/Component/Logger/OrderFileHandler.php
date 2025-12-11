@@ -34,7 +34,7 @@ final class OrderFileHandler extends AbstractHandler
 
         $mollieLogDir = $this->logDir . '/mollie';
         if (! is_dir($mollieLogDir)) {
-            @mkdir($mollieLogDir, 0755, true);
+            mkdir($mollieLogDir, 0755, true);
         }
 
         $orderLogPath = $mollieLogDir . '/order-' . $orderNumber . '.log';
