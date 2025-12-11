@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Account;
 
 use Mollie\Shopware\Component\Mollie\Address;
+use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\CustomerException;
 use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
@@ -16,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
@@ -24,6 +26,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParamete
 use Shopware\Core\System\SalesChannel\SalesChannel\AbstractContextSwitchRoute;
 use Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\Salutation\SalutationCollection;
 use Shopware\Core\System\Salutation\SalutationEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -34,6 +37,11 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final class AccountService extends AbstractAccountService
 {
+    /**
+     * @param EntityRepository<CustomerCollection> $customerRepository
+     * @param EntityRepository<CountryCollection> $countryRepository
+     * @param EntityRepository<SalutationCollection> $salutationRepository
+     */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
         private EntityRepository $customerRepository,
