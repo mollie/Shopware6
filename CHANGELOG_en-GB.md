@@ -10,14 +10,14 @@
 - The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.
 - The URL for saving the POS terminal ID is deprecated; provide terminalId as a body parameter in the checkout request.
 - A product can now have multiple voucher categories.
+- Added: order-related log entries are now stored in a dedicated mollie directory. Log files follow the naming pattern order-<orderNumber>, for example order-12345.
+- Added: order-related log entries are now automatically removed when the payment status changes to "paid". Additionally, any remaining entries are deleted once they exceed the retention period defined in the settings.
 
 ## [Unreleased]
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
 - Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.
 - Fixed: Shipping methods were shown in Apple Pay Express even for countries where shipping was disabled in the administration.
 - Removed: Removed dependency for the Basecom Fixture plugin and built our own fixture framework.
-- Added: order-related log entries are now stored in a dedicated mollie directory. Log files follow the naming pattern order-<orderNumber>, for example order-12345.
-- Added: order-related log entries are now automatically removed when the payment status changes to "paid". Additionally, any remaining entries are deleted once they exceed the retention period defined in the settings.
 
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore

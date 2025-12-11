@@ -10,14 +10,14 @@
 - Die URL zum Speichern der Mandats-ID ist veraltet; übergebe mandateId als Body-Parameter in der Checkout-Anfrage.
 - Die URL zum Speichern der POS-Terminal-ID ist veraltet; übergebe terminalId als Body-Parameter in der Checkout-Anfrage.
 - Ein Produkt kann nun mehreren Gutschein-Kategorien zugeordnet werden.
+- Hinzugefügt: Order-bezogene Logeinträge werden nun in einem eigenen mollie-Verzeichnis abgelegt. Die Logdateien tragen ein Namensschema im Format order-<orderNumber>, z. B. order-12345.
+- Hinzugefügt: Order-bezogene Logeinträge werden nun automatisch gelöscht, sobald sich der Zahlungsstatus auf "paid" ändert. Zudem werden alle übrigen Einträge entfernt, sobald sie die in den Einstellungen definierte Aufbewahrungsfrist überschreiten.
 
 ## [Unreleased]
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
 - Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
 - Behoben: Versandarten wurden in Apple Pay Express angezeigt, obwohl der Versand für diese Länder in der Administration deaktiviert war.
 - Aktualisiert: Die Abhängigkeit zum Basecom Fixture Plugin wurde entfernt und durch unser eigenes Fixture Plugin ersetzt.
-- Hinzugefügt: Order-bezogene Logeinträge werden nun in einem eigenen mollie-Verzeichnis abgelegt. Die Logdateien tragen ein Namensschema im Format order-<orderNumber>, z. B. order-12345.
-- Hinzugefügt: Order-bezogene Logeinträge werden nun automatisch gelöscht, sobald sich der Zahlungsstatus auf "paid" ändert. Zudem werden alle übrigen Einträge entfernt, sobald sie die in den Einstellungen definierte Aufbewahrungsfrist überschreiten.
 
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
