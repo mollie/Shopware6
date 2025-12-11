@@ -68,14 +68,16 @@ final class WebhookRoute extends AbstractWebhookRoute
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
-        $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
-        $webhookStatusEvent = new $webhookStatusEventClass($payment, $shopwareOrder, $context);
-        $this->eventDispatcher->dispatch($webhookStatusEvent);
 
         $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
         $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
 
         // TODO: update order status
+
+        $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
+        $webhookStatusEvent = new $webhookStatusEventClass($payment, $shopwareOrder, $context);
+        $this->eventDispatcher->dispatch($webhookStatusEvent);
+
         return new WebhookRouteResponse();
     }
 

@@ -26,4 +26,15 @@ final class FakeRouteBuilder implements RouteBuilderInterface
     {
         return $this->posCheckoutUrl;
     }
+
+    public function getPaypalExpressRedirectUrl(): string
+    {
+        // TODO: Implement getPaypalExpressRedirectUrl() method.
+    }
+
+    public function getPaypalExpressCancelUrl(): string
+    {
+        // TODO: Implement getPaypalExpressCancelUrl() method.
+    }
+
 }

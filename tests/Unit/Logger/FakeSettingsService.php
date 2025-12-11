@@ -31,7 +31,7 @@ final class FakeSettingsService extends AbstractSettingsService
         }
     }
 
-    public function getPaypalExpressSettings(): PayPalExpressSettings
+    public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings
     {
         // TODO: Implement getPaypalExpressSettings() method.
     }
