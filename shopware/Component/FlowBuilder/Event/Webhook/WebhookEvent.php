@@ -75,6 +75,11 @@ class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, Mail
         return $this->context;
     }
 
+    public function getOrder(): OrderEntity
+    {
+        return $this->order;
+    }
+
     protected static function getStatus(): string
     {
         return 'all';

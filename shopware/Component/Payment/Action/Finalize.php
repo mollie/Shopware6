@@ -65,26 +65,27 @@ final class Finalize
         $this->logger->debug('PaymentFinalizeEvent fired', $logData);
 
         if ($paymentStatus->isCanceled()) {
-            $paymentCancelledEvent = new CancelledEvent($payment, $order, $customer, $context);
-            $this->eventDispatcher->dispatch($paymentCancelledEvent);
             $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $orderNumber, $payment->getId());
             $this->logger->warning('Finished - Payment finalize. Payment was cancelled, CancelledEvent fired', $logData);
+
+            $paymentCancelledEvent = new CancelledEvent($payment, $order, $customer, $context);
+            $this->eventDispatcher->dispatch($paymentCancelledEvent);
+
             throw PaymentException::customerCanceled($transaction->getOrderTransactionId(), $message);
         }
 
         if ($paymentStatus->isFailed()) {
-            $paymentFailedEvent = new FailedEvent($payment, $order, $customer, $context);
-            $this->eventDispatcher->dispatch($paymentFailedEvent);
             $message = sprintf('Payment for order %s (%s) is failed', $orderNumber, $payment->getId());
 
             $this->logger->warning('Finished - Payment finalize. Payment is failed, FailedEvent fired', $logData);
 
+            $paymentFailedEvent = new FailedEvent($payment, $order, $customer, $context);
+            $this->eventDispatcher->dispatch($paymentFailedEvent);
+
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $message);
         }
-
+        $this->logger->info('Finished - Payment finalize. Payment is successful, SuccessEvent fired', $logData);
         $paymentSuccessEvent = new SuccessEvent($payment, $order, $customer, $context);
         $this->eventDispatcher->dispatch($paymentSuccessEvent);
-
-        $this->logger->info('Finished - Payment finalize. Payment is successful, SuccessEvent fired', $logData);
     }
 }
