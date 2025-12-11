@@ -12,4 +12,8 @@ interface RouteBuilderInterface
     public function getWebhookUrl(string $transactionId): string;
 
     public function getPosCheckoutUrl(Payment $payment,string $transactionId, string $orderNumber): string;
+
+    public function getPaypalExpressRedirectUrl(): string;
+
+    public function getPaypalExpressCancelUrl(): string;
 }

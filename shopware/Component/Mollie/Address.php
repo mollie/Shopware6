@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 final class Address implements \JsonSerializable
 {
     use JsonSerializableTrait;
+
     private string $title;
     private string $givenName;
     private string $familyName;
@@ -74,6 +75,41 @@ final class Address implements \JsonSerializable
         }
 
         return $address;
+    }
+
+    public static function fromResponseBody(array $body): self
+    {
+        $address = new self($body['email'] ?? '',
+            '',
+            $body['givenName'] ?? '',
+            $body['familyName'] ?? '',
+            $body['streetAndNumber'] ?? '',
+            $body['postalCode'] ?? '',
+            $body['city'] ?? '',
+            $body['country'] ?? ''
+        );
+        $phone = $body['phone'] ?? null;
+        $streetAdditional = $body['streetAdditional'] ?? null;
+        if ($streetAdditional !== null) {
+            $address->setStreetAdditional($streetAdditional);
+        }
+        if ($phone !== null) {
+            $address->setPhone($phone);
+        }
+
+        return $address;
+    }
+
+    public function toRegisterFormArray(): array
+    {
+        return [
+            'firstName' => $this->givenName,
+            'lastName' => $this->familyName,
+            'email' => $this->email,
+            'street' => $this->streetAndNumber,
+            'zipcode' => $this->postalCode,
+            'city' => $this->city,
+        ];
     }
 
     public function setOrganizationName(string $organizationName): void

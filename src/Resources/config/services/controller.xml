@@ -210,17 +210,7 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\PaypalExpress\PaypalExpressControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\Route\FinishCheckoutRoute"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute"/>
-            <argument type="service" id="router"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
+
 
 
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
@@ -256,19 +246,7 @@
 
 
 
-        <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\StartCheckoutRoute">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
-            <tag name="controller.service_arguments"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\FinishCheckoutRoute">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
-            <tag name="controller.service_arguments"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
