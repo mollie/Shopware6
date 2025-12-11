@@ -19,6 +19,9 @@ final class Session extends Struct implements \JsonSerializable
     {
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public static function createFromClientResponse(array $body): self
     {
         $session = new self($body['id']);
