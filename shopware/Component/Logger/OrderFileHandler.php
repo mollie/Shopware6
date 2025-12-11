@@ -37,7 +37,7 @@ final class OrderFileHandler extends AbstractHandler
             @mkdir($mollieLogDir, 0755, true);
         }
 
-        $orderLogPath = $mollieLogDir . '/mollie_order_' . $orderNumber . '.log';
+        $orderLogPath = $mollieLogDir . '/order-' . $orderNumber . '.log';
 
         try {
             $handler = new StreamHandler($orderLogPath, LogLevel::DEBUG);

@@ -94,7 +94,9 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-
+        <service id="Mollie\Shopware\Component\Logger\WebhookStatusPaidEventSubscriber" autowire="true">
+            <tag name="kernel.event_subscriber"/>
+        </service>
 
     </services>
 </container>
