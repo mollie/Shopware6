@@ -7,6 +7,9 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class SetShippingCountryResponse extends StoreApiResponse
 {
     public function __construct(private SalesChannelContext $salesChannelContext)

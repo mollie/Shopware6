@@ -7,6 +7,9 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayCart;
 use Shopware\Core\Checkout\Cart\Cart as ShopwareCart;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ApplePayCart>
+ */
 final class GetCartResponse extends StoreApiResponse
 {
     public function __construct(private ApplePayCart $cart, private ShopwareCart $shopwareCart)

@@ -10,6 +10,8 @@
 - The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.
 - The URL for saving the POS terminal ID is deprecated; provide terminalId as a body parameter in the checkout request.
 - A product can now have multiple voucher categories.
+- Added: order-related log entries are now stored in a dedicated mollie directory. Log files follow the naming pattern order-<orderNumber>, for example order-12345.
+- Added: order-related log entries are now automatically removed when the payment status changes to "paid". Additionally, any remaining entries are deleted once they exceed the retention period defined in the settings.
 
 ## [Unreleased]
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
