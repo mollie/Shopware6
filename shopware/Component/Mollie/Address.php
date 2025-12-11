@@ -77,6 +77,9 @@ final class Address implements \JsonSerializable
         return $address;
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public static function fromResponseBody(array $body): self
     {
         $address = new self($body['email'] ?? '',
@@ -100,6 +103,9 @@ final class Address implements \JsonSerializable
         return $address;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toRegisterFormArray(): array
     {
         return [

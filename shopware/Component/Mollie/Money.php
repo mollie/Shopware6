@@ -21,6 +21,9 @@ final class Money implements \JsonSerializable
         $this->value = $this->formatValue($value);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return json_decode((string) json_encode($this), true);
