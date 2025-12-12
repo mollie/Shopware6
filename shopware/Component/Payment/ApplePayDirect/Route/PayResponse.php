@@ -7,6 +7,9 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class PayResponse extends StoreApiResponse
 {
     public function __construct(bool $success, private string $redirectUrl,string $message,private string $orderId,private SalesChannelContext $salesChannelContext)
