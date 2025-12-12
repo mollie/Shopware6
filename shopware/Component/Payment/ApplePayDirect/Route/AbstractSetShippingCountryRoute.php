@@ -10,5 +10,5 @@ abstract class AbstractSetShippingCountryRoute
 {
     abstract public function getDecorated(): self;
 
-    abstract public function setShippingCountry(Request $request, SalesChannelContext $salesChannelContext): SetShippingCountryResponse;
+    abstract public function setCountry(Request $request, SalesChannelContext $salesChannelContext): SetShippingCountryResponse;
 }
