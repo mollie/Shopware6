@@ -6,6 +6,9 @@ namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class ApplePayDirectEnabledResponse extends StoreApiResponse
 {
     public function __construct(private bool $enabled,private ?string $paymentMethodId = null)
