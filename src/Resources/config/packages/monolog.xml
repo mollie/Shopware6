@@ -16,7 +16,7 @@
                 type="service"
                 id="Mollie\Shopware\Component\Logger\OrderFileHandler"
                 level="debug"
-                bubble="false"
+                bubble="true"
         />
 
         <monolog:handler
