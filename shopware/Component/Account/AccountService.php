@@ -231,7 +231,7 @@ final class AccountService extends AbstractAccountService
         $criteria->setTitle('account-service::fetchCustomer');
 
         $result = $this->customerRepository->search($criteria, $context->getContext())->getEntities();
-        $result = $result->filter(function (CustomerEntity $customer) use ($includeGuest, $context): ?bool {
+        $result = $result->filter(function (CustomerEntity $customer) use ($includeGuest, $context) {
             // Skip not active users
             if (! $customer->getActive()) {
                 return null;
