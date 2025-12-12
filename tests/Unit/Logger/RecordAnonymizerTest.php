@@ -92,13 +92,13 @@ final class RecordAnonymizerTest extends TestCase
 
         $result = $anonymizer($record);
 
-        $this->assertEquals('Ma**', $result['context']['payload']['billingAddress']['givenName']);
-        $this->assertEquals('Mo**', $result['context']['payload']['billingAddress']['familyName']);
-        $this->assertEquals('Mo**', $result['context']['payload']['billingAddress']['organizationName']);
-        $this->assertEquals('te**', $result['context']['payload']['billingAddress']['email']);
-        $this->assertEquals('+4**', $result['context']['payload']['billingAddress']['phone']);
-        $this->assertEquals('Mo**', $result['context']['payload']['billingAddress']['streetAndNumber']);
-        $this->assertEquals('12**', $result['context']['payload']['billingAddress']['postalCode']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['givenName']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['familyName']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['organizationName']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['email']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['phone']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['streetAndNumber']);
+        $this->assertEquals('**', $result['context']['payload']['billingAddress']['postalCode']);
     }
 
     public function testTokenParametersInUrlsAreAnonymized(): void
@@ -125,12 +125,15 @@ final class RecordAnonymizerTest extends TestCase
         $applePayToken = '{"paymentData":{"data":"zazq6d9tsJzah148grEdwNBWosUlEdnmu9c/tpEidah","signature":"MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQECAQUAMIAGCSqGSIb3DQEH"}}';
         
         $record = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [
-            'applePayPaymentToken' => $applePayToken
+            'payment'=>[
+                'applePayPaymentToken' => $applePayToken
+            ]
+
         ]);
 
         $result = $anonymizer($record);
-        $maskedToken = $result['context']['applePayPaymentToken'];
+        $maskedToken = $result['context']['payment']['applePayPaymentToken'];
 
-        $this->assertEquals('{"**', $maskedToken);
+        $this->assertEquals('**', $maskedToken);
     }
 }
