@@ -6,19 +6,8 @@
 
 
 
-    <route id="store-api.mollie.apple-pay.enabled"
-           path="/store-api/mollie/applepay/enabled"
-           methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectControllerBase::isEnabled</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
 
-    <route id="store-api.mollie.apple-pay.id"
-           path="/store-api/mollie/applepay/id"
-           methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectControllerBase::getId</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
+
 
     <route id="store-api.mollie.apple-pay.add-product"
            path="/store-api/mollie/applepay/add-product"
@@ -30,15 +19,6 @@
 
 
 
-
-
-
-    <route id="store-api.mollie.apple-pay.pay"
-           path="/store-api/mollie/applepay/pay"
-           methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectControllerBase::pay</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
 
     <route id="store-api.mollie.apple-pay.restore-cart"
            path="/store-api/mollie/applepay/restore-cart"

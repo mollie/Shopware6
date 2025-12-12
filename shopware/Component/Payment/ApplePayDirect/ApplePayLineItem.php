@@ -8,7 +8,7 @@ use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 /**
  * https://developer.apple.com/documentation/applepayontheweb/applepaylineitem
  */
-final class ApplePayLineItem implements \JsonSerializable
+class ApplePayLineItem implements \JsonSerializable
 {
     use JsonSerializableTrait;
 

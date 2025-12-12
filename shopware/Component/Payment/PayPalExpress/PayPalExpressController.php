@@ -27,7 +27,7 @@ final class PayPalExpressController extends StorefrontController
     {
         $response = $this->startCheckoutRoute->startCheckout($request, $salesChannelContext);
 
-        return new RedirectResponse($response->getRedirectUrl());
+        return new RedirectResponse((string) $response->getRedirectUrl());
     }
 
     #[Route(name: 'frontend.mollie.paypal-express.finish', path: '/mollie/paypal-express/finish', methods: ['POST', 'GET'], options: ['seo' => false])]
