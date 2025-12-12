@@ -66,6 +66,7 @@ final class RecordAnonymizer implements ProcessorInterface
     {
         $sensitiveFields = ['givenName', 'familyName', 'organizationName', 'email', 'phone', 'streetAndNumber', 'postalCode'];
         $urlFields = ['redirectUrl', 'webhookUrl', 'cancelUrl', 'href', 'checkoutUrl', 'finalizeUrl'];
+        $tokenFields = ['applePayPaymentToken'];
 
         foreach ($data as $key => &$value) {
             if (in_array($key, $sensitiveFields, true) && is_string($value)) {
@@ -79,6 +80,11 @@ final class RecordAnonymizer implements ProcessorInterface
                     fn ($m) => (strpos($m[0], '_sw_payment_token') !== false ? '_sw_payment_token=' : 'token=') . substr($m[1], 0, 2) . '**',
                     $value
                 );
+                continue;
+            }
+
+            if (in_array($key, $tokenFields, true) && is_string($value)) {
+                $value = substr($value, 0, 2) . '**';
                 continue;
             }
 

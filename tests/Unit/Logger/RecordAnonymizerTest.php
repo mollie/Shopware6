@@ -117,4 +117,20 @@ final class RecordAnonymizerTest extends TestCase
         $this->assertStringContainsString('_sw_payment_token=ey**', $result['context']['finalizeUrl']);
         $this->assertStringNotContainsString('eyeo555n4777nclr771n5zcidj6ym96m3456', $result['context']['finalizeUrl']);
     }
+
+    public function testApplePayPaymentTokenIsAnonymized(): void
+    {
+        $anonymizer = new RecordAnonymizer();
+        $now = new \DateTimeImmutable();
+        $applePayToken = '{"paymentData":{"data":"zazq6d9tsJzah148grEdwNBWosUlEdnmu9c/tpEidah","signature":"MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQECAQUAMIAGCSqGSIb3DQEH"}}';
+        
+        $record = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [
+            'applePayPaymentToken' => $applePayToken
+        ]);
+
+        $result = $anonymizer($record);
+        $maskedToken = $result['context']['applePayPaymentToken'];
+
+        $this->assertEquals('{"**', $maskedToken);
+    }
 }
