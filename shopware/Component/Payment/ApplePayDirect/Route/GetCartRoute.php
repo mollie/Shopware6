@@ -6,8 +6,11 @@ namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayAmount;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayCart;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayLineItem;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayShippingLineItem;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -30,6 +33,8 @@ final class GetCartRoute extends AbstractGetCartRoute
         private AbstractSettingsService $settingsService,
         #[Autowire(service: Translator::class)]
         private AbstractTranslator $translator,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -42,17 +47,34 @@ final class GetCartRoute extends AbstractGetCartRoute
     public function cart(Request $request, SalesChannelContext $salesChannelContext): GetCartResponse
     {
         $localeCode = '';
+        $salesChannelId = $salesChannelContext->getSalesChannelId();
         $languageInfo = $salesChannelContext->getLanguageInfo();
+        /** @phpstan-ignore-next-line  */
         if ($languageInfo instanceof LanguageInfo) {
             $localeCode = $languageInfo->localeCode;
         }
+        $logData = [
+            'localeCode' => $localeCode,
+            'salesChannelId' => $salesChannelId,
+        ];
+        $this->logger->info('Start - Apple Pay cart route request', $logData);
         $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
 
-        $apiSettings = $this->settingsService->getApiSettings($salesChannelContext->getSalesChannelId());
+        $applePayCart = $this->getApplePayCart($cart, $salesChannelContext, $localeCode);
+
+        $this->logger->info('Finished - Apple Pay cart route request', $logData);
+
+        return new GetCartResponse($applePayCart, $cart);
+    }
+
+    private function getApplePayCart(Cart $cart, SalesChannelContext $salesChannelContext, string $localeCode): ApplePayCart
+    {
+        $salesChannelId = $salesChannelContext->getSalesChannelId();
+        $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
         $shopName = (string) $salesChannelContext->getSalesChannel()->getName();
         $isTestMode = $apiSettings->isTestMode();
 
-        $this->translator->injectSettings($salesChannelContext->getSalesChannelId(), $salesChannelContext->getLanguageId(), $localeCode, $salesChannelContext->getContext());
+        $this->translator->injectSettings($salesChannelId, $salesChannelContext->getLanguageId(), $localeCode, $salesChannelContext->getContext());
 
         $testModeLabel = $this->translator->trans('molliePayments.testMode.label');
         if (mb_strlen($testModeLabel) === 0) {
@@ -106,7 +128,7 @@ final class GetCartRoute extends AbstractGetCartRoute
                 $taxAmount += $tax->getTax();
             }
 
-            $item = new ApplePayLineItem((string) $delivery->getShippingMethod()->getName(), new ApplePayAmount($shippingCosts->getTotalPrice()));
+            $item = new ApplePayShippingLineItem((string) $delivery->getShippingMethod()->getName(), new ApplePayAmount($shippingCosts->getTotalPrice()));
             $applePayCart->addItem($item);
         }
 
@@ -115,6 +137,6 @@ final class GetCartRoute extends AbstractGetCartRoute
             $applePayCart->addItem($taxItem);
         }
 
-        return new GetCartResponse($applePayCart, $cart);
+        return $applePayCart;
     }
 }

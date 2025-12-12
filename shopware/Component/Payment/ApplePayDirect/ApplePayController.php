@@ -3,19 +3,29 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect;
 
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractApplePayDirectEnabledRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractCreateSessionRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetApplePayIdRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetShippingMethodsRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractPayRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractSetShippingCountryRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractSetShippingMethodRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\ApplePayDirectEnabledRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\CreateSessionRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetApplePayIdRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetShippingMethodsRoute;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\SetShippingCountryRouteRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\PayRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\SetShippingCountryRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\SetShippingMethodRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(defaults: ['_routeScope' => ['storefront'], 'csrf_protected' => false])]
@@ -26,10 +36,18 @@ final class ApplePayController extends StorefrontController
         private AbstractCreateSessionRoute $createSessionRoute,
         #[Autowire(service: GetCartRoute::class)]
         private AbstractGetCartRoute $getCartRoute,
-        #[Autowire(service: SetShippingCountryRouteRoute::class)]
+        #[Autowire(service: SetShippingCountryRoute::class)]
         private AbstractSetShippingCountryRoute $setShippingCountryRoute,
         #[Autowire(service: GetShippingMethodsRoute::class)]
         private AbstractGetShippingMethodsRoute $getShippingMethodsRoute,
+        #[Autowire(service: SetShippingMethodRoute::class)]
+        private AbstractSetShippingMethodRoute $setShippingMethodRoute,
+        #[Autowire(service: PayRoute::class)]
+        private AbstractPayRoute $payRoute,
+        #[Autowire(service: GetApplePayIdRoute::class)]
+        private AbstractGetApplePayIdRoute $getApplePayIdRoute,
+        #[Autowire(service: ApplePayDirectEnabledRoute::class)]
+        private AbstractApplePayDirectEnabledRoute $applePayDirectEnabledRoute,
     ) {
     }
 
@@ -58,10 +76,10 @@ final class ApplePayController extends StorefrontController
         $cart = [];
         $shippingMethods = [];
         try {
-            $setShippingCountryResponse = $this->setShippingCountryRoute->setShippingCountry($request, $salesChannelContext);
+            $setShippingCountryResponse = $this->setShippingCountryRoute->setCountry($request, $salesChannelContext);
             $salesChannelContext = $setShippingCountryResponse->getSalesChannelContext();
             $cartResponse = $this->getCartRoute->cart($request, $salesChannelContext);
-            $shippingMethodsResponse = $this->getShippingMethodsRoute->methods($request,$cartResponse->getShopwareCart(),$salesChannelContext);
+            $shippingMethodsResponse = $this->getShippingMethodsRoute->methods($request, $cartResponse->getShopwareCart(), $salesChannelContext);
 
             $cart = $cartResponse->getCart();
             $shippingMethods = $shippingMethodsResponse->getShippingMethods();
@@ -72,7 +90,84 @@ final class ApplePayController extends StorefrontController
         return new JsonResponse([
             'success' => $success,
             'cart' => $cart,
-            'shippingMethods' => $shippingMethods,
+            'shippingmethods' => $shippingMethods,
+        ]);
+    }
+
+    #[Route(name: 'frontend.mollie.apple-pay.set-shipping', path: '/mollie/apple-pay/set-shipping', methods: ['POST'], options: ['seo' => false])]
+    public function setShippingMethod(Request $request, SalesChannelContext $salesChannelContext): JsonResponse
+    {
+        $cart = [];
+        $success = false;
+        try {
+            $setShippingMethodResponse = $this->setShippingMethodRoute->setShipping($request, $salesChannelContext);
+            $salesChannelContext = $setShippingMethodResponse->getSalesChannelContext();
+            $cartResponse = $this->getCartRoute->cart($request, $salesChannelContext);
+            $cart = $cartResponse->getCart();
+            $success = true;
+        } catch (\Throwable $exception) {
+        }
+
+        return new JsonResponse([
+            'success' => $success,
+            'cart' => $cart,
+        ]);
+    }
+
+    #[Route(name: 'frontend.mollie.apple-pay.start-payment', path: '/mollie/apple-pay/start-payment', methods: ['POST'], options: ['seo' => false])]
+    public function startPayment(Request $request, SalesChannelContext $salesChannelContext): Response
+    {
+        $errorSnippet = 'molliePayments.payments.applePayDirect.paymentError';
+        try {
+            $response = $this->payRoute->pay($request, $salesChannelContext);
+            $orderId = $response->getOrderId();
+            $finishUrl = $this->generateUrl('frontend.checkout.finish.page',['orderId' => $orderId]);
+
+            return new RedirectResponse($finishUrl);
+        } catch (ApplePayDirectException $exception) {
+            $this->addFlash('danger', $this->trans($errorSnippet));
+            if ($exception->getErrorCode() === ApplePayDirectException::PAYMENT_FAILED) {
+                $orderId = $exception->getParameter('orderId');
+
+                return $this->forwardToRoute('frontend.account.edit-order.page', [], ['orderId' => $orderId]);
+            }
+
+            return $this->forwardToRoute('frontend.checkout.confirm.page');
+        } catch (\Throwable $exception) {
+            $this->addFlash('danger', $exception->getMessage());
+
+            return $this->forwardToRoute('frontend.checkout.confirm.page');
+        }
+    }
+
+    #[Route(name: 'frontend.mollie.apple-pay.id', path: '/mollie/apple-pay/applepay-id', methods: ['GET'], options: ['seo' => false])]
+    public function getApplePayId(SalesChannelContext $salesChannelContext): Response
+    {
+        $id = 'not-found';
+        try {
+            $response = $this->getApplePayIdRoute->getId($salesChannelContext);
+
+            $id = $response->getId() ?? $id;
+        } catch (\Throwable $exception) {
+        }
+
+        return new JsonResponse([
+            'id' => $id,
+        ]);
+    }
+
+    #[Route(name: 'frontend.mollie.apple-pay.available', path: '/mollie/apple-pay/available', methods: ['GET'], options: ['seo' => false])]
+    public function isDirectAvailable(SalesChannelContext $salesChannelContext): Response
+    {
+        $available = false;
+        try {
+            $response = $this->applePayDirectEnabledRoute->getEnabled($salesChannelContext);
+            $available = $response->isEnabled();
+        } catch (\Throwable $exception) {
+        }
+
+        return new JsonResponse([
+            'available' => $available,
         ]);
     }
 }

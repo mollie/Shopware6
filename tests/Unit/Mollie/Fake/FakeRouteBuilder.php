@@ -36,5 +36,4 @@ final class FakeRouteBuilder implements RouteBuilderInterface
     {
         // TODO: Implement getPaypalExpressCancelUrl() method.
     }
-
 }

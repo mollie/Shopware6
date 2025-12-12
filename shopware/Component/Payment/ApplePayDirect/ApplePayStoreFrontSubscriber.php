@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect;
 
-use Mollie\Shopware\Component\Payment\Method\ApplePayPayment;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractApplePayDirectEnabledRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\ApplePayDirectEnabledRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Repository\PaymentMethodRepository;
-use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -16,10 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class ApplePayStoreFrontSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        #[Autowire(service: PaymentMethodRepository::class)]
-        private PaymentMethodRepositoryInterface $paymentMethodRepository,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settings,
+        #[Autowire(service: ApplePayDirectEnabledRoute::class)]
+        private AbstractApplePayDirectEnabledRoute $applePayDirectEnabledRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -36,9 +35,13 @@ final class ApplePayStoreFrontSubscriber implements EventSubscriberInterface
     {
         $salesChannelContext = $event->getSalesChannelContext();
         $salesChannel = $salesChannelContext->getSalesChannel();
+
         $salesChannelId = $salesChannel->getId();
+
         try {
-            $applePayMethodId = $this->paymentMethodRepository->getIdForPaymentMethod(ApplePayPayment::class, $salesChannelId, $salesChannelContext->getContext());
+            $response = $this->applePayDirectEnabledRoute->getEnabled($salesChannelContext);
+
+            $applePayMethodId = $response->getPaymentMethodId();
 
             if ($applePayMethodId === null) {
                 return;
@@ -50,7 +53,8 @@ final class ApplePayStoreFrontSubscriber implements EventSubscriberInterface
 
             $event->setParameter('apple_pay_payment_method_id', $applePayMethodId);
             $event->setParameter('mollie_applepaydirect_phonenumber_required', (int) $shoPhoneNumberField);
-            $event->setParameter('mollie_applepaydirect_enabled', $applePaySettings->isApplePayDirectEnabled());
+            $event->setParameter('mollie_applepaydirect_enabled', $response->isEnabled());
+
             $event->setParameter('mollie_applepaydirect_restrictions', $applePaySettings->getVisibilityRestrictions());
             $event->setParameter('mollie_express_required_data_protection', $isNotLoggedIn && $accountSettings->isDataProtectionEnabled());
         } catch (\Throwable $exception) {
