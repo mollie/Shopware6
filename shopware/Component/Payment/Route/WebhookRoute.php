@@ -148,7 +148,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $this->logger->debug('Payment methods are different, try to find payment method based on mollies payment method name', $logData);
 
-        $newPaymentMethodId = $this->paymentMethodRepository->getIdForPaymentMethod($payment->getMethod(), $salesChannelId, $context);
+        $newPaymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod($payment->getMethod(), $salesChannelId, $context);
 
         if ($newPaymentMethodId === null) {
             throw new \Exception('Payment method not found for TransactionId: ' . $transactionId);

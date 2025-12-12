@@ -10,5 +10,5 @@ abstract class AbstractAccountService
 {
     abstract public function getDecorated(): self;
 
-    abstract public function loginOrCreateAccount(Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): SalesChannelContext;
+    abstract public function loginOrCreateAccount(string $paymentMethodId, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): SalesChannelContext;
 }
