@@ -12,8 +12,6 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 final class ApplePayPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface
 {
-    private ?string $applePayPaymentToken = null;
-
     public function getPaymentMethod(): PaymentMethod
     {
         return PaymentMethod::APPLEPAY;
@@ -26,13 +24,11 @@ final class ApplePayPayment extends AbstractMolliePaymentHandler implements Subs
 
     public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag,CustomerEntity $customer): CreatePayment
     {
-        $payment->setApplePayPaymentToken($this->applePayPaymentToken);
+        $paymentToken = $dataBag->get('paymentToken');
+        if ($paymentToken !== null) {
+            $payment->setApplePayPaymentToken($paymentToken);
+        }
 
         return $payment;
-    }
-
-    public function setApplePayPaymentToken(string $token): void
-    {
-        $this->applePayPaymentToken = $token;
     }
 }

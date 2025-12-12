@@ -4,49 +4,13 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="frontend.mollie.apple-pay.available" path="/mollie/apple-pay/available" methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::isPaymentAvailable</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>true</bool></default>
-        <option key="seo">false</option>
-    </route>
 
-    <route id="frontend.mollie.apple-pay.id" path="/mollie/apple-pay/applepay-id" methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::getApplePayID</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>true</bool></default>
-        <option key="seo">false</option>
-    </route>
+
 
     <route id="frontend.mollie.apple-pay.add-product" path="/mollie/apple-pay/add-product" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::addProduct</default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="csrf_protected"><bool>false</bool></default>
-        <option key="seo">false</option>
-    </route>
-
-
-    <route id="frontend.mollie.apple-pay.set-shipping" path="/mollie/apple-pay/set-shipping" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::setShippingMethod</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <default key="XmlHttpRequest"><bool>true</bool></default>
-        <option key="seo">false</option>
-    </route>
-
-    <route id="frontend.mollie.apple-pay.start-payment" path="/mollie/apple-pay/start-payment" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::startPayment</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <default key="XmlHttpRequest"><bool>true</bool></default>
-        <option key="seo">false</option>
-    </route>
-
-    <route id="frontend.mollie.apple-pay.finish-payment" path="/mollie/apple-pay/finish-payment" methods="GET">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::finishPayment</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <default key="XmlHttpRequest"><bool>true</bool></default>
         <option key="seo">false</option>
     </route>
 

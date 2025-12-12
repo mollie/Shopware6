@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Account;
 
 use Mollie\Shopware\Component\Mollie\Address;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\CustomerException;
@@ -38,9 +39,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class AccountService extends AbstractAccountService
 {
     /**
-     * @param EntityRepository<CustomerCollection> $customerRepository
-     * @param EntityRepository<CountryCollection> $countryRepository
-     * @param EntityRepository<SalutationCollection> $salutationRepository
+     * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
+     * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
+     * @param EntityRepository<SalutationCollection<SalutationEntity>> $salutationRepository
      */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
@@ -56,6 +57,8 @@ final class AccountService extends AbstractAccountService
         private AbstractContextSwitchRoute $contextSwitchRoute,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -64,25 +67,48 @@ final class AccountService extends AbstractAccountService
         throw new DecorationPatternException(self::class);
     }
 
-    public function loginOrCreateAccount(Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): SalesChannelContext
+    public function loginOrCreateAccount(string $paymentMethodId, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): SalesChannelContext
     {
-        $email = $billingAddress->getEmail();
+        $currentPaymentMethodId = $salesChannelContext->getPaymentMethod()->getId();
 
-        try {
-            $customer = $this->getCustomerByEmail($email, $salesChannelContext);
-        } catch (\Throwable $e) {
-            $customer = $this->createNewGuestAccount($billingAddress, $shippingAddress, $salesChannelContext);
+        $logData = [
+            'salesChannelId' => $salesChannelContext->getSalesChannelId(),
+            'currentPaymentMethodId' => $currentPaymentMethodId,
+            'newPaymentMethodId' => $paymentMethodId,
+        ];
+        $email = $billingAddress->getEmail();
+        $this->logger->debug('Start - login or create express customer', $logData);
+
+        $customer = $salesChannelContext->getCustomer();
+        if ($customer === null) {
+            $this->logger->debug('Customer not logged in, try to login or create an account', $logData);
+            try {
+                $customer = $this->getCustomerByEmail($email, $salesChannelContext);
+                $logData['customerId'] = $customer->getId();
+                $logData['customerNumber'] = $customer->getCustomerNumber();
+                $this->logger->debug('Customer was found by email', $logData);
+                $this->accountService->loginById($customer->getId(), $salesChannelContext);
+            } catch (\Throwable $e) {
+                $customer = $this->createNewGuestAccount($billingAddress, $shippingAddress, $salesChannelContext);
+                $logData['customerId'] = $customer->getId();
+                $logData['customerNumber'] = $customer->getCustomerNumber();
+                $this->logger->debug('New guest account created', $logData);
+            }
         }
 
+        $logData['paymentMethodId'] = $paymentMethodId;
         $requestDataBag = new RequestDataBag();
-        $requestDataBag->set(SalesChannelContextService::PAYMENT_METHOD_ID, '2e94438b815aaf02e02a4a4c1853f406');
+        $requestDataBag->set(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethodId);
         $requestDataBag->set(SalesChannelContextService::CUSTOMER_ID, $customer->getId());
-
+        $this->logger->debug('Switch customers payment method', $logData);
         $contextSwitchResponse = $this->contextSwitchRoute->switchContext($requestDataBag, $salesChannelContext);
 
         $parameters = new SalesChannelContextServiceParameters($salesChannelContext->getSalesChannelId(),
             $contextSwitchResponse->getToken(),
-            originalContext: $salesChannelContext->getContext());
+            originalContext: $salesChannelContext->getContext(),
+            customerId: $customer->getId()
+        );
+        $this->logger->debug('Finished - login or create express customer', $logData);
 
         return $this->salesChannelContextService->get($parameters);
     }
@@ -90,7 +116,7 @@ final class AccountService extends AbstractAccountService
     /**
      * @return array<string,string>
      */
-    public function getCountryIsoMapping(Address $shippingAddress, Address $billingAddress, SalesChannelContext $salesChannelContext): array
+    private function getCountryIsoMapping(Address $shippingAddress, Address $billingAddress, SalesChannelContext $salesChannelContext): array
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', true));
@@ -124,13 +150,16 @@ final class AccountService extends AbstractAccountService
     {
         $criteria = new Criteria();
         $salutationSearchResult = $this->salutationRepository->search($criteria, $context->getContext());
-
+        $foundSalutation = null;
         /** @var SalutationEntity $salutation */
         foreach ($salutationSearchResult->getElements() as $salutation) {
             $foundSalutation = $salutation;
             if ($salutation->getSalutationKey() === 'not_specified') {
                 return $foundSalutation;
             }
+        }
+        if ($foundSalutation === null) {
+            throw new \Exception('Salutations not found, please add at least one salutation');
         }
 
         return $foundSalutation;
