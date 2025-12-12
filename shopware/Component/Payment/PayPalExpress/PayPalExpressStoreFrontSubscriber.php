@@ -38,7 +38,7 @@ final class PayPalExpressStoreFrontSubscriber implements EventSubscriberInterfac
         $salesChannel = $salesChannelContext->getSalesChannel();
         $salesChannelId = $salesChannel->getId();
         try {
-            $paypalExpressMethodId = $this->paymentMethodRepository->getIdForPaymentMethod(PayPalExpressPayment::class, $salesChannelId,$salesChannelContext->getContext());
+            $paypalExpressMethodId = $this->paymentMethodRepository->getIdByPaymentHandler(PayPalExpressPayment::class, $salesChannelId,$salesChannelContext->getContext());
             if ($paypalExpressMethodId === null) {
                 return;
             }
