@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Logger;
 
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Level;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -46,7 +47,6 @@ final class OrderFileHandler extends AbstractHandler
             return false;
         }
 
-        // don't pass to other handlers
-        return ! $this->bubble;
+        return $record->level->value < Level::Warning->value;
     }
 }

@@ -66,10 +66,16 @@ final class RecordAnonymizer implements ProcessorInterface
     {
         $sensitiveFields = ['givenName', 'familyName', 'organizationName', 'email', 'phone', 'streetAndNumber', 'postalCode'];
         $urlFields = ['redirectUrl', 'webhookUrl', 'cancelUrl', 'href', 'checkoutUrl', 'finalizeUrl'];
+        $tokenFields = ['applePayPaymentToken'];
 
         foreach ($data as $key => &$value) {
-            if (in_array($key, $sensitiveFields, true) && is_string($value)) {
-                $value = substr($value, 0, 2) . '**';
+            if (is_array($value)) {
+                $value = $this->maskPersonalDataInArray($value);
+                continue;
+            }
+
+            if (in_array($key, $sensitiveFields, true)) {
+                $value = '**';
                 continue;
             }
 
@@ -82,10 +88,11 @@ final class RecordAnonymizer implements ProcessorInterface
                 continue;
             }
 
-            if (is_array($value)) {
-                $value = $this->maskPersonalDataInArray($value);
+            if (in_array($key, $tokenFields, true)) {
+                $value = '**';
             }
         }
+        unset($value);
 
         return $data;
     }
