@@ -7,6 +7,10 @@ use Shopware\Core\Framework\Struct\Struct;
 
 final class PayPalExpressSettings extends Struct
 {
+    public const KEY_BUTTON_STYLE = 'paypalExpressButtonStyle';
+    public const KEY_BUTTON_SHAPE = 'paypalExpressButtonShape';
+    public const KEY_RESTRICTIONS = 'paypalExpressRestrictions';
+
     private int $shape = 0;
     private int $style = 0;
     /**
