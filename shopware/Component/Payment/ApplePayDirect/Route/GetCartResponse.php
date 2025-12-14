@@ -9,7 +9,7 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 /**
- * @extends StoreApiResponse<ApplePayCart>
+ * @extends StoreApiResponse<ArrayStruct>
  */
 final class GetCartResponse extends StoreApiResponse
 {
