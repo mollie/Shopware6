@@ -83,13 +83,6 @@ final class Pay
 
         $paypalExpressAuthenticationId = $createPaymentStruct->getAuthenticationId();
 
-        if ($paypalExpressAuthenticationId !== null) {
-            $payment = new Payment('no-created', $paymentHandler->getPaymentMethod());
-            $payment->setAuthenticationId($paypalExpressAuthenticationId);
-            $payment->setFinalizeUrl($shopwareFinalizeUrl);
-            $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
-        }
-
         $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
 
         if ($paypalExpressAuthenticationId !== null) {
