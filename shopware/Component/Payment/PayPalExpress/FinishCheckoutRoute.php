@@ -8,9 +8,12 @@ use Mollie\Shopware\Component\Account\AccountService;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Session;
+use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Repository\PaymentMethodRepository;
+use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -27,6 +30,8 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         private SessionGatewayInterface $sessionGateway,
         #[Autowire(service: AccountService::class)]
         private AbstractAccountService $accountService,
+        #[Autowire(service: PaymentMethodRepository::class)]
+        private PaymentMethodRepositoryInterface $paymentMethodRepository,
         private CartService $cartService,
     ) {
     }
@@ -40,6 +45,11 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
     public function finishCheckout(SalesChannelContext $salesChannelContext): FinishCheckoutResponse
     {
         $salesChannelId = $salesChannelContext->getSalesChannelId();
+        $payPalExpressId = $this->paymentMethodRepository->getIdByPaymentHandler(PayPalExpressPayment::class, $salesChannelId, $salesChannelContext->getContext());
+        if ($payPalExpressId === null) {
+            throw PaypalExpressException::paymentNotEnabled($salesChannelId);
+        }
+
         $settings = $this->settingsService->getPaypalExpressSettings($salesChannelId);
 
         if ($settings->isEnabled() === false) {
@@ -62,11 +72,11 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         if ($shippingAddress === null) {
             throw PaypalExpressException::shippingAddressMissing();
         }
-        $payPalExpressId = '';
-        $newContext = $this->accountService->loginOrCreateAccount($payPalExpressId,$billingAddress,$shippingAddress,$salesChannelContext);
+
+        $newContext = $this->accountService->loginOrCreateAccount($payPalExpressId, $billingAddress, $shippingAddress, $salesChannelContext);
         $cart = $this->cartService->getCart($newContext->getToken(), $newContext);
         $cart->addExtension(Mollie::EXTENSION, $session);
-        $this->cartService->recalculate($cart,$salesChannelContext);
+        $this->cartService->recalculate($cart, $salesChannelContext);
 
         return new FinishCheckoutResponse($session->getId(), $session->getAuthenticationId());
     }
