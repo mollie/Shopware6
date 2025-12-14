@@ -89,13 +89,26 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
-    public function getPaypalExpressSettings(?string $salesChannelid = null): PayPalExpressSettings
+    public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings
     {
-        $settings = new PayPalExpressSettings($this->paypalExpressEnabled);
-        $settings->setStyle($this->paypalExpressStyle);
-        $settings->setShape($this->paypalExpressShape);
+        $cacheKey = PayPalExpressSettings::class . '_' . ($salesChannelId ?? 'all');
 
-        $settings->setRestrictions(explode(' ', trim($this->paypalExpressRestrictions)));
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+        $fallbackRestrictions = explode(' ', trim($this->paypalExpressRestrictions));
+        $style = $shopwareSettings[PayPalExpressSettings::KEY_BUTTON_STYLE] ?? $this->paypalExpressStyle;
+        $shape = $shopwareSettings[PayPalExpressSettings::KEY_BUTTON_SHAPE] ?? $this->paypalExpressShape;
+        $restrictions = $shopwareSettings[PayPalExpressSettings::KEY_RESTRICTIONS] ?? $fallbackRestrictions;
+        $settings = new PayPalExpressSettings($this->paypalExpressEnabled);
+
+        $settings->setStyle((int) $style);
+        $settings->setShape((int) $shape);
+
+        $settings->setRestrictions($restrictions);
+
+        $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;
     }
@@ -177,8 +190,8 @@ final class SettingsService extends AbstractSettingsService
     }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
      *
      * @return array<mixed[]>
      */
