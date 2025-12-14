@@ -25,7 +25,11 @@ final class PayPalExpressPayment extends AbstractMolliePaymentHandler implements
 
     public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
     {
-        // TODO authenticationId
+        $authenticationId = $dataBag->get('authenticationId');
+        if ($authenticationId !== null) {
+            $payment->setAuthenticationId($authenticationId);
+        }
+
         return $payment;
     }
 

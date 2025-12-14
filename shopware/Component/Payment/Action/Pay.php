@@ -81,7 +81,20 @@ final class Pay
         $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $context);
         $this->eventDispatcher->dispatch($paymentEvent);
 
+        $paypalExpressAuthenticationId = $createPaymentStruct->getAuthenticationId();
+
+        if ($paypalExpressAuthenticationId !== null) {
+            $payment = new Payment('no-created', $paymentHandler->getPaymentMethod());
+            $payment->setAuthenticationId($paypalExpressAuthenticationId);
+            $payment->setFinalizeUrl($shopwareFinalizeUrl);
+            $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
+        }
+
         $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
+
+        if ($paypalExpressAuthenticationId !== null) {
+            $payment->setAuthenticationId($paypalExpressAuthenticationId);
+        }
 
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
@@ -92,7 +105,7 @@ final class Pay
 
         $redirectUrl = $payment->getCheckoutUrl();
         if ($paymentHandler instanceof PosPayment) {
-            $redirectUrl = $this->routeBuilder->getPosCheckoutUrl($payment,$transactionId,$orderNumber);
+            $redirectUrl = $this->routeBuilder->getPosCheckoutUrl($payment, $transactionId, $orderNumber);
         }
         if (mb_strlen($redirectUrl) === 0) {
             $redirectUrl = $shopwareFinalizeUrl;
