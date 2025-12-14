@@ -15,8 +15,10 @@ final class GetApplePayIdResponse extends StoreApiResponse
     {
         $object = new ArrayStruct(
             [
-                'success' => $this->id !== null,
-                'id' => $id,
+                'data' => [
+                    'success' => $this->id !== null,
+                    'id' => $id,
+                ]
             ],
             'mollie_payments_applepay_direct_id'
         );

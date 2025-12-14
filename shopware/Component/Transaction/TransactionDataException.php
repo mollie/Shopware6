@@ -19,7 +19,7 @@ final class TransactionDataException extends HttpException
     public static function transactionNotFound(string $transactionId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::TRANSACTION_NOT_FOUND,
             'Transaction {{transactionId}} not found in Shopware',
             ['transactionId' => $transactionId],
@@ -30,7 +30,7 @@ final class TransactionDataException extends HttpException
     public static function oderNotExists(string $transactionId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::TRANSACTION_ORDER_NOT_FOUND,
             'Transaction {{transactionId}} does not have an Order in Shopware',
             ['transactionId' => $transactionId],
@@ -41,7 +41,7 @@ final class TransactionDataException extends HttpException
     public static function orderWithoutDeliveries(string $orderId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_WITHOUT_DELIVERIES,
             'Order {{orderId}} does not have delivery addresses in Shopware',
             ['orderId' => $orderId],
@@ -52,7 +52,7 @@ final class TransactionDataException extends HttpException
     public static function orderWithoutLanguage(string $orderId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_WITHOUT_LANGUAGE,
             'Order {{orderId}} does not have language in Shopware',
             ['orderId' => $orderId],
@@ -63,7 +63,7 @@ final class TransactionDataException extends HttpException
     public static function orderWithoutCurrency(string $orderId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_WITHOUT_CURRENCY,
             'Order {{orderId}} does not have a currency in Shopware',
             ['orderId' => $orderId],
@@ -74,7 +74,7 @@ final class TransactionDataException extends HttpException
     public static function orderDeliveryWithoutShippingAddress(string $orderId, string $deliveryAddressId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_DELIVERY_WITHOUT_ADDRESS,
             'Delivery address {{deliveryAddressId}} from order {{orderId}} does shipping address in Shopware',
             ['orderId' => $orderId, 'deliveryAddressId' => $deliveryAddressId],
@@ -85,7 +85,7 @@ final class TransactionDataException extends HttpException
     public static function orderWithoutCustomer(string $orderId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_DELIVERY_WITHOUT_ADDRESS,
             'Order {{orderId}} does not have a customer in Shopware',
             ['orderId' => $orderId],
@@ -96,7 +96,7 @@ final class TransactionDataException extends HttpException
     public static function orderWithoutSalesChannel(string $orderId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_DELIVERY_WITHOUT_ADDRESS,
             'Order {{orderId}} does not have a sales channel in Shopware',
             ['orderId' => $orderId],
@@ -107,7 +107,7 @@ final class TransactionDataException extends HttpException
     public static function orderWithoutBillingAddress(string $orderId, ?\Throwable $exception = null): self
     {
         return new self(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_WITHOUT_BILLING_ADDRESS,
             'Order {{orderId}} does not have a billing address in Shopware',
             ['orderId' => $orderId],

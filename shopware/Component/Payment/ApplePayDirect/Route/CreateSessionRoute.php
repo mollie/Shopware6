@@ -6,7 +6,6 @@ namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 use Mollie\Shopware\Component\Mollie\Gateway\ApplePayGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\ApplePayGatewayInterface;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -16,6 +15,7 @@ use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelD
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class CreateSessionRoute extends AbstractCreateSessionRoute

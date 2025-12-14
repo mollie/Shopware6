@@ -64,8 +64,10 @@ final class ApplePayController extends StorefrontController
         }
 
         return new JsonResponse([
-            'success' => $success,
-            'session' => json_encode($session),
+            'data' => [
+                'success' => $success,
+                'session' => json_encode($session),
+            ]
         ]);
     }
 
@@ -121,7 +123,7 @@ final class ApplePayController extends StorefrontController
         try {
             $response = $this->payRoute->pay($request, $salesChannelContext);
             $orderId = $response->getOrderId();
-            $finishUrl = $this->generateUrl('frontend.checkout.finish.page',['orderId' => $orderId]);
+            $finishUrl = $this->generateUrl('frontend.checkout.finish.page', ['orderId' => $orderId]);
 
             return new RedirectResponse($finishUrl);
         } catch (ApplePayDirectException $exception) {
