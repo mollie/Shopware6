@@ -8,7 +8,6 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Repository\PaymentMethodRepository;
 use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -21,9 +20,7 @@ final class ApplePayDirectEnabledRoute extends AbstractApplePayDirectEnabledRout
         #[Autowire(service: PaymentMethodRepository::class)]
         private PaymentMethodRepositoryInterface $paymentMethodRepository,
         #[Autowire(service: SettingsService::class)]
-        private AbstractSettingsService $settingsService,
-        #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger,
+        private AbstractSettingsService $settingsService
     ) {
     }
 
@@ -43,10 +40,6 @@ final class ApplePayDirectEnabledRoute extends AbstractApplePayDirectEnabledRout
             $applePaySettings = $this->settingsService->getApplePaySettings($salesChannelContext->getSalesChannelId());
             $enabled = $applePaySettings->isApplePayDirectEnabled();
         }
-        $this->logger->debug('Apple pay enabled route requested', [
-            'enabled' => $enabled,
-            'paymentMethodId' => $id,
-        ]);
 
         return new ApplePayDirectEnabledResponse($enabled, $id);
     }
