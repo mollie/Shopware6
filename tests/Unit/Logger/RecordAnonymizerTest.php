@@ -123,12 +123,11 @@ final class RecordAnonymizerTest extends TestCase
         $anonymizer = new RecordAnonymizer();
         $now = new \DateTimeImmutable();
         $applePayToken = '{"paymentData":{"data":"zazq6d9tsJzah148grEdwNBWosUlEdnmu9c/tpEidah","signature":"MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQECAQUAMIAGCSqGSIb3DQEH"}}';
-        
+
         $record = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [
-            'payment'=>[
+            'payment' => [
                 'applePayPaymentToken' => $applePayToken
             ]
-
         ]);
 
         $result = $anonymizer($record);

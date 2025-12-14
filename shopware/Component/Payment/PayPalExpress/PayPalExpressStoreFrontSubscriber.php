@@ -43,6 +43,7 @@ final class PayPalExpressStoreFrontSubscriber implements EventSubscriberInterfac
                 return;
             }
             $paypalExpressSettings = $this->settings->getPaypalExpressSettings();
+
             $event->setParameter('mollie_paypalexpress_enabled', $paypalExpressSettings->isEnabled());
 
             $event->setParameter('mollie_paypalexpress_style', $paypalExpressSettings->getStyle());
