@@ -29,8 +29,8 @@ final class LoggerSettingsTest extends TestCase
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS, 10);
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE, false);
 
-        $devMode = (bool) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', false);
-        $cypressMode = (bool) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', false);
+        $devMode = (int) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', 0);
+        $cypressMode = (int) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', 0);
         $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
 
         $actualSettings = $settingsService->getLoggerSettings();
