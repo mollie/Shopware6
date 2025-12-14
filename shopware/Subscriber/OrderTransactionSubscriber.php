@@ -34,9 +34,11 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 continue;
             }
             $mollieCustomFields = $orderTransaction->getTranslated()['customFields'][Mollie::EXTENSION] ?? null;
+
             if ($mollieCustomFields === null) {
                 $mollieCustomFields = $orderTransaction->getCustomFields()[Mollie::EXTENSION] ?? null;
             }
+
             if ($mollieCustomFields === null) {
                 continue;
             }
@@ -50,12 +52,18 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             $method = $mollieCustomFields['method'] ?? '';
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
+            $authenticationId = $mollieCustomFields['authenticationId'] ?? null;
+
             $transactionExtension = new Payment($paymentId, PaymentMethod::from($method));
             $transactionExtension->setCountPayments($countPayments);
             $transactionExtension->setFinalizeUrl($finalizeUrl);
             if ($thirdPartyPaymentId !== null) {
                 $transactionExtension->setThirdPartyPaymentId($thirdPartyPaymentId);
             }
+            if ($authenticationId !== null) {
+                $transactionExtension->setAuthenticationId($authenticationId);
+            }
+
             $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
         }
     }

@@ -1,0 +1,11 @@
+{% set currentPaymentMethod = page.paymentMethods.get(context.paymentMethod.id) %}
+
+{% if(currentPaymentMethod != null)  %}
+    {% set authenticationId =currentPaymentMethod.customFields.mollie_payments.authenticationId ?? null %}
+    {% if(authenticationId != null) %}
+        <input type="hidden" name="authenticationId" value="{{ authenticationId }}" form="confirmOrderForm"/>
+    {% endif %}
+{% endif %}
+
+
+

@@ -21,6 +21,8 @@ final class Payment extends Struct implements \JsonSerializable
     private int $countPayments = 1;
     private string $changePaymentStateUrl;
 
+    private ?string $authenticationId = null;
+
     public function __construct(private string $id, private PaymentMethod $method)
     {
     }
@@ -138,5 +140,15 @@ final class Payment extends Struct implements \JsonSerializable
     public function setChangePaymentStateUrl(string $changePaymentStateUrl): void
     {
         $this->changePaymentStateUrl = $changePaymentStateUrl;
+    }
+
+    public function getAuthenticationId(): ?string
+    {
+        return $this->authenticationId;
+    }
+
+    public function setAuthenticationId(?string $authenticationId): void
+    {
+        $this->authenticationId = $authenticationId;
     }
 }

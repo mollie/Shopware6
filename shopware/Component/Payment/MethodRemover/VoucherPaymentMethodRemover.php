@@ -34,10 +34,10 @@ final class VoucherPaymentMethodRemover extends AbstractPaymentRemover
 
     public function remove(PaymentMethodCollection $paymentMethods, string $orderId, SalesChannelContext $salesChannelContext): PaymentMethodCollection
     {
-        $voucherPaymentMethodCollection = $paymentMethods->filter(function (PaymentMethodEntity $paymentMethod) {
+        $filteredPaymentMethods = $paymentMethods->filter(function (PaymentMethodEntity $paymentMethod) {
             return $paymentMethod->getHandlerIdentifier() === VoucherPayment::class;
         });
-        $voucherPaymentMethod = $voucherPaymentMethodCollection->first();
+        $voucherPaymentMethod = $filteredPaymentMethods->first();
 
         if (! $voucherPaymentMethod instanceof PaymentMethodEntity) {
             return $paymentMethods;

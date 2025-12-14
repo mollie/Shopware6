@@ -29,6 +29,7 @@ final class CreatePayment implements \JsonSerializable
 
     private ?string $profileId = null;
     private ?string $terminalId = null;
+    private ?string $authenticationId = null;
     /**
      * @var array<mixed>
      */
@@ -245,5 +246,15 @@ final class CreatePayment implements \JsonSerializable
     public function setTerminalId(?string $terminalId): void
     {
         $this->terminalId = $terminalId;
+    }
+
+    public function getAuthenticationId(): ?string
+    {
+        return $this->authenticationId;
+    }
+
+    public function setAuthenticationId(string $authenticationId): void
+    {
+        $this->authenticationId = $authenticationId;
     }
 }
