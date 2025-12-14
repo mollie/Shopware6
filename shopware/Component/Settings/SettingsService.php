@@ -35,11 +35,11 @@ final class SettingsService extends AbstractSettingsService
     public function __construct(
         private SystemConfigService $systemConfigService,
         #[Autowire(env: 'default::MOLLIE_DEV_MODE')]
-        ?int $devMode,
+        ?int $devMode = 0,
         #[Autowire(env: 'default::MOLLIE_CYPRESS_MODE')]
-        ?int $cypressMode,
+        ?int $cypressMode = 0,
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BETA')]
-        ?int $paypalExpressEnabled,
+        ?int $paypalExpressEnabled = 0,
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE')]
         ?string $paypalExpressStyle = '1',
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE')]

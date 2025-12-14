@@ -231,37 +231,37 @@ final class AccountService extends AbstractAccountService
         $criteria->setTitle('account-service::fetchCustomer');
 
         $result = $this->customerRepository->search($criteria, $context->getContext())->getEntities();
-        $result = $result->filter(function (CustomerEntity $customer) use ($includeGuest, $context) {
+        $customers = $result->getElements();
+        $resultArray = [];
+        /** @var CustomerEntity $customer */
+        foreach ($customers as $customer) {
             // Skip not active users
             if (! $customer->getActive()) {
-                return null;
+                continue;
             }
-
             // Skip guest if not required
             if (! $includeGuest && $customer->getGuest()) {
-                return null;
+                continue;
             }
-
-            // If not bound, we still need to consider it
-            if ($customer->getBoundSalesChannelId() === null) {
-                return true;
-            }
-
             // It is bound, but not to the current one. Skip it
-            if ($customer->getBoundSalesChannelId() !== $context->getSalesChannelId()) {
-                return null;
+            if ($customer->getBoundSalesChannelId() !== null && $customer->getBoundSalesChannelId() !== $context->getSalesChannelId()) {
+                continue;
             }
+            $resultArray[] = $customer;
+        }
 
-            return true;
-        });
-
+        if (count($resultArray) === 0) {
+            return null;
+        }
         // If there is more than one account we want to return the latest, this is important
         // for guest accounts, real customer accounts should only occur once, otherwise the
         // wrong password will be validated
-        if ($result->count() > 1) {
-            $result->sort(fn (CustomerEntity $a, CustomerEntity $b) => ($a->getCreatedAt() <=> $b->getCreatedAt()) * -1);
+        if (count($resultArray) > 1) {
+            usort($resultArray, function (CustomerEntity $a, CustomerEntity $b) {
+                return $b->getCreatedAt() <=> $a->getCreatedAt();
+            });
         }
 
-        return $result->first();
+        return $resultArray[0];
     }
 }
