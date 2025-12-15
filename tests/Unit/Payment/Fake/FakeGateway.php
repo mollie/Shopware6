@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
@@ -40,12 +41,16 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer
     {
-        // TODO: Implement createCustomer() method.
+        return new Customer('cust_fake_' . uniqid(), 'Fake Customer', 'fake@mollie.test', []);
     }
 
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection
     {
-        // TODO: Implement listMandates() method.
+        $collection = new MandateCollection();
+        $mandate = new Mandate('tr_test_mandate_id', PaymentMethod::CREDIT_CARD, []);
+        $collection->set('tr_test_mandate_id', $mandate);
+
+        return $collection;
     }
 
     public function listTerminals(string $salesChannelId): TerminalCollection
