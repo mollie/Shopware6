@@ -6,6 +6,9 @@
 
     <services>
         <defaults autowire="true" autoconfigure="true"/>
-        <prototype namespace="Mollie\Shopware\" resource="../../" exclude="../../../{Resources,Migration,*.php}"/>
+
+
+        <prototype namespace="Mollie\Shopware\" resource="./../../" exclude="../../{Resources,Migration,*.php}"/>
+
     </services>
 </container>

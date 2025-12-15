@@ -49,10 +49,13 @@ class ApplePayDomainVerificationService
             return;
         }
 
-        if ($this->filesystem->has(self::LOCAL_FILE)) {
-            $this->filesystem->delete(self::LOCAL_FILE);
-        }
+        try {
+            if ($this->filesystem->has(self::LOCAL_FILE)) {
+                $this->filesystem->delete(self::LOCAL_FILE);
+            }
 
-        $this->filesystem->write(self::LOCAL_FILE, $response->getBody());
+            $this->filesystem->write(self::LOCAL_FILE, $response->getBody(), ['ContentType' => 'text/plain']);
+        } catch (\Throwable $e) {
+        }
     }
 }

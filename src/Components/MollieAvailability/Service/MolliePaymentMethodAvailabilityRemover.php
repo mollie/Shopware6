@@ -85,7 +85,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
             $billingAddress = $order->getBillingAddress();
         }
 
-        if (! isset($price)) {
+        if (! isset($price) || 0.0 === $price) {
             return $originalData;
         }
 
