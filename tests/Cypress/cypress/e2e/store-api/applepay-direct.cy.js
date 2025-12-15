@@ -137,7 +137,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('No Country Code provided!');
+                expect(response.data.errors[0].detail).to.contain('No Country Code provided');
             });
         })
 
