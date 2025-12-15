@@ -10,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\Request;
-use Traversable;
 
 class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
 {
@@ -27,7 +26,7 @@ class RemovePaymentMethodRoute64 extends AbstractPaymentMethodRoute
     /**
      * @param \Traversable<PaymentMethodRemoverInterface> $paymentMethodRemovers
      */
-    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, Traversable $paymentMethodRemovers)
+    public function __construct(AbstractPaymentMethodRoute $corePaymentMethodRoute, \Traversable $paymentMethodRemovers)
     {
         $this->corePaymentMethodRoute = $corePaymentMethodRoute;
         $this->paymentMethodRemovers = iterator_to_array($paymentMethodRemovers);

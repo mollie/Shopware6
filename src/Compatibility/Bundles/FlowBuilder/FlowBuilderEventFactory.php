@@ -394,9 +394,11 @@ class FlowBuilderEventFactory
     {
         if ($this->versionCompare->gte(self::SW_VERSION_67)) {
             $salesChannelContext = $this->salesChannelContextFactory->create(Uuid::randomHex(), $newOrder->getSalesChannelId());
+
             /** @phpstan-ignore-next-line  */
             return new CheckoutOrderPlacedEvent($salesChannelContext, $newOrder);
         }
+
         /** @phpstan-ignore-next-line  */
         return new CheckoutOrderPlacedEvent($context, $newOrder, $newOrder->getSalesChannelId());
     }

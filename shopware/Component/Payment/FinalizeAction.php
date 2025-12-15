@@ -42,7 +42,7 @@ final class FinalizeAction
             $this->logger->info(
                 'Finalizing Mollie payment for order ' . $transaction->getOrder()->getOrderNumber() . ' with payment: ' . $paymentHandler->getPaymentMethod() . ' and Mollie ID' . $mollieID,
                 [
-                    'salesChannelId' => $salesChannelId, //todo: add a name somehow
+                    'salesChannelId' => $salesChannelId, // todo: add a name somehow
                 ]
             );
 

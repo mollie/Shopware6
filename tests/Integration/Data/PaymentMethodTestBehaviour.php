@@ -65,7 +65,7 @@ trait PaymentMethodTestBehaviour
         EpsPayment::PAYMENT_METHOD_NAME => EpsPayment::class,
         GiftCardPayment::PAYMENT_METHOD_NAME => GiftCardPayment::class,
         GiroPayPayment::PAYMENT_METHOD_NAME => GiroPayPayment::class,
-        IdealPayment::PAYMENT_METHOD_NAME => IdealPayment::class,
+        iDealPayment::PAYMENT_METHOD_NAME => iDealPayment::class,
         KbcPayment::PAYMENT_METHOD_NAME => KbcPayment::class,
         KlarnaOnePayment::PAYMENT_METHOD_NAME => KlarnaOnePayment::class,
         MbWayPayment::PAYMENT_METHOD_NAME => MbWayPayment::class,
