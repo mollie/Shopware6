@@ -5,8 +5,9 @@ import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import LoginAction from "Actions/storefront/account/LoginAction";
 import Session from "Services/utils/Session";
 import RegisterAction from "Actions/storefront/account/RegisterAction";
+import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
 
-
+const mollieProductsAction = new MollieProductsAction();
 const topMenu = new TopMenuAction();
 const listing = new ListingAction();
 const pdp = new PDPAction();
@@ -56,7 +57,8 @@ export default class DummyBasketScenario {
 
 
         for (let i = 0; i < this.lineItemCount; i++) {
-            topMenu.clickOnSecondCategory();
+
+            mollieProductsAction.openListingRegularProducts();
 
             listing.clickOnNthProduct(i + 1);
 
@@ -67,8 +69,9 @@ export default class DummyBasketScenario {
             }
         }
 
-        checkout.goToCheckoutInOffCanvas();
+        checkout.goToCheckout();
         checkout.changeBillingCountry('Germany');
+        checkout.changeToMollieShippingMethod();
     }
 
 }

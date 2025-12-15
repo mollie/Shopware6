@@ -14,11 +14,11 @@ export default class AdminProductsAction {
      *
      */
     openProducts() {
-        cy.wait(200);
-        repoMainMenu.getCatalogues().click();
-        cy.wait(1500);
-        repoMainMenu.getProductsOverview().click();
-        cy.wait(2000);
+
+        cy.visit('/admin#/sw/product/index');
+
+        // wait for page to appear
+        cy.contains('h2', 'Products', {timeout: 20000});
     }
 
     /**

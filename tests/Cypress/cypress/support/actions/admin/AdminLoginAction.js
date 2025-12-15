@@ -8,13 +8,27 @@ export default class AdminLoginAction {
         // increase our viewport for admin
         // otherwise we don't see a lot (page height)
         cy.viewport(1920, 1500);
+
+        // cy.session('admin_login', () => {
+
         cy.visit('/admin');
-        cy.wait(4000);
-        cy.get('#sw-field--username').type('admin');
-        cy.get('#sw-field--password,.mt-password-field__input').type('shopware');
+
+        cy.get('#sw-field--username', {timeout: 10000}).type('admin');
+        cy.get('#sw-field--password').type('shopware');
 
         cy.get('.sw-button,.sw-login__submit button').click();
-        cy.wait(4000);
+
+        // make sure we are logged in
+        cy.get('.sw-version__info', {timeout: 10000}).should('be.visible');
+
+        //  }, {
+        //     cacheAcrossSpecs: true,
+        //      validate() {
+        //          cy.visit('/admin#/sw/dashboard/index');
+        //      }
+        //  });
+
+        //   cy.visit('/admin#/sw/dashboard/index');
     }
 
 }

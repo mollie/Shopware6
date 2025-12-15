@@ -14,13 +14,13 @@ export default class AdminPluginAction {
         } else {
             cy.visit('/admin#/sw/plugin/settings/MolliePayments');
         }
-
-        cy.wait(4000);
+        
+        cy.contains('.sw-meteor-page__smart-bar-title', 'Mollie Payments', {timeout: 10000});
     }
 
     savePlugConfiguration() {
         cy.get('.sw-extension-config__save-action').click();
-        cy.wait(4000);
+        cy.wait(3000);
     }
 
 }

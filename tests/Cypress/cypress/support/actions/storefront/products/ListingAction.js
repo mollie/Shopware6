@@ -2,15 +2,7 @@ import ListingRepository from 'Repositories/storefront/products/ListingRepositor
 
 export default class ListingAction {
 
-    /**
-     *
-     */
-    clickOnFirstProduct() {
 
-        const repo = new ListingRepository();
-
-        repo.getFirstProduct().click();
-    }
 
     /**
      *

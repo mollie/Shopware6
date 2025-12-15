@@ -21,7 +21,7 @@ trait ProductFixtureTrait
      * @param array<mixed> $customFields
      * @param EntityRepository<ProductCollection> $repoProducts
      */
-    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, EntityRepository $repoProducts, FixtureUtils $fixtureUtils): void
+    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, $repoProducts, FixtureUtils $fixtureUtils): void
     {
         $this->utils = $fixtureUtils;
 

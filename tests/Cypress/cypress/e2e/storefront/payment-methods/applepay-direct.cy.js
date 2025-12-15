@@ -1,6 +1,5 @@
 import {ApplePaySessionMockFactory} from "Services/applepay/ApplePay.Mock";
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
-import ListingAction from "Actions/storefront/products/ListingAction";
 import Devices from "Services/utils/Devices";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PDPRepository from "Repositories/storefront/products/PDPRepository";
@@ -11,6 +10,8 @@ import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import CartRepository from "Repositories/storefront/checkout/CartRepository";
 import ListingRepository from "Repositories/storefront/products/ListingRepository";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 const storefrontClient = new StorefrontClient();
 
@@ -18,9 +19,9 @@ const devices = new Devices();
 const configAction = new ShopConfigurationAction();
 const applePayFactory = new ApplePaySessionMockFactory();
 const topMenu = new TopMenuAction();
-const listing = new ListingAction();
 const pdp = new PDPAction();
 const checkout = new CheckoutAction();
+const mollieProductsAction = new MollieProductsAction();
 
 const repoPDP = new PDPRepository();
 const repoListing = new ListingRepository();
@@ -31,7 +32,14 @@ const repoCart = new CartRepository();
 function beforeEachUIConfigDisabled() {
     cy.wrap(null).then(() => {
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, false);
+
+        const shopConfig = new ShopConfiguration();
+        const pluginConfig = new PluginConfiguration();
+
+        pluginConfig.setMollieFailureMode(true);
+
+        configAction.configureEnvironment(shopConfig, pluginConfig);
+
         devices.setDevice(devices.getFirstDevice());
     });
 }
@@ -42,7 +50,14 @@ function beforeEachUIConfigDisabled() {
 function beforeEachUIConfigEnabled(shopConfiguration) {
     cy.wrap(null).then(() => {
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, true, shopConfiguration);
+
+        const pluginConfig = new PluginConfiguration();
+
+        pluginConfig.setMollieFailureMode(true);
+        pluginConfig.setApplePayDirectEnabled(true);
+
+        configAction.configureEnvironment(shopConfiguration, pluginConfig);
+
         devices.setDevice(devices.getFirstDevice());
     });
 }
@@ -212,9 +227,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
 
                 repoPDP.getApplePayDirectButton().should('not.exist');
             })
@@ -228,8 +241,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
+                mollieProductsAction.openListingRegularProducts();
 
                 repoListing.getApplePayDirectButton().should('not.exist');
             })
@@ -243,9 +255,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 repoOffcanvas.getApplePayDirectButton().should('not.exist');
@@ -260,9 +270,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 checkout.goToCartInOffCanvas();
@@ -283,9 +291,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
 
                 repoPDP.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
@@ -296,9 +302,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(false);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
 
                 repoPDP.getApplePayDirectButton().should('have.class', 'd-none');
             })
@@ -309,16 +313,14 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
 
                 // click and make sure data privacy is validated
                 repoPDP.getApplePayDirectButton().click();
                 repoPDP.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoPDP.getDataPrivacyCheckbox().check({force:true});
+                repoPDP.getDataPrivacyCheckbox().check({force: true});
             })
 
         })
@@ -331,8 +333,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
+                mollieProductsAction.openListingRegularProducts();
 
                 repoListing.getApplePayDirectButton().should('not.have.class', 'd-none');
             })
@@ -343,8 +344,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(false);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
+                mollieProductsAction.openListingRegularProducts();
 
                 repoListing.getApplePayDirectButton().should('have.class', 'd-none');
             })
@@ -355,15 +355,14 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
+                mollieProductsAction.openListingRegularProducts();
 
                 // click and make sure data privacy is validated
                 repoListing.getApplePayDirectButton().first().click();
                 repoListing.getDataPrivacyCheckbox().first().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoListing.getDataPrivacyCheckbox().first().check({force:true});
+                repoListing.getDataPrivacyCheckbox().first().check({force: true});
             })
 
         })
@@ -377,9 +376,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 repoOffcanvas.getApplePayDirectButton().should('not.have.class', 'd-none');
@@ -391,9 +388,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(false);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 repoOffcanvas.getApplePayDirectButton().should('have.class', 'd-none');
@@ -405,9 +400,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 // click and make sure data privacy is validated
@@ -415,7 +408,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoOffcanvas.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoOffcanvas.getDataPrivacyCheckbox().check({force:true});
+                repoOffcanvas.getDataPrivacyCheckbox().check({force: true});
             })
 
         })
@@ -428,9 +421,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 checkout.goToCartInOffCanvas();
@@ -444,9 +435,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(false);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 checkout.goToCartInOffCanvas();
@@ -460,9 +449,7 @@ describe('Apple Pay Direct - UI Tests', () => {
 
                 applePayFactory.registerApplePay(true);
 
-                cy.visit('/');
-                topMenu.clickOnSecondCategory();
-                listing.clickOnFirstProduct();
+                mollieProductsAction.openRegularProduct();
                 pdp.addToCart(1);
 
                 checkout.goToCartInOffCanvas();
@@ -472,7 +459,7 @@ describe('Apple Pay Direct - UI Tests', () => {
                 repoCart.getDataPrivacyCheckbox().should('have.class', 'is-invalid');
 
                 // now click on checkbox
-                repoCart.getDataPrivacyCheckbox().check({force:true});
+                repoCart.getDataPrivacyCheckbox().check({force: true});
             })
 
         })

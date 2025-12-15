@@ -6,6 +6,8 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 // ------------------------------------------------------
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -30,7 +32,14 @@ context('Active Payment Methods', () => {
             it('C3996: Mollie Payment Methods show TEST MODE @core', () => {
 
                 devices.setDevice(device);
-                configAction.setupShop(true, false, false);
+
+                const shopConfig = new ShopConfiguration();
+                const pluginConfig = new PluginConfiguration();
+
+                pluginConfig.setMollieFailureMode(true);
+
+                configAction.configureEnvironment(shopConfig, pluginConfig);
+
                 session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();
@@ -55,7 +64,14 @@ context('Deprecated Payment Methods', () => {
             it('C38332: ING Home Pay must not exist @core', () => {
 
                 devices.setDevice(device);
-                configAction.setupShop(true, false, false);
+
+                const shopConfig = new ShopConfiguration();
+                const pluginConfig = new PluginConfiguration();
+
+                pluginConfig.setMollieFailureMode(true);
+
+                configAction.configureEnvironment(shopConfig, pluginConfig);
+
                 session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();
@@ -68,7 +84,14 @@ context('Deprecated Payment Methods', () => {
             it('C38333: SEPA Direct Debit must not exist @core', () => {
 
                 devices.setDevice(device);
-                configAction.setupShop(true, false, false);
+
+                const shopConfig = new ShopConfiguration();
+                const pluginConfig = new PluginConfiguration();
+
+                pluginConfig.setMollieFailureMode(true);
+
+                configAction.configureEnvironment(shopConfig, pluginConfig);
+
                 session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();

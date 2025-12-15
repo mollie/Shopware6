@@ -54,6 +54,10 @@ export default class CheckoutAction {
         repoOffCanvas.getCartButton().click({force: true});
     }
 
+    goToCheckout() {
+        cy.visit('/checkout/confirm');
+    }
+
     /**
      *
      */
@@ -109,6 +113,10 @@ export default class CheckoutAction {
      */
     backToShop() {
         cy.get('.header-minimal-back-to-shop > .btn').click();
+    }
+
+    changeToMollieShippingMethod() {
+        cy.contains('Mollie Test Shipment').click();
     }
 
     changeBillingCountry(billingCountry) {

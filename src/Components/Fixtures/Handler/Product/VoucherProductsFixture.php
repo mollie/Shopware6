@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\Fixtures\FixtureUtils;
 use Kiener\MolliePayments\Components\Fixtures\Handler\Product\Traits\ProductFixtureTrait;
 use Kiener\MolliePayments\Components\Fixtures\MollieFixtureHandlerInterface;
 use Shopware\Core\Content\Product\ProductCollection;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class VoucherProductsFixture implements MollieFixtureHandlerInterface
@@ -16,12 +17,12 @@ class VoucherProductsFixture implements MollieFixtureHandlerInterface
     /**
      * @var EntityRepository<ProductCollection>
      */
-    private EntityRepository $repoProducts;
+    private $repoProducts;
 
     /**
      * @param EntityRepository<ProductCollection> $repoProducts
      */
-    public function __construct(FixtureUtils $utils, EntityRepository $repoProducts)
+    public function __construct(FixtureUtils $utils, $repoProducts)
     {
         $this->utils = $utils;
         $this->repoProducts = $repoProducts;
@@ -48,5 +49,17 @@ class VoucherProductsFixture implements MollieFixtureHandlerInterface
         $this->createProduct('4d1eeedd6d22436385580e2ff42431b9', 'Voucher ECO', 'MOL_VOUCHER_1', $category, $description, 19, $image, false, $customFieldsEco, $this->repoProducts, $this->utils);
         $this->createProduct('5d1eeedd6d22436385580e2ff42431b9', 'Voucher MEAL', 'MOL_VOUCHER_2', $category, $description, 19, 'champagne.png', false, $customFieldsMeal, $this->repoProducts, $this->utils);
         $this->createProduct('6d1eeedd6d22436385580e2ff42431b9', 'Voucher GIFT', 'MOL_VOUCHER_3', $category, $description, 19, $image, false, $customFieldsGift, $this->repoProducts, $this->utils);
+    }
+
+    public function uninstall(): void
+    {
+        $this->repoProducts->delete(
+            [
+                ['id' => '4d1eeedd6d22436385580e2ff42431b9'],
+                ['id' => '5d1eeedd6d22436385580e2ff42431b9'],
+                ['id' => '6d1eeedd6d22436385580e2ff42431b9']
+            ],
+            Context::createDefaultContext()
+        );
     }
 }

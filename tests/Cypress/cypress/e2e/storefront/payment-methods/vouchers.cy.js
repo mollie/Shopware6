@@ -13,6 +13,12 @@ import ProductDetailRepository from "Repositories/admin/products/ProductDetailRe
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import DummyUserScenario from "Scenarios/DummyUserScenario";
+import ListingAction from "Actions/storefront/products/ListingAction";
+import PDPAction from "Actions/storefront/products/PDPAction";
+import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -30,13 +36,16 @@ const adminProducts = new AdminProductsAction();
 
 const payment = new PaymentAction();
 
+const listingAction = new ListingAction();
+const pdpAction = new PDPAction();
+const mollieProductsAction = new MollieProductsAction();
 
 const repoProductDetailsAdmin = new ProductDetailRepository();
 
 
 const testDevices = [devices.getFirstDevice()];
 const scenarioDummyBasket = new DummyBasketScenario(1);
-
+const scenarioDummyUser = new DummyUserScenario();
 
 let beforeAllCalled = false;
 
@@ -44,8 +53,10 @@ function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
             devices.setDevice(devices.getFirstDevice());
-            configAction.setupShop(false, false, false);
-            configAction.updateProducts('', false, 0, '');
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
             beforeAllCalled = true;
         }
         devices.setDevice(device);
@@ -85,13 +96,14 @@ describe('Voucher Payments', () => {
                     return;
                 }
 
-                configAction.updateProducts('', false, '', '');
-
-                scenarioDummyBasket.execute();
+                scenarioDummyUser.execute();
+                mollieProductsAction.openRegularProduct();
+                pdpAction.addToCart(1);
+                checkout.goToCheckout();
 
                 paymentAction.showPaymentMethods();
 
-                cy.contains('.checkout-container', 'Voucher').should('not.exist');
+                cy.contains('.confirm-payment-shipping', 'Voucher').should('not.exist');
 
                 // now also check the edit order page
                 payment.switchPaymentMethod('PayPal');
@@ -104,14 +116,17 @@ describe('Voucher Payments', () => {
 
                 paymentAction.showPaymentMethods();
 
-                cy.contains('.checkout-container', 'Voucher').should('not.exist');
+                cy.contains('.confirm-payment-shipping', 'Voucher').should('not.exist');
             })
 
             it('C4136: Voucher available for ECO products', () => {
 
                 beforeEach(device);
 
-                configAction.updateProducts('eco', false, '', '');
+                scenarioDummyUser.execute();
+                mollieProductsAction.openEcoProduct();
+                pdpAction.addToCart(1);
+
                 testVoucherPayment();
             })
 
@@ -119,7 +134,10 @@ describe('Voucher Payments', () => {
 
                 beforeEach(device);
 
-                configAction.updateProducts('meal', false, '', '');
+                scenarioDummyUser.execute();
+                mollieProductsAction.openMealProduct();
+                pdpAction.addToCart(1);
+
                 testVoucherPayment();
             })
 
@@ -127,7 +145,10 @@ describe('Voucher Payments', () => {
 
                 beforeEach(device);
 
-                configAction.updateProducts('gift', false, '', '');
+                scenarioDummyUser.execute();
+                mollieProductsAction.openGiftProduct();
+                pdpAction.addToCart(1);
+
                 testVoucherPayment();
             })
 
@@ -136,11 +157,9 @@ describe('Voucher Payments', () => {
 })
 
 
-/**
- *
- */
 function testVoucherPayment() {
-    scenarioDummyBasket.execute();
+
+    checkout.goToCheckout();
 
     paymentAction.switchPaymentMethod('Voucher');
 
