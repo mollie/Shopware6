@@ -19,6 +19,7 @@ final class FakeSettingsService extends AbstractSettingsService
     public function __construct(private ?LoggerSettings $loggerSettings = null,
         private ?PaymentSettings $paymentSettings = null,
         private ?ApiSettings $apiSettings = null,
+        private ?string $profileId = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -27,7 +28,8 @@ final class FakeSettingsService extends AbstractSettingsService
             $this->paymentSettings = new PaymentSettings('',0);
         }
         if ($this->apiSettings === null) {
-            $this->apiSettings = new ApiSettings('test_key', 'live_key', Mode::TEST,'');
+            $profileId = $this->profileId ?? '';
+            $this->apiSettings = new ApiSettings('test_key', 'live_key', Mode::TEST, $profileId);
         }
     }
 
