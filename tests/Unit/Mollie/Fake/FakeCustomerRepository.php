@@ -26,6 +26,7 @@ final class FakeCustomerRepository
         $orderCustomer->setFirstName('Tester');
         $orderCustomer->setLastName('Test');
         $orderCustomer->setGuest(false);
+        $orderCustomer->setId('test-customer-id');
 
         return $orderCustomer;
     }
