@@ -3,6 +3,7 @@
 - Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.
 - Fixed: Shipping methods were shown in Apple Pay Express even for countries where shipping was disabled in the administration.
 - Removed: Removed dependency for the Basecom Fixture plugin and built our own fixture framework.
+- Fixed: MolliePaymentMethodAvailabilityRemover to consider carts with price 0 to avoid getting all the payment methods removed.
 – Compatibility with Click & Collect plugin
 
 # 4.20.1
