@@ -40,5 +40,8 @@
         {% sw_include '@MolliePayments/storefront/component/payment/component/pos-fields.html.twig' %}
     {% elseif payment.translated.customFields.mollie_payment_method_name in ['bancomatpay', 'bizum'] %}
         {% sw_include '@MolliePayments/storefront/component/payment/component/phone-fields.html.twig' %}
+    {% elseif payment.technicalName == 'payment_mollie_paypalexpress' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/ppe-fields.html.twig' %}
     {% endif %}
+
 {% endblock %}

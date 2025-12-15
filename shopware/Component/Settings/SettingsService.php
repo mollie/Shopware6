@@ -25,22 +25,48 @@ final class SettingsService extends AbstractSettingsService
      * @var array<string, ApiSettings|LoggerSettings|mixed|PaymentSettings>
      */
     private array $settingsCache = [];
+    private bool $devMode = false;
+    private bool $cypressMode = false;
+    private bool $paypalExpressEnabled = false;
+    private int $paypalExpressStyle = 1;
+    private int $paypalExpressShape = 1;
+    private string $paypalExpressRestrictions = '';
 
     public function __construct(
         private SystemConfigService $systemConfigService,
-        #[Autowire('%env(bool:default:false:MOLLIE_DEV_MODE)')]
-        private bool $devMode = false,
-        #[Autowire('%env(bool:default:false:MOLLIE_CYPRESS_MODE)')]
-        private bool $cypressMode = false,
-        #[Autowire('%env(bool:default:false:MOLLIE_PAYPAL_EXPRESS_BETA)')]
-        private bool $paypalExpressEanbled = false,
-        #[Autowire('%env(int:default:1:MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE)')]
-        private string $paypalExpressStyle = '1',
-        #[Autowire('%env(int:default:1MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE)')]
-        private string $paypalExpressShape = '1',
-        #[Autowire('%env(string:default:"":MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS)')]
-        private string $paypalExpressRestrictions = ''
+        #[Autowire(env: 'default::MOLLIE_DEV_MODE')]
+        ?int $devMode = 0,
+        #[Autowire(env: 'default::MOLLIE_CYPRESS_MODE')]
+        ?int $cypressMode = 0,
+        #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BETA')]
+        ?int $paypalExpressEnabled = 0,
+        #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_STYLE')]
+        ?string $paypalExpressStyle = '1',
+        #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE')]
+        ?string $paypalExpressShape = '1',
+        #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS')]
+        ?string $paypalExpressRestrictions = ''
     ) {
+        if ($devMode !== null) {
+            $this->devMode = (bool) $devMode;
+        }
+
+        if ($cypressMode !== null) {
+            $this->cypressMode = (bool) $cypressMode;
+        }
+
+        if ($paypalExpressEnabled !== null) {
+            $this->paypalExpressEnabled = (bool) $paypalExpressEnabled;
+            if ($paypalExpressShape !== null) {
+                $this->paypalExpressShape = (int) $paypalExpressShape;
+            }
+            if ($paypalExpressStyle !== null) {
+                $this->paypalExpressStyle = (int) $paypalExpressStyle;
+            }
+            if ($paypalExpressRestrictions !== null) {
+                $this->paypalExpressRestrictions = $paypalExpressRestrictions;
+            }
+        }
     }
 
     public function getDecorated(): AbstractSettingsService
@@ -63,13 +89,26 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
-    public function getPaypalExpressSettings(?string $salesChannelid = null): PayPalExpressSettings
+    public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings
     {
-        $settings = new PayPalExpressSettings($this->paypalExpressEanbled);
-        $settings->setStyle((int) $this->paypalExpressStyle);
-        $settings->setShape((int) $this->paypalExpressShape);
+        $cacheKey = PayPalExpressSettings::class . '_' . ($salesChannelId ?? 'all');
 
-        $settings->setRestrictions(explode(' ', trim($this->paypalExpressRestrictions)));
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+        $fallbackRestrictions = explode(' ', trim($this->paypalExpressRestrictions));
+        $style = $shopwareSettings[PayPalExpressSettings::KEY_BUTTON_STYLE] ?? $this->paypalExpressStyle;
+        $shape = $shopwareSettings[PayPalExpressSettings::KEY_BUTTON_SHAPE] ?? $this->paypalExpressShape;
+        $restrictions = $shopwareSettings[PayPalExpressSettings::KEY_RESTRICTIONS] ?? $fallbackRestrictions;
+        $settings = new PayPalExpressSettings($this->paypalExpressEnabled);
+
+        $settings->setStyle((int) $style);
+        $settings->setShape((int) $shape);
+
+        $settings->setRestrictions($restrictions);
+
+        $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;
     }

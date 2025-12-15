@@ -30,8 +30,8 @@ final class ApiSettingsTest extends TestCase
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_LIVE_API_KEY, 'live_key');
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_TEST_API_KEY, 'test_key');
 
-        $devMode = (bool) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', false);
-        $cypressMode = (bool) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', false);
+        $devMode = (int) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', 0);
+        $cypressMode = (int) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', 0);
         $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
         $apiSettings = $settingsService->getApiSettings();
 
