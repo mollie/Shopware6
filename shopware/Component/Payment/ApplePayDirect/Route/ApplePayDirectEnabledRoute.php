@@ -11,8 +11,10 @@ use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class ApplePayDirectEnabledRoute extends AbstractApplePayDirectEnabledRoute
 {
