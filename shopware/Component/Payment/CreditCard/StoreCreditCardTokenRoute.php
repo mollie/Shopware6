@@ -6,8 +6,10 @@ namespace Mollie\Shopware\Component\Payment\CreditCard;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class StoreCreditCardTokenRoute
 {

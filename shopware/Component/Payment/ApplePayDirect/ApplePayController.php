@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetApplePayId
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetShippingMethodsRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractPayRoute;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractSetShippingCountryRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractSetShippingMethodRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\ApplePayDirectEnabledRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\CreateSessionRoute;
@@ -17,7 +16,6 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetApplePayIdRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetShippingMethodsRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\PayRoute;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\SetShippingCountryRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\SetShippingMethodRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -36,8 +34,6 @@ final class ApplePayController extends StorefrontController
         private AbstractCreateSessionRoute $createSessionRoute,
         #[Autowire(service: GetCartRoute::class)]
         private AbstractGetCartRoute $getCartRoute,
-        #[Autowire(service: SetShippingCountryRoute::class)]
-        private AbstractSetShippingCountryRoute $setShippingCountryRoute,
         #[Autowire(service: GetShippingMethodsRoute::class)]
         private AbstractGetShippingMethodsRoute $getShippingMethodsRoute,
         #[Autowire(service: SetShippingMethodRoute::class)]
@@ -77,22 +73,26 @@ final class ApplePayController extends StorefrontController
         $success = false;
         $cart = [];
         $shippingMethods = [];
+        $error = '';
         try {
-            $setShippingCountryResponse = $this->setShippingCountryRoute->setCountry($request, $salesChannelContext);
-            $salesChannelContext = $setShippingCountryResponse->getSalesChannelContext();
             $cartResponse = $this->getCartRoute->cart($request, $salesChannelContext);
-            $shippingMethodsResponse = $this->getShippingMethodsRoute->methods($request, $cartResponse->getShopwareCart(), $salesChannelContext);
+            $shippingMethodsResponse = $this->getShippingMethodsRoute->methods($request, $salesChannelContext);
 
             $cart = $cartResponse->getCart();
             $shippingMethods = $shippingMethodsResponse->getShippingMethods();
             $success = true;
         } catch (\Throwable $exception) {
+            $error = $exception->getMessage();
         }
 
         return new JsonResponse([
             'success' => $success,
-            'cart' => $cart,
             'shippingmethods' => $shippingMethods,
+            'data' => [
+                'cart' => $cart,
+                'error' => $error,
+                'success' => $success,
+            ]
         ]);
     }
 
@@ -101,6 +101,7 @@ final class ApplePayController extends StorefrontController
     {
         $cart = [];
         $success = false;
+        $error = '';
         try {
             $setShippingMethodResponse = $this->setShippingMethodRoute->setShipping($request, $salesChannelContext);
             $salesChannelContext = $setShippingMethodResponse->getSalesChannelContext();
@@ -108,11 +109,15 @@ final class ApplePayController extends StorefrontController
             $cart = $cartResponse->getCart();
             $success = true;
         } catch (\Throwable $exception) {
+            $error = $exception->getMessage();
         }
 
         return new JsonResponse([
-            'success' => $success,
-            'cart' => $cart,
+            'data' => [
+                'success' => $success,
+                'cart' => $cart,
+                'error' => $error,
+            ]
         ]);
     }
 
