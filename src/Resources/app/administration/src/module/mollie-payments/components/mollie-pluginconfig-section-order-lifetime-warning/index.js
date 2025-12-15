@@ -3,6 +3,7 @@ import OrderLifeTimeLimitsDetectorService from './services/OderLifeTimeLimitDete
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
+import './mollie-pluginconfig-section-order-lifetime-warning.scss';
 
 Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
     template,
@@ -27,7 +28,7 @@ Component.register('mollie-pluginconfig-section-order-lifetime-warning', {
              */
             const interval = setInterval(() => {
                 const orderLifeTimeElement = document.querySelector(
-                    'input[name="MolliePayments.config.orderLifetimeDays"]',
+                    'input[name="MolliePayments.config.orderLifetimeDays"],[class*="mollie-payments-config-order-lifetime-days"] input',
                 );
 
                 if (orderLifeTimeElement === null) {

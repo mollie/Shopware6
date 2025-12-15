@@ -99,7 +99,8 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            const inputPrefix = '#MolliePayments\\.config\\.formatOrderNumber';
+            const inputPrefix ='[class*="mollie-payments-config-format-order-number"] input';
+
             const divPreview = '.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments-format';
 
             cy.get(inputPrefix).click().clear();
@@ -123,7 +124,7 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            const inputField = '#MolliePayments\\.config\\.orderLifetimeDays';
+            const inputField = '[class*="mollie-payments-config-order-lifetime-days"] input'
             const errorDiv = '.bankTransferDueDateLimitReached';
             const klarnaWarningDiv = '.bankTransferDueDateKlarnaLimitReached';
 

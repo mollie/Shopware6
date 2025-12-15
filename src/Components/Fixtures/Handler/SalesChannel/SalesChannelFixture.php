@@ -1,32 +1,31 @@
 <?php
+declare(strict_types=1);
 
-namespace MolliePayments\Fixtures\SalesChannel;
+namespace Kiener\MolliePayments\Components\Fixtures\Handler\SalesChannel;
 
-use Basecom\FixturePlugin\Fixture;
-use Basecom\FixturePlugin\FixtureBag;
-use Kiener\MolliePayments\Repository\SalesChannel\SalesChannelRepositoryInterface;
+use Kiener\MolliePayments\Components\Fixtures\MollieFixtureHandlerInterface;
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 
-class SalesChannelFixture extends Fixture
+class SalesChannelFixture implements MollieFixtureHandlerInterface
 {
     /**
-     * @var EntityRepository
+     * @var EntityRepository<SalesChannelCollection>
      */
-    private $repoSalesChannels;
+    private EntityRepository $repoSalesChannels;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository<PaymentMethodCollection>
      */
-    private $repoPaymentMethods;
-
+    private EntityRepository $repoPaymentMethods;
 
     /**
-     * @param EntityRepository $repoSalesChannels
-     * @param EntityRepository $repoPaymentMethods
+     * @param EntityRepository<SalesChannelCollection> $repoSalesChannels
+     * @param EntityRepository<PaymentMethodCollection> $repoPaymentMethods
      */
     public function __construct(EntityRepository $repoSalesChannels, EntityRepository $repoPaymentMethods)
     {
@@ -34,39 +33,18 @@ class SalesChannelFixture extends Fixture
         $this->repoPaymentMethods = $repoPaymentMethods;
     }
 
-
-    /**
-     * @return string[]
-     */
-    public function groups(): array
-    {
-        return [
-            'mollie',
-            'mollie-setup',
-        ];
-    }
-
-    /**
-     * @param FixtureBag $bag
-     * @return void
-     */
-    public function load(): void
+    public function install(): void
     {
         $ctx = Context::createDefaultContext();
 
-        # first delete all existing configurations
-        # of the specific sales channels
+        // first delete all existing configurations
+        // of the specific sales channels
         $salesChannelIds = $this->repoSalesChannels->searchIds(new Criteria(), $ctx)->getIds();
 
         $this->activatePaymentMethods($ctx);
         $this->assignPaymentMethods($salesChannelIds, $ctx);
     }
 
-    /**
-     * @param array<mixed> $salesChannelIds
-     * @param Context $ctx
-     * @return void
-     */
     private function activatePaymentMethods(Context $ctx): void
     {
         $paymentUpdates = [];
@@ -90,8 +68,6 @@ class SalesChannelFixture extends Fixture
 
     /**
      * @param array<mixed> $salesChannelIds
-     * @param Context $ctx
-     * @return void
      */
     private function assignPaymentMethods(array $salesChannelIds, Context $ctx): void
     {
@@ -99,7 +75,6 @@ class SalesChannelFixture extends Fixture
         $molliePaymentMethodIdsPrepared = [];
 
         $molliePaymentMethodIds = $this->repoPaymentMethods->searchIds(new Criteria(), $ctx)->getIds();
-
 
         foreach ($molliePaymentMethodIds as $id) {
             $molliePaymentMethodIdsPrepared[] = [

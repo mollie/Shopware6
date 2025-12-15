@@ -6,52 +6,69 @@
 
     <services>
 
-        <service id="MolliePayments\Fixtures\SalesChannel\SalesChannelFixture">
+        <service id="Kiener\MolliePayments\Components\Fixtures\FixturesInstaller">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\SalesChannel\SalesChannelFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\SubscriptionProductsFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\VoucherProductsFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\RoundingProductsFixture"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture">
+            <argument type="service" id="category.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\SalesChannel\SalesChannelFixture">
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="payment_method.repository"/>
-            <tag name="basecom.fixture"/>
         </service>
 
-        <service id="MolliePayments\Fixtures\Category\CategoryFixture">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
-            <argument type="service" id="category.repository"/>
-            <tag name="basecom.fixture"/>
-        </service>
-
-        <service id="MolliePayments\Fixtures\Customer\CustomerFixture">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
-            <argument type="service" id="customer.repository"/>
-            <tag name="basecom.fixture"/>
-        </service>
-
-        <service id="MolliePayments\Fixtures\Product\SubscriptionFixture">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\SubscriptionProductsFixture">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
             <argument type="service" id="product.repository"/>
-            <tag name="basecom.fixture"/>
         </service>
 
-        <service id="MolliePayments\Fixtures\Product\VoucherFixture">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\VoucherProductsFixture">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
             <argument type="service" id="product.repository"/>
-            <tag name="basecom.fixture"/>
         </service>
 
-        <service id="MolliePayments\Fixtures\Product\FailureProducts">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
             <argument type="service" id="product.repository"/>
-            <tag name="basecom.fixture"/>
         </service>
 
-        <service id="MolliePayments\Fixtures\Product\RoundingProducts">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
             <argument type="service" id="product.repository"/>
-            <tag name="basecom.fixture"/>
         </service>
 
-        <service id="MolliePayments\Fixtures\Product\CheapProducts">
-            <argument type="service" id="Basecom\FixturePlugin\FixtureHelper"/>
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\RoundingProductsFixture">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
             <argument type="service" id="product.repository"/>
-            <tag name="basecom.fixture"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils">
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\MediaUtils"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\TaxUtils"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\SalesChannelUtils"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Utils\MediaUtils">
+            <argument type="service" id="media.repository"/>
+            <argument type="service" id="media_folder.repository"/>
+            <argument type="service" id="Shopware\Core\Content\Media\File\FileSaver"/>
+            <argument type="service" id="Shopware\Core\Content\Media\File\FileFetcher"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Utils\TaxUtils">
+            <argument type="service" id="tax.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Utils\SalesChannelUtils">
+            <argument type="service" id="sales_channel.repository"/>
         </service>
 
     </services>
