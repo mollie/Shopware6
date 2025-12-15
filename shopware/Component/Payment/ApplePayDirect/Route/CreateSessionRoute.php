@@ -15,8 +15,10 @@ use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelD
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class CreateSessionRoute extends AbstractCreateSessionRoute
 {
