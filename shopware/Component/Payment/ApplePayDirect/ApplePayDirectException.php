@@ -34,7 +34,7 @@ final class ApplePayDirectException extends HttpException
     public static function validationUrlNotFound(): self
     {
         return new self(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
             self::INVALID_VALIDATION_URL,
             'Please provide a validation url'
         );
@@ -54,7 +54,7 @@ final class ApplePayDirectException extends HttpException
     public static function missingShippingMethodIdentifier(): self
     {
         return new self(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
             self::MISSING_SHIPPING_METHOD,
             'Missing shipping method identifier',
         );
@@ -63,16 +63,16 @@ final class ApplePayDirectException extends HttpException
     public static function paymentTokenNotFound(): self
     {
         return new self(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
             self::PAYMENT_TOKEN_NOT_FOUND,
-            'Payment token not found',
+            '"paymentToken" not set in request body',
         );
     }
 
     public static function paymentDisabled(): self
     {
         return new self(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
             self::PAYMENT_DISABLED,
             'Applepay Direct payment is disabled',
         );
@@ -121,6 +121,15 @@ final class ApplePayDirectException extends HttpException
                 'orderId' => $orderId,
             ],
             $exception
+        );
+    }
+
+    public static function countryCodeEmpty(): self
+    {
+        return new self(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::ORDER_ACTION_FAILED,
+            'No Country Code provided',
         );
     }
 }
