@@ -53,7 +53,7 @@ class SettingsService implements PluginSettingsServiceInterface
      * @var string
      */
     private $envCypressMode;
-    private PayPalExpressConfig $payPalExpressConfig;
+
 
     /**
      * @var array<string,MollieSettingStruct>
@@ -63,7 +63,7 @@ class SettingsService implements PluginSettingsServiceInterface
     /**
      * @param EntityRepository<EntityCollection<SalesChannelEntity>> $repoSalesChannels
      */
-    public function __construct(SystemConfigService $systemConfigService, $repoSalesChannels, PayPalExpressConfig $payPalExpressConfig, ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
+    public function __construct(SystemConfigService $systemConfigService, $repoSalesChannels,  ?string $envShopDomain, ?string $envDevMode, ?string $envCypressMode)
     {
         $this->systemConfigService = $systemConfigService;
         $this->repoSalesChannels = $repoSalesChannels;
@@ -71,7 +71,7 @@ class SettingsService implements PluginSettingsServiceInterface
         $this->envShopDomain = (string) $envShopDomain;
         $this->envDevMode = (string) $envDevMode;
         $this->envCypressMode = (string) $envCypressMode;
-        $this->payPalExpressConfig = $payPalExpressConfig;
+
     }
 
     /**
@@ -112,10 +112,6 @@ class SettingsService implements PluginSettingsServiceInterface
             $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
         }
 
-        /**
-         * TODO: remove this when we move to config
-         */
-        $structData = $this->payPalExpressConfig->assign($structData);
 
         $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
 
