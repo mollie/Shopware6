@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
-use Mollie\Shopware\Component\Account\AbstractAccountService;
-use Mollie\Shopware\Component\Account\AccountService;
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractAccountService;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AccountService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;

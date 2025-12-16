@@ -23,14 +23,15 @@ final class CleanUpLoggerScheduledTaskHandler extends ScheduledTaskHandler
      */
     public function __construct(
         #[Autowire(service: 'scheduled_task.repository')]
-        EntityRepository $scheduledTaskRepository,
+        EntityRepository                $scheduledTaskRepository,
         #[Autowire(value: '%kernel.logs_dir%')]
-        private string $logDir,
+        private string                  $logDir,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger
-    ) {
+        private LoggerInterface         $logger
+    )
+    {
         parent::__construct($scheduledTaskRepository, $logger);
     }
 
@@ -38,9 +39,12 @@ final class CleanUpLoggerScheduledTaskHandler extends ScheduledTaskHandler
     {
         $loggerSettings = $this->settingsService->getLoggerSettings();
         $logFileDays = $loggerSettings->getLogFileDays();
-
+        $mollieLogDir = $this->logDir . '/mollie';
+        if (!is_dir($mollieLogDir)) {
+            return;
+        }
         try {
-            $mollieLogDir = $this->logDir . '/mollie';
+
             $daysToKeep = $logFileDays;
             $cutoffTime = time() - ($daysToKeep * 24 * 60 * 60);
 
@@ -58,13 +62,13 @@ final class CleanUpLoggerScheduledTaskHandler extends ScheduledTaskHandler
                     break;
                 }
 
-                if (! str_starts_with($file, 'order-') || ! str_ends_with($file, '.log')) {
+                if (!str_starts_with($file, 'order-') || !str_ends_with($file, '.log')) {
                     continue;
                 }
 
                 $logFile = $mollieLogDir . '/' . $file;
 
-                if (! is_file($logFile)) {
+                if (!is_file($logFile)) {
                     continue;
                 }
 

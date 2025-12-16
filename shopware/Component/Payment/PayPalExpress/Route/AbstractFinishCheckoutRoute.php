@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\PayPalExpress;
+namespace Mollie\Shopware\Component\Payment\PayPalExpress\Route;
 
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
