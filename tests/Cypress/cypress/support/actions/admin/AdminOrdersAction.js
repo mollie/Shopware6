@@ -29,7 +29,7 @@ export default class AdminOrdersAction {
         repoOrdersList.getLatestOrderNumber().trigger('click');
 
         // wait for info panel on order detail page
-        cy.contains('h3', 'Info', {timeout: 20000});
+        cy.contains( 'Info', {timeout: 20000});
     }
 
 
