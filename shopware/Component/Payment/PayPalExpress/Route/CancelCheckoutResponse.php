@@ -6,6 +6,9 @@ namespace Mollie\Shopware\Component\Payment\PayPalExpress\Route;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
+/**
+ * @extends StoreApiResponse<ArrayStruct>
+ */
 final class CancelCheckoutResponse extends StoreApiResponse
 {
     public function __construct(private string $sessionId)
