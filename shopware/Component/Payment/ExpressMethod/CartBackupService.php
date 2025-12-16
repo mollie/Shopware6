@@ -22,8 +22,8 @@ final class CartBackupService extends AbstractCartBackupService
     private array $existingBackups = [];
 
     public function __construct(private CartService $cartService,
-                                #[Autowire(service: CartPersister::class)]
-                                private AbstractCartPersister $cartPersister)
+        #[Autowire(service: CartPersister::class)]
+        private AbstractCartPersister $cartPersister)
     {
     }
 

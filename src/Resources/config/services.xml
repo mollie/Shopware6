@@ -131,10 +131,6 @@
             <argument type="service" id="order_transaction.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService"  public="true">
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
@@ -169,7 +165,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\MandatesSubscriber">
+        <service id="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
 
