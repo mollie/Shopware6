@@ -15,6 +15,16 @@
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\RoundingProductsFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Customer\CustomerFixture"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Customer\CustomerFixture">
+            <argument type="service" id="customer.repository"/>
+            <argument type="service" id="customer_group.repository"/>
+            <argument type="service" id="salutation.repository"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="payment_method.repository"/>
+            <argument type="service" id="country.repository"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture">

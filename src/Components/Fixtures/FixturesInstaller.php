@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Fixtures;
 
 use Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture;
+use Kiener\MolliePayments\Components\Fixtures\Handler\Customer\CustomerFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\PaymentMethod\PaymentMethodsFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture;
@@ -22,6 +23,7 @@ class FixturesInstaller
     private CheapProductsFixture $cheapProducts;
     private FailureProductsFixture $failureProducts;
     private RoundingProductsFixture $roundingProducts;
+    private CustomerFixture $customerFixture;
 
     public function __construct(
         CategoryFixture $categoryFixture,
@@ -31,7 +33,8 @@ class FixturesInstaller
         VoucherProductsFixture $voucherFixture,
         CheapProductsFixture $cheapProducts,
         FailureProductsFixture $failureProducts,
-        RoundingProductsFixture $roundingProducts
+        RoundingProductsFixture $roundingProducts,
+        CustomerFixture $customerFixture
     ) {
         $this->categoryFixture = $categoryFixture;
         $this->salesChannelFixture = $salesChannelFixture;
@@ -41,6 +44,7 @@ class FixturesInstaller
         $this->cheapProducts = $cheapProducts;
         $this->failureProducts = $failureProducts;
         $this->roundingProducts = $roundingProducts;
+        $this->customerFixture = $customerFixture;
     }
 
     public function install(bool $onlySetupMode, bool $onlyDemoData): void
@@ -68,6 +72,7 @@ class FixturesInstaller
         $this->shipmentFixture->uninstall();
         $this->categoryFixture->uninstall();
 
+        $this->customerFixture->uninstall();
         $this->cheapProducts->uninstall();
         $this->failureProducts->uninstall();
         $this->roundingProducts->uninstall();
@@ -82,6 +87,9 @@ class FixturesInstaller
 
     private function installDemoData(): void
     {
+        // ------------------------------------------
+        // customers
+        $this->customerFixture->install();
         // ------------------------------------------
         // categories
         $this->categoryFixture->install();
