@@ -5,22 +5,15 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
-use Mollie\Shopware\Component\Payment\Action\Finalize;
-use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 final class FakeRecurringAwarePaymentHandler extends AbstractMolliePaymentHandler implements RecurringAwareInterface
 {
     public function __construct(
-        Pay $pay,
-        Finalize $finalize,
-        LoggerInterface $logger,
     ) {
-        parent::__construct($pay, $finalize, $logger);
     }
 
     public function getPaymentMethod(): PaymentMethod
