@@ -12,7 +12,7 @@ use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 final class Address implements \JsonSerializable
 {
     use JsonSerializableTrait;
-
+    public const CUSTOM_FIELDS_KEY = 'express_address_id';
     private string $title;
     private string $givenName;
     private string $familyName;
@@ -48,13 +48,13 @@ final class Address implements \JsonSerializable
             throw new MissingCountryException();
         }
         $address = new self($customer->getEmail(),
-            (string) $salutation->getDisplayName(),
+            (string)$salutation->getDisplayName(),
             $orderAddress->getFirstName(),
             $orderAddress->getLastName(),
             $orderAddress->getStreet(),
-            (string) $orderAddress->getZipcode(),
+            (string)$orderAddress->getZipcode(),
             $orderAddress->getCity(),
-            (string) $country->getIso()
+            (string)$country->getIso()
         );
 
         if ($orderAddress->getPhoneNumber() !== null) {
@@ -186,5 +186,26 @@ final class Address implements \JsonSerializable
     public function getCountry(): string
     {
         return $this->country;
+    }
+
+    public function getId(): string
+    {
+        $keys = [
+            $this->givenName,
+            $this->familyName,
+            $this->email,
+            $this->streetAndNumber,
+            $this->streetAdditional,
+            $this->postalCode,
+            $this->city,
+            $this->country
+        ];
+        if (mb_strlen($this->organizationName) > 0) {
+            $keys[] = $this->organizationName;
+        }
+        if (mb_strlen($this->phone) > 0) {
+            $keys[] = $this->phone;
+        }
+        return md5(implode('-', $keys));
     }
 }
