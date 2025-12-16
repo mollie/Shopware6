@@ -17,13 +17,14 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
 use Mollie\Api\Endpoints\WalletEndpoint;
 use Mollie\Api\MollieApiClient;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractCartBackupService;
+use Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService;
 use MolliePayments\Shopware\Tests\Fakes\FakeCartService;
 use MolliePayments\Shopware\Tests\Traits\MockTrait;
 use PHPUnit\Framework\TestCase;
@@ -92,7 +93,7 @@ class ApplePayDirectTest extends TestCase
         $repoPaymentMethods = new PaymentMethodRepository($this->createDummyMock(EntityRepository::class, $this));
 
         /** @var CartBackupService $cartBackupService */
-        $cartBackupService = $this->createDummyMock(CartBackupService::class, $this);
+        $cartBackupService = $this->createDummyMock(AbstractCartBackupService::class, $this);
 
         /* @var MollieApiFactory $apiFactory */
         $this->apiFactory = $this->createDummyMock(MollieApiFactory::class, $this);

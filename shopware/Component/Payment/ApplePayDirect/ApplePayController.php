@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetApplePayId
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractGetShippingMethodsRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractPayRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractRestoreCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\AbstractSetShippingMethodRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\ApplePayDirectEnabledRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\CreateSessionRoute;
@@ -16,6 +17,7 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetApplePayIdRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetShippingMethodsRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\PayRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\RestoreCartRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\SetShippingMethodRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -44,6 +46,8 @@ final class ApplePayController extends StorefrontController
         private AbstractGetApplePayIdRoute $getApplePayIdRoute,
         #[Autowire(service: ApplePayDirectEnabledRoute::class)]
         private AbstractApplePayDirectEnabledRoute $applePayDirectEnabledRoute,
+        #[Autowire(service: RestoreCartRoute::class)]
+        private AbstractRestoreCartRoute $restoreCartRoute,
     ) {
     }
 
@@ -175,6 +179,21 @@ final class ApplePayController extends StorefrontController
 
         return new JsonResponse([
             'available' => $available,
+        ]);
+    }
+
+    #[Route(name: 'frontend.mollie.apple-pay.restore-cart', path: '/mollie/apple-pay/restore-cart', methods: ['POST'], options: ['seo' => false])]
+    public function restoreCart(SalesChannelContext $salesChannelContext): Response
+    {
+        $success = false;
+        try {
+            $response = $this->restoreCartRoute->restore($salesChannelContext);
+            $success = $response->isSuccessful();
+        } catch (\Throwable $exception) {
+        }
+
+        return new JsonResponse([
+            'success' => $success,
         ]);
     }
 }

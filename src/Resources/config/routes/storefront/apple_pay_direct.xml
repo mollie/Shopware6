@@ -14,11 +14,6 @@
         <option key="seo">false</option>
     </route>
 
-    <route id="frontend.mollie.apple-pay.restore-cart" path="/mollie/apple-pay/restore-cart" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase::restoreCart</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-        <default key="csrf_protected"><bool>false</bool></default>
-        <option key="seo">false</option>
-    </route>
+
 
 </routes>
