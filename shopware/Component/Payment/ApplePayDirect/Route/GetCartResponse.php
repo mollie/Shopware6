@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
-use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayCart;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayCart;
 use Shopware\Core\Checkout\Cart\Cart as ShopwareCart;
 use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
