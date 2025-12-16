@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Account;
+namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
