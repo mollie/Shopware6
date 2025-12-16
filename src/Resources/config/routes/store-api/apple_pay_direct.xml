@@ -20,11 +20,5 @@
 
 
 
-    <route id="store-api.mollie.apple-pay.restore-cart"
-           path="/store-api/mollie/applepay/restore-cart"
-           methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectControllerBase::restoreCart</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-    </route>
 
 </routes>
