@@ -1,35 +1,29 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Checkout\Cart;
+namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
-use Kiener\MolliePayments\Service\CartService;
-use Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService;
-use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
-use Psr\Container\ContainerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartItemAddRoute;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartItemAddRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartResponse;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 
+#[AsDecorator(AbstractCartItemAddRoute::class)]
 class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
 {
-    /**
-     * @var AbstractCartItemAddRoute
-     */
-    private $cartItemAddRoute;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(AbstractCartItemAddRoute $cartItemAddRoute, ContainerInterface $container)
+    public function __construct(
+        #[Autowire(service: CartItemAddRoute::class)]
+        private AbstractCartItemAddRoute $cartItemAddRoute,
+        #[Autowire(service: CartBackupService::class)]
+        private AbstractCartBackupService $cartBackupService,
+        private CartService $cartService)
     {
-        $this->cartItemAddRoute = $cartItemAddRoute;
-        $this->container = $container;
     }
 
     public function getDecorated(): AbstractCartItemAddRoute
@@ -51,18 +45,17 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
             return $this->getDecorated()->add($request, $cart, $context, $items);
         }
 
-        // Shopware 6.4 have circular injection, we have to use container
-        $cartBackupService = $this->container->get(CartBackupService::class);
-        $cartService = $this->container->get(CartService::class);
-
         // add product somehow happens twice, so dont backup our express-cart, only originals
-        if (! $cartBackupService->isBackupExisting($context)) {
-            $cartBackupService->backupCart($context);
+        if (! $this->cartBackupService->isBackupExisting($context)) {
+            $this->cartBackupService->backupCart($context);
         }
 
         // clear existing cart and also update it to save it
         $cart->setLineItems(new LineItemCollection());
 
+        $this->cartService->recalculate($cart, $context);
+
+        /*
         $mollieCart = new MollieShopwareCart($cart);
 
         // we mark the cart as single product express checkout
@@ -72,7 +65,7 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
 
         $cart = $mollieCart->getCart();
 
-        $cartService->updateCart($cart);
+        $cartService->updateCart($cart);*/
 
         return $this->getDecorated()->add($request, $cart, $context, $items);
     }
