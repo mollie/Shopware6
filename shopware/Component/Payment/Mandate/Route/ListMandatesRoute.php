@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\Mandate;
+namespace Mollie\Shopware\Component\Payment\Mandate\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
@@ -15,8 +15,10 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class ListMandatesRoute extends AbstractListMandatesRoute
 {
@@ -65,9 +67,9 @@ final class ListMandatesRoute extends AbstractListMandatesRoute
             return new ListMandatesResponse($mandateCollection);
         }
 
-        $creditCardSettings = $this->settings->getCreditCardSettings($salesChannelId);
+        $paymentSettings = $this->settings->getPaymentSettings($salesChannelId);
 
-        if (! $creditCardSettings->isOneClickPayment()) {
+        if (! $paymentSettings->isOneClickPayment()) {
             $this->logger->debug('One click payment is disabled, mandates are not loaded', $logData);
 
             return new ListMandatesResponse($mandateCollection);

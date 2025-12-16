@@ -12,7 +12,10 @@ final class PaymentSettings extends Struct
     private const MIN_DUE_DAYS = 1;
     private const MAX_DUE_DAYS = 100;
 
-    public function __construct(private string $orderNumberFormat, private int $dueDateDays)
+    private const KEY_ONE_CLICK_PAYMENT = 'oneClickPaymentsEnabled';
+    private const KEY_ONE_CLICK_COMPACT_VIEW = 'oneClickPaymentsCompactView';
+
+    public function __construct(private string $orderNumberFormat, private int $dueDateDays, private bool $oneClickPayment = false, private bool $oneClickCompactView = false)
     {
     }
 
@@ -23,8 +26,10 @@ final class PaymentSettings extends Struct
     {
         $orderNumberFormat = $settings[self::KEY_ORDER_NUMBER_FORMAT] ?? '';
         $dueDateDays = $settings[self::KEY_DUE_DATE_DAYS] ?? 0;
+        $oneClickPayment = $settings[self::KEY_ONE_CLICK_PAYMENT] ?? false;
+        $oneClickCompactView = $settings[self::KEY_ONE_CLICK_COMPACT_VIEW] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays);
+        return new self($orderNumberFormat, $dueDateDays,$oneClickPayment,$oneClickCompactView);
     }
 
     public function getOrderNumberFormat(): string
@@ -39,5 +44,15 @@ final class PaymentSettings extends Struct
         }
 
         return max(min($this->dueDateDays, self::MAX_DUE_DAYS), self::MIN_DUE_DAYS);
+    }
+
+    public function isOneClickPayment(): bool
+    {
+        return $this->oneClickPayment;
+    }
+
+    public function isOneClickCompactView(): bool
+    {
+        return $this->oneClickCompactView;
     }
 }

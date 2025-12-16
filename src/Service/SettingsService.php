@@ -54,7 +54,6 @@ class SettingsService implements PluginSettingsServiceInterface
      */
     private $envCypressMode;
 
-
     /**
      * @var array<string,MollieSettingStruct>
      */
@@ -71,7 +70,6 @@ class SettingsService implements PluginSettingsServiceInterface
         $this->envShopDomain = (string) $envShopDomain;
         $this->envDevMode = (string) $envDevMode;
         $this->envCypressMode = (string) $envCypressMode;
-
     }
 
     /**
@@ -111,7 +109,6 @@ class SettingsService implements PluginSettingsServiceInterface
         if (is_array($cartSettings) && count($cartSettings) > 0) {
             $structData[self::PAYMENT_FINALIZE_TRANSACTION_TIME] = $cartSettings[self::PAYMENT_FINALIZE_TRANSACTION_TIME] ?? 1800;
         }
-
 
         $this->cachedStructs[$cacheKey] = (new MollieSettingStruct())->assign($structData);
 
