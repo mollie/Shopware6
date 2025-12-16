@@ -170,33 +170,7 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
 
-
-
-
-        <service id="Kiener\MolliePayments\Controller\Storefront\ApplePayDirect\ApplePayDirectControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
-            <argument type="service" id="router"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service"
-                      id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
-            <argument type="service" id="customer.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
 
 
         <service id="Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase">

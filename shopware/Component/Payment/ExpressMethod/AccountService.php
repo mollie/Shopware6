@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
+use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Shopware\Component\Mollie\Address;
+use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\CustomerException;
@@ -13,6 +17,7 @@ use Shopware\Core\Checkout\Customer\SalesChannel\AccountService as ShopwareAccou
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
@@ -42,24 +47,28 @@ final class AccountService extends AbstractAccountService
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
      * @param EntityRepository<SalutationCollection<SalutationEntity>> $salutationRepository
+     * @param EntityRepository<CustomerAddressCollection<CustomerAddressEntity>> $customerAddressRepository
      */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
-        private EntityRepository $customerRepository,
+        private EntityRepository                    $customerRepository,
         #[Autowire(service: 'country.repository')]
-        private EntityRepository $countryRepository,
+        private EntityRepository                    $countryRepository,
         #[Autowire(service: 'salutation.repository')]
-        private EntityRepository $salutationRepository,
+        private EntityRepository                    $salutationRepository,
+        #[Autowire(service: 'customer_address.repository')]
+        private EntityRepository $customerAddressRepository,
         #[Autowire(service: RegisterRoute::class)]
-        private AbstractRegisterRoute $registerRoute,
-        private ShopwareAccountService $accountService,
+        private AbstractRegisterRoute               $registerRoute,
+        private ShopwareAccountService              $accountService,
         #[Autowire(service: ContextSwitchRoute::class)]
-        private AbstractContextSwitchRoute $contextSwitchRoute,
+        private AbstractContextSwitchRoute          $contextSwitchRoute,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger,
-    ) {
+        private LoggerInterface                     $logger,
+    )
+    {
     }
 
     public function getDecorated(): AbstractAccountService
@@ -74,10 +83,12 @@ final class AccountService extends AbstractAccountService
         $logData = [
             'salesChannelId' => $salesChannelContext->getSalesChannelId(),
             'currentPaymentMethodId' => $currentPaymentMethodId,
-            'newPaymentMethodId' => $paymentMethodId,
+            'paymentMethodId' => $paymentMethodId,
         ];
         $email = $billingAddress->getEmail();
         $this->logger->debug('Start - login or create express customer', $logData);
+        $requestDataBag = new RequestDataBag();
+        $requestDataBag->set(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethodId);
 
         $customer = $salesChannelContext->getCustomer();
         if ($customer === null) {
@@ -88,6 +99,7 @@ final class AccountService extends AbstractAccountService
                 $logData['customerNumber'] = $customer->getCustomerNumber();
                 $this->logger->debug('Customer was found by email', $logData);
                 $this->accountService->loginById($customer->getId(), $salesChannelContext);
+                $requestDataBag = $this->createOrReuseAddresses($requestDataBag,$customer,$billingAddress,$shippingAddress,$salesChannelContext);
             } catch (\Throwable $e) {
                 $customer = $this->createNewGuestAccount($billingAddress, $shippingAddress, $salesChannelContext);
                 $logData['customerId'] = $customer->getId();
@@ -96,9 +108,6 @@ final class AccountService extends AbstractAccountService
             }
         }
 
-        $logData['paymentMethodId'] = $paymentMethodId;
-        $requestDataBag = new RequestDataBag();
-        $requestDataBag->set(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethodId);
         $requestDataBag->set(SalesChannelContextService::CUSTOMER_ID, $customer->getId());
         $this->logger->debug('Switch customers payment method', $logData);
         $contextSwitchResponse = $this->contextSwitchRoute->switchContext($requestDataBag, $salesChannelContext);
@@ -200,10 +209,20 @@ final class AccountService extends AbstractAccountService
         $billingAddressData = new DataBag($billingAddress->toRegisterFormArray());
         $billingAddressData->set('countryId', $countryIsoMapping[$billingAddress->getCountry()] ?? null);
         $billingAddressData->set('salutationId', $defaultSalutation->getId());
+        $billingAddressData->set('customFields', [
+            Mollie::EXTENSION => [
+                Address::CUSTOM_FIELDS_KEY => $billingAddress->getId()
+            ]
+        ]);
 
         $shippingAddressData = new DataBag($shippingAddress->toRegisterFormArray());
         $shippingAddressData->set('countryId', $countryIsoMapping[$shippingAddress->getCountry()] ?? null);
         $shippingAddressData->set('salutationId', $defaultSalutation->getId());
+        $shippingAddressData->set('customFields', [
+            Mollie::EXTENSION => [
+                Address::CUSTOM_FIELDS_KEY => $billingAddress->getId()
+            ]
+        ]);
 
         $data->set('guest', true);
         $data->set('salutationId', $defaultSalutation->getId());
@@ -236,11 +255,11 @@ final class AccountService extends AbstractAccountService
         /** @var CustomerEntity $customer */
         foreach ($customers as $customer) {
             // Skip not active users
-            if (! $customer->getActive()) {
+            if (!$customer->getActive()) {
                 continue;
             }
             // Skip guest if not required
-            if (! $includeGuest && $customer->getGuest()) {
+            if (!$includeGuest && $customer->getGuest()) {
                 continue;
             }
             // It is bound, but not to the current one. Skip it
@@ -263,5 +282,22 @@ final class AccountService extends AbstractAccountService
         }
 
         return $resultArray[0];
+    }
+
+    private function createOrReuseAddresses(RequestDataBag $requestDataBag, CustomerEntity $customer, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext):RequestDataBag
+    {
+
+        $mollieAddressIds[]= $billingAddress->getId();
+        $mollieAddressIds[]= $shippingAddress->getId();
+        $mollieAddressIds = array_unique($mollieAddressIds);
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new AndFilter([
+            new EqualsFilter('customerId', $customer->getId()),
+            new EqualsAnyFilter('customFields.' . Mollie::EXTENSION . '.' . Address::CUSTOM_FIELDS_KEY, $mollieAddressIds),
+        ]));
+        $addressSearchResult = $this->customerAddressRepository->search($criteria, $salesChannelContext->getContext());
+
+        return $requestDataBag;
     }
 }
