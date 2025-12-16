@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 export default class ConfirmRepository {
 
     /**
@@ -6,6 +10,14 @@ export default class ConfirmRepository {
      */
     getSwitchPaymentMethodsButton() {
         return cy.get('.confirm-payment > .card > .card-body > [data-toggle="modal"]');
+    }
+
+    getChangeShippingAddressButton() {
+        if (shopware.isVersionGreaterEqual('6.6.10.9')) {
+            return cy.get('.confirm-address .card-actions:eq(0) > a');
+        }
+
+        return cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]');
     }
 
     /**

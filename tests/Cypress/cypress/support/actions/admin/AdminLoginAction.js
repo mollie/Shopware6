@@ -9,8 +9,6 @@ export default class AdminLoginAction {
         // otherwise we don't see a lot (page height)
         cy.viewport(1920, 1500);
 
-        // cy.session('admin_login', () => {
-
         cy.visit('/admin');
 
         cy.get('#sw-field--username', {timeout: 10000}).type('admin');
@@ -20,15 +18,6 @@ export default class AdminLoginAction {
 
         // make sure we are logged in
         cy.get('.sw-version__info', {timeout: 10000}).should('be.visible');
-
-        //  }, {
-        //     cacheAcrossSpecs: true,
-        //      validate() {
-        //          cy.visit('/admin#/sw/dashboard/index');
-        //      }
-        //  });
-
-        //   cy.visit('/admin#/sw/dashboard/index');
     }
 
 }

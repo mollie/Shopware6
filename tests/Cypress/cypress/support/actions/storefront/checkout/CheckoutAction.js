@@ -3,15 +3,12 @@ import ConfirmRepository from 'Repositories/storefront/checkout/ConfirmRepositor
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
 import ListingAction from "Actions/storefront/products/ListingAction";
 import PDPAction from "Actions/storefront/products/PDPAction";
+import Shopware from "Services/shopware/Shopware";
+import AddressModalRepository from "Repositories/storefront/checkout/AddressModalRepository";
 
 const repoOffCanvas = new OffCanvasRepository();
 const repoConfirm = new ConfirmRepository();
-
-
-const topMenu = new TopMenuAction();
-const listing = new ListingAction();
-const pdp = new PDPAction();
-import Shopware from "Services/shopware/Shopware";
+const repoAddressModal = new AddressModalRepository();
 
 const shopware = new Shopware();
 
@@ -121,25 +118,21 @@ export default class CheckoutAction {
 
     changeBillingCountry(billingCountry) {
 
-        if (shopware.isVersionGreaterEqual('6.7.0.0')) {
-            cy.get('.confirm-address .card-actions:eq(0) > a').click();
-            cy.wait(1000);
-            cy.get('.modal-dialog-address #shipping-address-tab-pane .address-manager-select-address button').click();
-            cy.get('.dropdown-menu .address-manager-modal-address-form[data-address-type="shipping"]').click();
+        if (shopware.isVersionGreaterEqual('6.6.10.9')) {
+            repoConfirm.getChangeShippingAddressButton().click();
+            repoAddressModal.getCurrentAddressEditButton().click();
+            repoAddressModal.getEditFormCountryDropdownContainer().click();
         }
-
-        if (shopware.isVersionLower('6.7.0.0')) {
-            cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]').click();
-            cy.wait(2000);
+        else {
+            repoConfirm.getChangeShippingAddressButton().click();
             cy.get('.address-editor-edit').click();
             cy.wait(1000);
         }
 
+        repoAddressModal.getEditFormCountryDropdown().select(billingCountry);
 
-        cy.get('select.country-select:eq(0)').select(billingCountry);
-
-        if (shopware.isVersionGreaterEqual('6.7.0.0')) {
-            cy.get('.address-form-create-submit').click()
+        if (shopware.isVersionGreaterEqual('6.6.10.9')) {
+            repoAddressModal.getEditFormSaveAddressButton().click();
         } else {
             cy.get('.address-form-actions:eq(0) button').click();
         }
@@ -150,7 +143,7 @@ export default class CheckoutAction {
             cy.get('.js-pseudo-modal .modal-dialog .btn-close').click();
         }
 
-        if (shopware.isVersionGreaterEqual('6.7.0.0')) {
+        if (shopware.isVersionGreaterEqual('6.6.10.9')) {
             // i think in sw 6.7.0.0 there is some kind of bug
             // so that the selected payment method in the next steps is not taken over.
             // let's try with a simple reload after changing the address

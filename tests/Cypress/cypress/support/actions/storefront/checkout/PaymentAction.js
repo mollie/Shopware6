@@ -44,11 +44,12 @@ export default class PaymentAction {
     selectPaymentMethod(paymentName) {
         cy.get('.payment-methods').contains(paymentName).click({force: true});
     }
+
     showPaymentMethods(){
-        if (shopware.isVersionGreaterEqual(6.7)) {
+        if (shopware.isVersionGreaterEqual('6.6.10.9')) {
             return;
         }
-        if (shopware.isVersionGreaterEqual(6.4)) {
+        if (shopware.isVersionGreaterEqual('6.4')) {
             this.showAllPaymentMethods();
             return;
         }
