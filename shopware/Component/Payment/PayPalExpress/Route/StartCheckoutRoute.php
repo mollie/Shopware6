@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\PayPalExpress;
+namespace Mollie\Shopware\Component\Payment\PayPalExpress\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
+use Mollie\Shopware\Component\Payment\PayPalExpress\PaypalExpressException;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
@@ -13,8 +14,10 @@ use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class StartCheckoutRoute extends AbstractStartCheckoutRoute
 {

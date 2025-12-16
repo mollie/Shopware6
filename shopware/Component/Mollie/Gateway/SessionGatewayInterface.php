@@ -12,4 +12,6 @@ interface SessionGatewayInterface
     public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext): Session;
 
     public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext): Session;
+
+    public function cancelSession(string $sessionId, SalesChannelContext $salesChannelContext): Session;
 }

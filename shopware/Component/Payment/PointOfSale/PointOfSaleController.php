@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Payment\PointOfSale;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use Mollie\Shopware\Component\Payment\PointOfSale\Route\StoreTerminalRoute;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
