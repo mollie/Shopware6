@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Fixtures\Handler\SalesChannel;
+namespace Kiener\MolliePayments\Components\Fixtures\Handler\PaymentMethod;
 
 use Kiener\MolliePayments\Components\Fixtures\MollieFixtureHandlerInterface;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
@@ -11,23 +11,23 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 
-class SalesChannelFixture implements MollieFixtureHandlerInterface
+class PaymentMethodsFixture implements MollieFixtureHandlerInterface
 {
     /**
      * @var EntityRepository<SalesChannelCollection>
      */
-    private EntityRepository $repoSalesChannels;
+    private $repoSalesChannels;
 
     /**
      * @var EntityRepository<PaymentMethodCollection>
      */
-    private EntityRepository $repoPaymentMethods;
+    private $repoPaymentMethods;
 
     /**
      * @param EntityRepository<SalesChannelCollection> $repoSalesChannels
      * @param EntityRepository<PaymentMethodCollection> $repoPaymentMethods
      */
-    public function __construct(EntityRepository $repoSalesChannels, EntityRepository $repoPaymentMethods)
+    public function __construct($repoSalesChannels, $repoPaymentMethods)
     {
         $this->repoSalesChannels = $repoSalesChannels;
         $this->repoPaymentMethods = $repoPaymentMethods;
@@ -43,6 +43,12 @@ class SalesChannelFixture implements MollieFixtureHandlerInterface
 
         $this->activatePaymentMethods($ctx);
         $this->assignPaymentMethods($salesChannelIds, $ctx);
+    }
+
+    public function uninstall(): void
+    {
+        // do nothing in this case
+        // we dont want to unassign things again
     }
 
     private function activatePaymentMethods(Context $ctx): void

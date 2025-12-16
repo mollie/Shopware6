@@ -29,13 +29,20 @@ module.exports = defineConfig({
             width: 1024,
             height: 768,
         },
-    ], 
+    ],
     e2e: {
-        defaultCommandTimeout: 10000,
-        experimentalSessionAndOrigin: true,
+
+        defaultCommandTimeout: 8000,
+        pageLoadTimeout: 30000,
+        requestTimeout: 15000,
+        responseTimeout: 15000,
+        execTimeout: 60000,
+        taskTimeout: 60000,
+
         testIsolation: true,
+        experimentalSessionAndOrigin: true,
         experimentalWebKitSupport: true,
-        experimentalRunAllSpecs: true,
+
         // We've imported your old cypress plugins here.
         // You may want to clean this up later by importing these.
         setupNodeEvents(on, config) {

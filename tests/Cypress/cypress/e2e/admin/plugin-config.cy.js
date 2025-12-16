@@ -99,7 +99,7 @@ context("Plugin Config", () => {
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 
-            const inputPrefix ='[class*="mollie-payments-config-format-order-number"] input';
+            const inputPrefix = '[class*="mollie-payments-config-format-order-number"] input';
 
             const divPreview = '.sw-system-config--field-mollie-payments-config-mollie-plugin-config-section-payments-format';
 
@@ -158,6 +158,7 @@ context("Plugin Config", () => {
         it('C4255361: Wiki Button redirects to correct page @core', () => {
 
             beforeEach(device);
+            
             adminLogin.login();
             pluginAction.openPluginConfiguration();
 

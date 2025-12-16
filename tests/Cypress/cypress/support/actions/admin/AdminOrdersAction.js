@@ -5,7 +5,6 @@ import MainMenuRepository from "Repositories/admin/MainMenuRepository";
 
 const shopware = new Shopware();
 
-const repoMainMenu = new MainMenuRepository();
 const repoOrdersList = new OrdersListRepository();
 const repoOrdersDetails = new OrderDetailsRepository();
 
@@ -17,11 +16,10 @@ export default class AdminOrdersAction {
      *
      */
     openOrders() {
-        cy.wait(1000);
-        repoMainMenu.getOrders().click(forceOption);
-        cy.wait(1000);
-        repoMainMenu.getOrdersOverview().click(forceOption);
-        cy.wait(4000);
+        cy.visit('/admin#/sw/order/index');
+
+        // wait for order list
+        cy.contains('h2', 'Orders', {timeout: 20000});
     }
 
     /**
@@ -29,7 +27,9 @@ export default class AdminOrdersAction {
      */
     openLastOrder() {
         repoOrdersList.getLatestOrderNumber().trigger('click');
-        cy.wait(2000);
+
+        // wait for info panel on order detail page
+        cy.contains('h3', 'Info', {timeout: 20000});
     }
 
 
@@ -45,14 +45,12 @@ export default class AdminOrdersAction {
         }
 
         cy.wait(2000);
-        repoOrdersDetails.getMollieRefundManagerButton().trigger('click');//the normal click, missed somehow the element randomly
+        repoOrdersDetails.getMollieRefundManagerButton().trigger('click'); //the normal click, missed somehow the element randomly
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
         cy.wait(4000);
         repoOrdersDetails.getMollieRefundManagerDialog().should('be.visible');
     }
-
-
 
 
     /**
@@ -62,7 +60,6 @@ export default class AdminOrdersAction {
     assertLatestOrderStatus(status) {
 
         this.openOrders();
-
 
         // match with case-insensitive option because shopware
         // switched from "In progress" to "In Progress" with 6.4.11.0 for example
@@ -84,7 +81,9 @@ export default class AdminOrdersAction {
      *
      */
     openShipThroughMollie() {
+
         cy.wait(2000);
+
         if (shopware.isVersionLower('6.5')) {
             repoOrdersDetails.getMollieActionsButton().click(forceOption);
         }
@@ -105,6 +104,7 @@ export default class AdminOrdersAction {
 
         cy.wait(2000);
         cy.reload();
+
         repoOrdersDetails.getLineItemActionsButton(nthItem).trigger('click')
 
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
@@ -114,7 +114,6 @@ export default class AdminOrdersAction {
         // here are automatic reloads and things as it seems
         // I really want to test the real UX, so we just wait like a human
         cy.wait(4000);
-
     }
 
     /**
@@ -127,7 +126,6 @@ export default class AdminOrdersAction {
             repoOrdersDetails.getEditButton().click();
         }
         cy.wait(2000);
-
 
 
         // Tracking Code is added on OrderDetails Tab, therefore we need to open a new tab first

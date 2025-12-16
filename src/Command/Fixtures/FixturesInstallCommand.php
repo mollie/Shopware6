@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class FixturesCommand extends Command
+class FixturesInstallCommand extends Command
 {
     /** @var string */
     public static $defaultName = 'mollie:fixtures:install';

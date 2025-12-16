@@ -11,6 +11,9 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import CancelItemRepository from "Repositories/admin/cancel-item/CancelItemRepository";
 import Session from "Services/utils/Session";
+import DummyUserScenario from "Scenarios/DummyUserScenario";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -29,14 +32,17 @@ const cancelItemRepository = new CancelItemRepository();
 const device = devices.getFirstDevice();
 const session = new Session();
 
-
 let beforeAllCalled = false;
 
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
-            configAction.setupShop(false, false, false);
-            configAction.updateProducts('', false, 0, '');
+
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             beforeAllCalled = true;
         }
         session.resetBrowserSession();

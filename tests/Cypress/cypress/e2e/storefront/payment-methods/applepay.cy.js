@@ -7,6 +7,8 @@ import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import Session from "Services/utils/Session";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -28,7 +30,13 @@ let beforeAllCalled = false;
 function beforeEach(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalled) {
-            configAction.setupShop(true, false, false);
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            pluginConfig.setMollieFailureMode(true);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             beforeAllCalled = true;
         }
         session.resetBrowserSession();

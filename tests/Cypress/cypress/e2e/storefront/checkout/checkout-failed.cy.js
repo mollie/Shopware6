@@ -11,6 +11,8 @@ import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentStatusScreen from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
 import PaymentListScreen from "cypress-mollie/src/actions/screens/PaymentListScreen";
+import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -36,8 +38,14 @@ let beforeAllCalledMollieShopwareMode = false;
 function beforeEachMollieFailureMode(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalledMollieFailureMode) {
-            configAction.setupShop(true, false, false);
-            configAction.updateProducts('', false, 0, '');
+
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            pluginConfig.setMollieFailureMode(true);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             beforeAllCalledMollieFailureMode = true;
         }
         session.resetBrowserSession();
@@ -48,7 +56,14 @@ function beforeEachMollieFailureMode(device) {
 function beforeEachShopwareFailureMode(device) {
     cy.wrap(null).then(() => {
         if (!beforeAllCalledMollieShopwareMode) {
-            configAction.setupShop(false, false, false);
+
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            pluginConfig.setMollieFailureMode(false);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
             beforeAllCalledMollieShopwareMode = true;
         }
         session.resetBrowserSession();

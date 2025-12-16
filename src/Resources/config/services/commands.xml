@@ -31,8 +31,14 @@
             <tag name="console.command"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Command\Fixtures\FixturesCommand">
+        <service id="Kiener\MolliePayments\Command\Fixtures\FixturesInstallCommand">
             <argument>%env(APP_ENV)%</argument>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixturesInstaller"/>
+            <argument type="service" id="monolog.logger.mollie"/>
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Command\Fixtures\FixturesUninstallCommand">
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixturesInstaller"/>
             <argument type="service" id="monolog.logger.mollie"/>
             <tag name="console.command"/>

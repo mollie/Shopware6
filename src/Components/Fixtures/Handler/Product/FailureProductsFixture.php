@@ -8,6 +8,7 @@ use Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\Product\Traits\ProductFixtureTrait;
 use Kiener\MolliePayments\Components\Fixtures\MollieFixtureHandlerInterface;
 use Shopware\Core\Content\Product\ProductCollection;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 
 class FailureProductsFixture implements MollieFixtureHandlerInterface
@@ -17,12 +18,12 @@ class FailureProductsFixture implements MollieFixtureHandlerInterface
     /**
      * @var EntityRepository<ProductCollection>
      */
-    private EntityRepository $repoProducts;
+    private $repoProducts;
 
     /**
      * @param EntityRepository<ProductCollection> $repoProducts
      */
-    public function __construct(FixtureUtils $utils, EntityRepository $repoProducts)
+    public function __construct(FixtureUtils $utils, $repoProducts)
     {
         $this->utils = $utils;
         $this->repoProducts = $repoProducts;
@@ -66,5 +67,25 @@ class FailureProductsFixture implements MollieFixtureHandlerInterface
         $this->createProduct('0d9eeedd6d22436385580e2ff42431b9', 'Possible Fraud', 'MOL_ERROR_9', $category, $description, 1009, $image, false, [], $this->repoProducts, $this->utils);
         $this->createProduct('0d3eeedd6d10436385580e2ff42431b9', 'Authentication Failed', 'MOL_ERROR_10', $category, $description, 1010, $image, false, [], $this->repoProducts, $this->utils);
         $this->createProduct('0d3eeedd6d11436385580e2ff42431b9', 'Card Declined', 'MOL_ERROR_11', $category, $description, 1011, $image, false, [], $this->repoProducts, $this->utils);
+    }
+
+    public function uninstall(): void
+    {
+        $this->repoProducts->delete(
+            [
+                ['id' => '0d1eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d2eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d3eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d4eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d5eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d6eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d7eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d8eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d9eeedd6d22436385580e2ff42431b9'],
+                ['id' => '0d3eeedd6d10436385580e2ff42431b9'],
+                ['id' => '0d3eeedd6d11436385580e2ff42431b9'],
+            ],
+            Context::createDefaultContext()
+        );
     }
 }

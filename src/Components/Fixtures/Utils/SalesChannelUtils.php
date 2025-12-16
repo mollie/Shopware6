@@ -16,12 +16,12 @@ class SalesChannelUtils
     /**
      * @var EntityRepository<SalesChannelCollection>
      */
-    private EntityRepository $salesChannelRepository;
+    private $salesChannelRepository;
 
     /**
      * @param EntityRepository<SalesChannelCollection> $salesChannelRepository
      */
-    public function __construct(EntityRepository $salesChannelRepository)
+    public function __construct($salesChannelRepository)
     {
         $this->salesChannelRepository = $salesChannelRepository;
     }

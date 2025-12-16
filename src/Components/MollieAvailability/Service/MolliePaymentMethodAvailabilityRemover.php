@@ -48,6 +48,7 @@ class MolliePaymentMethodAvailabilityRemover extends PaymentMethodRemover
         if (! $this->isAllowedRoute()) {
             return $originalData;
         }
+
         $billingAddress = null;
         $countryIsoCode = null;
 

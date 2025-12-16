@@ -8,7 +8,8 @@
 
         <service id="Kiener\MolliePayments\Components\Fixtures\FixturesInstaller">
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\SalesChannel\SalesChannelFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\PaymentMethod\PaymentMethodsFixture"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\SubscriptionProductsFixture"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\VoucherProductsFixture"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture"/>
@@ -20,9 +21,17 @@
             <argument type="service" id="category.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\SalesChannel\SalesChannelFixture">
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\PaymentMethod\PaymentMethodsFixture">
             <argument type="service" id="sales_channel.repository"/>
             <argument type="service" id="payment_method.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture">
+            <argument type="service" id="shipping_method.repository"/>
+            <argument type="service" id="sales_channel.repository"/>
+            <argument type="service" id="rule.repository"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\CurrencyUtils"/>
+            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\DeliveryTimesUtils"/>
         </service>
 
         <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\SubscriptionProductsFixture">
@@ -69,6 +78,14 @@
 
         <service id="Kiener\MolliePayments\Components\Fixtures\Utils\SalesChannelUtils">
             <argument type="service" id="sales_channel.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Utils\CurrencyUtils">
+            <argument type="service" id="currency.repository"/>
+        </service>
+
+        <service id="Kiener\MolliePayments\Components\Fixtures\Utils\DeliveryTimesUtils">
+            <argument type="service" id="delivery_time.repository"/>
         </service>
 
     </services>

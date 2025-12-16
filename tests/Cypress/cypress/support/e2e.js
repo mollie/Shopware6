@@ -29,3 +29,11 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     // cause an error in the console which stops the test
     return false
 })
+
+
+afterEach(function () {
+    // Stop after first failure only in UI mode (cypress open), not in headless mode (cypress run)
+    if (this.currentTest.state === 'failed' && Cypress.config('isInteractive')) {
+        Cypress.runner.stop()
+    }
+});

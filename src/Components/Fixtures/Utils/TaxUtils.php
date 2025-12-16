@@ -15,12 +15,12 @@ class TaxUtils
     /**
      * @var EntityRepository<TaxCollection>
      */
-    private EntityRepository $taxRepository;
+    private $taxRepository;
 
     /**
      * @param EntityRepository<TaxCollection> $taxRepository
      */
-    public function __construct(EntityRepository $taxRepository)
+    public function __construct($taxRepository)
     {
         $this->taxRepository = $taxRepository;
     }

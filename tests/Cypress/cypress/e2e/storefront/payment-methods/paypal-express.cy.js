@@ -10,6 +10,8 @@ import CartRepository from "Repositories/storefront/checkout/CartRepository";
 import ListingRepository from "Repositories/storefront/products/ListingRepository";
 import RegisterRepository from "Repositories/storefront/checkout/RegisterRepository";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";
+import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
+import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
@@ -18,6 +20,7 @@ const topMenu = new TopMenuAction();
 const listing = new ListingAction();
 const pdp = new PDPAction();
 const checkout = new CheckoutAction();
+const mollieProductsAction = new MollieProductsAction();
 
 const repoPDP = new PDPRepository();
 const repoListing = new ListingRepository();
@@ -29,16 +32,29 @@ const registerRepo = new RegisterRepository();
 function beforeEachNoPrivacy() {
     cy.wrap(null).then(() => {
         devices.setDevice(devices.getFirstDevice());
-        configAction.setupShop(true, false, false, new ShopConfiguration());
+
+        const shopConfig = new ShopConfiguration();
+        const pluginConfig = new PluginConfiguration();
+
+        pluginConfig.setMollieFailureMode(true);
+
+        configAction.configureEnvironment(shopConfig, pluginConfig);
+
     });
 }
 
 function beforeEachPrivacy() {
     cy.wrap(null).then(() => {
         devices.setDevice(devices.getFirstDevice());
-        const config = new ShopConfiguration();
-        config.setDataPrivacy(true);
-        configAction.setupShop(true, false, false, config);
+
+        const shopConfig = new ShopConfiguration();
+        const pluginConfig = new PluginConfiguration();
+
+        shopConfig.setDataPrivacy(true);
+        pluginConfig.setMollieFailureMode(true);
+
+        configAction.configureEnvironment(shopConfig, pluginConfig);
+
     });
 }
 
@@ -52,12 +68,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
 
             repoPDP.getPayPalExpressButton().should('be.visible');
         })
@@ -67,12 +82,12 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, ['pdp']);
+                const pluginConfig = new PluginConfiguration();
+                pluginConfig.setPaypalExpressRestrictions(['pdp']);
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
 
             repoPDP.getPayPalExpressButton().should('not.exist');
         })
@@ -82,12 +97,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
 
             // click and make sure data privacy is validated
             repoPDP.getPayPalExpressButton().click();
@@ -103,11 +117,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
+            mollieProductsAction.openListingRegularProducts();
 
             const button = repoListing.getPayPalExpressButton().first();
             button.should('be.visible');
@@ -119,11 +133,12 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, ['plp']);
+                const pluginConfig = new PluginConfiguration();
+                pluginConfig.setPaypalExpressRestrictions(['plp']);
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
+            mollieProductsAction.openListingRegularProducts();
 
             repoListing.getPayPalExpressButton().should('not.exist');
         })
@@ -133,11 +148,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
+            mollieProductsAction.openListingRegularProducts();
 
             // click and make sure data privacy is validated
             repoListing.getPayPalExpressButton().first().click();
@@ -153,12 +168,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             const button = repoOffcanvas.getPayPalExpressButton();
@@ -170,12 +184,12 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, ['offcanvas'])
+                const pluginConfig = new PluginConfiguration();
+                pluginConfig.setPaypalExpressRestrictions(['offcanvas']);
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             repoOffcanvas.getPayPalExpressButton().should('not.exist');
@@ -186,12 +200,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             // click and make sure data privacy is validated
@@ -208,12 +221,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             checkout.goToCartInOffCanvas();
@@ -228,12 +240,12 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, ['cart']);
+                const pluginConfig = new PluginConfiguration();
+                pluginConfig.setPaypalExpressRestrictions(['cart']);
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             checkout.goToCartInOffCanvas();
@@ -246,12 +258,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             checkout.goToCartInOffCanvas();
@@ -270,12 +281,11 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, []);
+                const pluginConfig = new PluginConfiguration();
+                configAction.configurePlugin(pluginConfig);
             });
 
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             checkout.goToCheckoutInOffCanvas();
@@ -290,12 +300,12 @@ describe('Paypal Express - UI Tests', () => {
             beforeEachNoPrivacy();
 
             cy.wrap(null).then(() => {
-                configAction.setupPlugin(false, false, false, false, ['register']);
+                const pluginConfig = new PluginConfiguration();
+                pluginConfig.setPaypalExpressRestrictions(['register']);
+                configAction.configurePlugin(pluginConfig);
             });
-            
-            cy.visit('/');
-            topMenu.clickOnSecondCategory();
-            listing.clickOnFirstProduct();
+
+            mollieProductsAction.openRegularProduct();
             pdp.addToCart(1);
 
             checkout.goToCheckoutInOffCanvas();
