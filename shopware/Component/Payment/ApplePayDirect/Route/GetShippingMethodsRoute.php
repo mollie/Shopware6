@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayShippingMethod;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\FakeApplePayAddress;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMethod;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\FakeApplePayAddress;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
