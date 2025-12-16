@@ -5,10 +5,12 @@ namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
 use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CartBackupService extends AbstractCartBackupService
 {
@@ -19,7 +21,9 @@ final class CartBackupService extends AbstractCartBackupService
      */
     private array $existingBackups = [];
 
-    public function __construct(private CartService $cartService, private AbstractCartPersister $cartPersister)
+    public function __construct(private CartService $cartService,
+                                #[Autowire(service: CartPersister::class)]
+                                private AbstractCartPersister $cartPersister)
     {
     }
 
