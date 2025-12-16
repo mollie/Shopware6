@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\PointOfSale;
+namespace Mollie\Shopware\Component\Payment\PointOfSale\Route;
 
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Framework\Struct\ArrayStruct;
