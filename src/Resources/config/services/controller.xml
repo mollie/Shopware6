@@ -224,12 +224,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\ApplePayDirect\ApplePayDirectControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="controller.service_arguments"/>
-        </service>
-
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
