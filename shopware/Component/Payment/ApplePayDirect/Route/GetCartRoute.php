@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
-use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayAmount;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayCart;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayLineItem;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayShippingLineItem;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayAmount;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayCart;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayLineItem;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingLineItem;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\ApplePayDirect;
+namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Struct;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
