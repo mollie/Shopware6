@@ -5,8 +5,8 @@ namespace Mollie\Shopware\Subscriber;
 
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
-use Mollie\Shopware\Component\Payment\Mandate\AbstractListMandatesRoute;
-use Mollie\Shopware\Component\Payment\Mandate\ListMandatesRoute;
+use Mollie\Shopware\Component\Payment\Mandate\Route\AbstractListMandatesRoute;
+use Mollie\Shopware\Component\Payment\Mandate\Route\ListMandatesRoute;
 use Mollie\Shopware\Component\Payment\PointOfSale\Route\AbstractListTerminalsRoute;
 use Mollie\Shopware\Component\Payment\PointOfSale\Route\ListTerminalsRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -91,13 +91,13 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
 
         $salesChannelId = $salesChannelContext->getSalesChannelId();
         $creditCardSettings = $this->settings->getCreditCardSettings($salesChannelId);
-
+        $paymentSettings = $this->settings->getPaymentSettings($salesChannelId);
         $page->addExtension('MollieCreditCardMandateCollection', $creditCardMandates);
 
         $page->assign([
             'enable_credit_card_components' => $creditCardSettings->isCreditCardComponentsEnabled(),
-            'enable_one_click_payments' => $creditCardSettings->isOneClickPayment(),
-            'enable_one_click_payments_compact_view' => $creditCardSettings->isOneClickCompactView()
+            'enable_one_click_payments' => $paymentSettings->isOneClickPayment(),
+            'enable_one_click_payments_compact_view' => $paymentSettings->isOneClickCompactView()
         ]);
     }
 

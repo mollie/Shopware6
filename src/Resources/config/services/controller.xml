@@ -230,12 +230,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\StoreApi\CreditCard\CreditCardControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-            <tag name="controller.service_arguments"/>
-        </service>
-
 
         <service id="Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
