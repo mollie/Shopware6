@@ -78,7 +78,7 @@ final class PaymentMethodInstaller
                 continue;
             }
             $paymentMethod = $paymentHandler->getPaymentMethod();
-
+            $isDeprecatedMethod = $paymentHandler instanceof DeprecatedMethodAwareInterface;
             $paymentMethodName = $paymentHandler->getName();
             $paymentMethodTechnicalName = $paymentHandler->getTechnicalName();
             $mapping[$handlerIdentifier] = [
@@ -96,8 +96,9 @@ final class PaymentMethodInstaller
                 'customFields' => [
                     'mollie_payment_method_name' => $paymentMethod->value,
                 ],
-                'active' => true
+                'active' => $isDeprecatedMethod === false
             ];
+
             $handlers[$handlerIdentifier] = $paymentHandler;
             $iconMapping[$paymentHandler->getIconFileName()] = $handlerIdentifier;
         }
