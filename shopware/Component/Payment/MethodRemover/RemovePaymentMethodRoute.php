@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment;
+namespace Mollie\Shopware\Component\Payment\MethodRemover;
 
-use Mollie\Shopware\Component\Payment\MethodRemover\AbstractPaymentRemover;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
