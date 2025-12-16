@@ -196,4 +196,12 @@ final class ApplePayController extends StorefrontController
             'success' => $success,
         ]);
     }
+
+    #[Route(name: 'frontend.mollie.apple-pay.add-product', path: '/mollie/apple-pay/add-product', methods: ['POST'], options: ['seo' => false])]
+    public function addProduct(SalesChannelContext $salesChannelContext): JsonResponse
+    {
+        return new JsonResponse([
+            'success' => true,
+        ]);
+    }
 }
