@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Checkout\Cart;
 
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartService;
+use Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService;
 use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
 use Psr\Container\ContainerInterface;
 use Shopware\Core\Checkout\Cart\Cart;

@@ -1,42 +1,31 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service\Cart;
+namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
 use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\CartPersisterInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class CartBackupService
+final class CartBackupService extends AbstractCartBackupService
 {
     private const BACKUP_TOKEN = 'mollie_backup_%s';
 
     /**
-     * @var CartService
-     */
-    private $cartService;
-
-    /**
-     * @var AbstractCartPersister|CartPersisterInterface
-     */
-    private $cartPersister;
-    /**
      * @var array<string, bool>
      */
-    private array $existingBackups;
+    private array $existingBackups = [];
 
-    /**
-     * @param AbstractCartPersister|CartPersisterInterface $cartPersister
-     */
-    public function __construct(CartService $cartService, $cartPersister)
+    public function __construct(private CartService $cartService, private AbstractCartPersister $cartPersister)
     {
-        $this->cartService = $cartService;
-        $this->cartPersister = $cartPersister;
+    }
 
-        $this->existingBackups = [];
+    public function getDecorated(): AbstractCartBackupService
+    {
+        throw new DecorationPatternException(self::class);
     }
 
     public function backupCart(SalesChannelContext $context): void
@@ -101,12 +90,9 @@ class CartBackupService
 
     public function replaceToken(string $oldToken, string $currentToken, SalesChannelContext $context): void
     {
-        // only cart persister has replace method, so it wont work in shopware 6.4.1.0
-        if ($this->cartPersister instanceof AbstractCartPersister) {
-            $oldToken = $this->getToken($oldToken);
-            $currentToken = $this->getToken($currentToken);
-            $this->cartPersister->replace($oldToken, $currentToken, $context);
-        }
+        $oldToken = $this->getToken($oldToken);
+        $currentToken = $this->getToken($currentToken);
+        $this->cartPersister->replace($oldToken, $currentToken, $context);
     }
 
     public function isBackupExisting(SalesChannelContext $context): bool
