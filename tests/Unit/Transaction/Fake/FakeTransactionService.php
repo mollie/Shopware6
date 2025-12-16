@@ -11,7 +11,6 @@ use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderTransactionRepository;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
@@ -31,8 +30,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 final class FakeTransactionService implements TransactionServiceInterface
 {
-    private FakeOrderTransactionRepository $orderTransactionRepository;
-
     private bool $withPayment = false;
     private ?TransactionDataStruct $transaction = null;
 
@@ -53,10 +50,6 @@ final class FakeTransactionService implements TransactionServiceInterface
     {
         if ($this->transaction === null) {
             $this->createTransaction();
-        } else {
-            $this->transaction->getTransaction()->setId($transactionId);
-
-            return $this->transaction;
         }
         $this->transaction->getTransaction()->setId($transactionId);
 

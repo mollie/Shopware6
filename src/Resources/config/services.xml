@@ -130,10 +130,6 @@
             <argument type="service" id="order_transaction.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\CartBackupService"  public="true">
-            <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\CartPersister"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
         </service>
