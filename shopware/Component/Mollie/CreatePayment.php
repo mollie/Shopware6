@@ -161,6 +161,9 @@ final class CreatePayment implements \JsonSerializable
     public function toArray(): array
     {
         $createPaymentBody = json_decode((string) json_encode($this), true);
+        if ($this->dueDate !== null) {
+            $createPaymentBody['dueDate'] = $this->dueDate->format('Y-m-d');
+        }
 
         // Remove all entries with null values
         return array_filter($createPaymentBody, function ($entry) {
