@@ -69,6 +69,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->decorated->listMandates($mollieCustomerId, $salesChannelId);
     }
 
+    public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool
+    {
+        return $this->decorated->revokeMandate($mollieCustomerId, $mandateId, $salesChannelId);
+    }
+
     public function listTerminals(string $salesChannelId): TerminalCollection
     {
         return $this->decorated->listTerminals($salesChannelId);
