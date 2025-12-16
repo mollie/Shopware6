@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\Mandate;
+namespace Mollie\Shopware\Component\Payment\Mandate\Route;
 
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class StoreMandateIdRoute
 {

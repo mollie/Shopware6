@@ -53,6 +53,11 @@ final class FakeGateway implements MollieGatewayInterface
         return $collection;
     }
 
+    public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool
+    {
+        // TODO: Implement revokeMandate() method.
+    }
+
     public function listTerminals(string $salesChannelId): TerminalCollection
     {
         // TODO: Implement listTerminals() method.
