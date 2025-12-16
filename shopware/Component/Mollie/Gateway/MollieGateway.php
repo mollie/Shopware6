@@ -24,6 +24,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Language\LanguageEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Response;
 
 final class MollieGateway implements MollieGatewayInterface
 {
@@ -180,6 +181,18 @@ final class MollieGateway implements MollieGatewayInterface
             }
 
             return $collection;
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
+    public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $response = $client->delete('customers/' . $mollieCustomerId . '/mandates/' . $mandateId);
+
+            return $response->getStatusCode() !== Response::HTTP_NOT_FOUND;
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }

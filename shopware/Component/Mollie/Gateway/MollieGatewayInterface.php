@@ -25,4 +25,6 @@ interface MollieGatewayInterface
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection;
 
     public function listTerminals(string $salesChannelId): TerminalCollection;
+
+    public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool;
 }
