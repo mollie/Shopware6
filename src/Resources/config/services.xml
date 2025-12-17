@@ -195,12 +195,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\RemovePaymentMethodRoute64"
-                 decorates="Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute">
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\RemovePaymentMethodRoute64.inner"/>
-
-            <argument type="tagged" tag="mollie_payments.payment_method.remover.sw64"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
