@@ -94,6 +94,7 @@ class CustomerFixture implements MollieFixtureHandlerInterface
             'customerNumber' => 'CYPRESS-' . date('YmdHis'),
             'email' => $email,
             'password' => $password,
+            'accountType' => 'commercial',
             'firstName' => 'Cypress',
             'lastName' => 'TestUser',
             'groupId' => $firstCustomerGroupId,
@@ -103,6 +104,7 @@ class CustomerFixture implements MollieFixtureHandlerInterface
             'addresses' => [[
                 'id' => $addressId,
                 'salutationId' => $firstSaluationId,
+                'company' => 'Mollie B.V.',
                 'firstName' => 'Cypress',
                 'lastName' => 'User',
                 'street' => 'Cypress Street 1',
