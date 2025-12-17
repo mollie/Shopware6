@@ -13,7 +13,6 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Throwable;
 
 trait PaymentHandlerTrait
 {
@@ -54,7 +53,7 @@ trait PaymentHandlerTrait
         $salesChannelContext = $request->get('sw-sales-channel-context');
         try {
             return $this->payAction->pay($this, $transaction, new RequestDataBag($request->request->all()), $salesChannelContext);
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             throw $exception;
         }
     }

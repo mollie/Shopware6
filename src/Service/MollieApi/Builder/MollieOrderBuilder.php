@@ -17,6 +17,7 @@ use Kiener\MolliePayments\Struct\Order\OrderAttributes;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -186,11 +187,19 @@ class MollieOrderBuilder
         $email = $orderCustomer ? $orderCustomer->getEmail() : $customer->getEmail();
         $shippingAddress = $customer->getActiveShippingAddress();
         $deliveries = $order->getDeliveries();
+
         if ($deliveries instanceof OrderDeliveryCollection && $deliveries->count() > 0) {
             $firstDelivery = $deliveries->first();
 
             if ($firstDelivery instanceof OrderDeliveryEntity) {
-                $shippingAddress = $firstDelivery->getShippingOrderAddress();
+                $firstDeliveryAddress = $firstDelivery->getShippingOrderAddress();
+
+                if ($firstDeliveryAddress instanceof OrderAddressEntity && ! in_array('-', [
+                    $firstDeliveryAddress->getFirstName(),
+                    $firstDeliveryAddress->getLastName(),
+                ])) {
+                    $shippingAddress = $firstDeliveryAddress;
+                }
             }
         }
 
@@ -266,7 +275,7 @@ class MollieOrderBuilder
     private function isVerticalTaxCalculation(SalesChannelContext $salesChannelContext): bool
     {
         $salesChannel = $salesChannelContext->getSalesChannel();
-        /** @phpstan-ignore-next-line  */
+        /** @phpstan-ignore-next-line */
         if (! method_exists($salesChannel, 'getTaxCalculationType')) {
             return false;
         }
