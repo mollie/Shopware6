@@ -33,7 +33,9 @@ final class LineItemSubscriber implements EventSubscriberInterface
             if ($customFields === null) {
                 continue;
             }
-            Product::setFromCustomFields($lineItem, $customFields);
+            $extension = Product::createFromCustomFields($customFields);
+
+            $lineItem->addExtension(Mollie::EXTENSION, $extension);
         }
     }
 
@@ -51,7 +53,9 @@ final class LineItemSubscriber implements EventSubscriberInterface
             if ($customFields === null) {
                 continue;
             }
-            Product::setFromCustomFields($lineItem, $customFields);
+            $extension = Product::createFromCustomFields($customFields);
+
+            $lineItem->addExtension(Mollie::EXTENSION, $extension);
         }
     }
 }
