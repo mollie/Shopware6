@@ -79,7 +79,6 @@ final class FakeSettingsService extends AbstractSettingsService
         // TODO: Implement getSubscriptionSettings() method.
     }
 
-
     public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings
     {
         // TODO: Implement getApplePaySettings() method.

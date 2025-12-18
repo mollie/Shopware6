@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Repository;
+namespace Mollie\Shopware\Component\Payment;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Shopware\Core\Framework\Context;
