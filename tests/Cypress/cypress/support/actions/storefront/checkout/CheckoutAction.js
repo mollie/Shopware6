@@ -98,14 +98,14 @@ export default class CheckoutAction {
      *
      */
     mollieFailureModeRetryPayment() {
-        cy.get('.cy-retry-payment').click();
+        cy.get('form[name="update-order"] .btn-primary').click();
     }
 
     /**
      *
      */
     mollieFailureModeContinueShopping() {
-        cy.get(':nth-child(3) > .btn-secondary').click();
+        cy.get('form[name="update-order"] .btn-secondary').click();
     }
 
     /**
@@ -123,17 +123,18 @@ export default class CheckoutAction {
 
         if (shopware.isVersionGreaterEqual('6.7.0.0')) {
             cy.get('.confirm-address .card-actions:eq(0) > a').click();
-            cy.get('.modal-dialog-address #shipping-address-tab-pane .address-manager-select-address button').first().click();
-            cy.get('.dropdown-menu .address-manager-modal-address-form[data-address-type="shipping"]').first().click();
+            cy.wait(1000);
+            cy.get('.modal-dialog-address #shipping-address-tab-pane .address-manager-select-address button').click();
+            cy.get('.dropdown-menu .address-manager-modal-address-form[data-address-type="shipping"]').click();
         }
 
-
         if (shopware.isVersionLower('6.7.0.0')) {
-            cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]', { timeout: 15000 }).click();
+            cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]').click();
             cy.wait(2000);
             cy.get('.address-editor-edit').click();
             cy.wait(1000);
         }
+
 
         cy.get('select.country-select:eq(0)').select(billingCountry);
 
