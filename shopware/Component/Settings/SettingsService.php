@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
@@ -200,6 +201,20 @@ final class SettingsService extends AbstractSettingsService
         $shopwareSettings = $this->getMollieSettings($salesChannelId);
 
         $settings = ApplePaySettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getOrderStateSettings(?string $salesChannelId = null): OrderStateSettings
+    {
+        $cacheKey = OrderStateSettings::class . '_' . ($salesChannelId ?? 'all');
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+
+        $settings = OrderStateSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;
