@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
 use Mollie\Shopware\Component\Payment\Method\ApplePayPayment;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Repository\PaymentMethodRepository;
-use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
