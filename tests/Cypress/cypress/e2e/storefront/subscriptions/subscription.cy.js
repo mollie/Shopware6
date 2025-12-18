@@ -253,7 +253,6 @@ describe('Subscription', () => {
 
                     cy.wrap(null).then(() => {
                         const pluginConfig = new PluginConfiguration();
-                        pluginConfig.setMollieFailureMode(true);
                         pluginConfig.setSubscriptionIndicator(true);
                         configAction.configurePlugin(pluginConfig);
                     });
@@ -272,16 +271,11 @@ describe('Subscription', () => {
 
                     cy.wrap(null).then(() => {
                         const pluginConfig = new PluginConfiguration();
-                        pluginConfig.setMollieFailureMode(false);
                         pluginConfig.setSubscriptionIndicator(false);
                         configAction.configurePlugin(pluginConfig);
                     });
 
-                    // for some reason, the configuration disabling is flaky
-                    // lets give it a try by waiting a bit
-                    cy.wait(5000);
-
-                    mollieProductsAction.openSubscriptionProduct_Weekly3();
+                    mollieProductsAction.openSubscriptionProductDaily1();
 
                     cy.contains('Subscription product').should('not.exist');
                 })
