@@ -10,11 +10,17 @@
                             <h1>{{ "molliePayments.messages.payment.error"|trans|striptags }}</h1>
 
                             <p>
-                                {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}<a href="{{ redirectUrl }}">{{ displayUrl }}</a>.
+                                {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}
                             </p>
                             <p>
-                                <a href="{{ redirectUrl }}" class="btn btn-primary">{{ "molliePayments.messages.payment.buttonPayThroughMollie"|trans|striptags }}</a>&nbsp;
+                            <form method="POST" action="{{ redirectUrl }}">
+                                <input type="hidden" name="paymentMethodId" value="{{ paymentMethodId }}" />
+                                {% for paymentMethod in paymentMethods %}
+                                    <input type="hidden" name="paymentMethods[]" value="{{ paymentMethod }}" />
+                                {% endfor %}
+                                <button class="btn btn-primary" type="submit">{{ "molliePayments.messages.payment.buttonPayThroughMollie"|trans|striptags }}</button>&nbsp;
                                 <a href="{{ path('frontend.home.page') }}" class="btn btn-secondary">{{ "molliePayments.messages.payment.buttonReturnToShop"|trans|striptags }}</a>
+                            </form>
                             </p>
                         </div>
                     </div>

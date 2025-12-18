@@ -22,8 +22,9 @@ final class Payment extends Struct implements \JsonSerializable
     private string $changePaymentStateUrl;
 
     private ?string $authenticationId = null;
+    private ?PaymentMethod $method = null;
 
-    public function __construct(private string $id, private PaymentMethod $method)
+    public function __construct(private string $id)
     {
     }
 
@@ -72,9 +73,14 @@ final class Payment extends Struct implements \JsonSerializable
         $this->shopwareTransaction = $shopwareTransaction;
     }
 
-    public function getMethod(): PaymentMethod
+    public function getMethod(): ?PaymentMethod
     {
         return $this->method;
+    }
+
+    public function setMethod(PaymentMethod $method): void
+    {
+        $this->method = $method;
     }
 
     public function getThirdPartyPaymentId(): string
@@ -92,12 +98,15 @@ final class Payment extends Struct implements \JsonSerializable
      */
     public static function createFromClientResponse(array $body): self
     {
-        $payment = new self($body['id'], PaymentMethod::from($body['method']));
+        $payment = new self($body['id']);
+        $paymentMethod = PaymentMethod::tryFrom($body['method'] ?? '');
         $payment->setStatus(PaymentStatus::from($body['status']));
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
         $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
         $changePaymentStateUrl = $body['_links']['changePaymentState']['href'] ?? null;
-
+        if ($paymentMethod !== null) {
+            $payment->setMethod($paymentMethod);
+        }
         if ($thirdPartyPaymentId !== null) {
             $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
         }

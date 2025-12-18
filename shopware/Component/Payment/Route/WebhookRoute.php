@@ -112,22 +112,25 @@ final class WebhookRoute extends AbstractWebhookRoute
     {
         $transaction = $payment->getShopwareTransaction();
         $transactionId = $transaction->getId();
-        $paymentMethod = $transaction->getPaymentMethod();
-        $molliePaymentMethod = $payment->getMethod()->value;
+        $transactionPaymentMethod = $transaction->getPaymentMethod();
 
+        $molliePaymentMethod = $payment->getMethod();
+        if ($molliePaymentMethod === null) {
+            throw new \Exception('Payment method not found for transactionId: ' . $transactionId);
+        }
         $logData = [
             'transactionId' => $transactionId,
-            'molliePaymentMethod' => $molliePaymentMethod,
+            'molliePaymentMethod' => $molliePaymentMethod->value,
             'orderNumber' => $orderNumber,
         ];
 
         $this->logger->info('Change payment method if changed', $logData);
 
-        if ($paymentMethod === null) {
+        if ($transactionPaymentMethod === null) {
             throw new TransactionWithoutOrderException($transactionId);
         }
         /** @var ?PaymentMethodExtension $molliePaymentMethodExtension */
-        $molliePaymentMethodExtension = $paymentMethod->getExtension(Mollie::EXTENSION);
+        $molliePaymentMethodExtension = $transactionPaymentMethod->getExtension(Mollie::EXTENSION);
 
         if ($molliePaymentMethodExtension === null) {
             throw new \Exception('Mollie payment method not found for TransactionId: ' . $transactionId);
@@ -136,13 +139,13 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $this->logger->debug('Start to compare payment', $logData);
 
-        if ($molliePaymentMethodExtension->getPaymentMethod() === $payment->getMethod()) {
+        if ($molliePaymentMethodExtension->getPaymentMethod() === $molliePaymentMethod) {
             $this->logger->debug('Payment methods are the same', $logData);
 
             return;
         }
 
-        if ($molliePaymentMethodExtension->getPaymentMethod() === PaymentMethod::APPLEPAY && $payment->getMethod() === PaymentMethod::CREDIT_CARD) {
+        if ($molliePaymentMethodExtension->getPaymentMethod() === PaymentMethod::APPLEPAY && $molliePaymentMethod === PaymentMethod::CREDIT_CARD) {
             $this->logger->debug('Apple Pay payment methods are stored as credit card in mollie, no change needed', $logData);
 
             return;
@@ -150,7 +153,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $this->logger->debug('Payment methods are different, try to find payment method based on mollies payment method name', $logData);
 
-        $newPaymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod($payment->getMethod(), $salesChannelId, $context);
+        $newPaymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod($molliePaymentMethod, $salesChannelId, $context);
 
         if ($newPaymentMethodId === null) {
             throw new \Exception('Payment method not found for TransactionId: ' . $transactionId);

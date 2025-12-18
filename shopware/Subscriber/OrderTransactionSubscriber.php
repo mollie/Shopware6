@@ -49,14 +49,17 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $method = $mollieCustomFields['method'] ?? '';
+            $method = $mollieCustomFields['method'] ?? null;
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
             $authenticationId = $mollieCustomFields['authenticationId'] ?? null;
 
-            $transactionExtension = new Payment($paymentId, PaymentMethod::from($method));
+            $transactionExtension = new Payment($paymentId);
             $transactionExtension->setCountPayments($countPayments);
             $transactionExtension->setFinalizeUrl($finalizeUrl);
+            if ($method !== null) {
+                $transactionExtension->setMethod(PaymentMethod::from($method));
+            }
             if ($thirdPartyPaymentId !== null) {
                 $transactionExtension->setThirdPartyPaymentId($thirdPartyPaymentId);
             }
