@@ -110,7 +110,7 @@ trait CheckoutTestBehaviour
         /** @var PaymentController $returnController */
         $returnController = $this->getContainer()->get(PaymentController::class);
 
-        return $returnController->return($paymentId, $salesChannelContext->getContext());
+        return $returnController->return($paymentId, $salesChannelContext);
     }
 
     public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity

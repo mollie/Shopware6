@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
-use Kiener\MolliePayments\Service\CustomFieldsInterface;
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
@@ -51,24 +50,23 @@ final class AccountService extends AbstractAccountService
      */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
-        private EntityRepository                    $customerRepository,
+        private EntityRepository $customerRepository,
         #[Autowire(service: 'country.repository')]
-        private EntityRepository                    $countryRepository,
+        private EntityRepository $countryRepository,
         #[Autowire(service: 'salutation.repository')]
-        private EntityRepository                    $salutationRepository,
+        private EntityRepository $salutationRepository,
         #[Autowire(service: 'customer_address.repository')]
         private EntityRepository $customerAddressRepository,
         #[Autowire(service: RegisterRoute::class)]
-        private AbstractRegisterRoute               $registerRoute,
-        private ShopwareAccountService              $accountService,
+        private AbstractRegisterRoute $registerRoute,
+        private ShopwareAccountService $accountService,
         #[Autowire(service: ContextSwitchRoute::class)]
-        private AbstractContextSwitchRoute          $contextSwitchRoute,
+        private AbstractContextSwitchRoute $contextSwitchRoute,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface                     $logger,
-    )
-    {
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function getDecorated(): AbstractAccountService
@@ -255,11 +253,11 @@ final class AccountService extends AbstractAccountService
         /** @var CustomerEntity $customer */
         foreach ($customers as $customer) {
             // Skip not active users
-            if (!$customer->getActive()) {
+            if (! $customer->getActive()) {
                 continue;
             }
             // Skip guest if not required
-            if (!$includeGuest && $customer->getGuest()) {
+            if (! $includeGuest && $customer->getGuest()) {
                 continue;
             }
             // It is bound, but not to the current one. Skip it
@@ -284,11 +282,10 @@ final class AccountService extends AbstractAccountService
         return $resultArray[0];
     }
 
-    private function createOrReuseAddresses(RequestDataBag $requestDataBag, CustomerEntity $customer, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext):RequestDataBag
+    private function createOrReuseAddresses(RequestDataBag $requestDataBag, CustomerEntity $customer, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): RequestDataBag
     {
-
-        $mollieAddressIds[]= $billingAddress->getId();
-        $mollieAddressIds[]= $shippingAddress->getId();
+        $mollieAddressIds[] = $billingAddress->getId();
+        $mollieAddressIds[] = $shippingAddress->getId();
         $mollieAddressIds = array_unique($mollieAddressIds);
 
         $criteria = new Criteria();
