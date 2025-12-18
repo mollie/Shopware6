@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
+use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -128,6 +129,21 @@ final class SettingsService extends AbstractSettingsService
 
         $shopwareSettings = $this->getMollieSettings($salesChannelId);
         $settings = ApiSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings
+    {
+        $cacheKey = SubscriptionSettings::class . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+        $settings = SubscriptionSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;

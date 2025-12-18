@@ -8,11 +8,10 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
-use Mollie\Shopware\Exception\TransactionWithoutOrderException;
 use Mollie\Shopware\Mollie;
-use Mollie\Shopware\Repository\PaymentMethodRepository;
-use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -64,8 +63,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
         if ($shopwareOrder === null) {
-            // TODO: use custom execption
-            throw new \Exception('Shopware order not found for TransactionId: ' . $transactionId);
+            throw PaymentException::transactionWithoutOrder($transactionId);
         }
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
@@ -116,7 +114,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $molliePaymentMethod = $payment->getMethod();
         if ($molliePaymentMethod === null) {
-            throw new \Exception('Payment method not found for transactionId: ' . $transactionId);
+            throw PaymentException::paymentWithoutMethod($transactionId,$payment->getId());
         }
         $logData = [
             'transactionId' => $transactionId,
@@ -127,13 +125,13 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->logger->info('Change payment method if changed', $logData);
 
         if ($transactionPaymentMethod === null) {
-            throw new TransactionWithoutOrderException($transactionId);
+            throw PaymentException::transactionWithoutPaymentMethod($transactionId);
         }
         /** @var ?PaymentMethodExtension $molliePaymentMethodExtension */
         $molliePaymentMethodExtension = $transactionPaymentMethod->getExtension(Mollie::EXTENSION);
 
         if ($molliePaymentMethodExtension === null) {
-            throw new \Exception('Mollie payment method not found for TransactionId: ' . $transactionId);
+            throw PaymentException::transactionWithoutMolliePayment($transactionId);
         }
         $logData['shopwarePaymentMethod'] = $molliePaymentMethodExtension->getPaymentMethod()->value;
 
@@ -156,7 +154,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $newPaymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod($molliePaymentMethod, $salesChannelId, $context);
 
         if ($newPaymentMethodId === null) {
-            throw new \Exception('Payment method not found for TransactionId: ' . $transactionId);
+            throw PaymentException::paymentMethodNotFound($transactionId,$payment->getMethod()->value);
         }
 
         $this->orderTransactionRepository->upsert([

@@ -13,6 +13,7 @@ use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
+use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
 {
@@ -71,6 +72,11 @@ final class FakeSettingsService extends AbstractSettingsService
     public function getAccountSettings(?string $salesChannelId = null): AccountSettings
     {
         // TODO: Implement getAccountSettings() method.
+    }
+
+    public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings
+    {
+        // TODO: Implement getSubscriptionSettings() method.
     }
 
     public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings

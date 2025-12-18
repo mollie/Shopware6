@@ -3,17 +3,19 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Entity\Product;
 
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
-use Mollie\Shopware\Mollie;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class Product extends Struct
 {
     private VoucherCategoryCollection $voucherCategories;
+    private bool $isSubscription = false;
+    private int $interval = 0;
+    private IntervalUnit $unit;
+
+    private int $repetition = 0;
 
     public function __construct()
     {
@@ -30,13 +32,50 @@ final class Product extends Struct
         $this->voucherCategories = $voucherCategories;
     }
 
+    public function isSubscription(): bool
+    {
+        return $this->isSubscription;
+    }
+
+    public function setIsSubscription(bool $isSubscription): void
+    {
+        $this->isSubscription = $isSubscription;
+    }
+
+    public function getInterval(): int
+    {
+        return $this->interval;
+    }
+
+    public function setInterval(int $interval): void
+    {
+        $this->interval = $interval;
+    }
+
+    public function getUnit(): IntervalUnit
+    {
+        return $this->unit;
+    }
+
+    public function setUnit(IntervalUnit $unit): void
+    {
+        $this->unit = $unit;
+    }
+
+    public function getRepetition(): int
+    {
+        return $this->repetition;
+    }
+
+    public function setRepetition(int $repetition): void
+    {
+        $this->repetition = $repetition;
+    }
+
     /**
-     * @param LineItem|OrderLineItemEntity|ProductEntity $product
      * @param array<mixed> $customFields
-     *
-     * @return LineItem|OrderLineItemEntity|ProductEntity
      */
-    public static function setFromCustomFields(Struct $product,array $customFields): Struct
+    public static function createFromCustomFields(array $customFields): Product
     {
         $productExtension = new Product();
         $voucherTypes = $customFields['mollie_payments_product_voucher_type'] ?? null;
@@ -56,10 +95,20 @@ final class Product extends Struct
 
             if ($collection->count() > 0) {
                 $productExtension->setVoucherCategories($collection);
-                $product->addExtension(Mollie::EXTENSION, $productExtension);
             }
         }
 
-        return $product;
+        $subscriptionEnabled = $customFields['mollie_payments_product_subscription_enabled'] ?? false;
+        $subscriptionInterval = $customFields['mollie_payments_product_subscription_interval'] ?? 0;
+        $subscriptionUnit = $customFields['mollie_payments_product_subscription_interval_unit'] ?? '';
+        if ((bool) $subscriptionEnabled && (int) $subscriptionInterval > 0 && mb_strlen($subscriptionUnit) > 0) {
+            $subscriptionRepetitions = $customFields['mollie_payments_product_subscription_repetition'] ?? 0;
+            $productExtension->setIsSubscription(true);
+            $productExtension->setInterval($subscriptionInterval);
+            $productExtension->setUnit(IntervalUnit::from($subscriptionUnit));
+            $productExtension->setRepetition((int) $subscriptionRepetitions);
+        }
+
+        return $productExtension;
     }
 }

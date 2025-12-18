@@ -33,7 +33,9 @@ final class ProductSubscriber implements EventSubscriberInterface
             if ($customFields === null) {
                 continue;
             }
-            Product::setFromCustomFields($product, $customFields);
+            $extension = Product::createFromCustomFields($customFields);
+
+            $product->addExtension(Mollie::EXTENSION, $extension);
         }
     }
 }
