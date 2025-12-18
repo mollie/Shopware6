@@ -13,7 +13,7 @@
                                 {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}
                             </p>
                             <p>
-                            <form method="POST" action="{{ redirectUrl }}">
+                            <form method="POST" action="{{ redirectUrl }}" name="update-order">
                                 <input type="hidden" name="paymentMethodId" value="{{ paymentMethodId }}" />
                                 {% for paymentMethod in paymentMethods %}
                                     <input type="hidden" name="paymentMethods[]" value="{{ paymentMethod }}" />
