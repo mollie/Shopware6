@@ -11,6 +11,12 @@ export default class MollieProductsAction {
         cy.visit('/Subscription-3x-Weekly/MOL-SUB-3', {failOnStatusCode: false});
     }
 
+    openSubscriptionProductDaily1()
+    {
+        this._visitDifferentPage();
+        cy.visit('/Subscription-1x-Daily/MOL-SUB-1', {failOnStatusCode: false});
+    }
+
     openRegularProduct() {
         this._visitDifferentPage();
         cy.visit('/Regular-Mollie-Shirt/MOL-CHEAP-2', {failOnStatusCode: false});
