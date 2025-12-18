@@ -24,6 +24,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -80,11 +81,15 @@ final class Pay
 
         $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $context);
         $this->eventDispatcher->dispatch($paymentEvent);
+        /** @var RequestDataBag $paymentMethods */
+        $paymentMethods = $dataBag->get('paymentMethods',new DataBag());
 
-        $paypalExpressAuthenticationId = $createPaymentStruct->getAuthenticationId();
+        if ($paymentMethods->count() > 0) {
+            $createPaymentStruct->setMethods($paymentMethods->all());
+        }
 
         $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
-
+        $paypalExpressAuthenticationId = $createPaymentStruct->getAuthenticationId();
         if ($paypalExpressAuthenticationId !== null) {
             $payment->setAuthenticationId($paypalExpressAuthenticationId);
         }
