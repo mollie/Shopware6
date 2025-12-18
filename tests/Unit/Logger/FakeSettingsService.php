@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
@@ -83,4 +84,10 @@ final class FakeSettingsService extends AbstractSettingsService
     {
         // TODO: Implement getApplePaySettings() method.
     }
+
+    public function getOrderStateSettings(?string $salesChannelId = null): OrderStateSettings
+    {
+        // TODO: Implement getOrderStateSettings() method.
+    }
+
 }
