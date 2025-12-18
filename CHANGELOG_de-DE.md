@@ -19,6 +19,7 @@
 - Behoben: Versandarten wurden in Apple Pay Express angezeigt, obwohl der Versand für diese Länder in der Administration deaktiviert war.
 - Aktualisiert: Die Abhängigkeit zum Basecom Fixture Plugin wurde entfernt und durch unser eigenes Fixture Plugin ersetzt.
 - Behoben: MolliePaymentMethodAvailabilityRemover berücksichtigt nun auch Warenkörbe mit dem Preis 0, um zu vermeiden, dass alle Zahlungsmethoden entfernt werden.
+- Kompatibilität mit Click & Collect Plugin
 
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar

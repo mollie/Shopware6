@@ -277,6 +277,10 @@ describe('Subscription', () => {
                         configAction.configurePlugin(pluginConfig);
                     });
 
+                    // for some reason, the configuration disabling is flaky
+                    // lets give it a try by waiting a bit
+                    cy.wait(5000);
+
                     mollieProductsAction.openSubscriptionProduct_Weekly3();
 
                     cy.contains('Subscription product').should('not.exist');
