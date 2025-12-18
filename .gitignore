@@ -18,4 +18,6 @@ config-*
 /src/Resources/public/administration/.vite
 composer.lock
 package-lock.json
+.tmp
+
 .php-cs-fixer.cache
