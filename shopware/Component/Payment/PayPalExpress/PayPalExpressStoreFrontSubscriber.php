@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\PayPalExpress;
 
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Repository\PaymentMethodRepository;
-use Mollie\Shopware\Repository\PaymentMethodRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
