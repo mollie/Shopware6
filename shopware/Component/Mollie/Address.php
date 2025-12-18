@@ -48,13 +48,13 @@ final class Address implements \JsonSerializable
             throw new MissingCountryException();
         }
         $address = new self($customer->getEmail(),
-            (string)$salutation->getDisplayName(),
+            (string) $salutation->getDisplayName(),
             $orderAddress->getFirstName(),
             $orderAddress->getLastName(),
             $orderAddress->getStreet(),
-            (string)$orderAddress->getZipcode(),
+            (string) $orderAddress->getZipcode(),
             $orderAddress->getCity(),
-            (string)$country->getIso()
+            (string) $country->getIso()
         );
 
         if ($orderAddress->getPhoneNumber() !== null) {
@@ -206,6 +206,7 @@ final class Address implements \JsonSerializable
         if (mb_strlen($this->phone) > 0) {
             $keys[] = $this->phone;
         }
+
         return md5(implode('-', $keys));
     }
 }

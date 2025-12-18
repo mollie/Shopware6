@@ -16,7 +16,8 @@ final class PaymentTest extends TestCase
 {
     public function testSettersAndGetters(): void
     {
-        $payment = new Payment('tr_test', PaymentMethod::PAYPAL);
+        $payment = new Payment('tr_test');
+        $payment->setMethod(PaymentMethod::PAYPAL);
         $payment->setStatus(PaymentStatus::PENDING);
         $payment->setFinalizeUrl('http://test.finalize');
         $payment->setCheckoutUrl('http://test.checkout');
@@ -38,7 +39,8 @@ final class PaymentTest extends TestCase
 
     public function testShopwareTransactionIsRemovedInData(): void
     {
-        $payment = new Payment('tr_test', PaymentMethod::PAYPAL);
+        $payment = new Payment('tr_test');
+        $payment->setMethod(PaymentMethod::PAYPAL);
         $payment->setStatus(PaymentStatus::PENDING);
         $payment->setShopwareTransaction(new OrderTransactionEntity());
 
