@@ -60,7 +60,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         /** @var Page $page */
         $page = $event->getPage();
         try {
-            $apiSettings = $this->settings->getApiSettings($salesChannelContext->getSalesChannelId());
+            $apiSettings = $this->settings->getApiSettings($salesChannelId);
 
             $languageInfo = $salesChannelContext->getLanguageInfo();
             /** @phpstan-ignore-next-line */

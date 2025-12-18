@@ -6,13 +6,14 @@ namespace Mollie\Shopware\Component\Payment\Route;
 use Shopware\Core\Framework\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-final class PaymentException extends HttpException
+final class WebhookException extends HttpException
 {
     public const TRANSACTION_WITHOUT_ORDER = 'TRANSACTION_WITHOUT_ORDER';
     public const TRANSACTION_WITHOUT_PAYMENT_METHOD = 'TRANSACTION_WITHOUT_PAYMENT_METHOD';
     public const TRANSACTION_WITHOUT_MOLLIE_PAYMENT = 'TRANSACTION_WITHOUT_MOLLIE_PAYMENT';
     public const NEW_PAYMENT_METHOD_NOT_FOUND = 'NEW_PAYMENT_METHOD_NOT_FOUND';
     public const PAYMENT_WITHOUT_METHOD = 'PAYMENT_WITHOUT_METHOD';
+    public const ORDER_WITHOUT_STATE = 'ORDER_WITHOUT_STATE';
 
     public static function transactionWithoutOrder(string $transactionId): self
     {
@@ -67,6 +68,18 @@ final class PaymentException extends HttpException
             'Mollie payment {paymentId} is without payment method in transaction {transactionId}',[
                 'transactionId' => $transactionId,
                 'paymentId' => $paymentId,
+            ]
+        );
+    }
+
+    public static function orderWithoutState(string $transactionId, string $orderNumber): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::ORDER_WITHOUT_STATE,
+            'Transaction {transactionId} in order {orderNumber} does not have a StateMachineState',[
+                'transactionId' => $transactionId,
+                'orderNumber' => $orderNumber,
             ]
         );
     }

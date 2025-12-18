@@ -10,6 +10,10 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
+use Mollie\Shopware\Component\StateHandler\OrderStateHandlerInterface;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -17,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
@@ -42,6 +47,10 @@ final class WebhookRoute extends AbstractWebhookRoute
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: PaymentMethodRepository::class)]
         private PaymentMethodRepositoryInterface $paymentMethodRepository,
+        #[Autowire(service: OrderStateHandler::class)]
+        private OrderStateHandlerInterface $orderStateHandler,
+        #[Autowire(service: SettingsService::class)]
+        private AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -63,7 +72,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
         if ($shopwareOrder === null) {
-            throw PaymentException::transactionWithoutOrder($transactionId);
+            throw WebhookException::transactionWithoutOrder($transactionId);
         }
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
@@ -71,8 +80,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
         $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
-
-        // TODO: update order status
+        $this->updateOrderStatus($payment, $shopwareOrder, $context);
 
         $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
         $webhookStatusEvent = new $webhookStatusEventClass($payment, $shopwareOrder, $context);
@@ -103,6 +111,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         } catch (IllegalTransitionException $exception) {
             $logData['exceptionMessage'] = $exception->getMessage();
             $this->logger->error('Failed to change payment status', $logData);
+            throw $exception;
         }
     }
 
@@ -114,7 +123,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $molliePaymentMethod = $payment->getMethod();
         if ($molliePaymentMethod === null) {
-            throw PaymentException::paymentWithoutMethod($transactionId,$payment->getId());
+            throw WebhookException::paymentWithoutMethod($transactionId, $payment->getId());
         }
         $logData = [
             'transactionId' => $transactionId,
@@ -125,13 +134,13 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->logger->info('Change payment method if changed', $logData);
 
         if ($transactionPaymentMethod === null) {
-            throw PaymentException::transactionWithoutPaymentMethod($transactionId);
+            throw WebhookException::transactionWithoutPaymentMethod($transactionId);
         }
         /** @var ?PaymentMethodExtension $molliePaymentMethodExtension */
         $molliePaymentMethodExtension = $transactionPaymentMethod->getExtension(Mollie::EXTENSION);
 
         if ($molliePaymentMethodExtension === null) {
-            throw PaymentException::transactionWithoutMolliePayment($transactionId);
+            throw WebhookException::transactionWithoutMolliePayment($transactionId);
         }
         $logData['shopwarePaymentMethod'] = $molliePaymentMethodExtension->getPaymentMethod()->value;
 
@@ -154,7 +163,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $newPaymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod($molliePaymentMethod, $salesChannelId, $context);
 
         if ($newPaymentMethodId === null) {
-            throw PaymentException::paymentMethodNotFound($transactionId, $molliePaymentMethod->value);
+            throw WebhookException::paymentMethodNotFound($transactionId, $molliePaymentMethod->value);
         }
 
         $this->orderTransactionRepository->upsert([
@@ -165,5 +174,63 @@ final class WebhookRoute extends AbstractWebhookRoute
         ], $context);
 
         $this->logger->info('Changed payment methods for transaction', $logData);
+    }
+
+    private function updateOrderStatus(Payment $payment, OrderEntity $shopwareOrder, Context $context): void
+    {
+        $transaction = $payment->getShopwareTransaction();
+        $transactionId = $transaction->getId();
+        $paymentId = $payment->getId();
+        $salesChannelId = $shopwareOrder->getSalesChannelId();
+        $orderNumber = (string) $shopwareOrder->getOrderNumber();
+        $paymentStatus = $payment->getStatus();
+        $shopwarePaymentStatus = $paymentStatus->getShopwarePaymentStatus();
+        $orderStateId = $shopwareOrder->getStateId();
+        $logData = [
+            'transactionId' => $transactionId,
+            'paymentId' => $paymentId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+            'molliePaymentStatus' => $paymentStatus->value,
+            'shopwarePaymentStatus' => $shopwarePaymentStatus,
+            'currentOrderStateId' => $orderStateId,
+        ];
+        $this->logger->info('Change order status based on order status mapping', $logData);
+        $orderStateSettings = $this->settingsService->getOrderStateSettings($salesChannelId);
+        $finalOrderStateId = (string) $orderStateSettings->getFinalOrderState();
+
+        $logData['finalOrderStateId'] = $finalOrderStateId;
+
+        if ($finalOrderStateId === $orderStateId) {
+            $this->logger->info('Order is in final state, changing skipped', $logData);
+
+            return;
+        }
+
+        $transition = $orderStateSettings->getStatus($shopwarePaymentStatus);
+
+        if ($transition === null) {
+            $this->logger->info('Target order status is not configured for shopware payment status', $logData);
+
+            return;
+        }
+
+        $logData['targetOrderStatus'] = $transition;
+        $currentOrderState = $shopwareOrder->getStateMachineState();
+        if ($currentOrderState === null) {
+            throw WebhookException::orderWithoutState($transactionId,$orderNumber);
+        }
+        try {
+            $this->logger->info('Start - Change order status', $logData);
+
+            $newOrderStateId = $this->orderStateHandler->performTransition($shopwareOrder,$currentOrderState, $transition, $context);
+
+            $logData['newOrderStateId'] = $newOrderStateId;
+            $this->logger->info('Finished - Change order status', $logData);
+        } catch (\Throwable $exception) {
+            $logData['message'] = $exception->getMessage();
+            $this->logger->error('Finished - Change order status, Failed to change order status', $logData);
+            throw $exception;
+        }
     }
 }
