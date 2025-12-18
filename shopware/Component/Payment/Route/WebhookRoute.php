@@ -151,7 +151,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $newPaymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod($payment->getMethod(), $salesChannelId, $context);
 
         if ($newPaymentMethodId === null) {
-            throw PaymentException::paymentMethodNotFound($transactionId,$payment->getMethod()->value);
+            throw PaymentException::paymentMethodNotFound($transactionId, $molliePaymentMethod->value);
         }
 
         $this->orderTransactionRepository->upsert([
