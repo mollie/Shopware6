@@ -9,13 +9,14 @@ final class PaymentSettings extends Struct
 {
     public const KEY_ORDER_NUMBER_FORMAT = 'formatOrderNumber';
     public const KEY_DUE_DATE_DAYS = 'paymentMethodBankTransferDueDateDays';
+    public const KEY_SHOPWARE_FAILED_PAYMENT = 'shopwareFailedPayment';
     private const MIN_DUE_DAYS = 1;
     private const MAX_DUE_DAYS = 100;
 
     private const KEY_ONE_CLICK_PAYMENT = 'oneClickPaymentsEnabled';
     private const KEY_ONE_CLICK_COMPACT_VIEW = 'oneClickPaymentsCompactView';
 
-    public function __construct(private string $orderNumberFormat, private int $dueDateDays, private bool $oneClickPayment = false, private bool $oneClickCompactView = false)
+    public function __construct(private string $orderNumberFormat, private int $dueDateDays, private bool $oneClickPayment = false, private bool $oneClickCompactView = false,private bool $shopwareFailedPayment = false)
     {
     }
 
@@ -28,13 +29,19 @@ final class PaymentSettings extends Struct
         $dueDateDays = $settings[self::KEY_DUE_DATE_DAYS] ?? 0;
         $oneClickPayment = $settings[self::KEY_ONE_CLICK_PAYMENT] ?? false;
         $oneClickCompactView = $settings[self::KEY_ONE_CLICK_COMPACT_VIEW] ?? false;
+        $shopwareFailedPayment = $settings[self::KEY_SHOPWARE_FAILED_PAYMENT] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays,$oneClickPayment,$oneClickCompactView);
+        return new self($orderNumberFormat, $dueDateDays,$oneClickPayment,$oneClickCompactView,$shopwareFailedPayment);
     }
 
     public function getOrderNumberFormat(): string
     {
         return $this->orderNumberFormat;
+    }
+
+    public function isShopwareFailedPayment(): bool
+    {
+        return $this->shopwareFailedPayment;
     }
 
     public function getDueDateDays(): int

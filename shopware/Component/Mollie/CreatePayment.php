@@ -34,6 +34,10 @@ final class CreatePayment implements \JsonSerializable
      * @var array<mixed>
      */
     private array $metadata = [];
+    /**
+     * @var string[]
+     */
+    private array $methods = [];
 
     public function __construct(private string $description,private string $redirectUrl,private Money $amount)
     {
@@ -83,6 +87,14 @@ final class CreatePayment implements \JsonSerializable
     public function setMethod(PaymentMethod $method): void
     {
         $this->method = $method;
+    }
+
+    /**
+     * @param string[] $methods
+     */
+    public function setMethods(array $methods): void
+    {
+        $this->methods = $methods;
     }
 
     public function getLines(): LineItemCollection
@@ -164,6 +176,10 @@ final class CreatePayment implements \JsonSerializable
         if ($this->dueDate !== null) {
             $createPaymentBody['dueDate'] = $this->dueDate->format('Y-m-d');
         }
+        if (count($this->methods) > 0) {
+            $createPaymentBody['method'] = $this->methods;
+        }
+        unset($createPaymentBody['methods']);
 
         // Remove all entries with null values
         return array_filter($createPaymentBody, function ($entry) {
