@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusFailedEvent
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusOpenEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPendingEvent;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 
 enum PaymentStatus: string
 {
@@ -66,6 +67,18 @@ enum PaymentStatus: string
             self::CANCELED => WebhookStatusCancelledEvent::class,
             self::EXPIRED => WebhookStatusExpiredEvent::class,
             self::FAILED => WebhookStatusFailedEvent::class
+        };
+    }
+
+    public function getShopwarePaymentStatus(): string
+    {
+        return match ($this) {
+            self::OPEN => OrderTransactionStates::STATE_OPEN,
+            self::PENDING => OrderTransactionStates::STATE_UNCONFIRMED,
+            self::AUTHORIZED => OrderTransactionStates::STATE_AUTHORIZED,
+            self::PAID => OrderTransactionStates::STATE_PAID,
+            self::CANCELED, self::EXPIRED => OrderTransactionStates::STATE_CANCELLED,
+            self::FAILED => OrderTransactionStates::STATE_FAILED,
         };
     }
 
