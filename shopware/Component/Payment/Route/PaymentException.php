@@ -12,7 +12,7 @@ final class PaymentException extends HttpException
     public const TRANSACTION_WITHOUT_PAYMENT_METHOD = 'TRANSACTION_WITHOUT_PAYMENT_METHOD';
     public const TRANSACTION_WITHOUT_MOLLIE_PAYMENT = 'TRANSACTION_WITHOUT_MOLLIE_PAYMENT';
     public const NEW_PAYMENT_METHOD_NOT_FOUND = 'NEW_PAYMENT_METHOD_NOT_FOUND';
-    const PAYMENT_WITHOUT_METHOD = 'PAYMENT_WITHOUT_METHOD';
+    public const PAYMENT_WITHOUT_METHOD = 'PAYMENT_WITHOUT_METHOD';
 
     public static function transactionWithoutOrder(string $transactionId): self
     {
@@ -59,7 +59,7 @@ final class PaymentException extends HttpException
         );
     }
 
-    public static function paymentWithoutMethod(string $transactionId, string $paymentId):self
+    public static function paymentWithoutMethod(string $transactionId, string $paymentId): self
     {
         return new self(
             Response::HTTP_BAD_REQUEST,
