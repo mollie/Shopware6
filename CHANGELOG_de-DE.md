@@ -12,6 +12,9 @@
 - Ein Produkt kann nun mehreren Gutschein-Kategorien zugeordnet werden.
 - Hinzugefügt: Order-bezogene Logeinträge werden nun in einem eigenen mollie-Verzeichnis abgelegt. Die Logdateien tragen ein Namensschema im Format order-<orderNumber>, z. B. order-12345.
 - Hinzugefügt: Order-bezogene Logeinträge werden nun automatisch gelöscht, sobald sich der Zahlungsstatus auf "paid" ändert. Zudem werden alle übrigen Einträge entfernt, sobald sie die in den Einstellungen definierte Aufbewahrungsfrist überschreiten.
+- Im Mollie Failure Mode werden auf der Mollie-Seite ausschließlich Zahlungsarten angezeigt, die auch im Warenkorb verfügbar sind.
+- Das Order-State-Mapping wurde optimiert. Beim Statuswechsel wird nun ein präziser Übergangspfad ermittelt; kann der Wechsel nicht durchgeführt werden, werden detaillierte Log-Einträge erstellt.
+- Payconiq ist eingestellt und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
 
 ## [Unreleased]
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.

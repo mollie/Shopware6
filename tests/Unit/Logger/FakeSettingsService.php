@@ -89,5 +89,4 @@ final class FakeSettingsService extends AbstractSettingsService
     {
         // TODO: Implement getOrderStateSettings() method.
     }
-
 }
