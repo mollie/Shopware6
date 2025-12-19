@@ -83,7 +83,7 @@ context("Order Status Mapping Tests", () => {
             /**
              * In Shopware 6.7 the action DO_PAY was removed, so we use ACTION_PROCESS for bank payments. this action sets status to open in lower than 6.7
              */
-            if(shopware.isVersionLower('6.7.0.0')){
+            if(shopware.isVersionLower('6.6.0.0')){
                 paymentStatus = 'Open'
             }
 

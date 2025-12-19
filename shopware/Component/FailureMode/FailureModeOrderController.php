@@ -7,6 +7,11 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod;
 use Mollie\Shopware\Mollie;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\OrderException;
+use Shopware\Core\Checkout\Order\SalesChannel\AbstractOrderRoute;
+use Shopware\Core\Checkout\Order\SalesChannel\OrderRoute;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\AccountOrderController;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -27,6 +32,8 @@ final class FailureModeOrderController extends StorefrontController
     public function __construct(
         #[AutowireDecorated]
         private AccountOrderController $accountOrderController,
+        #[Autowire(service: OrderRoute::class)]
+        private AbstractOrderRoute $orderRoute,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
         private AccountEditOrderPageLoader $accountEditOrderPageLoader,
@@ -38,11 +45,25 @@ final class FailureModeOrderController extends StorefrontController
         $salesChannelId = $context->getSalesChannelId();
 
         $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
+
         if ($paymentSettings->isShopwareFailedPayment()) {
             return $this->accountOrderController->editOrder($orderId, $request, $context);
         }
-        $editOrderPage = $this->accountEditOrderPageLoader->load($request, $context);
-        $paymentMethods = $editOrderPage->getPaymentMethods();
+
+        try {
+            $editOrderPage = $this->accountEditOrderPageLoader->load($request, $context);
+            $paymentMethods = $editOrderPage->getPaymentMethods();
+        } catch (OrderException $exception) {
+            $criteria = new Criteria([$orderId]);
+            $orderRouteResponse = $this->orderRoute->load($request,$context,$criteria);
+            $order = $orderRouteResponse->getOrders()->first();
+
+            if ($order instanceof OrderEntity) {
+                $this->addFlash(self::DANGER, $this->trans('error.' . $exception->getErrorCode(), ['%orderNumber%' => (string) $order->getOrderNumber()]));
+            }
+
+            return $this->redirectToRoute('frontend.account.order.page');
+        }
 
         $paymentMethodList = [];
         foreach ($paymentMethods as $paymentMethod) {
