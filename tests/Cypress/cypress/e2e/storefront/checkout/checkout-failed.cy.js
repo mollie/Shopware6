@@ -129,22 +129,10 @@ context("Checkout Failure Tests", () => {
                 // verify that we are back in our shop
                 // if the payment fails, the order is finished, but
                 // we still have the option to change the payment method
-                cy.url().should('include', '/account/order/edit');
-
-                // click on the mollie plugin retry button
-                // which brings us to the mollie payment selection page
-                checkout.mollieFailureModeRetryPayment();
-
-                cy.url().should('include', '/checkout/select-method/');
-
-                // select giro pay and mark it as "paid"
-                mollieSandbox.initSandboxCookie();
-                molliePaymentList.selectBankTransfer();
-                molliePaymentStatus.selectPaid();
-
-                cy.url().should('include', '/checkout/finish');
-                cy.contains('Thank you');
-                cy.contains('Your order number');
+                cy.url().should('include', '/account/order');
+                //in newer shopware version, if a customer cancelled a payment and order was changed to cancelled
+                //that means the order reached final state and cannot be edited afterwards
+                cy.contains('canceled and cannot be edited afterwards');
             })
 
             it('C4010: Continue Shopping after failed payment in Mollie Failure Mode', () => {
