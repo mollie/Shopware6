@@ -23,6 +23,7 @@ use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\Test\TestDefaults;
 
 final class FakeOrderRepository
@@ -41,6 +42,13 @@ final class FakeOrderRepository
         if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
             $order->setPrimaryOrderDeliveryId('fake-delivery-id');
         }
+
+        $stateMachineState = new StateMachineStateEntity();
+        $stateMachineState->setTechnicalName('open');
+        $stateMachineState->setId('openFakeStateId');
+
+        $order->setStateId($stateMachineState->getId());
+        $order->setStateMachineState($stateMachineState);
 
         return $order;
     }
