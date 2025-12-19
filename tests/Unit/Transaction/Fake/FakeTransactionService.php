@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Entity\Customer\Customer;
+use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
@@ -17,6 +18,7 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -37,8 +39,10 @@ final class FakeTransactionService implements TransactionServiceInterface
     private FakeOrderRepository $orderRepository;
     private array $orderCustomFields = [];
     private array $mollieCustomerIds = [];
-    private ?bool $withNullLineItems = null;
-    private ?bool $withZeroShippingCosts = null;
+    private bool $withNullLineItems = false;
+    private bool $withZeroShippingCosts = false;
+
+    private bool $withoutOrder = false;
 
     public function __construct()
     {
@@ -67,31 +71,31 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function createValidStruct(): void
     {
         $this->withPayment = true;
-        $this->createTransaction();
+    }
+
+    public function withoutOrder(): void
+    {
+        $this->withoutOrder = true;
     }
 
     public function withOrderCustomFields(array $customFields): void
     {
         $this->orderCustomFields = $customFields;
-        $this->createTransaction();
     }
 
     public function withMollieCustomerId(string $profileId, string $mollieCustomerId): void
     {
         $this->mollieCustomerIds[$profileId] = $mollieCustomerId;
-        $this->createTransaction();
     }
 
     public function withNullLineItems(): void
     {
         $this->withNullLineItems = true;
-        $this->createTransaction();
     }
 
     public function withZeroShippingCosts(): void
     {
         $this->withZeroShippingCosts = true;
-        $this->createTransaction();
     }
 
     public function getDefaultSalesChannelEntity(): SalesChannelEntity
@@ -118,11 +122,19 @@ final class FakeTransactionService implements TransactionServiceInterface
         }
 
         if ($this->withPayment) {
-            $payment = new Payment('testMollieId', PaymentMethod::CREDIT_CARD);
+            $payment = new Payment('testMollieId');
+            $payment->setMethod(PaymentMethod::CREDIT_CARD);
             $payment->setFinalizeUrl('payment/finalize');
+            $payment->setShopwareTransaction($transaction);
             $transaction->addExtension(Mollie::EXTENSION, $payment);
-        }
 
+            $paymentMethod = new PaymentMethodEntity();
+            $paymentMethod->setId('testShopwareId');
+            $paymentMethod->addExtension(Mollie::EXTENSION, new PaymentMethodExtension('testShopwareId', PaymentMethod::CREDIT_CARD));
+
+            $transaction->setPaymentMethodId($paymentMethod->getId());
+            $transaction->setPaymentMethod($paymentMethod);
+        }
         $order = $this->orderRepository->getDefaultOrder($customer);
         $order->setCurrency($currency);
         $order->setLanguage($language);
@@ -134,6 +146,10 @@ final class FakeTransactionService implements TransactionServiceInterface
 
         if ($this->withNullLineItems === true) {
             $order->setLineItems(new OrderLineItemCollection());
+        }
+
+        if ($this->withoutOrder === false) {
+            $transaction->setOrder($order);
         }
 
         $shippingAddress = $this->orderRepository->getOrderAddress($customer);

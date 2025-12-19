@@ -59,4 +59,9 @@ class FakeMollieGateway implements MollieGatewayInterface
     {
         // TODO: Implement updateSubscription() method.
     }
+
+    public function getPosTerminals(): array
+    {
+        // TODO: Implement getPosTerminals() method.
+    }
 }

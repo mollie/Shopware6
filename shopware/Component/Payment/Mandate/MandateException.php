@@ -26,7 +26,7 @@ final class MandateException extends HttpException
         return new self(
             Response::HTTP_BAD_REQUEST,
             self::MISSING_MOLLIE_CUSTOMER_ID,
-            'Customer {customerNumber} does not have mollie customer id',
+            'Customer {{customerNumber}} does not have mollie customer id',
             ['customerNumber' => $customerNumber]
         );
     }
@@ -36,7 +36,7 @@ final class MandateException extends HttpException
         return new self(
             Response::HTTP_BAD_REQUEST,
             self::ONE_CLICK_DISABLED,
-            'One click payment is disabled for SalesChannel {salesChannelId}',
+            'One click payment is disabled for SalesChannel {{salesChannelId}}',
             ['salesChannelId' => $salesChannelId]
         );
     }
@@ -46,7 +46,7 @@ final class MandateException extends HttpException
         return new self(
             Response::HTTP_BAD_REQUEST,
             self::ONE_CLICK_DISABLED,
-            'The customer {customerNumber} does not have mollie customer ID in profile {mollieProfileId}',
+            'The customer {{customerNumber}} does not have mollie customer ID in profile {{mollieProfileId}}',
             ['customerNumber' => $customerNumber, 'mollieProfileId' => $mollieProfileId]
         );
     }

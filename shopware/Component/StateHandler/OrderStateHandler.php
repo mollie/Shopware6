@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\StateHandler;
 
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -27,24 +29,47 @@ final class OrderStateHandler implements OrderStateHandlerInterface
         #[Autowire(service: 'state_machine_transition.repository')]
         private readonly EntityRepository $stateMachineRepository,
         private readonly StateMachineRegistry $stateMachineRegistry,
+        #[Autowire(service: SettingsService::class)]
+        private AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
     }
 
-    public function performTransition(OrderEntity $shopwareOrder, StateMachineStateEntity $currentOrderState, string $targetState, Context $context): string
+    public function performTransition(OrderEntity $shopwareOrder, string $shopwarePaymentStatus, string $currentState, string $salesChannelId, Context $context): string
     {
         $orderNumber = $shopwareOrder->getOrderNumber();
         $salesChannelId = $shopwareOrder->getSalesChannelId();
         $orderId = $shopwareOrder->getId();
-        $currentState = $currentOrderState->getTechnicalName();
+        $currentOrderStateId = $shopwareOrder->getStateId();
+
+        $orderStateSettings = $this->settingsService->getOrderStateSettings($salesChannelId);
+        $finalOrderStateId = (string) $orderStateSettings->getFinalOrderState();
+
         $logData = [
-            'currentState' => $currentState,
-            'targetState' => $targetState,
-            'orderId' => $orderId,
-            'salesChannelId' => $salesChannelId,
             'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+            'orderId' => $orderId,
+            'currentOrderStateId' => $currentOrderStateId,
+            'currentState' => $currentState,
+            'finalOrderStateId' => $finalOrderStateId,
         ];
+
+        if ($finalOrderStateId === $currentOrderStateId) {
+            $this->logger->debug('Order is in final state, changing skipped', $logData);
+
+            return $currentOrderStateId;
+        }
+
+        $targetState = $orderStateSettings->getStatus($shopwarePaymentStatus);
+
+        if ($targetState === null) {
+            $this->logger->debug('Target order status is not configured for shopware payment status', $logData);
+
+            return $currentOrderStateId;
+        }
+
+        $logData['targetState'] = $targetState;
 
         if ($targetState === $currentState) {
             $this->logger->debug('Order is already in current status', $logData);
@@ -63,31 +88,31 @@ final class OrderStateHandler implements OrderStateHandlerInterface
         $transitionList = $searchResult->getEntities();
 
         $movedToTransactionId = '';
-        $transitionActions = $this->loadTransitionActions($transitionList,$currentState,$targetState);
-        if (count($transitionActions) === 0) {
-            $this->logger->error('Failed to find a way to move the order transaction, please check your state machine state',$logData);
+        $transitionActions = $this->loadTransitionActions($transitionList, $currentState, $targetState);
 
-            return $movedToTransactionId;
+        if (count($transitionActions) === 0) {
+            $this->logger->error('Failed to find a way to move the order transaction, please check your state machine state', $logData);
+            $message = sprintf('Could not find a way to move the order status from %s to status %s', $currentState, $targetState);
+            throw new \RuntimeException($message);
         }
 
         foreach ($transitionActions as $action) {
-            $this->logger->debug(sprintf("Use action '%s' to move order state",$action), $logData);
+            $this->logger->debug(sprintf("Use action '%s' to move order state", $action), $logData);
             $result = $this->stateMachineRegistry->transition(new Transition(
                 OrderDefinition::ENTITY_NAME,
                 $orderId,
                 $action,
                 'stateId'
-            ),$context);
+            ), $context);
             /** @var StateMachineStateEntity $movedToTransaction */
             $movedToTransaction = $result->get('toPlace');
             $movedToTransactionId = $movedToTransaction->getId();
         }
-        $this->logger->info('Transitioned order status', $logData);
 
         return $movedToTransactionId;
     }
 
-    private function getAllowedTransitions(StateMachineTransitionCollection $transitions,string $currentState): StateMachineTransitionCollection
+    private function getAllowedTransitions(StateMachineTransitionCollection $transitions, string $currentState): StateMachineTransitionCollection
     {
         $result = new StateMachineTransitionCollection();
         foreach ($transitions as $transition) {
@@ -106,10 +131,10 @@ final class OrderStateHandler implements OrderStateHandlerInterface
     /**
      * @return string[]
      */
-    private function loadTransitionActions(StateMachineTransitionCollection $transitions,string $currentState, string $targetState): array
+    private function loadTransitionActions(StateMachineTransitionCollection $transitions, string $currentState, string $targetState): array
     {
         $result = [];
-        $allowedTransitions = $this->getAllowedTransitions($transitions,$currentState);
+        $allowedTransitions = $this->getAllowedTransitions($transitions, $currentState);
         // If there is only one allowed actions, then we execute that action
         if ($allowedTransitions->count() === 1) {
             $firstTransition = $allowedTransitions->first();
@@ -144,13 +169,13 @@ final class OrderStateHandler implements OrderStateHandlerInterface
             $reverseResults[] = $transition->getActionName();
 
             if ($fromState->getTechnicalName() === $currentState) {
-                return array_merge($result,array_reverse($reverseResults));
+                return array_merge($result, array_reverse($reverseResults));
             }
-            $subResult = $this->loadTransitionActions($transitions,$currentState,$fromState->getTechnicalName());
+            $subResult = $this->loadTransitionActions($transitions, $currentState, $fromState->getTechnicalName());
 
-            $reverseResults = array_merge($reverseResults,$subResult);
+            $reverseResults = array_merge($reverseResults, $subResult);
         }
 
-        return array_merge($result,array_reverse($reverseResults));
+        return array_merge($result, array_reverse($reverseResults));
     }
 }
