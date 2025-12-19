@@ -111,7 +111,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         } catch (IllegalTransitionException $exception) {
             $logData['exceptionMessage'] = $exception->getMessage();
             $this->logger->error('Failed to change payment status', $logData);
-            throw $exception;
+            throw WebhookException::paymentStatusChangeFailed($transactionId,$orderNumber,$exception);
         }
     }
 
@@ -230,7 +230,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         } catch (\Throwable $exception) {
             $logData['message'] = $exception->getMessage();
             $this->logger->error('Finished - Change order status, Failed to change order status', $logData);
-            throw $exception;
+            throw WebhookException::orderStatusChangeFailed($transactionId, $orderNumber, $exception);
         }
     }
 }
