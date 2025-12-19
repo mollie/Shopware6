@@ -16,6 +16,7 @@ final class WebhookException extends HttpException
     public const ORDER_WITHOUT_STATE = 'ORDER_WITHOUT_STATE';
     public const PAYMENT_STATUS_CHANGE_FAILED = 'PAYMENT_STATUS_CHANGE_FAILED';
     public const ORDER_STATUS_CHANGE_FAILED = 'ORDER_STATUS_CHANGE_FAILED';
+    public const PAYMENT_METHOD_CHANGE_FAILED = 'PAYMENT_METHOD_CHANGE_FAILED';
 
     public static function transactionWithoutOrder(string $transactionId): self
     {
@@ -46,18 +47,6 @@ final class WebhookException extends HttpException
             self::TRANSACTION_WITHOUT_MOLLIE_PAYMENT,
             'Transaction {{transactionId}} does not have mollie custom fields',[
                 'transactionId' => $transactionId,
-            ]
-        );
-    }
-
-    public static function paymentMethodNotFound(string $transactionId, string $paymentMethod): self
-    {
-        return new self(
-            Response::HTTP_BAD_REQUEST,
-            self::NEW_PAYMENT_METHOD_NOT_FOUND,
-            'Transaction {{transactionId}} has {{paymentMethod}} in mollie API, but this method is not active in shop',[
-                'transactionId' => $transactionId,
-                'paymentMethod' => $paymentMethod,
             ]
         );
     }
@@ -105,6 +94,19 @@ final class WebhookException extends HttpException
             Response::HTTP_BAD_REQUEST,
             self::ORDER_STATUS_CHANGE_FAILED,
             'Failed to change order status in order {{orderNumber}} for transaction {{transactionId}}',[
+                'transactionId' => $transactionId,
+                'orderNumber' => $orderNumber,
+            ],
+            $exception
+        );
+    }
+
+    public static function paymentMethodChangeFailed(string $transactionId, string $orderNumber, \Throwable $exception): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::PAYMENT_METHOD_CHANGE_FAILED,
+            'Failed to change payment method in order {{orderNumber}} for transaction {{transactionId}}',[
                 'transactionId' => $transactionId,
                 'orderNumber' => $orderNumber,
             ],
