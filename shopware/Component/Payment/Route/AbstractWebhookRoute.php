@@ -9,5 +9,5 @@ abstract class AbstractWebhookRoute
 {
     abstract public function getDecorated(): self;
 
-    abstract public function notify(string $transactionId, Context $context): WebhookRouteResponse;
+    abstract public function notify(string $transactionId, Context $context): WebhookResponse;
 }

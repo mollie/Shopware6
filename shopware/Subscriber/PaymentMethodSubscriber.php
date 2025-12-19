@@ -40,7 +40,7 @@ final class PaymentMethodSubscriber implements EventSubscriberInterface
             if ($molliePaymentMethod === null) {
                 continue;
             }
-            $paymentMethodExtension = new PaymentMethodExtension($molliePaymentMethod);
+            $paymentMethodExtension = new PaymentMethodExtension($paymentMethod->getId(),$molliePaymentMethod);
             $paymentMethod->addExtension(Mollie::EXTENSION, $paymentMethodExtension);
         }
     }
