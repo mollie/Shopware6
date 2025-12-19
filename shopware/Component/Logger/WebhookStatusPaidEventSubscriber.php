@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Logger;
 
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,6 +35,10 @@ final class WebhookStatusPaidEventSubscriber implements EventSubscriberInterface
     public function onWebhookStatusPaid(Event $event): void
     {
         try {
+            $payment = $event->getPayment();
+            if ($payment->getStatus() !== PaymentStatus::PAID) {
+                return;
+            }
             $orderNumber = (string) $event->getOrder()->getOrderNumber();
 
             $logFile = $this->logDir . '/mollie/order-' . $orderNumber . '.log';
