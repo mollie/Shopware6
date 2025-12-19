@@ -12,6 +12,9 @@
 - A product can now have multiple voucher categories.
 - Added: order-related log entries are now stored in a dedicated mollie directory. Log files follow the naming pattern order-<orderNumber>, for example order-12345.
 - Added: order-related log entries are now automatically removed when the payment status changes to "paid". Additionally, any remaining entries are deleted once they exceed the retention period defined in the settings.
+- In Mollie Failure Mode, only payment methods that are also available in the cart are displayed on the Mollie page.
+- The order state mapping has been optimized. During a status change, a precise transition path is now determined; if the transition cannot be performed, detailed log entries are generated.
+- Payconiq is discontinued and will not be activated after update. Please deactivate the payment method and remove it from saleschannel
 
 ## [Unreleased]
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
