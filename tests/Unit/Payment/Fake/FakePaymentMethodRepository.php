@@ -9,13 +9,17 @@ use Shopware\Core\Framework\Context;
 
 final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
+    public function __construct(private ?string $fakeId = null)
+    {
+    }
+
     public function getIdByPaymentHandler(string $handlerIdentifier, string $salesChannelId, Context $context): ?string
     {
-        // TODO: Implement getIdByPaymentHandler() method.
+        return $this->fakeId;
     }
 
     public function getIdByPaymentMethod(PaymentMethod $paymentMethod, string $salesChannelId, Context $context): ?string
     {
-        // TODO: Implement getIdByPaymentMethod() method.
+        return $this->fakeId;
     }
 }

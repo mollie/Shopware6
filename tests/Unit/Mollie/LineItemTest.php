@@ -8,7 +8,8 @@ use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -72,7 +73,7 @@ final class LineItemTest extends TestCase
 
     public function testCanCreateFromDelivery(): void
     {
-        $customerRepository = new Fake\FakeCustomerRepository();
+        $customerRepository = new FakeCustomerRepository();
         $customer = $customerRepository->getDefaultCustomer();
         $delivery = $this->orderRepository->getOrderDeliveries($customer)->first();
         $currency = new CurrencyEntity();
