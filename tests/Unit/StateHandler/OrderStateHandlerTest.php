@@ -39,7 +39,7 @@ final class OrderStateHandlerTest extends TestCase
 
         $stateHandler = $this->getOrderStateHandler($settings);
 
-        $actual = $stateHandler->performTransition($fakeOrder,    OrderTransactionStates::STATE_PAID, OrderStates::STATE_COMPLETED, 'test', $this->context);
+        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_COMPLETED, 'test', $this->context);
         $this->assertSame('finalId', $actual);
     }
 
@@ -49,7 +49,7 @@ final class OrderStateHandlerTest extends TestCase
 
         $stateHandler = $this->getOrderStateHandler();
 
-        $actual = $stateHandler->performTransition($fakeOrder,OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
+        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
         $this->assertSame('openFakeStateId', $actual);
     }
 
@@ -63,7 +63,7 @@ final class OrderStateHandlerTest extends TestCase
 
         $stateHandler = $this->getOrderStateHandler($settings);
 
-        $actual = $stateHandler->performTransition($fakeOrder,    OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
+        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
         $this->assertSame('openFakeStateId', $actual);
     }
 
@@ -76,12 +76,9 @@ final class OrderStateHandlerTest extends TestCase
         ]);
 
         $stateHandler = $this->getOrderStateHandler($settings);
+        $this->expectException(\RuntimeException::class);
 
-        try {
-            $actual = $stateHandler->performTransition($fakeOrder,OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
-        } catch (\Throwable $exception) {
-            $this->assertInstanceOf(\RuntimeException::class, $exception);
-        }
+        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
     }
 
     public function testTransactionIsMovedOnce(): void
@@ -94,13 +91,13 @@ final class OrderStateHandlerTest extends TestCase
         $stateMachineRepository = new FakeStateMachineRepository();
         $stateMachineRepository->createDefaultCollection();
 
-        $stateHandler = $this->getOrderStateHandler($settings,$stateMachineRepository);
+        $stateHandler = $this->getOrderStateHandler($settings, $stateMachineRepository);
 
-        $actual = $stateHandler->performTransition($fakeOrder,  OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
+        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
 
         $expectedTransition = ['process'];
         $this->assertSame('inProgressId', $actual);
-        $this->assertSame($expectedTransition,$this->registry->getActions());
+        $this->assertSame($expectedTransition, $this->registry->getActions());
     }
 
     public function testTransactionIsMovedFromCancelledToComplete(): void
@@ -113,13 +110,13 @@ final class OrderStateHandlerTest extends TestCase
         $stateMachineRepository = new FakeStateMachineRepository();
         $stateMachineRepository->createDefaultCollection();
 
-        $stateHandler = $this->getOrderStateHandler($settings,$stateMachineRepository);
+        $stateHandler = $this->getOrderStateHandler($settings, $stateMachineRepository);
 
         $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_CANCELLED, 'test', $this->context);
 
         $expectedTransition = ['reopen', 'process', 'complete'];
         $this->assertSame('completedId', $actual);
-        $this->assertSame($expectedTransition,$this->registry->getActions());
+        $this->assertSame($expectedTransition, $this->registry->getActions());
     }
 
     public function testTransactionIsMovedFromCompleteToCancelled(): void
@@ -132,13 +129,13 @@ final class OrderStateHandlerTest extends TestCase
         $stateMachineRepository = new FakeStateMachineRepository();
         $stateMachineRepository->createDefaultCollection();
 
-        $stateHandler = $this->getOrderStateHandler($settings,$stateMachineRepository);
+        $stateHandler = $this->getOrderStateHandler($settings, $stateMachineRepository);
 
         $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_FAILED, OrderStates::STATE_COMPLETED, 'test', $this->context);
 
         $expectedTransition = ['reopen', 'cancel'];
         $this->assertSame('cancelledId', $actual);
-        $this->assertSame($expectedTransition,$this->registry->getActions());
+        $this->assertSame($expectedTransition, $this->registry->getActions());
     }
 
     private function getOrder(): OrderEntity
