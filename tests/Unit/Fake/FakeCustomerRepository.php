@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Unit\Mollie\Fake;
+namespace Mollie\Shopware\Unit\Fake;
 
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;

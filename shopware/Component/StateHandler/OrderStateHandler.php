@@ -20,15 +20,15 @@ use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class OrderStateHandler implements OrderStateHandlerInterface
+final readonly class OrderStateHandler implements OrderStateHandlerInterface
 {
     /**
      * @param EntityRepository<StateMachineTransitionCollection<StateMachineTransitionEntity>> $stateMachineRepository
      */
     public function __construct(
         #[Autowire(service: 'state_machine_transition.repository')]
-        private readonly EntityRepository $stateMachineRepository,
-        private readonly StateMachineRegistry $stateMachineRegistry,
+        private EntityRepository $stateMachineRepository,
+        private StateMachineRegistry $stateMachineRegistry,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -74,7 +74,7 @@ final class OrderStateHandler implements OrderStateHandlerInterface
         if ($targetState === $currentState) {
             $this->logger->debug('Order is already in current status', $logData);
 
-            return $targetState;
+            return $currentOrderStateId;
         }
 
         $criteria = new Criteria();
