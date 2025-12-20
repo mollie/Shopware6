@@ -103,7 +103,7 @@ class DependencyLoader
         $dirFixtures = (string) realpath(__DIR__ . '/../../tests/Fixtures/');
         // we need to tell Shopware to load our custom fixtures
         // from our TEST autoload-dev area....
-        $classLoader->addPsr4('MolliePayments\Fixtures\\', $dirFixtures, true);
+        $classLoader->addPsr4('MolliePayments\Shopware\Fixtures\\', $dirFixtures, true);
     }
 
     private function shouldLoadFixtures(): bool

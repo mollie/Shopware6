@@ -44,7 +44,7 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
             <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
+            <argument type="service" id="Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService"/>
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\ShopService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>

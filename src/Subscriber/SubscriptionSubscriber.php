@@ -40,7 +40,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     /**
      * @return string[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CartBeforeSerializationEvent::class => 'onBeforeSerializeCart',

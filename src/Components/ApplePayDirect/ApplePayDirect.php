@@ -15,7 +15,6 @@ use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\DomainExtractor;
@@ -24,6 +23,7 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractCartBackupService;
 use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
@@ -90,7 +90,7 @@ class ApplePayDirect
     private $repoPaymentMethods;
 
     /**
-     * @var CartBackupService
+     * @var AbstractCartBackupService
      */
     private $cartBackupService;
 
@@ -127,7 +127,19 @@ class ApplePayDirect
     /**
      * @param EntityRepository<EntityCollection<OrderAddressEntity>> $repoOrderAdresses
      */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
+    public function __construct(
+        ApplePayDomainVerificationService $domainFileDownloader,
+        ApplePayPayment $paymentHandler,
+        MolliePaymentDoPay $molliePayments,
+        CartServiceInterface $cartService,
+        ApplePayFormatter $formatter,
+        ApplePayShippingBuilder $shippingBuilder,
+        SettingsService $pluginSettings,
+        CustomerService $customerService,
+        PaymentMethodRepository $repoPaymentMethods,
+        AbstractCartBackupService $cartBackupService,
+        MollieApiFactory $mollieApiFactory,
+        ShopService $shopService, OrderService $orderService, $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentHandler = $paymentHandler;

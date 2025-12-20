@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\RefundManager\RefundData;
+namespace MolliePayments\Shopware\Tests\Components\RefundManager\RefundData;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundData\OrderItem\ProductItem;
 use Kiener\MolliePayments\Components\RefundManager\RefundData\RefundData;

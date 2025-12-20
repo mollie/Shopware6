@@ -275,10 +275,7 @@
             <tag name="shopware.cart.validator"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\Subscription\Cart\Validator\SubscriptionCartValidator">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <tag name="shopware.cart.validator"/>
-        </service>
+
 
         <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService">
             <argument type="service" id="order.repository"/>

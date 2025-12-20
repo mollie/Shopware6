@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Data;
+namespace Mollie\Shopware\Integration\Data;
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -106,7 +106,7 @@ trait CustomerTestBehaviour
                 'street' => 'Mollie Street 123',
                 'city' => 'Mollie City',
                 'zipcode' => '12345',
-                'phoneNumber' => '0123456789',
+                'phoneNumber' => '+390123456789',
             ];
         }
         $customerData = [
@@ -140,7 +140,7 @@ trait CustomerTestBehaviour
                 'street' => 'Mollie Street 123',
                 'city' => 'Mollie City',
                 'zipcode' => '12345',
-                'phoneNumber' => '0123456789',
+                'phoneNumber' => '+490123456789',
             ]
         ];
     }
