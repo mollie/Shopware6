@@ -46,4 +46,33 @@ final class PaymentMethodUpdaterTest extends TestCase
 
         $this->assertSame('shopwareId', $newPaymentMethodId);
     }
+
+    public function testExceptionIsThrownOnDisabledPaymentMethod(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $context = new Context(new SystemSource());
+
+        $paymentMethodUpdater = new PaymentMethodUpdater(
+            new FakeOrderTransactionRepository(),
+            new FakePaymentMethodRepository(),
+            new NullLogger()
+        );
+        $paymentMethodExtension = new PaymentMethodExtension('shopwareId', PaymentMethod::CREDIT_CARD);
+        $newPaymentMethodId = $paymentMethodUpdater->updatePaymentMethod($paymentMethodExtension, PaymentMethod::PAYCONIQ, 'test', 'test', 'test', $context);
+    }
+
+    public function testNewPaymentMethodIsSet(): void
+    {
+        $context = new Context(new SystemSource());
+
+        $paymentMethodUpdater = new PaymentMethodUpdater(
+            new FakeOrderTransactionRepository(),
+            new FakePaymentMethodRepository('newPaymentMethodId'),
+            new NullLogger()
+        );
+        $paymentMethodExtension = new PaymentMethodExtension('shopwareId', PaymentMethod::PAYPAL);
+        $newPaymentMethodId = $paymentMethodUpdater->updatePaymentMethod($paymentMethodExtension, PaymentMethod::CREDIT_CARD, 'test', 'test', 'test', $context);
+
+        $this->assertSame('newPaymentMethodId', $newPaymentMethodId);
+    }
 }

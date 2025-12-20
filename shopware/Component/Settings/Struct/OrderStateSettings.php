@@ -21,7 +21,7 @@ final class OrderStateSettings
      * @param array<string,string> $stateMapping
      */
     public function __construct(
-        private array $stateMapping,
+        private array $stateMapping = [],
         private ?string $finalOrderState = null,
     ) {
     }

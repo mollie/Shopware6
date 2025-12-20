@@ -35,7 +35,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class CreatePaymentBuilder implements CreatePaymentBuilderInterface
+final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterface
 {
     /**
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
