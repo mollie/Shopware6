@@ -22,6 +22,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?PaymentSettings $paymentSettings = null,
         private ?ApiSettings $apiSettings = null,
         private ?string $profileId = null,
+        private ?OrderStateSettings $orderStateSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -32,6 +33,9 @@ final class FakeSettingsService extends AbstractSettingsService
         if ($this->apiSettings === null) {
             $profileId = $this->profileId ?? '';
             $this->apiSettings = new ApiSettings('test_key', 'live_key', Mode::TEST, $profileId);
+        }
+        if ($this->orderStateSettings === null) {
+            $this->orderStateSettings = new OrderStateSettings();
         }
     }
 
@@ -87,6 +91,6 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getOrderStateSettings(?string $salesChannelId = null): OrderStateSettings
     {
-        // TODO: Implement getOrderStateSettings() method.
+        return $this->orderStateSettings;
     }
 }

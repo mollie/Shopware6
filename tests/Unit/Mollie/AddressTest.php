@@ -6,8 +6,8 @@ namespace Mollie\Shopware\Unit\Mollie;
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeCustomerRepository;
-use Mollie\Shopware\Unit\Mollie\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Unit\Mollie\Fake;
+namespace Mollie\Shopware\Unit\Fake;
 
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
@@ -31,6 +31,7 @@ final class FakeOrderRepository
     public function getDefaultOrder($customer): OrderEntity
     {
         $order = new OrderEntity();
+        $order->setId('fakeShopwareOrderId');
         $order->setOrderNumber('10000');
         $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
         $order->setBillingAddress($this->getOrderAddress($customer));
