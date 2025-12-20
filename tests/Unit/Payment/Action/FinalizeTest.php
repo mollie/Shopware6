@@ -10,24 +10,27 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\Action\Finalize;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
-final class FinalizeTest extends TestCase implements EventDispatcherInterface
+#[CoversClass(Finalize::class)]
+final class FinalizeTest extends TestCase
 {
-    private object $event;
     private Context $context;
+    private EventSpy $eventSpy;
 
     public function setUp(): void
     {
         $this->context = new Context(new SystemSource());
+        $this->eventSpy = new EventSpy();
     }
 
     public function testSuccessEventIsFired(): void
@@ -38,7 +41,7 @@ final class FinalizeTest extends TestCase implements EventDispatcherInterface
         $paymentFinalize = $this->getFinalizeAction($fakePayment);
         $paymentFinalize->execute(new PaymentTransactionStruct('test'), $this->context);
 
-        $this->assertInstanceOf(SuccessEvent::class, $this->event);
+        $this->assertInstanceOf(SuccessEvent::class, $this->eventSpy->getEvent());
     }
 
     public function testCancelEventIsFired(): void
@@ -51,7 +54,7 @@ final class FinalizeTest extends TestCase implements EventDispatcherInterface
 
         $paymentFinalize = $this->getFinalizeAction($fakePayment);
         $paymentFinalize->execute(new PaymentTransactionStruct('test'), $this->context);
-        $this->assertInstanceOf(CancelledEvent::class, $this->event);
+        $this->assertInstanceOf(CancelledEvent::class, $this->eventSpy->getEvent());
     }
 
     public function testFailedEventIsFired(): void
@@ -64,12 +67,7 @@ final class FinalizeTest extends TestCase implements EventDispatcherInterface
 
         $paymentFinalize = $this->getFinalizeAction($fakePayment);
         $paymentFinalize->execute(new PaymentTransactionStruct('test'), $this->context);
-        $this->assertInstanceOf(FailedEvent::class, $this->event);
-    }
-
-    public function dispatch(object $event): void
-    {
-        $this->event = $event;
+        $this->assertInstanceOf(FailedEvent::class, $this->eventSpy->getEvent());
     }
 
     private function getFinalizeAction(Payment $fakePayment): Finalize
@@ -80,7 +78,7 @@ final class FinalizeTest extends TestCase implements EventDispatcherInterface
         return new Finalize(
             $transactionService,
             new FakeGateway(payment: $fakePayment),
-            $this,
+            $this->eventSpy,
             new NullLogger()
         );
     }
