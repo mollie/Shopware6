@@ -17,21 +17,24 @@ use Shopware\Core\Framework\Context;
 
 final class FakeGateway implements MollieGatewayInterface
 {
-    public function __construct(private string $checkoutUrl = '')
+    public function __construct(private string $checkoutUrl = '',private ?Payment $payment = null)
     {
+        if ($payment === null) {
+            $payment = new Payment('test');
+            $payment->setMethod(PaymentMethod::CREDIT_CARD);
+            $payment->setCheckoutUrl($this->checkoutUrl);
+            $this->payment = $payment;
+        }
     }
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
-        $payment = new Payment('test', PaymentMethod::CREDIT_CARD);
-        $payment->setCheckoutUrl($this->checkoutUrl);
-
-        return $payment;
+        return $this->payment;
     }
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
-        // TODO: Implement getPaymentByTransactionId() method.
+        return $this->payment;
     }
 
     public function getCurrentProfile(?string $salesChannelId = null): Profile
