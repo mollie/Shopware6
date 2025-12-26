@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Fixture\Category;
 
-use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Mollie\Shopware\Component\Fixture\AbstractFixture;
+use Mollie\Shopware\Component\Fixture\FixtureGroup;
+use Shopware\Core\Content\Category\CategoryCollection;
+use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -12,15 +14,15 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-
 final class MollieCategories extends AbstractFixture
 {
+    /**
+     * @param EntityRepository<CategoryCollection<CategoryEntity>> $categoryRepository
+     */
     public function __construct(
         #[Autowire(service: 'category.repository')]
         private readonly EntityRepository $categoryRepository
-    )
-    {
-
+    ) {
     }
 
     public function getGroup(): FixtureGroup
@@ -46,7 +48,6 @@ final class MollieCategories extends AbstractFixture
         $categoryTree = $this->getCategoryTree('root');
         $deleteData = [];
         foreach ($categoryTree as $categoryData) {
-
             $deleteData[] = [
                 'id' => $categoryData['id'],
             ];
@@ -54,9 +55,13 @@ final class MollieCategories extends AbstractFixture
         $this->categoryRepository->delete($deleteData, $context);
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function getCategoryTree(string $rootCategoryId): array
     {
         $mollieRootId = Uuid::fromStringToHex('mollie');
+
         return [
             [
                 'id' => $mollieRootId,
@@ -95,11 +100,14 @@ final class MollieCategories extends AbstractFixture
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('parentId', null));
-        return $this->categoryRepository->searchIds($criteria, $context)->firstId();
 
+        return (string) $this->categoryRepository->searchIds($criteria, $context)->firstId();
     }
 
-    private function getCategoryData(string $id, string $name, string $parentId = null): array
+    /**
+     * @return array<mixed>
+     */
+    private function getCategoryData(string $id, string $name, string $parentId): array
     {
         return [
             'id' => $id,
@@ -122,5 +130,4 @@ final class MollieCategories extends AbstractFixture
             'afterCategoryId' => null,
         ];
     }
-
 }
