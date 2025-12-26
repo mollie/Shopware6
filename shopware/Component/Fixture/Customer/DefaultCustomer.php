@@ -3,30 +3,30 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Fixture\Customer;
 
-use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Mollie\Shopware\Component\Fixture\AbstractFixture;
-
+use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Psr\Container\ContainerInterface;
+use Shopware\Core\Checkout\Customer\CustomerCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Test\TestDefaults;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-
 
 final class DefaultCustomer extends AbstractFixture
 {
     use CustomerTrait;
 
+    /**
+     * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
+     */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
-        private readonly EntityRepository   $customerRepository,
+        private readonly EntityRepository $customerRepository,
         #[Autowire(service: 'service_container')]
         private readonly ContainerInterface $container
-    )
-    {
-
+    ) {
     }
 
     public function getGroup(): FixtureGroup
