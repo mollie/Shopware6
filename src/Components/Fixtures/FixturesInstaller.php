@@ -15,7 +15,7 @@ use Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture;
 
 class FixturesInstaller
 {
-    private CategoryFixture $categoryFixture;
+
     private PaymentMethodsFixture $salesChannelFixture;
     private ShipmentFixture $shipmentFixture;
     private SubscriptionProductsFixture $subscriptionFixture;
@@ -23,10 +23,8 @@ class FixturesInstaller
     private CheapProductsFixture $cheapProducts;
     private FailureProductsFixture $failureProducts;
     private RoundingProductsFixture $roundingProducts;
-    private CustomerFixture $customerFixture;
 
     public function __construct(
-        CategoryFixture $categoryFixture,
         PaymentMethodsFixture $salesChannelFixture,
         ShipmentFixture $shipmentFixture,
         SubscriptionProductsFixture $subscriptionFixture,
@@ -34,9 +32,8 @@ class FixturesInstaller
         CheapProductsFixture $cheapProducts,
         FailureProductsFixture $failureProducts,
         RoundingProductsFixture $roundingProducts,
-        CustomerFixture $customerFixture
     ) {
-        $this->categoryFixture = $categoryFixture;
+
         $this->salesChannelFixture = $salesChannelFixture;
         $this->shipmentFixture = $shipmentFixture;
         $this->subscriptionFixture = $subscriptionFixture;
@@ -44,7 +41,6 @@ class FixturesInstaller
         $this->cheapProducts = $cheapProducts;
         $this->failureProducts = $failureProducts;
         $this->roundingProducts = $roundingProducts;
-        $this->customerFixture = $customerFixture;
     }
 
     public function install(bool $onlySetupMode, bool $onlyDemoData): void
@@ -70,9 +66,9 @@ class FixturesInstaller
     public function uninstall(): void
     {
         $this->shipmentFixture->uninstall();
-        $this->categoryFixture->uninstall();
 
-        $this->customerFixture->uninstall();
+
+
         $this->cheapProducts->uninstall();
         $this->failureProducts->uninstall();
         $this->roundingProducts->uninstall();
