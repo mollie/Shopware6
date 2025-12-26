@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Fixtures;
 
-use Kiener\MolliePayments\Components\Fixtures\Handler\Category\CategoryFixture;
-use Kiener\MolliePayments\Components\Fixtures\Handler\Customer\CustomerFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\PaymentMethod\PaymentMethodsFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture;
 use Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture;
@@ -15,7 +13,6 @@ use Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture;
 
 class FixturesInstaller
 {
-
     private PaymentMethodsFixture $salesChannelFixture;
     private ShipmentFixture $shipmentFixture;
     private SubscriptionProductsFixture $subscriptionFixture;
@@ -33,7 +30,6 @@ class FixturesInstaller
         FailureProductsFixture $failureProducts,
         RoundingProductsFixture $roundingProducts,
     ) {
-
         $this->salesChannelFixture = $salesChannelFixture;
         $this->shipmentFixture = $shipmentFixture;
         $this->subscriptionFixture = $subscriptionFixture;
@@ -67,8 +63,6 @@ class FixturesInstaller
     {
         $this->shipmentFixture->uninstall();
 
-
-
         $this->cheapProducts->uninstall();
         $this->failureProducts->uninstall();
         $this->roundingProducts->uninstall();
@@ -83,12 +77,6 @@ class FixturesInstaller
 
     private function installDemoData(): void
     {
-        // ------------------------------------------
-        // customers
-        $this->customerFixture->install();
-        // ------------------------------------------
-        // categories
-        $this->categoryFixture->install();
         // ------------------------------------------
         // shipment
         $this->shipmentFixture->install();
