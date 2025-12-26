@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie;
 
-use Mollie\Shopware\Component\Mollie\Exception\MissingCalculatedTaxException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
 use Mollie\Shopware\Component\Mollie\LineItem;
@@ -59,15 +58,6 @@ final class LineItemTest extends TestCase
         $currency = new CurrencyEntity();
         $currency->setIsoCode('EUR');
         $this->expectException(MissingShippingMethodException::class);
-        LineItem::fromDelivery($delivery, $currency);
-    }
-
-    public function testExpectExceptionOnEmptyCalculatedTax(): void
-    {
-        $delivery = $this->orderRepository->getOrderDeliveryWithoutShippingCosts();
-        $currency = new CurrencyEntity();
-        $currency->setIsoCode('EUR');
-        $this->expectException(MissingCalculatedTaxException::class);
         LineItem::fromDelivery($delivery, $currency);
     }
 
