@@ -21,7 +21,7 @@ trait ProductFixtureTrait
      * @param array<mixed> $customFields
      * @param EntityRepository<ProductCollection> $repoProducts
      */
-    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, $repoProducts, FixtureUtils $fixtureUtils): void
+    protected function createProduct(string $id, string $name, string $number, string $categoryName, string $description, float $price, string $image, bool $shippingFree, array $customFields, $repoProducts, FixtureUtils $fixtureUtils,?float $taxRateValue = 19.0): void
     {
         $this->utils = $fixtureUtils;
 
@@ -59,10 +59,10 @@ trait ProductFixtureTrait
             throw new \RuntimeException('Could not find storefront sales channel.');
         }
 
-        $taxRate = $this->utils->getTaxes()->getTax19();
+        $taxRate = $this->utils->getTaxes()->getTax($taxRateValue);
 
         if (! $taxRate instanceof TaxEntity) {
-            throw new \RuntimeException('Could not find 19% tax rate for products.');
+            throw new \RuntimeException('Could not find ' . $taxRateValue . '% tax rate for products.');
         }
 
         $repoProducts->upsert(

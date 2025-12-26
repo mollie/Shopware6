@@ -36,6 +36,7 @@ class CheapProductsFixture implements MollieFixtureHandlerInterface
 
         $this->createProduct('1d3eefdd2d22436385580e2fb43431b9', 'Cheap Mollie Shirt', 'MOL_CHEAP_1', $category, $description, 1, $image, false, [], $this->repoProducts, $this->utils);
         $this->createProduct('1d3eefdd2d22436385580e2fb53432b2', 'Regular Mollie Shirt', 'MOL_CHEAP_2', $category, $description, 29.90, $image, false, [], $this->repoProducts, $this->utils);
+        $this->createProduct('1d3eefdd2d22436385580e2fb53432b5', 'Reduced Tax Rate Mollie Shirt', 'MOL_CHEAP_3', $category, $description, 19.90, $image, false, [], $this->repoProducts, $this->utils,7.0);
     }
 
     public function uninstall(): void
@@ -44,6 +45,7 @@ class CheapProductsFixture implements MollieFixtureHandlerInterface
             [
                 ['id' => '1d3eefdd2d22436385580e2fb43431b9'],
                 ['id' => '1d3eefdd2d22436385580e2fb53432b2'],
+                ['id' => '1d3eefdd2d22436385580e2fb53432b5'],
             ],
             Context::createDefaultContext()
         );
