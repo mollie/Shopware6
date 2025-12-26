@@ -18,12 +18,13 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 #[AsCommand('mollie:fixtures:load', 'Install or remove mollie fixtures')]
 final class FixtureCommand extends Command
 {
-
+    /**
+     * @param iterable<AbstractFixture> $fixtures
+     */
     public function __construct(
         #[AutowireIterator('mollie.fixture')]
         private iterable $fixtures
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -50,7 +51,7 @@ final class FixtureCommand extends Command
         if ($isUninstall) {
             $output->writeln('<info>uninstalling all fixtures</info>');
 
-            uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b){
+            uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b) {
                 return $a->getPriority() <=> $b->getPriority();
             });
 
@@ -58,27 +59,27 @@ final class FixtureCommand extends Command
                 $fixture->uninstall($context);
             }
             $output->writeln('<info>finished uninstalling</info>');
+
             return Command::SUCCESS;
         }
         $output->writeln('<info>installing fixtures</info>');
 
-
-        uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b){
+        uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b) {
             return $b->getPriority() <=> $a->getPriority();
         });
 
         /** @var AbstractFixture $fixture */
         foreach ($fixtures as $fixture) {
-            if (count($groups) > 0 && !in_array($fixture->getGroup(), $groups)) {
+            if (count($groups) > 0 && ! in_array($fixture->getGroup(), $groups)) {
                 continue;
             }
-            $fixtureClass = (string)get_class($fixture);
+            $fixtureClass = (string) get_class($fixture);
             $fixtureGroup = $fixture->getGroup()->value;
             $output->writeln('<info>installing ' . $fixtureClass . ' group:' . $fixtureGroup . '</info>');
             $fixture->install($context);
         }
         $output->writeln('<info>finished installing fixtures</info>');
+
         return Command::SUCCESS;
     }
-
 }

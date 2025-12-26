@@ -32,33 +32,42 @@ trait CustomerTrait
         $salesChannelRepository = $this->container->get('sales_channel.repository');
         $searchResult = $salesChannelRepository->searchIds($criteria, $context);
 
-        return (string)$searchResult->firstId();
+        return (string) $searchResult->firstId();
     }
 
     private function getDefaultSalutationId(Context $context): string
     {
-
         $criteria = (new Criteria())
             ->setLimit(1)
-            ->addSorting(new FieldSorting('salutationKey'));
+            ->addSorting(new FieldSorting('salutationKey'))
+        ;
 
         /** @var EntityRepository<SalutationCollection<SalesChannelEntity>> $salutationRepository */
         $salutationRepository = $this->container->get('salutation.repository');
-        /** @var string $id */
-        $id = $salutationRepository->searchIds($criteria, $context)->firstId();
 
-        return $id;
+
+        return (string)$salutationRepository->searchIds($criteria, $context)->firstId();
     }
 
+    /**
+     * @param string[] $isoCodes
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     *
+     * @return EntitySearchResult<CountryCollection<CountryEntity>>
+     */
     private function getCountries(array $isoCodes, Context $context): EntitySearchResult
     {
         $criteria = (new Criteria())
             ->addFilter(new EqualsFilter('active', true))
             ->addFilter(new EqualsFilter('shippingAvailable', true))
-            ->addFilter(new EqualsAnyFilter('iso', $isoCodes));
+            ->addFilter(new EqualsAnyFilter('iso', $isoCodes))
+        ;
 
         /** @var EntityRepository<CountryCollection<CountryEntity>> $countryRepository */
         $countryRepository = $this->container->get('country.repository');
+
         return $countryRepository->search($criteria, $context);
     }
 
@@ -70,18 +79,27 @@ trait CustomerTrait
         /** @var EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $paymentMethodRepository */
         $paymentMethodRepository = $this->container->get('payment_method.repository');
         $searchResult = $paymentMethodRepository->searchIds($criteria, $context);
-        return (string)$searchResult->firstId();
+
+        return (string) $searchResult->firstId();
     }
 
+    /**
+     * @param array<mixed> $customer
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     *
+     * @return array<mixed>
+     */
     private function getAddresses(array $customer, Context $context): array
     {
         $countries = $this->getCountries(['DE', 'NL', 'FR', 'BE', 'PL', 'ES', 'SE'], $context);
         $addresses = [];
         /** @var CountryEntity $country */
         foreach ($countries as $country) {
-
-            $addresses[$country->getIso()] = [
-                'id' => $this->getAddressId($country->getIso()),
+            $isoCode = (string) $country->getIso();
+            $addresses[$isoCode] = [
+                'id' => $this->getAddressId($isoCode),
                 'company' => 'Mollie B.V.',
                 'firstName' => $customer['firstName'],
                 'lastName' => $customer['lastName'],
@@ -99,6 +117,7 @@ trait CustomerTrait
     private function getAddressId(string $iso): string
     {
         $addressId = sprintf('%s-%s', $this->getCustomerId(), $iso);
+
         return Uuid::fromStringToHex($addressId);
     }
 }
