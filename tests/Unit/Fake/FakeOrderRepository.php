@@ -38,7 +38,7 @@ final class FakeOrderRepository
 
         $order->setDeliveries($this->getOrderDeliveries($customer));
         $order->setAmountTotal(100.00);
-        $order->setTaxStatus(CartPrice::TAX_STATE_NET);
+        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
         $order->setLineItems($this->getLineItems());
         if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
             $order->setPrimaryOrderDeliveryId('fake-delivery-id');
@@ -185,9 +185,9 @@ final class FakeOrderRepository
     {
         $totalPrice = $unitPrice * $quantity;
 
-        $taxAmount = $unitPrice * ($taxRate / 100);
+        $taxAmount = $totalPrice * ($taxRate / 100);
 
-        $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $unitPrice);
+        $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);
 
         return new CalculatedPrice($totalPrice, $unitPrice, new CalculatedTaxCollection([$calculatedTax]), new TaxRuleCollection(), $quantity);
     }
