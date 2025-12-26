@@ -73,7 +73,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         $customerNumber = $customer->getCustomerNumber();
         $description = (string) $order->getOrderNumber();
         $orderNumber = (string) $order->getOrderNumber();
-
+        $taxStatus = (string) $order->getTaxStatus();
         $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
         $profileId = $apiSettings->getProfileId();
 
@@ -86,6 +86,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
             'salesChannel' => $salesChannelName,
             'transactionId' => $transactionId,
             'orderNumber' => $orderNumber,
+            'taxStatus' => $taxStatus,
         ];
 
         if (mb_strlen($orderNumberFormat) > 0) {
@@ -105,7 +106,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         $oderLineItems = $order->getLineItems();
         if ($oderLineItems !== null) {
             foreach ($oderLineItems as $lineItem) {
-                $lineItem = LineItem::fromOrderLine($lineItem, $currency);
+                $lineItem = LineItem::fromOrderLine($lineItem, $currency,$taxStatus);
                 $lineItemCollection->add($lineItem);
             }
         }
@@ -126,7 +127,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
                 continue;
             }
 
-            $lineItem = LineItem::fromDelivery($delivery, $currency);
+            $lineItem = LineItem::fromDelivery($delivery, $currency,$taxStatus);
             $lineItemCollection->add($lineItem);
         }
 
