@@ -51,11 +51,15 @@ final class FixtureCommand extends Command
         if ($isUninstall) {
             $output->writeln('<info>uninstalling all fixtures</info>');
 
+            //Uninstall fixtures with lowest priority first
             uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b) {
                 return $a->getPriority() <=> $b->getPriority();
             });
 
             foreach ($fixtures as $fixture) {
+                $fixtureClass = (string) get_class($fixture);
+                $fixtureGroup = $fixture->getGroup()->value;
+                $output->writeln('<info>uninstalling ' . $fixtureClass . ' group:' . $fixtureGroup . '</info>');
                 $fixture->uninstall($context);
             }
             $output->writeln('<info>finished uninstalling</info>');
@@ -64,6 +68,7 @@ final class FixtureCommand extends Command
         }
         $output->writeln('<info>installing fixtures</info>');
 
+        //Install fixtures with highest priority first
         uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b) {
             return $b->getPriority() <=> $a->getPriority();
         });
