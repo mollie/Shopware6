@@ -13,7 +13,7 @@ use Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture;
 
 class FixturesInstaller
 {
-    private PaymentMethodsFixture $salesChannelFixture;
+
     private ShipmentFixture $shipmentFixture;
     private SubscriptionProductsFixture $subscriptionFixture;
     private VoucherProductsFixture $voucherFixture;
@@ -22,7 +22,7 @@ class FixturesInstaller
     private RoundingProductsFixture $roundingProducts;
 
     public function __construct(
-        PaymentMethodsFixture $salesChannelFixture,
+
         ShipmentFixture $shipmentFixture,
         SubscriptionProductsFixture $subscriptionFixture,
         VoucherProductsFixture $voucherFixture,
@@ -30,7 +30,7 @@ class FixturesInstaller
         FailureProductsFixture $failureProducts,
         RoundingProductsFixture $roundingProducts,
     ) {
-        $this->salesChannelFixture = $salesChannelFixture;
+
         $this->shipmentFixture = $shipmentFixture;
         $this->subscriptionFixture = $subscriptionFixture;
         $this->voucherFixture = $voucherFixture;
@@ -72,7 +72,7 @@ class FixturesInstaller
 
     private function installSetup(): void
     {
-        $this->salesChannelFixture->install();
+
     }
 
     private function installDemoData(): void
