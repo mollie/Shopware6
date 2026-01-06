@@ -11,9 +11,10 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Test\TestDefaults;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class NetCustomer extends AbstractFixture
+final class DefaultCustomerFixture extends AbstractFixture
 {
     use CustomerTrait;
 
@@ -26,6 +27,7 @@ final class NetCustomer extends AbstractFixture
         #[Autowire(service: 'service_container')]
         private readonly ContainerInterface $container
     ) {
+
     }
 
     public function getGroup(): FixtureGroup
@@ -38,10 +40,10 @@ final class NetCustomer extends AbstractFixture
         $salutationId = $this->getDefaultSalutationId($context);
         $salesChannelId = $this->getSalesChannelId($context);
         $paymentMethodId = $this->getPaymentMethodId($context);
-        $email = 'cypress-net@mollie.com';
+        $email = 'cypress@mollie.com';
         $password = 'cypress123';
-        $defaultAddressId = $this->getAddressId('DE');
 
+        $defaultAddressId = $this->getAddressId('DE');
         $customer = [
             'id' => $this->getCustomerId(),
             'salutationId' => $salutationId,
@@ -53,9 +55,9 @@ final class NetCustomer extends AbstractFixture
             'password' => $password,
             'email' => $email,
             'group' => [
-                'id' => Uuid::fromStringToHex('net-customer-group'),
-                'name' => 'Net customer group',
-                'displayGross' => false
+                'id' => TestDefaults::FALLBACK_CUSTOMER_GROUP,
+                'name' => 'Standard customer group',
+                'displayGross' => true
             ],
             'salesChannelId' => $salesChannelId,
             'defaultPaymentMethodId' => $paymentMethodId,
@@ -77,6 +79,6 @@ final class NetCustomer extends AbstractFixture
 
     private function getCustomerId(): string
     {
-        return Uuid::fromStringToHex('net-customer-id');
+        return Uuid::fromStringToHex('default-customer-id');
     }
 }
