@@ -78,7 +78,9 @@
         "boxblinkracer/phpunuhi": "dev-main",
         "spaze/phpstan-disallowed-calls": "^4",
         "behat/behat": "^3",
-        "behat/gherkin": "^4"
+        "behat/gherkin": "^4",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "ext-fileinfo": "*"
     },
     "scripts": {
         "post-install-cmd": [

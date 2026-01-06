@@ -14,7 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class MollieCategories extends AbstractFixture
+final class MollieCategoriesFixture extends AbstractFixture
 {
     /**
      * @param EntityRepository<CategoryCollection<CategoryEntity>> $categoryRepository
@@ -24,6 +24,12 @@ final class MollieCategories extends AbstractFixture
         private readonly EntityRepository $categoryRepository
     ) {
     }
+
+    public function getPriority(): int
+    {
+        return 100;
+    }
+
 
     public function getGroup(): FixtureGroup
     {

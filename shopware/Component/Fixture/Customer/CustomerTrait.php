@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Fixture\Customer;
 
+use Mollie\Shopware\Component\Fixture\SalesChannelTrait;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
@@ -15,25 +16,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Country\CountryEntity;
-use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\Salutation\SalutationCollection;
 
 trait CustomerTrait
 {
-    private function getSalesChannelId(Context $context): string
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('type.name', 'Storefront'));
-        $criteria->addFilter(new EqualsFilter('active', true));
-        $criteria->setLimit(1);
-
-        /** @var EntityRepository<SalesChannelCollection<SalesChannelEntity>> $salesChannelRepository */
-        $salesChannelRepository = $this->container->get('sales_channel.repository');
-        $searchResult = $salesChannelRepository->searchIds($criteria, $context);
-
-        return (string) $searchResult->firstId();
-    }
+    use SalesChannelTrait;
 
     private function getDefaultSalutationId(Context $context): string
     {
