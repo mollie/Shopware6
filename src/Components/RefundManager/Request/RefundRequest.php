@@ -46,6 +46,11 @@ class RefundRequest
         $this->items[] = $item;
     }
 
+    public function setAmount(float $amount): void
+    {
+        $this->amount = $amount;
+    }
+
     /**
      * @param RefundRequestItem[] $items
      */
