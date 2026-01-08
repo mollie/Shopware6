@@ -6,6 +6,7 @@
 - Aktualisiert: Die Abhängigkeit zum Basecom Fixture Plugin wurde entfernt und durch unser eigenes Fixture Plugin ersetzt.
 - Behoben: MolliePaymentMethodAvailabilityRemover berücksichtigt nun auch Warenkörbe mit dem Preis 0, um zu vermeiden, dass alle Zahlungsmethoden entfernt werden.
 - Kompatibilität mit Click & Collect Plugin
+- Behoben: Beschreibungen von Zahlungsarten wurden beim Checkout angezeigt, obwohl diese nicht ausgewählt waren.
 
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
