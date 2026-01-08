@@ -20,9 +20,6 @@ use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
-use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\MbWayPayment;
 use Kiener\MolliePayments\Handler\Method\MultibancoPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
@@ -35,7 +32,6 @@ use Kiener\MolliePayments\Handler\Method\PosPayment;
 use Kiener\MolliePayments\Handler\Method\Przelewy24Payment;
 use Kiener\MolliePayments\Handler\Method\RivertyPayment;
 use Kiener\MolliePayments\Handler\Method\SatispayPayment;
-use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\SwishPayment;
 use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
@@ -125,14 +121,10 @@ class PaymentMethodServiceTest extends TestCase
             GiftCardPayment::class,
             iDealPayment::class,
             KbcPayment::class,
-            KlarnaPayLaterPayment::class,
-            KlarnaPayNowPayment::class,
-            KlarnaSliceItPayment::class,
             KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
-            SofortPayment::class,
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
