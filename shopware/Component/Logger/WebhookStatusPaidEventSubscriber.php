@@ -36,7 +36,11 @@ final class WebhookStatusPaidEventSubscriber implements EventSubscriberInterface
     {
         try {
             $payment = $event->getPayment();
-            if ($payment->getStatus() !== PaymentStatus::PAID) {
+            $successStatus = [
+                PaymentStatus::PAID,
+                PaymentStatus::AUTHORIZED
+            ];
+            if (! in_array($payment->getStatus(),$successStatus)) {
                 return;
             }
             $orderNumber = (string) $event->getOrder()->getOrderNumber();

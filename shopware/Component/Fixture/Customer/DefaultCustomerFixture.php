@@ -47,7 +47,7 @@ final class DefaultCustomerFixture extends AbstractFixture
             'id' => $this->getCustomerId(),
             'salutationId' => $salutationId,
             'accountType' => 'commercial',
-            'customerNumber' => 'CYPRESS-' . date('YmdHis'),
+            'customerNumber' => 'mollie-CYPRESS',
             'firstName' => 'Cypress',
             'lastName' => 'TestUser',
             'createCustomerAccount' => true,
