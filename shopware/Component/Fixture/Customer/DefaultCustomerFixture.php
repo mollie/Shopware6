@@ -27,7 +27,6 @@ final class DefaultCustomerFixture extends AbstractFixture
         #[Autowire(service: 'service_container')]
         private readonly ContainerInterface $container
     ) {
-
     }
 
     public function getGroup(): FixtureGroup
