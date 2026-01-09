@@ -7,8 +7,8 @@ use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
-use Mollie\Shopware\Integration\Data\MolliePageTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
+use Mollie\Shopware\Integration\MolliePage\MolliePage;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
@@ -18,7 +18,6 @@ final class CheckoutContext extends ShopwareContext
 {
     use CheckoutTestBehaviour;
     use PaymentMethodTestBehaviour;
-    use MolliePageTestBehaviour;
 
     private string $mollieSandboxPage = '';
     private string $shopwareReturnPage = '';
@@ -48,18 +47,26 @@ final class CheckoutContext extends ShopwareContext
     #[When('select payment status :arg1')]
     public function selectPaymentStatus(string $selectedStatus): void
     {
-        $response = $this->selectMolliePaymentStatus($selectedStatus, $this->mollieSandboxPage);
+        $molliePage = new MolliePage($this->mollieSandboxPage);
+        $response = $molliePage->selectPaymentStatus($selectedStatus);
         Assert::assertSame($response->getStatusCode(), 302);
+        $redirect = $response->getHeaderLine('location');
 
-        $this->shopwareReturnPage = $response->getHeaderLine('location');
+        if (str_contains($redirect, 'mollie.com')) {
+            $this->mollieSandboxPage = $redirect;
 
-        Assert::assertStringContainsString('mollie/', $this->shopwareReturnPage);
+            return;
+        }
+
+        $this->shopwareReturnPage = $redirect;
     }
 
     #[When('i select issuer :arg1')]
-    public function iSelectIssuer(string $idealIssuer): void
+    public function iSelectIssuer(string $issuer): void
     {
-        $response = $this->selectMollieIssuer($idealIssuer, $this->mollieSandboxPage);
+        $molliePage = new MolliePage($this->mollieSandboxPage);
+        $response = $molliePage->selectIssuer($issuer);
+
         Assert::assertSame($response->getStatusCode(), 302);
         $this->mollieSandboxPage = $response->getHeaderLine('location');
         Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
@@ -76,13 +83,31 @@ final class CheckoutContext extends ShopwareContext
     public function iSeeSuccessPage(): void
     {
         $this->shopwareOderId = '';
-
+        $returnPage = $this->shopwareReturnPage;
+        if (strlen($returnPage) === 0) {
+            $molliePage = new MolliePage($this->mollieSandboxPage);
+            $returnPage = $molliePage->getShopwareReturnPage();
+            $this->shopwareReturnPage = $returnPage;
+        }
+        Assert::assertStringContainsString('mollie/', $returnPage);
         /** @var RedirectResponse $response */
-        $response = $this->finishCheckout($this->shopwareReturnPage, $this->getCurrentSalesChannelContext());
+        $response = $this->finishCheckout($returnPage, $this->getCurrentSalesChannelContext());
         $this->shopwareOderId = str_replace('/checkout/finish?orderId=', '', $response->getTargetUrl());
 
         Assert::assertSame($response->getStatusCode(), 302);
         Assert::assertNotEmpty($this->shopwareOderId);
+    }
+
+    #[When('select mollie payment method :arg1')]
+    public function selectMolliePaymentMethod(string $molliePaymentMethod): void
+    {
+        $molliePage = new MolliePage($this->mollieSandboxPage);
+        $response = $molliePage->selectPaymentMethod($molliePaymentMethod);
+
+        Assert::assertSame($response->getStatusCode(), 302);
+        $this->mollieSandboxPage = $response->getHeaderLine('location');
+
+        Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
     }
 
     #[Then('order payment status is :arg1')]
