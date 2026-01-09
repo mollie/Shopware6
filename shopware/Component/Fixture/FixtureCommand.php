@@ -51,7 +51,7 @@ final class FixtureCommand extends Command
         if ($isUninstall) {
             $output->writeln('<info>uninstalling all fixtures</info>');
 
-            //Uninstall fixtures with lowest priority first
+            // Uninstall fixtures with lowest priority first
             uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b) {
                 return $a->getPriority() <=> $b->getPriority();
             });
@@ -68,7 +68,7 @@ final class FixtureCommand extends Command
         }
         $output->writeln('<info>installing fixtures</info>');
 
-        //Install fixtures with highest priority first
+        // Install fixtures with highest priority first
         uasort($fixtures,function (AbstractFixture $a, AbstractFixture $b) {
             return $b->getPriority() <=> $a->getPriority();
         });
