@@ -41,7 +41,7 @@ prod: ##1 Installs all production dependencies
 
 dev: ##1 Installs all dev dependencies
 	composer validate
-	composer install --ignore-platform-req=ext-amqp
+	COMPOSER_NO_SECURITY_BLOCKING=1 composer update --ignore-platform-req=ext-amqp
 	npm install
 	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
@@ -86,7 +86,7 @@ endif
 
 fixtures: ##2 Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console --no-debug cache:clear
-	cd ../../.. && php bin/console --no-debug fixture:load:group mollie
+	cd ../../.. && php bin/console --no-debug mollie:fixtures:load
 
 pr: ##2 Prepares everything for a Pull Request
 	# -----------------------------------------------------------------

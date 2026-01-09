@@ -16,7 +16,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class RegularProductsFixture extends AbstractFixture
+final class RoundingProductsFixture extends AbstractFixture
 {
     use ProductTrait;
     use SalesChannelTrait;
@@ -41,18 +41,17 @@ final class RegularProductsFixture extends AbstractFixture
 
     public function install(Context $context): void
     {
-        $image = 'tshirt-black.png';
+        $image = 'tshirt-white.png';
         $mediaIds = $this->getMediaMapping([$image], $context);
         $salesChannelId = $this->getSalesChannelId($context);
         $mediaId = $mediaIds[$image];
-        $category = MollieCategoriesFixture::CATEGORY_REGULAR;
-        $description = 'Mollie Product for testing purpose in development environment. You can use this products for LIVE tests or other scenarios';
+        $category = MollieCategoriesFixture::CATEGORY_ROUNDING;
+        $description = 'Product to test rounding issues.';
 
         $productData = [];
-        $productData[] = $this->getProductData('Cheap Mollie Shirt', 'MOL_CHEAP_1', $description, $mediaId, $category, $salesChannelId, 1);
-        $productData[] = $this->getProductData('Regular Mollie Shirt', 'MOL_REGULAR_2', $description, $mediaId, $category, $salesChannelId, 29.90);
-        $productData[] = $this->getProductData('Reduced Tax Rate Mollie Shirt', 'MOL_REDUCED_TAX_1', $description, $mediaId, $category, $salesChannelId, 19.90, 7.00);
-        $productData[] = $this->getProductData('Tax Free Mollie Shirt', 'MOL_TAX_FREE_1', $description, $mediaId, $category, $salesChannelId, 19.90, 0.00);
+        $productData[] = $this->getProductData('Product A 4 Decimals', 'MOL_ROUNDING_1', $description, $mediaId, $category, $salesChannelId, 2.7336);
+        $productData[] = $this->getProductData('Product B 4 Decimals', 'MOL_ROUNDING_2', $description, $mediaId, $category, $salesChannelId, 2.9334);
+        $productData[] = $this->getProductData('Product C 4 Decimals', 'MOL_ROUNDING_3', $description, $mediaId, $category, $salesChannelId, 1.6494);
 
         $this->productRepository->upsert($productData, $context);
     }
@@ -60,10 +59,9 @@ final class RegularProductsFixture extends AbstractFixture
     public function uninstall(Context $context): void
     {
         $productData = [
-            ['id' => $this->getProductId('MOL_CHEAP_1')],
-            ['id' => $this->getProductId('MOL_REGULAR_2')],
-            ['id' => $this->getProductId('MOL_REDUCED_TAX_1')],
-            ['id' => $this->getProductId('MOL_TAX_FREE_1')],
+            ['id' => $this->getProductId('MOL_ROUNDING_1')],
+            ['id' => $this->getProductId('MOL_ROUNDING_2')],
+            ['id' => $this->getProductId('MOL_ROUNDING_3')],
         ];
         $this->productRepository->delete($productData, $context);
     }
