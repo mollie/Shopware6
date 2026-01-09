@@ -74,6 +74,7 @@ trait CheckoutTestBehaviour
         $requestDataBag->set('tos', true);
 
         $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
+
         /** @var FlashBag $flashBag */
         $flashBag = $request->getSession()->getBag('flashes');
         $flashBagData = $flashBag->peekAll();

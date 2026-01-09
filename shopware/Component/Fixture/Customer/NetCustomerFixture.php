@@ -46,7 +46,7 @@ final class NetCustomerFixture extends AbstractFixture
             'id' => $this->getCustomerId(),
             'salutationId' => $salutationId,
             'accountType' => 'commercial',
-            'customerNumber' => 'CYPRESS-' . date('YmdHis'),
+            'customerNumber' => 'mollie-net-CYPRESS',
             'firstName' => 'Cypress',
             'lastName' => 'TestUser',
             'createCustomerAccount' => true,
