@@ -13,7 +13,6 @@ use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 use Shopware\Core\Kernel;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
@@ -75,27 +74,6 @@ class MolliePayments extends Plugin
         $this->runDbMigrations($context->getMigrationCollection());
 
         $this->preparePlugin($context->getContext());
-    }
-
-    public function boot(): void
-    {
-        parent::boot();
-
-        if ($this->container === null) {
-            return;
-        }
-        /** @var Container $container */
-        $container = $this->container;
-
-        $shopwareVersion = $container->getParameter('kernel.shopware_version');
-        if (! is_string($shopwareVersion)) {
-            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
-        }
-        // load the dependencies that are compatible
-        // with our current shopware version
-
-        $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
-        $loader->registerDependencies();
     }
 
     /**

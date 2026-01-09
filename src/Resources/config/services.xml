@@ -23,7 +23,6 @@
         <import resource="services/controller.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="services/repositories.xml"/>
-        <import resource="services/fixtures/fixtures.xml"/>
         <import resource="packages/**/*.xml"/>
         <import resource="../../../shopware/Resources/config/services.xml"/>
     </imports>
