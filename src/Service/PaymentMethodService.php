@@ -112,6 +112,10 @@ class PaymentMethodService
         // we still need the min the database
         // but always disable them :)
         $this->disablePaymentMethod(IngHomePayPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaPayLaterPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaPayNowPayment::class, $context);
+        $this->disablePaymentMethod(KlarnaSliceItPayment::class, $context);
+        $this->disablePaymentMethod(SofortPayment::class, $context);
 
         if (! $this->payPalExpressConfig->isEnabled()) {
             $this->disablePaymentMethod(PayPalExpressPayment::class, $context);
@@ -191,10 +195,10 @@ class PaymentMethodService
                     }
                 }
 
-                /** @phpstan-ignore-next-line  */
+                /** @phpstan-ignore-next-line */
                 if ($this->versionCompare->gte('6.5.7.0') && method_exists($existingPaymentMethod, 'getTechnicalName')) {
                     // we do a string cast here, since getTechnicalName will be not nullable in the future
-                    /** @phpstan-ignore-next-line  */
+                    /** @phpstan-ignore-next-line */
                     $technicalName = (string) $existingPaymentMethod->getTechnicalName();
                 }
             } else {
@@ -395,14 +399,14 @@ class PaymentMethodService
             GiftCardPayment::class,
             iDealPayment::class,
             KbcPayment::class,
-            KlarnaPayLaterPayment::class,
-            KlarnaPayNowPayment::class,
-            KlarnaSliceItPayment::class,
+            //  KlarnaPayLaterPayment::class,
+            //  KlarnaPayNowPayment::class,
+            //  KlarnaSliceItPayment::class,
             KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
-            SofortPayment::class,
+            //   SofortPayment::class,
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
