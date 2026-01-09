@@ -6,7 +6,6 @@ namespace Mollie\Shopware\Integration\Repository;
 use Mollie\Shopware\Component\Payment\Method\PayPalPayment;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
-use Mollie\Shopware\Integration\Data\MolliePageTestBehaviour;
 use Mollie\Shopware\Integration\Data\OrderTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
@@ -31,7 +30,6 @@ class OrderTransactionRepositoryTest extends TestCase
     use ProductTestBehaviour;
     use CheckoutTestBehaviour;
     use PaymentMethodTestBehaviour;
-    use MolliePageTestBehaviour;
     use OrderTestBehaviour;
     private array $createdOrders = [];
 
@@ -85,7 +83,7 @@ class OrderTransactionRepositoryTest extends TestCase
             $salesChannelContext = $this->getDefaultSalesChannelContext();
         }
 
-        $customerId = $this->loginOrCreateAccount('test@mollie.com', $salesChannelContext);
+        $customerId = $this->loginOrCreateAccount('cypress@mollie.com', $salesChannelContext);
 
         return $this->getDefaultSalesChannelContext(options: [
             SalesChannelContextService::CUSTOMER_ID => $customerId
