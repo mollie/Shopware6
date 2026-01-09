@@ -33,8 +33,7 @@ trait CustomerTrait
         /** @var EntityRepository<SalutationCollection<SalesChannelEntity>> $salutationRepository */
         $salutationRepository = $this->container->get('salutation.repository');
 
-
-        return (string)$salutationRepository->searchIds($criteria, $context)->firstId();
+        return (string) $salutationRepository->searchIds($criteria, $context)->firstId();
     }
 
     /**
