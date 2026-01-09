@@ -34,8 +34,8 @@ final class CheckoutContext extends ShopwareContext
     #[When('i start checkout with payment method :arg1')]
     public function iStartCheckoutWithPaymentMethod(string $paymentMethodTechnicalName): void
     {
-        $salesChannelContext = $this->getCurrentSalesChannelContext();
-        $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodTechnicalName, $salesChannelContext->getContext());
+        $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodTechnicalName, $this->getCurrentSalesChannelContext()->getContext());
+
         $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
 
         /** @var RedirectResponse $response */
@@ -50,8 +50,19 @@ final class CheckoutContext extends ShopwareContext
     {
         $response = $this->selectMolliePaymentStatus($selectedStatus, $this->mollieSandboxPage);
         Assert::assertSame($response->getStatusCode(), 302);
+
         $this->shopwareReturnPage = $response->getHeaderLine('location');
+
         Assert::assertStringContainsString('mollie/', $this->shopwareReturnPage);
+    }
+
+    #[When('i select issuer :arg1')]
+    public function iSelectIssuer(string $idealIssuer): void
+    {
+        $response = $this->selectMollieIssuer($idealIssuer, $this->mollieSandboxPage);
+        Assert::assertSame($response->getStatusCode(), 302);
+        $this->mollieSandboxPage = $response->getHeaderLine('location');
+        Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
     }
 
     #[Given('i select :art1 as currency')]

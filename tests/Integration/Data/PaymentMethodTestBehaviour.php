@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Integration\Data;
 
-use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -18,15 +17,19 @@ trait PaymentMethodTestBehaviour
 
     public function getPaymentMethodByTechnicalName(string $technicalName, Context $context): PaymentMethodEntity
     {
-        /** @var PaymentHandlerLocator $molliePaymentMethods */
-        $molliePaymentMethods = $this->getContainer()->get(PaymentHandlerLocator::class);
-        $handler = $molliePaymentMethods->findByPaymentMethod($technicalName);
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('payment_method.repository');
+        $criteria = new Criteria();
 
-        if (! is_string($handler)) {
-            $handler = get_class($handler);
+        $criteria->addFilter(new EqualsFilter('technicalName', 'payment_mollie_' . $technicalName));
+        $searchResult = $repository->search($criteria, $context);
+        /** @var ?PaymentMethodEntity $firstPaymentMethod */
+        $firstPaymentMethod = $searchResult->first();
+        if ($firstPaymentMethod === null) {
+            throw new \RuntimeException(sprintf('Payment method not found for technical name "payment_mollie_%s"', $technicalName));
         }
 
-        return $this->getPaymentMethodByIdentifier($handler,$context);
+        return $firstPaymentMethod;
     }
 
     public function getPaymentMethodByIdentifier(string $handlerIdentifier, Context $context): PaymentMethodEntity

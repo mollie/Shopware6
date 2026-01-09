@@ -23,8 +23,9 @@ final class BizumPayment extends AbstractMolliePaymentHandler
 
     public function applyPaymentSpecificParameters(CreatePayment $payment,RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
     {
-        $phoneNumber = $dataBag->get('molliePayPhone','');
-        $payment->getBillingAddress()->setPhone($phoneNumber);
+        $billingAddress = $payment->getBillingAddress();
+        $phoneNumber = $dataBag->get('molliePayPhone',$billingAddress->getPhone());
+        $billingAddress->setPhone($phoneNumber);
 
         return $payment;
     }
