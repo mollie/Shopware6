@@ -16,19 +16,22 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\SalesChannelCollection;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class PaymentMethodFixture extends AbstractFixture
 {
+    /**
+     * @param EntityRepository<SalesChannelCollection<SalesChannelEntity>> $salesChannelRepository
+     */
     public function __construct(
         private readonly PaymentHandlerLocator $paymentHandlerLocator,
         #[Autowire(service: 'sales_channel.repository')]
-        private readonly EntityRepository      $salesChannelRepository,
+        private readonly EntityRepository $salesChannelRepository,
         #[Autowire(service: SettingsService::class)]
-        private AbstractSettingsService        $settingsService,
-    )
-    {
-
+        private AbstractSettingsService $settingsService,
+    ) {
     }
 
     public function getGroup(): FixtureGroup
@@ -54,17 +57,19 @@ final class PaymentMethodFixture extends AbstractFixture
 
     public function uninstall(Context $context): void
     {
-        //We dont want to unassign payment methods
+        // We dont want to unassign payment methods
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function getActivePaymentMethods(): array
     {
         $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
         $paypalExpressSettings = $this->settingsService->getPaypalExpressSettings();
         $result = [];
         foreach ($paymentHandlers as $paymentHandler) {
-
-            if ($paymentHandler instanceof PayPalExpressPayment && !$paypalExpressSettings->isEnabled()) {
+            if ($paymentHandler instanceof PayPalExpressPayment && ! $paypalExpressSettings->isEnabled()) {
                 continue;
             }
             $paymentMethodName = $paymentHandler->getName();
@@ -80,6 +85,7 @@ final class PaymentMethodFixture extends AbstractFixture
                 'active' => $isDeprecatedMethod === false
             ];
         }
+
         return $result;
     }
 }

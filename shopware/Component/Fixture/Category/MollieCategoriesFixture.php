@@ -16,6 +16,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class MollieCategoriesFixture extends AbstractFixture
 {
+    public const CATEGORY_REGULAR = 'regular';
+    public const CATEGORY_VOUCHER = 'voucher';
+    public const CATEGORY_SUBSCRIPTIONS = 'subscriptions';
+    public const CATEGORY_ROUNDING = 'rounding';
+    public const CATEGORY_CREDIT_CARD_ERRORS = 'creditCardErrors';
+
     /**
      * @param EntityRepository<CategoryCollection<CategoryEntity>> $categoryRepository
      */
@@ -29,7 +35,6 @@ final class MollieCategoriesFixture extends AbstractFixture
     {
         return 100;
     }
-
 
     public function getGroup(): FixtureGroup
     {
@@ -75,27 +80,27 @@ final class MollieCategoriesFixture extends AbstractFixture
                 'parentId' => $rootCategoryId,
             ],
             [
-                'id' => Uuid::fromStringToHex('mollie-regular'),
+                'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_REGULAR),
                 'name' => 'Regular Products',
                 'parentId' => $mollieRootId,
             ],
             [
-                'id' => Uuid::fromStringToHex('mollie-voucher'),
+                'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_VOUCHER),
                 'name' => 'Voucher',
                 'parentId' => $mollieRootId,
             ],
             [
-                'id' => Uuid::fromStringToHex('mollie-subscriptions'),
+                'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_SUBSCRIPTIONS),
                 'name' => 'Subscriptions',
                 'parentId' => $mollieRootId,
             ],
             [
-                'id' => Uuid::fromStringToHex('mollie-rounding'),
+                'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_ROUNDING),
                 'name' => 'Rounding',
                 'parentId' => $mollieRootId,
             ],
             [
-                'id' => Uuid::fromStringToHex('mollie-failures'),
+                'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_CREDIT_CARD_ERRORS),
                 'name' => 'Credit Card Errors',
                 'parentId' => $mollieRootId,
             ],

@@ -6,51 +6,17 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\FixturesInstaller">
-
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\SubscriptionProductsFixture"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\VoucherProductsFixture"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\RoundingProductsFixture"/>
-
-        </service>
 
 
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Shipment\ShipmentFixture">
-            <argument type="service" id="shipping_method.repository"/>
-            <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="rule.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\CurrencyUtils"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\DeliveryTimesUtils"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\SubscriptionProductsFixture">
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
-            <argument type="service" id="product.repository"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\VoucherProductsFixture">
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
-            <argument type="service" id="product.repository"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\CheapProductsFixture">
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
-            <argument type="service" id="product.repository"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\FailureProductsFixture">
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
-            <argument type="service" id="product.repository"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\Fixtures\Handler\Product\RoundingProductsFixture">
-            <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils"/>
-            <argument type="service" id="product.repository"/>
-        </service>
+
+
+
 
         <service id="Kiener\MolliePayments\Components\Fixtures\FixtureUtils">
             <argument type="service" id="Kiener\MolliePayments\Components\Fixtures\Utils\MediaUtils"/>
