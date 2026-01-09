@@ -90,3 +90,16 @@ Feature: Basic payment checkout
     And select payment status "paid"
     Then i see success page
     And order payment status is "paid"
+
+  Scenario: payment success with mixed tax and net customer
+    Given payment method "paypal" exists and active
+    And iam logged in as user "cypress-net@mollie.com"
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And product "MOL_REDUCED_TAX" with quantity "1" is in cart
+    And product "MOL_TAX_FREE" with quantity "1" is in cart
+    When i start checkout with payment method "paypal"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
