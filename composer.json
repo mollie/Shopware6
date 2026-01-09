@@ -80,7 +80,8 @@
         "behat/behat": "^3",
         "behat/gherkin": "^4",
         "phpstan/phpstan-phpunit": "^2.0",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "ext-dom": "*"
     },
     "scripts": {
         "post-install-cmd": [
