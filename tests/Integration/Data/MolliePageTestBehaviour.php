@@ -34,13 +34,11 @@ trait MolliePageTestBehaviour
             $inputValue = $input->getAttribute('value');
             $inputType = $input->getAttribute('type');
 
-            dump($inputName, $inputType);
             if (isset($formData[$inputName])) {
                 continue;
             }
             $formData[$inputName] = $inputValue;
         }
-        dump($formData);
 
         return $client->post($formLocation, [
             RequestOptions::FORM_PARAMS => $formData,
@@ -48,7 +46,49 @@ trait MolliePageTestBehaviour
         ]);
     }
 
-    public function selectMolliePaymentStatus(string $paymentStatus, string $url): ResponseInterface
+    private function selectMollieIssuer(string $issuer, string $url): ResponseInterface
+    {
+        $client = new Client();
+        $response = $client->get($url, [RequestOptions::ALLOW_REDIRECTS => false]);
+
+        $formLocation = $response->getHeader('location')[0] ?? null;
+        if ($formLocation === null) {
+            $htmlContent = $response->getBody()->getContents();
+            $formLocation = $url;
+        } else {
+            $htmlContent = file_get_contents($formLocation);
+        }
+
+        $dom = new \DOMDocument();
+        try {
+            $dom = $dom->loadHTML($htmlContent);
+        } catch (\Throwable $exception) {
+        }
+        $form = $dom->getElementById('body');
+        $inputs = $form->getElementsByTagName('input');
+
+        $formData = [
+            'issuer' => $issuer,
+        ];
+
+        foreach ($inputs as $input) {
+            $inputName = $input->getAttribute('name');
+            $inputValue = $input->getAttribute('value');
+            $inputType = $input->getAttribute('type');
+
+            if (isset($formData[$inputName])) {
+                continue;
+            }
+            $formData[$inputName] = $inputValue;
+        }
+
+        return $client->post($formLocation, [
+            RequestOptions::FORM_PARAMS => $formData,
+            RequestOptions::ALLOW_REDIRECTS => false,
+        ]);
+    }
+
+    private function selectMolliePaymentStatus(string $paymentStatus, string $url): ResponseInterface
     {
         $client = new Client();
         $response = $client->get($url, [RequestOptions::ALLOW_REDIRECTS => false]);
@@ -93,9 +133,16 @@ trait MolliePageTestBehaviour
         Assert::assertTrue(isset($formData['final_state']));
         Assert::assertEquals($paymentStatus, $formData['final_state']);
 
-        return $client->post($formLocation, [
+        $response = $client->post($formLocation, [
             RequestOptions::FORM_PARAMS => $formData,
             RequestOptions::ALLOW_REDIRECTS => false,
         ]);
+        $location = $response->getHeaderLine('location');
+
+        if (! str_contains($location,'mollie.com')) {
+            return $response;
+        }
+
+        return $client->get($location, [RequestOptions::ALLOW_REDIRECTS => false]);
     }
 }

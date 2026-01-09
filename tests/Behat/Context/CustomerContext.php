@@ -24,6 +24,7 @@ final class CustomerContext extends ShopwareContext
         $salesChannelContext = $this->getCurrentSalesChannelContext();
         $addressIdSearchResult = $this->getUserAddressByIso($billingCountry, $salesChannelContext);
         $addressId = $addressIdSearchResult->firstId();
+
         $this->setOptions(SalesChannelContextService::BILLING_ADDRESS_ID,$addressId);
         $this->setOptions(SalesChannelContextService::SHIPPING_ADDRESS_ID,$addressId);
     }

@@ -80,7 +80,8 @@ trait CustomerTrait
      */
     private function getAddresses(array $customer, Context $context): array
     {
-        $countries = $this->getCountries(['DE', 'NL', 'FR', 'BE', 'PL', 'ES', 'SE'], $context);
+        $countries = $this->getCountries(['DE', 'NL', 'FR', 'BE', 'PL', 'ES', 'SE', 'IT'], $context);
+
         $addresses = [];
         /** @var CountryEntity $country */
         foreach ($countries as $country) {
@@ -88,6 +89,7 @@ trait CustomerTrait
             $addresses[$isoCode] = [
                 'id' => $this->getAddressId($isoCode),
                 'company' => 'Mollie B.V.',
+                'salutationId' => $customer['salutationId'],
                 'firstName' => $customer['firstName'],
                 'lastName' => $customer['lastName'],
                 'street' => 'Cypress Street 1',
