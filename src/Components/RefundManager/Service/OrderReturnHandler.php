@@ -10,6 +10,7 @@ use Kiener\MolliePayments\Service\OrderService;
 use Psr\Log\LoggerInterface;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
@@ -74,17 +75,41 @@ class OrderReturnHandler
 
     private function createRequestFromOrder(string $orderNumber, OrderReturnEntity $orderReturn): RefundRequest
     {
+        $amount = (float) $orderReturn->getAmountTotal();
         $request = new RefundRequest(
             $orderNumber,
             (string) $orderReturn->getInternalComment(),
             '',
-            $orderReturn->getAmountTotal()
+            $amount
         );
         /** @var OrderReturnLineItemEntity $item */
         foreach ($orderReturn->getLineItems() as $item) {
             $price = $item->getRefundAmount() / $item->getQuantity();
             $refundRequestItem = new RefundRequestItem($item->getOrderLineItemId(), $price, $item->getQuantity(), 0);
             $request->addItem($refundRequestItem);
+        }
+
+        $order = $orderReturn->getOrder();
+        if ($order instanceof OrderEntity) {
+            $deliveries = $order->getDeliveries();
+            if ($deliveries instanceof OrderDeliveryCollection) {
+                foreach ($deliveries as $delivery) {
+                    $shippingCosts = $delivery->getShippingCosts();
+                    if ($shippingCosts->getTotalPrice() < 0) {
+                        continue;
+                    }
+                    $amount += $shippingCosts->getTotalPrice();
+
+                    $refundRequestItem = new RefundRequestItem(
+                        $delivery->getId(),
+                        $shippingCosts->getTotalPrice(),
+                        $shippingCosts->getQuantity(),
+                        0
+                    );
+                    $request->addItem($refundRequestItem);
+                }
+                $request->setAmount($amount);
+            }
         }
 
         return $request;
@@ -99,6 +124,7 @@ class OrderReturnHandler
         $criteria->addFilter(new EqualsFilter('orderId', $order->getId()));
         $criteria->addFilter(new EqualsFilter('orderVersionId', $order->getVersionId()));
         $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('order.deliveries');
 
         $orderReturnSearchResult = $this->orderReturnRepository->search($criteria, $context);
 

@@ -17,14 +17,12 @@
     {% if "Mollie" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
         <div class="payment-method-description">
             <strong>{{ payment.translated.name }} ({{ "molliePayments.testMode.label"|trans }})</strong>
-            {% if payment.translated.description %}
+            {% if payment.translated.description and payment.id is same as(selectedPaymentMethodId) %}
                 {% set paymentDescription = payment.translated.description|raw %}
+                {% set paymentDescriptionTitle = payment.translated.description|striptags|raw %}
+                {% set paymentDescription = (paymentDescription|length > 75 ? paymentDescription[:75] ~ ' ...' : paymentDescription) %}
 
-                {% if not payment.id is same as(selectedPaymentMethodId) %}
-                    {% set paymentDescription = (paymentDescription|length > 75 ? paymentDescription[:75] ~ ' ...' : paymentDescription) %}
-                {% endif %}
-
-                <p title="{{ payment.translated.description|raw }}">{{ paymentDescription }}</p>
+                <p title="{{ paymentDescriptionTitle }}">{{ paymentDescription }}</p>
             {% endif %}
         </div>
     {% else %}
