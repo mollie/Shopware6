@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\Cart\Error;
+namespace Mollie\Shopware\Component\Subscription\Cart\Error;
 
 use Shopware\Core\Checkout\Cart\Error\Error;
 
@@ -9,15 +9,8 @@ class PaymentMethodAvailabilityNotice extends Error
 {
     private const KEY = 'mollie-payments-cart-error-paymentmethod-availability';
 
-    /**
-     * @var string
-     */
-    private $lineItemId;
-
-    public function __construct(string $lineItemId)
+    public function __construct(private string $lineItemId)
     {
-        $this->lineItemId = $lineItemId;
-
         parent::__construct();
     }
 
