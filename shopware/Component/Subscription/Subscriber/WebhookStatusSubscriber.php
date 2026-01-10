@@ -142,7 +142,7 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
                 [
                     'statusFrom' => $subscriptionStatus,
                     'statusTo' => $newSubscriptionStatus,
-                    'mollieID' => $subscription->getId(),
+                    'mollieId' => $subscription->getId(),
                     'comment' => 'confirmed'
                 ]
             ]
