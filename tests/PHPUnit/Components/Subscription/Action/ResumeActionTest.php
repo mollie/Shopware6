@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Subscription;
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -110,7 +111,7 @@ class ResumeActionTest extends TestCase
 
         $fakeSubscription->setHistoryEntries($subscriptionHistoryEntries);
 
-        $subscriptionMetadata = new SubscriptionMetadata('2025-08-13', 2, 'months', null, '');
+        $subscriptionMetadata = new SubscriptionMetadata('2025-08-13', 2, IntervalUnit::MONTHS, 0, '');
         $fakeSubscription->setMetadata($subscriptionMetadata);
 
         $repoSubscriptions = $this->createMock(SubscriptionRepository::class);
