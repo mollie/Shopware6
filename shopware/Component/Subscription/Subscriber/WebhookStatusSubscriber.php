@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Subscription\Subscriber;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusCancelledEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
 use Mollie\Shopware\Component\Mollie\CreateSubscription;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
@@ -45,7 +46,73 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
     {
         return [
             WebhookStatusPaidEvent::class => ['onPaidWebhook', self::PRIORITY],
+            WebhookStatusCancelledEvent::class => ['onCancelledWebhook', self::PRIORITY],
         ];
+    }
+
+    public function onCancelledWebhook(WebhookStatusCancelledEvent $event): void
+    {
+        $order = $event->getOrder();
+        $payment = $event->getPayment();
+        $salesChannelId = $order->getSalesChannelId();
+
+        $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
+        if (! $subscriptionSettings->isEnabled()) {
+            return;
+        }
+
+        $subscriptionCollection = $order->getExtension('subscription');
+        if (! $subscriptionCollection instanceof SubscriptionCollection) {
+            return;
+        }
+
+        $firstSubscription = $subscriptionCollection->first();
+        if (! $firstSubscription instanceof SubscriptionEntity) {
+            return;
+        }
+
+        $subscriptionId = $firstSubscription->getId();
+        $subscriptionStatus = $firstSubscription->getStatus();
+        $orderNumber = (string) $order->getOrderNumber();
+
+        $logData = [
+            'orderNumber' => $orderNumber,
+            'subscriptionId' => $subscriptionId,
+            'subscriptionStatus' => $subscriptionStatus
+        ];
+
+        $this->logger->info('Start finalize subscription', $logData);
+
+        if ($subscriptionStatus !== SubscriptionStatus::PENDING->value) {
+            $this->logger->warning('Subscription is not pending, nothing to do', $logData);
+
+            return;
+        }
+        $mollieCustomerId = $payment->getCustomerId();
+
+        if ($mollieCustomerId === null) {
+            $this->logger->error('Failed to get mollie customer id from payment', $logData);
+            throw new \Exception('Failed to get mollie customer id');
+        }
+
+        $newSubscriptionStatus = SubscriptionStatus::CANCELED->value;
+        $subscriptionData = [
+            'id' => $subscriptionId,
+            'status' => $newSubscriptionStatus,
+            'mollieCustomerId' => $mollieCustomerId,
+            'canceledAt' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'historyEntries' => [
+                [
+                    'statusFrom' => $subscriptionStatus,
+                    'statusTo' => $newSubscriptionStatus,
+                    'comment' => 'canceled'
+                ]
+            ]
+        ];
+
+        $context = $event->getContext();
+
+        $this->subscriptionRepository->upsert([$subscriptionData], $context);
     }
 
     public function onPaidWebhook(WebhookStatusPaidEvent $event): void
@@ -53,6 +120,7 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $order = $event->getOrder();
         $payment = $event->getPayment();
         $salesChannelId = $order->getSalesChannelId();
+
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
         if (! $subscriptionSettings->isEnabled()) {
             return;
