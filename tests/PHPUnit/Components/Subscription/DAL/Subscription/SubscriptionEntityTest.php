@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\Interv
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 
@@ -248,8 +249,8 @@ class SubscriptionEntityTest extends TestCase
             new SubscriptionMetadata(
                 '2022-05-01',
                 1,
-                IntervalType::MONTHS,
-                null,
+                IntervalUnit::MONTHS,
+                0,
                 ''
             )
         );
@@ -260,7 +261,6 @@ class SubscriptionEntityTest extends TestCase
             'start_date' => '2022-05-01',
             'interval_value' => 1,
             'interval_unit' => IntervalType::MONTHS,
-            'times' => null,
         ];
 
         static::assertSame($expected, $returnedMeta->toArray());

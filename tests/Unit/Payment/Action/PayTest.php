@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Payment\Action;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
@@ -65,7 +66,8 @@ final class PayTest extends TestCase
         $fakeCustomerRepository = new FakeCustomerRepository();
         $logger = new NullLogger();
         $gateway = new FakeGateway($checkoutUrl);
-        $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService,$gateway,$fakeCustomerRepository,$logger);
+        $lineItemAnalyzer = new LineItemAnalyzer();
+        $builder = new CreatePaymentBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,$logger);
 
         return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $fakeRouteBuilder,$eventDispatcher, $logger);
     }
