@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\MethodRemover;
+namespace Mollie\Shopware\Component\Payment\PayPalExpress;
 
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
+use Mollie\Shopware\Component\Payment\MethodRemover\AbstractPaymentRemover;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
