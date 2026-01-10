@@ -77,7 +77,7 @@ class ConfirmAction extends BaseAction
             $pendingSubscription,
             $metaData->getStartDate(),
             (string) $metaData->getInterval(),
-            $metaData->getIntervalUnit(),
+            $metaData->getIntervalUnit()->value,
             (int) $metaData->getTimes(),
             $mandateId
         );
