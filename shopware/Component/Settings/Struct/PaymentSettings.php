@@ -15,8 +15,17 @@ final class PaymentSettings extends Struct
 
     private const KEY_ONE_CLICK_PAYMENT = 'oneClickPaymentsEnabled';
     private const KEY_ONE_CLICK_COMPACT_VIEW = 'oneClickPaymentsCompactView';
+    private const KEY_CREATE_CUSTOMERS_AT_MOLLIE = 'createCustomersAtMollie';
 
-    public function __construct(private string $orderNumberFormat, private int $dueDateDays, private bool $oneClickPayment = false, private bool $oneClickCompactView = false,private bool $shopwareFailedPayment = false)
+    private const KEY_USE_MOLLIE_LIMITS = 'useMolliePaymentMethodLimits';
+
+    public function __construct(private string $orderNumberFormat,
+        private int $dueDateDays,
+        private bool $oneClickPayment = false,
+        private bool $oneClickCompactView = false,
+        private bool $shopwareFailedPayment = false,
+        private bool $createCustomersAtMollie = false,
+        private bool $useMollieLimits = false)
     {
     }
 
@@ -30,8 +39,10 @@ final class PaymentSettings extends Struct
         $oneClickPayment = $settings[self::KEY_ONE_CLICK_PAYMENT] ?? false;
         $oneClickCompactView = $settings[self::KEY_ONE_CLICK_COMPACT_VIEW] ?? false;
         $shopwareFailedPayment = $settings[self::KEY_SHOPWARE_FAILED_PAYMENT] ?? false;
+        $createCustomersAtMollie = $settings[self::KEY_CREATE_CUSTOMERS_AT_MOLLIE] ?? false;
+        $useMollieLimits = $settings[self::KEY_USE_MOLLIE_LIMITS] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays,$oneClickPayment,$oneClickCompactView,$shopwareFailedPayment);
+        return new self($orderNumberFormat, $dueDateDays,$oneClickPayment,$oneClickCompactView,$shopwareFailedPayment,$createCustomersAtMollie,$useMollieLimits);
     }
 
     public function getOrderNumberFormat(): string
@@ -61,5 +72,15 @@ final class PaymentSettings extends Struct
     public function isOneClickCompactView(): bool
     {
         return $this->oneClickCompactView;
+    }
+
+    public function forceCustomerCreation(): bool
+    {
+        return $this->createCustomersAtMollie;
+    }
+
+    public function useMollieLimits(): bool
+    {
+        return $this->useMollieLimits;
     }
 }

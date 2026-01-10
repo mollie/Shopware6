@@ -51,7 +51,8 @@ final class LineItemAnalyzer
         /** @var LineItem|OrderLineItemEntity $lineItem */
         foreach ($lineItems as $lineItem) {
             if ($lineItem->getType() === PromotionProcessor::LINE_ITEM_TYPE) {
-                continue;
+                // TODO: figure out what to do with promotions
+                // continue;
             }
             /** @var ?Product $extension */
             $extension = $lineItem->getExtension(Mollie::EXTENSION);
