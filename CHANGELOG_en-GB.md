@@ -33,6 +33,7 @@
 - In Mollie Failure Mode, only payment methods that are also available in the cart are displayed on the Mollie page.
 - The order state mapping has been optimized. During a status change, a precise transition path is now determined; if the transition cannot be performed, detailed log entries are generated.
 - Payconiq is discontinued and will not be activated after update. Please deactivate the payment method and remove it from saleschannel
+- Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
 
 # 4.23.0
 - New: Added Vipps as a payment method.
