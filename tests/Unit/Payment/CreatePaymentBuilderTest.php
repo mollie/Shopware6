@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Logger\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
@@ -461,6 +462,6 @@ final class CreatePaymentBuilderTest extends TestCase
         }
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId);
 
-        return new CreatePaymentBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new FakeCustomerRepository(), new NullLogger());
+        return new CreatePaymentBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new NullLogger());
     }
 }
