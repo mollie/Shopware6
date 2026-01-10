@@ -19,10 +19,12 @@ use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Entity\Customer\Customer as CustomerExtension;
 use Mollie\Shopware\Mollie;
@@ -47,6 +49,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         private AbstractSettingsService $settingsService,
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
+        private LineItemAnalyzer $lineItemAnalyzer,
         #[Autowire(service: 'customer.repository')]
         private EntityRepository $customerRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -104,11 +107,13 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
 
         $lineItemCollection = new LineItemCollection();
         $oderLineItems = $order->getLineItems();
+        $hasSubscriptionLineItem = false;
         if ($oderLineItems !== null) {
             foreach ($oderLineItems as $lineItem) {
-                $lineItem = LineItem::fromOrderLine($lineItem, $currency,$taxStatus);
+                $lineItem = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
                 $lineItemCollection->add($lineItem);
             }
+            $hasSubscriptionLineItem = $this->lineItemAnalyzer->hasSubscriptionProduct($oderLineItems);
         }
 
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
@@ -127,7 +132,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
                 continue;
             }
 
-            $lineItem = LineItem::fromDelivery($delivery, $currency,$taxStatus);
+            $lineItem = LineItem::fromDelivery($delivery, $currency, $taxStatus);
             $lineItemCollection->add($lineItem);
         }
 
@@ -154,7 +159,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         }
 
         $mollieCustomerExtension = $customer->getExtension(Mollie::EXTENSION);
-        $mollieCustomerId = null;
+
         if ($mollieCustomerExtension instanceof CustomerExtension) {
             $mollieCustomerId = $mollieCustomerExtension->getForProfileId($profileId);
             if ($mollieCustomerId !== null) {
@@ -162,14 +167,49 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
             }
         }
 
+        if (! $customer->getGuest()) {
+            $createPaymentStruct = $this->modifySequenceType($createPaymentStruct, $paymentHandler, $dataBag, $salesChannelId, $hasSubscriptionLineItem);
+
+            if (
+                (
+                    $createPaymentStruct->getSequenceType() !== SequenceType::ONEOFF
+                    || $paymentSettings->forceCustomerCreation()
+                )
+                && $createPaymentStruct->getCustomerId() === null
+            ) {
+                $mollieCustomer = $this->mollieGateway->createCustomer($customer, $salesChannelId);
+                $createPaymentStruct->setCustomerId($mollieCustomer->getId());
+
+                $customer = $this->saveCustomerId($customer, $mollieCustomer, $profileId, $context);
+
+                $this->logger->info('Mollie customer created and assigned to shopware customer', $logData);
+            }
+        }
+
+        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $customer);
+
+        $logData['payload'] = $createPaymentStruct->toArray();
+        $this->logger->info('Payment payload created for mollie API', $logData);
+
+        return $createPaymentStruct;
+    }
+
+    private function modifySequenceType(CreatePayment $createPaymentStruct, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, string $salesChannelId, bool $hasSubscriptionLineItem): CreatePayment
+    {
         $savePaymentDetails = $dataBag->get('savePaymentDetails', false);
-        if (! $customer->getGuest() && $savePaymentDetails) {
+
+        if ($savePaymentDetails || ($hasSubscriptionLineItem && $paymentHandler instanceof SubscriptionAwareInterface)) {
             $createPaymentStruct->setSequenceType(SequenceType::FIRST);
         }
 
         $mandateId = $dataBag->get('mandateId');
+        $mollieCustomerId = $createPaymentStruct->getCustomerId();
 
-        if (! $customer->getGuest() && $mollieCustomerId && $mandateId && $paymentHandler instanceof RecurringAwareInterface) {
+        if (
+            $mollieCustomerId
+            && $mandateId
+            && $paymentHandler instanceof RecurringAwareInterface
+        ) {
             $mandates = $this->mollieGateway->listMandates($mollieCustomerId, $salesChannelId);
             $paymentMethodMandates = $mandates->filterByPaymentMethod($paymentHandler->getPaymentMethod());
             $mandate = $paymentMethodMandates->get($mandateId);
@@ -178,18 +218,6 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
                 $createPaymentStruct->setSequenceType(SequenceType::RECURRING);
             }
         }
-
-        if (! $customer->getGuest() && $createPaymentStruct->getSequenceType() !== SequenceType::ONEOFF && $createPaymentStruct->getCustomerId() === null) {
-            $mollieCustomer = $this->mollieGateway->createCustomer($customer, $salesChannelId);
-            $createPaymentStruct->setCustomerId($mollieCustomer->getId());
-
-            $customer = $this->saveCustomerId($customer, $mollieCustomer, $profileId, $context);
-            $this->logger->info('Mollie customer created and assigned to shopware customer', $logData);
-        }
-        $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $customer);
-
-        $logData['payload'] = $createPaymentStruct->toArray();
-        $this->logger->info('Payment payload created for mollie API', $logData);
 
         return $createPaymentStruct;
     }

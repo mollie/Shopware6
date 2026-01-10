@@ -93,7 +93,7 @@ final class MollieGateway implements MollieGatewayInterface
             $formParams = $molliePayment->toArray();
 
             $response = $client->post('payments', [
-                'form_params' => $molliePayment->toArray(),
+                'form_params' => $formParams,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 

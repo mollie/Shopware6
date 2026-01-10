@@ -5,9 +5,9 @@ namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionEntityTest extends TestCase
