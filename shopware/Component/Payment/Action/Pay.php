@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Payment\CreatePaymentBuilderInterface;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
+use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PosPayment;
@@ -108,6 +109,10 @@ final class Pay
         if (mb_strlen($redirectUrl) === 0) {
             $redirectUrl = $shopwareFinalizeUrl;
         }
+
+        $paymentCreatedEvent = new PaymentCreatedEvent($redirectUrl, $payment,$transactionDataStruct, $dataBag, $context);
+        $this->eventDispatcher->dispatch($paymentCreatedEvent);
+
         $logData['redirectUrl'] = $redirectUrl;
         $this->logger->info('Finished - Mollie payment, redirecting', $logData);
 

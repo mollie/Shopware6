@@ -15,6 +15,7 @@
 - Im Mollie Failure Mode werden auf der Mollie-Seite ausschließlich Zahlungsarten angezeigt, die auch im Warenkorb verfügbar sind.
 - Das Order-State-Mapping wurde optimiert. Beim Statuswechsel wird nun ein präziser Übergangspfad ermittelt; kann der Wechsel nicht durchgeführt werden, werden detaillierte Log-Einträge erstellt.
 - Payconiq ist eingestellt und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
+- Das Event PaymentCreatedEvent wurde eingeführt, damit ist es möglich vor der Weiterleitung zum Zahlungsanbieter noch eigene Logik einzubauen
 
 ## [Unreleased]
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
