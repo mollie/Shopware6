@@ -6,8 +6,9 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
@@ -157,6 +158,18 @@ class SubscriptionEntity extends Entity
      * @var ?CashRoundingConfig
      */
     protected $itemRounding;
+
+    protected ?OrderEntity $order;
+
+    public function getOrder(): ?OrderEntity
+    {
+        return $this->order;
+    }
+
+    public function setOrder(OrderEntity $order): void
+    {
+        $this->order = $order;
+    }
     // --------------------------------------------------------------------------------
 
     public function setMetadata(SubscriptionMetadata $metadata): void

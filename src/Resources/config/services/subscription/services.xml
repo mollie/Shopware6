@@ -40,6 +40,9 @@
         <service id="Kiener\MolliePayments\Components\Subscription\DAL\Currency\CurrencyExtension">
             <tag name="shopware.entity.extension"/>
         </service>
+        <service id="Kiener\MolliePayments\Components\Subscription\DAL\Order\OrderExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
 
 
 

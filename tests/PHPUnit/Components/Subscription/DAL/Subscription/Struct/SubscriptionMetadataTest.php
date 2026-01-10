@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription\Struct;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionMetadataTest extends TestCase
