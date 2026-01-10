@@ -210,12 +210,6 @@
 
 
 
-        <service id="Kiener\MolliePayments\Components\PaypalExpress\Route\CancelCheckoutRoute">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CartService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress"/>
-            <tag name="controller.service_arguments"/>
-        </service>
 
 
     </services>
