@@ -71,15 +71,15 @@ class SkipAction extends BaseAction
 
         $nextPaymentDate = $intervalCalculator->getNextIntervalDate(
             $currentSubscriptionNextPaymentAt,
-            (int) $metaData->getInterval(),
-            $metaData->getIntervalUnit()
+            (int) $metaData->getIntervalValue(),
+            (string) $metaData->getIntervalUnit()->value
         );
 
         $jsonPayload = $this->getPayloadBuilder()->buildRequestPayload(
             $subscription,
             $nextPaymentDate,
-            (string) $metaData->getInterval(),
-            $metaData->getIntervalUnit(),
+            (string) $metaData->getIntervalValue(),
+            (string) $metaData->getIntervalUnit()->value,
             (int) $metaData->getTimes(),
             $subscription->getMandateId()
         );

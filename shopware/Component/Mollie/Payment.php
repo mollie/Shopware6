@@ -24,6 +24,10 @@ final class Payment extends Struct implements \JsonSerializable
     private ?string $authenticationId = null;
     private ?PaymentMethod $method = null;
 
+    private ?string $profileId = null;
+    private ?string $customerId = null;
+    private ?string $mandateId = null;
+
     public function __construct(private string $id)
     {
     }
@@ -104,6 +108,10 @@ final class Payment extends Struct implements \JsonSerializable
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
         $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
         $changePaymentStateUrl = $body['_links']['changePaymentState']['href'] ?? null;
+        $customerId = $body['customerId'] ?? null;
+        $mandateId = $body['mandateId'] ?? null;
+        $profileId = $body['profileId'] ?? null;
+
         if ($paymentMethod !== null) {
             $payment->setMethod($paymentMethod);
         }
@@ -116,8 +124,47 @@ final class Payment extends Struct implements \JsonSerializable
         if ($changePaymentStateUrl !== null) {
             $payment->setChangePaymentStateUrl($changePaymentStateUrl);
         }
+        if ($customerId !== null) {
+            $payment->setCustomerId($customerId);
+        }
+        if ($mandateId !== null) {
+            $payment->setMandateId($mandateId);
+        }
+        if ($profileId !== null) {
+            $payment->setProfileId($profileId);
+        }
 
         return $payment;
+    }
+
+    public function getProfileId(): ?string
+    {
+        return $this->profileId;
+    }
+
+    public function setProfileId(string $profileId): void
+    {
+        $this->profileId = $profileId;
+    }
+
+    public function getCustomerId(): ?string
+    {
+        return $this->customerId;
+    }
+
+    public function setCustomerId(string $customerId): void
+    {
+        $this->customerId = $customerId;
+    }
+
+    public function getMandateId(): ?string
+    {
+        return $this->mandateId;
+    }
+
+    public function setMandateId(string $mandateId): void
+    {
+        $this->mandateId = $mandateId;
     }
 
     public function getCheckoutUrl(): string
