@@ -39,6 +39,16 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
     }
 
+    public function getSubscriptionWebhookUrl(string $subscriptionId): string
+    {
+        $routeName = 'frontend.mollie.webhook.subscription';
+        if ($this->isStoreApiRequest()) {
+            $routeName = 'api.mollie.webhook_subscription';
+        }
+
+        return $this->router->generate($routeName, ['swSubscriptionId' => $subscriptionId], RouterInterface::ABSOLUTE_URL);
+    }
+
     public function getPaypalExpressRedirectUrl(): string
     {
         $routeName = 'frontend.mollie.paypal-express.finish';
