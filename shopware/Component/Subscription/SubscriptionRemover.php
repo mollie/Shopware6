@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\MethodRemover;
+namespace Mollie\Shopware\Component\Subscription;
 
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
+use Mollie\Shopware\Component\Payment\MethodRemover\AbstractPaymentRemover;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Entity\Product\Product;
-use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
@@ -29,6 +29,7 @@ final class SubscriptionRemover extends AbstractPaymentRemover
         #[Autowire(service: 'order.repository')]
         private EntityRepository $orderRepository,
         private PaymentHandlerLocator $paymentHandlerLocator,
+        private LineItemAnalyzer $lineItemAnalyzer,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
     ) {
@@ -69,16 +70,9 @@ final class SubscriptionRemover extends AbstractPaymentRemover
 
     private function hasSubscriptionProductInCart(Cart $cart): bool
     {
-        $lineItems = $cart->getLineItems();
-        foreach ($lineItems as $lineItem) {
-            /** @var ?Product $extension */
-            $extension = $lineItem->getExtension(Mollie::EXTENSION);
-            if ($extension instanceof Product && $extension->isSubscription() === true) {
-                return true;
-            }
-        }
+        $lineItems = new LineItemCollection($cart->getLineItems()->getFlat());
 
-        return false;
+        return $this->lineItemAnalyzer->hasSubscriptionProduct($lineItems);
     }
 
     private function hasSubscriptionProductInOrder(OrderEntity $order): bool
@@ -87,14 +81,7 @@ final class SubscriptionRemover extends AbstractPaymentRemover
         if ($lineItems === null) {
             return false;
         }
-        foreach ($lineItems as $lineItem) {
-            /** @var ?Product $extension */
-            $extension = $lineItem->getExtension(Mollie::EXTENSION);
-            if ($extension instanceof Product && $extension->isSubscription() === true) {
-                return true;
-            }
-        }
 
-        return false;
+        return $this->lineItemAnalyzer->hasSubscriptionProduct($lineItems);
     }
 }
