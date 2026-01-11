@@ -13,4 +13,14 @@ final class Interval implements \Stringable
     {
         return $this->intervalValue . ' ' . $this->intervalUnit->value;
     }
+
+    public function getIntervalValue(): int
+    {
+        return $this->intervalValue;
+    }
+
+    public function getIntervalUnit(): IntervalUnit
+    {
+        return $this->intervalUnit;
+    }
 }

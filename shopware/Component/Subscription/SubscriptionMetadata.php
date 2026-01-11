@@ -50,10 +50,9 @@ final class SubscriptionMetadata
             'start_date' => $this->startDate,
             'interval_value' => $this->intervalValue,
             'interval_unit' => $this->intervalUnit->value,
+            'times' => $this->times,
         ];
-        if ($this->times > 0) {
-            $data['times'] = $this->times;
-        }
+
         if (strlen($this->tmpTransactionId) > 0) {
             $data['tmp_transaction'] = $this->tmpTransactionId;
         }

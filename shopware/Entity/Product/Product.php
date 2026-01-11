@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Entity\Product;
 
+use Mollie\Shopware\Component\Mollie\Interval;
 use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
@@ -12,8 +13,7 @@ final class Product extends Struct
 {
     private VoucherCategoryCollection $voucherCategories;
     private bool $isSubscription = false;
-    private int $interval = 0;
-    private IntervalUnit $unit;
+    private Interval $interval;
 
     private int $repetition = 0;
 
@@ -42,24 +42,14 @@ final class Product extends Struct
         $this->isSubscription = $isSubscription;
     }
 
-    public function getInterval(): int
+    public function getInterval(): Interval
     {
         return $this->interval;
     }
 
-    public function setInterval(int $interval): void
+    public function setInterval(Interval $interval): void
     {
         $this->interval = $interval;
-    }
-
-    public function getUnit(): IntervalUnit
-    {
-        return $this->unit;
-    }
-
-    public function setUnit(IntervalUnit $unit): void
-    {
-        $this->unit = $unit;
     }
 
     public function getRepetition(): int
@@ -104,8 +94,7 @@ final class Product extends Struct
         if ((bool) $subscriptionEnabled && (int) $subscriptionInterval > 0 && mb_strlen($subscriptionUnit) > 0) {
             $subscriptionRepetitions = $customFields['mollie_payments_product_subscription_repetition'] ?? 0;
             $productExtension->setIsSubscription(true);
-            $productExtension->setInterval($subscriptionInterval);
-            $productExtension->setUnit(IntervalUnit::from($subscriptionUnit));
+            $productExtension->setInterval(new Interval($subscriptionInterval,IntervalUnit::from($subscriptionUnit)));
             $productExtension->setRepetition((int) $subscriptionRepetitions);
         }
 
