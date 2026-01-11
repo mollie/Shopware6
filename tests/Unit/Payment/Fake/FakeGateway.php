@@ -70,5 +70,4 @@ final class FakeGateway implements MollieGatewayInterface
     {
         // TODO: Implement getPayment() method.
     }
-
 }
