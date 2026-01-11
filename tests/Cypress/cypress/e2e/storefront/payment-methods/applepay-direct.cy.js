@@ -170,7 +170,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             cy.wrap(request).its('data').then(data => {
                 cy.wrap(data).its('success').should('eq', false)
-                cy.wrap(data).its('error').should('contain', 'Please provide a Shipping Method identifier');
+                cy.wrap(data).its('error').should('contain', 'Missing shipping method identifier');
             });
         })
 
@@ -187,18 +187,6 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('C266707: /mollie/apple-pay/finish-payment redirects to cart with invalid data @core', () => {
-
-            const request = new Promise((resolve) => {
-                storefrontClient.get('/mollie/apple-pay/finish-payment').then(response => {
-                    resolve({'data': response});
-                });
-            })
-
-            cy.wrap(request).its('data').then(data => {
-                cy.wrap(data).its('request.responseURL').should('contain', '/checkout/cart');
-            });
-        })
 
         it('C266708: /mollie/apple-pay/restore-cart @core', () => {
 

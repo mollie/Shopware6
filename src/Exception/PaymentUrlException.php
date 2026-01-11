@@ -3,16 +3,20 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Exception;
 
-use Shopware\Core\Checkout\Payment\Exception\PaymentProcessException;
+use Shopware\Core\Checkout\Payment\PaymentException;
+use Symfony\Component\HttpFoundation\Response;
 
-class PaymentUrlException extends PaymentProcessException
+class PaymentUrlException extends PaymentException
 {
     public function __construct(string $orderTransactionId, string $errorMessage)
     {
         parent::__construct(
-            $orderTransactionId,
-            'Could not create a Mollie payment url due to the following error: {{ errorMessage }}',
-            ['errorMessage' => $errorMessage]
+            Response::HTTP_BAD_REQUEST,
+            $this->getErrorCode(),
+            'Could not create a Mollie payment url for transaction {{transactionId}} due to the following error: {{ errorMessage }}',
+            ['transactionId' => $orderTransactionId,
+                'errorMessage' => $errorMessage
+            ]
         );
     }
 

@@ -1,15 +1,10 @@
 <?php
+declare(strict_types=1);
 
-namespace Mollie\Behat;
+namespace Mollie\Shopware\Behat;
 
-use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
-use Behat\Gherkin\Node\TableNode;
 use Behat\Step\Given;
-use Mollie\Integration\Data\PaymentMethodTestBehaviour;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-
+use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 
 final class PaymentContext extends ShopwareContext
 {
@@ -23,6 +18,4 @@ final class PaymentContext extends ShopwareContext
         $this->activatePaymentMethod($paymentMethod, $salesChannelContext->getContext());
         $this->assignPaymentMethodToSalesChannel($paymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
     }
-
-
 }

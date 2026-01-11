@@ -87,7 +87,7 @@ class ResumeAction extends BaseAction
             $subscription,
             $nextPaymentDate->format('Y-m-d'),
             (string) $metaData->getInterval(),
-            $metaData->getIntervalUnit(),
+            (string) $metaData->getIntervalUnit()->value,
             (int) $metaData->getTimes(),
             $subscription->getMandateId()
         );

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
+use Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService;
 use Shopware\Core\System\SalesChannel\Event\SalesChannelContextTokenChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,7 +19,7 @@ class SalesChannelContextTokenChangedSubscriber implements EventSubscriberInterf
         $this->cartBackupService = $cartBackupService;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SalesChannelContextTokenChangeEvent::class => 'onTokenChange',

@@ -36,7 +36,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         $this->apiClient = new MollieApiClient();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'system_config.written' => 'onSystemConfigWritten',

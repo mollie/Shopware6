@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Mollie;
+namespace MolliePayments\Shopware\Tests\Service\Mollie;
 
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
@@ -30,7 +30,7 @@ class OrderStatusConverterTest extends TestCase
         $fakePayment = $this->createMock(Payment::class);
         $fakePayment->createdAt = date(DATE_ISO8601, strtotime('-1 hour'));
 
-        $paymentCollection = new PaymentCollection($this->createMock(MollieApiClient::class), 2, null);
+        $paymentCollection = new PaymentCollection($this->createMock(MollieApiClient::class), [], null);
         $paymentCollection->append($this->payment);
         $paymentCollection->append($fakePayment);
 

@@ -78,8 +78,8 @@ class SubscriptionDefinition extends EntityDefinition
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),
             (new DateTimeField('canceled_at', 'canceledAt'))->addFlags(new ApiAware()),
 
-            (new FkField('product_id', 'productId', ProductDefinition::class))->addFlags(new ApiAware()),
-            (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new ApiAware()),
+            (new FkField('product_id', 'productId', ProductDefinition::class))->addFlags(new ApiAware(),new Required()),
+            (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new ApiAware(),new Required()),
             (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
 
             (new FkField('billing_address_id', 'billingAddressId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
@@ -97,6 +97,7 @@ class SubscriptionDefinition extends EntityDefinition
 
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
             new ManyToOneAssociationField('currency', 'currency_id', CurrencyDefinition::class, 'id', false),
+            new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
             new OneToManyAssociationField('addresses', SubscriptionAddressDefinition::class, 'subscription_id'),
             new OneToManyAssociationField('historyEntries', SubscriptionHistoryDefinition::class, 'subscription_id'),
 
