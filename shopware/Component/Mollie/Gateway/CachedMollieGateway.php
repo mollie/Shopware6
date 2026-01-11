@@ -26,9 +26,15 @@ final class CachedMollieGateway implements MollieGatewayInterface
      */
     private array $profiles = [];
 
+    /**
+     * @var array<string, Payment>
+     */
+    private array $paymentIdPayments = [];
+
     public function __construct(
         private MollieGatewayInterface $decorated
-    ) {
+    )
+    {
     }
 
     public function getCurrentProfile(?string $salesChannelId = null): Profile
@@ -56,6 +62,17 @@ final class CachedMollieGateway implements MollieGatewayInterface
         $this->transactionPayments[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
 
         return $this->transactionPayments[$key];
+    }
+
+    public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
+    {
+        $key = sprintf('%s', $molliePaymentId);
+        if (isset($this->paymentIdPayments[$key])) {
+            return $this->paymentIdPayments[$key];
+        }
+        $this->paymentIdPayments[$key] = $this->decorated->getPayment($molliePaymentId, $orderNumber, $salesChannelId);
+
+        return $this->paymentIdPayments[$key];
     }
 
     public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer
