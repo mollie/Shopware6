@@ -261,6 +261,7 @@ class SubscriptionEntityTest extends TestCase
             'start_date' => '2022-05-01',
             'interval_value' => 1,
             'interval_unit' => IntervalType::MONTHS,
+            'times' => 0
         ];
 
         static::assertSame($expected, $returnedMeta->toArray());
