@@ -10,7 +10,5 @@ interface SubscriptionGatewayInterface
 {
     public function createSubscription(CreateSubscription $createSubscription,string $customerId,string $orderNumber, string $salesChannelId): Subscription;
 
-    public function getSubscription(string $mollieSubscriptionId,  string $customerId, string $orderNumber, string $salesChannelId):Subscription;
-
-    public function updateSubscription(array $data, string $mollieSubscriptionId, string $customerId, string $orderNumber, string $salesChannelId):Subscription;
+    public function getSubscription(string $mollieSubscriptionId,  string $customerId, string $orderNumber, string $salesChannelId): Subscription;
 }

@@ -57,7 +57,7 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
 
             $transactionExtension = new Payment($paymentId);
             $transactionExtension->setCountPayments($countPayments);
-            if($finalizeUrl !== null) {
+            if ($finalizeUrl !== null) {
                 $transactionExtension->setFinalizeUrl($finalizeUrl);
             }
 
