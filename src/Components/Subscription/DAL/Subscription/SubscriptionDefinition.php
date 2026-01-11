@@ -7,23 +7,23 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\Sub
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryDefinition;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Order\OrderDefinition;
-use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\CashRoundingConfigField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\CreatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Runtime;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\IntField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToOneAssociationField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ReferenceVersionField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
@@ -61,7 +61,6 @@ class SubscriptionDefinition extends EntityDefinition
             (new StringField('status', 'status'))->addFlags(new ApiAware()),
             (new StringField('description', 'description'))->addFlags(new ApiAware()),
             (new FloatField('amount', 'amount'))->addFlags(new ApiAware()),
-            (new IntField('quantity', 'quantity'))->addFlags(new ApiAware()),
             (new FkField('currency_id', 'currencyId', CurrencyDefinition::class))->addFlags(new ApiAware(), new Required()),
             new JsonField('metadata', 'metadata'),
 
@@ -78,8 +77,8 @@ class SubscriptionDefinition extends EntityDefinition
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),
             (new DateTimeField('canceled_at', 'canceledAt'))->addFlags(new ApiAware()),
 
-            (new FkField('product_id', 'productId', ProductDefinition::class))->addFlags(new ApiAware(),new Required()),
             (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new ApiAware(),new Required()),
+            (new ReferenceVersionField(OrderDefinition::class))->addFlags(new ApiAware(), new Required()),
             (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
 
             (new FkField('billing_address_id', 'billingAddressId', SalesChannelDefinition::class))->addFlags(new ApiAware()),
@@ -97,7 +96,7 @@ class SubscriptionDefinition extends EntityDefinition
 
             new ManyToOneAssociationField('customer', 'customer_id', CustomerDefinition::class, 'id', false),
             new ManyToOneAssociationField('currency', 'currency_id', CurrencyDefinition::class, 'id', false),
-            new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false),
+            (new ManyToOneAssociationField('order', 'order_id', OrderDefinition::class, 'id', false))->addFlags(new CascadeDelete()),
             new OneToManyAssociationField('addresses', SubscriptionAddressDefinition::class, 'subscription_id'),
             new OneToManyAssociationField('historyEntries', SubscriptionHistoryDefinition::class, 'subscription_id'),
 
