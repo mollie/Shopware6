@@ -22,7 +22,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\Currency\CurrencyEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -80,7 +79,7 @@ final class PaymentSubscriber implements EventSubscriberInterface
         ];
         $shippingAddress = $transactionData->getShippingOrderAddress();
         $billingAddress = $transactionData->getBillingOrderAddress();
-        $subscriptionData = $this->getSubscriptionData($order, $firstSubscriptionProduct, $transactionData->getCustomer(),$transactionData->getCurrency());
+        $subscriptionData = $this->getSubscriptionData($order, $firstSubscriptionProduct, $transactionData->getCustomer());
         $subscriptionData['billingAddress'] = $this->getAddressData($billingAddress, $subscriptionData['id']);
         $subscriptionData['shippingAddress'] = $this->getAddressData($shippingAddress, $subscriptionData['id']);
 
@@ -90,16 +89,16 @@ final class PaymentSubscriber implements EventSubscriberInterface
             'comment' => 'created'
         ];
 
-        $this->logger->info('Subscription created', $logData);
+        $this->logger->info('Pending subscription created', $logData);
         $this->subscriptionRepository->upsert([$subscriptionData], $context);
     }
 
     /**
      * @return array<mixed>
      */
-    private function getSubscriptionData(OrderEntity $order, OrderLineItemEntity $lineItem, CustomerEntity $customer,CurrencyEntity $currency): array
+    private function getSubscriptionData(OrderEntity $order, OrderLineItemEntity $lineItem, CustomerEntity $customer): array
     {
-        $description = $lineItem->getQuantity() . 'x ' . $lineItem->getLabel() . ' (Order #' . $order->getOrderNumber() . ', ' . $lineItem->getTotalPrice() . ' ' . $currency->getIsoCode() . ')';
+        $description = 'Order #' . $order->getOrderNumber();
         $totalRoundingValue = null;
         $totalRounding = $order->getTotalRounding();
         if ($totalRounding instanceof CashRoundingConfig) {
@@ -113,7 +112,7 @@ final class PaymentSubscriber implements EventSubscriberInterface
 
         return [
             'id' => Uuid::randomHex(),
-            'customerId' => $customer->getId(),
+            'customerId' => $order->getId(),
             'mollieCustomerId' => null,
             'mollieSubscriptionId' => null,
             'lastRemindedAt' => null,
@@ -121,10 +120,8 @@ final class PaymentSubscriber implements EventSubscriberInterface
             'status' => SubscriptionStatus::PENDING->value,
             'description' => $description,
             'amount' => $order->getAmountTotal(),
-            'quantity' => $lineItem->getQuantity(),
             'currencyId' => $order->getCurrencyId(),
             'metadata' => $this->getMetaDataArray($lineItem, $order->getOrderDate()),
-            'productId' => (string) $lineItem->getProductId(),
             'orderId' => $order->getId(),
             'orderVersionId' => $order->getVersionId(),
             'salesChannelId' => $order->getSalesChannelId(),
@@ -176,12 +173,11 @@ final class PaymentSubscriber implements EventSubscriberInterface
             return [];
         }
 
-        $repetition = 0;
-
-        // Since we already paid once, we get then the next start date as first date and also reduce the amount of repetitions
-
-        if ($productExtension->getRepetition() > 0) {
-            $repetition = $productExtension->getRepetition() - 1;
+        $repetitions = 0;
+        $hasRepetitions = $productExtension->getRepetition() > 0;
+        if ($hasRepetitions) {
+            // Since we already paid once, we get then the next start date as first date and also reduce the amount of repetitions
+            $repetitions = $productExtension->getRepetition() - 1;
         }
 
         $startDate = \DateTime::createFromFormat('Y-m-d', $orderDate->format('Y-m-d'));
@@ -189,9 +185,10 @@ final class PaymentSubscriber implements EventSubscriberInterface
         if (! $startDate instanceof \DateTimeInterface) {
             throw new \RuntimeException('Failed to create date object');
         }
-        $startDate->modify('+' . $productExtension->getInterval() . ' ' . $productExtension->getUnit()->value);
+        $interval = $productExtension->getInterval();
 
-        $metaData = new SubscriptionMetadata($startDate->format('Y-m-d'), $productExtension->getInterval(), $productExtension->getUnit(), $repetition);
+        $startDate->modify('+' . (string) $interval);
+        $metaData = new SubscriptionMetadata($startDate->format('Y-m-d'),$interval->getIntervalValue(),$interval->getIntervalUnit(),$repetitions);
 
         return $metaData->toArray();
     }

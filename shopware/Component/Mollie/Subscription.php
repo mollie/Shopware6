@@ -5,8 +5,6 @@ namespace Mollie\Shopware\Component\Mollie;
 
 final class Subscription
 {
-    private PaymentCollection $payments;
-
     /**
      * @param array<mixed> $metadata
      */
@@ -62,16 +60,6 @@ final class Subscription
     public function getMetadata(): array
     {
         return $this->metadata;
-    }
-
-    public function getPayments(): PaymentCollection
-    {
-        return $this->payments;
-    }
-
-    public function setPayments(PaymentCollection $payments): void
-    {
-        $this->payments = $payments;
     }
 
     public function setStatus(SubscriptionStatus $status): void
