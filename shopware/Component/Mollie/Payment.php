@@ -27,6 +27,9 @@ final class Payment extends Struct implements \JsonSerializable
     private ?string $profileId = null;
     private ?string $customerId = null;
     private ?string $mandateId = null;
+    private ?string $subscriptionId = null;
+
+    private ?\DateTimeInterface $createdAt = null;
 
     public function __construct(private string $id)
     {
@@ -111,6 +114,8 @@ final class Payment extends Struct implements \JsonSerializable
         $customerId = $body['customerId'] ?? null;
         $mandateId = $body['mandateId'] ?? null;
         $profileId = $body['profileId'] ?? null;
+        $createdAt = $body['createdAt'] ?? null;
+        $subscriptionId = $body['subscriptionId'] ?? null;
 
         if ($paymentMethod !== null) {
             $payment->setMethod($paymentMethod);
@@ -133,8 +138,38 @@ final class Payment extends Struct implements \JsonSerializable
         if ($profileId !== null) {
             $payment->setProfileId($profileId);
         }
+        if($createdAt !== null) {
+            $createdAtDate = \DateTime::createFromFormat(\DateTimeInterface::ATOM, $createdAt);
+            if ($createdAtDate instanceof \DateTimeInterface) {
+                $payment->setCreatedAt($createdAtDate);
+            }
+        }
+
+        if($subscriptionId !== null) {
+            $payment->setSubscriptionId($subscriptionId);
+        }
 
         return $payment;
+    }
+
+    public function getSubscriptionId(): ?string
+    {
+        return $this->subscriptionId;
+    }
+
+    public function setSubscriptionId(?string $subscriptionId): void
+    {
+        $this->subscriptionId = $subscriptionId;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 
     public function getProfileId(): ?string

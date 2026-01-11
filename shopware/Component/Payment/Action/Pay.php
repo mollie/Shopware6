@@ -35,37 +35,38 @@ final class Pay
 {
     public function __construct(
         #[Autowire(service: TransactionService::class)]
-        private TransactionServiceInterface $transactionService,
+        private TransactionServiceInterface   $transactionService,
         #[Autowire(service: CreatePaymentBuilder::class)]
         private CreatePaymentBuilderInterface $createPaymentBuilder,
         #[Autowire(service: MollieGateway::class)]
-        private MollieGatewayInterface $mollieGateway,
+        private MollieGatewayInterface        $mollieGateway,
         #[Autowire(service: OrderTransactionStateHandler::class)]
-        private OrderTransactionStateHandler $stateMachineHandler,
+        private OrderTransactionStateHandler  $stateMachineHandler,
         #[Autowire(service: RouteBuilder::class)]
-        private RouteBuilderInterface $routeBuilder,
+        private RouteBuilderInterface         $routeBuilder,
         #[Autowire(service: 'event_dispatcher')]
-        private EventDispatcherInterface $eventDispatcher,
+        private EventDispatcherInterface      $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger
-    ) {
+        private LoggerInterface               $logger
+    )
+    {
     }
 
     public function execute(AbstractMolliePaymentHandler $paymentHandler,
-        PaymentTransactionStruct $transaction,
-        RequestDataBag $dataBag,
-        Context $context): RedirectResponse
+                            PaymentTransactionStruct     $transaction,
+                            RequestDataBag               $dataBag,
+                            Context                      $context): RedirectResponse
     {
         $transactionId = $transaction->getOrderTransactionId();
-        $shopwareFinalizeUrl = (string) $transaction->getReturnUrl();
+        $shopwareFinalizeUrl = (string)$transaction->getReturnUrl();
 
         $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
         $transaction = $transactionDataStruct->getTransaction();
-        $orderNumber = (string) $order->getOrderNumber();
+        $orderNumber = (string)$order->getOrderNumber();
         $salesChannel = $transactionDataStruct->getSalesChannel();
-        $salesChannelName = (string) $salesChannel->getName();
+        $salesChannelName = (string)$salesChannel->getName();
 
         $logData = [
             'salesChannel' => $salesChannelName,
@@ -80,15 +81,17 @@ final class Pay
 
         $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
 
-        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $context);
-        $this->eventDispatcher->dispatch($paymentEvent);
+
         /** @var RequestDataBag $paymentMethods */
-        $paymentMethods = $dataBag->get('paymentMethods',new DataBag());
+        $paymentMethods = $dataBag->get('paymentMethods', new DataBag());
 
         if ($paymentMethods->count() > 0) {
             $createPaymentStruct->setMethods($paymentMethods->all());
         }
-
+        $paymentEvent = new ModifyCreatePaymentPayloadEvent($createPaymentStruct, $context);
+        /** @var ModifyCreatePaymentPayloadEvent $paymentEvent */
+        $paymentEvent = $this->eventDispatcher->dispatch($paymentEvent);
+        $createPaymentStruct = $paymentEvent->getPayment();
         $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
         $paypalExpressAuthenticationId = $createPaymentStruct->getAuthenticationId();
         if ($paypalExpressAuthenticationId !== null) {
@@ -110,7 +113,7 @@ final class Pay
             $redirectUrl = $shopwareFinalizeUrl;
         }
 
-        $paymentCreatedEvent = new PaymentCreatedEvent($redirectUrl, $payment,$transactionDataStruct, $dataBag, $context);
+        $paymentCreatedEvent = new PaymentCreatedEvent($redirectUrl, $payment, $transactionDataStruct, $dataBag, $context);
         $this->eventDispatcher->dispatch($paymentCreatedEvent);
 
         $logData['redirectUrl'] = $redirectUrl;

@@ -18,6 +18,8 @@ interface MollieGatewayInterface
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment;
 
+    public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment;
+
     public function getCurrentProfile(?string $salesChannelId = null): Profile;
 
     public function createCustomer(CustomerEntity $customer,string $salesChannelId): Customer;
