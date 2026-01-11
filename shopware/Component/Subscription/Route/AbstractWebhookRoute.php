@@ -12,5 +12,4 @@ abstract class AbstractWebhookRoute
     abstract public function getDecorated(): self;
 
     abstract public function notify(string $subscriptionId,Request $request, Context $context): WebhookResponse;
-
 }

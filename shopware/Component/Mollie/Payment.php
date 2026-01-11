@@ -138,14 +138,14 @@ final class Payment extends Struct implements \JsonSerializable
         if ($profileId !== null) {
             $payment->setProfileId($profileId);
         }
-        if($createdAt !== null) {
+        if ($createdAt !== null) {
             $createdAtDate = \DateTime::createFromFormat(\DateTimeInterface::ATOM, $createdAt);
             if ($createdAtDate instanceof \DateTimeInterface) {
                 $payment->setCreatedAt($createdAtDate);
             }
         }
 
-        if($subscriptionId !== null) {
+        if ($subscriptionId !== null) {
             $payment->setSubscriptionId($subscriptionId);
         }
 

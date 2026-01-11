@@ -65,4 +65,10 @@ final class FakeGateway implements MollieGatewayInterface
     {
         // TODO: Implement listTerminals() method.
     }
+
+    public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
+    {
+        // TODO: Implement getPayment() method.
+    }
+
 }
