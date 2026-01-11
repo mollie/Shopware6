@@ -8,10 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class WebhookException extends HttpException
 {
+    public const SUBSCRIPTION_WITHOUT_PAYMENT_ID = 'SUBSCRIPTION_WITHOUT_PAYMENT_ID';
 
-    const SUBSCRIPTION_WITHOUT_PAYMENT_ID = 'SUBSCRIPTION_WITHOUT_PAYMENT_ID';
-
-    public static function paymentIdNotProvided(string $subscriptionId)
+    public static function paymentIdNotProvided(string $subscriptionId): self
     {
         return new self(
             Response::HTTP_BAD_REQUEST,

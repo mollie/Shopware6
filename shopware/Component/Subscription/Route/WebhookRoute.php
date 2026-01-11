@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Route;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute as AbstractPaymentWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute as PaymentWebhookRoute;
@@ -22,18 +24,19 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
 final class WebhookRoute extends AbstractWebhookRoute
 {
+    /**
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
+     */
     public function __construct(
         #[Autowire(service: 'order_transaction.repository')]
-        private readonly EntityRepository   $subscriptionRepository,
+        private readonly EntityRepository $subscriptionRepository,
         #[Autowire(service: PaymentWebhookRoute::class)]
         private AbstractPaymentWebhookRoute $abstractWebhookRoute,
         #[Autowire(service: RenewRoute::class)]
-        private AbstractRenewRoute          $abstractRenewRoute,
+        private AbstractRenewRoute $abstractRenewRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private readonly LoggerInterface    $logger
-    )
-    {
-
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     public function getDecorated(): AbstractWebhookRoute
@@ -66,10 +69,11 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         if ($transactionId !== null) {
             $this->logger->info('Subscription status updated', $logData);
+
             return $this->abstractWebhookRoute->notify($transactionId, $context);
         }
         $this->logger->info('Subscription will be renewed', $logData);
+
         return $this->abstractRenewRoute->renew($subscriptionId, $request, $context);
     }
-
 }

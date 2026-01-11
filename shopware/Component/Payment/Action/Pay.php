@@ -35,38 +35,37 @@ final class Pay
 {
     public function __construct(
         #[Autowire(service: TransactionService::class)]
-        private TransactionServiceInterface   $transactionService,
+        private TransactionServiceInterface $transactionService,
         #[Autowire(service: CreatePaymentBuilder::class)]
         private CreatePaymentBuilderInterface $createPaymentBuilder,
         #[Autowire(service: MollieGateway::class)]
-        private MollieGatewayInterface        $mollieGateway,
+        private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: OrderTransactionStateHandler::class)]
-        private OrderTransactionStateHandler  $stateMachineHandler,
+        private OrderTransactionStateHandler $stateMachineHandler,
         #[Autowire(service: RouteBuilder::class)]
-        private RouteBuilderInterface         $routeBuilder,
+        private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: 'event_dispatcher')]
-        private EventDispatcherInterface      $eventDispatcher,
+        private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface               $logger
-    )
-    {
+        private LoggerInterface $logger
+    ) {
     }
 
     public function execute(AbstractMolliePaymentHandler $paymentHandler,
-                            PaymentTransactionStruct     $transaction,
-                            RequestDataBag               $dataBag,
-                            Context                      $context): RedirectResponse
+        PaymentTransactionStruct $transaction,
+        RequestDataBag $dataBag,
+        Context $context): RedirectResponse
     {
         $transactionId = $transaction->getOrderTransactionId();
-        $shopwareFinalizeUrl = (string)$transaction->getReturnUrl();
+        $shopwareFinalizeUrl = (string) $transaction->getReturnUrl();
 
         $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
         $transaction = $transactionDataStruct->getTransaction();
-        $orderNumber = (string)$order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
         $salesChannel = $transactionDataStruct->getSalesChannel();
-        $salesChannelName = (string)$salesChannel->getName();
+        $salesChannelName = (string) $salesChannel->getName();
 
         $logData = [
             'salesChannel' => $salesChannelName,
@@ -80,7 +79,6 @@ final class Pay
         $createPaymentStruct = $this->createPaymentBuilder->build($transactionDataStruct, $paymentHandler, $dataBag, $context);
 
         $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
-
 
         /** @var RequestDataBag $paymentMethods */
         $paymentMethods = $dataBag->get('paymentMethods', new DataBag());

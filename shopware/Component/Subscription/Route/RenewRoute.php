@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Route;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
-use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
-use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute as AbstractPaymentWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute as PaymentWebhookRoute;
@@ -19,17 +18,13 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\AbstractCartPersister;
-use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryCollection;
-use Shopware\Core\Checkout\Cart\Delivery\Struct\ShippingLocation;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -44,25 +39,26 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
 final class RenewRoute extends AbstractRenewRoute
 {
+    /**
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
+     */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
-        private readonly AbstractSettingsService      $settingsService,
+        private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: 'mollie_subscription.repository')]
-        private readonly EntityRepository             $subscriptionRepository,
+        private readonly EntityRepository $subscriptionRepository,
         #[Autowire(service: SubscriptionGateway::class)]
         private readonly SubscriptionGatewayInterface $subscriptionGateway,
         #[Autowire(service: MollieGateway::class)]
-        private readonly MollieGatewayInterface       $mollieGateway,
-        private readonly OrderConverter               $orderConverter,
+        private readonly MollieGatewayInterface $mollieGateway,
+        private readonly OrderConverter $orderConverter,
         #[Autowire(service: CartOrderRoute::class)]
-        private readonly AbstractCartOrderRoute       $cartOrderRoute,
+        private readonly AbstractCartOrderRoute $cartOrderRoute,
         #[Autowire(service: PaymentWebhookRoute::class)]
-        private readonly AbstractPaymentWebhookRoute  $paymentWebhookRoute,
+        private readonly AbstractPaymentWebhookRoute $paymentWebhookRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private readonly LoggerInterface              $logger
-    )
-    {
-
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     public function getDecorated(): AbstractRenewRoute
@@ -73,7 +69,7 @@ final class RenewRoute extends AbstractRenewRoute
     #[Route(path: '/api/mollie/webhook/subscription/{subscriptionId}/renew', name: 'api.mollie.webhook_subscription_renew', methods: ['GET', 'POST'])]
     public function renew(string $subscriptionId, Request $request, Context $context): WebhookResponse
     {
-        $molliePaymentId = (string)$request->get('id', '');
+        $molliePaymentId = (string) $request->get('id', '');
         $logData = [
             'subscriptionId' => $subscriptionId,
             'molliePaymentId' => $molliePaymentId,
@@ -101,21 +97,19 @@ final class RenewRoute extends AbstractRenewRoute
         $searchResult = $this->subscriptionRepository->search($criteria, $context);
 
         $subscriptionEntity = $searchResult->first();
-        if (!$subscriptionEntity instanceof SubscriptionEntity) {
+        if (! $subscriptionEntity instanceof SubscriptionEntity) {
             $this->logger->error('Subscription was not found', $logData);
             throw RenewException::subscriptionNotFound($subscriptionId);
         }
 
-
         $order = $subscriptionEntity->getOrder();
-        if (!$order instanceof OrderEntity) {
+        if (! $order instanceof OrderEntity) {
             $this->logger->error('Subscription without order loaded', $logData);
             throw RenewException::subscriptionWithoutOrder($subscriptionId);
         }
 
-
         $salesChannelId = $order->getSalesChannelId();
-        $orderNumber = (string)$order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
         $mollieCustomerId = $subscriptionEntity->getMollieCustomerId();
         $mollieSubscriptionId = $subscriptionEntity->getMollieId();
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
@@ -124,7 +118,7 @@ final class RenewRoute extends AbstractRenewRoute
         $logData['salesChannelId'] = $salesChannelId;
         $logData['mollieCustomerId'] = $mollieCustomerId;
         $logData['mollieSubscriptionId'] = $mollieSubscriptionId;
-        if (!$subscriptionSettings->isEnabled()) {
+        if (! $subscriptionSettings->isEnabled()) {
             $this->logger->error('Subscription renew not possible, subscriptions are disabled for this sales channel', $logData);
             throw RenewException::subscriptionsDisabled($subscriptionId, $salesChannelId);
         }
@@ -133,7 +127,7 @@ final class RenewRoute extends AbstractRenewRoute
         $molliePayment = $this->mollieGateway->getPayment($molliePaymentId, $orderNumber, $salesChannelId);
         $environmentSettings = $this->settingsService->getEnvironmentSettings();
 
-        if (!$environmentSettings->isDevMode() && $molliePayment->getSubscriptionId() !== $subscription->getId()) {
+        if (! $environmentSettings->isDevMode() && $molliePayment->getSubscriptionId() !== $subscription->getId()) {
             $this->logger->error('The provided mollie payments ID does not belong to the subscription', $logData);
             throw RenewException::invalidPaymentId($subscriptionId, $molliePaymentId);
         }
@@ -142,7 +136,6 @@ final class RenewRoute extends AbstractRenewRoute
             return new WebhookResponse($molliePayment);
         }
         $subscriptionHistories = [];
-
 
         if ($subscription->getStatus() === SubscriptionStatus::SKIPPED) {
             $subscriptionHistories[] = [
@@ -154,41 +147,15 @@ final class RenewRoute extends AbstractRenewRoute
             $subscription->setStatus(SubscriptionStatus::RESUMED);
         }
 
-        $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context);
+        $newOrder = $this->copyOrder($order, $context);
+        $orderNumber = (string) $newOrder->getOrderNumber();
+        $logData['orderNumber'] = $orderNumber;
+        $firstTransaction = $newOrder->getTransactions()?->first();
 
-        $cart = $this->orderConverter->convertToCart($order, $context);
-        $cart->setToken($salesChannelContext->getToken());
-        $cart->removeExtension(OrderConverter::ORIGINAL_ID);
-        $cart->removeExtension(OrderConverter::ORIGINAL_ORDER_NUMBER);
-        $deliveries = new DeliveryCollection();
-        foreach($cart->getDeliveries() as $delivery) {
-            $delivery->removeExtension(OrderConverter::ORIGINAL_ID);
-            $delivery->removeExtension(OrderConverter::ORIGINAL_ADDRESS_ID);
-            $delivery->removeExtension(OrderConverter::ORIGINAL_ADDRESS_VERSION_ID);
-            foreach($delivery->getPositions() as $position) {
-                $position->removeExtension(OrderConverter::ORIGINAL_ID);
-                $position->getLineItem()->removeExtension(OrderConverter::ORIGINAL_ID);
-            }
-            $delivery = new Delivery(
-                $delivery->getPositions(),
-                $delivery->getDeliveryDate(),
-                $delivery->getShippingMethod(),
-                $salesChannelContext->getShippingLocation(),
-                $delivery->getShippingCosts()
-            );
-            $deliveries->add($delivery);
-
+        if (! $firstTransaction instanceof OrderTransactionEntity) {
+            $this->logger->error('The order transaction entity was not found', $logData);
+            throw RenewException::orderWithoutTransaction($subscriptionId, $orderNumber);
         }
-        $cart->setDeliveries($deliveries);
-        foreach($cart->getLineItems() as $lineItem) {
-            $lineItem->removeExtension(OrderConverter::ORIGINAL_ID);
-        }
-
-        $orderResponse = $this->cartOrderRoute->order($cart,$salesChannelContext,(new DataBag())->toRequestDataBag());
-        $newOrder = $orderResponse->getOrder();
-        /** @var OrderTransactionEntity $firstTransaction */
-        $firstTransaction = $newOrder->getTransactions()->first();
-
 
         $subscriptionHistories[] = [
             'statusFrom' => $subscription->getStatus()->value,
@@ -199,7 +166,7 @@ final class RenewRoute extends AbstractRenewRoute
 
         $upsertData = [
             'id' => $subscriptionId,
-            'order'=>[
+            'order' => [
                 'id' => $newOrder->getId(),
                 'transactions' => [
                     [
@@ -220,10 +187,43 @@ final class RenewRoute extends AbstractRenewRoute
         ];
         $this->subscriptionRepository->upsert([$upsertData], $context);
 
-        return $this->paymentWebhookRoute->notify($firstTransaction->getId(),$context);
+        return $this->paymentWebhookRoute->notify($firstTransaction->getId(), $context);
     }
 
+    public function copyOrder(OrderEntity $order, Context $context): OrderEntity
+    {
+        $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context);
+
+        $cart = $this->orderConverter->convertToCart($order, $context);
+
+        $cart->removeExtension(OrderConverter::ORIGINAL_ID);
+        $cart->removeExtension(OrderConverter::ORIGINAL_ORDER_NUMBER);
+
+        $deliveries = new DeliveryCollection();
+
+        foreach ($cart->getDeliveries() as $delivery) {
+            foreach ($delivery->getPositions() as $position) {
+                $position->removeExtension(OrderConverter::ORIGINAL_ID);
+                $position->getLineItem()->removeExtension(OrderConverter::ORIGINAL_ID);
+            }
+
+            $delivery = new Delivery(
+                $delivery->getPositions(),
+                $delivery->getDeliveryDate(),
+                $delivery->getShippingMethod(),
+                $salesChannelContext->getShippingLocation(),
+                $delivery->getShippingCosts()
+            );
+            $deliveries->add($delivery);
+        }
+        $cart->setDeliveries($deliveries);
+
+        foreach ($cart->getLineItems() as $lineItem) {
+            $lineItem->removeExtension(OrderConverter::ORIGINAL_ID);
+        }
+
+        $orderResponse = $this->cartOrderRoute->order($cart, $salesChannelContext, (new DataBag())->toRequestDataBag());
+
+        return $orderResponse->getOrder();
+    }
 }
-
-
-

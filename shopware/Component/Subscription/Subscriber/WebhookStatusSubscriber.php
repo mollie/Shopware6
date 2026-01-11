@@ -32,19 +32,18 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
-        private readonly AbstractSettingsService      $settingsService,
+        private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: SubscriptionGateway::class)]
         private readonly SubscriptionGatewayInterface $subscriptionGateway,
         #[Autowire(service: RouteBuilder::class)]
-        private RouteBuilderInterface                 $routeBuilder,
+        private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: 'mollie_subscription.repository')]
-        private EntityRepository                      $subscriptionRepository,
+        private EntityRepository $subscriptionRepository,
         #[Autowire(service: 'event_dispatcher')]
-        private EventDispatcherInterface              $eventDispatcher,
+        private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private readonly LoggerInterface              $logger
-    )
-    {
+        private readonly LoggerInterface $logger
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -62,23 +61,23 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $salesChannelId = $order->getSalesChannelId();
 
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
-        if (!$subscriptionSettings->isEnabled()) {
+        if (! $subscriptionSettings->isEnabled()) {
             return;
         }
 
         $subscriptionCollection = $order->getExtension('subscription');
-        if (!$subscriptionCollection instanceof SubscriptionCollection) {
+        if (! $subscriptionCollection instanceof SubscriptionCollection) {
             return;
         }
 
         $firstSubscription = $subscriptionCollection->first();
-        if (!$firstSubscription instanceof SubscriptionEntity) {
+        if (! $firstSubscription instanceof SubscriptionEntity) {
             return;
         }
 
         $subscriptionId = $firstSubscription->getId();
         $subscriptionStatus = $firstSubscription->getStatus();
-        $orderNumber = (string)$order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
 
         $logData = [
             'orderNumber' => $orderNumber,
@@ -127,23 +126,23 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $salesChannelId = $order->getSalesChannelId();
 
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
-        if (!$subscriptionSettings->isEnabled()) {
+        if (! $subscriptionSettings->isEnabled()) {
             return;
         }
 
         $subscriptionCollection = $order->getExtension('subscription');
-        if (!$subscriptionCollection instanceof SubscriptionCollection) {
+        if (! $subscriptionCollection instanceof SubscriptionCollection) {
             return;
         }
 
         $firstSubscription = $subscriptionCollection->first();
-        if (!$firstSubscription instanceof SubscriptionEntity) {
+        if (! $firstSubscription instanceof SubscriptionEntity) {
             return;
         }
 
         $subscriptionId = $firstSubscription->getId();
         $subscriptionStatus = $firstSubscription->getStatus();
-        $orderNumber = (string)$order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
 
         $logData = [
             'orderNumber' => $orderNumber,
@@ -193,7 +192,7 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $createSubscription->setMetadata([
             'subscriptionId' => $subscriptionId,
         ]);
-        $repetition = (int)$metaData->getTimes();
+        $repetition = (int) $metaData->getTimes();
 
         if ($repetition > 0) {
             $createSubscription->setTimes($repetition);
@@ -223,7 +222,6 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
                 ]
             ]
         ];
-
 
         $this->subscriptionRepository->upsert([$subscriptionData], $context);
     }

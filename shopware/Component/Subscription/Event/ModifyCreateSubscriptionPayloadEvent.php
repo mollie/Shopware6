@@ -12,7 +12,6 @@ final class ModifyCreateSubscriptionPayloadEvent
         private readonly CreateSubscription $createSubscription,
         private readonly Context $context)
     {
-
     }
 
     public function getCreateSubscription(): CreateSubscription
@@ -24,5 +23,4 @@ final class ModifyCreateSubscriptionPayloadEvent
     {
         return $this->context;
     }
-
 }

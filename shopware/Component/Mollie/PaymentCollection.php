@@ -10,15 +10,15 @@ use Shopware\Core\Framework\Struct\Collection;
  */
 final class PaymentCollection extends Collection
 {
-
-    public function findById(string $molliePaymentId):?Payment
+    public function findById(string $molliePaymentId): ?Payment
     {
         /** @var Payment $payment */
-        foreach($this->getElements() as $payment) {
-            if($payment->getId() === $molliePaymentId) {
+        foreach ($this->getElements() as $payment) {
+            if ($payment->getId() === $molliePaymentId) {
                 return $payment;
             }
         }
+
         return null;
     }
 }

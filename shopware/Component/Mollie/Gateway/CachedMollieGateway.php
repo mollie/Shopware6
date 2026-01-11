@@ -33,8 +33,7 @@ final class CachedMollieGateway implements MollieGatewayInterface
 
     public function __construct(
         private MollieGatewayInterface $decorated
-    )
-    {
+    ) {
     }
 
     public function getCurrentProfile(?string $salesChannelId = null): Profile
