@@ -5,8 +5,6 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreateSubscription;
-use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Subscription;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -19,9 +17,8 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
         #[Autowire(service: ClientFactory::class)]
         private ClientFactoryInterface $clientFactory,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface        $logger
-    )
-    {
+        private LoggerInterface $logger
+    ) {
     }
 
     public function createSubscription(CreateSubscription $createSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
@@ -62,36 +59,10 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
                 'orderNumber' => $orderNumber,
                 'salesChannelId' => $salesChannelId,
             ]);
-            return Subscription::createFromClientResponse($body);
-        } catch (ClientException $exception) {
-            throw $this->convertException($exception);
-        }
-    }
-
-    public function updateSubscription(array $data, string $mollieSubscriptionId, string $customerId, string $orderNumber, string $salesChannelId): Subscription
-    {
-        try {
-            $client = $this->clientFactory->create($salesChannelId);
-
-            $response = $client->patch('customers/' . $customerId . '/subscriptions/' . $mollieSubscriptionId, [
-                'form_params' => $data,
-            ]);
-        dump($data);
-            $body = json_decode($response->getBody()->getContents(), true);
-            $this->logger->info('Subscription created', [
-                'requestParameter' => $data,
-                'responseParameter' => $body,
-                'customerId' => $customerId,
-                'orderNumber' => $orderNumber,
-                'salesChannelId' => $salesChannelId,
-            ]);
-
 
             return Subscription::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }
     }
-
-
 }
