@@ -86,13 +86,14 @@ final class RenewRoute extends AbstractRenewRoute
         }
 
         $criteria = new Criteria([$subscriptionId]);
+        $criteria->addAssociation('billingAddress');
+        $criteria->addAssociation('shippingAddress');
         $criteria->addAssociation('order.transactions');
         $criteria->addAssociation('order.lineItems');
         $criteria->addAssociation('order.deliveries.positions.orderLineItem');
         $criteria->addAssociation('order.deliveries.shippingMethod');
         $criteria->addAssociation('order.deliveries.shippingOrderAddress.country');
         $criteria->addAssociation('order.orderCustomer.customer');
-        $criteria->addAssociation('order.tags');
         $criteria->setLimit(1);
         $searchResult = $this->subscriptionRepository->search($criteria, $context);
 
@@ -146,6 +147,13 @@ final class RenewRoute extends AbstractRenewRoute
             ];
             $subscription->setStatus(SubscriptionStatus::RESUMED);
         }
+        $metaData = $subscriptionEntity->getMetadata();
+        $isLimited = $metaData->getTimes() > 0;
+        $metaDataArray = $metaData->toArray();
+
+        if ($isLimited > 0 && $subscription->getTimesRemaining() > 0) {
+            $metaDataArray['times'] = $subscription->getTimesRemaining();
+        }
 
         $newOrder = $this->copyOrder($order, $context);
         $orderNumber = (string) $newOrder->getOrderNumber();
@@ -182,10 +190,16 @@ final class RenewRoute extends AbstractRenewRoute
                     ]
                 ]
             ],
+            'metaData' => $metaDataArray,
+            'mandateId' => (string) $molliePayment->getMandateId(),
             'nextPaymentAt' => $subscription->getNextPaymentDate()->format('Y-m-d'),
             'historyEntries' => $subscriptionHistories
         ];
+
         $this->subscriptionRepository->upsert([$upsertData], $context);
+
+        if ($isLimited && $subscription->getTimesRemaining() <= 0) {
+        }
 
         return $this->paymentWebhookRoute->notify($firstTransaction->getId(), $context);
     }

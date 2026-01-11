@@ -201,7 +201,8 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         /** @var ModifyCreateSubscriptionPayloadEvent $event */
         $event = $this->eventDispatcher->dispatch(new ModifyCreateSubscriptionPayloadEvent($createSubscription, $context));
         $createSubscription = $event->getCreateSubscription();
-
+        $logData['payload'] = $createSubscription->toArray();
+        $this->logger->info('Send create subscription payload to mollie API', $logData);
         $subscription = $this->subscriptionGateway->createSubscription($createSubscription, $mollieCustomerId, $orderNumber, $salesChannelId);
         $newSubscriptionStatus = $subscription->getStatus()->value;
 
