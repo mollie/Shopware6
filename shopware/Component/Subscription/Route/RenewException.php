@@ -6,12 +6,12 @@ namespace Mollie\Shopware\Component\Subscription\Route;
 use Shopware\Core\Framework\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-final class RenewException  extends HttpException
+final class RenewException extends HttpException
 {
-    const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
-    const INVALID_PAYMENT_ID = 'INVALID_PAYMENT_ID';
-    const SUBSCRIPTION_WITHOUT_ORDER = 'SUBSCRIPTION_WITHOUT_ORDER';
-    const SUBSCRIPTIONS_DISABLED = 'SUBSCRIPTIONS_DISABLED';
+    public const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
+    public const INVALID_PAYMENT_ID = 'INVALID_PAYMENT_ID';
+    public const SUBSCRIPTION_WITHOUT_ORDER = 'SUBSCRIPTION_WITHOUT_ORDER';
+    public const SUBSCRIPTIONS_DISABLED = 'SUBSCRIPTIONS_DISABLED';
 
     public static function subscriptionNotFound(string $subscriptionId): self
     {
@@ -24,7 +24,7 @@ final class RenewException  extends HttpException
         );
     }
 
-    public static function subscriptionWithoutOrder(string $subscriptionId):self
+    public static function subscriptionWithoutOrder(string $subscriptionId): self
     {
         return new self(
             Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -35,7 +35,7 @@ final class RenewException  extends HttpException
         );
     }
 
-    public static function subscriptionsDisabled(string $subscriptionId, string $salesChannelId):self
+    public static function subscriptionsDisabled(string $subscriptionId, string $salesChannelId): self
     {
         return new self(
             Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -47,14 +47,26 @@ final class RenewException  extends HttpException
         );
     }
 
-    public static function invalidPaymentId(string $subscriptionId, string $molliePaymentId):self
+    public static function invalidPaymentId(string $subscriptionId, string $molliePaymentId): self
     {
         return new self(
             Response::HTTP_UNPROCESSABLE_ENTITY,
             self::INVALID_PAYMENT_ID,
-            'Failed to renew {{subscriptionId}}, payment id {{salesChannelId}} does not belong to this subscription',[
+            'Failed to renew {{subscriptionId}}, payment id {{paymentId}} does not belong to this subscription',[
                 'subscriptionId' => $subscriptionId,
-                'salesChannelId' => $molliePaymentId,
+                'paymentId' => $molliePaymentId,
+            ]
+        );
+    }
+
+    public static function orderWithoutTransaction(string $subscriptionId,string $orderNumber): self
+    {
+        return new self(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::INVALID_PAYMENT_ID,
+            'Failed to renew {{subscriptionId}}, new created order {{orderNumber}} is without transactions',[
+                'subscriptionId' => $subscriptionId,
+                'orderNumber' => $orderNumber,
             ]
         );
     }
