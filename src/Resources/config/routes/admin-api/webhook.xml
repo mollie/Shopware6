@@ -6,33 +6,9 @@
 
 
 
-    <route id="api.mollie.webhook_subscription" path="/api/mollie/webhook/subscription/{swSubscriptionId}" methods="GET|POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionAction</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>false</bool></default>
-        <default key="auth_enabled"><bool>false</bool></default>
-    </route>
 
-    <route id="api.mollie.webhook_subscription-legacy" path="/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}" methods="GET|POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionLegacyAction</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>false</bool></default>
-        <default key="auth_enabled"><bool>false</bool></default>
-    </route>
 
-    <route id="api.mollie.webhook_subscription_renew" path="/api/mollie/webhook/subscription/{swSubscriptionId}/renew" methods="GET|POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionRenewAction</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>false</bool></default>
-        <default key="auth_enabled"><bool>false</bool></default>
-    </route>
 
-    <route id="api.mollie.webhook_subscription_renew-legacy" path="/api/v{version}/mollie/webhook/subscription/{swSubscriptionId}/renew" methods="GET|POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionRenewLegacyAction</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>false</bool></default>
-        <default key="auth_enabled"><bool>false</bool></default>
-    </route>
 
     <route id="api.mollie.webhook_subscription_paymentmethod" path="/api/mollie/webhook/subscription/{swSubscriptionId}/mandate/update" methods="GET|POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Webhook\WebhookControllerBase::webhookSubscriptionMandateUpdatedAction</default>

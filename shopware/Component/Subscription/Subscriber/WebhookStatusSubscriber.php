@@ -16,6 +16,8 @@ use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\Event\ModifyCreateSubscriptionPayloadEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -30,16 +32,19 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
-        private readonly AbstractSettingsService $settingsService,
+        private readonly AbstractSettingsService      $settingsService,
         #[Autowire(service: SubscriptionGateway::class)]
         private readonly SubscriptionGatewayInterface $subscriptionGateway,
         #[Autowire(service: RouteBuilder::class)]
-        private RouteBuilderInterface $routeBuilder,
+        private RouteBuilderInterface                 $routeBuilder,
         #[Autowire(service: 'mollie_subscription.repository')]
-        private EntityRepository $subscriptionRepository,
+        private EntityRepository                      $subscriptionRepository,
+        #[Autowire(service: 'event_dispatcher')]
+        private EventDispatcherInterface              $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private readonly LoggerInterface $logger
-    ) {
+        private readonly LoggerInterface              $logger
+    )
+    {
     }
 
     public static function getSubscribedEvents(): array
@@ -57,23 +62,23 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $salesChannelId = $order->getSalesChannelId();
 
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
-        if (! $subscriptionSettings->isEnabled()) {
+        if (!$subscriptionSettings->isEnabled()) {
             return;
         }
 
         $subscriptionCollection = $order->getExtension('subscription');
-        if (! $subscriptionCollection instanceof SubscriptionCollection) {
+        if (!$subscriptionCollection instanceof SubscriptionCollection) {
             return;
         }
 
         $firstSubscription = $subscriptionCollection->first();
-        if (! $firstSubscription instanceof SubscriptionEntity) {
+        if (!$firstSubscription instanceof SubscriptionEntity) {
             return;
         }
 
         $subscriptionId = $firstSubscription->getId();
         $subscriptionStatus = $firstSubscription->getStatus();
-        $orderNumber = (string) $order->getOrderNumber();
+        $orderNumber = (string)$order->getOrderNumber();
 
         $logData = [
             'orderNumber' => $orderNumber,
@@ -122,23 +127,23 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $salesChannelId = $order->getSalesChannelId();
 
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
-        if (! $subscriptionSettings->isEnabled()) {
+        if (!$subscriptionSettings->isEnabled()) {
             return;
         }
 
         $subscriptionCollection = $order->getExtension('subscription');
-        if (! $subscriptionCollection instanceof SubscriptionCollection) {
+        if (!$subscriptionCollection instanceof SubscriptionCollection) {
             return;
         }
 
         $firstSubscription = $subscriptionCollection->first();
-        if (! $firstSubscription instanceof SubscriptionEntity) {
+        if (!$firstSubscription instanceof SubscriptionEntity) {
             return;
         }
 
         $subscriptionId = $firstSubscription->getId();
         $subscriptionStatus = $firstSubscription->getStatus();
-        $orderNumber = (string) $order->getOrderNumber();
+        $orderNumber = (string)$order->getOrderNumber();
 
         $logData = [
             'orderNumber' => $orderNumber,
@@ -186,14 +191,17 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
         $createSubscription->setStartDate($metaData->getStartDate());
 
         $createSubscription->setMetadata([
-            'orderNumber' => $orderNumber,
             'subscriptionId' => $subscriptionId,
         ]);
-        $repetition = (int) $metaData->getTimes();
+        $repetition = (int)$metaData->getTimes();
 
         if ($repetition > 0) {
             $createSubscription->setTimes($repetition);
         }
+        $context = $event->getContext();
+        /** @var ModifyCreateSubscriptionPayloadEvent $event */
+        $event = $this->eventDispatcher->dispatch(new ModifyCreateSubscriptionPayloadEvent($createSubscription, $context));
+        $createSubscription = $event->getCreateSubscription();
 
         $subscription = $this->subscriptionGateway->createSubscription($createSubscription, $mollieCustomerId, $orderNumber, $salesChannelId);
         $newSubscriptionStatus = $subscription->getStatus()->value;
@@ -216,7 +224,6 @@ final class WebhookStatusSubscriber implements EventSubscriberInterface
             ]
         ];
 
-        $context = $event->getContext();
 
         $this->subscriptionRepository->upsert([$subscriptionData], $context);
     }

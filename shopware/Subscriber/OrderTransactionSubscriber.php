@@ -44,8 +44,8 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
 
             $paymentId = $mollieCustomFields['id'] ?? null;
-            $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
-            if ($finalizeUrl === null || $paymentId === null) {
+
+            if ($paymentId === null) {
                 continue;
             }
 
@@ -53,10 +53,14 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
             $authenticationId = $mollieCustomFields['authenticationId'] ?? null;
+            $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
 
             $transactionExtension = new Payment($paymentId);
             $transactionExtension->setCountPayments($countPayments);
-            $transactionExtension->setFinalizeUrl($finalizeUrl);
+            if($finalizeUrl !== null) {
+                $transactionExtension->setFinalizeUrl($finalizeUrl);
+            }
+
             if ($method !== null) {
                 $transactionExtension->setMethod(PaymentMethod::from($method));
             }

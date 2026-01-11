@@ -16,6 +16,7 @@
 - The order state mapping has been optimized. During a status change, a precise transition path is now determined; if the transition cannot be performed, detailed log entries are generated.
 - Payconiq is discontinued and will not be activated after update. Please deactivate the payment method and remove it from saleschannel
 - Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
+- Added new event ModifyCreateSubscriptionPayloadEvent. This allows developers to modify and extend the payload for the Mollie Subscription API before a subscription is created.
 
 ## [Unreleased]
 - Shipping costs are now considered in refunds via Shopware Return Management.

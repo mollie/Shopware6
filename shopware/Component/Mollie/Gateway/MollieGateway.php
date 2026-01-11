@@ -198,7 +198,7 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
-    private function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
+    public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
