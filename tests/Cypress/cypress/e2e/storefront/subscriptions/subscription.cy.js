@@ -480,7 +480,6 @@ function assertAvailablePaymentMethods() {
 
     cy.contains('iDEAL').should('exist');
     cy.contains('Card').should('exist');
-    cy.contains('SOFORT').should('exist');
     cy.contains('eps').should('exist');
     cy.contains('Bancontact').should('exist');
     cy.contains('Belfius').should('exist');
