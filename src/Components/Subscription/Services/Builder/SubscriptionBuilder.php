@@ -88,10 +88,8 @@ class SubscriptionBuilder
 
         $subscriptionEntity->setCurrency($order->getCurrency());
 
-        $subscriptionEntity->setQuantity($lineItem->getQuantity());
-
         $subscriptionEntity->setCustomerId((string) $order->getOrderCustomer()->getCustomerId());
-        $subscriptionEntity->setProductId((string) $lineItem->getProductId());
+
         $subscriptionEntity->setOrderId($order->getId());
         $subscriptionEntity->setSalesChannelId($order->getSalesChannelId());
         $subscriptionEntity->setTotalRounding($order->getTotalRounding());
