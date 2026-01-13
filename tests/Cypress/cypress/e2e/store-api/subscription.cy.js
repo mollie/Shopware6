@@ -43,7 +43,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -85,7 +85,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -126,7 +126,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -167,7 +167,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -207,7 +207,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -247,7 +247,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -287,7 +287,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 
@@ -328,7 +328,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
             
-            loginAction.registerAndLogin('loginDone');
+            loginAction.login('loginDone');
 
             cy.wait('@loginDone').then(() => {
 

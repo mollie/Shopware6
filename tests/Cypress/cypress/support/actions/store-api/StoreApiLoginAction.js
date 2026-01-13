@@ -11,6 +11,30 @@ export default class StoreApiLoginAction {
     }
 
 
+    login(completionAlias)
+    {
+        const email = 'cypress@mollie.com';
+        const pwd = 'cypress123';
+
+        cy.intercept('**/account/login').as(completionAlias);
+
+        const loginPromise = this.client.post('/account/login',
+            {
+                "email": email,
+                "password": pwd,
+            }
+        );
+
+        cy.wrap(loginPromise).then((response) => {
+            let loginToken = response.data.contextToken;
+            if(loginToken === undefined){
+                loginToken = response.headers["sw-context-token"];
+            }
+            this.client.setContextToken(loginToken);
+            cy.log('Context-Token: ' + loginToken);
+        });
+    }
+
     /**
      *
      * @param completionAlias
