@@ -109,10 +109,11 @@ final class PaymentSubscriber implements EventSubscriberInterface
         if ($itemRounding instanceof CashRoundingConfig) {
             $itemRoundingValue = $itemRounding->jsonSerialize();
         }
+        $subscriptionId = Uuid::randomHex();
 
         return [
-            'id' => Uuid::randomHex(),
-            'customerId' => $order->getId(),
+            'id' => $subscriptionId,
+            'customerId' => $customer->getId(),
             'mollieCustomerId' => null,
             'mollieSubscriptionId' => null,
             'lastRemindedAt' => null,
@@ -129,9 +130,15 @@ final class PaymentSubscriber implements EventSubscriberInterface
             'itemRounding' => $itemRoundingValue,
             'order' => [
                 'id' => $order->getId(),
+                'orderVersionId' => $order->getVersionId(),
                 'tags' => [
                     [
                         'id' => SubscriptionTag::ID
+                    ]
+                ],
+                'customFields' => [
+                    Mollie::EXTENSION => [
+                        'swSubscriptionId' => $subscriptionId
                     ]
                 ]
             ]
@@ -143,7 +150,7 @@ final class PaymentSubscriber implements EventSubscriberInterface
      */
     private function getAddressData(OrderAddressEntity $address, string $subscriptionId): array
     {
-        return [
+        $address = [
             'subscriptionId' => $subscriptionId,
             'salutationId' => $address->getSalutationId(),
             'firstName' => $address->getFirstName(),
@@ -160,6 +167,9 @@ final class PaymentSubscriber implements EventSubscriberInterface
             'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
             'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
         ];
+        $address['id'] = Uuid::fromStringToHex(implode('-',array_values($address)));
+
+        return $address;
     }
 
     /**
@@ -188,7 +198,7 @@ final class PaymentSubscriber implements EventSubscriberInterface
         $interval = $productExtension->getInterval();
 
         $startDate->modify('+' . (string) $interval);
-        $metaData = new SubscriptionMetadata($startDate->format('Y-m-d'),$interval->getIntervalValue(),$interval->getIntervalUnit(),$repetitions);
+        $metaData = new SubscriptionMetadata($startDate->format('Y-m-d'), $interval->getIntervalValue(), $interval->getIntervalUnit(), $repetitions);
 
         return $metaData->toArray();
     }
