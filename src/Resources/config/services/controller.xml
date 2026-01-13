@@ -223,6 +223,7 @@
             <argument type="service"
                       id="Kiener\MolliePayments\Components\Subscription\Page\Account\SubscriptionPageLoader"/>
             <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
+            <argument type="service" id="Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoader"/>
             <argument type="service" id="monolog.logger.mollie"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

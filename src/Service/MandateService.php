@@ -67,6 +67,7 @@ class MandateService implements MandateServiceInterface
             $context->getSalesChannelId(),
             $context->getContext()
         );
+
         $mandatesArray = [];
         try {
             $mandates = $this->mandateApiService->getMandatesByMollieCustomerId($mollieCustomerId, $context->getSalesChannelId());
