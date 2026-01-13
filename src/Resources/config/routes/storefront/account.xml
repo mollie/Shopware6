@@ -13,6 +13,15 @@
         <option key="seo">false</option>
     </route>
 
+    <route id="frontend.account.mollie.mandates.page"
+           path="/account/mollie/mandates"
+           methods="GET|POST">
+        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::mandatesList</default>
+        <default key="_routeScope"><list><string>storefront</string></list></default>
+        <default key="XmlHttpRequest"><bool>true</bool></default>
+        <option key="seo">false</option>
+    </route>
+
     <route id="frontend.account.mollie.subscriptions.billing.update"
            path="/account/mollie/subscriptions/{subscriptionId}/billing/update"
            methods="POST">

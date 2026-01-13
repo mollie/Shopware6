@@ -7,10 +7,10 @@ use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Storefront\Page\Account\PaymentMethod\AccountPaymentMethodPageLoadedEvent;
+use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
+class MandatesSubscriber implements EventSubscriberInterface
 {
     /**
      * @var SettingsService
@@ -41,15 +41,15 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AccountPaymentMethodPageLoadedEvent::class => ['addDataToPage', 10],
+            StorefrontRenderEvent::class => ['addDataToPage', 10],
         ];
     }
 
-    public function addDataToPage(AccountPaymentMethodPageLoadedEvent $args): void
+    public function addDataToPage(StorefrontRenderEvent $args): void
     {
         // load our settings for the
         // current request
-        $this->settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannel()->getId());
+        $this->settings = $this->settingsService->getSettings($args->getSalesChannelContext()->getSalesChannelId());
 
         $this->addMollieSingleClickPaymentDataToPage($args);
     }
@@ -57,11 +57,9 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
     /**
      * Adds the components variable to the storefront.
      */
-    private function addMollieSingleClickPaymentDataToPage(AccountPaymentMethodPageLoadedEvent $args): void
+    private function addMollieSingleClickPaymentDataToPage(StorefrontRenderEvent $args): void
     {
-        $args->getPage()->assign([
-            'enable_one_click_payments' => $this->settings->isOneClickPaymentsEnabled(),
-        ]);
+        $args->setParameter('enable_one_click_payments', $this->settings->isOneClickPaymentsEnabled());
 
         if (! $this->settings->isOneClickPaymentsEnabled()) {
             return;
@@ -76,9 +74,7 @@ class AccountPaymentMethodPageSubscriber implements EventSubscriberInterface
 
             $mandates = $this->mandateService->getCreditCardMandatesByCustomerId($loggedInCustomer->getId(), $salesChannelContext);
 
-            $args->getPage()->setExtensions([
-                'MollieCreditCardMandateCollection' => $mandates,
-            ]);
+            $args->setParameter('MollieCreditCardMandateCollection', $mandates);
         } catch (\Exception $e) {
         }
     }
