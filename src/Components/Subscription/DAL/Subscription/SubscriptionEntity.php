@@ -54,11 +54,6 @@ class SubscriptionEntity extends Entity
     protected $amount;
 
     /**
-     * @var int
-     */
-    protected $quantity;
-
-    /**
      * @var ?CurrencyEntity
      */
     protected $currency;
@@ -66,12 +61,9 @@ class SubscriptionEntity extends Entity
     /**
      * @var string
      */
-    protected $productId;
-
-    /**
-     * @var string
-     */
     protected $orderId;
+
+    protected string $orderVersionId;
 
     /**
      * @var string
@@ -244,16 +236,6 @@ class SubscriptionEntity extends Entity
         $this->amount = $amount;
     }
 
-    public function getQuantity(): int
-    {
-        return $this->quantity;
-    }
-
-    public function setQuantity(int $quantity): void
-    {
-        $this->quantity = $quantity;
-    }
-
     public function getCurrency(): ?CurrencyEntity
     {
         return $this->currency;
@@ -264,16 +246,6 @@ class SubscriptionEntity extends Entity
         $this->currency = $currency;
     }
 
-    public function getProductId(): string
-    {
-        return (string) $this->productId;
-    }
-
-    public function setProductId(string $productId): void
-    {
-        $this->productId = $productId;
-    }
-
     public function getOrderId(): string
     {
         return (string) $this->orderId;
@@ -282,6 +254,16 @@ class SubscriptionEntity extends Entity
     public function setOrderId(string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    public function getOrderVersionId(): string
+    {
+        return $this->orderVersionId;
+    }
+
+    public function setOrderVersionId(string $orderVersionId): void
+    {
+        $this->orderVersionId = $orderVersionId;
     }
 
     public function getMandateId(): string

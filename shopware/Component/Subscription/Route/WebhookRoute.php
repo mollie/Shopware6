@@ -25,11 +25,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class WebhookRoute extends AbstractWebhookRoute
 {
     /**
-     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $transactionRepository
      */
     public function __construct(
         #[Autowire(service: 'order_transaction.repository')]
-        private readonly EntityRepository $subscriptionRepository,
+        private readonly EntityRepository $transactionRepository,
         #[Autowire(service: PaymentWebhookRoute::class)]
         private AbstractPaymentWebhookRoute $abstractWebhookRoute,
         #[Autowire(service: RenewRoute::class)]
@@ -48,6 +48,7 @@ final class WebhookRoute extends AbstractWebhookRoute
     public function notify(string $subscriptionId, Request $request, Context $context): WebhookResponse
     {
         $molliePaymentId = $request->get('id');
+        $subscriptionId = strtolower($subscriptionId);
         $logData = [
             'subscriptionId' => $subscriptionId,
             'data' => [
@@ -63,8 +64,9 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('customFields.' . Mollie::EXTENSION . '.id', $molliePaymentId));
-        $criteria->addFilter(new EqualsFilter('order.subscription.id', $subscriptionId));
-        $searchIdResult = $this->subscriptionRepository->searchIds($criteria, $context);
+        $criteria->addFilter(new EqualsFilter('order.customFields.' . Mollie::EXTENSION . '.swSubscriptionId', $subscriptionId));
+
+        $searchIdResult = $this->transactionRepository->searchIds($criteria, $context);
         $transactionId = $searchIdResult->firstId();
 
         if ($transactionId !== null) {
@@ -72,6 +74,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
             return $this->abstractWebhookRoute->notify($transactionId, $context);
         }
+
         $this->logger->info('Subscription will be renewed', $logData);
 
         return $this->abstractRenewRoute->renew($subscriptionId, $request, $context);

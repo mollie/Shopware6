@@ -28,5 +28,17 @@ class Migration1768084646SubscriptionOrderVersionId extends MigrationStep
                 ';
 
         $connection->executeQuery($sql);
+
+        $sql = 'ALTER TABLE `mollie_subscription_history`
+ ADD CONSTRAINT `fk.mollie_subscription_history.mollie_subscription` FOREIGN KEY (`subscription_id`)
+                REFERENCES `mollie_subscription` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+';
+        $connection->executeQuery($sql);
+
+        $sql = 'ALTER TABLE `mollie_subscription_address`
+ ADD CONSTRAINT `fk.mollie_subscription_history.mollie_subscription_address` FOREIGN KEY (`subscription_id`)
+                REFERENCES `mollie_subscription` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+';
+        $connection->executeQuery($sql);
     }
 }

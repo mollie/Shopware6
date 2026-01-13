@@ -24,6 +24,7 @@ use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -41,12 +42,15 @@ final class RenewRoute extends AbstractRenewRoute
 {
     /**
      * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
+     * @param EntityRepository<OrderCollection<OrderEntity>> $orderRepository
      */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: 'mollie_subscription.repository')]
         private readonly EntityRepository $subscriptionRepository,
+        #[Autowire(service: 'order.repository')]
+        private readonly EntityRepository $orderRepository,
         #[Autowire(service: SubscriptionGateway::class)]
         private readonly SubscriptionGatewayInterface $subscriptionGateway,
         #[Autowire(service: MollieGateway::class)]
@@ -172,10 +176,9 @@ final class RenewRoute extends AbstractRenewRoute
             'comment' => 'renewed'
         ];
 
-        $upsertData = [
-            'id' => $subscriptionId,
-            'order' => [
-                'id' => $newOrder->getId(),
+        $this->orderRepository->upsert([
+            [
+                'id' => $firstTransaction->getOrderId(),
                 'transactions' => [
                     [
                         'id' => $firstTransaction->getId(),
@@ -188,15 +191,22 @@ final class RenewRoute extends AbstractRenewRoute
                     [
                         'id' => SubscriptionTag::ID
                     ]
+                ],
+                'customFields' => [
+                    Mollie::EXTENSION => [
+                        'swSubscriptionId' => $subscriptionId,
+                    ]
                 ]
-            ],
+            ]
+        ], $context);
+
+        $this->subscriptionRepository->upsert([[
+            'id' => $subscriptionId,
             'metaData' => $metaDataArray,
             'mandateId' => (string) $molliePayment->getMandateId(),
             'nextPaymentAt' => $subscription->getNextPaymentDate()->format('Y-m-d'),
             'historyEntries' => $subscriptionHistories
-        ];
-
-        $this->subscriptionRepository->upsert([$upsertData], $context);
+        ]], $context);
 
         if ($isLimited && $subscription->getTimesRemaining() <= 0) {
         }
