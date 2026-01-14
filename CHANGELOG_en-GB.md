@@ -1,4 +1,4 @@
-## [Unreleased]
+## 4.21.0
 - Shipping costs are now considered in refunds via Shopware Return Management.
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
 - Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.
