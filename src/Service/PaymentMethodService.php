@@ -16,6 +16,7 @@ use Kiener\MolliePayments\Handler\Method\BlikPayment;
 use Kiener\MolliePayments\Handler\Method\CreditCardPayment;
 use Kiener\MolliePayments\Handler\Method\EpsPayment;
 use Kiener\MolliePayments\Handler\Method\GiftCardPayment;
+use Kiener\MolliePayments\Handler\Method\GiroPayPayment;
 use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
@@ -116,6 +117,8 @@ class PaymentMethodService
         $this->disablePaymentMethod(KlarnaPayNowPayment::class, $context);
         $this->disablePaymentMethod(KlarnaSliceItPayment::class, $context);
         $this->disablePaymentMethod(SofortPayment::class, $context);
+        $this->disablePaymentMethod(PayconiqPayment::class, $context);
+        $this->disablePaymentMethod(GiroPayPayment::class, $context);
 
         if (! $this->payPalExpressConfig->isEnabled()) {
             $this->disablePaymentMethod(PayPalExpressPayment::class, $context);
@@ -399,14 +402,15 @@ class PaymentMethodService
             GiftCardPayment::class,
             iDealPayment::class,
             KbcPayment::class,
-            //  KlarnaPayLaterPayment::class,
-            //  KlarnaPayNowPayment::class,
-            //  KlarnaSliceItPayment::class,
+            //  GiroPayPayment::class, // not existing anymore
+            //  KlarnaPayLaterPayment::class, // not existing anymore
+            //  KlarnaPayNowPayment::class, // not existing anymore
+            //  KlarnaSliceItPayment::class, // not existing anymore
             KlarnaOnePayment::class,
             PayPalPayment::class,
             PaySafeCardPayment::class,
             Przelewy24Payment::class,
-            //   SofortPayment::class,
+            //   SofortPayment::class, // not existing anymore
             VoucherPayment::class,
             In3Payment::class,
             PosPayment::class,
@@ -416,7 +420,7 @@ class PaymentMethodService
             MyBankPayment::class,
             AlmaPayment::class,
             TrustlyPayment::class,
-            PayconiqPayment::class,
+            // PayconiqPayment::class,  // not existing anymore
             RivertyPayment::class,
             SatispayPayment::class,
             PayByBankPayment::class,
