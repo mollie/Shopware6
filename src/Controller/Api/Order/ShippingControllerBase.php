@@ -86,9 +86,9 @@ class ShippingControllerBase extends AbstractController
             $jsonData = json_decode($content, true);
 
             $orderNumber = (string) $jsonData['orderNumber'];
-            $trackingCarrier = (string) $jsonData['trackingCarrier'];
-            $trackingCode = (string) $jsonData['trackingCode'];
-            $trackingUrl = (string) $jsonData['trackingUrl'];
+            $trackingCarrier = (string) ($jsonData['trackingCarrier'] ?? '');
+            $trackingCode = (string) ($jsonData['trackingCode'] ?? '');
+            $trackingUrl = (string) ($jsonData['trackingUrl'] ?? '');
 
             if ($orderNumber === '') {
                 throw new \InvalidArgumentException('Missing Argument for Order Number!');
@@ -185,9 +185,9 @@ class ShippingControllerBase extends AbstractController
 
             $orderNumber = (string) $jsonData['orderNumber'];
             $requestItems = $jsonData['items'];
-            $trackingCarrier = (string) $jsonData['trackingCarrier'];
-            $trackingCode = (string) $jsonData['trackingCode'];
-            $trackingUrl = (string) $jsonData['trackingUrl'];
+            $trackingCarrier = (string) ($jsonData['trackingCarrier'] ?? '');
+            $trackingCode = (string) ($jsonData['trackingCode'] ?? '');
+            $trackingUrl = (string) ($jsonData['trackingUrl'] ?? '');
 
             if (! is_array($requestItems)) {
                 $requestItems = [];
