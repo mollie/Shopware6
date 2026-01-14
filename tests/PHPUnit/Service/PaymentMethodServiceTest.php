@@ -24,7 +24,6 @@ use Kiener\MolliePayments\Handler\Method\MbWayPayment;
 use Kiener\MolliePayments\Handler\Method\MultibancoPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
-use Kiener\MolliePayments\Handler\Method\PayconiqPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
 use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Kiener\MolliePayments\Handler\Method\PaySafeCardPayment;
@@ -134,7 +133,6 @@ class PaymentMethodServiceTest extends TestCase
             MyBankPayment::class,
             AlmaPayment::class,
             TrustlyPayment::class,
-            PayconiqPayment::class,
             RivertyPayment::class,
             SatispayPayment::class,
             PayByBankPayment::class,
