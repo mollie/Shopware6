@@ -8,6 +8,7 @@
 - Kompatibilität mit Click & Collect Plugin
 - Behoben: Beschreibungen von Zahlungsarten wurden beim Checkout angezeigt, obwohl diese nicht ausgewählt waren.
 - Die Profilnavigation wurde erweitert und umfasst nun die Verwaltung gespeicherter Kreditkartendaten (nur sichtbar, wenn Kreditkartendaten vorhanden sind).
+- Tracking-Parameter sind jetzt optional für alle Versand-API-Routen.
 
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
