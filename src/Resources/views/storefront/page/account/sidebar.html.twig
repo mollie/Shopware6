@@ -4,13 +4,27 @@
 
     {{ parent() }}
 
-    {% if not context.customer.guest and mollie_subscriptions_enabled %}
-        {% block page_account_sidebar_link_mollie_subscriptions %}
-            <a href="{{ path('frontend.account.mollie.subscriptions.page') }}" title="{{ "molliePayments.subscriptions.account.mollieSubscriptionsLink"|trans|striptags }}" class="list-group-item list-group-item-action account-aside-item{% if activeRoute is same as('frontend.account.mollie.subscriptions.page') %} is-active{% endif %}">
-                {{ "molliePayments.subscriptions.account.mollieSubscriptionsLink"|trans|sw_sanitize }}
+    {% if not context.customer.guest %}
+        {% if mollie_subscriptions_enabled %}
+            {% block page_account_sidebar_link_mollie_subscriptions %}
+                <a href="{{ path('frontend.account.mollie.subscriptions.page') }}"
+                   title="{{ "molliePayments.subscriptions.account.mollieSubscriptionsLink"|trans|striptags }}"
+                   class="list-group-item list-group-item-action account-aside-item{% if activeRoute is same as('frontend.account.mollie.subscriptions.page') %} is-active{% endif %}">
+                    {{ "molliePayments.subscriptions.account.mollieSubscriptionsLink"|trans|sw_sanitize }}
+                </a>
+            {% endblock %}
+        {% endif %}
+
+        {% if enable_one_click_payments and MollieCreditCardMandateCollection|length > 0 %}
+            <a href="{{ path('frontend.account.mollie.mandates.page') }}"
+               title="{{ "molliePayments.components.mandate.sectionTitle"|trans|striptags }}"
+               class="list-group-item list-group-item-action account-aside-item{% if activeRoute is same as('frontend.account.mollie.mandates.page') %} is-active{% endif %}">
+                {{ "molliePayments.components.mandate.sectionTitle"|trans|sw_sanitize }}
             </a>
-        {% endblock %}
+
+        {% endif %}
     {% endif %}
+
 
 {% endblock %}
 

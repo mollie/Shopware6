@@ -11,7 +11,7 @@
                 {% block mollie_credit_card_mandate_remove_modal_content %}
                     <div class="modal-content">
                         {% block mollie_credit_card_mandate_remove_modal_header %}
-                            <div class="modal-header">
+                            <div class="modal-header pb-0 align-items-start">
                                 {% block mollie_credit_card_mandate_remove_modal_header_title %}
                                     <h5 class="modal-title">
                                         {{ "molliePayments.components.mandateRemoveModal.title"|trans|striptags }}
@@ -19,8 +19,7 @@
                                 {% endblock %}
 
                                 {% block mollie_credit_card_mandate_remove_modal_header_close_button %}
-                                    <button class="close" type="button" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
-                                    {% sw_icon 'x' %}
+                                    <button class="btn-close" type="button" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
                                     </button>
                                 {% endblock %}
                             </div>

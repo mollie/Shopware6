@@ -163,7 +163,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber">
+        <service id="Kiener\MolliePayments\Subscriber\MandatesSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
 

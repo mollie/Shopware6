@@ -1,23 +1,12 @@
-{% sw_extends '@Storefront/storefront/page/account/payment/index.html.twig' %}
+{% sw_extends '@Storefront/storefront/page/account/_page.html.twig' %}
 
-{% block page_account_payment %}
-    {% if mollie_applepay_enabled %}
-        <div id="mollie_hide_applepay" data-mollie-template-applepay-account data-mollie-apple-pay-payment-method-options="{{ {
-            shopUrl: seoUrl('frontend.home.page'),
-            hideAlways: true,
-            applePayId: apple_pay_payment_method_id,
-        }
-        |json_encode }}"></div>
-    {% endif %}
 
-    {{ parent() }}
-{% endblock %}
+{% block page_account_main_content %}
 
-{% block page_account_payment_main %}
     {% block mollie_page_account_credit_card_mandate %}
-        {% if page.enable_one_click_payments %}
+        {% if enable_one_click_payments %}
 
-            {% set mandates = page.extensions.MollieCreditCardMandateCollection %}
+            {% set mandates = MollieCreditCardMandateCollection %}
 
             {% block mollie_page_account_credit_card_mandate_condition %}
                 {% if mandates|length > 0 %}

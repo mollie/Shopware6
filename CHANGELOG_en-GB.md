@@ -27,6 +27,7 @@
 - Fixed: MolliePaymentMethodAvailabilityRemover to consider carts with price 0 to avoid getting all the payment methods removed.
 – Compatibility with Click & Collect plugin
 - Fixed: Descriptions of payment methods were displayed during checkout even when they were not selected.
+- The profile navigation has been extended to include management of saved credit card details (visible only when credit card data is available).
 
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore

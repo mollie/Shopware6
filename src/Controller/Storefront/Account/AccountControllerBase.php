@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoader;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,12 +32,16 @@ class AccountControllerBase extends AbstractStoreFrontController
      * @var LoggerInterface
      */
     private $logger;
+    private AccountOverviewPageLoader $overviewPageLoader;
 
-    public function __construct(SubscriptionPageLoader $pageLoader, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
+    public function __construct(SubscriptionPageLoader $pageLoader, SubscriptionManager $subscriptionManager,
+        AccountOverviewPageLoader $overviewPageLoader,
+        LoggerInterface $logger)
     {
         $this->pageLoader = $pageLoader;
         $this->subscriptionManager = $subscriptionManager;
         $this->logger = $logger;
+        $this->overviewPageLoader = $overviewPageLoader;
     }
 
     public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
@@ -49,6 +54,23 @@ class AccountControllerBase extends AbstractStoreFrontController
 
         return $this->renderStorefront(
             '@Storefront/storefront/page/account/subscriptions/index.html.twig',
+            [
+                'page' => $page,
+            ]
+        );
+    }
+
+    public function mandatesList(Request $request, SalesChannelContext $salesChannelContext): Response
+    {
+        $customer = $salesChannelContext->getCustomer();
+        if (! $customer instanceof CustomerEntity) {
+            return $this->redirectToLoginPage();
+        }
+
+        $page = $this->overviewPageLoader->load($request, $salesChannelContext, $customer);
+
+        return $this->renderStorefront(
+            '@Storefront/storefront/page/account/payment/index.html.twig',
             [
                 'page' => $page,
             ]
