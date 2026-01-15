@@ -18,7 +18,7 @@
 - Das Event PaymentCreatedEvent wurde eingeführt, damit ist es möglich vor der Weiterleitung zum Zahlungsanbieter noch eigene Logik einzubauen
 - Neues Event ModifyCreateSubscriptionPayloadEvent hinzugefügt. Damit können Entwickler den Payload für die Mollie Subscription API vor dem Erstellen einer Subscription anpassen und erweitern.
 
-## [Unreleased]
+# 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
 - Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.
@@ -28,6 +28,7 @@
 - Kompatibilität mit Click & Collect Plugin
 - Behoben: Beschreibungen von Zahlungsarten wurden beim Checkout angezeigt, obwohl diese nicht ausgewählt waren.
 - Die Profilnavigation wurde erweitert und umfasst nun die Verwaltung gespeicherter Kreditkartendaten (nur sichtbar, wenn Kreditkartendaten vorhanden sind).
+- Tracking-Parameter sind jetzt optional für alle Versand-API-Routen.
 
 # 4.20.1 
 - Problem behoben. In Shopware 6.5 war die Order Übersicht nicht aufrufbar
