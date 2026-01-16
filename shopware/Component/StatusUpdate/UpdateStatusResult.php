@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\StatusUpdate;
 
-class UpdateStatusResult
+final class UpdateStatusResult
 {
+    /**
+     * @var array<string>
+     */
     private array $updateTransactionIds = [];
 
     public function getUpdated(): int

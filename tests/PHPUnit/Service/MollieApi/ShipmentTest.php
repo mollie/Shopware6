@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\MollieOrderCouldNotBeShippedException;
 use Kiener\MolliePayments\Service\MollieApi\Order;

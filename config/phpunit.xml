@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
          bootstrap="./../vendor/autoload.php"
          cacheResult="false"
          colors="true"
          executionOrder="random"
+         displayDetailsOnPhpunitDeprecations="true"
 >
 
     <testsuites>
@@ -14,12 +15,10 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
-        <include>
-            <directory suffix=".php">./../src</directory>
-            <directory suffix=".php">./../shopware</directory>
-        </include>
-    </coverage>
-
-    
+   <source>
+       <include>
+           <directory>./../src</directory>
+           <directory>./../shopware</directory>
+       </include>
+   </source>
 </phpunit>

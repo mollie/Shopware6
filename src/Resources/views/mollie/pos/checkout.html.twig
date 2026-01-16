@@ -193,8 +193,8 @@
                     </svg>
                 </a>
             </div>
-            {% if changeStatusUrl %}
-                <a href="{{ changeStatusUrl }}" title="Change Status in Test Mode" target="_blank" rel="noopener noreferrer" id="statusChange" class="m-button">
+            {% if changePaymentStateUrl %}
+                <a href="{{ changePaymentStateUrl }}" title="Change Status in Test Mode" target="_blank" rel="noopener noreferrer" id="statusChange" class="m-button">
                     Change Status in Test Mode
                     <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.17 32.92l9.17-9.17-9.17-9.17 2.83-2.83 12 12-12 12z"/>
@@ -257,7 +257,7 @@
 
     function requestStatus() {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/mollie/pos/{{ swOrderId }}/{{ molliePaymentId }}/status');
+        xhr.open('GET', '/mollie/pos/{{ transactionId }}/{{ paymentId }}/status');
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         xhr.onload = handleResponse;

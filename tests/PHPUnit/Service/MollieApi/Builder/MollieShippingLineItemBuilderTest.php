@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Hydrator\MollieLineItemHydrator;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder;
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Mollie\Api\Types\OrderLineType;
-use MolliePayments\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;

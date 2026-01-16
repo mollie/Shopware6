@@ -6,8 +6,9 @@ namespace Kiener\MolliePayments\Components\Subscription\DAL\Subscription;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
@@ -53,11 +54,6 @@ class SubscriptionEntity extends Entity
     protected $amount;
 
     /**
-     * @var int
-     */
-    protected $quantity;
-
-    /**
      * @var ?CurrencyEntity
      */
     protected $currency;
@@ -65,12 +61,9 @@ class SubscriptionEntity extends Entity
     /**
      * @var string
      */
-    protected $productId;
-
-    /**
-     * @var string
-     */
     protected $orderId;
+
+    protected string $orderVersionId;
 
     /**
      * @var string
@@ -157,6 +150,18 @@ class SubscriptionEntity extends Entity
      * @var ?CashRoundingConfig
      */
     protected $itemRounding;
+
+    protected ?OrderEntity $order;
+
+    public function getOrder(): ?OrderEntity
+    {
+        return $this->order;
+    }
+
+    public function setOrder(OrderEntity $order): void
+    {
+        $this->order = $order;
+    }
     // --------------------------------------------------------------------------------
 
     public function setMetadata(SubscriptionMetadata $metadata): void
@@ -231,16 +236,6 @@ class SubscriptionEntity extends Entity
         $this->amount = $amount;
     }
 
-    public function getQuantity(): int
-    {
-        return $this->quantity;
-    }
-
-    public function setQuantity(int $quantity): void
-    {
-        $this->quantity = $quantity;
-    }
-
     public function getCurrency(): ?CurrencyEntity
     {
         return $this->currency;
@@ -251,16 +246,6 @@ class SubscriptionEntity extends Entity
         $this->currency = $currency;
     }
 
-    public function getProductId(): string
-    {
-        return (string) $this->productId;
-    }
-
-    public function setProductId(string $productId): void
-    {
-        $this->productId = $productId;
-    }
-
     public function getOrderId(): string
     {
         return (string) $this->orderId;
@@ -269,6 +254,16 @@ class SubscriptionEntity extends Entity
     public function setOrderId(string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    public function getOrderVersionId(): string
+    {
+        return $this->orderVersionId;
+    }
+
+    public function setOrderVersionId(string $orderVersionId): void
+    {
+        $this->orderVersionId = $orderVersionId;
     }
 
     public function getMandateId(): string

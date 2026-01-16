@@ -39,8 +39,8 @@ context(storeApiPrefix +"/mollie/ideal/store-issuer", () => {
         })
 
         cy.wrap(request).its('data').then(response => {
-            cy.wrap(response).its('status').should('eq', 500)
-            expect(response.data.errors[0].detail).to.contain('Customer with ID cust-123 not found in Shopware');
+
+            expect(response.message).to.contain('Using deprecated route, please provide "terminalId" in request body for payment');
         });
     })
 

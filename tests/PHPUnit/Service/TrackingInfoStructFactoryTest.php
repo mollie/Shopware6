@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Components\ShipmentManager\Exceptions\NoDeliveriesFoundExceptions;
 use Kiener\MolliePayments\Service\TrackingInfoStructFactory;
 use Kiener\MolliePayments\Service\UrlParsingService;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -13,9 +15,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 
-/**
- * @coversDefaultClass \Kiener\MolliePayments\Service\TrackingInfoStructFactory
- */
+#[CoversClass(TrackingInfoStructFactory::class)]
 class TrackingInfoStructFactoryTest extends TestCase
 {
     /**
@@ -154,9 +154,7 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame($expectedCarrier, $trackingInfoStruct->getCarrier());
     }
 
-    /**
-     * @dataProvider invalidShippingUrlPatterns
-     */
+    #[DataProvider('invalidShippingUrlPatterns')]
     public function testUrlEmptyOnInvalidShippingURLs(string $invalidPattern): void
     {
         $trackingInfoStruct = $this->factory->create('test', 'valid-code', 'https://foo.bar/' . $invalidPattern);
@@ -164,7 +162,7 @@ class TrackingInfoStructFactoryTest extends TestCase
         $this->assertSame('', $trackingInfoStruct->getUrl());
     }
 
-    public function invalidShippingUrlPatterns(): array
+    public static function invalidShippingUrlPatterns(): array
     {
         return [
             ['%s%'],

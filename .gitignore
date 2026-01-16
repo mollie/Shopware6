@@ -8,19 +8,14 @@ src/Resources/app/administration/node_modules
 
 src/Resources/app/storefront/dist/storefront
 src/Resources/app/storefront/node_modules
-
-src/Resources/public/administration/css/
-src/Resources/public/administration/js/
-src/Resources/public/administration/assets/
+*.js.LICENSE.txt
+config-*
 /tests/Cypress/Cypress.env.json
 /tests/Cypress/cypress/results
 /src/Resources/app/administration/.stryker-tmp
 /.phpunuhi/
-/src/Resources/public/static/css
-/src/Resources/public/static/js
-/src/Resources/public/js
-/src/Resources/public/mollie-payments.js
 /node_modules/
 /src/Resources/public/administration/.vite
 composer.lock
 package-lock.json
+.tmp

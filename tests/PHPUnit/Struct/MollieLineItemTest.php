@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct;
+namespace MolliePayments\Shopware\Tests\Struct;
 
 use Kiener\MolliePayments\Struct\LineItemPriceStruct;
 use Kiener\MolliePayments\Struct\MollieLineItem;

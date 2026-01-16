@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace PHPUnit\Components\CancelManager;
+namespace MolliePayments\Shopware\Tests\Components\CancelManager;
 
-use MolliePayments\Tests\Fakes\CancelItemFacadeBuilder;
+use Kiener\MolliePayments\Components\CancelManager\CancelItemFacade;
+use MolliePayments\Shopware\Tests\Fakes\CancelItemFacadeBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 
-/**
- * @coversDefaultClass \Kiener\MolliePayments\Components\CancelManager\CancelItemFacade
- */
+#[CoversClass(CancelItemFacade::class)]
 class CancelItemFacadeTest extends TestCase
 {
     private CancelItemFacadeBuilder $cancelManagerBuilder;
