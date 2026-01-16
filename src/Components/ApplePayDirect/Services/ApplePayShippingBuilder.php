@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Service\CartService;
 use Kiener\MolliePayments\Service\ShippingMethodService;
 use Shopware\Core\Checkout\Cart\Cart;
-use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayShippingBuilder
@@ -32,41 +31,6 @@ class ApplePayShippingBuilder
         $this->cartService = $cartService;
         $this->shippingMethods = $shippingMethodService;
         $this->formatter = $applePayFormatter;
-    }
-
-    public function buildApplePayCart(Cart $cart): ApplePayCart
-    {
-        $appleCart = new ApplePayCart();
-
-        foreach ($cart->getLineItems() as $item) {
-            if ($item->getPrice() instanceof CalculatedPrice) {
-                $appleCart->addItem(
-                    (string) $item->getReferencedId(),
-                    (string) $item->getLabel(),
-                    $item->getQuantity(),
-                    $item->getPrice()->getUnitPrice()
-                );
-            }
-        }
-
-        foreach ($cart->getDeliveries() as $delivery) {
-            $grossPrice = $delivery->getShippingCosts()->getUnitPrice();
-
-            if ($grossPrice > 0) {
-                $appleCart->addShipping(
-                    (string) $delivery->getShippingMethod()->getName(),
-                    $grossPrice
-                );
-            }
-        }
-
-        $taxes = $cart->getPrice()->getCalculatedTaxes()->getAmount();
-
-        if ($taxes > 0) {
-            $appleCart->setTaxes($taxes);
-        }
-
-        return $appleCart;
     }
 
     /**

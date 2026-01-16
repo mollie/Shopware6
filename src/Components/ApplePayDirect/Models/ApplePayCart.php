@@ -20,8 +20,12 @@ class ApplePayCart
      */
     private $taxes;
 
-    public function __construct()
+    private bool $isGrossPriceDisplay;
+
+    public function __construct(bool $isGrossPriceDisplay)
     {
+        $this->isGrossPriceDisplay = $isGrossPriceDisplay;
+
         $this->items = [];
 
         $this->shippings = [];
@@ -45,6 +49,12 @@ class ApplePayCart
     {
         $amount = $this->getProductAmount();
         $amount += $this->getShippingAmount();
+
+        if (! $this->isGrossPriceDisplay && $this->getTaxes() instanceof ApplePayLineItem) {
+            // our products show the NET price, so
+            // we also have to add the taxes to the total amount
+            $amount += $this->getTaxes()->getPrice();
+        }
 
         return $amount;
     }

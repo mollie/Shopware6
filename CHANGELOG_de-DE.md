@@ -1,3 +1,6 @@
+## [unreleased]
+- Behebung eines falschen Warenkorbpreises bei Apple Pay Direct in Kombination mit Netto-Anzeigepreise bei Kundengruppen. Hier wurden keine Steuern miteinberechnet. 
+
 ## 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
