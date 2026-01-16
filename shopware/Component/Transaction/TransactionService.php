@@ -79,6 +79,17 @@ final class TransactionService implements TransactionServiceInterface
         if (! $deliveries instanceof OrderDeliveryCollection) {
             throw TransactionDataException::orderWithoutDeliveries($order->getId());
         }
+        /** @var ?OrderDeliveryEntity $firstDeliveryLine */
+        $firstDeliveryLine = $deliveries->first();
+
+        if (method_exists($order,'getPrimaryOrderDelivery')) {
+            $firstDeliveryLine = $order->getPrimaryOrderDelivery();
+        }
+
+        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
+            throw TransactionDataException::orderWithoutDeliveries($order->getId());
+        }
+
         $language = $order->getLanguage();
         if (! $language instanceof LanguageEntity) {
             throw TransactionDataException::orderWithoutLanguage($order->getId());
@@ -88,8 +99,6 @@ final class TransactionService implements TransactionServiceInterface
         if (! $currency instanceof CurrencyEntity) {
             throw TransactionDataException::orderWithoutCurrency($order->getId());
         }
-        /** @var OrderDeliveryEntity $firstDeliveryLine */
-        $firstDeliveryLine = $deliveries->first();
 
         $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
         if (! $shippingOrderAddress instanceof OrderAddressEntity) {
