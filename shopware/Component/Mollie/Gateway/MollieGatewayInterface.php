@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
+use Mollie\Shopware\Component\Mollie\Capture;
+use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
@@ -29,4 +31,6 @@ interface MollieGatewayInterface
     public function listTerminals(string $salesChannelId): TerminalCollection;
 
     public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool;
+
+    public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture;
 }

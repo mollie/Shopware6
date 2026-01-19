@@ -31,6 +31,12 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?\DateTimeInterface $createdAt = null;
 
+    private ?Money $capturedAmount = null;
+
+    private ?Money $amountRemaining = null;
+
+    private ?Money $amount = null;
+
     public function __construct(private string $id)
     {
     }
@@ -116,6 +122,9 @@ final class Payment extends Struct implements \JsonSerializable
         $profileId = $body['profileId'] ?? null;
         $createdAt = $body['createdAt'] ?? null;
         $subscriptionId = $body['subscriptionId'] ?? null;
+        $capturedAmount = $body['amountCaptured'] ?? null;
+        $amountRemaining = $body['amountRemaining'] ?? null;
+        $amount = $body['amount'] ?? null;
 
         if ($paymentMethod !== null) {
             $payment->setMethod($paymentMethod);
@@ -147,6 +156,17 @@ final class Payment extends Struct implements \JsonSerializable
 
         if ($subscriptionId !== null) {
             $payment->setSubscriptionId($subscriptionId);
+        }
+
+        if ($capturedAmount !== null) {
+            $payment->setCapturedAmount(new Money((float) $capturedAmount['value'], $capturedAmount['currency']));
+        }
+
+        if ($amountRemaining !== null) {
+            $payment->setAmountRemaining(new Money((float) $amountRemaining['value'], $amountRemaining['currency']));
+        }
+        if ($amount !== null) {
+            $payment->setAmount(new Money((float) $amount['value'], $amount['currency']));
         }
 
         return $payment;
@@ -241,5 +261,35 @@ final class Payment extends Struct implements \JsonSerializable
     public function setAuthenticationId(?string $authenticationId): void
     {
         $this->authenticationId = $authenticationId;
+    }
+
+    public function getCapturedAmount(): ?Money
+    {
+        return $this->capturedAmount;
+    }
+
+    public function setCapturedAmount(Money $capturedAmount): void
+    {
+        $this->capturedAmount = $capturedAmount;
+    }
+
+    public function getAmountRemaining(): ?Money
+    {
+        return $this->amountRemaining;
+    }
+
+    public function setAmountRemaining(Money $amountRemaining): void
+    {
+        $this->amountRemaining = $amountRemaining;
+    }
+
+    public function getAmount(): ?Money
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(Money $amount): void
+    {
+        $this->amount = $amount;
     }
 }
