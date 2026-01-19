@@ -1,3 +1,6 @@
+## [unreleased]
+- Fixed wrong total amount in Apple Pay Direct when using NET display prices for customer groups. Taxes were not added in this case.
+
 ## 4.21.0
 - Shipping costs are now considered in refunds via Shopware Return Management.
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.

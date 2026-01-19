@@ -103,11 +103,12 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
-	@make phpintegration -B
-	@make behat -B
 	@make vitest -B
 	@make configcheck -B
 	@make phpunuhi -B
+	# -----------------------------------------------------------------
+	@make phpintegration -B
+	@make behat -B
 
 snippetexport: ##2 Exports all snippets
 	php vendor/bin/phpunuhi export --configuration=./config/.phpunuhi.xml --dir=./.phpunuhi
