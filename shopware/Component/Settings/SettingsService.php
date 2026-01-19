@@ -220,6 +220,11 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
+    public function clearCache(): void
+    {
+        $this->settingsCache = [];
+    }
+
     /**
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\Container\ContainerExceptionInterface

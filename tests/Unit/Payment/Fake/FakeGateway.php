@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Payment\Fake;
 
+use Mollie\Shopware\Component\Mollie\Capture;
+use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
@@ -69,5 +71,10 @@ final class FakeGateway implements MollieGatewayInterface
     public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
     {
         // TODO: Implement getPayment() method.
+    }
+
+    public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
+    {
+        // TODO: Implement createCapture() method.
     }
 }
