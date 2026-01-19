@@ -14,6 +14,7 @@ final class RenewException extends HttpException
     public const SUBSCRIPTIONS_DISABLED = 'SUBSCRIPTIONS_DISABLED';
     public const SUBSCRIPTION_WITHOUT_ADDRESS = 'SUBSCRIPTION_WITHOUT_ADDRESS';
     public const ORDER_WITHOUT_DELIVERIES = 'ORDER_WITHOUT_DELIVERIES';
+    public const SUBSCRIPTION_WITHOUT_CUSTOMER = 'SUBSCRIPTION_WITHOUT_CUSTOMER';
 
     public static function subscriptionNotFound(string $subscriptionId): self
     {
@@ -92,6 +93,17 @@ final class RenewException extends HttpException
             'Failed to renew {{subscriptionId}}, new created order {{orderNumber}} is without deliveries',[
                 'subscriptionId' => $subscriptionId,
                 'orderNumber' => $orderNumber,
+            ]
+        );
+    }
+
+    public static function subscriptionWithoutCustomer(string $subscriptionId): self
+    {
+        return new self(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::SUBSCRIPTION_WITHOUT_CUSTOMER,
+            'Failed to renew {{subscriptionId}}, subscription order has no customer ',[
+                'subscriptionId' => $subscriptionId,
             ]
         );
     }
