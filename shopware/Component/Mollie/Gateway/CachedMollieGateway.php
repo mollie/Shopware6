@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
+use Mollie\Shopware\Component\Mollie\Capture;
+use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
@@ -93,5 +95,16 @@ final class CachedMollieGateway implements MollieGatewayInterface
     public function listTerminals(string $salesChannelId): TerminalCollection
     {
         return $this->decorated->listTerminals($salesChannelId);
+    }
+
+    public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
+    {
+        return $this->decorated->createCapture($createCapture, $paymentId, $orderNumber, $salesChannelId);
+    }
+
+    public function clearCache(): void
+    {
+        $this->paymentIdPayments = [];
+        $this->transactionPayments = [];
     }
 }

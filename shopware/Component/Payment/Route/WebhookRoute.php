@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\PaymentMethodUpdater;
 use Mollie\Shopware\Component\Payment\PaymentMethodUpdaterInterface;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
@@ -17,9 +18,12 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -37,6 +41,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         private readonly PaymentMethodUpdaterInterface $paymentMethodUpdater,
         #[Autowire(service: OrderStateHandler::class)]
         private readonly OrderStateHandlerInterface $orderStateHandler,
+        private readonly OrderService $orderService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -67,6 +72,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
         $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
         $this->updateOrderStatus($payment, $shopwareOrder, $context);
+        $this->updateDeliveryStatus($payment, $shopwareOrder, $context);
 
         $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
         $webhookStatusEvent = new $webhookStatusEventClass($payment, $shopwareOrder, $context);
@@ -178,5 +184,32 @@ final class WebhookRoute extends AbstractWebhookRoute
             $this->logger->error('Finished - Change order status, Failed to change order status', $logData);
             throw WebhookException::orderStatusChangeFailed($transactionId, $orderNumber, $exception);
         }
+    }
+
+    private function updateDeliveryStatus(Payment $payment, OrderEntity $shopwareOrder, Context $context): void
+    {
+        $captured = $payment->getCapturedAmount();
+        if ($captured === null || (float) $captured->getValue() <= 0.0 || $payment->getStatus() !== PaymentStatus::PAID) {
+            return;
+        }
+
+        $deliveries = $shopwareOrder->getDeliveries();
+        if ($deliveries === null) {
+            return;
+        }
+        $firstDelivery = $deliveries->first();
+        if ($firstDelivery === null) {
+            return;
+        }
+        $orderDeliveryId = $firstDelivery->getId();
+
+        $transition = StateMachineTransitionActions::ACTION_SHIP;
+
+        $this->orderService->orderDeliveryStateTransition(
+            $orderDeliveryId,
+            $transition,
+            new ParameterBag(),
+            $context
+        );
     }
 }
