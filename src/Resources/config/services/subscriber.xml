@@ -6,14 +6,7 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\Subscriber\OrderDeliverySubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="order_transaction.repository"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
+
 
         <service id="Kiener\MolliePayments\Subscriber\CancelOrderSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>

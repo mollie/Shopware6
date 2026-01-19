@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Exception\ClientException;
+use Mollie\Shopware\Component\Mollie\Capture;
+use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
@@ -214,6 +216,33 @@ final class MollieGateway implements MollieGatewayInterface
             return Payment::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $formParams = $createCapture->toArray();
+
+            $response = $client->post('payments/' . $paymentId . '/captures', [
+                'form_params' => $formParams,
+            ]);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Capture created', [
+                'requestParameter' => $formParams,
+                'responseParameter' => $body,
+                'paymentId' => $paymentId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Capture::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
         }
     }
 
