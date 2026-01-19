@@ -17,14 +17,18 @@ use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute as PaymentWebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionEndedEvent;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Mollie;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryCollection;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderCollection;
@@ -63,6 +67,8 @@ final class RenewRoute extends AbstractRenewRoute
         private readonly AbstractCartOrderRoute $cartOrderRoute,
         #[Autowire(service: PaymentWebhookRoute::class)]
         private readonly AbstractPaymentWebhookRoute $paymentWebhookRoute,
+        #[Autowire(service: 'event_dispatcher')]
+        private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger
     ) {
@@ -86,6 +92,7 @@ final class RenewRoute extends AbstractRenewRoute
                 'queryData' => $request->query->all(),
             ]
         ];
+
         $this->logger->info('Subscription renew started', $logData);
 
         if (strlen($molliePaymentId) === 0) {
@@ -115,6 +122,11 @@ final class RenewRoute extends AbstractRenewRoute
         if (! $order instanceof OrderEntity) {
             $this->logger->error('Subscription without order loaded', $logData);
             throw RenewException::subscriptionWithoutOrder($subscriptionId);
+        }
+        $customer = $order->getOrderCustomer()?->getCustomer();
+        if (! $customer instanceof CustomerEntity) {
+            $this->logger->error('Subscription order has no customer', $logData);
+            throw RenewException::subscriptionWithoutCustomer($subscriptionId);
         }
         $subscriptionBillingAddress = $subscriptionEntity->getBillingAddress();
         if (! $subscriptionBillingAddress instanceof SubscriptionAddressEntity) {
@@ -214,10 +226,16 @@ final class RenewRoute extends AbstractRenewRoute
             'historyEntries' => $subscriptionHistories
         ]], $context);
 
+        $this->logger->info('Subscription renew finished', $logData);
+
+        $renewEvent = new SubscriptionRenewedEvent($subscriptionEntity, $customer, $context);
+        $this->eventDispatcher->dispatch($renewEvent);
+
         if ($isLimited && $subscription->getTimesRemaining() <= 0) {
             $this->logger->info('Subscription had limited amount, it is finished completely now', $logData);
+            $endedEvent = new SubscriptionEndedEvent($subscriptionEntity, $customer, $context);
+            $this->eventDispatcher->dispatch($endedEvent);
         }
-        $this->logger->info('Subscription renew finished', $logData);
 
         return $this->paymentWebhookRoute->notify($firstTransaction->getId(), $context);
     }
@@ -225,7 +243,7 @@ final class RenewRoute extends AbstractRenewRoute
     /**
      * @return array<mixed>
      */
-    public function getOrderData(string $subscriptionId, OrderEntity $newOrder, OrderDeliveryCollection $deliveryCollection, OrderTransactionEntity $firstTransaction, SubscriptionAddressEntity $subscriptionBillingAddress, SubscriptionAddressEntity $subscriptionShippingAddress, Payment $molliePayment): array
+    private function getOrderData(string $subscriptionId, OrderEntity $newOrder, OrderDeliveryCollection $deliveryCollection, OrderTransactionEntity $firstTransaction, SubscriptionAddressEntity $subscriptionBillingAddress, SubscriptionAddressEntity $subscriptionShippingAddress, Payment $molliePayment): array
     {
         $billingAddress = $this->getAddressData($subscriptionBillingAddress);
         $billingAddress['id'] = $newOrder->getBillingAddressId();
