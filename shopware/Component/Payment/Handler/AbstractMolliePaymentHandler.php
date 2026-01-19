@@ -68,7 +68,8 @@ abstract class AbstractMolliePaymentHandler extends AbstractPaymentHandler
         } catch (\Throwable $exception) {
             $this->logger->error('Payment failed unexpected', [
                 'error' => $exception->getMessage(),
-                'paymentMethod' => $this->getPaymentMethod()->value
+                'paymentMethod' => $this->getPaymentMethod()->value,
+                'trace' => $exception->getTrace()
             ]);
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $exception->getMessage(), $exception);
         }
