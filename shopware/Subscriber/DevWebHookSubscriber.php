@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * by the code during redirect back to shop and at same time over webhook.
  * In dev environment the webhook URL is not reachable from outside, therefore we want to change the status
  */
-final class PaymentFinalizeSubscriber implements EventSubscriberInterface
+final class DevWebHookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         #[Autowire(service: SettingsService::class)]
@@ -34,6 +35,7 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
     {
         return [
             PaymentFinalizeEvent::class => 'handleFinalizeEvent',
+            OrderShippedEvent::class => 'onOrderShipped',
         ];
     }
 
@@ -47,5 +49,17 @@ final class PaymentFinalizeSubscriber implements EventSubscriberInterface
         $payment = $event->getPayment();
         $transaction = $payment->getShopwareTransaction();
         $this->webhookRoute->notify($transaction->getId(), $event->getContext());
+    }
+
+    public function onOrderShipped(OrderShippedEvent $event): void
+    {
+        $environmentSettings = $this->settingsService->getEnvironmentSettings();
+
+        if (! $environmentSettings->isDevMode() && ! $environmentSettings->isCypressMode()) {
+            return;
+        }
+        $this->logger->warning('Executing Webhook in Dev mode');
+        sleep(2);
+        $this->webhookRoute->notify($event->getTransactionId(), $event->getContext());
     }
 }

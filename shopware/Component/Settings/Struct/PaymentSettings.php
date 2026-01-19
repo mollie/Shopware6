@@ -10,6 +10,7 @@ final class PaymentSettings extends Struct
     public const KEY_ORDER_NUMBER_FORMAT = 'formatOrderNumber';
     public const KEY_DUE_DATE_DAYS = 'paymentMethodBankTransferDueDateDays';
     public const KEY_SHOPWARE_FAILED_PAYMENT = 'shopwareFailedPayment';
+    public const KEY_AUTOMATIC_SHIPMENT = 'automaticShipping';
     private const MIN_DUE_DAYS = 1;
     private const MAX_DUE_DAYS = 100;
 
@@ -25,8 +26,9 @@ final class PaymentSettings extends Struct
         private bool $oneClickCompactView = false,
         private bool $shopwareFailedPayment = false,
         private bool $createCustomersAtMollie = false,
-        private bool $useMollieLimits = false)
-    {
+        private bool $useMollieLimits = false,
+        private bool $automaticShipment = false,
+    ) {
     }
 
     /**
@@ -41,8 +43,9 @@ final class PaymentSettings extends Struct
         $shopwareFailedPayment = $settings[self::KEY_SHOPWARE_FAILED_PAYMENT] ?? false;
         $createCustomersAtMollie = $settings[self::KEY_CREATE_CUSTOMERS_AT_MOLLIE] ?? false;
         $useMollieLimits = $settings[self::KEY_USE_MOLLIE_LIMITS] ?? false;
+        $automaticShipment = $settings[self::KEY_AUTOMATIC_SHIPMENT] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays,$oneClickPayment,$oneClickCompactView,$shopwareFailedPayment,$createCustomersAtMollie,$useMollieLimits);
+        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment);
     }
 
     public function getOrderNumberFormat(): string
@@ -82,5 +85,10 @@ final class PaymentSettings extends Struct
     public function useMollieLimits(): bool
     {
         return $this->useMollieLimits;
+    }
+
+    public function isAutomaticShipment(): bool
+    {
+        return $this->automaticShipment;
     }
 }

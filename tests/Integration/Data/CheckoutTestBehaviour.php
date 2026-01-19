@@ -120,8 +120,14 @@ trait CheckoutTestBehaviour
         $repository = $this->getContainer()->get('order.repository');
         $criteria = (new Criteria([$orderId]));
         $criteria->addAssociation('transactions.stateMachineState');
-
+        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.stateMachineState');
         $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt'));
+        $criteria->addAssociation('lineItems.product');
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('deliveries.positions');
+        $criteria->addAssociation('deliveries.shippingCosts');
+
         $searchResult = $repository->search($criteria, $salesChannelContext->getContext());
 
         return $searchResult->first();
