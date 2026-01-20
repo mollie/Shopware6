@@ -1,6 +1,7 @@
 ## [unreleased]
 - Behebung eines falschen Warenkorbpreises bei Apple Pay Direct in Kombination mit Netto-Anzeigepreise bei Kundengruppen. Hier wurden keine Steuern miteinberechnet. 
 - Behebung eines Problems, bei dem in manchen zufälligen Fällen die Kreditkartenfelder nicht funktionieren. (mollie.js defer-sync Laden wurde entfernt).
+- Wenn ein Kunde die Zahlungsart eines Abonnements ändert, werden alle älteren, noch stornierbaren Zahlungen automatisch abgebrochen.
 
 ## 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig

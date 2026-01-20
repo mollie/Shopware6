@@ -40,4 +40,6 @@ interface MollieGatewayInterface
     public function updateSubscription(string $subscriptionId, string $customerId, string $mandateId): void;
 
     public function getSubscription(string $subscriptionId, string $customerId): Subscription;
+
+    public function cancelPayment(string $id): Payment;
 }
