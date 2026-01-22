@@ -27,6 +27,10 @@ class SubscriptionControllerBase extends AbstractController
     private $subscriptionManager;
 
     private MollieApiFactory $mollieApiFactory;
+    
+    /**
+     * @var EntityRepository<CustomerCollection<CustomerEntity>>
+     */
     private EntityRepository $customerRepository;
     private SettingsService $settingsService;
     private LoggerInterface $logger;
