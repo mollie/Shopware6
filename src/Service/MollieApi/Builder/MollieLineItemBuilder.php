@@ -24,7 +24,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
-    public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS = 'customized-products-option';
 
     /**
      * @var IsOrderLineItemValid
@@ -113,45 +112,11 @@ class MollieLineItemBuilder
         if (! $lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
             return $lines;
         }
-
-        $customizedProducts = $lineItems->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS);
-
-        foreach ($customizedProducts as $customizedProduct) {
-            $productChildren = $customizedProduct->getChildren();
-            if ($productChildren === null) {
-                continue;
-            }
-            $options = $productChildren->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS);
-            foreach ($options as $option) {
-                $optionValues = $option->getChildren();
-                if ($optionValues !== null) {
-                    foreach ($optionValues as $optionValue) {
-                        if ($optionValue->getPrice() !== null && $optionValue->getPrice()->getTotalPrice() > 0) {
-                            $lineItems->add($optionValue);
-                        }
-                    }
-                }
-                if ($option->getPrice() !== null && $option->getPrice()->getTotalPrice() > 0) {
-                    $lineItems->add($option);
-                }
-            }
-        }
+        $lineItems = $this->getLineItemsFlat($lineItems);
 
         foreach ($lineItems as $item) {
-            /* Filter out the product from customized products plugin */
             if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
-                $lineItemChildren = $item->getChildren();
-
-                if ($lineItemChildren instanceof OrderLineItemCollection && $lineItemChildren->count() > 0) {
-                    $filteredItems = $lineItemChildren->filter(function (OrderLineItemEntity $lineItemEntity) {
-                        return $lineItemEntity->getType() !== self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS;
-                    });
-
-                    if ($filteredItems->count() === 1) {
-                        /** @var OrderLineItemEntity $item */
-                        $item = $filteredItems->first();
-                    }
-                }
+                continue;
             }
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
@@ -164,6 +129,9 @@ class MollieLineItemBuilder
 
             if (! $itemPrice instanceof CalculatedPrice) {
                 throw new MissingPriceLineItemException((string) $item->getProductId());
+            }
+            if ($itemPrice->getTotalPrice() <= 0) {
+                continue;
             }
 
             $price = $this->priceCalculator->calculateLineItemPrice(
@@ -197,6 +165,27 @@ class MollieLineItemBuilder
         }
 
         return 'promotion';
+    }
+
+    /**
+     * @return OrderLineItemEntity[]
+     */
+    private function getLineItemsFlat(?OrderLineItemCollection $lineItems): array
+    {
+        $flat = [];
+        if (! $lineItems) {
+            return $flat;
+        }
+
+        foreach ($lineItems as $lineItem) {
+            $flat[] = $lineItem;
+
+            foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
+                $flat[] = $nest;
+            }
+        }
+
+        return $flat;
     }
 
     /**
