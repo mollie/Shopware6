@@ -143,7 +143,7 @@ class MollieLineItemBuilderTest extends TestCase
             'PRODUCT Line Item is PHYSICAL' => [LineItem::PRODUCT_LINE_ITEM_TYPE, OrderLineType::TYPE_PHYSICAL],
             'CREDIT Line Item is PHYSICAL' => [LineItem::CREDIT_LINE_ITEM_TYPE, OrderLineType::TYPE_STORE_CREDIT],
             'PROMOTION Line Item is PHYSICAL' => [LineItem::PROMOTION_LINE_ITEM_TYPE, OrderLineType::TYPE_DISCOUNT],
-            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS, OrderLineType::TYPE_PHYSICAL],
+            'CUSTOM_PRODUCT Line Item is PHYSICAL' => [MollieLineItemBuilder::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS, OrderLineType::TYPE_DIGITAL],
             'Fallback Line Item is DIGITAL' => ['test', OrderLineType::TYPE_DIGITAL],
         ];
     }
