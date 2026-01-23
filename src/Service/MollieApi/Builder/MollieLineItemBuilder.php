@@ -24,6 +24,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
+    public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS = 'customized-products-option';
 
     /**
      * @var IsOrderLineItemValid
