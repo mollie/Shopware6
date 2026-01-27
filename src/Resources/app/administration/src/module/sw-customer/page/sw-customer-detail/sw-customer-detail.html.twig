@@ -1,0 +1,11 @@
+{% block sw_customer_detail_content_tab_after %}
+    {% parent %}
+    <sw-tabs-item
+            v-if="hasMollieData"
+            class="sw-customer-detail__tab-molli-subscriptions"
+            :route="subscriptionRoute"
+            :title="$tc('mollie-payments.subscriptions.navigation.title')"
+    >
+        {{ $tc('mollie-payments.subscriptions.navigation.title')}}
+    </sw-tabs-item>
+{% endblock %}

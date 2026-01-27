@@ -172,4 +172,9 @@ class MollieGateway implements MollieGatewayInterface
     {
         return $this->apiClient->subscriptions->getForId($customerId, $subscriptionId);
     }
+
+    public function cancelPayment(string $id): Payment
+    {
+        return $this->apiClient->payments->cancel($id);
+    }
 }

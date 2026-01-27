@@ -1,0 +1,45 @@
+<sw-card
+        :title="$tc('mollie-payments.subscriptions.navigation.title')"
+        class="sw-customer-mollie-subscriptions"
+        large="true"
+>
+
+    <sw-loader
+            v-if="isLoading"
+            size="16px"
+    />
+
+    <sw-data-grid
+            v-if="subscriptions.length > 0"
+            :data-source="subscriptions"
+            :columns="columns"
+            :show-selection="false"
+            :is-loading="isLoading"
+    >
+        <template #column-amount="{ item }">
+            {{ item.amount.value }} {{ item.amount.currency }}
+        </template>
+
+        <template #actions="{ item }">
+
+            <sw-context-menu-item
+                    variant="danger"
+                    :disabled="item.status !== 'active'"
+                    @click="cancelSubscription(item)"
+            >
+                {{ $tc('mollie-payments.subscriptions.detail.buttonCancelSubscription') }}
+            </sw-context-menu-item>
+
+        </template>
+
+    </sw-data-grid>
+    <sw-empty-state
+            v-else
+            :absolute="false"
+            :title="$tc('sw-empty-state.messageNoResultTitle')"
+    >
+    </sw-empty-state>
+</sw-card>
+
+
+

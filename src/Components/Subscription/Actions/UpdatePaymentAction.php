@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Api\Resources\Payment;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
@@ -95,6 +96,19 @@ class UpdatePaymentAction extends BaseAction
         // it's important to use a sequenceType first to allow 0,00 amount payment.
         // this will be used to process the payment and get/create a new mandate inside the Mollie API systems.
         $gateway = $this->getMollieGateway($subscription);
+
+        $mollieSubscription = $gateway->getSubscription($subscription->getMollieId(), $customerId);
+
+        $pastPayments = $mollieSubscription->payments();
+        if ($pastPayments->count > 0) {
+            /** @var Payment $pastPayment */
+            foreach ($pastPayments as $pastPayment) {
+                if (! $pastPayment->isCancelable) {
+                    continue;
+                }
+                $gateway->cancelPayment($pastPayment->id);
+            }
+        }
 
         // for headless, we might provide a separate return URL
         // for the storefront, we build our correct one

@@ -60,4 +60,18 @@
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
+
+    <route id="api.action.mollie.subscription.list" path="/api/_action/mollie/subscriptions/{customerId}" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::listUserMollieSubscriptions</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
+        <default key="auth_required"><bool>true</bool></default>
+        <default key="auth_enabled"><bool>true</bool></default>
+    </route>
+    <route id="api.action.mollie.subscription.cancel_by_customer" path="/api/_action/mollie/subscriptions/cancel/{customerId}/{mollieSubscriptionId}" methods="GET">
+        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::cancelByMollieId</default>
+        <default key="_routeScope"><list><string>api</string></list></default>
+        <default key="auth_required"><bool>true</bool></default>
+        <default key="auth_enabled"><bool>true</bool></default>
+    </route>
+
 </routes>

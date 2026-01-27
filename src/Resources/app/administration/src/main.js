@@ -16,6 +16,7 @@ import './component/flow-sequence/action-order-ship-modal';
 import './component/flow-sequence/action-order-refund-modal';
 import './component/credit-card-logo';
 import './module/mollie-payments';
+import './module/sw-customer';
 import './module/sw-product';
 import './module/mollie-payments/acl';
 import './module/mollie-payments/extension/sw-order';

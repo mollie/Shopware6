@@ -4,8 +4,15 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Controller\Api\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
+use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
+use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Customer\CustomerCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,9 +26,30 @@ class SubscriptionControllerBase extends AbstractController
      */
     private $subscriptionManager;
 
-    public function __construct(SubscriptionManager $subscriptionManager)
-    {
+    private MollieApiFactory $mollieApiFactory;
+
+    /**
+     * @var EntityRepository<CustomerCollection<CustomerEntity>>
+     */
+    private EntityRepository $customerRepository;
+    private SettingsService $settingsService;
+    private LoggerInterface $logger;
+
+    /**
+     * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
+     */
+    public function __construct(
+        SubscriptionManager $subscriptionManager,
+        MollieApiFactory $mollieApiFactory,
+        EntityRepository $customerRepository,
+        SettingsService $settingsService,
+        LoggerInterface $logger
+    ) {
         $this->subscriptionManager = $subscriptionManager;
+        $this->mollieApiFactory = $mollieApiFactory;
+        $this->customerRepository = $customerRepository;
+        $this->settingsService = $settingsService;
+        $this->logger = $logger;
     }
 
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
@@ -100,5 +128,87 @@ class SubscriptionControllerBase extends AbstractController
     public function skipLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->skip($data, $context);
+    }
+
+    public function listUserMollieSubscriptions(string $customerId, Context $context): JsonResponse
+    {
+        try {
+            $response = [
+                'success' => true,
+                'subscriptions' => []
+            ];
+            $criteria = new Criteria([strtolower($customerId)]);
+            $customer = $this->customerRepository->search($criteria, $context)->first();
+            if (! $customer instanceof CustomerEntity) {
+                throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
+            }
+            $salesChannelId = $customer->getSalesChannelId();
+            $settings = $this->settingsService->getSettings($salesChannelId);
+            $client = $this->mollieApiFactory->getClient($salesChannelId);
+            $mode = 'live';
+            if ($settings->isTestMode()) {
+                $mode = 'test';
+            }
+            $currentProfile = $client->profiles->getCurrent();
+            $mollieCustomerId = $customer->getCustomFields()['mollie_payments']['customer_ids'][$currentProfile->id][$mode] ?? null;
+            if ($mollieCustomerId === null) {
+                $this->logger->warning('Could not load subscriptions from Mollie, the customer is not connected to Mollies customer, please check the custom fields', [
+                    'customerId' => $customerId,
+                    'mollieProfileId' => $currentProfile->id,
+                    'mode' => $mode
+                ]);
+
+                return new JsonResponse($response);
+            }
+
+            $mollieSubscriptions = $client->subscriptions->listForId($mollieCustomerId);
+            $response['subscriptions'] = $mollieSubscriptions->getArrayCopy();
+
+            return new JsonResponse($response);
+        } catch (\Throwable $ex) {
+            return $this->buildErrorResponse($ex->getMessage());
+        }
+    }
+
+    public function cancelByMollieId(string $customerId, string $mollieSubscriptionId, Context $context): JsonResponse
+    {
+        try {
+            $response = [
+                'success' => true,
+                'subscriptions' => []
+            ];
+            $criteria = new Criteria([strtolower($customerId)]);
+            $customer = $this->customerRepository->search($criteria, $context)->first();
+            if (! $customer instanceof CustomerEntity) {
+                throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
+            }
+            $salesChannelId = $customer->getSalesChannelId();
+            $settings = $this->settingsService->getSettings($salesChannelId);
+            $client = $this->mollieApiFactory->getClient($salesChannelId);
+            $mode = 'live';
+            if ($settings->isTestMode()) {
+                $mode = 'test';
+            }
+            $currentProfile = $client->profiles->getCurrent();
+            $mollieCustomerId = $customer->getCustomFields()['mollie_payments']['customer_ids'][$currentProfile->id][$mode] ?? null;
+            if ($mollieCustomerId === null) {
+                $this->logger->warning('Could not load subscriptions from Mollie, the customer is not connected to Mollies customer, please check the custom fields', [
+                    'customerId' => $customerId,
+                    'mollieProfileId' => $currentProfile->id,
+                    'mode' => $mode
+                ]);
+
+                return new JsonResponse($response);
+            }
+
+            $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
+
+            $subscription = $subscription->cancel();
+            $response['subscription'] = $subscription;
+
+            return new JsonResponse($response);
+        } catch (\Throwable $ex) {
+            return $this->buildErrorResponse($ex->getMessage());
+        }
     }
 }
