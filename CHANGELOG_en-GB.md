@@ -2,6 +2,7 @@
 - Fixed wrong total amount in Apple Pay Direct when using NET display prices for customer groups. Taxes were not added in this case.
 - Fix a problem where the credit card input fields are sometimes not editable due to race conditions when loading the mollie.js file. (removed defer-async loading).
 - When a customer changes the payment method of a subscription, all older payments that can still be canceled will be automatically canceled.
+- Added support for the “Additional Options/Warranties” plugin.
 
 ## 4.21.0
 - Shipping costs are now considered in refunds via Shopware Return Management.
