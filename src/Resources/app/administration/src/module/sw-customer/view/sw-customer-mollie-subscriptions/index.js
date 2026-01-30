@@ -53,6 +53,7 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
                 },
             ];
         },
+
         assetFilter() {
             return Shopware.Filter.getByName('asset');
         },
@@ -66,8 +67,9 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
         async cancelSubscription(item) {
             this.isLoading = true;
             const response = await this.MolliePaymentsSubscriptionService.cancelByMollieId({
-                customerId: this.customer.id,
+                mollieCustomerId: item.customerId,
                 mollieSubscriptionId: item.id,
+                salesChannelId: this.customer.salesChannelId,
             });
             const updatedSubscription = response.subscription;
 
@@ -86,8 +88,32 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
                 id: this.customer.id,
             });
             this.subscriptions = response.subscriptions;
-            console.error(this.subscriptions);
             this.isLoading = false;
         },
+        
+        statusColor(status) {
+            if (status === '' || status === null) {
+                return 'neutral';
+            }
+
+            if (status === 'active' || status === 'resumed') {
+                return 'success';
+            }
+
+            if (status === 'canceled' || status === 'suspended' || status === 'completed') {
+                return 'neutral';
+            }
+
+            if (status === 'skipped') {
+                return 'info';
+            }
+
+            if (status === 'pending' || status === 'paused') {
+                return 'warning';
+            }
+
+            return 'danger';
+        },
+
     },
 });

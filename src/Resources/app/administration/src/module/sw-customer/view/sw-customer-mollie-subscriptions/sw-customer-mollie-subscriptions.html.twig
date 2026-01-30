@@ -16,6 +16,18 @@
             :show-selection="false"
             :is-loading="isLoading"
     >
+
+        <template #column-status="{ item }">
+            <sw-label :variant="statusColor(item.status)"
+                      size="medium"
+                      appearance="pill"
+                      :ghost="false"
+                      :caps="true"
+                      :dismissable="false">
+                {{ item.status }}
+            </sw-label>
+        </template>
+
         <template #column-amount="{ item }">
             {{ item.amount.value }} {{ item.amount.currency }}
         </template>

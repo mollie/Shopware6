@@ -149,6 +149,7 @@ class SubscriptionControllerBase extends AbstractController
                 'success' => true,
                 'subscriptions' => []
             ];
+
             $criteria = new Criteria([strtolower($customerId)]);
             $customer = $this->customerRepository->search($criteria, $context)->first();
             if (! $customer instanceof CustomerEntity) {
@@ -156,25 +157,25 @@ class SubscriptionControllerBase extends AbstractController
             }
             $salesChannelId = $customer->getSalesChannelId();
             $settings = $this->settingsService->getSettings($salesChannelId);
-            $client = $this->mollieApiFactory->getClient($salesChannelId);
-            $mode = 'live';
-            if ($settings->isTestMode()) {
-                $mode = 'test';
-            }
-            $currentProfile = $client->profiles->getCurrent();
-            $mollieCustomerId = $customer->getCustomFields()['mollie_payments']['customer_ids'][$currentProfile->id][$mode] ?? null;
-            if ($mollieCustomerId === null) {
+
+            $mollieCustomerIds = $this->getCustomerIds($customer, $settings->isTestMode());
+            if (count($mollieCustomerIds) === 0) {
                 $this->logger->warning('Could not load subscriptions from Mollie, the customer is not connected to Mollies customer, please check the custom fields', [
                     'customerId' => $customerId,
-                    'mollieProfileId' => $currentProfile->id,
-                    'mode' => $mode
+                    'testMode' => $settings->isTestMode()
                 ]);
 
                 return new JsonResponse($response);
             }
 
-            $mollieSubscriptions = $client->subscriptions->listForId($mollieCustomerId);
-            $response['subscriptions'] = $mollieSubscriptions->getArrayCopy();
+            $client = $this->mollieApiFactory->getClient($salesChannelId);
+            $subscriptions = [];
+            foreach ($mollieCustomerIds as $mollieCustomerId) {
+                $apiSubscriptions = $client->subscriptions->listForId($mollieCustomerId);
+                $subscriptions = array_merge($subscriptions, $apiSubscriptions->getArrayCopy());
+            }
+
+            $response['subscriptions'] = $subscriptions;
 
             return new JsonResponse($response);
         } catch (\Throwable $ex) {
@@ -182,39 +183,14 @@ class SubscriptionControllerBase extends AbstractController
         }
     }
 
-    public function cancelByMollieId(string $customerId, string $mollieSubscriptionId, Context $context): JsonResponse
+    public function cancelByMollieId(string $mollieCustomerId, string $mollieSubscriptionId, string $salesChannelId, Context $context): JsonResponse
     {
         try {
             $response = [
                 'success' => true,
-                'subscriptions' => []
             ];
-            $criteria = new Criteria([strtolower($customerId)]);
-            $customer = $this->customerRepository->search($criteria, $context)->first();
-            if (! $customer instanceof CustomerEntity) {
-                throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
-            }
-            $salesChannelId = $customer->getSalesChannelId();
-            $settings = $this->settingsService->getSettings($salesChannelId);
+
             $client = $this->mollieApiFactory->getClient($salesChannelId);
-
-            $mode = 'live';
-            if ($settings->isTestMode()) {
-                $mode = 'test';
-            }
-
-            $currentProfile = $client->profiles->getCurrent();
-
-            $mollieCustomerId = $customer->getCustomFields()['mollie_payments']['customer_ids'][$currentProfile->id][$mode] ?? null;
-            if ($mollieCustomerId === null) {
-                $this->logger->warning('Could not load subscriptions from Mollie, the customer is not connected to Mollies customer, please check the custom fields', [
-                    'customerId' => $customerId,
-                    'mollieProfileId' => $currentProfile->id,
-                    'mode' => $mode
-                ]);
-
-                return new JsonResponse($response);
-            }
 
             $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
             $subscription = $subscription->cancel();
@@ -251,5 +227,26 @@ class SubscriptionControllerBase extends AbstractController
         } catch (\Throwable $ex) {
             return $this->buildErrorResponse($ex->getMessage());
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCustomerIds(CustomerEntity $customer, bool $testMode = true): array
+    {
+        $result = [];
+        $mode = $testMode ? 'test' : 'live';
+
+        $customFields = $customer->getCustomFields()['mollie_payments']['customer_ids'] ?? [];
+
+        foreach ($customFields as $modes) {
+            $customerId = $modes[$mode] ?? null;
+            if ($customerId === null) {
+                continue;
+            }
+            $result[] = $customerId;
+        }
+
+        return array_unique($result);
     }
 }
