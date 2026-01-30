@@ -69,10 +69,11 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
                 customerId: this.customer.id,
                 mollieSubscriptionId: item.id,
             });
-            item = response.subscription;
+            const updatedSubscription = response.subscription;
+
             this.subscriptions.forEach((subscription, index) => {
-                if (subscription.id !== item.id) {
-                    this.subscriptions[index] = item;
+                if (subscription.id === updatedSubscription.id) {
+                    this.subscriptions[index] = updatedSubscription;
                 }
             });
 
