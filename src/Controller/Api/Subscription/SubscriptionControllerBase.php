@@ -38,7 +38,7 @@ class SubscriptionControllerBase extends AbstractController
     private EntityRepository $customerRepository;
     private SettingsService $settingsService;
     private LoggerInterface $logger;
-    
+
     /**
      * @var EntityRepository<SubscriptionCollection<SubscriptionEntity>>
      */
