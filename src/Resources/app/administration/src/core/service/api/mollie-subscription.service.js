@@ -57,7 +57,7 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
         return this.__get('/' + data.id);
     }
 
-    cancelByMollieId(data = { mollieCustomerId: null, mollieSubscriptionId: null,salesChannelId:null }) {
+    cancelByMollieId(data = { mollieCustomerId: null, mollieSubscriptionId: null, salesChannelId: null }) {
         return this.__get(`/cancel/${data.mollieCustomerId}/${data.mollieSubscriptionId}/${data.salesChannelId}`);
     }
 

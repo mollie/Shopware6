@@ -90,7 +90,7 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
             this.subscriptions = response.subscriptions;
             this.isLoading = false;
         },
-        
+
         statusColor(status) {
             if (status === '' || status === null) {
                 return 'neutral';
@@ -114,6 +114,5 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
 
             return 'danger';
         },
-
     },
 });
