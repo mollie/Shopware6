@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Subscription;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\SettingsService;
@@ -13,6 +16,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,12 +40,19 @@ class SubscriptionControllerBase extends AbstractController
     private LoggerInterface $logger;
 
     /**
+     * @var EntityRepository<SubscriptionCollection<SubscriptionEntity>>
+     */
+    private EntityRepository $subscriptionRepository;
+
+    /**
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
      */
     public function __construct(
         SubscriptionManager $subscriptionManager,
         MollieApiFactory $mollieApiFactory,
         EntityRepository $customerRepository,
+        EntityRepository $subscriptionRepository,
         SettingsService $settingsService,
         LoggerInterface $logger
     ) {
@@ -50,6 +61,7 @@ class SubscriptionControllerBase extends AbstractController
         $this->customerRepository = $customerRepository;
         $this->settingsService = $settingsService;
         $this->logger = $logger;
+        $this->subscriptionRepository = $subscriptionRepository;
     }
 
     public function cancel(RequestDataBag $data, Context $context): JsonResponse
@@ -185,11 +197,14 @@ class SubscriptionControllerBase extends AbstractController
             $salesChannelId = $customer->getSalesChannelId();
             $settings = $this->settingsService->getSettings($salesChannelId);
             $client = $this->mollieApiFactory->getClient($salesChannelId);
+
             $mode = 'live';
             if ($settings->isTestMode()) {
                 $mode = 'test';
             }
+
             $currentProfile = $client->profiles->getCurrent();
+
             $mollieCustomerId = $customer->getCustomFields()['mollie_payments']['customer_ids'][$currentProfile->id][$mode] ?? null;
             if ($mollieCustomerId === null) {
                 $this->logger->warning('Could not load subscriptions from Mollie, the customer is not connected to Mollies customer, please check the custom fields', [
@@ -202,8 +217,34 @@ class SubscriptionControllerBase extends AbstractController
             }
 
             $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
-
             $subscription = $subscription->cancel();
+
+            $criteria = new Criteria();
+            $criteria->addFilter(new EqualsFilter('mollieId', $mollieSubscriptionId));
+            $result = $this->subscriptionRepository->search($criteria, $context);
+
+            if ($result->count() > 0) {
+                $upsertArray = [];
+                /** @var SubscriptionEntity $subscriptionEntity */
+                foreach ($result as $subscriptionEntity) {
+                    $upsertArray[] = [
+                        'id' => $subscriptionEntity->getId(),
+                        'status' => SubscriptionStatus::CANCELED,
+                        'nextPaymentAt' => null,
+                        'canceledAt' => new \DateTime(),
+                        'historyEntries' => [
+                            [
+                                'statusFrom' => $subscriptionEntity->getStatus(),
+                                'statusTo' => SubscriptionStatus::CANCELED,
+                                'comment' => 'canceled',
+                                'mollieId' => $mollieSubscriptionId,
+                            ],
+                        ],
+                    ];
+                }
+                $this->subscriptionRepository->upsert($upsertArray, $context);
+            }
+
             $response['subscription'] = $subscription;
 
             return new JsonResponse($response);
