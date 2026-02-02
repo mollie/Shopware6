@@ -5,6 +5,7 @@
 - Added support for the “Additional Options/Warranties” plugin.
 - Added an admin overview page allowing existing subscribers to cancel their subscriptions.
 - Fixed the display of payment methods in older Shopware versions.
+- Fixed the “Test API Keys” button in the plugin settings for Shopware 6.7.
 
 ## 4.21.0
 - Shipping costs are now considered in refunds via Shopware Return Management.

@@ -15,8 +15,8 @@ Component.register('mollie-pluginconfig-section-api', {
         onTestButtonClicked() {
             const me = this;
 
-            const liveApiKeyInput = document.querySelector('input[name="MolliePayments.config.liveApiKey"]');
-            const testApiKeyInput = document.querySelector('input[name="MolliePayments.config.testApiKey"]');
+            const liveApiKeyInput = document.querySelector('input[name="MolliePayments.config.liveApiKey"],*[class*="field-mollie-payments-config-live-api-key"] input');
+            const testApiKeyInput = document.querySelector('input[name="MolliePayments.config.testApiKey"],*[class*="field-mollie-payments-config-test-api-key"] input');
 
             const liveApiKey = liveApiKeyInput ? liveApiKeyInput.value : null;
             const testApiKey = testApiKeyInput ? testApiKeyInput.value : null;
