@@ -4,6 +4,7 @@
 - When a customer changes the payment method of a subscription, all older payments that can still be canceled will be automatically canceled.
 - Added support for the “Additional Options/Warranties” plugin.
 - Added an admin overview page allowing existing subscribers to cancel their subscriptions.
+- Fixed the display of payment methods in older Shopware versions.
 
 ## 4.21.0
 - Shipping costs are now considered in refunds via Shopware Return Management.

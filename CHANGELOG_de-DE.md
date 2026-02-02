@@ -4,6 +4,7 @@
 - Wenn ein Kunde die Zahlungsart eines Abonnements ändert, werden alle älteren, noch stornierbaren Zahlungen automatisch abgebrochen.
 - Die Kompatibilität mit dem Plugin „Zusatzoptionen/Garantien“ wurde implementiert.
 - Kunden mit bestehendem Abonnement haben nun eine Übersichtsseite in der Administration zum Kündigen ihrer Abonnements.
+- Die Darstellung der Zahlarten in älteren Shopware-Versionen wurde korrigiert.
 
 ## 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig

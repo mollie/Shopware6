@@ -70,7 +70,7 @@ class AccountControllerBase extends AbstractStoreFrontController
         $page = $this->overviewPageLoader->load($request, $salesChannelContext, $customer);
 
         return $this->renderStorefront(
-            '@Storefront/storefront/page/account/payment/index.html.twig',
+            '@Storefront/storefront/page/account/mandates/index.html.twig',
             [
                 'page' => $page,
             ]
