@@ -12,7 +12,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 class iDealPayment extends PaymentHandler
 {
     public const PAYMENT_METHOD_NAME = PaymentMethod::IDEAL;
-    public const PAYMENT_METHOD_DESCRIPTION = 'iDEAL';
+    public const PAYMENT_METHOD_DESCRIPTION = 'iDEAL | Wero';
 
     protected string $paymentMethod = self::PAYMENT_METHOD_NAME;
 

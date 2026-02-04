@@ -7,6 +7,7 @@
 - Die Darstellung der Zahlarten in älteren Shopware-Versionen wurde korrigiert.
 - Der „Test API Keys“-Button in den Plugin-Einstellungen wurde für Shopware 6.7 korrigiert.
 - Die Zahlungsstatus-Aktion wurde versionsabhängig angepasst, sodass in älteren Shopware-Versionen wieder die korrekte Action verwendet wird.
+- iDEAL wurde zu iDEAL | Wero umbenannt.
 
 # 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig

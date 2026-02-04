@@ -73,9 +73,9 @@ class MolliePayments extends Plugin
     {
         parent::activate($context);
 
-        $this->preparePlugin($context->getContext());
-
         $this->runDbMigrations($context->getMigrationCollection());
+
+        $this->preparePlugin($context->getContext());
     }
 
     public function boot(): void
