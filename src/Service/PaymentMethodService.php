@@ -178,6 +178,7 @@ class PaymentMethodService
                     // make sure to repair some fields in here
                     // so that Mollie does always work for our wonderful customers :)
                     'pluginId' => $pluginId,
+                    'mediaId' => $mediaId,
                     // ------------------------------------------
                     // unfortunately some fields are required (*sigh)
                     // so we need to provide those with the value of
