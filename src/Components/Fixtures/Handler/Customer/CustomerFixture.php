@@ -80,14 +80,13 @@ class CustomerFixture implements MollieFixtureHandlerInterface
             throw new \RuntimeException('No sales channel found.');
         }
 
-        $addressId = Uuid::randomHex();
-
         $defaultPaymentMethodId = $this->repoPaymentMethods->searchIds((new Criteria())->setLimit(1), $context)->firstId();
 
         $firstSalutationId = $this->repoSalutations->searchIds((new Criteria())->setLimit(1), $context)->firstId();
         $firstCountryId = $this->repoCountries->searchIds((new Criteria())->setLimit(1), $context)->firstId();
         $firstCustomerGroupId = $this->repoCustomerGroups->searchIds((new Criteria())->setLimit(1), $context)->firstId();
 
+        $addressId = Uuid::fromStringToHex('address-' . $firstCountryId);
         $payload = [[
             'id' => self::CYPRESS_CUSTOMER_ID,
             'salesChannelId' => $salesChannelId,
@@ -112,6 +111,7 @@ class CustomerFixture implements MollieFixtureHandlerInterface
                 'zipcode' => '10115',
                 'city' => 'Berlin',
                 'countryId' => $firstCountryId,
+                'phoneNumber' => '+49123456789',
             ]],
         ]];
 
