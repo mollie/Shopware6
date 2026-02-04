@@ -84,13 +84,14 @@ class CustomerFixture implements MollieFixtureHandlerInterface
 
         $defaultPaymentMethodId = $this->repoPaymentMethods->searchIds((new Criteria())->setLimit(1), $context)->firstId();
 
-        $firstSaluationId = $this->repoSalutations->searchIds((new Criteria())->setLimit(1), $context)->firstId();
+        $firstSalutationId = $this->repoSalutations->searchIds((new Criteria())->setLimit(1), $context)->firstId();
         $firstCountryId = $this->repoCountries->searchIds((new Criteria())->setLimit(1), $context)->firstId();
         $firstCustomerGroupId = $this->repoCustomerGroups->searchIds((new Criteria())->setLimit(1), $context)->firstId();
 
         $payload = [[
             'id' => self::CYPRESS_CUSTOMER_ID,
             'salesChannelId' => $salesChannelId,
+            'salutationId' => $firstSalutationId,
             'customerNumber' => 'CYPRESS-' . date('YmdHis'),
             'email' => $email,
             'password' => $password,
@@ -103,7 +104,7 @@ class CustomerFixture implements MollieFixtureHandlerInterface
             'defaultShippingAddressId' => $addressId,
             'addresses' => [[
                 'id' => $addressId,
-                'salutationId' => $firstSaluationId,
+                'salutationId' => $firstSalutationId,
                 'company' => 'Mollie B.V.',
                 'firstName' => 'Cypress',
                 'lastName' => 'User',
