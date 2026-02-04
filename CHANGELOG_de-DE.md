@@ -1,4 +1,4 @@
-## [unreleased]
+# 4.22.0
 - Behebung eines falschen Warenkorbpreises bei Apple Pay Direct in Kombination mit Netto-Anzeigepreise bei Kundengruppen. Hier wurden keine Steuern miteinberechnet. 
 - Behebung eines Problems, bei dem in manchen zufälligen Fällen die Kreditkartenfelder nicht funktionieren. (mollie.js defer-sync Laden wurde entfernt).
 - Wenn ein Kunde die Zahlungsart eines Abonnements ändert, werden alle älteren, noch stornierbaren Zahlungen automatisch abgebrochen.
@@ -8,7 +8,7 @@
 - Der „Test API Keys“-Button in den Plugin-Einstellungen wurde für Shopware 6.7 korrigiert.
 - Die Zahlungsstatus-Aktion wurde versionsabhängig angepasst, sodass in älteren Shopware-Versionen wieder die korrekte Action verwendet wird.
 
-## 4.21.0
+# 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.
 - Aktualisiert: Dokumentation zum Endpoint für das Validieren und Erstellen einer Apple-Pay-Zahlungssession korrigiert.

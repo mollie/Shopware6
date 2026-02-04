@@ -58,7 +58,7 @@ context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('C4028: Test Status Open stays Unconfirmed/In progress', () => {
+        it('C4028: Test Status Open stays In progress', () => {
 
             beforeEach(device);
 
@@ -79,15 +79,7 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             adminOrders.assertLatestOrderStatus('Open');
-            let paymentStatus = 'In Progress'
-            /**
-             * In Shopware 6.7 the action DO_PAY was removed, so we use ACTION_PROCESS for bank payments. this action sets status to open in lower than 6.7
-             */
-            if(shopware.isVersionLower('6.7.0.0')){
-                paymentStatus = 'Open'
-            }
-
-            adminOrders.assertLatestPaymentStatus(paymentStatus);
+            adminOrders.assertLatestPaymentStatus('In Progress');
             
         })
 
