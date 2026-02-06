@@ -193,13 +193,16 @@ class SubscriptionControllerBase extends AbstractController
             $client = $this->mollieApiFactory->getClient($salesChannelId);
 
             $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
+            $mandateId = $subscription->mandateId;
 
             try {
                 $subscription = $subscription->cancel();
             } catch (\Exception $ex) {
-                $mandate = $client->mandates->getForId($mollieCustomerId, $subscription->mandateId);
-                $mandate->revoke();
-                $subscription->status = 'cancelled';
+                if ($mandateId !== null) {
+                    $mandate = $client->mandates->getForId($mollieCustomerId, $mandateId);
+                    $mandate->revoke();
+                    $subscription->status = 'cancelled';
+                }
             }
 
             $criteria = new Criteria();
