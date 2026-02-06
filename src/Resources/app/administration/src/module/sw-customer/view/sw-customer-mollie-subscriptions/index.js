@@ -69,15 +69,19 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
             const response = await this.MolliePaymentsSubscriptionService.cancelByMollieId({
                 mollieCustomerId: item.customerId,
                 mollieSubscriptionId: item.id,
+                mandateId: item.mandateId,
                 salesChannelId: this.customer.salesChannelId,
             });
+
             const updatedSubscription = response.subscription;
 
-            this.subscriptions.forEach((subscription, index) => {
-                if (subscription.id === updatedSubscription.id) {
-                    this.subscriptions[index] = updatedSubscription;
-                }
-            });
+            if (updatedSubscription !== undefined) {
+                this.subscriptions.forEach((subscription, index) => {
+                    if (subscription.id === updatedSubscription.id) {
+                        this.subscriptions[index].status = updatedSubscription.status;
+                    }
+                });
+            }
 
             this.isLoading = false;
         },

@@ -131,9 +131,6 @@ class MollieLineItemBuilder
             if (! $itemPrice instanceof CalculatedPrice) {
                 throw new MissingPriceLineItemException((string) $item->getProductId());
             }
-            if ($itemPrice->getTotalPrice() <= 0) {
-                continue;
-            }
 
             $price = $this->priceCalculator->calculateLineItemPrice(
                 $itemPrice,
