@@ -1,3 +1,6 @@
+# 4.22.1
+- Die Verarbeitung von Positionen mit negativen Beträgen wurde behoben.
+
 # 4.22.0
 - Behebung eines falschen Warenkorbpreises bei Apple Pay Direct in Kombination mit Netto-Anzeigepreise bei Kundengruppen. Hier wurden keine Steuern miteinberechnet. 
 - Behebung eines Problems, bei dem in manchen zufälligen Fällen die Kreditkartenfelder nicht funktionieren. (mollie.js defer-sync Laden wurde entfernt).

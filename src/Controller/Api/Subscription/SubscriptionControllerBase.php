@@ -50,12 +50,13 @@ class SubscriptionControllerBase extends AbstractController
      */
     public function __construct(
         SubscriptionManager $subscriptionManager,
-        MollieApiFactory $mollieApiFactory,
-        EntityRepository $customerRepository,
-        EntityRepository $subscriptionRepository,
-        SettingsService $settingsService,
-        LoggerInterface $logger
-    ) {
+        MollieApiFactory    $mollieApiFactory,
+        EntityRepository    $customerRepository,
+        EntityRepository    $subscriptionRepository,
+        SettingsService     $settingsService,
+        LoggerInterface     $logger
+    )
+    {
         $this->subscriptionManager = $subscriptionManager;
         $this->mollieApiFactory = $mollieApiFactory;
         $this->customerRepository = $customerRepository;
@@ -152,7 +153,7 @@ class SubscriptionControllerBase extends AbstractController
 
             $criteria = new Criteria([strtolower($customerId)]);
             $customer = $this->customerRepository->search($criteria, $context)->first();
-            if (! $customer instanceof CustomerEntity) {
+            if (!$customer instanceof CustomerEntity) {
                 throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
             }
             $salesChannelId = $customer->getSalesChannelId();
@@ -193,7 +194,16 @@ class SubscriptionControllerBase extends AbstractController
             $client = $this->mollieApiFactory->getClient($salesChannelId);
 
             $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
-            $subscription = $subscription->cancel();
+
+
+            try{
+                $subscription = $subscription->cancel();
+            }catch (\Exception $ex){
+                $mandate = $client->mandates->getForId($mollieCustomerId,$subscription->mandateId);
+                $mandate->revoke();
+                $subscription->status = 'cancelled';
+            }
+
 
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('mollieId', $mollieSubscriptionId));
