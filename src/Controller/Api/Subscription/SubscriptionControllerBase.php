@@ -183,7 +183,7 @@ class SubscriptionControllerBase extends AbstractController
         }
     }
 
-    public function cancelByMollieId(string $mollieCustomerId, string $mollieSubscriptionId, string $salesChannelId, Context $context): JsonResponse
+    public function cancelByMollieId(string $mollieCustomerId, string $mollieSubscriptionId, string $mandateId, string $salesChannelId, Context $context): JsonResponse
     {
         try {
             $response = [
@@ -192,17 +192,16 @@ class SubscriptionControllerBase extends AbstractController
 
             $client = $this->mollieApiFactory->getClient($salesChannelId);
 
-            $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
-            $mandateId = $subscription->mandateId;
-
             try {
+                $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
                 $subscription = $subscription->cancel();
             } catch (\Exception $ex) {
-                if ($mandateId !== null) {
-                    $mandate = $client->mandates->getForId($mollieCustomerId, $mandateId);
-                    $mandate->revoke();
-                    $subscription->status = 'cancelled';
-                }
+                $mandate = $client->mandates->getForId($mollieCustomerId, $mandateId);
+                $mandate->revoke();
+                $subscription = [
+                    'id' => $mollieSubscriptionId,
+                    'status' => 'canceled',
+                ];
             }
 
             $criteria = new Criteria();
