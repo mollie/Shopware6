@@ -1,3 +1,6 @@
+# Unreleased
+- Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
+
 # 4.22.1
 - Fixed an issue so that line items with negative amounts work again.
 
