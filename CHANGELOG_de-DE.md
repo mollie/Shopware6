@@ -18,6 +18,25 @@
 - Das Event PaymentCreatedEvent wurde eingeführt, damit ist es möglich vor der Weiterleitung zum Zahlungsanbieter noch eigene Logik einzubauen
 - Neues Event ModifyCreateSubscriptionPayloadEvent hinzugefügt. Damit können Entwickler den Payload für die Mollie Subscription API vor dem Erstellen einer Subscription anpassen und erweitern.
 
+
+# Unreleased
+- Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
+# 4.22.1
+- Die Verarbeitung von Positionen mit negativen Beträgen wurde behoben.
+
+# 4.22.0
+- Behebung eines falschen Warenkorbpreises bei Apple Pay Direct in Kombination mit Netto-Anzeigepreise bei Kundengruppen. Hier wurden keine Steuern miteinberechnet. 
+- Behebung eines Problems, bei dem in manchen zufälligen Fällen die Kreditkartenfelder nicht funktionieren. (mollie.js defer-sync Laden wurde entfernt).
+- Wenn ein Kunde die Zahlungsart eines Abonnements ändert, werden alle älteren, noch stornierbaren Zahlungen automatisch abgebrochen.
+- Die Kompatibilität mit dem Plugin „Zusatzoptionen/Garantien“ wurde implementiert.
+- Kunden mit bestehendem Abonnement haben nun eine Übersichtsseite in der Administration zum Kündigen ihrer Abonnements.
+- Die Darstellung der Zahlarten in älteren Shopware-Versionen wurde korrigiert.
+- Der „Test API Keys“-Button in den Plugin-Einstellungen wurde für Shopware 6.7 korrigiert.
+- Die Zahlungsstatus-Aktion wurde versionsabhängig angepasst, sodass in älteren Shopware-Versionen wieder die korrekte Action verwendet wird.
+- iDEAL wurde zu iDEAL | Wero umbenannt.
+
+# 4.21.0
+
 # 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig
 - Behoben: Fehler bei Warenkörben mit unterschiedlichen Steuersätzen und Promotion mit proportionaler Steuerberechnung.

@@ -100,7 +100,7 @@ class ApplePayFormatterTest extends TestCase
 
     private function getSampleCart(): ApplePayCart
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->addItem('123', 'T-Shirt', 3, 10);
         $cart->addItem('333', 'Pants', 1, 25);
         $cart->addShipping('Express', 5);

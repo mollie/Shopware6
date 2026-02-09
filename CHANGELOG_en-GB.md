@@ -18,7 +18,25 @@
 - Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
 - Added new event ModifyCreateSubscriptionPayloadEvent. This allows developers to modify and extend the payload for the Mollie Subscription API before a subscription is created.
 
-## 4.21.0
+
+# Unreleased
+- Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
+
+# 4.22.1
+- Fixed an issue so that line items with negative amounts work again.
+
+# 4.22.0
+- Fixed wrong total amount in Apple Pay Direct when using NET display prices for customer groups. Taxes were not added in this case.
+- Fix a problem where the credit card input fields are sometimes not editable due to race conditions when loading the mollie.js file. (removed defer-async loading).
+- When a customer changes the payment method of a subscription, all older payments that can still be canceled will be automatically canceled.
+- Added support for the “Additional Options/Warranties” plugin.
+- Added an admin overview page allowing existing subscribers to cancel their subscriptions.
+- Fixed the display of payment methods in older Shopware versions.
+- Fixed the “Test API Keys” button in the plugin settings for Shopware 6.7.
+- Adjusted the payment status action based on the Shopware version to ensure compatibility with older versions.
+- iDEAL was renamed to zu iDEAL | Wero.
+
+# 4.21.0
 - Shipping costs are now considered in refunds via Shopware Return Management.
 - Fixed: Issue with carts containing multiple tax rates in combination with a promotion using proportional tax calculation.
 - Updated: Corrected the documentation for the endpoint used to validate and create an Apple Pay payment session.

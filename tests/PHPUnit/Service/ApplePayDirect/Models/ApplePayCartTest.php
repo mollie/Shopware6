@@ -14,7 +14,7 @@ class ApplePayCartTest extends TestCase
      */
     public function testProducts()
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->addItem('123', 'T-Shirt', 3, 10);
         $cart->addItem('456', 'Pants', 1, 20);
 
@@ -31,7 +31,7 @@ class ApplePayCartTest extends TestCase
      */
     public function testTaxes()
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->setTaxes(4.49);
 
         $this->assertEquals('', $cart->getTaxes()->getName());
@@ -45,7 +45,7 @@ class ApplePayCartTest extends TestCase
      */
     public function testShippings()
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->addShipping('My Shipping 1', 3.49);
         $cart->addShipping('My Shipping 2', 1);
 
@@ -62,7 +62,7 @@ class ApplePayCartTest extends TestCase
      */
     public function testProductAmount()
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->addItem('', '', 3, 10);
         $cart->addItem('', '', 1, 20);
 
@@ -75,7 +75,7 @@ class ApplePayCartTest extends TestCase
      */
     public function testShippingAmount()
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->addShipping('My Shipping 1', 3.49);
         $cart->addShipping('My Shipping 2', 1);
 
@@ -88,10 +88,28 @@ class ApplePayCartTest extends TestCase
      */
     public function testTotalAmount()
     {
-        $cart = new ApplePayCart();
+        $cart = new ApplePayCart(true);
         $cart->addItem('', '', 3, 10);
         $cart->addShipping('My Shipping 1', 3.49);
+        $cart->setTaxes(4);
 
         $this->assertEquals(33.49, $cart->getAmount());
+    }
+
+    /**
+     * If the shop is configured to have a customer group with NET display
+     * then our total amount does also need to have the TAX amount added.
+     * In gross display mode, the line items are already including the tax amount.
+     */
+    public function testTotalAmountWithNetDisplay(): void
+    {
+        $cart = new ApplePayCart(false);
+
+        $cart->addItem('', '', 1, 20);
+        $cart->addShipping('My Shipping 1', 5);
+        $cart->setTaxes(4);
+
+        // cart = 20 + 5 + 4 = 29
+        $this->assertEquals(29, $cart->getAmount());
     }
 }

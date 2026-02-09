@@ -226,7 +226,7 @@ class ApplePayDirect
 
         $swCart = $this->cartService->getCalculatedMainCart($context);
 
-        return $this->buildApplePayCart($swCart);
+        return $this->buildApplePayCart($swCart, $context);
     }
 
     /**
@@ -455,9 +455,11 @@ class ApplePayDirect
         return $paymentData->getMollieID();
     }
 
-    private function buildApplePayCart(Cart $cart): ApplePayCart
+    private function buildApplePayCart(Cart $cart, SalesChannelContext $context): ApplePayCart
     {
-        $appleCart = new ApplePayCart();
+        $isDisplayGross = $context->getCurrentCustomerGroup()->getDisplayGross();
+
+        $appleCart = new ApplePayCart($isDisplayGross);
 
         foreach ($cart->getLineItems() as $item) {
             if ($item->getPrice() instanceof CalculatedPrice) {

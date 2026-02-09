@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Handler\Method\BankTransfer;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
@@ -24,23 +25,22 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
      * @var LoggerInterface
      */
     private $logger;
+    private OrderTransactionStateHandler $orderTransactionStateHandler;
 
     public function __construct(
         TransitionServiceInterface $transitionService,
+        OrderTransactionStateHandler $orderTransactionStateHandler,
         LoggerInterface $loggerService
     ) {
         $this->transitionService = $transitionService;
         $this->logger = $loggerService;
+        $this->orderTransactionStateHandler = $orderTransactionStateHandler;
     }
 
     public function processTransaction(OrderTransactionEntity $transaction, Context $context): void
     {
-        $technicalName = ($transaction->getStateMachineState() instanceof StateMachineStateEntity) ? $transaction->getStateMachineState()->getTechnicalName() : '';
-        $defaultState = OrderTransactionStates::STATE_IN_PROGRESS;
-        $action = StateMachineTransitionActions::ACTION_PROCESS;
-        if (defined(StateMachineTransitionActions::ACTION_DO_PAY)) {
-            $action = StateMachineTransitionActions::ACTION_DO_PAY;
-        }
+        $method = 'process';
+
         $paymentMethod = $transaction->getPaymentMethod();
         $isBankTransfer = false;
         if ($paymentMethod === null) {
@@ -50,26 +50,14 @@ class TransactionTransitionService implements TransactionTransitionServiceInterf
         if ($paymentMethod instanceof PaymentMethodEntity) {
             /** @phpstan-ignore-next-line */
             $reflectionClass = new \ReflectionClass($paymentMethod->getHandlerIdentifier());
-
             $isBankTransfer = $reflectionClass->implementsInterface(BankTransfer::class);
         }
+
         if (defined('\Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates::STATE_UNCONFIRMED') && ! $isBankTransfer) {
-            $defaultState = OrderTransactionStates::STATE_UNCONFIRMED;
-            $action = StateMachineTransitionActions::ACTION_PROCESS_UNCONFIRMED;
+            $method = 'processUnconfirmed';
         }
 
-        if ($this->isFinalOrTargetStatus($technicalName, [$defaultState])) {
-            return;
-        }
-
-        $entityId = $transaction->getId();
-        $availableTransitions = $this->getAvailableTransitions($entityId, $context);
-
-        if (! $this->transitionIsAllowed($action, $availableTransitions)) {
-            $this->reOpenTransaction($transaction, $context);
-        }
-
-        $this->performTransition($entityId, $action, $context);
+        $this->orderTransactionStateHandler->{$method}($transaction->getId(), $context);
     }
 
     public function reOpenTransaction(OrderTransactionEntity $transaction, Context $context): void

@@ -41,6 +41,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerGroup\CustomerGroupEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\Country\CountryEntity;
@@ -65,6 +66,10 @@ class ApplePayDirectTest extends TestCase
         $swCart = $this->buildShopwareCart();
 
         $this->scContext = $this->createDummyMock(SalesChannelContext::class, $this);
+
+        $customerGroup = $this->createDummyMock(CustomerGroupEntity::class, $this);
+        $customerGroup->method('getDisplayGross')->willReturn(true);
+        $this->scContext->method('getCurrentCustomerGroup')->willReturn($customerGroup);
 
         $fakeCartService = new FakeCartService($swCart, $this->scContext);
 
