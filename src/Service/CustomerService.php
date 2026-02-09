@@ -722,7 +722,7 @@ class CustomerService implements CustomerServiceInterface
             'additionalAddressLine1' => $address->getStreetAdditional(),
             'zipcode' => $address->getZipCode(),
             'city' => $address->getCity(),
-            'phoneNumber' => '',
+            'phoneNumber' => $address->getPhone(),
             'customFields' => [
                 CustomFieldsInterface::MOLLIE_KEY => [
                     self::CUSTOM_FIELDS_KEY_EXPRESS_ADDRESS_ID => $address->getMollieAddressId(),
