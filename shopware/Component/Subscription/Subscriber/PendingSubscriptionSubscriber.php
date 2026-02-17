@@ -162,7 +162,11 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
 
         $context = $event->getContext();
         $subscription = $this->createSubscription($subscriptionEntity, $order, $currency, $mandateId, $logData, $mollieCustomerId, $context);
-
+        $nextPaymentDate = $subscription->getNextPaymentDate();
+        if (! $nextPaymentDate instanceof \DateTimeInterface) {
+            $this->logger->error('Subscription created without next payment date', $logData);
+            throw new \Exception('Subscription created without next payment date');
+        }
         $newSubscriptionStatus = $subscription->getStatus()->value;
 
         $subscriptionData = [
@@ -171,7 +175,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
             'mollieId' => $subscription->getId(),
             'mollieCustomerId' => $mollieCustomerId,
             'mandateId' => $mandateId,
-            'nextPaymentAt' => $subscription->getNextPaymentDate()->format('Y-m-d'),
+            'nextPaymentAt' => $nextPaymentDate->format('Y-m-d'),
             'canceledAt' => null,
             'historyEntries' => [
                 [
@@ -236,7 +240,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
             return null;
         }
 
-        $subscriptionCollection = $order->getExtension('subscription');
+        $subscriptionCollection = $order->getExtension('mollieSubscriptions');
         if (! $subscriptionCollection instanceof SubscriptionCollection) {
             return null;
         }

@@ -12,13 +12,14 @@ use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
+use Shopware\Core\Framework\Event\FlowEventAware;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class OrderCanceledEvent extends Event implements CustomerAware, OrderAware, MailAware, SalesChannelAware
+class OrderCanceledEvent extends Event implements CustomerAware, OrderAware, MailAware, SalesChannelAware, FlowEventAware
 {
     use JsonSerializableTrait;
 

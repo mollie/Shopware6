@@ -39,6 +39,12 @@ final readonly class PaymentMethodUpdater implements PaymentMethodUpdaterInterfa
 
         $this->logger->info('Change payment method if changed', $logData);
 
+        if ($molliePaymentMethod === PaymentMethod::DIRECT_DEBIT) {
+            $this->logger->debug('Payment method is direct debit, must be subscription renewal', $logData);
+
+            return $paymentMethodExtension->getId();
+        }
+
         if ($shopwarePaymentMethod === $molliePaymentMethod) {
             $this->logger->debug('Payment methods are the same', $logData);
 

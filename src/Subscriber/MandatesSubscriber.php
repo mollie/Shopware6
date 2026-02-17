@@ -41,7 +41,7 @@ class MandatesSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            StorefrontRenderEvent::class => ['addDataToPage', 10],
+            //   StorefrontRenderEvent::class => ['addDataToPage', 10],
         ];
     }
 

@@ -48,7 +48,7 @@ final class Finalize
             'salesChannelId' => $salesChannelId,
         ];
 
-        $this->logger->info('Start - Payment finalize', $logData);
+        $this->logger->info('Finalize Process - Start', $logData);
 
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
@@ -66,7 +66,7 @@ final class Finalize
 
         if ($paymentStatus->isCanceled()) {
             $message = sprintf('Payment for order %s (%s) was cancelled by the customer.', $orderNumber, $payment->getId());
-            $this->logger->warning('Finished - Payment finalize. Payment was cancelled, CancelledEvent fired', $logData);
+            $this->logger->warning('Finalize Process - Finished. Payment was cancelled, CancelledEvent fired', $logData);
 
             $paymentCancelledEvent = new CancelledEvent($payment, $order, $customer, $context);
             $this->eventDispatcher->dispatch($paymentCancelledEvent);
@@ -77,14 +77,14 @@ final class Finalize
         if ($paymentStatus->isFailed()) {
             $message = sprintf('Payment for order %s (%s) is failed', $orderNumber, $payment->getId());
 
-            $this->logger->warning('Finished - Payment finalize. Payment is failed, FailedEvent fired', $logData);
+            $this->logger->warning('Finalize Process - Finished. Payment is failed, FailedEvent fired', $logData);
 
             $paymentFailedEvent = new FailedEvent($payment, $order, $customer, $context);
             $this->eventDispatcher->dispatch($paymentFailedEvent);
 
             throw PaymentException::asyncFinalizeInterrupted($transaction->getOrderTransactionId(), $message);
         }
-        $this->logger->info('Finished - Payment finalize. Payment is successful, SuccessEvent fired', $logData);
+        $this->logger->info('Finalize Process - Finished. Payment is successful, SuccessEvent fired', $logData);
         $paymentSuccessEvent = new SuccessEvent($payment, $order, $customer, $context);
         $this->eventDispatcher->dispatch($paymentSuccessEvent);
     }

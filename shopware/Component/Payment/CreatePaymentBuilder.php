@@ -13,6 +13,7 @@ use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
+use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
@@ -161,7 +162,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         $mollieCustomerExtension = $customer->getExtension(Mollie::EXTENSION);
 
         if ($mollieCustomerExtension instanceof CustomerExtension) {
-            $mollieCustomerId = $mollieCustomerExtension->getForProfileId($profileId);
+            $mollieCustomerId = $mollieCustomerExtension->getForProfileId($profileId, $apiSettings->getMode());
             if ($mollieCustomerId !== null) {
                 $createPaymentStruct->setCustomerId($mollieCustomerId);
             }
@@ -180,7 +181,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
                 $mollieCustomer = $this->mollieGateway->createCustomer($customer, $salesChannelId);
                 $createPaymentStruct->setCustomerId($mollieCustomer->getId());
 
-                $customer = $this->saveCustomerId($customer, $mollieCustomer, $profileId, $context);
+                $customer = $this->saveCustomerId($customer, $mollieCustomer, $profileId, $apiSettings->getMode(), $context);
 
                 $this->logger->info('Mollie customer created and assigned to shopware customer', $logData);
             }
@@ -222,10 +223,10 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         return $createPaymentStruct;
     }
 
-    private function saveCustomerId(CustomerEntity $customerEntity, Customer $mollieCustomer, string $profileId, Context $context): CustomerEntity
+    private function saveCustomerId(CustomerEntity $customerEntity, Customer $mollieCustomer, string $profileId, Mode $mode, Context $context): CustomerEntity
     {
         $customerExtension = new CustomerExtension();
-        $customerExtension->setCustomerId($profileId, $mollieCustomer->getId());
+        $customerExtension->setCustomerId($profileId, $mode, $mollieCustomer->getId());
         $customerEntity->addExtension(Mollie::EXTENSION, $customerExtension);
 
         $customerCustomFields = $customerEntity->getCustomFields() ?? [];

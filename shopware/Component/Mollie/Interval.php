@@ -14,6 +14,14 @@ final class Interval implements \Stringable
         return $this->intervalValue . ' ' . $this->intervalUnit->value;
     }
 
+    public static function fromString(string $interval): self
+    {
+        $intervalValues = explode(' ', $interval);
+        $intervalUnit = str_replace('ss','s',$intervalValues[1] . 's');
+
+        return new self((int) $intervalValues[0], IntervalUnit::from($intervalUnit));
+    }
+
     public function getIntervalValue(): int
     {
         return $this->intervalValue;

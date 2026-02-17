@@ -38,6 +38,7 @@ class SubscriptionMetadataTest extends TestCase
             'interval_value' => 1,
             'interval_unit' => IntervalType::MONTHS,
             'times' => 5,
+            'nextPossiblePaymentDate' => '',
             'tmp_transaction' => 'tr_123',
         ];
         static::assertSame($expected, $meta->toArray());

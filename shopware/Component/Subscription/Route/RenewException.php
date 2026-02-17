@@ -3,29 +3,16 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Route;
 
-use Shopware\Core\Framework\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 
-final class RenewException extends HttpException
+final class RenewException extends SubscriptionException
 {
-    public const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
     public const INVALID_PAYMENT_ID = 'INVALID_PAYMENT_ID';
     public const SUBSCRIPTION_WITHOUT_ORDER = 'SUBSCRIPTION_WITHOUT_ORDER';
     public const SUBSCRIPTIONS_DISABLED = 'SUBSCRIPTIONS_DISABLED';
     public const SUBSCRIPTION_WITHOUT_ADDRESS = 'SUBSCRIPTION_WITHOUT_ADDRESS';
     public const ORDER_WITHOUT_DELIVERIES = 'ORDER_WITHOUT_DELIVERIES';
     public const SUBSCRIPTION_WITHOUT_CUSTOMER = 'SUBSCRIPTION_WITHOUT_CUSTOMER';
-
-    public static function subscriptionNotFound(string $subscriptionId): self
-    {
-        return new self(
-            Response::HTTP_BAD_REQUEST,
-            self::SUBSCRIPTION_NOT_FOUND,
-            'Subscription not found: {{subscriptionId}}',[
-                'subscriptionId' => $subscriptionId,
-            ]
-        );
-    }
 
     public static function subscriptionWithoutOrder(string $subscriptionId): self
     {

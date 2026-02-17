@@ -12,12 +12,13 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
+use Shopware\Core\Framework\Event\FlowEventAware;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, MailAware, SalesChannelAware
+class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, MailAware, SalesChannelAware, FlowEventAware
 {
     public function __construct(private Payment $payment, private OrderEntity $order, private Context $context)
     {

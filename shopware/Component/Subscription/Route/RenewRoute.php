@@ -19,6 +19,7 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionEndedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
+use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -44,7 +45,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
+#[Route(defaults: ['_routeScope' => ['api']])]
 final class RenewRoute extends AbstractRenewRoute
 {
     /**
@@ -67,6 +68,7 @@ final class RenewRoute extends AbstractRenewRoute
         private readonly AbstractCartOrderRoute $cartOrderRoute,
         #[Autowire(service: PaymentWebhookRoute::class)]
         private readonly AbstractPaymentWebhookRoute $paymentWebhookRoute,
+        private readonly SubscriptionActionHandler $subscriptionActionHandler,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -79,7 +81,7 @@ final class RenewRoute extends AbstractRenewRoute
         throw new DecorationPatternException(self::class);
     }
 
-    #[Route(path: '/api/mollie/webhook/subscription/{subscriptionId}/renew', name: 'api.mollie.webhook_subscription_renew', methods: ['GET', 'POST'])]
+    #[Route(path: '/api/mollie/webhook/subscription/{subscriptionId}/renew', name: 'api.mollie.webhook.subscription.renew', methods: ['GET', 'POST'])]
     public function renew(string $subscriptionId, Request $request, Context $context): WebhookResponse
     {
         $subscriptionId = strtolower($subscriptionId);
@@ -93,7 +95,7 @@ final class RenewRoute extends AbstractRenewRoute
             ]
         ];
 
-        $this->logger->info('Subscription renew started', $logData);
+        $this->logger->debug('Subscription renew requested', $logData);
 
         if (strlen($molliePaymentId) === 0) {
             $this->logger->error('Subscription renew was triggered without required data', $logData);
@@ -123,6 +125,9 @@ final class RenewRoute extends AbstractRenewRoute
             $this->logger->error('Subscription without order loaded', $logData);
             throw RenewException::subscriptionWithoutOrder($subscriptionId);
         }
+        $orderNumber = (string) $order->getOrderNumber();
+        $logData['orderNumber'] = $orderNumber;
+
         $customer = $order->getOrderCustomer()?->getCustomer();
         if (! $customer instanceof CustomerEntity) {
             $this->logger->error('Subscription order has no customer', $logData);
@@ -139,21 +144,21 @@ final class RenewRoute extends AbstractRenewRoute
             throw RenewException::subscriptionWithoutAddress($subscriptionId);
         }
 
-        $salesChannelId = $order->getSalesChannelId();
-        $orderNumber = (string) $order->getOrderNumber();
+        $salesChannelId = $subscriptionEntity->getSalesChannelId();
         $mollieCustomerId = $subscriptionEntity->getMollieCustomerId();
         $mollieSubscriptionId = $subscriptionEntity->getMollieId();
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
+        $shopwareSubscriptionStatus = SubscriptionStatus::from($subscriptionEntity->getStatus());
 
-        $logData['orderNumber'] = $orderNumber;
         $logData['salesChannelId'] = $salesChannelId;
         $logData['mollieCustomerId'] = $mollieCustomerId;
         $logData['mollieSubscriptionId'] = $mollieSubscriptionId;
+        $logData['shopwareSubscriptionStatus'] = $shopwareSubscriptionStatus;
         if (! $subscriptionSettings->isEnabled()) {
             $this->logger->error('Subscription renew not possible, subscriptions are disabled for this sales channel', $logData);
             throw RenewException::subscriptionsDisabled($subscriptionId, $salesChannelId);
         }
-
+        $this->logger->info('Subscription renew - Start', $logData);
         $subscription = $this->subscriptionGateway->getSubscription($mollieSubscriptionId, $mollieCustomerId, $orderNumber, $salesChannelId);
         $molliePayment = $this->mollieGateway->getPayment($molliePaymentId, $orderNumber, $salesChannelId);
         $environmentSettings = $this->settingsService->getEnvironmentSettings();
@@ -169,15 +174,15 @@ final class RenewRoute extends AbstractRenewRoute
 
         $subscriptionHistories = [];
 
-        if ($subscription->getStatus() === SubscriptionStatus::SKIPPED) {
-            $this->logger->info('Subscription was skipped, changed to resumed', $logData);
+        if ($shopwareSubscriptionStatus->isInterrupted()) {
+            $this->logger->info('Subscription was skipped or paused, changed to resumed', $logData);
             $subscriptionHistories[] = [
-                'statusFrom' => $subscription->getStatus()->value,
+                'statusFrom' => $shopwareSubscriptionStatus->value,
                 'statusTo' => SubscriptionStatus::RESUMED->value,
                 'mollieId' => $subscription->getId(),
                 'comment' => 'resumed'
             ];
-            $subscription->setStatus(SubscriptionStatus::RESUMED);
+            $shopwareSubscriptionStatus = SubscriptionStatus::RESUMED;
         }
 
         $metaData = $subscriptionEntity->getMetadata();
@@ -190,9 +195,9 @@ final class RenewRoute extends AbstractRenewRoute
 
         $this->logger->info('Start to copy old order', $logData);
         $newOrder = $this->copyOrder($order, $context);
-        $logData['oldOrderNumber'] = $orderNumber;
+
         $orderNumber = (string) $newOrder->getOrderNumber();
-        $logData['orderNumber'] = $orderNumber;
+        $logData['newOrderNumber'] = $orderNumber;
 
         $this->logger->info('New order was created', $logData);
 
@@ -206,13 +211,16 @@ final class RenewRoute extends AbstractRenewRoute
         if (! $orderDeliveries instanceof OrderDeliveryCollection) {
             throw RenewException::orderWithoutDeliveries($subscriptionId, $orderNumber);
         }
+        $today = new \DateTime();
+        $nextPaymentDate = $subscription->getNextPaymentDate() ?? $today;
+        $nextPaymentDate = max($nextPaymentDate, $today);
 
         $orderData = $this->getOrderData($subscriptionId, $newOrder, $orderDeliveries, $firstTransaction, $subscriptionBillingAddress, $subscriptionShippingAddress, $molliePayment);
 
         $this->orderRepository->upsert([$orderData], $context);
 
         $subscriptionHistories[] = [
-            'statusFrom' => $subscription->getStatus()->value,
+            'statusFrom' => $shopwareSubscriptionStatus->value,
             'statusTo' => SubscriptionStatus::ACTIVE->value,
             'mollieId' => $subscription->getId(),
             'comment' => 'renewed'
@@ -222,11 +230,9 @@ final class RenewRoute extends AbstractRenewRoute
             'id' => $subscriptionId,
             'metaData' => $metaDataArray,
             'mandateId' => (string) $molliePayment->getMandateId(),
-            'nextPaymentAt' => $subscription->getNextPaymentDate()->format('Y-m-d'),
+            'nextPaymentAt' => $nextPaymentDate->format('Y-m-d'),
             'historyEntries' => $subscriptionHistories
         ]], $context);
-
-        $this->logger->info('Subscription renew finished', $logData);
 
         $renewEvent = new SubscriptionRenewedEvent($subscriptionEntity, $customer, $context);
         $this->eventDispatcher->dispatch($renewEvent);
@@ -236,6 +242,20 @@ final class RenewRoute extends AbstractRenewRoute
             $endedEvent = new SubscriptionEndedEvent($subscriptionEntity, $customer, $context);
             $this->eventDispatcher->dispatch($endedEvent);
         }
+
+        $afterRenewalAction = $shopwareSubscriptionStatus->getAction();
+
+        if ($afterRenewalAction !== null) {
+            try {
+                $this->logger->info('Subscription was cancelled after renewal, changed to cancelled', $logData);
+                $this->subscriptionActionHandler->handle($afterRenewalAction, $subscriptionId, $context);
+            } catch (\Throwable $exception) {
+                $logData['message'] = $exception->getMessage();
+                $this->logger->error('Failed to execute after renewal action: ' . $afterRenewalAction, $logData);
+            }
+        }
+
+        $this->logger->info('Subscription renew - Finished, call Webhook', $logData);
 
         return $this->paymentWebhookRoute->notify($firstTransaction->getId(), $context);
     }
