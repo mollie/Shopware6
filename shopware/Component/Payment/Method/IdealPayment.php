@@ -16,6 +16,6 @@ final class IdealPayment extends AbstractMolliePaymentHandler implements Subscri
 
     public function getName(): string
     {
-        return 'iDEAL';
+        return 'iDEAL | Wero';
     }
 }
