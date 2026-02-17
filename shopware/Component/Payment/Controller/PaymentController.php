@@ -48,26 +48,31 @@ final class PaymentController extends StorefrontController
             'transactionId' => $transactionId,
             'salesChannelId' => $salesChannelId,
         ];
-        $this->logger->info('Returning from Payment Provider', $logData);
+        $this->logger->debug('Returning from Payment Provider', $logData);
         $response = $this->returnRoute->return($transactionId, $salesChannelContext->getContext());
         $paymentStatus = $response->getPaymentStatus();
         $payment = $response->getPayment();
 
         $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
+
         $logData['paymentStatus'] = $paymentStatus->value;
         $logData['paymentId'] = $payment->getId();
+
         $orderTransaction = $payment->getShopwareTransaction();
         $shopwareOrder = $orderTransaction->getOrder();
+        if ($shopwareOrder instanceof OrderEntity) {
+            $logData['orderNumber'] = (string) $shopwareOrder->getOrderNumber();
 
-        if ($shopwareOrder instanceof OrderEntity && $paymentStatus->isFailed() && ! $paymentSettings->isShopwareFailedPayment()) {
-            $paymentFailedEvent = new PaymentPageFailedEvent(
-                $transactionId,
-                $shopwareOrder,
-                $payment,
-                $salesChannelContext
-            );
-            $this->logger->info('Payment failed, send PaymentPageFailedEvent in mollie failure mode', $logData);
-            $this->eventDispatcher->dispatch($paymentFailedEvent);
+            if ($paymentStatus->isFailed() && ! $paymentSettings->isShopwareFailedPayment()) {
+                $paymentFailedEvent = new PaymentPageFailedEvent(
+                    $transactionId,
+                    $shopwareOrder,
+                    $payment,
+                    $salesChannelContext
+                );
+                $this->logger->info('Payment failed, send PaymentPageFailedEvent in mollie failure mode', $logData);
+                $this->eventDispatcher->dispatch($paymentFailedEvent);
+            }
         }
 
         $query = (string) parse_url($response->getFinalizeUrl(), PHP_URL_QUERY);
@@ -83,7 +88,7 @@ final class PaymentController extends StorefrontController
     public function webhook(string $transactionId, Context $context): Response
     {
         try {
-            $this->logger->info('Webhook received', [
+            $this->logger->debug('Webhook received', [
                 'transactionId' => $transactionId,
             ]);
             $response = $this->webhookRoute->notify($transactionId, $context);

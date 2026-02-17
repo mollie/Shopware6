@@ -58,14 +58,18 @@ final class WebhookRoute extends AbstractWebhookRoute
         $logData = [
             'transactionId' => $transactionId,
         ];
-        $this->logger->info('Webhook route opened', $logData);
+        $this->logger->debug('Webhook Process - Requested', $logData);
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $shopwareOrder = $payment->getShopwareTransaction()->getOrder();
         if ($shopwareOrder === null) {
+            $this->logger->error('Webhook Process Failed - Order not found');
             throw WebhookException::transactionWithoutOrder($transactionId);
         }
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
+        $logData['orderNumber'] = $orderNumber;
+
+        $this->logger->info('Webhook Process - Start', $logData);
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
 
@@ -77,6 +81,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
         $webhookStatusEvent = new $webhookStatusEventClass($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookStatusEvent);
+        $this->logger->info('Webhook Process - Finished', $logData);
 
         return new WebhookResponse($payment);
     }

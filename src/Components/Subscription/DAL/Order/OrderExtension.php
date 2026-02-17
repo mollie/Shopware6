@@ -18,7 +18,7 @@ final class OrderExtension extends EntityExtension
 
     public function extendFields(FieldCollection $collection): void
     {
-        $collection->add(new OneToManyAssociationField('subscription', SubscriptionDefinition::class, 'order_id'));
+        $collection->add(new OneToManyAssociationField('mollieSubscriptions', SubscriptionDefinition::class, 'order_id'));
     }
 
     public function getEntityName(): string

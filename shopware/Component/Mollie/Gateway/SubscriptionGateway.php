@@ -42,7 +42,7 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
 
             return Subscription::createFromClientResponse($body);
         } catch (ClientException $exception) {
-            throw $this->convertException($exception);
+            throw $this->convertException($exception, $orderNumber);
         }
     }
 
@@ -62,7 +62,79 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
 
             return Subscription::createFromClientResponse($body);
         } catch (ClientException $exception) {
-            throw $this->convertException($exception);
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function copySubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
+    {
+        try {
+            $createSubscription = new CreateSubscription($mollieSubscription->getDescription(), $mollieSubscription->getInterval(), $mollieSubscription->getAmount());
+
+            $createSubscription->setStartDate($mollieSubscription->getStartDate()->format('Y-m-d'));
+            $createSubscription->setWebhookUrl($mollieSubscription->getWebhookUrl());
+            $createSubscription->setMetadata($mollieSubscription->getMetadata());
+            $createSubscription->setMandateId($mollieSubscription->getMandateId());
+
+            if ($mollieSubscription->getTimesRemaining() !== null) {
+                $createSubscription->setTimes($mollieSubscription->getTimesRemaining());
+            }
+            $this->logger->info('Subscription copied', [
+                'requestParameter' => $createSubscription->toArray(),
+                'customerId' => $customerId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return $this->createSubscription($createSubscription, $customerId, $orderNumber, $salesChannelId);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function cancelSubscription(string $mollieSubscriptionId, string $customerId, string $orderNumber, string $salesChannelId): Subscription
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $response = $client->delete('customers/' . $customerId . '/subscriptions/' . $mollieSubscriptionId);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Subscription cancelled over mollie api', [
+                'responseParameter' => $body,
+                'customerId' => $customerId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Subscription::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function updateSubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $mollieSubscriptionId = $mollieSubscription->getId();
+
+            $response = $client->patch('customers/' . $customerId . '/subscriptions/' . $mollieSubscriptionId, [
+                'form_params' => $mollieSubscription->toArray()
+            ]);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            $this->logger->info('Subscription updated over mollie api', [
+                'responseParameter' => $body,
+                'customerId' => $customerId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Subscription::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
         }
     }
 }

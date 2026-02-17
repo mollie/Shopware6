@@ -78,7 +78,7 @@ final class ListMandatesRoute extends AbstractListMandatesRoute
         $apiSettings = $this->settings->getApiSettings($salesChannelId);
         $mollieProfileId = $apiSettings->getProfileId();
         $logData['profileId'] = $mollieProfileId;
-        $mollieCustomerId = $customerExtension->getForProfileId($mollieProfileId);
+        $mollieCustomerId = $customerExtension->getForProfileId($mollieProfileId,$apiSettings->getMode());
         if ($mollieCustomerId === null) {
             $this->logger->debug('Mollie Customer ID not found for Mollie Profile', $logData);
 

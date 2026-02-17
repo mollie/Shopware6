@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Transaction\Fake;
 
+use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
@@ -116,7 +117,7 @@ final class FakeTransactionService implements TransactionServiceInterface
         if (count($this->mollieCustomerIds) > 0) {
             $customerExtension = new Customer();
             foreach ($this->mollieCustomerIds as $profileId => $mollieCustomerId) {
-                $customerExtension->setCustomerId($profileId, $mollieCustomerId);
+                $customerExtension->setCustomerId($profileId, Mode::TEST, $mollieCustomerId);
             }
             $customer->addExtension(Mollie::EXTENSION, $customerExtension);
         }

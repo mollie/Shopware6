@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Payment\CancelledEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,8 +23,10 @@ final class BusinessEventSubscriber implements EventSubscriberInterface
         CancelledEvent::class,
     ];
 
-    public function __construct(private BusinessEventCollector $businessEventCollector)
-    {
+    public function __construct(
+        private readonly BusinessEventCollector $businessEventCollector,
+        private readonly SubscriptionActionHandler $subscriptionActionHandler,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -38,6 +41,7 @@ final class BusinessEventSubscriber implements EventSubscriberInterface
         $collection = $eventCollectorEvent->getCollection();
         $flowEventList = $this->flowEventList;
         $flowEventList = array_merge($flowEventList, PaymentStatus::getAllWebhookEvents());
+        $flowEventList = array_merge($flowEventList, $this->subscriptionActionHandler->getActionEvents());
 
         foreach ($flowEventList as $className) {
             $definition = $this->businessEventCollector->define($className);
