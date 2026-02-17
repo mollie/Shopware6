@@ -4,61 +4,6 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api.action.mollie.subscription.cancel" path="/api/_action/mollie/subscriptions/cancel" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::cancel</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.cancel_legacy" path="/api/v{version}/_action/mollie/subscriptions/cancel" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::cancelLegacy</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.pause" path="/api/_action/mollie/subscriptions/pause" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::pause</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.pause_legacy" path="/api/v{version}/_action/mollie/subscriptions/pause" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::pauseLegacy</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.resume" path="/api/_action/mollie/subscriptions/resume" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::resume</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.resume_legacy" path="/api/v{version}/_action/mollie/subscriptions/resume" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::resumeLegacy</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.skip" path="/api/_action/mollie/subscriptions/skip" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::skip</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.subscription.skip_legacy" path="/api/v{version}/_action/mollie/subscriptions/skip" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase::skipLegacy</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
 
 
     <route id="api.action.mollie.subscription.list" path="/api/_action/mollie/subscriptions/{customerId}" methods="GET">

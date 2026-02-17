@@ -44,7 +44,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         throw new DecorationPatternException(self::class);
     }
 
-    #[Route(path: '/api/mollie/webhook/subscription/{subscriptionId}', name: 'api.mollie.webhook_subscription', methods: ['GET', 'POST'])]
+    #[Route(path: '/api/mollie/webhook/subscription/{subscriptionId}', name: 'api.mollie.webhook.subscription', methods: ['GET', 'POST'])]
     public function notify(string $subscriptionId, Request $request, Context $context): WebhookResponse
     {
         $molliePaymentId = $request->get('id');
