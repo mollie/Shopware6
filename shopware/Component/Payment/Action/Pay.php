@@ -74,7 +74,7 @@ final class Pay
             'transactionId' => $transactionId,
         ];
 
-        $this->logger->info('Start - Mollie payment', $logData);
+        $this->logger->info('Payment Process - Start', $logData);
 
         $createPaymentStruct = $this->createPaymentBuilder->build($transactionDataStruct, $paymentHandler, $dataBag, $context);
 
@@ -115,7 +115,7 @@ final class Pay
         $this->eventDispatcher->dispatch($paymentCreatedEvent);
 
         $logData['redirectUrl'] = $redirectUrl;
-        $this->logger->info('Finished - Mollie payment, redirecting', $logData);
+        $this->logger->info('Payment Process - Finished, redirecting customer to URL', $logData);
 
         return new RedirectResponse($redirectUrl);
     }

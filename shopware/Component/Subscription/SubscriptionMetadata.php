@@ -12,7 +12,8 @@ final class SubscriptionMetadata
         private int $intervalValue,
         private IntervalUnit $intervalUnit,
         private int $times = 0,
-        private string $tmpTransactionId = '')
+        private string $tmpTransactionId = '',
+        private string $nextPossiblePaymentDate = '')
     {
     }
 
@@ -26,13 +27,15 @@ final class SubscriptionMetadata
         $intervalUnit = IntervalUnit::from($metadata['interval_unit'] ?? '');
         $times = $metadata['times'] ?? 0;
         $tmpTransactionId = $metadata['tmp_transaction'] ?? '';
+        $nextPossiblePaymentDate = $metadata['nextPossiblePaymentDate'] ?? '';
 
         return new SubscriptionMetadata(
             $startDate,
             $intervalValue,
             $intervalUnit,
             $times,
-            $tmpTransactionId
+            $tmpTransactionId,
+            $nextPossiblePaymentDate
         );
     }
 
@@ -51,6 +54,7 @@ final class SubscriptionMetadata
             'interval_value' => $this->intervalValue,
             'interval_unit' => $this->intervalUnit->value,
             'times' => $this->times,
+            'nextPossiblePaymentDate' => $this->nextPossiblePaymentDate,
         ];
 
         if (strlen($this->tmpTransactionId) > 0) {
@@ -88,5 +92,23 @@ final class SubscriptionMetadata
     public function setTmpTransaction(string $tmpTransaction): void
     {
         $this->tmpTransactionId = $tmpTransaction;
+    }
+
+    public function setNextPossiblePaymentDate(string $nextPossiblePaymentDate): void
+    {
+        $this->nextPossiblePaymentDate = $nextPossiblePaymentDate;
+    }
+
+    public function getNextPossiblePaymentDate(): \DateTimeInterface
+    {
+        if ($this->nextPossiblePaymentDate === '') {
+            return new \DateTime();
+        }
+        $nextPossiblePaymentDate = \DateTime::createFromFormat('Y-m-d', $this->nextPossiblePaymentDate);
+        if (! $nextPossiblePaymentDate instanceof \DateTimeInterface) {
+            throw new \RuntimeException('Invalid next possible payment date format: ' . $this->nextPossiblePaymentDate);
+        }
+
+        return $nextPossiblePaymentDate;
     }
 }
