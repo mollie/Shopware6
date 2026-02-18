@@ -83,7 +83,6 @@ class MailTemplateInstaller
 
         $subscription = new SubscriptionEntity();
         $subscription->setDescription('1x Sample Product (Order #1233, 24.99 EUR)');
-        $subscription->setQuantity(1);
         $subscription->setAmount(24.99);
         $subscription->setCurrency($currencyEntity);
         $subscription->setMollieCustomerId('cst_123456');

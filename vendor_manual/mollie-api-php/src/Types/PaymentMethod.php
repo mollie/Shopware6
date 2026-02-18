@@ -50,11 +50,6 @@ class PaymentMethod
     public const BITCOIN = "bitcoin";
 
     /**
-     * @link https://www.mollie.com/en/payments/bizum
-     */
-    public const BIZUM = "bizum";
-
-    /**
      * @link https://www.mollie.com/en/payments/blik
      */
     public const BLIK = "blik";

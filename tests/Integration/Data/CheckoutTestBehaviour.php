@@ -1,14 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Data;
+namespace Mollie\Shopware\Integration\Data;
 
-use Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase;
+use Mollie\Shopware\Component\Payment\Controller\PaymentController;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\Controller\PaymentController;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -21,7 +20,6 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CartLineItemController;
 use Shopware\Storefront\Controller\CheckoutController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
@@ -76,6 +74,7 @@ trait CheckoutTestBehaviour
         $requestDataBag->set('tos', true);
 
         $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
+
         /** @var FlashBag $flashBag */
         $flashBag = $request->getSession()->getBag('flashes');
         $flashBagData = $flashBag->peekAll();
@@ -103,24 +102,16 @@ trait CheckoutTestBehaviour
     {
         $matches = [];
         preg_match('/mollie\/payment\/(?<paymentId>.*)/m', $paymentUrl, $matches);
-        $paymentId = $matches['paymentId'];
+        $paymentId = $matches['paymentId'] ?? null;
 
-        $returnController = $this->getContainer()->get(ReturnControllerBase::class);
-        /** @var RedirectResponse $response */
-        $response = $returnController->payment($salesChannelContext, $paymentId);
-        $redirectLocation = $response->getTargetUrl();
-        Assert::assertSame(302, $response->getStatusCode());
-        Assert::assertStringContainsString('payment/finalize-transaction', $redirectLocation);
+        if ($paymentId === null) {
+            throw new \Exception('Failed to find Payment ID in ' . $paymentUrl);
+        }
 
-        $queryString = parse_url($redirectLocation, PHP_URL_QUERY);
-        $urlParameters = [];
-        parse_str($queryString, $urlParameters);
+        /** @var PaymentController $returnController */
+        $returnController = $this->getContainer()->get(PaymentController::class);
 
-        $request = $this->createStoreFrontRequest($salesChannelContext);
-        $request->request->set('_sw_payment_token', $urlParameters['_sw_payment_token']);
-        $paymentController = $this->getContainer()->get(PaymentController::class);
-
-        return $paymentController->finalizeTransaction($request);
+        return $returnController->return($paymentId, $salesChannelContext);
     }
 
     public function getOrderById(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
@@ -129,9 +120,16 @@ trait CheckoutTestBehaviour
         $repository = $this->getContainer()->get('order.repository');
         $criteria = (new Criteria([$orderId]));
         $criteria->addAssociation('transactions.stateMachineState');
-
+        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.stateMachineState');
         $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt'));
+        $criteria->addAssociation('lineItems.product');
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('deliveries.positions');
+        $criteria->addAssociation('deliveries.shippingCosts');
 
-        return $repository->search($criteria, $salesChannelContext->getContext())->first();
+        $searchResult = $repository->search($criteria, $salesChannelContext->getContext());
+
+        return $searchResult->first();
     }
 }

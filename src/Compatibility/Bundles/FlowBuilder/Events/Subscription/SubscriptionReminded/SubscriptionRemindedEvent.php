@@ -8,11 +8,11 @@ use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionE
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
+use Shopware\Core\Framework\Event\FlowEventAware;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
@@ -20,7 +20,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesChannelAware, MailAware, BusinessEventInterface
+class SubscriptionRemindedEvent extends Event implements CustomerAware, SalesChannelAware, MailAware, FlowEventAware
 {
     use JsonSerializableTrait;
 

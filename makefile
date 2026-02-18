@@ -33,22 +33,20 @@ help:
 
 prod: ##1 Installs all production dependencies
 	# ----------------------------------------------------------------
-	@composer validate
-	@composer install --no-dev
+	composer validate
+	composer install --no-dev
 	npm install --omit=dev
 	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
-	@composer validate
+	composer validate
 	COMPOSER_NO_SECURITY_BLOCKING=1 composer update --ignore-platform-req=ext-amqp
 	npm install
 	chmod a+x node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
 
-install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
-	@make prod -B
 
 clean: ##1 Cleans all dependencies and files
 	rm -rf vendor/*
@@ -56,16 +54,16 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf .reports | true
 	# ------------------------------------------------------
 	rm -rf ./node_modules/*
+	rm -rf config-*
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	# ------------------------------------------------------
-	rm -rf ./src/Resources/public/administration
-	rm -rf ./src/Resources/public/mollie-payments.js
+
 
 build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
 	sudo apt-get update --allow-releaseinfo-change -y
+	sudo apt-get install zip
 	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
 	# CUSTOM WEBPACK
 	cd ./src/Resources/app/storefront && make build -B
@@ -88,7 +86,7 @@ endif
 
 fixtures: ##2 Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console --no-debug cache:clear
-	cd ../../.. && php bin/console --no-debug mollie:fixtures:install
+	cd ../../.. && php bin/console --no-debug mollie:fixtures:load
 
 pr: ##2 Prepares everything for a Pull Request
 	# -----------------------------------------------------------------
@@ -122,14 +120,15 @@ phpcheck: ##3 Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
 phpmin: ##3 Starts the PHP compatibility checks
-	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.0 ./src ./shopware
+	echo "PHPCompatibility is in alpha right now and has issues with enums"
+	#@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.2 ./src ./shopware
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
+	php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
 endif
 ifeq ($(mode), fix)
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
+	php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
 endif
 
 stan: ##3 Starts the PHPStan Analyser
@@ -182,8 +181,8 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
-IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
-IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
+IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' 'MolliePayments/package.json' 'MolliePayments/package-lock.json' 'MolliePayments/composer.lock'
+IGNORED_FINAL = $(IGNORED)  '*/tests*' 'MolliePayments/config/*' '*/makefile'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 ifneq (,$(findstring v12,$(NODE_VERSION)))
@@ -195,12 +194,11 @@ endif
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
 	make clean -B
-	make dev -B
-	make build -B
+	cd src/Resources/app/administration && npm install
+	cd src/Resources/app/storefront && npm install
+	make build use67=true -B
 	# -------------------------------------------------------------------------------------------------
 	@echo "INSTALL PRODUCTION DEPENDENCIES"
-	make prod -B
-	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# DELETE distribution file. that ones not compatible between 6.5 and 6.4
 	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
 	# in our plugin configuration! (use shopware standard js)
