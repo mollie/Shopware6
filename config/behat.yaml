@@ -4,7 +4,8 @@ default:
       paths:
         features: '%paths.base%/../tests/Behat/Features'
       contexts:
-        - Mollie\Shopware\Behat\BootstrapContext
-        - Mollie\Shopware\Behat\PaymentContext
-        - Mollie\Shopware\Behat\CustomerContext
-        - Mollie\Shopware\Behat\CheckoutContext
+        - Mollie\Shopware\Behat\Context\BootstrapContext
+        - Mollie\Shopware\Behat\Context\PaymentContext
+        - Mollie\Shopware\Behat\Context\CustomerContext
+        - Mollie\Shopware\Behat\Context\CheckoutContext
+        - Mollie\Shopware\Behat\Context\SubscriptionContext
