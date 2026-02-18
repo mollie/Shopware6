@@ -83,7 +83,7 @@ class OrderTransactionRepositoryTest extends TestCase
             $salesChannelContext = $this->getDefaultSalesChannelContext();
         }
 
-        $customerId = $this->loginOrCreateAccount('cypress@mollie.com', $salesChannelContext);
+        $customerId = $this->getUserIdByEmail('cypress@mollie.com', $salesChannelContext);
 
         return $this->getDefaultSalesChannelContext(options: [
             SalesChannelContextService::CUSTOMER_ID => $customerId

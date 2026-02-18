@@ -16,7 +16,7 @@ trait CustomerTestBehaviour
     use SalesChannelTestBehaviour;
     use RequestTestBehaviour;
 
-    public function loginOrCreateAccount(string $email, SalesChannelContext $salesChannelContext): string
+    public function getUserIdByEmail(string $email, SalesChannelContext $salesChannelContext): string
     {
         /** @var EntityRepository $repository */
         $repository = $this->getContainer()->get('customer.repository');

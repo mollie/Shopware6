@@ -53,7 +53,7 @@
         "psr-4": {
             "Mollie\\Shopware\\Unit\\": "tests/Unit/",
             "Mollie\\Shopware\\Integration\\": "tests/Integration/",
-            "Mollie\\Shopware\\Behat\\": "tests/Behat/Context/",
+            "Mollie\\Shopware\\Behat\\": "tests/Behat/",
             "MolliePayments\\Shopware\\Tests\\": "tests/PHPUnit/",
             "MolliePayments\\Shopware\\PHPStan\\": "tests/PHPStan/"
         }
