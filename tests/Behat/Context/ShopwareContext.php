@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Behat;
+namespace Mollie\Shopware\Behat\Context;
 
 use Behat\Behat\Context\Context;
 use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
