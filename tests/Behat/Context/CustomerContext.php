@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Behat;
+namespace Mollie\Shopware\Behat\Context;
 
 use Behat\Step\Given;
 use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
@@ -14,7 +14,7 @@ final class CustomerContext extends ShopwareContext
     #[Given('iam logged in as user :arg1')]
     public function iamLoggedInAsUser(string $email): void
     {
-        $customerId = $this->loginOrCreateAccount($email, $this->getCurrentSalesChannelContext());
+        $customerId = $this->getUserIdByEmail($email, $this->getCurrentSalesChannelContext());
         $this->setOptions(SalesChannelContextService::CUSTOMER_ID,$customerId);
     }
 
