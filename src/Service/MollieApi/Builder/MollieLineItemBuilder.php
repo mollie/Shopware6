@@ -121,7 +121,7 @@ class MollieLineItemBuilder
 
         $ignoreTypes = [
             self::LINE_ITEM_REPERTUS_SET,
-            self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS,
+            self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS,
         ];
 
         foreach ($lineItems as $item) {
@@ -188,7 +188,7 @@ class MollieLineItemBuilder
         foreach ($lineItems as $lineItem) {
             if ($lineItem->getType() === self::LINE_ITEM_DREISEC_SET) {
                 foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
-                    if (stristr($nest->getType(), self::LINE_ITEM_DREISEC_SET) !== false) {
+                    if (stristr((string)$nest->getType(), self::LINE_ITEM_DREISEC_SET) !== false) {
                         $flat[] = $nest;
                     }
                 }
