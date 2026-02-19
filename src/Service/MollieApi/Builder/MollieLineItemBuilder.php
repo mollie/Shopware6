@@ -188,7 +188,7 @@ class MollieLineItemBuilder
         foreach ($lineItems as $lineItem) {
             if ($lineItem->getType() === self::LINE_ITEM_DREISEC_SET) {
                 foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
-                    if (stristr((string)$nest->getType(), self::LINE_ITEM_DREISEC_SET) !== false) {
+                    if (stristr((string) $nest->getType(), self::LINE_ITEM_DREISEC_SET) !== false) {
                         $flat[] = $nest;
                     }
                 }
