@@ -1,5 +1,6 @@
 # Unreleased
 - Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
+- Kompatibilität mit Set-Plugins verbessert. Produkte werden nun bei Mollie einzeln statt als zusammengefasstes Set aufgelistet.
 # 4.22.1
 - Die Verarbeitung von Positionen mit negativen Beträgen wurde behoben.
 

@@ -25,6 +25,9 @@ class MollieLineItemBuilder
 {
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
     public const LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS = 'customized-products-option';
+    public const LINE_ITEM_REPERTUS_SET = 'repertus_product_container';
+
+    public const LINE_ITEM_DREISEC_SET = 'dreisc-set';
 
     /**
      * @var IsOrderLineItemValid
@@ -113,12 +116,19 @@ class MollieLineItemBuilder
         if (! $lineItems instanceof OrderLineItemCollection || $lineItems->count() === 0) {
             return $lines;
         }
+
         $lineItems = $this->getLineItemsFlat($lineItems);
 
+        $ignoreTypes = [
+            self::LINE_ITEM_REPERTUS_SET,
+            self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS,
+        ];
+
         foreach ($lineItems as $item) {
-            if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS) {
+            if (in_array($item->getType(), $ignoreTypes, true)) {
                 continue;
             }
+
             $this->orderLineItemValidator->validate($item);
             $extraData = $this->lineItemDataExtractor->extractExtraData($item);
             $itemPrice = $item->getPrice();
@@ -176,6 +186,14 @@ class MollieLineItemBuilder
         }
 
         foreach ($lineItems as $lineItem) {
+            if ($lineItem->getType() === self::LINE_ITEM_DREISEC_SET) {
+                foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
+                    if (stristr($nest->getType(), self::LINE_ITEM_DREISEC_SET) !== false) {
+                        $flat[] = $nest;
+                    }
+                }
+                continue;
+            }
             $flat[] = $lineItem;
 
             foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
