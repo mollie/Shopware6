@@ -82,7 +82,7 @@ class OrderReturnHandler
     private function createRequestFromOrder(OrderEntity $order, OrderReturnEntity $orderReturn): RefundRequest
     {
         $amount = (float) $orderReturn->getAmountTotal();
-        $orderNumber = $order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
 
         $request = new RefundRequest(
             $orderNumber,
