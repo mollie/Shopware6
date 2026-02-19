@@ -6,10 +6,10 @@ namespace Kiener\MolliePayments\Components\RefundManager\Service;
 use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
-use Kiener\MolliePayments\Service\OrderService;
 use Psr\Log\LoggerInterface;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnLineItemEntity;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -25,9 +25,8 @@ class OrderReturnHandler
     /**
      * @var ?EntityRepository<EntityCollection<OrderReturnEntity>>
      */
-    private $orderReturnRepository;
+    private ?EntityRepository $orderReturnRepository;
     private LoggerInterface $logger;
-    private OrderService $orderService;
 
     private bool $featureDisabled = false;
 
@@ -36,14 +35,12 @@ class OrderReturnHandler
      */
     public function __construct(
         RefundManagerInterface $refundManager,
-        $orderReturnRepository,
-        OrderService $orderService,
+        ?EntityRepository $orderReturnRepository,
         LoggerInterface $logger
     ) {
         $this->refundManager = $refundManager;
         $this->orderReturnRepository = $orderReturnRepository;
         $this->logger = $logger;
-        $this->orderService = $orderService;
         $this->featureDisabled = $orderReturnRepository === null;
     }
 
@@ -56,8 +53,17 @@ class OrderReturnHandler
         if ($orderReturn === null) {
             return;
         }
-        $request = $this->createRequestFromOrder((string) $order->getOrderNumber(), $orderReturn);
-        $order = $this->orderService->getOrder($order->getId(), $context); // need to load the order again because the line items are not loaded in the event
+
+        $order = $orderReturn->getOrder();
+        if (! $order instanceof OrderEntity) {
+            $this->logger->error('Order Return has no order associated', [
+                'returnId' => $orderReturn->getId()
+            ]);
+
+            return;
+        }
+        $request = $this->createRequestFromOrder($order, $orderReturn);
+
         try {
             $this->refundManager->refund($order, $request, $context);
         } catch (\Throwable $throwable) {
@@ -73,9 +79,11 @@ class OrderReturnHandler
         $this->refundManager->cancelAllOrderRefunds($order, $context);
     }
 
-    private function createRequestFromOrder(string $orderNumber, OrderReturnEntity $orderReturn): RefundRequest
+    private function createRequestFromOrder(OrderEntity $order, OrderReturnEntity $orderReturn): RefundRequest
     {
         $amount = (float) $orderReturn->getAmountTotal();
+        $orderNumber = $order->getOrderNumber();
+
         $request = new RefundRequest(
             $orderNumber,
             (string) $orderReturn->getInternalComment(),
@@ -89,28 +97,69 @@ class OrderReturnHandler
             $request->addItem($refundRequestItem);
         }
 
-        $order = $orderReturn->getOrder();
-        if ($order instanceof OrderEntity) {
-            $deliveries = $order->getDeliveries();
-            if ($deliveries instanceof OrderDeliveryCollection) {
-                foreach ($deliveries as $delivery) {
-                    $shippingCosts = $delivery->getShippingCosts();
-                    if ($shippingCosts->getTotalPrice() < 0) {
-                        continue;
-                    }
-                    $amount += $shippingCosts->getTotalPrice();
+        $orderShippingTotal = $order->getShippingTotal();
+        if ($orderShippingTotal <= 0) {
+            return $request;
+        }
 
-                    $refundRequestItem = new RefundRequestItem(
-                        $delivery->getId(),
-                        $shippingCosts->getTotalPrice(),
-                        $shippingCosts->getQuantity(),
-                        0
-                    );
-                    $request->addItem($refundRequestItem);
-                }
-                $request->setAmount($amount);
+        $shippingCosts = $orderReturn->getShippingCosts();
+        $shippingCostsValue = 0.0;
+        if ($shippingCosts instanceof CalculatedPrice) {
+            $shippingCostsValue = $shippingCosts->getTotalPrice();
+        }
+
+        $isFullReturn = ($orderReturn->getAmountTotal() ?? 0.0) + $orderShippingTotal === $order->getAmountTotal();
+
+        if ($isFullReturn && $shippingCostsValue === 0.0) {
+            return $this->addOrderDeliveryToRefundRequest($request, $order);
+        }
+
+        $deliveries = $order->getDeliveries();
+        if (! $deliveries instanceof OrderDeliveryCollection) {
+            return $request;
+        }
+        $refundRequestItem = null;
+
+        foreach ($deliveries as $delivery) {
+            $shippingCosts = $delivery->getShippingCosts();
+            if ($shippingCosts->getTotalPrice() > 0) {
+                $refundRequestItem = new RefundRequestItem(
+                    $delivery->getId(),
+                    $shippingCostsValue,
+                    $shippingCosts->getQuantity(),
+                    0
+                );
+                $request->addItem($refundRequestItem);
+                break;
             }
         }
+
+        return $request;
+    }
+
+    private function addOrderDeliveryToRefundRequest(RefundRequest $request, OrderEntity $order): RefundRequest
+    {
+        $deliveries = $order->getDeliveries();
+        if (! $deliveries instanceof OrderDeliveryCollection) {
+            return $request;
+        }
+        $amount = (float) $request->getAmount();
+        foreach ($deliveries as $delivery) {
+            $shippingCosts = $delivery->getShippingCosts();
+            if ($shippingCosts->getTotalPrice() < 0) {
+                continue;
+            }
+            $amount += $shippingCosts->getTotalPrice();
+
+            $refundRequestItem = new RefundRequestItem(
+                $delivery->getId(),
+                $shippingCosts->getTotalPrice(),
+                $shippingCosts->getQuantity(),
+                0
+            );
+            $request->addItem($refundRequestItem);
+        }
+        $request->setAmount($amount);
 
         return $request;
     }
@@ -125,6 +174,10 @@ class OrderReturnHandler
         $criteria->addFilter(new EqualsFilter('orderVersionId', $order->getVersionId()));
         $criteria->addAssociation('lineItems');
         $criteria->addAssociation('order.deliveries');
+        $criteria->addAssociation('order.deliveries.shippingCosts');
+        $criteria->addAssociation('order.deliveries.shippingMethod');
+        $criteria->addAssociation('order.lineItems');
+        $criteria->addAssociation('order.currency');
 
         $orderReturnSearchResult = $this->orderReturnRepository->search($criteria, $context);
 
