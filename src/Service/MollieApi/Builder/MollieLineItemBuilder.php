@@ -29,6 +29,8 @@ class MollieLineItemBuilder
 
     public const LINE_ITEM_DREISEC_SET = 'dreisc-set';
 
+    public const LINE_ITEM_SKWEB_SET = 'swkweb-product-set';
+
     /**
      * @var IsOrderLineItemValid
      */
@@ -121,6 +123,7 @@ class MollieLineItemBuilder
 
         $ignoreTypes = [
             self::LINE_ITEM_REPERTUS_SET,
+            self::LINE_ITEM_SKWEB_SET,
             self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS,
         ];
 
