@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "editar la dirección de facturación",
                 "btnEditShippingAddress": "editar la dirección de envío",
-                "cancelSubscription": "La suscripción ha sido cancelada",
-                "errorCancelSubscription": "No ha sido posible cancelar la suscripción debido a un error. Por favor, contacta con nuestro soporte.",
+                "successCancel": "La suscripción ha sido cancelada",
+                "errorCancel": "No ha sido posible cancelar la suscripción debido a un error. Por favor, contacta con nuestro soporte.",
                 "errorPause": "Se ha producido un error al pausar tu suscripción",
                 "errorResume": "Se ha producido un error al reanudar tu suscripción",
                 "errorSkip": "Se ha producido un error al posponer tu suscripción",

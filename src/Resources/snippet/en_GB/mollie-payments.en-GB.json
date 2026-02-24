@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "edit billing address",
                 "btnEditShippingAddress": "edit shipping address",
-                "cancelSubscription": "Subscription has been canceled",
-                "errorCancelSubscription": "The subscription could not be canceled due to an error. Please contact our support.",
+                "successCancel": "Subscription has been canceled",
+                "errorCancel": "The subscription could not be canceled due to an error. Please contact our support.",
                 "errorPause": "There was an error when pausing your subscription",
                 "errorResume": "There was an error when resuming your subscription",
                 "errorSkip": "There was an error when skipping your subscription",

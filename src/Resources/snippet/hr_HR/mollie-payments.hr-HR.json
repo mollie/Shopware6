@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "uredi adresu za naplatu",
                 "btnEditShippingAddress": "uredi adresu za dostavu",
-                "cancelSubscription": "Pretplata je otkazana",
-                "errorCancelSubscription": "Pretplatu nije bilo moguće otkazati zbog pogreške. Molimo kontaktirajte našu podršku.",
+                "successCancel": "Pretplata je otkazana",
+                "errorCancel": "Pretplatu nije bilo moguće otkazati zbog pogreške. Molimo kontaktirajte našu podršku.",
                 "errorPause": "Došlo je do greške prilikom pauziranja pretplate",
                 "errorResume": "Došlo je do greške prilikom nastavka pretplate",
                 "errorSkip": "Došlo je do greške prilikom preskakanja pretplate",

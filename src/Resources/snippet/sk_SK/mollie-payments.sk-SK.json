@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "Upraviť fakturačnú adresu",
                 "btnEditShippingAddress": "Upraviť dodaciu adresu",
-                "cancelSubscription": "Predplatné bolo zrušené",
-                "errorCancelSubscription": "Predplatné sa nepodarilo zrušiť kvôli chybe. Prosím, kontaktujte našu podporu.",
+                "successCancel": "Predplatné bolo zrušené",
+                "errorCancel": "Predplatné sa nepodarilo zrušiť kvôli chybe. Prosím, kontaktujte našu podporu.",
                 "errorPause": "Pri pozastavovaní vášho predplatného nastala chyba",
                 "errorResume": "Pri obnove vášho predplatného nastala chyba",
                 "errorSkip": "Pri preskočení predplatného došlo k chybe",
