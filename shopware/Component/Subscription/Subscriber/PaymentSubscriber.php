@@ -63,6 +63,11 @@ final class PaymentSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $subscriptionCollection = $order->getExtension('mollieSubscriptions');
+        if ($subscriptionCollection instanceof SubscriptionCollection && $subscriptionCollection->count() > 0) {
+            return;
+        }
+
         $lineItems = $order->getLineItems();
         if ($lineItems === null) {
             return;
