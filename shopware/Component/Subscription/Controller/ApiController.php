@@ -32,9 +32,20 @@ final class ApiController extends AbstractController
     {
         $subscriptionId = (string) $request->request->get('id');
         $action = $request->attributes->get('action');
+        $status = 500;
+        $success = false;
+        $data = [];
+        try {
+            $response = $this->actionHandler->handle($action, $subscriptionId, $context);
+            $data = ['subscription' => $response->toArray()];
+            $status = 200;
+            $success = true;
+        } catch (\Throwable $exception) {
+            $data['error'] = $exception->getMessage();
+        }
 
-        $response = $this->actionHandler->handle($action, $subscriptionId, $context);
+        $data['success'] = $success;
 
-        return new JsonResponse([]);
+        return new JsonResponse($data, $status);
     }
 }
