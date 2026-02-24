@@ -29,7 +29,6 @@
         <service id="Kiener\MolliePayments\Components\RefundManager\Service\OrderReturnHandler">
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
             <argument type="service" id="order_return.repository" on-invalid="null"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 

@@ -21,6 +21,8 @@
 
 # Unreleased
 - Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
+- Fixed compatibility with set plugins. Products are now listed individually in Mollie instead of being grouped as a set.
+- New: Shipping costs are now automatically considered for refunds via the Shopware Return Manager, including manually entered shipping costs.
 
 # 4.22.1
 - Fixed an issue so that line items with negative amounts work again.
