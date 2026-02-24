@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "edytuj adres rozliczeniowy",
                 "btnEditShippingAddress": "edytuj adres dostawy",
-                "cancelSubscription": "Subskrypcja została anulowana",
-                "errorCancelSubscription": "Subskrypcja nie mogła zostać anulowana z powodu błędu. Prosimy o kontakt z naszym działem wsparcia.",
+                "successCancel": "Subskrypcja została anulowana",
+                "errorCancel": "Subskrypcja nie mogła zostać anulowana z powodu błędu. Prosimy o kontakt z naszym działem wsparcia.",
                 "errorPause": "Wystąpił błąd podczas wstrzymywania subskrypcji",
                 "errorResume": "Wystąpił błąd podczas wznawiania subskrypcji",
                 "errorSkip": "Wystąpił błąd podczas pomijania subskrypcji",

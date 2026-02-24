@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "rediger faktureringsadresse",
                 "btnEditShippingAddress": "rediger fraktadresse",
-                "cancelSubscription": "Abonnementet be kansellert",
-                "errorCancelSubscription": "Abonnementet kunne ikke kanselleres på grunn av en feil. Vennligst kontakt vår support.",
+                "successCancel": "Abonnementet be kansellert",
+                "errorCancel": "Abonnementet kunne ikke kanselleres på grunn av en feil. Vennligst kontakt vår support.",
                 "errorPause": "Det oppstod en feil ved pausing av abonnementet ditt",
                 "errorResume": "Det oppstod en feil ved gjenopptakelse av abonnementet ditt",
                 "errorSkip": "Det oppstod en feil ved overhopping av abonnementet ditt",

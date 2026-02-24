@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "uredi naslov za račun",
                 "btnEditShippingAddress": "Uredi naslov za pošiljanje",
-                "cancelSubscription": "Naročnina je bila preklicana",
-                "errorCancelSubscription": "Naročnine ni bilo mogoče preklicati zaradi napake. Prosimo, kontaktirajte našo podporo.",
+                "successCancel": "Naročnina je bila preklicana",
+                "errorCancel": "Naročnine ni bilo mogoče preklicati zaradi napake. Prosimo, kontaktirajte našo podporo.",
                 "errorPause": "Prišlo je do napake pri ustavljanju vaše naročnine",
                 "errorResume": "Prišlo je do napake pri nadaljevanju vaše naročnine",
                 "errorSkip": "Prišlo je do napake pri začasni zaustavitvi vaše naročnine",
