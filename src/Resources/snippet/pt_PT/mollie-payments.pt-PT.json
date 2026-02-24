@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "editar endereço de faturação",
                 "btnEditShippingAddress": "editar endereço de envio",
-                "cancelSubscription": "A subscrição foi cancelada",
-                "errorCancelSubscription": "A subscrição não pôde ser cancelada devido a um erro. Por favor, contacte o nosso centro de apoio.",
+                "successCancel": "A subscrição foi cancelada",
+                "errorCancel": "A subscrição não pôde ser cancelada devido a um erro. Por favor, contacte o nosso centro de apoio.",
                 "errorPause": "Ocorreu um erro ao colocar a sua subscrição em pausa",
                 "errorResume": "Ocorreu um erro ao retomar a sua subscrição",
                 "errorSkip": "Ocorreu um erro ao saltar a sua subscrição",

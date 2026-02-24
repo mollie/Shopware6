@@ -42,6 +42,7 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
     public function handleFinalizeEvent(PaymentFinalizeEvent $event): void
     {
         $environmentSettings = $this->settingsService->getEnvironmentSettings();
+
         if (! $environmentSettings->isDevMode() && ! $environmentSettings->isCypressMode()) {
             return;
         }
