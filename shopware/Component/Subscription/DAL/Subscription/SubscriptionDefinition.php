@@ -28,7 +28,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\System\Currency\CurrencyDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelDefinition;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('shopware.entity.definition',['entity' => 'mollie_subscription'])]
+#[AutoconfigureTag('shopware.composite_search.definition',['priority' => '1500'])]
 class SubscriptionDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription';
