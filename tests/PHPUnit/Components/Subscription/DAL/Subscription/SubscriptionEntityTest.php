@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\MollieStatus;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Mollie\Shopware\Component\Mollie\IntervalUnit;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\IntervalType;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\MollieStatus;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 

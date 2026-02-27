@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Behat\Context;
 
 use Behat\Step\Then;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Behat\Storage;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Integration\Data\SubscriptionTestBehaviour;
 use PHPUnit\Framework\Assert;
