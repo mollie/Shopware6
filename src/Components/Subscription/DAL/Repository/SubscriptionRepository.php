@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Subscription\DAL\Repository;
+namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
