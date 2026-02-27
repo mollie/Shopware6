@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory;
 
-use Mollie\Shopware\Component\Subscription\DAL\Repository\SubscriptionRepository;
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\Context;
