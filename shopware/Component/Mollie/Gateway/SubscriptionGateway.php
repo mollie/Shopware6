@@ -58,6 +58,7 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
                 'customerId' => $customerId,
                 'orderNumber' => $orderNumber,
                 'salesChannelId' => $salesChannelId,
+                'subscriptionId' => $mollieSubscriptionId
             ]);
 
             return Subscription::createFromClientResponse($body);
