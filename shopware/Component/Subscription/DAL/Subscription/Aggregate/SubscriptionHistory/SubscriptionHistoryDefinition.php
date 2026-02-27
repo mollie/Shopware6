@@ -15,7 +15,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('shopware.entity.definition',['entity' => 'mollie_subscription_history'])]
 class SubscriptionHistoryDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription_history';
