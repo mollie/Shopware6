@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription\Struct;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\IntervalType;
 use PHPUnit\Framework\TestCase;
 
 class IntervalTypeTest extends TestCase
