@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Subscriber;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusCancelledEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
 use Mollie\Shopware\Component\Mollie\CreateSubscription;
@@ -17,6 +15,8 @@ use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\ModifyCreateSubscriptionPayloadEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionStartedEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;

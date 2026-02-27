@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Action;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Mollie\Subscription;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionActionEvent;
+use Mollie\Shopware\Component\Subscription\SubscriptionDataStruct;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -14,7 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('mollie.subscription.action')]
 abstract class AbstractAction
 {
-    abstract public function execute(SubscriptionEntity $subscription, SubscriptionSettings $settings, Subscription $mollieSubscription, string $orderNumber, Context $context): Subscription;
+    abstract public function execute(SubscriptionDataStruct $subscriptionData, SubscriptionSettings $settings, Subscription $mollieSubscription, string $orderNumber, Context $context): Subscription;
 
     /**
      * @return class-string<SubscriptionActionEvent>

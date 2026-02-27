@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Mollie\Api\Types\SubscriptionStatus as MollieSubscriptionStatus;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
