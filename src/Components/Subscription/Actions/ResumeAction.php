@@ -6,6 +6,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Actions;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
@@ -14,7 +15,6 @@ use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\S
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
-use Mollie\Shopware\Component\Subscription\DAL\Repository\SubscriptionRepository;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
