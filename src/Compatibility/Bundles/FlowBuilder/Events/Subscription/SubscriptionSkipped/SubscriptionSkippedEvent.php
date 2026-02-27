@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Events\Subscription\SubscriptionSkipped;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionDefinition;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionDefinition;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;

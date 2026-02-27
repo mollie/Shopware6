@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Salutation\SalutationCollection;

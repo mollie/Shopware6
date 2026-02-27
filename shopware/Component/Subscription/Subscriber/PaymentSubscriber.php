@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Subscriber;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;

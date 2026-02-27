@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEvents;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEvents;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionEventsTest extends TestCase

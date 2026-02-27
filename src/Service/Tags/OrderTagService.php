@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Tags;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\Tags\Exceptions\CouldNotTagOrderException;
 use Kiener\MolliePayments\Struct\Tags\SubscriptionTag;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;

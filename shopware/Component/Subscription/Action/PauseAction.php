@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Action;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Subscription;
@@ -12,8 +10,11 @@ use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\Action\Exception\PauseAndResumeNotAllowedException;
 use Mollie\Shopware\Component\Subscription\Action\Exception\SubscriptionNotActiveException;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionActionEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionPausedEvent;
+use Mollie\Shopware\Component\Subscription\SubscriptionDataStruct;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -50,8 +51,9 @@ final class PauseAction extends AbstractAction
         return SubscriptionPausedEvent::class;
     }
 
-    public function execute(SubscriptionEntity $subscription, SubscriptionSettings $settings, Subscription $mollieSubscription, string $orderNumber, Context $context): Subscription
+    public function execute(SubscriptionDataStruct $subscriptionData, SubscriptionSettings $settings, Subscription $mollieSubscription, string $orderNumber, Context $context): Subscription
     {
+        $subscription = $subscriptionData->getSubscription();
         $subscriptionId = $subscription->getId();
         $salesChannelId = $subscription->getSalesChannelId();
         $mollieSubscriptionId = $subscription->getMollieId();

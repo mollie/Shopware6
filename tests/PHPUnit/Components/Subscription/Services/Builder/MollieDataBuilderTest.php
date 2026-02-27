@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\Builder;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use MolliePayments\Shopware\Tests\Traits\BuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\Currency\CurrencyEntity;
