@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription\Enricher;
 
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\Enricher\LiveDataEnricher;
+use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Enricher\LiveDataEnricher;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEvents;
 use PHPUnit\Framework\TestCase;
 

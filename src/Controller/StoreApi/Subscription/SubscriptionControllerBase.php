@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\StoreApi\Subscription;
 
+use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionCancelResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionPauseResponse;
@@ -13,7 +14,6 @@ use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\Subscription
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionUpdateBillingResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionUpdateShippingResponse;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
-use Mollie\Shopware\Component\Subscription\DAL\Repository\SubscriptionRepository;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Psr\Log\LoggerInterface;
