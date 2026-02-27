@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Content\MailTemplate\Aggregate\MailTemplateType\MailTemplateTypeEntity;
 use Shopware\Core\Content\MailTemplate\MailTemplateEntity;

@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Subscription;
@@ -12,13 +10,10 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Action\AbstractAction;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionActionEvent;
+use Mollie\Shopware\Component\Subscription\Exception\SubscriptionDisabledException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -30,20 +25,19 @@ final class SubscriptionActionHandler
     private array $actions = [];
 
     /**
-     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
      * @param iterable<AbstractAction> $actions
      */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        #[Autowire(service: 'mollie_subscription.repository')]
-        private readonly EntityRepository $subscriptionRepository,
         #[Autowire(service: SubscriptionGateway::class)]
         private readonly SubscriptionGatewayInterface $subscriptionGateway,
+        #[Autowire(service: SubscriptionDataService::class)]
+        private readonly SubscriptionDataServiceInterface $subscriptionDataService,
         #[AutowireIterator('mollie.subscription.action')]
         iterable $actions,
         #[Autowire(service: 'event_dispatcher')]
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger
     ) {
@@ -60,54 +54,36 @@ final class SubscriptionActionHandler
         ];
 
         $subscriptionId = strtolower($subscriptionId);
-        $criteria = new Criteria([$subscriptionId]);
-        $criteria->addAssociation('historyEntries');
-        $criteria->addAssociation('order.orderCustomer.customer');
-        $criteria->getAssociation('order')->setLimit(1);
-        $criteria->setLimit(1);
-        $searchResult = $this->subscriptionRepository->search($criteria, $context);
-
         $this->logger->debug('Subscription Action Handler called', $logData);
 
-        $subscriptionEntity = $searchResult->first();
-        if (! $subscriptionEntity instanceof SubscriptionEntity) {
-            $this->logger->error('Subscription was not found', $logData);
-            throw new SubscriptionNotFoundException($subscriptionId);
-        }
+        $subscriptionData = $this->subscriptionDataService->findById($subscriptionId, $context);
+
+        $order = $subscriptionData->getOrder();
+
+        $subscriptionEntity = $subscriptionData->getSubscription();
         $mollieSubscriptionId = $subscriptionEntity->getMollieId();
         $mollieCustomerId = $subscriptionEntity->getMollieCustomerId();
         $salesChannelId = $subscriptionEntity->getSalesChannelId();
+        $orderNumber = (string) $order->getOrderNumber();
+        $customer = $subscriptionData->getCustomer();
 
         $logData = array_merge($logData, [
             'mollieSubscriptionId' => $mollieSubscriptionId,
             'mollieCustomerId' => $mollieCustomerId,
             'salesChannelId' => $salesChannelId,
+            'orderNumber' => $orderNumber,
         ]);
 
-        $order = $subscriptionEntity->getOrder();
-        if (! $order instanceof OrderEntity) {
-            $this->logger->error('Subscription is without order', $logData);
-            throw new \Exception('Order was not found');
-        }
-        $orderNumber = (string) $order->getOrderNumber();
-        $logData['orderNumber'] = $orderNumber;
-        $this->logger->info('Subscription Action Handler - Started',$logData);
-        $customer = $order->getOrderCustomer()?->getCustomer();
+        $this->logger->info('Subscription Action Handler - Started', $logData);
 
-        if (! $customer instanceof CustomerEntity) {
-            $this->logger->error('Subscription Action Handler - Subscription is without customer', $logData);
-            throw new \Exception('Customer was not found');
-        }
-
-        $subscriptionSettings = $this->settingsService->getSubscriptionSettings($subscriptionEntity->getSalesChannelId());
+        $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
         if (! $subscriptionSettings->isEnabled()) {
             $this->logger->error('Subscription Action Handler - Failed to execute subscription action, subscriptions disabled for saleschannel', $logData);
-            throw new SubscriptionsDisabledException();
+            throw new SubscriptionDisabledException($salesChannelId);
         }
 
-        $mollieSubscription = $this->subscriptionGateway->getSubscription($mollieSubscriptionId, $mollieCustomerId, $orderNumber, $salesChannelId);
-
         $foundAction = null;
+
         foreach ($this->actions as $actionHandler) {
             if ($actionHandler->supports($action)) {
                 $foundAction = $actionHandler;
@@ -120,7 +96,8 @@ final class SubscriptionActionHandler
             throw new \Exception('No action handler found for action: ' . $action);
         }
 
-        $mollieSubscription = $foundAction->execute($subscriptionEntity, $subscriptionSettings, $mollieSubscription, $orderNumber, $context);
+        $mollieSubscription = $this->subscriptionGateway->getSubscription($mollieSubscriptionId, $mollieCustomerId, $orderNumber, $salesChannelId);
+        $mollieSubscription = $foundAction->execute($subscriptionData, $subscriptionSettings, $mollieSubscription, $orderNumber, $context);
 
         $event = $foundAction->getEvent($subscriptionEntity, $customer, $context);
         $logData['event'] = get_class($event);

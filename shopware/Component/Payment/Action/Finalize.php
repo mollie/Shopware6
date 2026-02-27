@@ -49,7 +49,7 @@ final class Finalize
         ];
 
         $this->logger->info('Finalize Process - Start', $logData);
-
+        // We need to change that part at some point. Because inside getPaymentByTraansactionId also calls the transactionData Loader.
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
         $paymentStatus = $payment->getStatus();
