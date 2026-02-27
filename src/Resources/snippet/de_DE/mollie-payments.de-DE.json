@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "Rechnungsadresse bearbeiten",
                 "btnEditShippingAddress": "Lieferadresse bearbeiten",
-                "cancelSubscription": "Das Abonnement wurde gekündigt",
-                "errorCancelSubscription": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
+                "successCancel": "Das Abonnement wurde gekündigt",
+                "errorCancel": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
                 "errorPause": "Dein Abonnement konnte nicht pausiert werden",
                 "errorResume": "Dein Abonnement konnte nicht fortgesetzt werden",
                 "errorSkip": "Dein Abonnement konnte nicht ausgesetzt werden",

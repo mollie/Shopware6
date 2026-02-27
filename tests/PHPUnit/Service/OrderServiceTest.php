@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderIdException;
 use Kiener\MolliePayments\Exception\CouldNotExtractMollieOrderLineIdException;
@@ -10,7 +10,7 @@ use Kiener\MolliePayments\Service\OrderDeliveryService;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\UpdateOrderCustomFields;
 use Kiener\MolliePayments\Service\UpdateOrderTransactionCustomFields;
-use MolliePayments\Tests\Fakes\Repositories\FakeOrderRepository;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeOrderRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;

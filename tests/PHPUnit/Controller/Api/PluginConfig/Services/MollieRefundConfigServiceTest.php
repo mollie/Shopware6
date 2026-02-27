@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Controller\Api\PluginConfig\Services;
+namespace MolliePayments\Shopware\Tests\Controller\Api\PluginConfig\Services;
 
 use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\EmptyOrderIdProvidedConfigException;

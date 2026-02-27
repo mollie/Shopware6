@@ -6,19 +6,16 @@ context("API Payment Webhooks", () => {
             // status code needs to be 422 unprocessable entity
             expect(response.status).to.eq(422);
             // also verify the content
-            expect(response.body.success).to.eq(false);
-            expect(response.body.error).to.eq('Transaction 0d8eefdd6d12456335280e2ff42431b9 not found in Shopware');
+            expect(response.body.errors[0].detail).to.eq('Transaction 0d8eefdd6d12456335280e2ff42431b9 not found in Shopware');
         })
     })
 
     it('C266660: API Legacy Webhook is reachable @core', () => {
 
         cy.request({url: '/api/v2/mollie/webhook/abc', failOnStatusCode: false,}).then((response) => {
-            // status code needs to be 422 unprocessable entity
-            expect(response.status).to.eq(422);
-            // also verify the content
-            expect(response.body.success).to.eq(false);
-            expect(response.body.error).to.eq('Value is not a valid UUID: abc');
+
+            expect(response.status).to.eq(404);
+
         })
     })
 

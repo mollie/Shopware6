@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -65,7 +66,7 @@ class SubscriptionBuilder
         $interval = $attributes->getSubscriptionInterval();
         $intervalUnit = $attributes->getSubscriptionIntervalUnit();
 
-        $times = $attributes->getSubscriptionRepetitionCount();
+        $times = (int) $attributes->getSubscriptionRepetitionCount();
 
         $description = $lineItem->getQuantity() . 'x ' . $lineItem->getLabel() . ' (Order #' . $order->getOrderNumber() . ', ' . $lineItem->getTotalPrice() . ' ' . $order->getCurrency()->getIsoCode() . ')';
 
@@ -87,10 +88,8 @@ class SubscriptionBuilder
 
         $subscriptionEntity->setCurrency($order->getCurrency());
 
-        $subscriptionEntity->setQuantity($lineItem->getQuantity());
-
         $subscriptionEntity->setCustomerId((string) $order->getOrderCustomer()->getCustomerId());
-        $subscriptionEntity->setProductId((string) $lineItem->getProductId());
+
         $subscriptionEntity->setOrderId($order->getId());
         $subscriptionEntity->setSalesChannelId($order->getSalesChannelId());
         $subscriptionEntity->setTotalRounding($order->getTotalRounding());
@@ -109,7 +108,7 @@ class SubscriptionBuilder
             new SubscriptionMetadata(
                 $firstStartDate,
                 $interval,
-                $intervalUnit,
+                IntervalUnit::from($intervalUnit),
                 $times,
                 ''
             )

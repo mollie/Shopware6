@@ -35,7 +35,8 @@
                 <div class="mollie-credit-card-mandate-radio {{ formRadioWrapperClass ?? 'custom-control custom-radio form-check' }}">
                     {% block mollie_credit_card_mandate_form_radio_input %}
                         <input type="radio"
-                               name="mollieCreditCardMandate"
+                               name="mandateId"
+                               form="confirmOrderForm"
                                class="{{ formCheckInputClass ?? 'custom-control-input form-check-input' }}"
                                id="mollieCreditCardMandateForm"
                                value="{{ NEW_CARD_MANDATE_OPTION }}"
@@ -68,7 +69,7 @@
                     {% endif %}>
 
                 {% if page.enable_credit_card_components == true %}
-                    <input type="hidden" name="mollie_shopware_credit_card_token" id="cardToken" value=""/>
+                    <input type="hidden" name="creditCardToken"  form="confirmOrderForm"  id="cardToken" value="test"/>
                     <div class="block-group">
                         <div class="intro-text">
                             <span>{{ "molliePayments.components.creditCard.headLine"|trans|striptags }}</span>
@@ -121,8 +122,9 @@
                                         {% block mollie_creditcard_form_check_store_card_checkbox_input %}
                                             <input type="checkbox"
                                                    id="mollieShouldSaveCardDetail"
+                                                   form="confirmOrderForm"
                                                    class="{{ formCheckInputClass ?? 'custom-control-input form-check-input' }}"
-                                                   name="mollieShouldSaveCardDetail"/>
+                                                   name="savePaymentDetails"/>
                                         {% endblock %}
                                         {% block mollie_creditcard_form_check_store_card_checkbox_label %}
                                             <label class="{{ formCheckLabelClass ?? 'custom-control-label form-check-label' }}" for="mollieShouldSaveCardDetail">

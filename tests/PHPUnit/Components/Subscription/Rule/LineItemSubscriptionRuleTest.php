@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\Rule;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Rule;
 
 use Kiener\MolliePayments\Components\Subscription\Rule\LineItemSubscriptionRule;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Rule\LineItemScope;
@@ -38,10 +39,9 @@ class LineItemSubscriptionRuleTest extends TestCase
      * This test verifies that our rule works on NON subscription items.
      * We first try to find NON-subscription item (valid), and then
      * try to find a subscription item (error).
-     *
-     * @testWith        [true, false]
-     *                  [false, true]
      */
+    #[TestWith([true, false])]
+    #[TestWith([false, true])]
     public function testNonSubscriptionCart(bool $expected, bool $lookingForSubscription): void
     {
         $lineItem = new LineItem('', 'product');
@@ -64,10 +64,9 @@ class LineItemSubscriptionRuleTest extends TestCase
      * This test verifies that our rule works on subscription items.
      * We first try to find subscription item (valid), and then
      * try to find a non-subscription item (error).
-     *
-     * @testWith        [true, true]
-     *                  [false, false]
      */
+    #[TestWith([true, true])]
+    #[TestWith([false, false])]
     public function testSubscriptionCart(bool $expected, bool $lookingForSubscription): void
     {
         $lineItem = new LineItem('', 'product');

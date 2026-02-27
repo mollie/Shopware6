@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Repository;
 
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
-use Kiener\MolliePayments\Service\CustomFieldsInterface;
+use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
@@ -20,17 +19,22 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class OrderTransactionRepository implements OrderTransactionRepositoryInterface
 {
-    /** @var EntityRepository<EntityCollection<OrderTransactionEntity> */
-    private $orderTransactionRepository;
+    /** @var EntityRepository<EntityCollection<OrderTransactionEntity>> */
+    private EntityRepository $orderTransactionRepository;
     private LoggerInterface $logger;
 
     /**
-     * @param EntityRepository<EntityCollection<OrderTransactionEntity> $orderTransactionRepository
+     * @param EntityRepository<EntityCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
-    public function __construct($orderTransactionRepository, LoggerInterface $logger)
+    public function __construct(
+        #[Autowire(service: 'order_transaction.repository')]
+        EntityRepository $orderTransactionRepository,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        LoggerInterface $logger)
     {
         $this->orderTransactionRepository = $orderTransactionRepository;
         $this->logger = $logger;
@@ -43,7 +47,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
         }
 
         $date = new \DateTimeImmutable();
-        $start = $date->modify(sprintf('-%d days', BankTransferPayment::DUE_DATE_MAX_DAYS + 1));
+        $start = $date->modify(sprintf('-%d days', 101));
         $end = $date->modify('-5 minutes');
         $orFilterArray = [
             new EqualsFilter('stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),
@@ -58,7 +62,12 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
 
         $criteria->addFilter(new OrFilter($orFilterArray));
 
-        $criteria->addFilter(new ContainsFilter('order.customFields', CustomFieldsInterface::MOLLIE_KEY));
+        $customFieldsFilter = [
+            new ContainsFilter('order.customFields', Mollie::EXTENSION),
+            new ContainsFilter('customFields', Mollie::EXTENSION)
+        ];
+
+        $criteria->addFilter(new OrFilter($customFieldsFilter));
         $criteria->addFilter(new RangeFilter('order.orderDateTime', [
             RangeFilter::GTE => $start->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             RangeFilter::LTE => $end->format(Defaults::STORAGE_DATE_TIME_FORMAT)]));

@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace PHPUnit\Components\Subscription\Services\Builder;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\Builder;
 
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class IntervalCalculatorTest extends TestCase
@@ -12,10 +13,9 @@ class IntervalCalculatorTest extends TestCase
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
      * to the configuration of the subscription.
-     *
-     * @testWith    ["day"]
-     *              ["days"]
      */
+    #[TestWith(['day'])]
+    #[TestWith(['days'])]
     public function testIntervalWithDays(string $unit)
     {
         $builder = new IntervalCalculator();
@@ -32,10 +32,9 @@ class IntervalCalculatorTest extends TestCase
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
      * to the configuration of the subscription.
-     *
-     * @testWith    ["week"]
-     *              ["weeks"]
      */
+    #[TestWith(['week'])]
+    #[TestWith(['weeks'])]
     public function testIntervalWithWeeks(string $unit)
     {
         $builder = new IntervalCalculator();
@@ -52,10 +51,9 @@ class IntervalCalculatorTest extends TestCase
      * This test verifies that the start date of our Mollie subscription is correctly calculated.
      * This is not the date of the order, but the first calculated date in the future according
      * to the configuration of the subscription.
-     *
-     * @testWith    ["month"]
-     *              ["months"]
      */
+    #[TestWith(['month'])]
+    #[TestWith(['months'])]
     public function testIntervalWithMonths(string $unit)
     {
         $builder = new IntervalCalculator();

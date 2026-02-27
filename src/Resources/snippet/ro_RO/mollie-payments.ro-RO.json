@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "editați adresa de facturare",
                 "btnEditShippingAddress": "editați adresa de livrare",
-                "cancelSubscription": "Abonamentul a fost anulat",
-                "errorCancelSubscription": "Abonamentul nu a putut fi anulat din cauza unei erori. Vă rugăm să contactați echipa noastră de suport.",
+                "successCancel": "Abonamentul a fost anulat",
+                "errorCancel": "Abonamentul nu a putut fi anulat din cauza unei erori. Vă rugăm să contactați echipa noastră de suport.",
                 "errorPause": "A apărut o eroare când ați încercat să suspendați abonamentul dvs.",
                 "errorResume": "A apărut o eroare când ați încercat să reactivați abonamentul dvs.",
                 "errorSkip": "A apărut o eroare când ați încercat să amânați abonamentul dvs.",

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes;
+namespace MolliePayments\Shopware\Tests\Fakes;
 
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -44,7 +44,7 @@ class FakeRouter implements RouterInterface
     }
 
     /**
-     * @return \Symfony\Component\Routing\RouteCollection|void
+     * @return RouteCollection|void
      */
     public function getRouteCollection(): RouteCollection
     {

@@ -1,3 +1,24 @@
+# 5.0.0
+- Payment methods now use the Mollie Payments API.
+- Minimum PHP version is 8.2.
+- Minimum Shopware version is 6.6.10.x.
+- Order Events and Flows are no longer triggered.
+- New payment flows have been added.
+- Added the ModifyCreatePaymentPayloadEvent to modify the request before creating a payment in Mollie.
+- All payment-related logs now include the Shopware orderNumber.
+- The URL for saving the credit card token is no longer used; provide creditCardToken in the checkout request.
+- The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.
+- The URL for saving the POS terminal ID is deprecated; provide terminalId as a body parameter in the checkout request.
+- A product can now have multiple voucher categories.
+- Added: order-related log entries are now stored in a dedicated mollie directory. Log files follow the naming pattern order-<orderNumber>, for example order-12345.
+- Added: order-related log entries are now automatically removed when the payment status changes to "paid". Additionally, any remaining entries are deleted once they exceed the retention period defined in the settings.
+- In Mollie Failure Mode, only payment methods that are also available in the cart are displayed on the Mollie page.
+- The order state mapping has been optimized. During a status change, a precise transition path is now determined; if the transition cannot be performed, detailed log entries are generated.
+- Payconiq is discontinued and will not be activated after update. Please deactivate the payment method and remove it from saleschannel
+- Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
+- Added new event ModifyCreateSubscriptionPayloadEvent. This allows developers to modify and extend the payload for the Mollie Subscription API before a subscription is created.
+
+
 # Unreleased
 - Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
 - Fixed compatibility with set plugins. Products are now listed individually in Mollie instead of being grouped as a set.
@@ -31,7 +52,8 @@
 
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore
-# 4.20.0
+
+# 4.20.0 - 2025-11-19
 - Changed order builder to use order addresses instead of customer default addresses to make sure the address in mollie matches the order information in shopware.
 - Fixed an issue where Apple Pay Direct did not work when the phone number was configured as a required field in the shop.
 - Fixed compatibility with shopware commercial 

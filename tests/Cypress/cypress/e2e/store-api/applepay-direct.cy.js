@@ -119,7 +119,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('Please provide a validation url!');
+                expect(response.data.errors[0].detail).to.contain('Please provide a validation url');
             });
         })
 
@@ -137,7 +137,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('No Country Code provided!');
+                expect(response.data.errors[0].detail).to.contain('No Country Code provided');
             });
         })
 
@@ -170,7 +170,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('Please provide a Shipping Method identifier!');
+                expect(response.data.errors[0].detail).to.contain('Missing shipping method identifier');
             });
         })
 
@@ -203,7 +203,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('PaymentToken not found!')
+                expect(response.data.errors[0].detail).to.contain('"paymentToken" not set in request body')
             });
         })
 

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service\Transition;
+namespace MolliePayments\Shopware\Tests\Service\Transition;
 
 use Kiener\MolliePayments\Service\Transition\DeliveryTransitionService;
 use Kiener\MolliePayments\Service\Transition\TransitionService;
@@ -192,13 +192,17 @@ class DeliveryTransitionServiceTest extends TestCase
 
         $expectedTransition1 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_REOPEN);
         $expectedTransition2 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_SHIP);
-
+        $matcher = $this->exactly(2);
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
-        $this->stateMachineRegistry->expects($this->exactly(2))->method('transition')
-            ->withConsecutive(
-                [$expectedTransition1, $this->context],
-                [$expectedTransition2, $this->context]
-            )
+        $this->stateMachineRegistry->expects($matcher)->method('transition')
+            ->willReturnCallback(function (Transition $transition) use ($matcher,$expectedTransition1, $expectedTransition2) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+            })
         ;
 
         $this->deliveryTransitionService->shipDelivery($delivery, $this->context);
@@ -251,12 +255,19 @@ class DeliveryTransitionServiceTest extends TestCase
         $expectedTransition3 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_RETOUR_PARTIALLY);
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
+        $matcher = $this->exactly(3);
         $this->stateMachineRegistry->expects($this->exactly(3))->method('transition')
-            ->withConsecutive(
-                [$expectedTransition1, $this->context],
-                [$expectedTransition2, $this->context],
-                [$expectedTransition3, $this->context]
-            )
+            ->willReturnCallback(function (Transition $transition) use ($matcher,$expectedTransition1, $expectedTransition2, $expectedTransition3) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertEquals($expectedTransition3, $transition);
+                }
+            })
         ;
 
         $this->deliveryTransitionService->partialReturnDelivery($delivery, $this->context);
@@ -309,12 +320,19 @@ class DeliveryTransitionServiceTest extends TestCase
         $expectedTransition3 = $this->createTransitionForAction(StateMachineTransitionActions::ACTION_RETOUR);
 
         $this->stateMachineRegistry->expects($this->once())->method('getAvailableTransitions');
-        $this->stateMachineRegistry->expects($this->exactly(3))->method('transition')
-            ->withConsecutive(
-                [$expectedTransition1, $this->context],
-                [$expectedTransition2, $this->context],
-                [$expectedTransition3, $this->context]
-            )
+        $matcher = $this->exactly(3);
+        $this->stateMachineRegistry->expects($matcher)->method('transition')
+            ->willReturnCallback(function (Transition $transition) use ($matcher,$expectedTransition1, $expectedTransition2, $expectedTransition3) {
+                if ($matcher->numberOfInvocations() === 1) {
+                    $this->assertEquals($expectedTransition1, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 2) {
+                    $this->assertEquals($expectedTransition2, $transition);
+                }
+                if ($matcher->numberOfInvocations() === 3) {
+                    $this->assertEquals($expectedTransition3, $transition);
+                }
+            })
         ;
 
         $this->deliveryTransitionService->returnDelivery($delivery, $this->context);

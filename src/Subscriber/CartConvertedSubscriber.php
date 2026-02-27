@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CartConvertedSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CartConvertedEvent::class => 'savePayPalExpressData',
@@ -21,7 +21,7 @@ final class CartConvertedSubscriber implements EventSubscriberInterface
     {
         $cart = $event->getCart();
         $cartExtension = $cart->getExtension(CustomFieldsInterface::MOLLIE_KEY);
-        if (! ($cartExtension instanceof ArrayStruct)) {
+        if (! $cartExtension instanceof ArrayStruct) {
             return;
         }
         $paypalExpressAuthenticateId = $cartExtension[CustomFieldsInterface::PAYPAL_EXPRESS_AUTHENTICATE_ID] ?? null;

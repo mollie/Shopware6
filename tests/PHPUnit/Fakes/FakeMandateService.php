@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes;
+namespace MolliePayments\Shopware\Tests\Fakes;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
 use Kiener\MolliePayments\Service\MandateServiceInterface;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 final class FakeMandateService implements MandateServiceInterface

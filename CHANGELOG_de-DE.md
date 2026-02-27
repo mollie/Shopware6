@@ -1,3 +1,24 @@
+# 5.0.0
+- Zahlungsarten verwenden jetzt die Mollie Payments API.
+- Die minimale PHP-Version ist 8.2.
+- Die minimale Shopware-Version ist 6.6.10.x.
+- Order Events und Flows werden nicht mehr ausgelöst.
+- Neue Payment Flows wurden hinzugefügt.
+- Das Event ModifyCreatePaymentPayloadEvent wurde eingeführt, um die Anfrage vor der Erstellung einer Mollie-Zahlung anzupassen.
+- Alle zahlungsbezogenen Logs enthalten nun die Shopware-orderNumber.
+- Die URL zum Speichern des Kreditkarten-Tokens wird nicht mehr verwendet; übergebe stattdessen creditCardToken in der Checkout-Anfrage.
+- Die URL zum Speichern der Mandats-ID ist veraltet; übergebe mandateId als Body-Parameter in der Checkout-Anfrage.
+- Die URL zum Speichern der POS-Terminal-ID ist veraltet; übergebe terminalId als Body-Parameter in der Checkout-Anfrage.
+- Ein Produkt kann nun mehreren Gutschein-Kategorien zugeordnet werden.
+- Hinzugefügt: Order-bezogene Logeinträge werden nun in einem eigenen mollie-Verzeichnis abgelegt. Die Logdateien tragen ein Namensschema im Format order-<orderNumber>, z. B. order-12345.
+- Hinzugefügt: Order-bezogene Logeinträge werden nun automatisch gelöscht, sobald sich der Zahlungsstatus auf "paid" ändert. Zudem werden alle übrigen Einträge entfernt, sobald sie die in den Einstellungen definierte Aufbewahrungsfrist überschreiten.
+- Im Mollie Failure Mode werden auf der Mollie-Seite ausschließlich Zahlungsarten angezeigt, die auch im Warenkorb verfügbar sind.
+- Das Order-State-Mapping wurde optimiert. Beim Statuswechsel wird nun ein präziser Übergangspfad ermittelt; kann der Wechsel nicht durchgeführt werden, werden detaillierte Log-Einträge erstellt.
+- Payconiq ist eingestellt und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
+- Das Event PaymentCreatedEvent wurde eingeführt, damit ist es möglich vor der Weiterleitung zum Zahlungsanbieter noch eigene Logik einzubauen
+- Neues Event ModifyCreateSubscriptionPayloadEvent hinzugefügt. Damit können Entwickler den Payload für die Mollie Subscription API vor dem Erstellen einer Subscription anpassen und erweitern.
+
+
 # Unreleased
 - Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
 - Kompatibilität mit Set-Plugins verbessert. Produkte werden nun bei Mollie einzeln statt als zusammengefasstes Set aufgelistet.
@@ -16,6 +37,8 @@
 - Der „Test API Keys“-Button in den Plugin-Einstellungen wurde für Shopware 6.7 korrigiert.
 - Die Zahlungsstatus-Aktion wurde versionsabhängig angepasst, sodass in älteren Shopware-Versionen wieder die korrekte Action verwendet wird.
 - iDEAL wurde zu iDEAL | Wero umbenannt.
+
+# 4.21.0
 
 # 4.21.0
 - Versandkosten werden bei Erstattung über Shopware Return Management berücksichtig

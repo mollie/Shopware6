@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\ApplePayDirect\Models;
+namespace MolliePayments\Shopware\Tests\Service\ApplePayDirect\Models;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayLineItem;
 use PHPUnit\Framework\TestCase;

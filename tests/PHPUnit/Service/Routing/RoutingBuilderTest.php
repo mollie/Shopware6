@@ -1,14 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Routing;
+namespace MolliePayments\Shopware\Tests\Service\Routing;
 
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
-use MolliePayments\Tests\Fakes\FakePluginSettings;
-use MolliePayments\Tests\Fakes\FakeRouter;
+use MolliePayments\Shopware\Tests\Fakes\FakePluginSettings;
+use MolliePayments\Shopware\Tests\Fakes\FakeRouter;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RoutingBuilderTest extends TestCase
@@ -96,7 +95,7 @@ class RoutingBuilderTest extends TestCase
     private function createBuilder(string $fakeURL, string $fakeEnvDomain): RoutingBuilder
     {
         $fakeRouter = new FakeRouter($fakeURL);
-        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
+        $routingDetector = new RoutingDetector(new RequestStack([]));
 
         return new RoutingBuilder(
             $fakeRouter,

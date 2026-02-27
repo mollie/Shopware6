@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "rediģēt rēķina adresi",
                 "btnEditShippingAddress": "rediģēt piegādes adresi",
-                "cancelSubscription": "Abonēšana ir atcelta",
-                "errorCancelSubscription": "Abonementu nevarēja atcelt kļūdas dēļ. Lūdzu, sazinieties ar mūsu atbalsta dienestu.",
+                "successCancel": "Abonēšana ir atcelta",
+                "errorCancel": "Abonementu nevarēja atcelt kļūdas dēļ. Lūdzu, sazinieties ar mūsu atbalsta dienestu.",
                 "errorPause": "Radās kļūda, pauzējot jūsu abonēšanu",
                 "errorResume": "Radās kļūda, atsākot jūsu abonēšanu",
                 "errorSkip": "Radās kļūda, izlaižot jūsu abonēšanu",

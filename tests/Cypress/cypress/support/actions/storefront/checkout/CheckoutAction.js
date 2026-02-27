@@ -98,14 +98,14 @@ export default class CheckoutAction {
      *
      */
     mollieFailureModeRetryPayment() {
-        cy.get(':nth-child(3) > .btn-primary').click();
+        cy.get('form[name="update-order"] .btn-primary').click();
     }
 
     /**
      *
      */
     mollieFailureModeContinueShopping() {
-        cy.get(':nth-child(3) > .btn-secondary').click();
+        cy.get('form[name="update-order"] .btn-secondary').click();
     }
 
     /**

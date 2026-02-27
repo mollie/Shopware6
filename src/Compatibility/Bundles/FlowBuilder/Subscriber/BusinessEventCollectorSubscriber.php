@@ -67,7 +67,7 @@ class BusinessEventCollectorSubscriber implements EventSubscriberInterface
     /**
      * @return array<mixed>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BusinessEventCollectorEvent::NAME => ['onAddEvent', 1000],

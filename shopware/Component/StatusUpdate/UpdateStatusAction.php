@@ -30,7 +30,7 @@ final class UpdateStatusAction
             return $result;
         }
         $transactionIds = $transactions->getIds();
-
+        /** @var string $transactionId */
         foreach ($transactionIds as $transactionId) {
             $result->addUpdateId($transactionId);
             $this->notification->onNotify($transactionId, $context);

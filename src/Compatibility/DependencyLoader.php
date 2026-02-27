@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility;
 
-use Composer\Autoload\ClassLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -47,20 +46,6 @@ class DependencyLoader
         if ($this->versionCompare->gte('6.4.6.0')) {
             $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
         }
-
-        if ($this->shouldLoadFixtures()) {
-            $loader->load('services/fixtures/fixtures.xml');
-        }
-    }
-
-    public function registerDependencies(): void
-    {
-        $classLoader = new ClassLoader();
-
-        $this->registerPolyfillsAutoloader($classLoader);
-        $this->registerFixturesAutoloader($classLoader);
-
-        $classLoader->register();
     }
 
     public function prepareStorefrontBuild(): void
@@ -87,33 +72,5 @@ class DependencyLoader
             // also it's not perfectly working somehow
             // copy($file, $target);
         }
-    }
-
-    private function registerPolyfillsAutoloader(ClassLoader $classLoader): void
-    {
-        $classLoader->addPsr4('Shopware\Core\\', __DIR__ . '/../../polyfill/Shopware/Core', true);
-    }
-
-    private function registerFixturesAutoloader(ClassLoader $classLoader): void
-    {
-        if ($this->shouldLoadFixtures() === false) {
-            return;
-        }
-
-        $dirFixtures = (string) realpath(__DIR__ . '/../../tests/Fixtures/');
-        // we need to tell Shopware to load our custom fixtures
-        // from our TEST autoload-dev area....
-        $classLoader->addPsr4('MolliePayments\Fixtures\\', $dirFixtures, true);
-    }
-
-    private function shouldLoadFixtures(): bool
-    {
-        $composerDevReqsInstalled = file_exists(__DIR__ . '/../../vendor/bin/phpunit');
-        if ($composerDevReqsInstalled === false) {
-            return false;
-        }
-        $dirFixtures = (string) realpath(__DIR__ . '/../../tests/Fixtures/');
-
-        return is_dir($dirFixtures);
     }
 }

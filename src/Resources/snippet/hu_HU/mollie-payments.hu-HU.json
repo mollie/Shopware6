@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "címzett cím módosítása",
                 "btnEditShippingAddress": "szállítási cím módosítása",
-                "cancelSubscription": "Az előfizetés törölve lett",
-                "errorCancelSubscription": "Hiba miatt nem lehetett lemondani az előfizetést. Kérjük, lépjen kapcsolatba ügyfélszolgálatunkkal.",
+                "successCancel": "Az előfizetés törölve lett",
+                "errorCancel": "Hiba miatt nem lehetett lemondani az előfizetést. Kérjük, lépjen kapcsolatba ügyfélszolgálatunkkal.",
                 "errorPause": "Hiba történt az előfizetés szüneteltetésekor",
                 "errorResume": "Hiba történt az előfizetés folytatásakor",
                 "errorSkip": "Hiba történt az előfizetés kihagyásakor",

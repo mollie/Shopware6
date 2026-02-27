@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\ApplePayDirect\Gateways;
+namespace MolliePayments\Shopware\Tests\Components\ApplePayDirect\Gateways;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Gateways\ApplePayDirectDomainAllowListGateway;
 use Kiener\MolliePayments\Service\SettingsService;

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\RequestAnonymizer;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\RequestAnonymizer;
 
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use PHPUnit\Framework\TestCase;
 
-class MollieRequestAnonymizerTest extends TestCase
+class RequestAnonymizerTest extends TestCase
 {
     /**
      * This test verifies that we get an empty string

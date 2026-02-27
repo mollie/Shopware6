@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
 
 use Kiener\MolliePayments\Compatibility\VersionCompare;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Exception\InconsistentCriteriaIdsException;

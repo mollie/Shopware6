@@ -1,15 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Compatibility\Bundles\FlowBuilder\Actions;
+namespace MolliePayments\Shopware\Tests\Compatibility\Bundles\FlowBuilder\Actions;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\Actions\ShipOrderAction;
-use MolliePayments\Tests\Fakes\FakeOrderService;
-use MolliePayments\Tests\Fakes\FakeShipmentManager;
-use MolliePayments\Tests\Traits\FlowBuilderTestTrait;
+use MolliePayments\Shopware\Tests\Fakes\FakeOrderService;
+use MolliePayments\Shopware\Tests\Fakes\FakeShipmentManager;
+use MolliePayments\Shopware\Tests\Traits\FlowBuilderTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Event\FlowEvent;
 
 class ShipOrderActionTest extends TestCase
 {
@@ -51,7 +52,11 @@ class ShipOrderActionTest extends TestCase
         // build our action and
         // start the handling process with our prepared data
         $action = new ShipOrderAction($fakeOrderService, $fakeShipment, new NullLogger());
-        $action->handle($flowEvent);
+        if (class_exists(FlowEvent::class) && $flowEvent instanceof FlowEvent) {
+            $action->handle($flowEvent);
+        } else {
+            $action->handleFlow($flowEvent);
+        }
 
         // let's see if our shipment service did receive
         // the correct calls and data

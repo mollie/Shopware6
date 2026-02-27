@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
 use Shopware\Core\Framework\Context;
 
 class SkipAction extends BaseAction
@@ -71,15 +71,15 @@ class SkipAction extends BaseAction
 
         $nextPaymentDate = $intervalCalculator->getNextIntervalDate(
             $currentSubscriptionNextPaymentAt,
-            (int) $metaData->getInterval(),
-            $metaData->getIntervalUnit()
+            (int) $metaData->getIntervalValue(),
+            (string) $metaData->getIntervalUnit()->value
         );
 
         $jsonPayload = $this->getPayloadBuilder()->buildRequestPayload(
             $subscription,
             $nextPaymentDate,
-            (string) $metaData->getInterval(),
-            $metaData->getIntervalUnit(),
+            (string) $metaData->getIntervalValue(),
+            (string) $metaData->getIntervalUnit()->value,
             (int) $metaData->getTimes(),
             $subscription->getMandateId()
         );

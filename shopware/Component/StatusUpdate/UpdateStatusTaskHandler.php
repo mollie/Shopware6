@@ -4,29 +4,31 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\StatusUpdate;
 
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskCollection;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskEntity;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(handles: UpdateStatusScheduledTask::class)]
 final class UpdateStatusTaskHandler extends ScheduledTaskHandler
 {
-    private UpdateStatusAction $action;
-
     /**
-     * @param EntityRepository<EntityCollection<ScheduledTaskEntity>> $scheduledTaskRepository
+     * @param EntityRepository<ScheduledTaskCollection<ScheduledTaskEntity>> $scheduledTaskRepository
      */
-    public function __construct(UpdateStatusAction $action, $scheduledTaskRepository, LoggerInterface $exceptionLogger)
-    {
+    public function __construct(private UpdateStatusAction $action,
+        #[Autowire(service: 'scheduled_task.repository')]
+        EntityRepository $scheduledTaskRepository,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        LoggerInterface $exceptionLogger
+    ) {
         parent::__construct($scheduledTaskRepository, $exceptionLogger);
-        $this->action = $action;
     }
 
     public function run(): void
     {
-        $result = $this->action->execute();
+        $this->action->execute();
     }
 
     /**

@@ -2,6 +2,7 @@ parameters:
     level: 8
     paths:
         - ./../src
+        - ./../shopware
     excludePaths:
         - ./../src/Resources/*
         - ./../src/Migration/*
@@ -21,8 +22,6 @@ parameters:
           message: 'use some logger instead'
         - function: 'putenv()'
           message: 'might overwrite existing variables'
-    scanDirectories:
-      - ../polyfill/Shopware
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
@@ -36,9 +35,10 @@ parameters:
     		- identifier: parameter.unresolvableType
     		- identifier: varTag.unresolvableType
     		- identifier: attribute.notFound
+    		- identifier: function.alreadyNarrowedType
 
 services:
-    - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
+    - class: MolliePayments\Shopware\PHPStan\Rules\NoManufacturerRule
       tags:
         - phpstan.rules.rule
 

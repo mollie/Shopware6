@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
@@ -17,7 +17,8 @@ use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\OrderLineCollection;
 use Mollie\Api\Types\OrderLineType;
-use MolliePayments\Tests\Traits\BuilderTestTrait;
+use MolliePayments\Shopware\Tests\Traits\BuilderTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Routing\RouterInterface;
@@ -108,9 +109,7 @@ class OrderTest extends TestCase
         $this->orderApiService->getMollieOrder('foo', 'bar');
     }
 
-    /**
-     * @dataProvider getIsCompletelyShippedData
-     */
+    #[DataProvider('getIsCompletelyShippedData')]
     public function testIsCompletelyShipped(string $type, int $shippableQuantity, bool $expectedValue)
     {
         $mollieOrderLine = $this->createMock(OrderLine::class);
@@ -138,7 +137,7 @@ class OrderTest extends TestCase
         $this->assertEquals($expectedValue, $actualValue);
     }
 
-    public function getIsCompletelyShippedData()
+    public static function getIsCompletelyShippedData()
     {
         return [
             // These types are available as line items in Shopware, so test whether they need to be shipped.

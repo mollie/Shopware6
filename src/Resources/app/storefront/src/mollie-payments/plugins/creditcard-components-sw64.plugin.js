@@ -233,17 +233,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         // so we have to call the API to save it
         // and then we continue by submitting our original payment form.
         if (this.isValidSelectedMandate(mandateId)) {
-            this.client.get(
-                me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
-                () => {
-                    me.continueShopwareCheckout(paymentForm);
-                },
-                () => {
-                    me.continueShopwareCheckout(paymentForm);
-                },
-                'application/json; charset=utf-8',
-            );
-
+            me.continueShopwareCheckout(paymentForm);
             return;
         }
 
@@ -260,35 +250,10 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             verificationErrors.scrollIntoView();
             return;
         }
-
-        // Build query params
-        const queryParams = new URLSearchParams({
-            shouldSaveCardDetail: this.shouldSaveCardDetail(),
-        });
-
-        let queryString = queryParams.toString();
-        if (queryString) {
-            queryString = `?${queryString}`;
-        }
-
-        // now we finish by first calling our URL to store
-        // the credit card token for the user and the current checkout
-        // and then we continue by submitting our original payment form.
-        this.client.get(
-            me.options.shopUrl +
-                '/mollie/components/store-card-token/' +
-                me.options.customerId +
-                '/' +
-                token +
-                queryString,
-            function () {
-                me.continueShopwareCheckout(paymentForm);
-            },
-            function () {
-                me.continueShopwareCheckout(paymentForm);
-            },
-            'application/json; charset=utf-8',
-        );
+        /** @type HTMLInputElement **/
+        const tokenInput = document.getElementById('cardToken');
+        tokenInput.value = token;
+        me.continueShopwareCheckout(paymentForm);
     }
 
     /**

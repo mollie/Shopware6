@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -77,7 +77,7 @@ class ConfirmAction extends BaseAction
             $pendingSubscription,
             $metaData->getStartDate(),
             (string) $metaData->getInterval(),
-            $metaData->getIntervalUnit(),
+            $metaData->getIntervalUnit()->value,
             (int) $metaData->getTimes(),
             $mandateId
         );

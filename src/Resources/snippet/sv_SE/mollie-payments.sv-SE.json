@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "redigera faktureringsadress",
                 "btnEditShippingAddress": "redigera fraktadress",
-                "cancelSubscription": "Prenumerationen har avbrutits",
-                "errorCancelSubscription": "Prenumerationen kunde inte avbrytas på grund av ett fel. Vänligen kontakta vår support.",
+                "successCancel": "Prenumerationen har avbrutits",
+                "errorCancel": "Prenumerationen kunde inte avbrytas på grund av ett fel. Vänligen kontakta vår support.",
                 "errorPause": "Det uppstod ett fel när prenumerationen skulle pausas",
                 "errorResume": "Det uppstod ett fel när prenumerationen skulle återupptas",
                 "errorSkip": "Det uppstod ett fel när prenumerationen skulle hoppas över",

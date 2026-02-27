@@ -94,6 +94,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
         $scId = $args->getSalesChannelContext()->getSalesChannel()->getId();
 
         $currentSelectedPaymentMethod = $args->getSalesChannelContext()->getPaymentMethod();
+
         $mollieAttributes = new PaymentMethodAttributes($currentSelectedPaymentMethod);
 
         // load additional data only for mollie payment methods

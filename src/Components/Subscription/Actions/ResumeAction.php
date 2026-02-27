@@ -7,9 +7,6 @@ use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFact
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Interval\IntervalCalculator;
@@ -18,6 +15,9 @@ use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\S
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\SettingsService;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 
@@ -87,7 +87,7 @@ class ResumeAction extends BaseAction
             $subscription,
             $nextPaymentDate->format('Y-m-d'),
             (string) $metaData->getInterval(),
-            $metaData->getIntervalUnit(),
+            (string) $metaData->getIntervalUnit()->value,
             (int) $metaData->getTimes(),
             $subscription->getMandateId()
         );
