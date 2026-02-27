@@ -20,7 +20,9 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\System\Country\Aggregate\CountryState\CountryStateDefinition;
 use Shopware\Core\System\Country\CountryDefinition;
 use Shopware\Core\System\Salutation\SalutationDefinition;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('shopware.entity.definition',['entity' => 'mollie_subscription_address'])]
 class SubscriptionAddressDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription_address';
