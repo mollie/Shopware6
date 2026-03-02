@@ -119,17 +119,55 @@ class MollieLineItemBuilder
             return $lines;
         }
 
-        $lineItems = $this->getLineItemsFlat($lineItems);
+        $customizedProducts = $lineItems->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS);
 
-        $ignoreTypes = [
-            self::LINE_ITEM_REPERTUS_SET,
-            self::LINE_ITEM_SKWEB_SET,
-            self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS,
-        ];
+        foreach ($customizedProducts as $customizedProduct) {
+            $productChildren = $customizedProduct->getChildren();
+            if ($productChildren === null) {
+                continue;
+            }
+            $options = $productChildren->filterByType(self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS);
+            foreach ($options as $option) {
+                $optionValues = $option->getChildren();
+                if ($optionValues !== null) {
+                    foreach ($optionValues as $optionValue) {
+                        if ($optionValue->getPrice() !== null && $optionValue->getPrice()->getTotalPrice() > 0) {
+                            $lineItems->add($optionValue);
+                        }
+                    }
+                }
+                if ($option->getPrice() !== null && $option->getPrice()->getTotalPrice() > 0) {
+                    $lineItems->add($option);
+                }
+            }
+        }
+
+        $products = $lineItems->filterByType(LineItem::PRODUCT_LINE_ITEM_TYPE);
+
+        foreach ($products as $product) {
+            $children = $product->getChildren();
+            $hasChildren = $children instanceof OrderLineItemCollection && $children->count() > 0;
+            if (! $hasChildren) {
+                continue;
+            }
+            foreach ($children as $child) {
+                $lineItems->add($child);
+            }
+        }
 
         foreach ($lineItems as $item) {
-            if (in_array($item->getType(), $ignoreTypes, true)) {
-                continue;
+            $lineItemChildren = $item->getChildren();
+            $hasChildren = $lineItemChildren instanceof OrderLineItemCollection && $lineItemChildren->count() > 0;
+
+            if ($item->getType() === self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS && $hasChildren) {
+                $filteredItems = $lineItemChildren->filter(function (OrderLineItemEntity $lineItemEntity) {
+                    return $lineItemEntity->getType() !== self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS_OPTIONS;
+                });
+
+                if ($filteredItems->count() === 1) {
+                    /** @var OrderLineItemEntity $item */
+                    $item = $filteredItems->first();
+                }
             }
 
             $this->orderLineItemValidator->validate($item);
@@ -176,35 +214,6 @@ class MollieLineItemBuilder
         }
 
         return 'promotion';
-    }
-
-    /**
-     * @return OrderLineItemEntity[]
-     */
-    private function getLineItemsFlat(?OrderLineItemCollection $lineItems): array
-    {
-        $flat = [];
-        if (! $lineItems) {
-            return $flat;
-        }
-
-        foreach ($lineItems as $lineItem) {
-            if ($lineItem->getType() === self::LINE_ITEM_DREISEC_SET) {
-                foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
-                    if (stristr((string) $nest->getType(), self::LINE_ITEM_DREISEC_SET) !== false) {
-                        $flat[] = $nest;
-                    }
-                }
-                continue;
-            }
-            $flat[] = $lineItem;
-
-            foreach ($this->getLineItemsFlat($lineItem->getChildren()) as $nest) {
-                $flat[] = $nest;
-            }
-        }
-
-        return $flat;
     }
 
     /**
