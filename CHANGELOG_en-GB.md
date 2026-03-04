@@ -1,6 +1,7 @@
 # Unreleased
 - Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
 - Fixed compatibility with set plugins.
+- Fixed: Page extensions are now correctly extended instead of overwritten during checkout to ensure compatibility with other plugins.
 - New: Shipping costs are now automatically considered for refunds via the Shopware Return Manager, including manually entered shipping costs.
 
 # 4.22.1

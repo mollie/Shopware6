@@ -1,6 +1,7 @@
 # Unreleased
 - Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
 - Problem behoben mit verschiedenen Set-Plugins
+- Behoben: Page Extensions werden im Checkout nun korrekt erweitert statt überschrieben, um Kompatibilität mit anderen Plugins zu gewährleisten.
 - Neu: Beim Erstatten aller Line Items im Shopware Return Manager werden Versandkosten nun automatisch mit berücksichtigt. Manuell angegebene Versandkosten werden ebenfalls übernommen.
 
 
