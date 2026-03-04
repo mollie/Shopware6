@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "muuda arvete aadressi",
                 "btnEditShippingAddress": "muuda kohaletoimetamise aadressi",
-                "cancelSubscription": "Tellimus on tühistatud",
-                "errorCancelSubscription": "Tellimust ei saa tühistada, kuna ilmnes viga. Palun võta meiega ühendust.",
+                "successCancel": "Tellimus on tühistatud",
+                "errorCancel": "Tellimust ei saa tühistada, kuna ilmnes viga. Palun võta meiega ühendust.",
                 "errorPause": "Tellimuse peatamisel tekkis viga",
                 "errorResume": "Tellimuse jätkamisel tekkis viga",
                 "errorSkip": "Tellimuse vahelejätmisel tekkis viga",

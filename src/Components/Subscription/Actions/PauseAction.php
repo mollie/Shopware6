@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Components\Subscription\Actions;
 
 use Kiener\MolliePayments\Components\Subscription\Actions\Base\BaseAction;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
 use Shopware\Core\Framework\Context;
 
 class PauseAction extends BaseAction

@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription\Struct;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription\Struct;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\IntervalType;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 
 class SubscriptionMetadataTest extends TestCase
@@ -15,11 +16,11 @@ class SubscriptionMetadataTest extends TestCase
      */
     public function testProperties(): void
     {
-        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalType::MONTHS, 5, 'tr_123');
+        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalUnit::MONTHS, 5, 'tr_123');
 
         static::assertSame('2022-05-01', $meta->getStartDate());
-        static::assertSame(1, $meta->getInterval());
-        static::assertSame(IntervalType::MONTHS, $meta->getIntervalUnit());
+        static::assertSame(1, $meta->getIntervalValue());
+        static::assertSame(IntervalType::MONTHS, $meta->getIntervalUnit()->value);
         static::assertSame(5, $meta->getTimes());
         static::assertSame('tr_123', $meta->getTmpTransaction());
     }
@@ -30,13 +31,14 @@ class SubscriptionMetadataTest extends TestCase
      */
     public function testArrayStructure(): void
     {
-        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalType::MONTHS, 5, 'tr_123');
+        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalUnit::MONTHS, 5, 'tr_123');
 
         $expected = [
             'start_date' => '2022-05-01',
             'interval_value' => 1,
             'interval_unit' => IntervalType::MONTHS,
             'times' => 5,
+            'nextPossiblePaymentDate' => '',
             'tmp_transaction' => 'tr_123',
         ];
         static::assertSame($expected, $meta->toArray());
@@ -49,21 +51,9 @@ class SubscriptionMetadataTest extends TestCase
      */
     public function testSkipTmpTransactionInArrayStructure(): void
     {
-        $meta = new SubscriptionMetadata('', 1, IntervalType::MONTHS, null, '');
+        $meta = new SubscriptionMetadata('', 1, IntervalUnit::MONTHS, 0, '');
 
         static::assertArrayNotHasKey('tmp_transaction', $meta->toArray());
-    }
-
-    /**
-     * This test verifies that our times key is created even
-     * if the value is NULL.
-     */
-    public function testTimesWithNullInArrayStructure(): void
-    {
-        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalType::MONTHS, null, 'tr_123');
-
-        static::assertArrayHasKey('times', $meta->toArray());
-        static::assertSame(null, $meta->toArray()['times']);
     }
 
     /**
@@ -71,7 +61,7 @@ class SubscriptionMetadataTest extends TestCase
      */
     public function testTmpTransactionId(): void
     {
-        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalType::MONTHS, null, 'tr_123');
+        $meta = new SubscriptionMetadata('2022-05-01', 1, IntervalUnit::MONTHS, 0, 'tr_123');
 
         $meta->setTmpTransaction('tr_xyz');
 

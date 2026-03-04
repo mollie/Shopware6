@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\Services\Builder;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 
 class MollieDataBuilder
 {

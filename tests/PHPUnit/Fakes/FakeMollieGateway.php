@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Fakes;
+namespace MolliePayments\Shopware\Tests\Fakes;
 
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Mollie\Api\Resources\Order;
@@ -58,11 +58,6 @@ class FakeMollieGateway implements MollieGatewayInterface
     public function updateSubscription(string $subscriptionId, string $customerId, string $mandateId): void
     {
         // TODO: Implement updateSubscription() method.
-    }
-
-    public function cancelPayment(string $id): Payment
-    {
-        // TODO: Implement cancelPayment() method.
     }
 
     public function getPosTerminals(): array

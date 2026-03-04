@@ -72,8 +72,8 @@
       "account": {
         "btnEditBillingAddress": "modifica l'indirizzo di fatturazione",
         "btnEditShippingAddress": "modifica l'indirizzo di spedizione",
-        "cancelSubscription": "L'abbonamento è stato annullato",
-        "errorCancelSubscription": "Non è stato possibile annullare l'abbonamento a causa di un errore. Si prega di contattare il nostro supporto.",
+        "successCancel": "L'abbonamento è stato annullato",
+        "errorCancel": "Non è stato possibile annullare l'abbonamento a causa di un errore. Si prega di contattare il nostro supporto.",
         "errorPause": "Si è verificato un errore durante la pausa del suo abbonamento",
         "errorResume": "Si è verificato un errore durante la ripresa del suo abbonamento",
         "errorSkip": "Si è verificato un errore durante il salto del suo abbonamento",

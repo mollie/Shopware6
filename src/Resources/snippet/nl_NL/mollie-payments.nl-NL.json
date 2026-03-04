@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "factuuradres bewerken",
                 "btnEditShippingAddress": "verzendadres bewerken",
-                "cancelSubscription": "Abonnement is geannuleerd",
-                "errorCancelSubscription": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
+                "successCancel": "Abonnement is geannuleerd",
+                "errorCancel": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
                 "errorPause": "There was an error when pausing your subscription",
                 "errorResume": "There was an error when resuming your subscription",
                 "errorSkip": "There was an error when skipping your subscription",

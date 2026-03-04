@@ -1,6 +1,7 @@
 {% block page_account_mollie_subscriptions_item_overview %}
     <div class="order-wrapper">
         <div class="order-item-header">
+
             <div class="row flex-wrap">
                 {% block page_account_mollie_subscriptions_item_heading %}
                     <h2 class="col-auto order-table-header-heading heading-mollie-subscriptions">
@@ -129,7 +130,7 @@
                                     {% if(subscription.isPauseAllowed) %}
                                         {% block page_account_subscriptions_item_context_menu_pause %}
                                             {% block page_account_subscriptions_item_context_menu_pause_form %}
-                                                <form action="{{ path('frontend.account.mollie.subscriptions.pause', { 'swSubscriptionId': subscription.id }) }}"
+                                                <form action="{{ path('frontend.account.mollie.subscriptions.pause', { 'subscriptionId': subscription.id }) }}"
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
@@ -152,7 +153,7 @@
                                     {% if(subscription.isResumeAllowed) %}
                                         {% block page_account_subscriptions_item_context_menu_resume %}
                                             {% block page_account_subscriptions_item_context_menu_resume_form %}
-                                                <form action="{{ path('frontend.account.mollie.subscriptions.resume', { 'swSubscriptionId': subscription.id }) }}"
+                                                <form action="{{ path('frontend.account.mollie.subscriptions.resume', { 'subscriptionId': subscription.id }) }}"
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
@@ -177,7 +178,7 @@
                                 {% if page.allowSkip and subscription.isSkipAllowed %}
                                     {% block page_account_subscriptions_item_context_menu_skip %}
                                         {% block page_account_subscriptions_item_context_menu_skip_form %}
-                                            <form action="{{ path('frontend.account.mollie.subscriptions.skip', { 'swSubscriptionId': subscription.id }) }}"
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.skip', { 'subscriptionId': subscription.id }) }}"
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">

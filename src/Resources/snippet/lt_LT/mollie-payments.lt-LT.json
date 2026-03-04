@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "redaguoti sąskaitos faktūros adresą",
                 "btnEditShippingAddress": "redaguoti siuntimo adresą",
-                "cancelSubscription": "Prenumerata sėkmingai atšaukta",
-                "errorCancelSubscription": "Dėl klaidos nepavyko atšaukti prenumeratos. Prašome susisiekti su mūsų pagalbos komanda.",
+                "successCancel": "Prenumerata sėkmingai atšaukta",
+                "errorCancel": "Dėl klaidos nepavyko atšaukti prenumeratos. Prašome susisiekti su mūsų pagalbos komanda.",
                 "errorPause": "Sustabdant jūsų prenumeratą įvyko klaida",
                 "errorResume": "Atnaujinant jūsų prenumeratą įvyko klaida",
                 "errorSkip": "Praleidžiant jūsų prenumeratą įvyko klaida",

@@ -336,7 +336,7 @@ class CustomerService implements CustomerServiceInterface
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (! ($customer instanceof CustomerEntity)) {
+        if (! $customer instanceof CustomerEntity) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 
@@ -481,7 +481,7 @@ class CustomerService implements CustomerServiceInterface
 
         $customer = $this->getCustomer($customerId, $context);
 
-        if (! ($customer instanceof CustomerEntity)) {
+        if (! $customer instanceof CustomerEntity) {
             throw new CustomerCouldNotBeFoundException($customerId);
         }
 

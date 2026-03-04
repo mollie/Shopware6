@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Subscriber;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\IntervalType;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Storefront\Struct\SubscriptionCartExtensionStruct;
 use Kiener\MolliePayments\Storefront\Struct\SubscriptionDataExtensionStruct;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Kiener\MolliePayments\Struct\Product\ProductAttributes;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\IntervalType;
 use Shopware\Core\Checkout\Cart\Event\CartBeforeSerializationEvent;
 use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPage;
@@ -40,7 +40,7 @@ class SubscriptionSubscriber implements EventSubscriberInterface
     /**
      * @return string[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CartBeforeSerializationEvent::class => 'onBeforeSerializeCart',

@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments\Components\Subscription\Services\Installer;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Content\MailTemplate\Aggregate\MailTemplateType\MailTemplateTypeEntity;
 use Shopware\Core\Content\MailTemplate\MailTemplateEntity;
@@ -83,7 +83,6 @@ class MailTemplateInstaller
 
         $subscription = new SubscriptionEntity();
         $subscription->setDescription('1x Sample Product (Order #1233, 24.99 EUR)');
-        $subscription->setQuantity(1);
         $subscription->setAmount(24.99);
         $subscription->setCurrency($currencyEntity);
         $subscription->setMollieCustomerId('cst_123456');

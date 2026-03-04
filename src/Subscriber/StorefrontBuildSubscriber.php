@@ -38,7 +38,7 @@ class StorefrontBuildSubscriber implements EventSubscriberInterface
         $this->versionCompare = $versionCompare;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StorefrontRenderEvent::class => 'onStorefrontRender',

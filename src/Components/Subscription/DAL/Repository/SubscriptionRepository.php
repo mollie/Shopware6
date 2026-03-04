@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription\DAL\Repository;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
 use Kiener\MolliePayments\Components\Subscription\Exception\SubscriptionNotFoundException;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
@@ -184,10 +184,8 @@ class SubscriptionRepository
                     'status' => $status,
                     'description' => $subscription->getDescription(),
                     'amount' => $subscription->getAmount(),
-                    'quantity' => $subscription->getQuantity(),
                     'currencyId' => $subscription->getCurrencyId(),
                     'metadata' => $subscription->getMetadata()->toArray(),
-                    'productId' => $subscription->getProductId(),
                     'orderId' => $subscription->getOrderId(),
                     'salesChannelId' => $subscription->getSalesChannelId(),
                     'totalRounding' => $totalRoundingValue,

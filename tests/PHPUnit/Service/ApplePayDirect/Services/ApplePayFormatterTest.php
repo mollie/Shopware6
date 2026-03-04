@@ -1,15 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service\ApplePayDirect\Models;
+namespace MolliePayments\Shopware\Tests\Service\ApplePayDirect\Services;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\Models\ApplePayCart;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
-use MolliePayments\Tests\Fakes\FakeTranslator;
+use MolliePayments\Shopware\Tests\Fakes\FakeTranslator;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ApplePayFormatterTest extends TestCase
@@ -26,7 +25,7 @@ class ApplePayFormatterTest extends TestCase
         $fakeSnippets->addSnippet('molliePayments.payments.applePayDirect.captionSubtotal', 'Subtotal');
         $fakeSnippets->addSnippet('molliePayments.payments.applePayDirect.captionTaxes', 'Taxes');
 
-        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
+        $routingDetector = new RoutingDetector(new RequestStack([]));
         $this->formatter = new ApplePayFormatter($fakeSnippets, $routingDetector);
     }
 

@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\Services\SubscriptionCancellation;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Services\SubscriptionCancellation;
 
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 class CancellationValidatorTest extends TestCase
@@ -22,13 +23,10 @@ class CancellationValidatorTest extends TestCase
      * This test verifies that we can cancel the subscription
      * until its renewed if there are no restrictions and settings.
      *
-     * @group subscriptions
-     *
      * @throws \Exception
-     *
-     * @return void
      */
-    public function testNoCancellationRestrictions()
+    #[Group('subscriptions')]
+    public function testNoCancellationRestrictions(): void
     {
         $isAllowed = $this->validator->isCancellationAllowed(
             new \DateTime('2022-07-08'),
@@ -43,13 +41,10 @@ class CancellationValidatorTest extends TestCase
      * This test verifies that a cancellation on the last possible
      * day is indeed valid and working for the customer.
      *
-     * @group subscriptions
-     *
      * @throws \Exception
-     *
-     * @return void
      */
-    public function testNoCancellationWithDaysInRange()
+    #[Group('subscriptions')]
+    public function testNoCancellationWithDaysInRange(): void
     {
         $isAllowed = $this->validator->isCancellationAllowed(
             new \DateTime('2022-07-08'),
@@ -65,13 +60,10 @@ class CancellationValidatorTest extends TestCase
      * subscription as soon as the latest possible date
      * has been exceeded.
      *
-     * @group subscriptions
-     *
      * @throws \Exception
-     *
-     * @return void
      */
-    public function testNoCancellationWithDaysOutsideRange()
+    #[Group('subscriptions')]
+    public function testNoCancellationWithDaysOutsideRange(): void
     {
         $isAllowed = $this->validator->isCancellationAllowed(
             new \DateTime('2022-07-08'),
@@ -87,13 +79,10 @@ class CancellationValidatorTest extends TestCase
      * a subscription if there is no renewal date known.
      * This should not happen, but still we need to support it in case it does.
      *
-     * @group subscriptions
-     *
      * @throws \Exception
-     *
-     * @return void
      */
-    public function testNoRenewalDateExisting()
+    #[Group('subscriptions')]
+    public function testNoRenewalDateExisting(): void
     {
         $isAllowed = $this->validator->isCancellationAllowed(
             null,

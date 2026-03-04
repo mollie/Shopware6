@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Subscriber;
+namespace MolliePayments\Shopware\Tests\Subscriber;
 
 use Kiener\MolliePayments\Service\Router\RoutingDetector;
 use Kiener\MolliePayments\Service\TransactionService;
@@ -152,7 +152,6 @@ class WebhookTimezoneSubscriberTest extends TestCase
      */
     public function testThatTimezoneIsNotSetWithoutATransaction()
     {
-        $this->setUpTransactionService(null);
         $event = $this->initSubscriberRequests(self::STOREFRONT_WEBHOOK_ROUTE, self::TRANSACTION_ID);
 
         $this->transactionService->expects($this->once())->method('getTransactionById');

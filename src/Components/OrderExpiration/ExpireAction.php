@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\OrderExpiration;
 
-use Kiener\MolliePayments\Handler\Method\BankTransferPayment;
 use Kiener\MolliePayments\Service\Order\OrderExpireService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -83,7 +82,7 @@ class ExpireAction
         $this->logger->info('Start expire orders for saleschannel', ['salesChannel' => $salesChannelEntity->getName()]);
 
         $date = new \DateTime();
-        $date->modify(sprintf('-%d days', BankTransferPayment::DUE_DATE_MAX_DAYS + 1));
+        $date->modify(sprintf('-%d days', 101));
 
         $orFilterArray = [
             new EqualsFilter('transactions.stateMachineState.technicalName', OrderTransactionStates::STATE_IN_PROGRESS),

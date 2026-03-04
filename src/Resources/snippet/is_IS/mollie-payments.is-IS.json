@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "breyta reikningsfangi",
                 "btnEditShippingAddress": "breyta heimilsfangi sendingar",
-                "cancelSubscription": "Hætt var við áskrift",
-                "errorCancelSubscription": "Ekki var hægt að hætta við áskrift vegna villu. Vinsamlegast hafðu samband við stuðningsíðuna okkar.",
+                "successCancel": "Hætt var við áskrift",
+                "errorCancel": "Ekki var hægt að hætta við áskrift vegna villu. Vinsamlegast hafðu samband við stuðningsíðuna okkar.",
                 "errorPause": "Vandamál kom upp þegar áskriftin var stöðvuð",
                 "errorResume": "Vandamál kom upp þegar áskriftin var hafin á ný",
                 "errorSkip": "Vandamál kom upp þegar áskriftinni var sleppt",

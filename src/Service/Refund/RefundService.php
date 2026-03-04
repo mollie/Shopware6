@@ -179,7 +179,7 @@ class RefundService implements RefundServiceInterface
         }
 
         // This payment does not have a refund with $refundId, so we cannot cancel it.
-        if (! ($refund instanceof Refund)) {
+        if (! $refund instanceof Refund) {
             return false;
         }
 

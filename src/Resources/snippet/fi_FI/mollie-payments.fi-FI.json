@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "muokkaa laskutusosoitetta",
                 "btnEditShippingAddress": "muokkaa toimitusosoitetta",
-                "cancelSubscription": "Tilaus on peruutettu",
-                "errorCancelSubscription": "Tilauksen peruuttaminen epäonnistui virheen vuoksi. Ota yhteyttä tukeemme.",
+                "successCancel": "Tilaus on peruutettu",
+                "errorCancel": "Tilauksen peruuttaminen epäonnistui virheen vuoksi. Ota yhteyttä tukeemme.",
                 "errorPause": "Tilauksen keskeyttämisessä ilmeni virhe",
                 "errorResume": "Tilauksen jatkamisessa ilmeni virhe",
                 "errorSkip": "Tilauksen ohittamisessa ilmeni virhe",

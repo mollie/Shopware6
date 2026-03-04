@@ -72,8 +72,8 @@
             "account": {
                 "btnEditBillingAddress": "rediger faktureringsadresse",
                 "btnEditShippingAddress": "rediger leveringsadresse",
-                "cancelSubscription": "Abonnementet er blevet annulleret",
-                "errorCancelSubscription": "Abonnementsaftalen kunne ikke annulleres på grund af en fejl. Kontakt venligst vores support.",
+                "successCancel": "Abonnementet er blevet annulleret",
+                "errorCancel": "Abonnementsaftalen kunne ikke annulleres på grund af en fejl. Kontakt venligst vores support.",
                 "errorPause": "Der opstod en fejl, da dit abonnement blev sat på pause.",
                 "errorResume": "Der opstod en fejl, da dit abonnement blev genoptaget.",
                 "errorSkip": "Der opstod en fejl, da dit abonnement blev sprunget over.",

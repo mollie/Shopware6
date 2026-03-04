@@ -9,7 +9,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Content\Flow\Dispatching\Action\FlowAction;
 use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\FlowEvent;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -48,7 +47,7 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            self::getName() => 'handle',
+            self::getName() => 'handleFlow',
         ];
     }
 
@@ -68,32 +67,6 @@ class ShipOrderAction extends FlowAction implements EventSubscriberInterface
         $orderId = $flow->getStore('orderId');
 
         $this->shipOrder($orderId, $flow->getContext());
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @phpstan-ignore class.notFound
-     */
-    public function handle(FlowEvent $event): void
-    {
-        /** @phpstan-ignore class.notFound */
-        $config = $event->getConfig();
-
-        if (empty($config)) {
-            return;
-        }
-
-        /** @phpstan-ignore class.notFound */
-        $baseEvent = $event->getEvent();
-
-        if (! $baseEvent instanceof OrderAware) {
-            return;
-        }
-
-        $orderId = $baseEvent->getOrderId();
-
-        $this->shipOrder($orderId, $baseEvent->getContext());
     }
 
     /**

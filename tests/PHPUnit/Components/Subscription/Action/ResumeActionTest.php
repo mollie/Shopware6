@@ -1,17 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\PHPUnit\Components\Subscription\Action;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\Action;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
 use Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\Struct\SubscriptionMetadata;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionStatus;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder;
 use Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator;
@@ -22,6 +17,12 @@ use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Mollie\Api\Resources\Subscription;
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -110,7 +111,7 @@ class ResumeActionTest extends TestCase
 
         $fakeSubscription->setHistoryEntries($subscriptionHistoryEntries);
 
-        $subscriptionMetadata = new SubscriptionMetadata('2025-08-13', 2, 'months', null, '');
+        $subscriptionMetadata = new SubscriptionMetadata('2025-08-13', 2, IntervalUnit::MONTHS, 0, '');
         $fakeSubscription->setMetadata($subscriptionMetadata);
 
         $repoSubscriptions = $this->createMock(SubscriptionRepository::class);

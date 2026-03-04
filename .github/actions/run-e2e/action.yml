@@ -117,20 +117,12 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
-
-    - name: Legacy fixes
-      if: ${{ startsWith(inputs.SHOPWARE,'6.4') }}
-      shell: bash
-      run: |
-        # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
-        docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
-        docker exec  shop bash -c 'mkdir -p /var/www/html/var/test/jwt && cp /var/www/html/config/jwt/*.pem /var/www/html/var/test/jwt && chmod 0660 /var/www/html/var/test/jwt/*.pem'
-       
+  
 
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:9.* -W' # we need to install phpunit 9 with all dependencies, because of minimum php version 8.0
+        docker exec shop bash -c 'composer require --dev phpunit/phpunit:11.* -W' 
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
@@ -154,12 +146,14 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
+        # clean settings inheritance
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
         docker exec shop bash -c 'php bin/console cache:clear'
 
     - name: Install Fixtures
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console mollie:fixtures:install --force'
+        docker exec shop bash -c 'php bin/console mollie:fixtures:load'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -172,7 +166,7 @@ runs:
     - name: Integration analyzer
       shell: bash
       run: |
-        docker exec shop bash -c 'php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
 
     - name: Integration tests
       shell: bash
@@ -188,14 +182,6 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
       run: cd tests/Cypress && make install -B
-
-    - name: Remove deprecated Cypress Tests
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.REMOVE_DEPRECATED_TESTS == 'true' }}
-      shell: bash
-      run: |
-        # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js || true
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'false' }}
