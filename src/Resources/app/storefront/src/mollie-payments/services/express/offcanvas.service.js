@@ -15,7 +15,7 @@ export default class ExpressOffcanvasService {
             const offCanvas = offCanvasInstances[i];
 
             if (!offCanvas['_' + key + '_subscribed']) {
-                offCanvas.$emitter.subscribe('offCanvasOpened', handler);
+                offCanvas.$emitter.subscribe('registerEvents', handler);
                 offCanvas['_' + key + '_subscribed'] = true;
             }
         }

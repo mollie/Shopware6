@@ -2,6 +2,7 @@
 - Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
 - Problem behoben mit verschiedenen Set-Plugins
 - Neu: Beim Erstatten aller Line Items im Shopware Return Manager werden Versandkosten nun automatisch mit berücksichtigt. Manuell angegebene Versandkosten werden ebenfalls übernommen.
+- Behoben: Der Apple Pay Direct Button wird im Shopping-Cart-Offcanvas korrekt angezeigt, wenn die Versandart geändert wird.
 
 
 # 4.22.1
