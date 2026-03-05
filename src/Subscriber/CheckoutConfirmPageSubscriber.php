@@ -268,7 +268,7 @@ class CheckoutConfirmPageSubscriber implements EventSubscriberInterface
 
             $mandates = $this->mandateService->getCreditCardMandatesByCustomerId($loggedInCustomer->getId(), $salesChannelContext);
 
-            $args->getPage()->setExtensions([
+            $args->getPage()->addExtensions([
                 'MollieCreditCardMandateCollection' => $mandates,
             ]);
         } catch (\Exception $e) {
