@@ -163,3 +163,5 @@ This structure allows developers and AI systems to quickly locate the relevant i
 - No new logic in `/src`
 - Tests required for new features
 - Follow project coding standards
+- If a code part was changed, add a summary in custom/plugins/MolliePayments/CHANGELOG*.md under `unreleased` Section
+- Run `make pr` to check if the code is working

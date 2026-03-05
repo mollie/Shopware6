@@ -3,6 +3,7 @@
 - Fixed compatibility with set plugins.
 - Fixed: Page extensions are now correctly extended instead of overwritten during checkout to ensure compatibility with other plugins.
 - New: Shipping costs are now automatically considered for refunds via the Shopware Return Manager, including manually entered shipping costs.
+- Fixed: Apple Pay Direct button in the shopping cart offcanvas is now displayed correctly when changing the shipping method.
 
 # 4.22.1
 - Fixed an issue so that line items with negative amounts work again.

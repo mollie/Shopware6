@@ -3,6 +3,7 @@
 - Problem behoben mit verschiedenen Set-Plugins
 - Behoben: Page Extensions werden im Checkout nun korrekt erweitert statt überschrieben, um Kompatibilität mit anderen Plugins zu gewährleisten.
 - Neu: Beim Erstatten aller Line Items im Shopware Return Manager werden Versandkosten nun automatisch mit berücksichtigt. Manuell angegebene Versandkosten werden ebenfalls übernommen.
+- Behoben: Der Apple Pay Direct Button wird im Shopping-Cart-Offcanvas korrekt angezeigt, wenn die Versandart geändert wird.
 
 
 # 4.22.1

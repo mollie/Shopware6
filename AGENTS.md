@@ -19,6 +19,4 @@ The markdown should be inside custom/plugins/MolliePayments/docks/learning
 The title of the markdown should contain a quick summary of things you learned.
 I will review it and adjust my docs accordingly
 
-# Codechanges
-- If a code part was changed, add a summary in custom/plugins/MolliePayments/CHANGELOG*.md under `unreleased` Section
-- Run at least unit tests and cs fixer so the pipeline does not break on pull request
+
