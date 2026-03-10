@@ -1,0 +1,505 @@
+{
+    "global": {
+        "entities": {
+            "mollie_subscription": "Mollie Абонамент | Mollie Абонаменти"
+        },
+        "businessEvents": {
+            "mollie_checkout_order_success": " Поръчката е успешна",
+            "mollie_checkout_order_failed": " Поръчката не е успешна",
+            "mollie_checkout_order_canceled": " Поръчката е отказана",
+            "mollie_webhook_received_All": " Получен е Mollie уебхук (Всички)",
+            "mollie_webhook_received_status_authorized": " Получен е уебхук на Mollie (Разрешен)",
+            "mollie_webhook_received_status_failed": " Получен е Mollie уебхук (Неуспешно)",
+            "mollie_webhook_received_status_canceled": " Получен е Mollie уебхук (Отказан)",
+            "mollie_webhook_received_status_expired": " Получен е Mollie уебхук (Изтекъл)",
+            "mollie_webhook_received_status_pending": " Получен е Mollie уебхук (В изчакване)",
+            "mollie_webhook_received_status_paid": " Получен е Mollie уебхук (Платено)",
+            "mollie_webhook_received_status_completed": " Получен е Mollie уебхук (Завършен)",
+            "mollie_webhook_received_status_refunded": " Получен е Mollie уебхук (Възстановена сума)",
+            "mollie_webhook_received_status_partially_refunded": " Получен е Mollie уебхук (Частично възстановена сума)",
+            "mollie_refund_started": " Започнато Mollie възстановяване на сума",
+            "mollie_subscription_started": " Mollie абонамент е започнат",
+            "mollie_subscription_ended": " Mollie абонамент е завършен",
+            "mollie_subscription_cancelled": " Mollie абонамент е прекратен",
+            "mollie_subscription_paused": " Mollie абонамент е паузиран",
+            "mollie_subscription_resumed": " Mollie абонамент е възобновен",
+            "mollie_subscription_skipped": " Mollie абонамент е пропуснат",
+            "mollie_subscription_renewed": " Mollie абонамент е подновен",
+            "mollie_subscription_renewal_reminder": " Mollie напомняне за подновяване на абонамент"
+        }
+    },
+    "mollie-payments": {
+        "pluginTitle": "Mollie",
+        "pluginDescription": "Mollie Модул",
+        "searchPlaceholder": "Търсене на абонаменти...",
+        "general": {
+            "mainMenuItemGeneral": "Mollie Плащания",
+            "descriptionTextModule": "Mollie Плащания",
+            "btnMollieActions": "Mollie Действия",
+            "refundThroughMollie": "Възстановяване на сума чрез Mollie",
+            "shipThroughMollie": "Изпращане чрез Mollie",
+            "cancelMollieItem": "Отказ чрез Mollie"
+        },
+        "config": {
+            "info": {
+                "title": "Здравейте {userName}, Добре дошли в Mollie!",
+                "descriptionTop": "Onboarding е лесно с Mollie!",
+                "descriptionBottom": "Това е!",
+                "descriptionFooter": "Ако искате да научите повече за нашия плъгин, моля посетете страницата с официалната ни документация.",
+                "onboardingStep1": "Регистрация за Mollie акаунт.",
+                "onboardingStep2": "Въведете вашите API ключове в секцията по-долу.",
+                "onboardingStep2TestMode": "Включете \"Тестов режим\", ако искате да тествате само плащания.",
+                "onboardingStep3": "Присвоете методи на плащане на вашия продажбени канали.",
+                "onboardingStep3Link": "към вашите продажбени канали",
+                "btnDocumentation": "Документация",
+                "btnRequestSupport": "Подкрепа",
+                "btnTroubleshooting": "Ръководство за отстраняване на проблеми"
+            },
+            "api": {
+                "apiLinkButton": "Вземете своите API ключове от Mollie табло",
+                "testButton": "Тестови API ключове",
+                "testApiKeys": {
+                    "title": "Mollie Плащания",
+                    "apiKey": "API ключ",
+                    "isValid": "е валиден",
+                    "isInvalid": "е невалиден"
+                }
+            },
+            "payments": {
+                "format": {
+                    "placeholder": "Заместител",
+                    "preview": "Предварителен преглед"
+                },
+                "updatePaymentMethods": {
+                    "title": "Mollie Плащания",
+                    "button": "Актуализиране на методите на плащане",
+                    "succeeded": "Методите за плащане са успешно актуализирани.",
+                    "failed": "Методите за плащане не можаха да бъдат актуализирани."
+                },
+                "mollieLimits": {
+                    "link": "Покажи правила за наличност на mollie за методи на плащане"
+                }
+            },
+            "rounding": {
+                "info1": "Shopware може да използва настройките за валута, за да изчисли как да закръгли крайната сума на поръчка. Това включва броя на десетичните знаци в ценообразуването на вашите продукти и най-близкия интервал на закръгляне, като например 0.50 или 1.00.",
+                "info2": "Тези настройки могат да доведат до различна обща сума от сбора на отделните артикули. Когато Mollie проверява тези суми и установи, че не съвпадат, това причинява грешка при плащането.",
+                "info3": "Можете да използвате тази функция, за да избегнете проблеми със закръглянето при обработката. Когато е активирана, тя добавя отделен артикул за разликата в закръглянето във вашето Mollie табло, и вашите клиенти плащат общата сума, изчислена от Shopware."
+            },
+            "order": {
+                "bankTransferDueDateKlarnaLimitReached": "Не е възможно да използвате Klarna Плати сега, Klarna Раздели го или Klarna Плати по-късно като метод, когато датата на изтичане е повече от 28 дни напред, освен ако не е договорено друг максимум между търговеца и Klarna.",
+                "bankTransferDueDateLimitReached": "Не е възможно срокът на поръчки да бъде зададен на повече от 100 дни."
+            },
+            "support": {
+                "modalTitle": "Заявка за помощ от Mollie",
+                "btnCancel": "Откажи",
+                "btnConfirm": "Заявка за помощ",
+                "btnSupport": "Повече за нашата поддръжка",
+                "form": {
+                    "name": "Вашето име",
+                    "email": "Вашият имейл",
+                    "recipient": "Изпратете заявка до",
+                    "subject": "Тема",
+                    "message": "Съобщение"
+                },
+                "data": {
+                    "header": "Данни изпратени до Mollie:",
+                    "other": "Други:",
+                    "shopwareVersion": "Версия на Shopware",
+                    "pluginLogs": "{plugin} лог файловете",
+                    "pluginConfiguration": "Конфигурация на {plugin}",
+                    "pluginConfigurationHelpText": "API ключовете са изключени.",
+                    "paymentMethods": "Данни за метода на плащане",
+                    "paymentMethodsHelpText": "Съдържа информация за това кои методи на плащане са активни, присвоени на всеки търговски канал, както и техния статус във вашия Mollie акаунт."
+                },
+                "success": "Заявката за помощ е успешна изпратена. Правим всичко възможно да отговорим възможно най-скоро",
+                "error": "Имаше проблем при изпращането на пощата чрез Shopware. Моля, опитайте отново или се свържете с нас директно по имейл."
+            }
+        },
+        "rules": {
+            "itemSubscriptionRule": "Артикулът е абонамент (Mollie)",
+            "cartSubscriptionRule": "Количка с абонаменти (Mollie)"
+        },
+        "refunds": {
+            "status": {
+                "queued": "В опашката",
+                "pending": "В изчакване",
+                "processing": "Обработване",
+                "refunded": "Възстановена сума",
+                "failed": "Неуспешно",
+                "description": {
+                    "queued": "Възстановяването на сума е в изчакване до момента, в който има достатъчно баланс за обработката му. Все още може да отмените възстановяването.",
+                    "pending": "Възстановената сума ще бъде изпратена към банката на следващия работен ден. Все още можете да отмените възстановяването.",
+                    "processing": "Възстановената сума е изпратена към банката. Сумата за възстановяване ще бъде прехвърлена по сметката на потребителя възможно най-скоро.",
+                    "refunded": "Сумата за възстановяване е прехвърлена към потребителя.",
+                    "failed": "Възстановяването на сума се провали след обработка. Например, клиентът е закрил своята банкова сметка. Средствата ще бъдат върнати във вашата сметка."
+                }
+            }
+        },
+        "refund-manager": {
+            "general": {
+                "unitQuantity": "бр."
+            },
+            "acl": {
+                "warningCreate": "Нямате разрешение да създавате възстановявания на суми",
+                "warningCancel": "Нямате разрешение да отказвате възстановявания на суми"
+            },
+            "cart": {
+                "title": "Поръчка ##orderNumber##",
+                "btnSelectAll": "Изберете Всички",
+                "btnResetForm": "Нулиране на формата",
+                "linkHowTo": "Как се използва този формуляр?",
+                "grid": {
+                    "columns": {
+                        "item": "Артикул",
+                        "productNumber": "Номер на Продукта",
+                        "unitPrice": "Единична цена",
+                        "quantity": "Количество",
+                        "refunded": "Възстановено",
+                        "refundQuantity": "Възстановяване",
+                        "totalPrice": "Общо",
+                        "refundAmount": "Възстановяване",
+                        "resetStock": "Нулиране на наличност"
+                    },
+                    "btnResetLine": "Нулиране на редът",
+                    "checkDeductPromotion": "Удръжка на промоция",
+                    "checkRefundTax": "Възстановяване на ДДС"
+                },
+                "roundDiffItemAdded": "Автоматичен елемент за закръгляне беше добавен"
+            },
+            "instructions": {
+                "linkResetTutorials": "Нулиране на Обучения",
+                "btnToggleTutorial": "Показване/Скриване на урока",
+                "titleFullRefund": "Пълно Възстановяване на Сума",
+                "textFullRefund": "Просто използвайте бутона за пълно възстановяване на сумата. Това гарантира, че всички ваши артикули са маркирани като възстановено и пълната сума е върната на клиента.",
+                "titleStockReset": "Нулиране на наличност",
+                "textStockReset": "Можете автоматично да увеличите наличността, като въведете количеството, което искате да върнете в наличност. Просто го въведете преди да продължите с пълно или частично възстановяване на сума. Нулирането на наличността може да бъде комбинирано с процесът на възстановяване по флексибилен начин.",
+                "titleShipping": "Доставка",
+                "textShipping": "Сумите на артикулите за доставка могат да бъдат възстановени, както всеки друг продукт. Ако желаете, въведете пълното количество или частична сума и продължете с възстановяването. Процесът на възстановяване на сума на разходи за доставка може да се комбинира с действителния процес на възстановяване на суми на артикули по флексибилен начин.",
+                "titlePartialAmount": "Частично Възстановяване (само сума)",
+                "textPartialAmount": "Просто въведете частичната сума в текстовото поле и започнете възстановяването.",
+                "titlePartialItems": "Частично Възстановяване (с артикули)",
+                "textPartialItems": "Ако желаете да отбележите количества и артикули като възстановени суми в Mollie, използвайте формата по-горе. Задайте вашите количества и предоставете сума по избор за всеки артикул, който ще бъде възстановен. Общата сума ще бъде видима в текстовото поле за крайна сума на възстановяването. Запомнете, все още е възможно да коригирате тази крайна сума преди да започнете възстановяването.",
+                "titlePartialPromotions": "Частично Възстановяване (с промоции)",
+                "textPartialPromotions": "Ако имате промоция във вашата количка, тогава вашата промоция е отделен елемент в списъка. Ако искате да възстановите сумите на всички намалени артикули, просто възстановете техните общи стойности и целият ред на промоцията. Обаче, ако искате да възстановите сумите на само няколко артикула, които са били намалени, можете автоматично да извадите приложената отстъпка за всеки отделен елемент в списъка. Разбира се, винаги можете да промените стойностите, ако те не са правилни.",
+                "titleRoundingDiff": "Разликата в закръглянето",
+                "textRoundingDiff": "Пълното възстановяване на сума ще включва разлики в закръглянето"
+            },
+            "summary": {
+                "dataLoading": "Данните се зареждат...",
+                "headerExcludingVat": "Без ДДС",
+                "headerIncludingVat": "С ДДС",
+                "captionTotal": "Общо",
+                "captionTotalTaxFree": "Общо",
+                "captionPendingRefunds": "Очаква се да бъде възстановена сумата",
+                "captionVouchers": "Сума на Ваучера",
+                "captionRefunded": "Възстановена сума",
+                "captionRemaining": "Възстановяема сума",
+                "btnFixDiff": "Поправяне на разликата",
+                "placeholderDescription": "Въведете описание на отчет от банка/карти за потребителя. Максимум 140 знака",
+                "lblDescription": "Описание (по избор) ({characters}/140 знака)",
+                "descriptionHelp": "Това ще бъде показано в банковия отчет или в отчета за карти на потребителя, когато е възможно. Съобщението ще бъде съкратено до 140 знака.",
+                "placeholderInternalDescription": "Въведете вашето вътрешно описание",
+                "lblInternalDescription": "Вътрешно описание (по избор)",
+                "internalDescriptionHelp": "Това ще бъде показано като локално описание в административния интерфейс.",
+                "checkVerification": "Проверил съм общата сума за възстановяване и конфигурираните количества за възстановяване и зареждане.",
+                "btnRefund": "Възстановяване на сума",
+                "btnFullRefund": "Пълно Възстановяване на Сума",
+                "roundDiffItemAdded": "Артикул за закръгляване"
+            },
+            "refunds": {
+                "title": "Възстановявания на Суми в Mollie таблото",
+                "linkMore": "Още за възстановявания на суми",
+                "grid": {
+                    "columns": {
+                        "amount": "Сума",
+                        "status": "Статус",
+                        "description": "Описание",
+                        "internalDescription": "Вътрешно описание",
+                        "composition": "Състав",
+                        "date": "Дата"
+                    },
+                    "lblNoComposition": "Няма наличен състав",
+                    "btnCancelRefund": "Откажете това възстановяване на сума"
+                }
+            },
+            "notifications": {
+                "success": {
+                    "refund-created": "Възстановяване е създадено в Mollie. Може да отнеме 2 часа за да се завърши възстановяването на сума. До този момент можете да отмените възстановяването.",
+                    "refund-canceled": "Очакваното възстановяване на сума е успешно отказано и премахнато."
+                },
+                "error": {
+                    "low-amount": "Моля, въведете сума за възстановяване на сума.",
+                    "refund-created": "Нещо се обърка при създаването на възстановяване на сума.",
+                    "refund-canceled": "Имаше проблем при отказа на възстановяването на сума в изчакване. Моля, опитайте отново в Mollie Таблото."
+                }
+            }
+        },
+        "vouchers": {
+            "CARD_TITLE": "Ваучер",
+            "VOUCHER_INFO_TITLE": "Плащания с ваучер",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie ви позволява лесно да приемате плащания във вашия онлайн магазин, използвайки еко, подаръчни и хранителни ваучери – умен избор за увеличаване на продажбите и удовлетворяване на вашите клиенти. Методът на плащане \"ваучер\" е видим само ако имате поне 1 продукт с присвоен тип ваучер в количката.",
+            "VOUCHER_INFO_DEFAULTLANGUAGE": "Моля, обърнете внимание, че тази конфигурация може да бъде редактирана само на вашия основен език. Моля, сменете езика си, за да модифицирате типа ваучер на този продукт.",
+            "VOUCHER_BTN_READMORE": "Прочетете още",
+            "VOUCHER_TYPE_CAPTION": "Вид ваучер на продукта",
+            "VOUCHER_TYPE_VALUE_NONE": "Няма",
+            "VOUCHER_TYPE_VALUE_ECO": "Еко",
+            "VOUCHER_TYPE_VALUE_MEAL": "Храна",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Подарък"
+        },
+        "modals": {
+            "shipping": {
+                "title": "Изпращане чрез Mollie",
+                "item": {
+                    "label": "Артикул:",
+                    "noQuantity": "Моля, въведете количество за изпращане.",
+                    "shipAll": "Изпратете всички",
+                    "summary": {
+                        "quantity": "Количество за изпращане",
+                        "shipped": "Изпратено количество",
+                        "shippable": "Количество годно за изпращане"
+                    },
+                    "success": "Поръчката е успешно изпратена."
+                },
+                "order": {
+                    "description": "Следните количества на артикули ще бъдат изпратени.",
+                    "itemHeader": "Артикул",
+                    "quantityHeader": "Количество",
+                    "originalQuantityHeader": "Количество (годно за изпращане)"
+                },
+                "availableTracking": {
+                    "label": "Налични кодове за проследяване",
+                    "hint": "Кликнете върху един от тези проследяващи кодове, за да попълните автоматично всички данни."
+                },
+                "showTracking": "Добавете информация за проследяване за тази пратка",
+                "tracking": {
+                    "carrier": "Куриер",
+                    "code": "Код",
+                    "url": "Url",
+                    "invalid": "Моля, въведете както куриер, така и код"
+                },
+                "confirmButton": "Изпращане на поръчката",
+                "cancelButton": "Отказ",
+                "selectAllButton": "Изберете всичко",
+                "resetButton": "Нулиране"
+            },
+            "cancel": {
+                "title": "Откажи артикул чрез mollie",
+                "confirmButton": "Откажи артикула чрез mollie",
+                "cancelButton": "Затвори modal",
+                "resetStock": "Нулиране на наличностите",
+                "item": {
+                    "success": "Продуктът беше успешно отказан",
+                    "failed": {
+                        "quantityZero": "Количество е 0",
+                        "invalidLine": "Продуктът не съществува в поръчката",
+                        "quantityTooHigh": "Количеството е твърде голямо"
+                    }
+                }
+            }
+        },
+        "sw-flow": {
+            "actions": {
+                "shipOrder": {
+                    "editor": {
+                        "title": "Изпратете поръчката (Mollie)",
+                        "description": "Изпратете поръчка в Mollie."
+                    },
+                    "modal": {
+                        "title": "Изпратете поръчката",
+                        "description": "Това действие ще изпрати поръчка автоматично чрез Mollie. Последователността на потока ще получи номера на поръчката и ще го предаде на Mollie API. Успешните и неуспешните изпращания ще бъдат видими във Mollie лог файловете.",
+                        "warningConfig": "Моля, уверете се, че сте изключили всяка допълнителна автоматизация за този тип действие, за да избегнете прекъсвания. \nСледните активирани функции на този плъгин може да попречат на това действие:",
+                        "noWarnings": "Без предупреждения"
+                    }
+                },
+                "refundOrder": {
+                    "editor": {
+                        "title": "Възстановяване на сума на поръчка (Mollie)",
+                        "description": "Възстановяване на сума на поръчка чрез Mollie."
+                    },
+                    "modal": {
+                        "title": "Възстановяване на сума на поръчка",
+                        "description": "Това действие ще стартира автоматично възстановяване на сума чрез Mollie. Поръчковият номер ще бъде изпратен към Mollie API. Успешните и неуспешните възстановявания на суми ще бъдат видими в Mollie лог файловете.",
+                        "warning": "Моля, имайте предвид, че възстановявания на суми могат да отнемат до 2 часа преди да бъдат финализирани и видими в магазина. До тогава винаги можете да отмените висящо възстановяване на сума от страницата за поръчки в Shopware или от Mollie Таблото.",
+                        "warningConfig": "Уверете се, че изключвате всяка допълнителна автоматизация за този вид действие, за да избегнете прекъсвания."
+                    }
+                },
+                "warnings": {
+                    "automaticShipping": "Автоматично изпращане в конфигурацията на плъгина"
+                }
+            }
+        },
+        "subscriptions": {
+            "status": {
+                "pending": "В изчакване",
+                "active": "Активно",
+                "canceled": "Прекратено",
+                "suspended": "Спряно",
+                "completed": "Завършено",
+                "paused": "Паузирано",
+                "resumed": "Възобновено",
+                "skipped": "Пропуснато"
+            },
+            "navigation": {
+                "title": "Абонаменти на Mollie"
+            },
+            "TYPE_DAYS": "Ден (дни)",
+            "TYPE_WEEKS": "Седмица/и",
+            "TYPE_MONTHS": "Месец(и)",
+            "confirm": {
+                "cancelTitle": "Прекратяване на абонамента?",
+                "cancel": "Прекратете абонамента на вашия клиент.",
+                "pauseTitle": "Паузирайте абонамента?",
+                "pause": "Поставете абонамента на пауза, докато го възобновите отново.",
+                "resumeTitle": "Възобновете абонамента?",
+                "resume": "Продължете с абонамента отново.",
+                "skipTitle": "Пропускане на следващата вноска?",
+                "skip": "Пропуснете следващата вноска от абонамента. Тя ще продължи автоматично след това."
+            },
+            "alerts": {
+                "cancelSuccess": "Абонаментът беше успешно прекратен",
+                "pauseSuccess": "Абонаментът беше успешно поставен на пауза",
+                "resumeSuccess": "Абонаментът беше успешно възобновен",
+                "skipSuccess": "Абонаментът беше успешно пропуснат. Следващото плащане е актуализирано."
+            },
+            "list": {
+                "title": "Mollie Абонаменти",
+                "columns": {
+                    "customer": "Клиент",
+                    "status": "Статус",
+                    "description": "Описание",
+                    "amount": "Сума",
+                    "nextPaymentAt": "Следващо плащане",
+                    "prePaymentReminder": "Напомнено на",
+                    "canceledAt": "Прекратено на",
+                    "createdAt": "Създадено на"
+                },
+                "action": {
+                    "edit": "Редактиране на абонамента"
+                },
+                "deletedCustomer": "Изтрит клиент"
+            },
+            "detail": {
+                "title": "Mollie абонамент",
+                "buttonCancelSubscription": "Прекратяване на абонамент",
+                "labelDescription": "Описание",
+                "labelAmount": "Сума",
+                "labelQuantity": "Количество",
+                "labelMollieSubscription": "Mollie Абонамент",
+                "labelMollieCustomer": "Mollie клиент",
+                "labelMandateId": "Мандат",
+                "labelShopwareCustomer": "Shopware клиент",
+                "labelCreatedAt": "Създадено на",
+                "buttonShowShopwareOrder": "Покажи Shopware поръчка",
+                "buttonShowShopwareCustomer": "Покажи Shopware клиент",
+                "cardTitleSubscription": "Абонамент",
+                "cardTitleStatus": "Статус",
+                "labelStatus": "Статус",
+                "labelNextPaymentAt": "Следващо плащане на",
+                "labelLastRemindedAt": "Последно напомнено на",
+                "labelCanceledAt": "Прекратено на",
+                "buttonPauseSubscription": "Паузирайте абонамента",
+                "buttonResumeSubscription": "Възобновяване на абонамента",
+                "buttonSkipSubscription": "Пропускане на абонамента",
+                "history": {
+                    "cardTitle": "История",
+                    "colDate": "Дата",
+                    "colComment": "Коментар",
+                    "colStatusFrom": "Статус (от)",
+                    "colStatusTo": "Статус (до)",
+                    "colMollieSubscription": "Mollie абонамент"
+                }
+            },
+            "product": {
+                "card-title": "Абонамент",
+                "title": "Mollie Абонаменти",
+                "description": "Управлението на вашите периодични плащания е по-лесно от всякога с нашите полезни функции. Издигнете бизнеса си на следващо ниво с ефективни възможности за проследяване, лесни интеграции и още. С абонаментите на Mollie, можете лесно да създавате абонаментни продукти и да планирате периодични плащания, които да се извършват в зададения интервал и период.",
+                "mollieSubscriptionProduct": "Абонаментен продукт",
+                "mollieSubscriptionIntervalAmount": "Повторение на плащането всеки",
+                "mollieSubscriptionIntervalType": "Интервална единица",
+                "mollieSubscriptionRepetitionAmount": "Броят на повторенията",
+                "mollieSubscriptionRepetitionPlaceholder": "Въведете число или оставете празно",
+                "infoDefaultLanguage": "Моля, обърнете внимание, че тази конфигурация може да бъде редактирана само на вашия основен език. Моля, сменете езика си, за да модифицирате настройките за абонамента на този продукт.",
+                "btnReadMore": "Прочетете още"
+            }
+        },
+        "sw-order-list": {
+            "columns": {
+                "mollie": "Mollie"
+            },
+            "badgeSubscription": "Абонамент"
+        }
+    },
+    "sw-order": {
+        "detailExtended": {
+            "titleCreditCardData": "Данни за кредитната карта",
+            "buttonMolliePaymentLink": "Копирайте в клипборда",
+            "columnRefunded": "Възстановена сума",
+            "columnShipped": "Изпратено",
+            "columnCanceled": "Отказан",
+            "labelMollieOrderId": "Mollie Поръчка ID",
+            "labelMollieThirdPartyPaymentId": "Референция на плащането",
+            "labelMolliePaymentLink": "Mollie Checkout URL",
+            "totalRefunds": "Възстановена сума",
+            "totalRefundsPending": "Очаква се да бъде възстановена сумата",
+            "totalRemaining": "Възстановяема сума",
+            "totalVouchers": "Сума на ваучера",
+            "totalShipments": "Изпратена сума ({quantity} артикули)",
+            "subscriptionBadge": "Абонаментна поръчка",
+            "refundManager": {
+                "title": "Mollie Управление на възстановяване на суми",
+                "btnOpenRefundManager": "Отворете Управлението на възстановявания на суми",
+                "btnCloseRefundManager": "Затворете Управлението на възстановявания на суми"
+            }
+        }
+    },
+    "sw-customer": {
+        "extendedInfo": {
+            "labelPreferredIdealIssuer": "Предпочитан iDeal издател"
+        }
+    },
+    "sw-privileges": {
+        "permissions": {
+            "parents": {
+                "mollie": "Mollie"
+            },
+            "mollie_refund_manager": {
+                "label": "Управление на възстановявания на суми"
+            },
+            "mollie_subscription": {
+                "label": "Абонаменти"
+            }
+        }
+    },
+    "sw-profile": {
+        "tabSearchPreferences": {
+            "modules": {
+                "mollie_subscription": {
+                    "description": "Описание"
+                }
+            }
+        }
+    },
+    "sw-flow": {
+        "triggers": {
+            "mollie": "Mollie",
+            "refund": "Възстановяване",
+            "subscription": "Абонамент",
+            "webhookReceived": "Уебхукс",
+            "status": "Статус",
+            "started": "Започнало",
+            "ended": "Завършено",
+            "paused": "Паузирано",
+            "renewalReminder": "Напомняне за подновяване",
+            "renewed": "Подновено",
+            "resumed": "Възобновено",
+            "skipped": "Пропуснато",
+            "all": "Всичко",
+            "canceled": "Отказан",
+            "expired": "Изтекъл",
+            "partiallyRefunded": "Възстановена сума (частично)",
+            "orderSuccess": "Поръчка успешна",
+            "orderFailed": "Поръчка неуспешна",
+            "orderCanceled": "Поръчката е отказана"
+        }
+    }
+}

@@ -31,6 +31,7 @@
                 <locale name="lv-LV">./../src/Resources/app/administration/src/snippet/lv-LV.json</locale>
                 <locale name="ro-RO">./../src/Resources/app/administration/src/snippet/ro-RO.json</locale>
                 <locale name="sk-SK">./../src/Resources/app/administration/src/snippet/sk-SK.json</locale>
+                <locale name="bg-BG">./../src/Resources/app/administration/src/snippet/bg-BG.json</locale>
             </locales>
         </set>
 
@@ -65,6 +66,7 @@
                 <locale name="lv-LV">./../src/Resources/snippet/lv_LV/mollie-payments.lv-LV.json</locale>
                 <locale name="ro-RO">./../src/Resources/snippet/ro_RO/mollie-payments.ro-RO.json</locale>
                 <locale name="sk-SK">./../src/Resources/snippet/sk_SK/mollie-payments.sk-SK.json</locale>
+                <locale name="bg-BG">./../src/Resources/snippet/bg_BG/mollie-payments.bg-BG.json</locale>
             </locales>
         </set>
 
@@ -102,6 +104,7 @@
                 <locale name="lv-LV"></locale>
                 <locale name="ro-RO"></locale>
                 <locale name="sk-SK"></locale>
+                <locale name="bg-BG"></locale>
             </locales>
         </set>
 

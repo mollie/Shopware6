@@ -5,6 +5,7 @@
 - Neu: Beim Erstatten aller Line Items im Shopware Return Manager werden Versandkosten nun automatisch mit berücksichtigt. Manuell angegebene Versandkosten werden ebenfalls übernommen.
 - Behoben: Der Apple Pay Direct Button wird im Shopping-Cart-Offcanvas korrekt angezeigt, wenn die Versandart geändert wird.
 - Behoben: Custom Fields von anderen Herstellern werden beim Aktualisieren von OrderLineItems nicht mehr überschrieben.
+- Neu: Bulgarische Übersetzungen hinzugefügt.
 
 
 # 4.22.1
@@ -637,7 +638,7 @@ Diese Version bietet Unterstützung für die Massenbearbeitung von Produkten in 
 - Neues `MollieOrderBuilder` Event, um eigene Metadaten zu einer Bestellung hinzufügen zu können (Feature für Entwickler).
 
 ### Verbesserungen
-- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch scheiterte, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
+- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch fehlschlug, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
 - SEPA Zahlungen bleiben nun auf "In Progress", wenn diese gestartet wurden, und springen nicht mehr zurück auf "Open".
 - Zahlungen mit Status "Created" werden nun als "fehlerhaft" erkannt.
 - Kreditkartenzahlungen mit Status "Open" werden nun als "fehlerhaft" erkannt.

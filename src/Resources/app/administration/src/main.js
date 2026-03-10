@@ -48,6 +48,7 @@ import ltLT from './snippet/lt-LT';
 import lvLV from './snippet/lv-LV';
 import roRO from './snippet/ro-RO';
 import skSK from './snippet/sk-SK';
+import bgBG from './snippet/bg-BG';
 
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('de-DE', deDE);
@@ -93,3 +94,5 @@ Shopware.Locale.extend('lv-LV', lvLV);
 Shopware.Locale.extend('ro-RO', roRO);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('sk-SK', skSK);
+// eslint-disable-next-line no-undef
+Shopware.Locale.extend('bg-BG', bgBG);
