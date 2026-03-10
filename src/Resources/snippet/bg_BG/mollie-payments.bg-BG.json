@@ -1,0 +1,126 @@
+{
+    "checkout": {
+        "mollie-payments-cart-error-method-invalid": "Текущо избраният метод на плащане не е наличен за абонаментни продукти.",
+        "mollie-payments-cart-error-mixedcart": "Вашата количка съдържа няколко артикула в комбинация с абонаментни артикули. Моля, обърнете внимание, че можете да закупите само 1 абонаментен артикул наведнъж.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Не всички методи на плащане са налични при поръчка на абонаментни продукти.",
+        "mollie-payments-cart-guest-account": "Гост акаунтите не могат да се използват за поръчки на абонамент."
+    },
+    "error": {
+        "mollie-payments-cart-error-method-invalid": "Текущо избраният метод на плащане не е наличен за абонаментни продукти.",
+        "mollie-payments-cart-error-mixedcart": "Вашата количка съдържа няколко артикула в комбинация с абонаментни артикули. Моля, обърнете внимание, че можете да закупите само 1 абонаментен артикул наведнъж.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Не всички методи на плащане са налични при поръчка на абонаментни продукти.",
+        "mollie-payments-cart-guest-account": "Гост акаунтите не могат да се използват за поръчки на абонамент."
+    },
+    "molliePayments": {
+        "components": {
+            "creditCard": {
+                "cardExpiryDateLabel": "Дата на изтичане",
+                "cardHolderLabel": "Име на картата",
+                "cardNumberLabel": "Номер на картата",
+                "cardVerificationCodeLabel": "CVC/CVV",
+                "creditCardTagLine": "Плащането е защитено и захранвано от",
+                "headLine": "Въведете информацията за вашата карта",
+                "saveCardDetailLabel": "Запазете данните на картата за бъдещи плащания"
+            },
+            "ideal": {
+                "selectBank": "Изберете банка"
+            },
+            "pos": {
+                "selectTerminal": "Изберете терминал"
+            },
+            "mandate": {
+                "sectionTitle": "Запазени карти",
+                "cardTitleLabel": "%name% •••• %number%",
+                "deleteSuccessMessage": "Вашата карта беше успешно изтрита",
+                "deleteErrorMessage": "Възникна проблем при премахване на вашата карта",
+                "newCard": "Нова карта",
+                "remove": "Премахване",
+                "subscriptionBadge": "Абонамент"
+            },
+            "mandateRemoveModal": {
+                "cancelButton": "Отказ",
+                "cardSubscription": "Тази карта се използва за абонамент. Моля, първо прекратете абонамента, преди да премахнете тази карта.",
+                "deleteButton": "Изтрий",
+                "deleteConfirmation": "Сигурни ли сте, че искате да изтриете?",
+                "title": "Потвърждение за изтриване"
+            },
+            "phoneField": {
+                "headLine": "Телефонен номер",
+                "phoneErrorMessage": "Телефонният номер е задължителен. Например +31208202070"
+            }
+        },
+        "messages": {
+            "payment": {
+                "buttonPayThroughMollie": "Платете с различен метод на плащане",
+                "buttonReturnToShop": "Върнете се в магазина",
+                "error": "Неуспешно плащане",
+                "failed": "Плащането е неуспешно или е отказано. Ще бъдете пренасочени към Mollie, където можете да завършите плащането с метода по ваш избор. "
+            },
+            "redirecting": "Пренасочване към: "
+        },
+        "payments": {
+            "applePayDirect": {
+                "captionSubtotal": "Междинна сума",
+                "captionTaxes": "Данъци",
+                "paymentError": "Плащането с Apple Pay е неуспешно."
+            },
+            "paypalExpress": {
+                "paymentError": "Плащането с Paypal Express е неуспешно."
+            }
+        },
+        "subscriptions": {
+            "account": {
+                "btnEditBillingAddress": "редактиране на адрес за фактуриране",
+                "btnEditShippingAddress": "редактиране на адрес за доставка",
+                "cancelSubscription": "Абонаментът е прекратен",
+                "errorCancelSubscription": "Абонаментът не може да бъде прекратен поради грешка. Моля, свържете се с нашата клиентска поддръжка.",
+                "errorPause": "Възникна грешка при паузиране на вашия абонамент",
+                "errorResume": "Възникна грешка при възобновяване на вашия абонамент",
+                "errorSkip": "Възникна грешка при пропускане на вашия абонамент",
+                "errorUpdateAddress": "Възникна грешка при актуализирането на вашия адрес",
+                "errorUpdatePayment": "Възникна грешка при актуализирането на вашия метод на плащане",
+                "headlineBillingAddress": "Адрес за фактуриране",
+                "headlineShippingAddress": "Адрес за доставка",
+                "mollieSubscriptionAmount": "Сума",
+                "mollieSubscriptionCancel": "Прекратяване на абонамент",
+                "mollieSubscriptionCancelUntil": "Прекратяването е възможно до",
+                "mollieSubscriptionContextMenuReorder": "Повторете абонамента",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Следващо плащане на",
+                "mollieSubscriptionPause": "Паузиране на абонамента",
+                "mollieSubscriptionResume": "Възобновяване на абонамента",
+                "mollieSubscriptionSkip": "Пропускане на абонамента",
+                "mollieSubscriptionUpdatePayment": "Актуализиране на плащането",
+                "mollieSubscriptionsHeadline": "Абонамент:",
+                "mollieSubscriptionsInfoEmpty": "Все още нямате абонаменти.",
+                "mollieSubscriptionsLink": "Абонаменти",
+                "mollieSubscriptionsTitle": "Абонаменти",
+                "mollieSubscriptionsWelcome": "Вашите последни абонаменти:",
+                "orderActionHide": "Скрий",
+                "orderActionView": "Преглед",
+                "shippingEqualToBilling": "Равно на адреса за фактуриране",
+                "successPause": "Вашият абонамент беше паузиран",
+                "successResume": "Вашият абонамент ще бъде възобновен сега",
+                "successSkip": "Вашият абонамент беше пропуснат",
+                "successUpdateAddress": "Вашият адрес беше успешно актуализиран",
+                "successUpdatePayment": "Вашият метод на плащане беше успешно актуализиран"
+            },
+            "options": {
+                "everyDay": "Всеки ден",
+                "everyDays": "Всеки %value% дни",
+                "everyMonth": "Всеки месец",
+                "everyMonths": "Всеки %value% месеци",
+                "everyWeek": "Всяка седмица",
+                "everyWeeks": "Всеки %value% седмици",
+                "repetitionCount": "%value% път(и)"
+            },
+            "product": {
+                "addToCartText": "Абонирате се",
+                "information": "Абонаментен продукт"
+            }
+        },
+        "testMode": {
+            "label": "Режим на тестване"
+        }
+    }
+}

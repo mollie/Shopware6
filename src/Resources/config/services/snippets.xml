@@ -93,6 +93,10 @@
             <tag name="shopware.snippet.file"/>
         </service>
 
+        <service id="Kiener\MolliePayments\Resources\snippet\bg_BG\SnippetFile_bg_BG">
+            <tag name="shopware.snippet.file"/>
+        </service>
+
 
 
 
