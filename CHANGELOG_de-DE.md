@@ -4,6 +4,7 @@
 - Behoben: Page Extensions werden im Checkout nun korrekt erweitert statt überschrieben, um Kompatibilität mit anderen Plugins zu gewährleisten.
 - Neu: Beim Erstatten aller Line Items im Shopware Return Manager werden Versandkosten nun automatisch mit berücksichtigt. Manuell angegebene Versandkosten werden ebenfalls übernommen.
 - Behoben: Der Apple Pay Direct Button wird im Shopping-Cart-Offcanvas korrekt angezeigt, wenn die Versandart geändert wird.
+- Behoben: Custom Fields von anderen Herstellern werden beim Aktualisieren von OrderLineItems nicht mehr überschrieben.
 
 
 # 4.22.1
@@ -801,7 +802,7 @@ Aber keine Sorge, es gibt eine neue Funktion **"Automatischer Versand"**, die st
 
 ## [1.4.3] - 2021-07-07
 ### Fehlerbehebungen
-- Fix für Backwards-Compatibility
+- Fix for Backwards-Compatibility
 
 ## [1.4.2] - 2021-07-06
 ### Fehlerbehebungen
