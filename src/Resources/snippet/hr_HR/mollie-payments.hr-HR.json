@@ -1,15 +1,15 @@
 {
     "checkout": {
         "mollie-payments-cart-error-method-invalid": "Trenutno odabrana metoda plaćanja nije dostupna za pretplatničke proizvode.",
-        "mollie-payments-cart-error-mixedcart": "Tvoj košarica sadrži više artikala u kombinaciji s pretplatničkim proizvodima. Napomena: moguće je kupiti samo jedan pretplatnički proizvod odjednom.",
-        "mollie-payments-cart-error-paymentmethod-availability": "Nisu sve metode plaćanja dostupne prilikom prilikom narudžbe pretplatničkih proizvoda.",
-        "mollie-payments-cart-guest-account": "Gostujući računi ne mogu se koristiti za narudžbe s pretplatom."
+        "mollie-payments-cart-error-mixedcart": "Vaša košarica sadrži više artikala u kombinaciji s pretplatničkim artiklima. Imajte na umu da možete kupiti samo 1 pretplatnički artikl odjednom.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nisu sve metode plaćanja dostupne prilikom naručivanja pretplatničkih proizvoda.",
+        "mollie-payments-cart-guest-account": "Gostujući računi ne mogu se koristiti za pretplatničke narudžbe."
     },
     "error": {
-        "mollie-payments-cart-error-method-invalid": "Trenutno odabrana metoda plaćanja nije dostupna za proizvode s pretplatom.",
-        "mollie-payments-cart-error-mixedcart": "Tvoja košarica sadrži više artikala u kombinaciji s preplatničkim proizvodima. Napomena: moguće je kupiti samo jedan preplatnički proizvod odjednom. ",
-        "mollie-payments-cart-error-paymentmethod-availability": "Sve metode plaćanja nisu dostupne prilikom naručivanja proizvoda s pretplatom.",
-        "mollie-payments-cart-guest-account": "Gosteći računi ne mogu se koristiti za narudžbe s pretplatom."
+        "mollie-payments-cart-error-method-invalid": "Trenutno odabrana metoda plaćanja nije dostupna za pretplatničke proizvode.",
+        "mollie-payments-cart-error-mixedcart": "Vaša košarica sadrži više artikala u kombinaciji s pretplatničkim artiklima. Imajte na umu da možete kupiti samo 1 pretplatnički artikl odjednom.",
+        "mollie-payments-cart-error-paymentmethod-availability": "Nisu sve metode plaćanja dostupne prilikom naručivanja pretplatničkih proizvoda.",
+        "mollie-payments-cart-guest-account": "Gostujući računi ne mogu se koristiti za pretplatničke narudžbe."
     },
     "molliePayments": {
         "components": {
@@ -18,9 +18,9 @@
                 "cardHolderLabel": "Ime na kartici",
                 "cardNumberLabel": "Broj kartice",
                 "cardVerificationCodeLabel": "CVC/CVV",
-                "creditCardTagLine": "Plaćanje osigurano i omogućeno putem",
+                "creditCardTagLine": "Plaćanje osigurano i omogućeno od strane",
                 "headLine": "Unesite podatke s kartice",
-                "saveCardDetailLabel": "Spremi podatke kartice za buduća plaćanja"
+                "saveCardDetailLabel": "Spremi detalje kartice za buduće plaćanje"
             },
             "ideal": {
                 "selectBank": "Odaberi banku"
@@ -32,40 +32,40 @@
                 "sectionTitle": "Spremljene kartice",
                 "cardTitleLabel": "%name% •••• %number%",
                 "deleteSuccessMessage": "Vaša kartica je uspješno izbrisana",
-                "deleteErrorMessage": "Došlo je do problema pri uklanjanju vaše kartice",
+                "deleteErrorMessage": "Došlo je do problema prilikom uklanjanja vaše kartice",
                 "newCard": "Nova kartica",
                 "remove": "Ukloni",
                 "subscriptionBadge": "Pretplata"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Otkaži",
-                "cardSubscription": "Ova kartica se koristi za pretplatu. Molimo prvo otkaži pretplatu prije nego što uklonite ovu karticu.",
+                "cardSubscription": "Ova se kartica koristi za pretplatu. Prije uklanjanja ove kartice prvo otkažite pretplatu.",
                 "deleteButton": "Izbriši",
                 "deleteConfirmation": "Jeste li sigurni da želite izbrisati?",
                 "title": "Potvrda brisanja"
             },
             "phoneField": {
                 "headLine": "Broj telefona",
-                "phoneErrorMessage": "Broj telefona je obavezan. Na primjer +31208202070"
+                "phoneErrorMessage": "Broj telefona je obavezan. Na primjer +38512345678"
             }
         },
         "messages": {
             "payment": {
-                "buttonPayThroughMollie": "Platite drugom metodom plaćanja",
+                "buttonPayThroughMollie": "Platite s drugom metodom plaćanja",
                 "buttonReturnToShop": "Povratak u trgovinu",
                 "error": "Plaćanje nije uspjelo",
-                "failed": "Plaćanje nije uspjelo ili je otkazano. Biti ćete preusmjereni na Mollie, gdje možete dovršiti plaćanje metodom po izboru."
+                "failed": "Plaćanje nije uspjelo ili je otkazano. Bit ćete preusmjereni na Mollie, gdje možete završiti plaćanje odabranom metodom. "
             },
-            "redirecting": "Preusmjeravamo vas na: "
+            "redirecting": "Preusmjeravam vas na: "
         },
         "payments": {
             "applePayDirect": {
                 "captionSubtotal": "Međuzbroj",
                 "captionTaxes": "Porezi",
-                "paymentError": "Plaćanje putem Apple Pay-a nije uspjelo."
+                "paymentError": "Plaćanje s Apple Pay nije uspjelo."
             },
             "paypalExpress": {
-                "paymentError": "Plaćanje putem PayPal Express-a nije uspjelo."
+                "paymentError": "Plaćanje s Paypal Express nije uspjelo."
             }
         },
         "subscriptions": {
@@ -73,54 +73,54 @@
                 "btnEditBillingAddress": "uredi adresu za naplatu",
                 "btnEditShippingAddress": "uredi adresu za dostavu",
                 "cancelSubscription": "Pretplata je otkazana",
-                "errorCancelSubscription": "Pretplatu nije bilo moguće otkazati zbog pogreške. Molimo kontaktirajte našu podršku.",
-                "errorPause": "Došlo je do greške prilikom pauziranja pretplate",
-                "errorResume": "Došlo je do greške prilikom nastavka pretplate",
-                "errorSkip": "Došlo je do greške prilikom preskakanja pretplate",
-                "errorUpdateAddress": "Došlo je do greške prilikom ažuriranja adrese",
-                "errorUpdatePayment": "Došlo je do greške prilikom ažuriranja metode plaćanja",
+                "errorCancelSubscription": "Pretplatu nije moguće otkazati zbog pogreške. Molimo kontaktirajte našu podršku.",
+                "errorPause": "Došlo je do greške prilikom pauziranja vaše pretplate",
+                "errorResume": "Došlo je do greške prilikom nastavka vaše pretplate",
+                "errorSkip": "Došlo je do pogreške pri preskakanju vaše pretplate",
+                "errorUpdateAddress": "Došlo je do greške prilikom ažuriranja vaše adrese",
+                "errorUpdatePayment": "Došlo je do greške prilikom ažuriranja vaše metode plaćanja",
                 "headlineBillingAddress": "Adresa za naplatu",
                 "headlineShippingAddress": "Adresa za dostavu",
                 "mollieSubscriptionAmount": "Iznos",
                 "mollieSubscriptionCancel": "Otkaži pretplatu",
                 "mollieSubscriptionCancelUntil": "Otkazivanje moguće do",
-                "mollieSubscriptionContextMenuReorder": "Ponovi pretplatu",
-                "mollieSubscriptionId": "ID",
-                "mollieSubscriptionNextPayment": "Sljedeće plaćanje",
+                "mollieSubscriptionContextMenuReorder": "Ponovite pretplatu",
+                "mollieSubscriptionId": "Id",
+                "mollieSubscriptionNextPayment": "Sljedeće plaćanje na",
                 "mollieSubscriptionPause": "Pauziraj pretplatu",
                 "mollieSubscriptionResume": "Nastavi pretplatu",
                 "mollieSubscriptionSkip": "Preskoči pretplatu",
                 "mollieSubscriptionUpdatePayment": "Ažuriraj plaćanje",
                 "mollieSubscriptionsHeadline": "Pretplata:",
-                "mollieSubscriptionsInfoEmpty": "Još nemate aktivnih pretplata.",
+                "mollieSubscriptionsInfoEmpty": "Još nemate pretplata.",
                 "mollieSubscriptionsLink": "Pretplate",
                 "mollieSubscriptionsTitle": "Pretplate",
                 "mollieSubscriptionsWelcome": "Vaše nedavne pretplate:",
                 "orderActionHide": "Sakrij",
-                "orderActionView": "Prikaži",
-                "shippingEqualToBilling": "Isto kao adresa za naplatu",
-                "successPause": "Vaša je pretplata pauzirana",
-                "successResume": "Vaša će se pretplata sada nastaviti",
-                "successSkip": "Vaša je pretplata preskočena",
-                "successUpdateAddress": "Adresa je uspješno ažurirana",
-                "successUpdatePayment": "Metoda plaćanja je uspješno ažurirana"
+                "orderActionView": "Pregledaj",
+                "shippingEqualToBilling": "Jednaka adresi za naplatu",
+                "successPause": "Vaša pretplata je pauzirana",
+                "successResume": "Vaša pretplata će sada biti nastavljena",
+                "successSkip": "Vaša pretplata je preskočena",
+                "successUpdateAddress": "Vaša adresa je uspješno ažurirana",
+                "successUpdatePayment": "Vaša metoda plaćanja je uspješno ažurirana"
             },
             "options": {
-                "everyDay": "Svakog dana",
-                "everyDays": "Svakih %value% dana",
-                "everyMonth": "Svaki mjesec",
+                "everyDay": "Svaki dan",
+                "everyDays": "Svaki %value% dana",
+                "everyMonth": "Svakog mjeseca",
                 "everyMonths": "Svakih %value% mjeseci",
-                "everyWeek": "Svaki tjedan",
-                "everyWeeks": "Svakih %value% tjedana",
+                "everyWeek": "Svake sedmice",
+                "everyWeeks": "Svake %value% sedmice",
                 "repetitionCount": "%value% puta"
             },
             "product": {
-                "addToCartText": "Pretplati se",
+                "addToCartText": "Pretplatite se",
                 "information": "Pretplatnički proizvod"
             }
         },
         "testMode": {
-            "label": "Testni način rada"
+            "label": "Testni režim"
         }
     }
 }

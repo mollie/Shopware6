@@ -6,6 +6,7 @@
 - Fixed: Apple Pay Direct button in the shopping cart offcanvas is now displayed correctly when changing the shipping method.
 - Fixed: Custom fields from other vendors are no longer overwritten when updating order line items.
 - New: Added Bulgarian translations.
+- Updated Croatian translations.
 
 # 4.22.1
 - Fixed an issue so that line items with negative amounts work again.
