@@ -6,6 +6,7 @@
 - Behoben: Der Apple Pay Direct Button wird im Shopping-Cart-Offcanvas korrekt angezeigt, wenn die Versandart geändert wird.
 - Behoben: Custom Fields von anderen Herstellern werden beim Aktualisieren von OrderLineItems nicht mehr überschrieben.
 - Neu: Bulgarische Übersetzungen hinzugefügt.
+- Kroatische Übersetzungen aktualisiert.
 
 
 # 4.22.1
