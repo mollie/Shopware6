@@ -7,6 +7,7 @@
 - Fixed: Custom fields from other vendors are no longer overwritten when updating order line items.
 - New: Added Bulgarian translations.
 - Updated Croatian translations.
+- Updated Lithuanian translations.
 
 # 4.22.1
 - Fixed an issue so that line items with negative amounts work again.

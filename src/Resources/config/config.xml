@@ -391,7 +391,7 @@
             <helpText lang="hr-HR">Automatski kreirajte kupce u Mollie nadzornoj ploči kako biste mogli vidjeti sva plaćanja određenog kupca.</helpText>
             <helpText lang="et-EE">Kliendid luuakse automaatselt sinu Mollie töölauale, et näha konkreetse kliendi kõiki makseid.</helpText>
             <helpText lang="is-IS">Sjálfkrafa búa til viðskiptavini í Mollie stjórnborðinu til að sjá allar greiðslur ákveðins viðskiptavinar.</helpText>
-            <helpText lang="lt-LT">Automatiškai kurti klientus Mollie isuvestinėje, kad galėtumėte matyti visus konkretaus kliento mokėjimus.</helpText>
+            <helpText lang="lt-LT">Automatiškai kurti klientus Mollie valdymo skydelyje, kad galėtumėte matyti visus tam tikro kliento mokėjimus.</helpText>
             <helpText lang="lv-LV">Automātiski izveidojiet klientus savā Mollie Dashboard, lai redzētu visus konkrētā klienta maksājumus.</helpText>
             <helpText lang="ro-RO">Creează automat clienți în tabloul de bord Mollie pentru a vedea toate plățile unui anumit client.</helpText>
             <helpText lang="sk-SK">Automaticky vytvárajte zákazníkov vo svojom Mollie Dashboarde, aby ste videli všetky platby konkrétneho zákazníka.</helpText><helpText lang="bg-BG">Клиентите автоматично се създават във вашето Mollie Табло, за да видите всички плащания на даден клиент.</helpText>
@@ -454,9 +454,7 @@
             <helpText lang="hr-HR">Automatski skriva načine plaćanja pri naplati na temelju pravila dostupnosti za načine plaćanja. Prikazivat će se samo aktivni načini plaćanja iz Mollie nadzorne ploče. Ako način plaćanja ima ograničenje košarice, ograničenje valute ili ograničenje adrese za naplatu, bit će skriven tijekom naplate.</helpText>
             <helpText lang="et-EE">Peidab automaatselt makseviisid kassas vastavalt makseviiside kättesaadavuse reeglitele. Sinu Mollie töölauas kuvatakse ainult aktiivsed makseviisid. Kui makseviisil on ostukorvipiirang, valuuta piirang või arvelduse aadressi piirang, peidetakse see kassas.</helpText>
             <helpText lang="is-IS">Fela sjálfkrafa greiðslumáta í afgreiðslu samkvæmt reglum um greiðslumáta. Einungis virkir greiðslumátar frá Mollie stjórnborðinu verða sýndir. Ef greiðslumátinn er með kortatakmörk, takmarkanir á gjaldmiðlum eða takmörkun á reikingsfangi verður hún falin við afgreiðslu.</helpText>
-            <helpText lang="lt-LT">Automatiškai paslepia būdus atsiskaitymo metu, remdamasis mokėjimo metodų prieinamumo taisyklėmis. Bus rodomi tik aktyvūs mokėjimo metodai iš jūsų Mollie informacijos suvestinės. Jei mokėjimo būdui taikomas krepšelio limitas, valiutos apribojimas ar atsiskaitymo adreso apribojimas, jis bus paslėptas atsiskaitymo
-                metu.
-            </helpText>
+            <helpText lang="lt-LT">Automatiškai paslepia mokėjimo būdus atsiskaitymo metu, remdamasis mokėjimo būdų prieinamumo taisyklėmis. Bus rodomi tik aktyvūs mokėjimo metodai iš jūsų Mollie valdymo skydelio. Jei mokėjimo būdui taikomas krepšelio limitas, valiutos apribojimas ar atsiskaitymo adreso apribojimas, jis bus paslėptas atsiskaitymo metu.</helpText>
             <helpText lang="lv-LV">Automātiski slēpj maksājuma metodes apmaksas procesā, pamatojoties uz pieejamības noteikumiem maksājuma metodēm. Tiks rādītas tikai aktīvās maksājuma metodes no jūsu Mollie vadības paneļa. Ja maksājuma metodei ir ierobežojums attiecībā uz groza limitu, valūtas ierobežojumiem vai rēķina adreses ierobežojumiem, tā
                 tiks slēpta apmaksas procesā.
             </helpText>
@@ -485,7 +483,7 @@
             <label lang="hr-HR">Prilagođeni format brojeva narudžbi za Mollie (nadzorna ploča, PayPal,...)</label>
             <label lang="et-EE">Mollie tellimusnumbrite kohandatud formaat (dashboard, PayPal jne)</label>
             <label lang="is-IS">Sérsniðið snið fyrir Mollie pöntunarnúmer (Stjórnborð, PayPal, ...)</label>
-            <label lang="lt-LT">Mollie užsakymų numerių (Dashboard, PayPal, ...) specialus formatas</label>
+            <label lang="lt-LT">Mollie užsakymų numerių (valdymo skydelio, PayPal, ...) specialus formatas</label>
             <label lang="lv-LV">Pielāgots formāts Mollie pasūtījuma numuriem (Dashboard, PayPal, ...)</label>
             <label lang="ro-RO">Format personalizat pentru numerele de comandă Mollie (Tablou de bord, PayPal, ...)</label>
             <label lang="sk-SK">Vlastný formát čísiel objednávok pre Mollie (Dashboard, PayPal, ...)</label><label lang="bg-BG">Персонализиран формат за номера на Поръчки в Mollie (Табло, PayPal, ...)</label>
@@ -507,7 +505,7 @@
             <helpText lang="hr-HR">Ako je postavljeno, ovaj će se format koristiti ispred broja narudžbe u Mollie nadzornoj ploči. Također će se proslijediti PayPalu kao broj računa.</helpText>
             <helpText lang="et-EE">Kui see on määratud, kasutatakse seda formaati Mollie'i töölaual tellimusnumbri ees. See edastatakse ka PayPalile arvenumbrina.</helpText>
             <helpText lang="is-IS">Ef valið, verður þetta snið notað á undan pöntunarnúmerinu í Mollie stjórnborðinu. Þetta mun einnig vera sent til PayPal sem reikningsnúmer.</helpText>
-            <helpText lang="lt-LT">Jei nustatyta, šis formatas bus naudojamas prieš užsakymo numerį Mollie suvestinėje. Jis taip pat bus perduotas PayPal kaip faktūros numeris.</helpText>
+            <helpText lang="lt-LT">Jei nustatyta, šis formatas bus naudojamas prieš užsakymo numerį Mollie suvestinėje. Jis taip pat bus perduotas PayPal kaip sąskaitos numeris.</helpText>
             <helpText lang="lv-LV">Ja iestatīts, šis formāts tiks izmantots pirms pasūtījuma numura Mollie informācijas panelī. Tas arī tiks nodots PayPal kā rēķina numurs.</helpText>
             <helpText lang="ro-RO">Dacă este setat, acest format va fi utilizat înainte de numărul comenzii în tabloul de bord Mollie. Acesta va fi, de asemenea, transmis către PayPal ca număr de factură.</helpText>
             <helpText lang="sk-SK">Ak je nastavený, tento formát sa použije pred číslom objednávky v Mollie Dashboarde. Rovnako sa odošle aj do služby PayPal ako číslo faktúry.</helpText><helpText lang="bg-BG">Ако е зададено, този формат ще се използва преди номера на поръчката в таблото на Mollie. Той също ще бъде предаден на PayPal като номер на фактурата.</helpText>
@@ -618,7 +616,7 @@
             <label lang="hr-HR">Omogući plaćanje jednim klikom</label>
             <label lang="et-EE">Luba ühe klõpsuga maksmine</label>
             <label lang="is-IS">Virkja greiðslur með einu smelli</label>
-            <label lang="lt-LT">Aktyvuoti Mokėjimus vienu paspaudimu</label>
+            <label lang="lt-LT">Aktyvuoti mokėjimus vienu paspaudimu</label>
             <label lang="lv-LV">Iespējot Viena klikšķa maksājumus</label>
             <label lang="ro-RO">Activează plățile cu un singur clic</label>
             <label lang="sk-SK">Povoliť platby jedným kliknutím</label><label lang="bg-BG">Активиране на Плащане с един клик</label>
@@ -704,7 +702,7 @@
             <helpText lang="hr-HR">Ako je omogućeno, spremljene kartice neće biti prikazane vizualno tijekom naplate.</helpText>
             <helpText lang="et-EE">Kui see on lubatud, ei kuvata salvestatud krediitkaarte kassalehel visuaalsete kaartidena.</helpText>
             <helpText lang="is-IS">Ef þetta er virkjað, verða geymd kreditkort ekki sýnd sem sjónræn kort í afgreiðslusíðunni.</helpText>
-            <helpText lang="lt-LT">Jei aktyvuota, išsaugotos kredito kortelės nebus rodomos kaip vizualinės kortelės atsiskaitymo puslapyje.</helpText>
+            <helpText lang="lt-LT">Jei ši parinktis įjungta, išsaugotos kredito kortelės atsiskaitymo puslapyje nebus rodomos kaip kortelės.</helpText>
             <helpText lang="lv-LV">Ja ir ieslēgts, uzglabātās kredītkartes netiks parādītas kā vizuālas kartes uz apmaksas lapas.</helpText>
             <helpText lang="ro-RO">Dacă este activată, opțiunea va ascunde cardurile de credit salvate sub forma unor carduri vizuale în pagina de finalizare a comenzii</helpText>
             <helpText lang="sk-SK">Ak je táto možnosť povolená, uložené kreditné karty sa nebudú na stránke pokladne zobrazovať ako vizuálne karty.</helpText><helpText lang="bg-BG">Ако е активирано, запазените кредитни карти няма да се показват като визуални карти на страницата за плащане.</helpText>
@@ -870,7 +868,7 @@
             <label lang="hr-HR">Omogući Apple Pay Direct</label>
             <label lang="et-EE">Aktiveeri Apple Pay Direct</label>
             <label lang="is-IS">Virkja Apple Pay Beint</label>
-            <label lang="lt-LT">Aktyvuoti Apple Pay Tiesiogiai</label>
+            <label lang="lt-LT">Aktyvuoti Apple Pay Direct</label>
             <label lang="lv-LV">Iespējot Apple Pay Direct</label>
             <label lang="ro-RO">Activează Apple Pay Direct</label>
             <label lang="sk-SK">Povoliť Apple Pay Direct</label><label lang="bg-BG">Активиране на Apple Pay Direct</label>
@@ -893,7 +891,7 @@
             <helpText lang="hr-HR">Prikažite Apple Pay gumbe i opcije plaćanja izravno na stranici s detaljima proizvoda ili na popisu proizvoda. Ova značajka zahtijeva da je način plaćanja Apple Pay dodijeljen vašem prodajnom kanalu.</helpText>
             <helpText lang="et-EE">Näita Apple Pay nuppe ja makseviise otse toote detailide lehel või nimekirjas. Selle funktsiooni kasutamiseks peab sinu müügikanalile olema määratud Apple Pay makseviis.</helpText>
             <helpText lang="is-IS">Sýna Apple Pay hnappa og greiðslumöguleika beint á vöruskýringarsíðu eða við skráningu. Þessi eiginleiki kallar á greiðslumátan Apple Pay sem þarf að vera úthlutað til sölurásarinnar.</helpText>
-            <helpText lang="lt-LT">Rodyti Apple Pay mygtukus ir mokėjimo pasirinkimus tiesiogiai produktų detalės puslapyje arba sąraše. Ši funkcija reikalauja, kad mokėjimo būdas Apple Pay būtų priskirtas jūsų Pardavimų kanalui.</helpText>
+            <helpText lang="lt-LT">Rodyti Apple Pay mygtukus ir mokėjimo pasirinkimus tiesiogiai produktų informacijos puslapyje arba sąraše. Ši funkcija reikalauja, kad mokėjimo būdas Apple Pay būtų priskirtas jūsų Pardavimų kanalui.</helpText>
             <helpText lang="lv-LV">Rādīt Apple Pay pogas un maksājuma iespējas tieši uz produkta informācijas lapas vai saraksta. Šī funkcija prasa, lai maksājuma metode Apple Pay tiktu piešķirta jūsu pārdošanas kanālam.</helpText>
             <helpText lang="ro-RO">Afișează butoanele și opțiunile de plată Apple Pay direct pe pagina de detalii a produsului sau în listare. Această funcționalitate necesită ca metoda de plată Apple Pay să fie atribuită canalului tău de vânzare.</helpText>
             <helpText lang="sk-SK">Zobraziť tlačidlá Apple Pay a platobné možnosti priamo na stránke s detailom produktu alebo v zozname produktov. Táto funkcia vyžaduje, aby bola platobná metóda Apple Pay priradená k vášmu predajnému kanálu.</helpText><helpText lang="bg-BG">Показване на Apple Pay бутони и опции за плащане директно на страница с подробности за продукта или списък. Тази функция изисква методът на плащане Apple Pay да бъде назначен към вашия продажбен канал.</helpText>
@@ -1105,7 +1103,7 @@
             <helpText lang="hr-HR">Unesite domene koje su dopuštene za Apple Pay Direct, odvojene zarezima. Ova postavka je neobavezna i potrebna je samo ako koristite headless postavke </helpText>
             <helpText lang="et-EE">Sisesta Apple Pay Directi jaoks lubatud domeenid, eraldades need komadega. See seade on valikuline ja vajalik ainult juhul, kui kasutate peata seadistust</helpText>
             <helpText lang="is-IS">Sláið inn þau lén sem eru leyfð fyrir Apple Pay Beint, aðskilin með kommu. Þessi stilling er valfrjáls og aðeins nauðsynleg ef þú ert að nota stærðfræði.</helpText>
-            <helpText lang="lt-LT">Įveskite domenus, kurie leidžiami Apple Pay Direct, atskirdami juos kableliais. Šis nustatymas yra neprivalomas ir reikalingas tik tuo atveju, jei naudojate „headless“ nustatymą</helpText>
+            <helpText lang="lt-LT">Įveskite domenus, kurie leidžiami Apple Pay Direct, atskirdami juos kableliais. Šis nustatymas yra neprivalomas ir reikalingas tik tuo atveju, jei naudojate „headless“ nustatymą </helpText>
             <helpText lang="lv-LV">Ievadiet domēnus, kas ir atļauti Apple Pay Direct, atdalot tos ar komatiem. Šis iestatījums ir izvēles un nepieciešams tikai tad, ja izmantojat bezgalvju iestatījumus.</helpText>
             <helpText lang="ro-RO">Introduceți domeniile care sunt permise pentru Apple Pay Direct, separate prin virgule. Această setare este opțională și necesară doar dacă folosiți o configurare headless.</helpText>
             <helpText lang="sk-SK">Zadajte domény, ktoré sú povolené pre Apple Pay Direct, oddelené čiarkami. Toto nastavenie je voliteľné a vyžaduje sa iba ak používate bezhlavé nastavenie.</helpText><helpText lang="bg-BG">Въведете домейните, които са разрешени за Apple Pay Direct, разделени със запетаи. Тази настройка не е задължителна и се изисква само ако използвате headless конфигурация. </helpText>
