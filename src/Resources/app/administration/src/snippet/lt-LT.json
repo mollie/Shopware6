@@ -7,16 +7,16 @@
             "mollie_checkout_order_success": "Užsakymas sėkmingas",
             "mollie_checkout_order_failed": "Užsakymas nepavyko",
             "mollie_checkout_order_canceled": "Užsakymas atšauktas",
-            "mollie_webhook_received_All": "Gautas Mollie Webhook (Visi)",
-            "mollie_webhook_received_status_authorized": "Gautas Mollie Webhook (Autorizuota)",
-            "mollie_webhook_received_status_failed": "Gautas Mollie Webhook (Nepavykęs)",
-            "mollie_webhook_received_status_canceled": "Gautas Mollie Webhook (Atšauktas)",
-            "mollie_webhook_received_status_expired": "Gautas Mollie Webhook (Pasibaigęs)",
-            "mollie_webhook_received_status_pending": "Gautas Mollie Webhook (Laukiamas)",
-            "mollie_webhook_received_status_paid": "Gautas Mollie Webhook (Apmokėta)",
-            "mollie_webhook_received_status_completed": "Gautas Mollie Webhook (Įvykdyta)",
-            "mollie_webhook_received_status_refunded": "Gautas Mollie Webhook (Grąžinta)",
-            "mollie_webhook_received_status_partially_refunded": " Gautas Mollie Webhook (Iš dalies grąžinta)",
+            "mollie_webhook_received_All": " Gautas Mollie „webhook“ (Visi)",
+            "mollie_webhook_received_status_authorized": "Gautas Mollie „webhook“ (Autorizuoti)",
+            "mollie_webhook_received_status_failed": "Gautas Mollie „webhook“ (Nepavykę)",
+            "mollie_webhook_received_status_canceled": "Gautas Mollie „webhook“ (Atšaukti)",
+            "mollie_webhook_received_status_expired": " Gautas Mollie „webhook“ (Nebegaliojantys)",
+            "mollie_webhook_received_status_pending": "Gautas Mollie „webhook“ (Laukiantys)",
+            "mollie_webhook_received_status_paid": "Gautas Mollie „webhook“ (Apmokėti)",
+            "mollie_webhook_received_status_completed": " Gautas Mollie „webhook“ (Įvykdyti)",
+            "mollie_webhook_received_status_refunded": " Gautas Mollie „webhook“ (Grąžinti)",
+            "mollie_webhook_received_status_partially_refunded": " Gautas Mollie „webhook“ (Iš dalies grąžinti)",
             "mollie_refund_started": "Mollie grąžinimo procesas pradėtas",
             "mollie_subscription_started": "Mollie prenumerata pradėta",
             "mollie_subscription_ended": "Mollie prenumerata įvykdyta",
@@ -43,7 +43,7 @@
         "config": {
             "info": {
                 "title": "Labas {userName}, Sveiki atvykę į Mollie!",
-                "descriptionTop": "Integracija su Mollie yra paprasta!",
+                "descriptionTop": "Paprasta registracija su Mollie!",
                 "descriptionBottom": "Tai viskas!",
                 "descriptionFooter": "Jei norite sužinoti daugiau apie mūsų papildinį, apsilankykite oficialiame dokumentacijos puslapyje.",
                 "onboardingStep1": "Užsiregistruokite Mollie paskyrai.",
@@ -56,8 +56,8 @@
                 "btnTroubleshooting": "Problemų sprendimo vadovas"
             },
             "api": {
-                "apiLinkButton": "Gaukite savo API raktais iš Mollie Dashboard",
-                "testButton": "Testuoti API raktus",
+                "apiLinkButton": "Gaukite savo API raktus iš Mollie valdymo skydelio",
+                "testButton": "Testavimo API raktai",
                 "testApiKeys": {
                     "title": "Mollie mokėjimai",
                     "apiKey": "API raktas",
@@ -67,27 +67,27 @@
             },
             "payments": {
                 "format": {
-                    "placeholder": "Vietaženklis",
+                    "placeholder": "Vieta tekstui",
                     "preview": "Peržiūra"
                 },
                 "updatePaymentMethods": {
                     "title": "Mollie mokėjimai",
                     "button": "Atnaujinti mokėjimo būdus",
-                    "succeeded": "Mokėjimo metodai sėkmingai atnaujinti.",
+                    "succeeded": "Mokėjimo būdai sėkmingai atnaujinti.",
                     "failed": "Nepavyko atnaujinti mokėjimo būdų."
                 },
                 "mollieLimits": {
-                    "link": "Rodyti mollie prieinamumo taisykles mokėjimo būdams"
+                    "link": "Rodyti Mollie mokėjimo būdų prieinamumo sąlygas"
                 }
             },
             "rounding": {
-                "info1": "„Shopware“ gali naudoti valiutos nustatymus, kad apskaičiuotų, kaip suapvalinti bendrą užsakymo sumą. Tai apima skaičių po kablelio jūsų produktų kainose ir artimiausią apvalinimo intervalą, pavyzdžiui, 0,50 arba 1,00.",
-                "info2": "Šie nustatymai gali lemti kitokią bendrą užsakymo sumą nei eilučių elementų suma. Kai Mollie patikrina šias sumas ir nustato, kad jos nesutampa, įvyksta atsiskaitymo klaida.",
-                "info3": "Šią funkciją galite naudoti, kad išvengtumėte apvalinimo problemų atsiskaitymo metu. Įjungus, Mollie paskyros suvestinėje bus pridėta atskira eilutė su apvalinimo skirtumu, o klientai mokės bendrą sumą, apskaičiuotą „Shopware“."
+                "info1": "Shopware gali naudoti valiutos nustatymus, kad apskaičiuotų, kaip suapvalinti bendrą užsakymo sumą. Tai apima skaičių po kablelio jūsų produktų kainose ir artimiausią apvalinimo intervalą, pavyzdžiui, 0,50 arba 1,00.",
+                "info2": "Dėl šių nustatymų galutinė suma gali skirtis nuo eilučių sumų bendros sumos. Kai Mollie sutikrina šias sumas ir nustato, kad jos nesutampa, atsiranda atsiskaitymo klaida.",
+                "info3": "Šią funkciją galite naudoti, kad išvengtumėte apvalinimo problemų atsiskaitymo metu. Įjungus, Mollie paskyros suvestinėje bus pridėta atskira eilutė su apvalinimo skirtumu, o klientai mokės bendrą sumą, apskaičiuotą Shopware."
             },
             "order": {
-                "bankTransferDueDateKlarnaLimitReached": "Negalima naudoti Klarna Pay now, Klarna Slice it ar Klarna Pay later kaip mokėjimo būdo, jei jūsų galiojimo pabaigos data yra daugiau nei 28 dienos į priekį, nebent prekybininkas ir Klarna yra susitarę dėl kito maksimalaus termino.",
-                "bankTransferDueDateLimitReached": "Negalima nustatyti užsakymo galiojimo trukmės ilgesnės, nei 100 dienų."
+                "bankTransferDueDateKlarnaLimitReached": "Negalima naudoti Klarna Pay now, Klarna Slice it arba Klarna Pay later kaip mokėjimo būdo, jei Jūsų galiojimo pabaigos data yra daugiau nei 28 dienos ateityje, nebent tarp prekybininko ir Klarna būtų susitarta dėl kito didžiausio termino.",
+                "bankTransferDueDateLimitReached": "Negalima nustatyti užsakymo galiojimo trukmės ilgesnės nei 100 dienų."
             },
             "support": {
                 "modalTitle": "Prašykite pagalbos iš Mollie",
@@ -104,7 +104,7 @@
                 "data": {
                     "header": "Duomenys, išsiųsti Mollie:",
                     "other": "Kita:",
-                    "shopwareVersion": "„Shopware“ versija",
+                    "shopwareVersion": "Shopware versija",
                     "pluginLogs": "{plugin} žurnalo failai",
                     "pluginConfiguration": "{plugin} nustatymai",
                     "pluginConfigurationHelpText": "API raktai yra neįtraukti.",
@@ -112,7 +112,7 @@
                     "paymentMethodsHelpText": "Įtraukta informacija apie tai, kurie mokėjimo būdai yra aktyvūs, priskirti kiekvienam pardavimo kanalui, taip pat apie jų būseną jūsų Mollie paskyroje."
                 },
                 "success": "Pagalbos užklausa buvo sėkmingai išsiųsta. Mes pasistengsime atsakyti kuo greičiau",
-                "error": "Siunčiant laišką per „Shopware“ įvyko klaida. Bandykite dar kartą arba susisiekite su mumis tiesiogiai el. paštu."
+                "error": "Siunčiant laišką per Shopware įvyko klaida. Bandykite dar kartą arba susisiekite su mumis tiesiogiai el. paštu."
             }
         },
         "rules": {
@@ -125,7 +125,7 @@
                 "pending": "Laukiama",
                 "processing": "Apdorojama",
                 "refunded": "Grąžinta",
-                "failed": "Nepavykęs",
+                "failed": "Nepavyko",
                 "description": {
                     "queued": "Grąžinimas įtrauktas į eilę, kol bus pakankamai lėšų jo apdorojimui. Vis dar galite atšaukti šį grąžinimą.",
                     "pending": "Grąžinimas bus išsiųstas į banką kitą darbo dieną. Vis dar galite atšaukti šį grąžinimą.",
@@ -140,8 +140,8 @@
                 "unitQuantity": "vnt."
             },
             "acl": {
-                "warningCreate": "Neturite leidimo kurti grąžinimų",
-                "warningCancel": "Neturite leidimo atšaukti grąžinimų"
+                "warningCreate": "Neturite leidimų kurti grąžinimų",
+                "warningCancel": "Neturite leidimų atšaukti grąžinimų"
             },
             "cart": {
                 "title": "Užsakymas ##orderNumber##",
@@ -174,11 +174,11 @@
                 "titleStockReset": "Atsargų atnaujinimas",
                 "textStockReset": "Galite automatiškai padidinti turimą atsargų kiekį, įvesdami kiekį, kurį norite grąžinti į sandėlį. Tiesiog įveskite jį prieš atlikdami visą arba dalinį grąžinimą. Atsargų atnaujinimą galima lanksčiai derinti su faktiniu grąžinimo procesu.",
                 "titleShipping": "Siuntimas",
-                "textShipping": "Siunimo prekes galima grąžinti kaip bet kurią kitą prekę. Įveskite visą kiekį arba nurodykite pasirinktą dalinę sumą ir tęskite grąžinimo procesą. Siuntimo išlaidų grąžinimas gali būti derinamas su faktiniu prekių grąžinimo procesu lanksčiu būdu.",
+                "textShipping": "Siuntimo prekes galima grąžinti kaip bet kurią kitą prekę. Įveskite visą kiekį arba nurodykite pasirinktą dalinę sumą ir tęskite grąžinimo procesą. Siuntimo išlaidų grąžinimas gali būti derinamas su faktiniu prekių grąžinimo procesu lanksčiu būdu.",
                 "titlePartialAmount": "Dalinis grąžinimas (tik suma)",
                 "textPartialAmount": "Tiesiog įveskite dalinę sumą į teksto laukelį ir pradėkite grąžinimą.",
                 "titlePartialItems": "Dalinis grąžinimas (su prekėmis)",
-                "textPartialItems": "Jei norite „Mollie“ sistemoje pažymėti kiekius ir prekes kaip grąžintas, naudokite aukščiau esančią formą. Nustatykite kiekius ir nurodykite pasirinktą sumą kiekvienai grąžinamai prekei. Bendra suma bus matoma galutinės grąžinimo sumos laukelyje. Prisiminkite, kad prieš pradėdami grąžinimą vis dar galite pakoreguoti šią galutinę sumą.",
+                "textPartialItems": "Jei norite Mollie sistemoje pažymėti kiekius ir prekes kaip grąžintas, naudokite aukščiau esančią formą. Nustatykite kiekius ir nurodykite pasirinktą sumą kiekvienai grąžinamai prekei. Bendra suma bus matoma galutinės grąžinimo sumos laukelyje. Prisiminkite, kad prieš pradėdami grąžinimą vis dar galite pakoreguoti šią galutinę sumą.",
                 "titlePartialPromotions": "Dalinis grąžinimas (su nuolaidomis)",
                 "textPartialPromotions": "Jei jūsų krepšelyje yra akcija, ji pateikiama kaip atskira eilutė. Jei norite grąžinti visas su nuolaida įsigytas prekes, grąžinkite jų bendras vertes ir visą akcijos eilutę. Tačiau jei norite grąžinti tik kelias nuolaidas gavusias prekes, galite automatiškai atimti pritaikytą nuolaidą kiekvienai eilutei atskirai. Žinoma, visada galite pakeisti vertes, jei jos neteisingos.",
                 "titleRoundingDiff": "Apvalinimo skirtumas",
@@ -201,7 +201,7 @@
                 "placeholderInternalDescription": "Įveskite savo vidinį aprašymą",
                 "lblInternalDescription": "Vidinis aprašymas (neprivalomas)",
                 "internalDescriptionHelp": "Tai bus rodoma kaip vietinis aprašymas administravimo sąsajoje.",
-                "checkVerification": "Aš patikrinau visą grąžinamą sumą ir nustatytus kiekius grąžinimui bei grąžinimui į sandėlį.",
+                "checkVerification": "Patikrinau visą grąžinamą sumą ir nustatytus kiekius grąžinimui bei grąžinimui į sandėlį.",
                 "btnRefund": "Grąžinimas",
                 "btnFullRefund": "Pilnas grąžinimas",
                 "roundDiffItemAdded": "Apvalinimo elementas"
@@ -212,7 +212,7 @@
                 "grid": {
                     "columns": {
                         "amount": "Suma",
-                        "status": "Statusas",
+                        "status": "Būsena",
                         "description": "Aprašymas",
                         "internalDescription": "Vidinis aprašymas",
                         "composition": "Sudėtis",
@@ -230,31 +230,31 @@
                 "error": {
                     "low-amount": "Prašome įvesti sumą, kurią reikia grąžinti.",
                     "refund-created": "Įvyko klaida kuriant grąžinimą.",
-                    "refund-canceled": "Atšaukiant grąžinimą įvyko klaida. Bandykite dar kartą Mollie suvestinėje."
+                    "refund-canceled": "Atšaukiant grąžinimą įvyko klaida. Bandykite dar kartą Mollie valdymo skydelyje."
                 }
             }
         },
         "vouchers": {
             "CARD_TITLE": "Kuponas",
             "VOUCHER_INFO_TITLE": "Kupono mokėjimai",
-            "VOUCHER_INFO_DESCRIPTION": "Mollie leidžia lengvai priimti mokėjimus savo internetinėje parduotuvėje, naudojant ekologiškus, dovanų ir valgio kuponus – išmanus pasirinkimas padedantis didinti pardavimus ir patenkinti jūsų klientus. Mokėjimo būdas „kuponas“ bus matomas tik tuo atveju, jei krepšelyje yra bent 1 produktas su priskirtu kupono tipu.",
+            "VOUCHER_INFO_DESCRIPTION": "Mollie leidžia lengvai priimti mokėjimus savo internetinėje parduotuvėje, naudojant eko, dovanų ir maisto kuponus – išmanus pasirinkimas padedantis didinti pardavimus ir patenkinti jūsų klientus. Mokėjimo būdas „kuponas“ bus matomas tik tuo atveju, jei krepšelyje yra bent 1 produktas su priskirtu kupono tipu.",
             "VOUCHER_INFO_DEFAULTLANGUAGE": "Atkreipkite dėmesį, kad šis nustatymas gali būti redaguojamas tik jūsų numatyta kalba. Norėdami pakeisti šio produkto kupono tipą, pakeiskite kalbą.",
             "VOUCHER_BTN_READMORE": "Skaityti daugiau",
             "VOUCHER_TYPE_CAPTION": "Kuponų produkto tipas",
             "VOUCHER_TYPE_VALUE_NONE": "Nėra",
-            "VOUCHER_TYPE_VALUE_ECO": "Ekologiškas",
-            "VOUCHER_TYPE_VALUE_MEAL": "Patiekalas",
-            "VOUCHER_TYPE_VALUE_VOUCHER": "Dovana"
+            "VOUCHER_TYPE_VALUE_ECO": "Eko",
+            "VOUCHER_TYPE_VALUE_MEAL": "Maisto",
+            "VOUCHER_TYPE_VALUE_VOUCHER": "Dovanų"
         },
         "modals": {
             "shipping": {
                 "title": "Siųsti per Mollie",
                 "item": {
                     "label": "Prekė:",
-                    "noQuantity": "Prašome įvesti kiekį, kuris bus siųstas.",
+                    "noQuantity": "Prašome įvesti siunčiamą kiekį.",
                     "shipAll": "Siųsti viską",
                     "summary": {
-                        "quantity": "Kiekis, kurį reikia siųsti",
+                        "quantity": "Siunčiamas kiekis",
                         "shipped": "Išsiųstas kiekis",
                         "shippable": "Kiekis, kuris gali būti siunčiamas"
                     },
@@ -274,8 +274,8 @@
                 "tracking": {
                     "carrier": "Vežėjas",
                     "code": "Kodas",
-                    "url": "Url",
-                    "invalid": "Prašome įvesti tiek Vežėją, tiek Kodą"
+                    "url": "URL",
+                    "invalid": "Prašome įvesti tiek vežėją, tiek kodą"
                 },
                 "confirmButton": "Siųsti užsakymą",
                 "cancelButton": "Atšaukti",
@@ -285,7 +285,7 @@
             "cancel": {
                 "title": "Atšaukti prekę per Mollie",
                 "confirmButton": "Atšaukti prekę per Mollie",
-                "cancelButton": "Uždaryti modalą",
+                "cancelButton": "Uždaryti modalinį langą",
                 "resetStock": "Iš naujo nustatyti atsargas",
                 "item": {
                     "success": "Produktas sėkmingai atšauktas",
@@ -306,8 +306,8 @@
                     },
                     "modal": {
                         "title": "Siųsti užsakymą",
-                        "description": "Šis veiksmas automatiškai išsiųs užsakymą per Mollie. Veiksmų seka gaus užsakymo numerį ir perduos jį Mollie API. Sėkmingi ir nesėkmingi siuntimai bus matomi Mollie žurnalo failuose.",
-                        "warningConfig": "Įsitikinkite, kad šiam veiksmui išjungėte bet kokią papildomą automatiką, kad išvengtumėte trukdžių.\nŠios papildomos funkcijos gali trukdyti šiam veiksmui:",
+                        "description": "Šis veiksmas automatiškai išsiųs užsakymą per Mollie. Šis procesas gaus užsakymo numerį ir perduos jį Mollie API. Sėkmingos ir nepavykusios siuntos bus matomos Mollie žurnalo failuose.",
+                        "warningConfig": "Prašome įsitikinti, kad išjungėte bet kokią papildomą automatizaciją šio tipo veiksmui, kad išvengtumėte bet kokių trikdžių.\nŠios papildomos funkcijos gali trukdyti šiam veiksmui:",
                         "noWarnings": "Įspėjimų nėra"
                     }
                 },
@@ -318,9 +318,9 @@
                     },
                     "modal": {
                         "title": "Grąžinti užsakymą",
-                        "description": "Šis veiksmas automatiškai pradės grąžinimą per Mollie. Šis procesas gaus užsakymo numerį ir perduos jį Mollie API. Sėkmingi ir nesėkmingi grąžinimai bus matomi Mollie žurnalo failuose.",
-                        "warning": "Atminkite, kad grąžinimų užbaigimas ir jų matomumas parduotuvėje gali užtrukti iki 2 valandų. ki tol visada galite atšaukti laukiantį grąžinimą iš užsakymo puslapio Shopware sistemoje arba iš Mollie suvestinės.",
-                        "warningConfig": "Įsitikinkite, kad šiam veiksmui išjungėte bet kokią papildomą automatiką, kad išvengtumėte trukdžių."
+                        "description": "Šis veiksmas automatiškai pradės grąžinimą per Mollie. Šis procesas gaus užsakymo numerį ir perduos jį Mollie API. Sėkmingi ir nepavykę grąžinimai bus matomi Mollie žurnalo failuose.",
+                        "warning": "Atminkite, kad grąžinimų užbaigimas ir jų matomumas parduotuvėje gali užtrukti iki 2 valandų. Iki tol visada galite atšaukti laukiantį grąžinimą iš užsakymo puslapio Shopware sistemoje arba iš Mollie valdymo skydelio.",
+                        "warningConfig": "Prašome įsitikinti, kad išjungėte bet kokią papildomą automatizaciją šio tipo veiksmui, kad išvengtumėte bet kokių trikdžių."
                     }
                 },
                 "warnings": {
@@ -343,7 +343,7 @@
                 "title": "Mollie Prenumeratos"
             },
             "TYPE_DAYS": "Diena(-os)",
-            "TYPE_WEEKS": "Savaitė(s)",
+            "TYPE_WEEKS": "Savaitė(-s)",
             "TYPE_MONTHS": "Mėnuo(-esiai)",
             "confirm": {
                 "cancelTitle": "Atšaukti prenumeratą?",
@@ -365,7 +365,7 @@
                 "title": "Mollie prenumeratos",
                 "columns": {
                     "customer": "Klientas",
-                    "status": "Statusas",
+                    "status": "Būsena",
                     "description": "Aprašymas",
                     "amount": "Suma",
                     "nextPaymentAt": "Kitas mokėjimas",
@@ -392,8 +392,8 @@
                 "buttonShowShopwareOrder": "Rodyti Shopware užsakymą",
                 "buttonShowShopwareCustomer": "Rodyti Shopware klientą",
                 "cardTitleSubscription": "Prenumerata",
-                "cardTitleStatus": "Statusas",
-                "labelStatus": "Statusas",
+                "cardTitleStatus": "Būsena",
+                "labelStatus": "Būsena",
                 "labelNextPaymentAt": "Kitas mokėjimas",
                 "labelLastRemindedAt": "Paskutinį kartą priminta",
                 "labelCanceledAt": "Atšauktas",
@@ -404,21 +404,21 @@
                     "cardTitle": "Istorija",
                     "colDate": "Data",
                     "colComment": "Komentaras",
-                    "colStatusFrom": "Statusas (iš)",
-                    "colStatusTo": "Statusas (į)",
+                    "colStatusFrom": "Būsena (iš)",
+                    "colStatusTo": "Būsena (į)",
                     "colMollieSubscription": "Mollie prenumerata"
                 }
             },
             "product": {
                 "card-title": "Prenumerata",
                 "title": "Mollie prenumeratos",
-                "description": "Tvarkyti jūsų periodinius mokėjimus dabar lengviau nei bet kada su mūsų naudingomis funkcijomis. Pakelkite savo verslą į aukštesnį lygį naudodamiesi efektyvaus sekimo galimybėmis, paprastomis integracijomis ir dar daugiau. Su Mollie prenumeratomis galite lengvai kurti prenumeratos produktus ir suplanuoti periodinius mokėjimus pasirinktu intervalu bei laikotarpiu.",
+                "description": "Valdyti pasikartojančius mokėjimus dar niekada nebuvo taip paprasta – padės mūsų naudingos funkcijos. Pakelkite savo verslą į kitą lygį naudodami efektyvias stebėjimo galimybes, paprastą integravimą ir dar daugiau. Naudodami Mollie prenumeratas, galite lengvai kurti prenumeruojamus produktus ir suplanuoti periodinius mokėjimus taip, kad jie būtų vykdomi nustatytu dažniu ir laikotarpiu.",
                 "mollieSubscriptionProduct": "Prenumeratos produktas",
                 "mollieSubscriptionIntervalAmount": "Kartoti mokėjimą kas",
                 "mollieSubscriptionIntervalType": "Intervalo vienetas",
                 "mollieSubscriptionRepetitionAmount": "Pasikartojimų skaičius",
                 "mollieSubscriptionRepetitionPlaceholder": "Įveskite skaičių arba palikite tuščią",
-                "infoDefaultLanguage": "Prašome atkreipti dėmesį, kad šis nustatymas gali būti redaguojamas tik jūsų numata kalba. Prašome pakeisti savo kalbą norint pakeisti produkto prenumeratos nustatymus.",
+                "infoDefaultLanguage": "Prašome atkreipti dėmesį, kad šis nustatymas gali būti redaguojamas tik jūsų numatyta kalba. Prašome pakeisti savo kalbą norint pakeisti produkto prenumeratos nustatymus.",
                 "btnReadMore": "Skaityti daugiau"
             }
         },
@@ -443,12 +443,12 @@
             "totalRefundsPending": "Laukiama grąžinimo",
             "totalRemaining": "Grąžinama suma",
             "totalVouchers": "Kupono suma",
-            "totalShipments": "Išsiųsta suma ({quantity} daiktai)",
+            "totalShipments": "Išsiųsta suma ({quantity} vienetai)",
             "subscriptionBadge": "Prenumeratos užsakymas",
             "refundManager": {
                 "title": "Mollie grąžinimų valdymas",
-                "btnOpenRefundManager": "Atidaryti grąžinimų tvarkyklę",
-                "btnCloseRefundManager": "Uždaryti grąžinimų tvarkyklę"
+                "btnOpenRefundManager": "Atidaryti grąžinimų valdymą",
+                "btnCloseRefundManager": "Uždaryti grąžinimų valdymą"
             }
         }
     },
@@ -463,7 +463,7 @@
                 "mollie": "Mollie"
             },
             "mollie_refund_manager": {
-                "label": "Grąžinimų tvarkyklė"
+                "label": "Grąžinimų valdymas"
             },
             "mollie_subscription": {
                 "label": "Prenumeratos"
@@ -484,8 +484,8 @@
             "mollie": "Mollie",
             "refund": "Grąžinimas",
             "subscription": "Prenumerata",
-            "webhookReceived": "Webhooks",
-            "status": "Statusas",
+            "webhookReceived": "„Webhook“ pranešimai",
+            "status": "Būsena",
             "started": "Pradėta",
             "ended": "Baigta",
             "paused": "Sustabdyta",
@@ -495,7 +495,7 @@
             "skipped": "Praleista",
             "all": "Visi",
             "canceled": "Atšaukta",
-            "expired": "Pasibaigęs",
+            "expired": "Nebegalioja",
             "partiallyRefunded": "Grąžinta (dalinai)",
             "orderSuccess": "Užsakymas sėkmingas",
             "orderFailed": "Užsakymas nepavyko",

@@ -18,7 +18,7 @@
                 "cardHolderLabel": "Vardas ant kortelės",
                 "cardNumberLabel": "Kortelės numeris",
                 "cardVerificationCodeLabel": "CVC/CVV",
-                "creditCardTagLine": "Mokėjimas užtikrintas ir palaikomas",
+                "creditCardTagLine": "Mokėjimas užtikrintas ir teikiamas",
                 "headLine": "Įveskite savo kortelės informaciją",
                 "saveCardDetailLabel": "Išsaugokite kortelės informaciją ateities mokėjimams"
             },
@@ -42,7 +42,7 @@
                 "cardSubscription": "Ši kortelė naudojama prenumeratai. Prašome pirmiausia atšaukti prenumeratą prieš pašalinant šią kortelę.",
                 "deleteButton": "Ištrinti",
                 "deleteConfirmation": "Ar tikrai norite ištrinti?",
-                "title": "Ištrynimo patvirtinimas"
+                "title": "Trinimo patvirtinimas"
             },
             "phoneField": {
                 "headLine": "Telefono numeris",
@@ -54,7 +54,7 @@
                 "buttonPayThroughMollie": "Apmokėti kitu mokėjimo būdu",
                 "buttonReturnToShop": "Grįžti į parduotuvę",
                 "error": "Mokėjimas nepavyko",
-                "failed": "Mokėjimas nepavyko arba buvo atšauktas. Būsite nukreipti į Mollie, kur galėsite užbaigti savo mokėjimą pasirinktu metodu. "
+                "failed": "Mokėjimas nepavyko arba buvo atšauktas. Būsite nukreipti į Mollie, kur galėsite užbaigti savo mokėjimą pasirinktu būdų. "
             },
             "redirecting": "Nukreipiama į: "
         },
@@ -70,7 +70,7 @@
         },
         "subscriptions": {
             "account": {
-                "btnEditBillingAddress": "redaguoti sąskaitos faktūros adresą",
+                "btnEditBillingAddress": "redaguoti faktūrų adresą",
                 "btnEditShippingAddress": "redaguoti siuntimo adresą",
                 "cancelSubscription": "Prenumerata sėkmingai atšaukta",
                 "errorCancelSubscription": "Dėl klaidos nepavyko atšaukti prenumeratos. Prašome susisiekti su mūsų pagalbos komanda.",
@@ -103,7 +103,7 @@
                 "successResume": "Jūsų prenumerata bus atnaujinta",
                 "successSkip": "Jūsų prenumerata buvo praleista",
                 "successUpdateAddress": "Jūsų adresas sėkmingai atnaujintas",
-                "successUpdatePayment": "Jūsų mokėjimo metodas buvo sėkmingai atnaujintas"
+                "successUpdatePayment": "Jūsų mokėjimo būdas buvo sėkmingai atnaujintas"
             },
             "options": {
                 "everyDay": "Kiekvieną dieną",

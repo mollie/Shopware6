@@ -7,6 +7,7 @@
 - Behoben: Custom Fields von anderen Herstellern werden beim Aktualisieren von OrderLineItems nicht mehr überschrieben.
 - Neu: Bulgarische Übersetzungen hinzugefügt.
 - Kroatische Übersetzungen aktualisiert.
+- Litauische Übersetzungen aktualisiert.
 
 
 # 4.22.1
