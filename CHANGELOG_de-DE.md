@@ -7,6 +7,8 @@
 - Behoben: Custom Fields von anderen Herstellern werden beim Aktualisieren von OrderLineItems nicht mehr überschrieben.
 - Neu: Bulgarische Übersetzungen hinzugefügt.
 - Kroatische Übersetzungen aktualisiert.
+- Litauische Übersetzungen aktualisiert.
+- Neu: Manuelles Capturing für Kreditkartenzahlungen. Wenn aktiviert, wird der Betrag erst beim Versand der Bestellung über Mollie eingezogen.
 
 
 # 4.22.1

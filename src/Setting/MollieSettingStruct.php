@@ -287,6 +287,8 @@ class MollieSettingStruct extends Struct
 
     protected bool $paypalExpressEnabled = false;
 
+    protected bool $creditCardManualCapture = false;
+
     /**
      * @var int
      */
@@ -865,6 +867,16 @@ class MollieSettingStruct extends Struct
     public function setAutomaticOrderExpire(bool $automaticOrderExpire): void
     {
         $this->automaticOrderExpire = $automaticOrderExpire;
+    }
+
+    public function isCreditCardManualCapture(): bool
+    {
+        return $this->creditCardManualCapture;
+    }
+
+    public function setCreditCardManualCapture(bool $creditCardManualCapture): void
+    {
+        $this->creditCardManualCapture = $creditCardManualCapture;
     }
 
     public function isPaypalExpressEnabled(): bool

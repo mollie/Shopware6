@@ -76,6 +76,7 @@ export default class ShopConfigurationAction {
             // ------------------------------------------------------------------
             "MolliePayments.config.shopwareFailedPayment": !pluginConfig.getMollieFailureMode(),
             "MolliePayments.config.enableCreditCardComponents": pluginConfig.getCreditCardComponents(),
+            "MolliePayments.config.creditCardManualCapture": pluginConfig.getCreditCardManualCapture(),
             "MolliePayments.config.enableApplePayDirect": pluginConfig.getApplePayDirectEnabled(),
             "MolliePayments.config.oneClickPaymentsEnabled": false,
             "MolliePayments.config.paymentMethodBankTransferDueDateDays": 2,

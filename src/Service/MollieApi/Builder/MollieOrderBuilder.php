@@ -227,6 +227,10 @@ class MollieOrderBuilder
                 $salesChannelContext,
                 $customer
             );
+
+            if ($handler instanceof CreditCardPayment && $settings->isCreditCardManualCapture()) {
+                $orderData['captureMode'] = 'manual';
+            }
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------

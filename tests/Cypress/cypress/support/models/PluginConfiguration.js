@@ -5,6 +5,7 @@ export default class PluginConfiguration {
         this._subscriptionIndicator = false;
         this._mollieFailureMode = false;
         this._creditCardComponents = false;
+        this._creditCardManualCapture = false;
         this._applePayDirectEnabled = false;
         this._paypalExpressRestrictions = [];
     }
@@ -32,6 +33,14 @@ export default class PluginConfiguration {
 
     setCreditCardComponents(value) {
         this._creditCardComponents = value;
+    }
+
+    getCreditCardManualCapture() {
+        return this._creditCardManualCapture;
+    }
+
+    setCreditCardManualCapture(value) {
+        this._creditCardManualCapture = value;
     }
 
     getApplePayDirectEnabled() {

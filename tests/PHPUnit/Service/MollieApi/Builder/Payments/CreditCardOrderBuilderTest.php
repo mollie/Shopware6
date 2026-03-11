@@ -67,6 +67,63 @@ class CreditCardOrderBuilderTest extends AbstractMollieOrderBuilder
         self::assertSame($expected, $actual);
     }
 
+    public function testOrderBuildWithManualCapture(): void
+    {
+        $redirectWebhookUrl = 'https://foo';
+        $this->router->method('generate')->willReturn($redirectWebhookUrl);
+        $paymentMethod = PaymentMethod::CREDITCARD;
+        /** @var CustomerService $customerService */
+        $customerService = $this->getMockBuilder(CustomerService::class)->disableOriginalConstructor()->getMock();
+
+        $this->paymentHandler = new CreditCardPayment(
+            $this->payAction,
+            $this->finalizeAction,
+            $customerService
+        );
+
+        $this->settingStruct->assign([
+            'creditCardManualCapture' => true,
+        ]);
+
+        $transactionId = Uuid::randomHex();
+        $amountTotal = 27.0;
+        $taxStatus = CartPrice::TAX_STATE_GROSS;
+        $currencyISO = 'EUR';
+
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode($currencyISO);
+
+        $orderNumber = 'foo number';
+        $lineItems = $this->getDummyLineItems();
+
+        $order = $this->getOrderEntity($amountTotal, $taxStatus, $currencyISO, $lineItems, $orderNumber);
+
+        $actual = $this->builder->buildOrderPayload($order, $transactionId, $paymentMethod, $this->salesChannelContext, $this->paymentHandler, []);
+
+        $expectedOrderLifeTime = (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))
+            ->modify(sprintf('+%d day', $this->expiresAt))
+            ->format('Y-m-d')
+        ;
+
+        $expected = [
+            'amount' => (new MollieOrderPriceBuilder())->build($amountTotal, $currencyISO),
+            'locale' => $this->localeCode,
+            'method' => $paymentMethod,
+            'orderNumber' => $orderNumber,
+            'captureMode' => 'manual',
+            'payment' => ['webhookUrl' => $redirectWebhookUrl],
+            'redirectUrl' => $redirectWebhookUrl,
+            'webhookUrl' => $redirectWebhookUrl,
+            'lines' => $this->getExpectedLineItems($taxStatus, $lineItems, $currency),
+            'billingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
+            'shippingAddress' => $this->getExpectedTestAddress($this->address, $this->email),
+            'expiresAt' => $expectedOrderLifeTime,
+        ];
+
+        self::assertSame($expected, $actual);
+    }
+
     public function testOrderBuildWithToken(): void
     {
         $token = 'secrettoken';

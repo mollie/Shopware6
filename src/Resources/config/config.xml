@@ -709,6 +709,56 @@
             <helpText lang="ro-RO">Dacă este activată, opțiunea va ascunde cardurile de credit salvate sub forma unor carduri vizuale în pagina de finalizare a comenzii</helpText>
             <helpText lang="sk-SK">Ak je táto možnosť povolená, uložené kreditné karty sa nebudú na stránke pokladne zobrazovať ako vizuálne karty.</helpText><helpText lang="bg-BG">Ако е активирано, запазените кредитни карти няма да се показват като визуални карти на страницата за плащане.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>creditCardManualCapture</name>
+            <label>Enable Manual Capture for Credit Cards</label>
+            <label lang="de-DE">Manuelles Capturing für Kreditkarten aktivieren</label>
+            <label lang="nl-NL">Handmatige capture voor creditcards inschakelen</label>
+            <label lang="it-IT">Abilita acquisizione manuale per carte di credito</label>
+            <label lang="pt-PT">Ativar captura manual para cartões de crédito</label>
+            <label lang="es-ES">Habilitar captura manual para tarjetas de crédito</label>
+            <label lang="sv-SE">Aktivera manuell capture för kreditkort</label>
+            <label lang="nb-NO">Aktiver manuell betaling for kredittkort</label>
+            <label lang="pl-PL">Włącz ręczne przechwytywanie dla kart kredytowych</label>
+            <label lang="cs-CZ">Povolit ruční zachycení pro kreditní karty</label>
+            <label lang="sl-SL">Omogoči ročno zajem za kreditne kartice</label>
+            <label lang="hu-HU">Manuális rögzítés engedélyezése hitelkártyákhoz</label>
+            <label lang="fi-FI">Ota käyttöön manuaalinen tila luottokorteille</label>
+            <label lang="da-DK">Aktiver manuel capture for kreditkort</label>
+            <label lang="el-GR">Ενεργοποίηση Μη Αυτόματης Καταγραφής για Πιστωτικές Κάρτες</label>
+            <label lang="hr-HR">Omogući ručno preuzimanje za kreditne kartice</label>
+            <label lang="et-EE">Luba käsitsi hõivamine krediitkaartide jaoks</label>
+            <label lang="is-IS">Virkja handvirka greiðsluhald fyrir kreditkort</label>
+            <label lang="lt-LT">Aktyvuoti rankinį fiksavimą kredito kortelėms</label>
+            <label lang="lv-LV">Iespējot manuālo uztveršanu kredītkartēm</label>
+            <label lang="ro-RO">Activează captarea manuală pentru carduri de credit</label>
+            <label lang="sk-SK">Povoliť manuálne zachytenie pre kreditné karty</label>
+            <label lang="bg-BG">Активиране на ръчно задържане за кредитни карти</label>
+            <defaultValue>false</defaultValue>
+            <helpText>When enabled, credit card payments will be authorized but not captured automatically. The payment is captured when the order is shipped through Mollie.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, werden Kreditkartenzahlungen autorisiert, aber nicht automatisch eingezogen. Der Betrag wird eingezogen, wenn die Bestellung über Mollie versendet wird.</helpText>
+            <helpText lang="nl-NL">Wanneer ingeschakeld, worden creditcardbetalingen geautoriseerd maar niet automatisch vastgelegd. De betaling wordt vastgelegd wanneer de bestelling via Mollie wordt verzonden.</helpText>
+            <helpText lang="it-IT">Se abilitato, i pagamenti con carta di credito verranno autorizzati ma non acquisiti automaticamente. Il pagamento viene acquisito quando l'ordine viene spedito tramite Mollie.</helpText>
+            <helpText lang="pt-PT">Quando ativado, os pagamentos com cartão de crédito serão autorizados mas não capturados automaticamente. O pagamento é capturado quando o pedido é enviado através da Mollie.</helpText>
+            <helpText lang="es-ES">Cuando está habilitado, los pagos con tarjeta de crédito serán autorizados pero no capturados automáticamente. El pago se captura cuando el pedido se envía a través de Mollie.</helpText>
+            <helpText lang="sv-SE">När aktiverat auktoriseras kreditkortsbetalningar men fångas inte automatiskt. Betalningen fångas när ordern skickas via Mollie.</helpText>
+            <helpText lang="nb-NO">Når aktivert vil kredittkortbetalinger bli autorisert men ikke fanget automatisk. Betalingen fanges når ordren sendes via Mollie.</helpText>
+            <helpText lang="pl-PL">Gdy włączone, płatności kartą kredytową zostaną autoryzowane, ale nie przechwycone automatycznie. Płatność jest przechwytywana po wysłaniu zamówienia przez Mollie.</helpText>
+            <helpText lang="cs-CZ">Pokud je povoleno, platby kreditní kartou budou autorizovány, ale ne automaticky zachyceny. Platba je zachycena při odeslání objednávky přes Mollie.</helpText>
+            <helpText lang="sl-SL">Ko je omogočeno, bodo plačila s kreditno kartico odobrena, vendar ne samodejno zajeta. Plačilo se zajame ob odpremi naročila prek Mollie.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a hitelkártyás fizetések engedélyezve lesznek, de nem kerülnek automatikusan rögzítésre. A fizetés rögzítése a rendelés Mollie-n keresztüli szállításakor történik.</helpText>
+            <helpText lang="fi-FI">Kun otettu käyttöön, luottokorttimaksut valtuutetaan, mutta niitä ei heti veloiteta. Maksu veloitetaan, kun tilaus lähetetään Mollien kautta.</helpText>
+            <helpText lang="da-DK">Når aktiveret vil kreditkortbetalinger blive autoriseret men ikke automatisk opfanget. Betalingen opfanges når ordren afsendes via Mollie.</helpText>
+            <helpText lang="el-GR">Όταν ενεργοποιηθεί, οι πληρωμές με πιστωτική κάρτα θα εγκριθούν αλλά δεν θα συλληφθούν αυτόματα. Η πληρωμή συλλαμβάνεται όταν η παραγγελία αποσταλεί μέσω Mollie.</helpText>
+            <helpText lang="hr-HR">Kada je omogućeno, plaćanja kreditnom karticom bit će autorizirana, ali neće biti automatski preuzeta. Plaćanje se preuzima kada se narudžba pošalje putem Molliea.</helpText>
+            <helpText lang="et-EE">Kui lubatud, autoriseeritakse krediitkaardimaksed, kuid neid ei hõivata automaatselt. Makse hõivatakse tellimuse saatmisel Mollie kaudu.</helpText>
+            <helpText lang="is-IS">Þegar virkjað verða kreditkortgreiðslur heimilaðar en ekki teknar sjálfkrafa. Greiðslan er tekin þegar pöntunin er send í gegnum Mollie.</helpText>
+            <helpText lang="lt-LT">Kai aktyvuota, mokėjimai kredito kortele bus autorizuoti, bet ne automatiškai fiksuoti. Mokėjimas fiksuojamas kai užsakymas išsiunčiamas per Mollie.</helpText>
+            <helpText lang="lv-LV">Kad iespējots, kredītkaršu maksājumi tiks autorizēti, bet ne automātiski uztverti. Maksājums tiek uztvers, kad pasūtījums tiek nosūtīts caur Mollie.</helpText>
+            <helpText lang="ro-RO">Când este activată, plățile cu card de credit vor fi autorizate dar nu capturate automat. Plata este capturată când comanda este expediată prin Mollie.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, platby kreditnou kartou budú autorizované, ale nie automaticky zachytené. Platba sa zachytí pri odoslaní objednávky cez Mollie.</helpText>
+            <helpText lang="bg-BG">Когато е активирано, плащанията с кредитна карта ще бъдат оторизирани, но не заловени автоматично. Плащането се залавя при изпращане на поръчката чрез Mollie.</helpText>
+        </input-field>
     </card>
     <!--card>
         <title>PayPal Express</title>
