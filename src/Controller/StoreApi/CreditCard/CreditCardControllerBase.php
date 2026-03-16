@@ -37,8 +37,9 @@ class CreditCardControllerBase
      *
      * @return StoreCardTokenResponse
      */
-    public function saveCardToken(string $customerId, string $cardToken, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
+    public function saveCardToken(string $cardToken, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
+        $customerId = (string) $context->getCustomerId();
         /** @var ?CustomerEntity $customer */
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
@@ -62,8 +63,9 @@ class CreditCardControllerBase
      *
      * @return StoreMandateIdResponse
      */
-    public function saveMandateId(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
+    public function saveMandateId(string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
+        $customerId = (string) $context->getCustomerId();
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
         if (! $customer instanceof CustomerEntity) {
             throw new \Exception('Customer with ID ' . $customerId . ' not found in Shopware');
@@ -84,8 +86,9 @@ class CreditCardControllerBase
      *
      * @return RevokeMandateResponse
      */
-    public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): StoreApiResponse
+    public function revokeMandate(string $mandateId, SalesChannelContext $context): StoreApiResponse
     {
+        $customerId = (string) $context->getCustomerId();
         $this->mandateService->revokeMandateByCustomerId($customerId, $mandateId, $context);
 
         return new RevokeMandateResponse();
@@ -96,8 +99,10 @@ class CreditCardControllerBase
      *
      * @return CreditCardMandatesResponse
      */
-    public function getMandates(string $customerId, SalesChannelContext $context): StoreApiResponse
+    public function getMandates(SalesChannelContext $context): StoreApiResponse
     {
+        $customerId = (string) $context->getCustomerId();
+
         $mandate = $this->mandateService->getCreditCardMandatesByCustomerId($customerId, $context);
 
         return new CreditCardMandatesResponse($mandate);

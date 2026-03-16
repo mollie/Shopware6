@@ -176,8 +176,9 @@ export default class MolliePosTerminalPlugin extends Plugin {
 
         const client = new HttpClientService();
 
-        client.get(
-            shopUrl + '/mollie/pos/store-terminal/' + customerId + '/' + terminalsDropdown.value,
+        client.post(
+            shopUrl + '/mollie/pos/store-terminal/' + terminalsDropdown.value,
+            '',
             function () {
                 onCompleted('terminal updated successfully');
             },

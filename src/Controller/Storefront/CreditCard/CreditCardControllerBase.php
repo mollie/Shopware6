@@ -36,10 +36,11 @@ class CreditCardControllerBase extends AbstractStoreFrontController
         $this->logger = $logger;
     }
 
-    public function storeCardToken(SalesChannelContext $context, string $customerId, string $cardToken, Request $data): JsonResponse
+    public function storeCardToken(SalesChannelContext $context, string $cardToken, Request $data): JsonResponse
     {
         $result = null;
         $success = false;
+        $customerId = (string) $context->getCustomerId();
         /** @var ?CustomerEntity $customer */
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
@@ -62,10 +63,11 @@ class CreditCardControllerBase extends AbstractStoreFrontController
         ]);
     }
 
-    public function storeMandateId(string $customerId, string $mandateId, SalesChannelContext $context): JsonResponse
+    public function storeMandateId(string $mandateId, SalesChannelContext $context): JsonResponse
     {
         $result = null;
         $success = false;
+        $customerId = (string) $context->getCustomerId();
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
         if ($customer instanceof CustomerEntity) {
             $writtenEvent = $this->customerService->setMandateId(
@@ -86,10 +88,12 @@ class CreditCardControllerBase extends AbstractStoreFrontController
         ]);
     }
 
-    public function revokeMandate(string $customerId, string $mandateId, SalesChannelContext $context): JsonResponse
+    public function revokeMandate(string $mandateId, SalesChannelContext $context): JsonResponse
     {
         $success = false;
         $result = null;
+
+        $customerId = (string) $context->getCustomerId();
 
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 

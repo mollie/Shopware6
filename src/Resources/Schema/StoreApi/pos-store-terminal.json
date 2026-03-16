@@ -6,8 +6,8 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/pos/store-terminal/{customerId}/{terminalId}": {
-      "get": {
+    "/mollie/pos/store-terminal/{terminalId}": {
+      "post": {
         "tags": [
           "Mollie",
           "POS"
@@ -15,15 +15,6 @@
         "summary": "Store POS Terminal",
         "operationId": "storePosTerminal",
         "parameters": [
-          {
-            "name": "customerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The ID of the customer."
-          },
           {
             "name": "terminalId",
             "in": "path",

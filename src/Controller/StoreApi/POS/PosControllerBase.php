@@ -55,8 +55,9 @@ class PosControllerBase
      *
      * @return StoreTerminalResponse
      */
-    public function saveTerminalId(string $customerId, string $terminalID, SalesChannelContext $context): StoreApiResponse
+    public function saveTerminalId(string $terminalID, SalesChannelContext $context): StoreApiResponse
     {
+        $customerId = (string) $context->getCustomerId();
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if (! $customer instanceof CustomerEntity) {

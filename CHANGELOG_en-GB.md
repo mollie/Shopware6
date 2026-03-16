@@ -8,6 +8,7 @@
 - New: Added Bulgarian translations.
 - Updated Croatian translations.
 - Updated Lithuanian translations.
+- Routes with customerIds were changed, now the customerId is used from the current logged in user instead Query parameter.
 
 # 4.22.1
 - Fixed an issue so that line items with negative amounts work again.

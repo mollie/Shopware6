@@ -12,9 +12,11 @@
     </route>
 
     <route id="store-api.mollie.pos.store-terminal"
-           path="/store-api/mollie/pos/store-terminal/{customerId}/{terminalID}"
+           path="/store-api/mollie/pos/store-terminal/{terminalID}"
            methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\POS\PosControllerBase::saveTerminalId</default>
         <default key="_routeScope"><list><string>store-api</string></list></default>
+        <default key="auth_required"><bool>true</bool></default>
+        <default key="auth_enabled"><bool>true</bool></default>
     </route>
 </routes>

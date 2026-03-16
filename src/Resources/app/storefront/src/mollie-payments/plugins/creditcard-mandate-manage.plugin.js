@@ -99,8 +99,9 @@ export default class MollieCreditCardMandateManage extends Plugin {
 
     deleteMandate(mandateId) {
         return new Promise((resolve) => {
-            this.client.get(
-                this.options.shopUrl + '/mollie/components/revoke-mandate/' + this.options.customerId + '/' + mandateId,
+            this.client.post(
+                this.options.shopUrl + '/mollie/components/revoke-mandate/' + mandateId,
+                '',
                 (res) => {
                     resolve({ success: res && res.success });
                 },

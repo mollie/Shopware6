@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/mandates/{customerId}": {
+    "/mollie/mandates/": {
       "get": {
         "tags": [
           "Mollie",
@@ -16,15 +16,6 @@
         "description": "Retrieves a list of mandates for the specified customer.",
         "operationId": "getCustomerMandates",
         "parameters": [
-          {
-            "name": "customerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The ID of the customer whose mandates are being retrieved."
-          }
         ],
         "responses": {
           "200": {

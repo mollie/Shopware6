@@ -62,10 +62,10 @@ class PosControllerBase extends AbstractStoreFrontController
         $this->repoTransactions = $repoTransactions;
     }
 
-    public function storeTerminal(SalesChannelContext $context, string $customerId, string $terminalId): JsonResponse
+    public function storeTerminal(SalesChannelContext $context, string $terminalId): JsonResponse
     {
         $result = null;
-
+        $customerId = (string) $context->getCustomerId();
         $customer = $this->customerService->getCustomer($customerId, $context->getContext());
 
         if ($customer instanceof CustomerEntity) {

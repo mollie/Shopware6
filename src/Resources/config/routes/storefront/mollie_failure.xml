@@ -21,6 +21,8 @@
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase::retry</default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="csrf_protected"><bool>false</bool></default>
+        <default key="auth_required"><bool>true</bool></default>
+        <default key="auth_enabled"><bool>true</bool></default>
         <option key="seo">false</option>
     </route>
 </routes>

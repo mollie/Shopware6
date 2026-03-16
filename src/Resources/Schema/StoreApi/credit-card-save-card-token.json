@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/creditcard/store-token/{customerId}/{cardToken}": {
+    "/mollie/creditcard/store-token/{cardToken}": {
       "post": {
         "tags": [
           "Mollie",
@@ -15,15 +15,6 @@
         "summary": "Store Mollie Credit Card Token",
         "operationId": "storeMollieCreditCardToken",
         "parameters": [
-          {
-            "name": "customerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The customer ID."
-          },
           {
             "name": "cardToken",
             "in": "path",

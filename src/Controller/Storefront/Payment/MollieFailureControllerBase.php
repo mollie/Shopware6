@@ -116,6 +116,10 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
      */
     public function paymentFailedAction(SalesChannelContext $salesChannelContext, string $transactionId): ?Response
     {
+        $customerId = $salesChannelContext->getCustomerId();
+        if ($customerId === null) {
+            throw new \Exception('Customer is not logged in.');
+        }
         /**
          * Get the transaction from the order transaction repository. With the
          * transaction we can fetch the order from the database.
@@ -126,13 +130,20 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
             $this->logger->critical(sprintf('Transaction with id %s could not be read from database', $transactionId));
             throw new CouldNotFetchTransactionException($transactionId);
         }
-
         $order = $transaction->getOrder();
 
         // TODO: Refactor to use Service/OrderService::getOrder if $order does not exist.
         if (! $order instanceof OrderEntity) {
             $this->logger->critical(sprintf('Could not fetch order from transaction with id %s', $transactionId));
             throw new MissingOrderInTransactionException($transactionId);
+        }
+        $orderCustomerId = $order->getOrderCustomer()?->getCustomerId();
+        if ($orderCustomerId !== $customerId) {
+            $message = sprintf(
+                'Payment retry failed, loggedin customer %s has different id than order customer %s', $customerId, $orderCustomerId
+            );
+            $this->logger->critical($message);
+            throw new \Exception('Customer is not logged in.');
         }
 
         $orderAttributes = new OrderAttributes($order);

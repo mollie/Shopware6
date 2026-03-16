@@ -8,7 +8,7 @@
 - Neu: Bulgarische Übersetzungen hinzugefügt.
 - Kroatische Übersetzungen aktualisiert.
 - Litauische Übersetzungen aktualisiert.
-
+- Routen mit Kundennummern in der URL wurden überarbeitet. Es wird nun der aktuell eingeloggte Kunde verwendet, anstatt der Kundenummer aus der URL
 
 # 4.22.1
 - Die Verarbeitung von Positionen mit negativen Beträgen wurde behoben.

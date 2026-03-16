@@ -233,7 +233,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
         // so we have to call the API to save it
         // and then we continue by submitting our original payment form.
         if (this.isValidSelectedMandate(mandateId)) {
-            this.client.get(
+            this.client.post(
                 me.options.shopUrl + '/mollie/components/store-mandate-id/' + me.options.customerId + '/' + mandateId,
                 () => {
                     me.continueShopwareCheckout(paymentForm);
@@ -261,26 +261,14 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             return;
         }
 
-        // Build query params
-        const queryParams = new URLSearchParams({
-            shouldSaveCardDetail: this.shouldSaveCardDetail(),
-        });
-
-        let queryString = queryParams.toString();
-        if (queryString) {
-            queryString = `?${queryString}`;
-        }
-
         // now we finish by first calling our URL to store
         // the credit card token for the user and the current checkout
         // and then we continue by submitting our original payment form.
-        this.client.get(
-            me.options.shopUrl +
-                '/mollie/components/store-card-token/' +
-                me.options.customerId +
-                '/' +
-                token +
-                queryString,
+        this.client.post(
+            me.options.shopUrl + '/mollie/components/store-card-token/' + token,
+            JSON.stringify({
+                shouldSaveCardDetail: this.shouldSaveCardDetail(),
+            }),
             function () {
                 me.continueShopwareCheckout(paymentForm);
             },

@@ -37,16 +37,20 @@ final class CheckoutContext extends ShopwareContext
     #[When('i start checkout with payment method :arg1')]
     public function iStartCheckoutWithPaymentMethod(string $paymentMethodTechnicalName): void
     {
-        $salesChannelContext = $this->getCurrentSalesChannelContext();
-        $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodTechnicalName, $salesChannelContext->getContext());
-        $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
 
-        /** @var RedirectResponse $response */
-        $response = $this->startCheckout($this->getCurrentSalesChannelContext());
+            $salesChannelContext = $this->getCurrentSalesChannelContext();
+            $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodTechnicalName, $salesChannelContext->getContext());
+            $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
 
-        $this->mollieSandboxPage = $response->getTargetUrl();
-        Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
+            /** @var RedirectResponse $response */
+            $response = $this->startCheckout($this->getCurrentSalesChannelContext());
+
+            $this->mollieSandboxPage = $response->getTargetUrl();
+
+            Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
+
     }
+
 
 
     #[When('select payment status :arg1')]

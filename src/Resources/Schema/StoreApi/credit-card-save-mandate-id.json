@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}": {
+    "/mollie/creditcard/store-mandate-id/{mandateId}": {
       "post": {
         "tags": [
           "Mollie",
@@ -15,15 +15,6 @@
         "summary": "Store Mollie Credit Card Mandate ID",
         "operationId": "storeMollieCreditCardMandateId",
         "parameters": [
-          {
-            "name": "customerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The customer ID."
-          },
           {
             "name": "mandateId",
             "in": "path",
