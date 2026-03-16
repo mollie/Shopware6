@@ -1,4 +1,4 @@
-# Unreleased
+# 4.23.0
 - Apple Pay Direct: Phone number is now correctly applied for guest checkout even when updated after login.
 - Fixed compatibility with set plugins.
 - Fixed: Page extensions are now correctly extended instead of overwritten during checkout to ensure compatibility with other plugins.
