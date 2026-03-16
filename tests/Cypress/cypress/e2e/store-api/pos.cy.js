@@ -33,14 +33,14 @@ context(storeApiPrefix +"/mollie/ideal/store-issuer", () => {
     it('C1341123: POS store terminal with invalid customer id (Store API) @core', () => {
 
         const request = new Promise((resolve) => {
-            client.post('/mollie/pos/store-terminal/cust-123/ideal_ABNANL2A').then(response => {
+            client.post('/mollie/pos/store-terminal/ideal_ABNANL2A').then(response => {
                 resolve({'data': response.data});
             });
         })
 
         cy.wrap(request).its('data').then(response => {
             cy.wrap(response).its('status').should('eq', 500)
-            expect(response.data.errors[0].detail).to.contain('Customer with ID cust-123 not found in Shopware');
+            expect(response.data.errors[0].detail).to.contain('Customer with ID  not found in Shopware');
         });
     })
 
