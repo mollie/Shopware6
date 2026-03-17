@@ -13,7 +13,7 @@ import VoucherScreenAction from "cypress-mollie/src/actions/screens/VoucherScree
 import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/PaymentListScreen";
 import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";
 import GiftCardsScreenAction from "cypress-mollie/src/actions/screens/GiftCardsScreen";
-import CreditCardScreen from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import CreditCardScreen from "../../../support/actions/mollie/screens/CreditCartScreen";
 import IDealScreen from "cypress-mollie/src/actions/screens/IDealScreen";
 import DummyUserScenario from "Scenarios/DummyUserScenario";
 import ListingAction from "Actions/storefront/products/ListingAction";

@@ -19,7 +19,7 @@ import AdminSubscriptionsAction from "Actions/admin/AdminSubscriptionsAction";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
-import CreditCardScreenAction from "cypress-mollie/src/actions/screens/CreditCardScreen";
+import CreditCardScreenAction from "../../../support/actions/mollie/screens/CreditCartScreen";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
 import SubscriptionRepository from "Repositories/storefront/account/SubscriptionRepository";
