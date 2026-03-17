@@ -263,13 +263,7 @@ class MollieOrderBuilder
             throw new \Exception('Event Dispatcher did not return a MollieOrderBuilder event. No mollie order data is available');
         }
 
-        // now check if we have metadata
-        // and add it to our order if existing
-        if (! empty($event->getMetadata())) {
-            $orderData['metadata'] = (string) json_encode($event->getMetadata());
-        }
-
-        return $orderData;
+        return $event->getOrderData();
     }
 
     private function isVerticalTaxCalculation(SalesChannelContext $salesChannelContext): bool
