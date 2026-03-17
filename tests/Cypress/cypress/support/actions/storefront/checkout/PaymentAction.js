@@ -104,16 +104,16 @@ export default class PaymentAction {
 
         cy.get('iframe[name="expiryDate-input"], #card-form iframe').then($element => {
             const $body = $element.contents().find('body')
-            cy.wrap($body).find('#expiryDate').eq(0).click();
+            cy.wrap($body).find('#expiryDate,#cardExpiryDate').eq(0).click();
             cy.wait(clickTimeMS);
-            cy.wrap($body).find('#expiryDate').eq(0).type(expiryDate);
+            cy.wrap($body).find('#expiryDate,#cardExpiryDate').eq(0).type(expiryDate);
         })
 
         cy.get('iframe[name="verificationCode-input"], ‚#card-form iframe').then($element => {
             const $body = $element.contents().find('body')
-            cy.wrap($body).find('#verificationCode').eq(0).click();
+            cy.wrap($body).find('#verificationCode,#cardCvv').eq(0).click();
             cy.wait(clickTimeMS);
-            cy.wrap($body).find('#verificationCode').eq(0).type(cvc);
+            cy.wrap($body).find('#verificationCode,#cardCvv').eq(0).type(cvc);
         })
 
         // just wait a bit

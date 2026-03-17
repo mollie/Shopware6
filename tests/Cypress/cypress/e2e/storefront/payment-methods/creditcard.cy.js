@@ -410,14 +410,14 @@ function assertComponentErrors(cardNameValid, cardNumberValid, expiryDateValid, 
     }
 
     if (expiryDateValid) {
-        cy.get('#expiryDate').should('not.have.class', 'error');
+        cy.get('#expiryDate,#cardExpiryDate').should('not.have.class', 'error');
     } else {
-        cy.get('#expiryDate').should('have.class', 'error');
+        cy.get('#expiryDate,#cardExpiryDate').should('have.class', 'error');
     }
 
     if (cvcValid) {
-        cy.get('#verificationCode').should('not.have.class', 'error');
+        cy.get('#verificationCode,#cardCvv').should('not.have.class', 'error');
     } else {
-        cy.get('#verificationCode').should('have.class', 'error');
+        cy.get('#verificationCode,#cardCvv').should('have.class', 'error');
     }
 }

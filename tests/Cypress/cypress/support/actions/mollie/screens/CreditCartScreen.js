@@ -3,7 +3,7 @@ export default class CreditCardScreen {
      *
      */
     enterValidCard() {
-        const currentYear = new Date().getFullYear().toString().substr(-2);
+        const currentYear = parseInt(new Date().getFullYear().toString().substr(-2));
 
         this.setCardHolder('Cypress Test');
         this.setCardNumber('3782 822463 10005');
@@ -47,9 +47,9 @@ export default class CreditCardScreen {
         cy.wait(500); // there is a weird iFrame reloading...with wait it works good
         cy.get('iframe[name="expiryDate-input"],  #card-form iframe').then(($element) => {
             const $body = $element.contents().find('body');
-            cy.wrap($body).find('#expiryDate').eq(0).click();
+            cy.wrap($body).find('#expiryDate,#cardExpiryDate').eq(0).click();
             cy.wait(10);
-            cy.wrap($body).find('#expiryDate').eq(0).type(expiryDate);
+            cy.wrap($body).find('#expiryDate,#cardExpiryDate').eq(0).type(expiryDate);
         });
     }
 
@@ -61,9 +61,9 @@ export default class CreditCardScreen {
         cy.wait(500); // there is a weird iFrame reloading...with wait it works good
         cy.get('iframe[name="verificationCode-input"],  #card-form iframe').then(($element) => {
             const $body = $element.contents().find('body');
-            cy.wrap($body).find('#verificationCode').eq(0).click();
+            cy.wrap($body).find('#verificationCode,#cardCvv').eq(0).click();
             cy.wait(10);
-            cy.wrap($body).find('#verificationCode').eq(0).type(cvc);
+            cy.wrap($body).find('#verificationCode,#cardCvv').eq(0).type(cvc);
         });
     }
 
@@ -71,6 +71,11 @@ export default class CreditCardScreen {
      *
      */
     submitForm() {
-        cy.get('#submit-button').click();
+        cy.get('#card-form iframe').then(($element) => {
+            const $body = $element.contents().find('body');
+            cy.wrap($body).find('button[type="submit"]').eq(0).click();
+            cy.wait(10);
+        });
+        //cy.get('#submit-button').click();
     }
 }
