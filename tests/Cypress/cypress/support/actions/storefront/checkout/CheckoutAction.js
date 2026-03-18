@@ -98,7 +98,7 @@ export default class CheckoutAction {
      *
      */
     mollieFailureModeRetryPayment() {
-        cy.get(':nth-child(3) > .btn-primary').click();
+        cy.get('.cy-retry-payment').click();
     }
 
     /**

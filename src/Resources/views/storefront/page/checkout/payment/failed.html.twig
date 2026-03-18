@@ -13,7 +13,7 @@
                                 {{ "molliePayments.messages.payment.failed"|trans|striptags }} {{ "molliePayments.messages.redirecting"|trans|striptags }}<a href="{{ redirectUrl }}">{{ displayUrl }}</a>.
                             </p>
                             <p>
-                                <a href="{{ redirectUrl }}" class="btn btn-primary">{{ "molliePayments.messages.payment.buttonPayThroughMollie"|trans|striptags }}</a>&nbsp;
+                                <a href="{{ redirectUrl }}" class="btn btn-primary cy-retry-payment">{{ "molliePayments.messages.payment.buttonPayThroughMollie"|trans|striptags }}</a>&nbsp;
                                 <a href="{{ path('frontend.home.page') }}" class="btn btn-secondary">{{ "molliePayments.messages.payment.buttonReturnToShop"|trans|striptags }}</a>
                             </p>
                         </div>
