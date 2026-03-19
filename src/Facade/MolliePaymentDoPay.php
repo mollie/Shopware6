@@ -205,7 +205,14 @@ class MolliePaymentDoPay
 
         // now update our custom struct values
         // and immediately set our Mollie Order ID and more
-        $orderCustomFields->setMollieOrderId($molliePaymentData->getId());
+        if (strpos($molliePaymentData->getId(), 'ord_') !== false) {
+            $orderCustomFields->setMollieOrderId($molliePaymentData->getId());
+        }
+
+        if (strpos($molliePaymentData->getId(), 'tr_') !== false) {
+            $orderCustomFields->setMolliePaymentId($molliePaymentData->getId());
+        }
+
         $orderCustomFields->setMolliePaymentUrl($molliePaymentData->getCheckoutUrl());
 
         // if we have a subscription, make sure
