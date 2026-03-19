@@ -1,3 +1,6 @@
+# unreleased
+- Behoben: Webhooks für POS-Terminal-Zahlungen funktionieren nun korrekt.
+
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.
 - Neu: MobilePay als Zahlungsmethode hinzugefügt.
