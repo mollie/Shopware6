@@ -137,10 +137,11 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
             $this->logger->critical(sprintf('Could not fetch order from transaction with id %s', $transactionId));
             throw new MissingOrderInTransactionException($transactionId);
         }
-        $orderCustomerId = $order->getOrderCustomer()?->getCustomerId();
-        if ($orderCustomerId !== $customerId) {
+        $orderCustomer = $order->getOrderCustomer();
+
+        if ($orderCustomer === null || $orderCustomer->getCustomerId() !== $customerId) {
             $message = sprintf(
-                'Payment retry failed, loggedin customer %s has different id than order customer %s', $customerId, $orderCustomerId
+                'Payment retry failed, order does belong to a different customer'
             );
             $this->logger->critical($message);
             throw new \Exception('Customer is not logged in.');
