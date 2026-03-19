@@ -202,4 +202,5 @@ class PaymentMethod
      * @link https://www.mollie.com/en/payments/twint
      */
     public const TWINT = "twint";
+
 }

@@ -34,6 +34,7 @@ use Kiener\MolliePayments\Handler\Method\SatispayPayment;
 use Kiener\MolliePayments\Handler\Method\SwishPayment;
 use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
+use Kiener\MolliePayments\Handler\Method\VippsPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Kiener\MolliePayments\Service\PayPalExpressConfig;
@@ -140,6 +141,7 @@ class PaymentMethodServiceTest extends TestCase
             MultibancoPayment::class,
             SwishPayment::class,
             BizumPayment::class,
+            VippsPayment::class,
             PayPalExpressPayment::class,
         ];
 

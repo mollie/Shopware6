@@ -41,6 +41,7 @@ use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Handler\Method\SwishPayment;
 use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
+use Kiener\MolliePayments\Handler\Method\VippsPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Kiener\MolliePayments\MolliePayments;
 use Kiener\MolliePayments\Repository\MediaRepository;
@@ -429,6 +430,7 @@ class PaymentMethodService
             MultibancoPayment::class,
             SwishPayment::class,
             BizumPayment::class,
+            VippsPayment::class,
             // IngHomePayPayment::class, // not allowed anymore
             // DirectDebitPayment::class, // only allowed when updating subsriptions, aka => not allowed anymore
         ];

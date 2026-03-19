@@ -1,4 +1,5 @@
 # 4.23.0
+- Neu: Vipps als Zahlungsmethode hinzugefügt.
 - Behoben: Änderungen an den Order-Daten durch Listener des `MollieOrderBuildEvent` werden nun korrekt für den Mollie-API-Request verwendet. Bisher wurde das Event zwar ausgelöst, die modifizierten Order-Daten jedoch ignoriert.
 - Apple Pay Direct: Telefonnummer wird nun auch bei Gast-Checkout korrekt übernommen, wenn sie nachträglich geändert wird.
 - Problem behoben mit verschiedenen Set-Plugins

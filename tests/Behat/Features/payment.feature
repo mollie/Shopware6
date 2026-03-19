@@ -35,3 +35,4 @@ Feature: Basic payment checkout
       | bancontact    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
       | paybybank     | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
       | satispay      | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+      | vipps         | SWDEMO10007.1 | 1        | paid          | NO             | NOK      |

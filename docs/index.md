@@ -142,13 +142,15 @@ Therefore:
 
 For more detailed guidance and rules, see:
 
-- **Architecture Overview** – `/docs/architecture.md`  
+- **Architecture Overview** – `/docs/architecture.md`
   Key entry points and services in the plugin
-- **Coding Guidelines** – `/docs/coding-guidelines.md`  
+- **Payment Methods** – `/docs/payment-methods.md`
+  How payment methods are structured, registered, and implemented; checklist for adding a new method
+- **Coding Guidelines** – `/docs/coding-guidelines.md`
   Rules for writing new code, class design, DTOs, etc.
-- **Testing Guidelines** – `/docs/testing-guidelines.md`  
+- **Testing Guidelines** – `/docs/testing-guidelines.md`
   Rules for fakes, builders, and unit test coverage
-- **Shopware Guidelines** – `/docs/shopware-guidelines.md`  
+- **Shopware Guidelines** – `/docs/shopware-guidelines.md`
   Attributes, extension points, state machine rules
 
 This structure allows developers and AI systems to quickly locate the relevant information without reading unnecessary details.
