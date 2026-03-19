@@ -28,7 +28,7 @@ describe('Vipps', () => {
             devices.setDevice(device);
         });
 
-        it('Vipps is existing in checkout', () => {
+        it('C4553499: Vipps is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 
