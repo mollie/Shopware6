@@ -32,6 +32,7 @@ use Kiener\MolliePayments\Handler\Method\SatispayPayment;
 use Kiener\MolliePayments\Handler\Method\SwishPayment;
 use Kiener\MolliePayments\Handler\Method\TrustlyPayment;
 use Kiener\MolliePayments\Handler\Method\TwintPayment;
+use Kiener\MolliePayments\Handler\Method\VippsPayment;
 use Kiener\MolliePayments\Handler\Method\VoucherPayment;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
@@ -81,6 +82,7 @@ trait PaymentMethodTestBehaviour
         TrustlyPayment::PAYMENT_METHOD_NAME => TrustlyPayment::class,
         TwintPayment::PAYMENT_METHOD_NAME => TwintPayment::class,
         VoucherPayment::PAYMENT_METHOD_NAME => VoucherPayment::class,
+        VippsPayment::PAYMENT_METHOD_NAME => VippsPayment::class,
     ];
 
     public function getPaymentMethodByTechnicalName(string $technicalName, Context $context): PaymentMethodEntity

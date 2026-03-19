@@ -142,7 +142,9 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         $locale->setCode($this->localeCode);
 
         /* @var OrderDataExtractor customerService */
-        $this->orderDataExtractor = $this->getMockBuilder(OrderDataExtractor::class)->disableOriginalConstructor()->getMock();
+        $this->orderDataExtractor = $this->getMockBuilder(OrderDataExtractor::class)->disableOriginalConstructor()
+            ->setConstructorArgs(['logger' => new NullLogger()])
+            ->onlyMethods(['extractCustomer', 'extractLocale'])->getMock();
         $this->orderDataExtractor->method('extractCustomer')->willReturn($this->customer);
         $this->orderDataExtractor->method('extractLocale')->willReturn($locale);
 

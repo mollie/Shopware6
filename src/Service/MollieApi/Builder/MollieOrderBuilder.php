@@ -131,6 +131,7 @@ class MollieOrderBuilder
 
         $customer = $this->extractor->extractCustomer($order, $salesChannelContext);
         $currency = $this->extractor->extractCurrency($order, $salesChannelContext);
+
         $locale = $this->extractor->extractLocale($order, $salesChannelContext);
         $localeCode = ($locale instanceof LocaleEntity) ? $locale->getCode() : self::MOLLIE_DEFAULT_LOCALE_CODE;
         $localeCode = $this->mollieLocaleService->getMollieLocale($localeCode);

@@ -275,8 +275,9 @@ Migration file naming: `Migration[unix_timestamp][ShortDescription].php`
 3. **Add to installer list** in `PaymentMethodService::getPaymentHandlers()`
 
 4. **Add tests**
-   - Create `tests/PHPUnit/Service/MollieApi/Builder/Payments/[MethodName]OrderBuilderTest.php` – copy the pattern from `SatispayOrderBuilderTest.php`
+   - Create `tests/PHPUnit/Service/MollieApi/Builder/Payments/[MethodName]OrderBuilderTest.php` – copy the pattern from `SatispayOrderBuilderTest.php`; use the correct currency for the payment method
    - Add the handler class to the expected list in `tests/PHPUnit/Service/PaymentMethodServiceTest.php`
+   - Add an entry to `$paymentMethodMapping` in `tests/Integration/Data/PaymentMethodTestBehaviour.php` so Behat integration tests can resolve the method by name
    - Create `tests/Cypress/cypress/e2e/storefront/payment-methods/[methodname].cy.js` – copy the pattern from `satispay.cy.js`; verify the payment method appears in checkout (full payment flow is usually not testable automatically)
    - Add an entry to the `payments` array in `tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js` with `key` matching the Mollie method name and `sanity: false`; leave `caseId` empty if no test management ID is assigned yet
    - Add a row to the `Examples` table in `tests/Behat/Features/payment.feature` with the correct `billingCountry` and `currency` required by the payment method
