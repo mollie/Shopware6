@@ -7,6 +7,9 @@ use Kiener\MolliePayments\Handler\Method\PayPalPayment;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\System\Locale\LocaleEntity;
 
 class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
 {
@@ -26,6 +29,7 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
         $this->settingStruct->setFormatOrderNumber($format);
 
         $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
         $order->setAmountTotal(14);
         $order->setSalesChannelId(Uuid::randomHex());
         $order->setTaxStatus('ok');
@@ -35,6 +39,18 @@ class MollieOrderBuilderTest extends AbstractMollieOrderBuilder
         $customer->setCustomerNumber('5000');
         $customer->setEmail('');
         $order->setOrderCustomer($customer);
+
+        $currency = new CurrencyEntity();
+        $currency->setId(Uuid::randomHex());
+        $currency->setIsoCode('EUR');
+        $order->setCurrency($currency);
+
+        $language = new LanguageEntity();
+        $language->setId(Uuid::randomHex());
+        $locale = new LocaleEntity();
+        $locale->setCode('en-GB');
+        $language->setLocale($locale);
+        $order->setLanguage($language);
 
         $data = $this->builder->buildOrderPayload(
             $order,

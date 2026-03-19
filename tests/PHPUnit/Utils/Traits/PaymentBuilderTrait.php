@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -25,6 +26,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Shopware\Core\System\Language\LanguageEntity;
+use Shopware\Core\System\Locale\LocaleEntity;
 
 trait PaymentBuilderTrait
 {
@@ -177,6 +180,19 @@ trait PaymentBuilderTrait
         $deliveries->add($orderDelivery);
         $order->setDeliveries($deliveries);
         $order->setSalesChannelId(Uuid::randomHex());
+
+        $orderCustomer = new OrderCustomerEntity();
+        $orderCustomer->setId(Uuid::randomHex());
+        $orderCustomer->setEmail('foo@bar.de');
+        $order->setOrderCustomer($orderCustomer);
+
+        $language = new LanguageEntity();
+        $language->setId(Uuid::randomHex());
+        $locale = new LocaleEntity();
+        $locale->setId(Uuid::randomHex());
+        $locale->setCode('de-DE');
+        $language->setLocale($locale);
+        $order->setLanguage($language);
 
         return $order;
     }

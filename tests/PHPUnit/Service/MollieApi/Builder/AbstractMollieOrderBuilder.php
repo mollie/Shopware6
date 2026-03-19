@@ -140,14 +140,10 @@ abstract class AbstractMollieOrderBuilder extends TestCase
         $locale = new LocaleEntity();
         $locale->setId(Uuid::randomHex());
         $locale->setCode($this->localeCode);
+        $customerService = $this->createMock(CustomerService::class);
+        $customerService->method('getCustomer')->willReturn($this->customer);
 
-        /* @var OrderDataExtractor customerService */
-        $this->orderDataExtractor = $this->getMockBuilder(OrderDataExtractor::class)->disableOriginalConstructor()
-            ->setConstructorArgs(['logger' => new NullLogger()])
-            ->onlyMethods(['extractCustomer', 'extractLocale'])->getMock();
-        $this->orderDataExtractor->method('extractCustomer')->willReturn($this->customer);
-        $this->orderDataExtractor->method('extractLocale')->willReturn($locale);
-
+        $this->orderDataExtractor = new OrderDataExtractor(new NullLogger(), $customerService);
         /* @var SettingsService settingsService */
         $this->settingsService = $this->getMockBuilder(SettingsService::class)->disableOriginalConstructor()->getMock();
         $this->settingStruct = new MollieSettingStruct();
