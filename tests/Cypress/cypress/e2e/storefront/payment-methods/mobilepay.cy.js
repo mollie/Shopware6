@@ -28,7 +28,7 @@ describe('MobilePay', () => {
             devices.setDevice(device);
         });
 
-        it('MobilePay is existing in checkout', () => {
+        it('C4553501: MobilePay is existing in checkout', () => {
 
             scenarioDummyBasket.execute();
 
