@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Handler\Method\iDealPayment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\MbWayPayment;
+use Kiener\MolliePayments\Handler\Method\MobilePayPayment;
 use Kiener\MolliePayments\Handler\Method\MultibancoPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
@@ -82,6 +83,7 @@ trait PaymentMethodTestBehaviour
         TrustlyPayment::PAYMENT_METHOD_NAME => TrustlyPayment::class,
         TwintPayment::PAYMENT_METHOD_NAME => TwintPayment::class,
         VoucherPayment::PAYMENT_METHOD_NAME => VoucherPayment::class,
+        MobilePayPayment::PAYMENT_METHOD_NAME => MobilePayPayment::class,
         VippsPayment::PAYMENT_METHOD_NAME => VippsPayment::class,
     ];
 

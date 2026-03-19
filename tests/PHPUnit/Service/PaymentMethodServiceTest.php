@@ -21,6 +21,7 @@ use Kiener\MolliePayments\Handler\Method\In3Payment;
 use Kiener\MolliePayments\Handler\Method\KbcPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaOnePayment;
 use Kiener\MolliePayments\Handler\Method\MbWayPayment;
+use Kiener\MolliePayments\Handler\Method\MobilePayPayment;
 use Kiener\MolliePayments\Handler\Method\MultibancoPayment;
 use Kiener\MolliePayments\Handler\Method\MyBankPayment;
 use Kiener\MolliePayments\Handler\Method\PayByBankPayment;
@@ -141,6 +142,7 @@ class PaymentMethodServiceTest extends TestCase
             MultibancoPayment::class,
             SwishPayment::class,
             BizumPayment::class,
+            MobilePayPayment::class,
             VippsPayment::class,
             PayPalExpressPayment::class,
         ];
