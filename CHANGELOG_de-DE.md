@@ -1,5 +1,6 @@
 # unreleased
 - Behoben: Webhooks für POS-Terminal-Zahlungen funktionieren nun korrekt.
+- Behoben: Beim Express Checkout werden nun nur die ausgewählten Radio-Button-Werte übermittelt, wenn das CustomProducts-Plugin verwendet wird. Zuvor wurden alle Optionen gesendet statt nur die gewählten.
 
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.

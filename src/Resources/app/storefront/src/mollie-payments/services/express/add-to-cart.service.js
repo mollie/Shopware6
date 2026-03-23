@@ -32,6 +32,9 @@ export default class AddToCartService {
         // we need all parameters except the redirectTo parameter
         for (let i = 0; i < formElements.length; i++) {
             const element = formElements[i];
+            if (element.type === 'radio' && !element.checked) {
+                continue;
+            }
             if (element.name && element.name !== 'redirectTo') {
                 params.push(encodeURIComponent(element.name) + '=' + encodeURIComponent(element.value));
             }
