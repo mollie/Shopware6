@@ -16,6 +16,6 @@ final class EpsPayment extends AbstractMolliePaymentHandler implements Subscript
 
     public function getName(): string
     {
-        return 'EPS';
+        return 'eps';
     }
 }
