@@ -163,12 +163,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\AccountPaymentMethodPageSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Service\Router\RoutingDetector">
             <argument type="service" id="request_stack"/>
