@@ -40,6 +40,8 @@ Feature: Basic payment checkout
       | swish         | MOL_REGULAR   | 1        | paid          | SE             | SEK      |
       | trustly       | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | twint         | MOL_REGULAR   | 1        | paid          | DE             | CHF      |
+      | vipps         | MOL_REGULAR   | 1        | paid          | NO             | NOK      |
+      | mobilepay     | MOL_REGULAR   | 1        | paid          | DK             | DKK      |
 
   Scenario Outline: payment success with issuer
     Given payment method "<paymentMethod>" exists and active
