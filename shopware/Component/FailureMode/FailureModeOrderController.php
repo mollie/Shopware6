@@ -14,7 +14,6 @@ use Shopware\Core\Checkout\Order\SalesChannel\OrderRoute;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\AccountOrderController;
-use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoader;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

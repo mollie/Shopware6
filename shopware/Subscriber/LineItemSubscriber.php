@@ -24,15 +24,16 @@ final class LineItemSubscriber implements EventSubscriberInterface
     public function onCartLoaded(CartLoadedEvent $event): void
     {
         $cart = $event->getCart();
-
         foreach ($cart->getLineItems() as $lineItem) {
             if ($lineItem->hasExtension(Mollie::EXTENSION)) {
                 continue;
             }
             $customFields = $lineItem->getPayloadValue('customFields');
+
             if ($customFields === null) {
                 continue;
             }
+
             $extension = Product::createFromCustomFields($customFields);
 
             $lineItem->addExtension(Mollie::EXTENSION, $extension);
