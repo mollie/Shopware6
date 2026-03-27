@@ -46,7 +46,7 @@ final class ShippingMethodFixture extends AbstractFixture
         $netPrice = round($price / (1 + $taxRate / 100), 2);
         $data = [
             'id' => Uuid::fromStringToHex('mollie-shipping-method'),
-            'name' => 'Mollie test shipping method',
+            'name' => 'Mollie Test Shipment',
             'active' => true,
             'trackingUrl' => 'https://www.carrier.com/de/tracking/%s',
             'technicalName' => 'mollie_fixture_shipment',
