@@ -18,7 +18,7 @@ final class PaySafeCardPayment extends AbstractMolliePaymentHandler
 
     public function getName(): string
     {
-        return 'PaysafeCard';
+        return 'paysafecard';
     }
 
     public function applyPaymentSpecificParameters(CreatePayment $payment, RequestDataBag $dataBag,CustomerEntity $customer): CreatePayment
