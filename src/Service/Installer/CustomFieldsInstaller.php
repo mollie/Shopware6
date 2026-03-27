@@ -67,6 +67,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_VOUCHER_TYPE,
                         'name' => 'mollie_payments_product_voucher_type',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
                             'customFieldPosition' => 1,
@@ -119,6 +120,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_ENABLED,
                         'name' => 'mollie_payments_product_subscription_enabled',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::SWITCH,
                         'config' => [
                             'customFieldPosition' => 2,
@@ -135,6 +137,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_INTERVAL,
                         'name' => 'mollie_payments_product_subscription_interval',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::INT,
                         'config' => [
                             'customFieldPosition' => 3,
@@ -161,6 +164,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_INTERVAL_UNIT,
                         'name' => 'mollie_payments_product_subscription_interval_unit',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
                             'customFieldPosition' => 4,
@@ -213,6 +217,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_REPETITION,
                         'name' => 'mollie_payments_product_subscription_repetition',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::TEXT,
                         'config' => [
                             'customFieldPosition' => 5,
