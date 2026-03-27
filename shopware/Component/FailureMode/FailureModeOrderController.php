@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['storefront']])]
 #[AsDecorator(decorates: AccountOrderController::class)]
-final class FailureModeOrderController extends StorefrontController
+final class FailureModeOrderController extends AccountOrderController
 {
     public function __construct(
         #[AutowireDecorated]

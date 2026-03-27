@@ -76,7 +76,7 @@ final class TransactionDataException extends HttpException
         return new self(
             Response::HTTP_UNPROCESSABLE_ENTITY,
             self::ORDER_DELIVERY_WITHOUT_ADDRESS,
-            'Delivery address {{deliveryAddressId}} from order {{orderId}} does shipping address in Shopware',
+            'Delivery address {{deliveryAddressId}} from order {{orderId}} without shipping address in Shopware',
             ['orderId' => $orderId, 'deliveryAddressId' => $deliveryAddressId],
             $exception
         );
