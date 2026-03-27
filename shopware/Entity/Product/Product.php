@@ -74,6 +74,7 @@ final class Product extends Struct
             if (! is_array($voucherTypes)) {
                 $voucherTypes = [$voucherTypes];
             }
+
             $collection = new VoucherCategoryCollection();
             foreach ($voucherTypes as $voucherType) {
                 $voucher = VoucherCategory::tryFromNumber((int) $voucherType);
