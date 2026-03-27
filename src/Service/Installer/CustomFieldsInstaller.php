@@ -70,7 +70,7 @@ class CustomFieldsInstaller
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
                             'customFieldPosition' => 1,
-                            'componentName' => 'sw-single-select',
+                            'componentName' => 'sw-multi-select',
                             'customFieldType' => 'select',
                             'label' => [
                                 'en-GB' => 'Voucher Type',
