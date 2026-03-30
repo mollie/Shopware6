@@ -31,7 +31,7 @@ export default class ConfirmPageRepository {
         let button = this._document.querySelector('#confirmFormSubmit');
 
         if (button === null) {
-            button = this._document.querySelector('#confirmOrderForm > button[type="submit"]');
+            button = this._document.querySelector('#confirmOrderForm button[type="submit"]');
         }
 
         return button;

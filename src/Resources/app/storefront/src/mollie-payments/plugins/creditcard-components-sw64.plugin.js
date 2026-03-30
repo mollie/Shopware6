@@ -74,14 +74,7 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
     }
 
     _reactivateFormSubmit() {
-        this._confirmFormButton.disabled = false;
-
-        // TODO check this
-        const loader = this._confirmFormButton.querySelector('.loader');
-
-        if (loader) {
-            loader.remove();
-        }
+        this._confirmForm.dispatchEvent(new CustomEvent('removeLoader'));
     }
 
     getDefaultProperties() {
