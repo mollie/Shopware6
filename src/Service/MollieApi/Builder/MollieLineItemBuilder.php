@@ -145,6 +145,11 @@ class MollieLineItemBuilder
         $products = $lineItems->filterByType(LineItem::PRODUCT_LINE_ITEM_TYPE);
 
         foreach ($products as $product) {
+            $bundleProducts = $product->getPayloadValue('zeobvProductsInBundle') ?? [];
+
+            if (count($bundleProducts) > 0) {
+                continue;
+            }
             $children = $product->getChildren();
             $hasChildren = $children instanceof OrderLineItemCollection && $children->count() > 0;
             if (! $hasChildren) {

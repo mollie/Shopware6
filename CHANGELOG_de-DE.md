@@ -1,5 +1,6 @@
 # unreleased
 - Behoben: Der Submit-Button des Kreditkartenformulars auf der Bestellbearbeitungsseite setzt seinen Ladezustand nun korrekt zurück, wenn ein Validierungsfehler auftritt, anstatt deaktiviert mit einem Spinner zu bleiben.
+- Behoben: Kompatibilität mit dem ProductBundle-Plugin (zeobv) - Bundle-Produkte werden nun korrekt in ihre einzelnen Positionen aufgeteilt für die Mollie API.
 - Behoben: Webhooks für POS-Terminal-Zahlungen funktionieren nun korrekt.
 - Behoben: Beim Express Checkout werden nun nur die ausgewählten Radio-Button-Werte übermittelt, wenn das CustomProducts-Plugin verwendet wird. Zuvor wurden alle Optionen gesendet statt nur die gewählten.
 - Behoben: Der PayPal Express Finish-Endpunkt gibt jetzt immer den korrekten Session-Token zurück, der nach dem Ablauf verwendet werden soll, auch wenn ein Gastkunde erstellt wird und sich die Session ändert.

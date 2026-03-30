@@ -1,5 +1,6 @@
 # unreleased
 - Fixed: Credit card form submit button on the Edit Order page now properly resets its loading state when a validation error occurs, instead of remaining disabled with a spinner.
+- Fixed: Compatibility with ProductBundle plugin (zeobv) - bundle products are now correctly split into their child line items for the Mollie API.
 - Fixed: Webhooks for POS Terminal payments now work correctly.
 - Fixed: Express Checkout now correctly submits only selected radio button values when using the CustomProducts plugin, preventing all options from being sent instead of the chosen ones.
 - Fixed: PayPal Express finish endpoint now always returns the correct session token to continue with, including when a guest customer is created and the session changes.
