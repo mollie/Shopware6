@@ -49,7 +49,7 @@ class CreditCardControllerBase extends AbstractStoreFrontController
                 $customer,
                 $cardToken,
                 $context,
-                $data->query->getBoolean('shouldSaveCardDetail')
+                $data->request->getBoolean('shouldSaveCardDetail')
             );
             $errors = $writtenEvent->getErrors();
             $success = count($errors) === 0;

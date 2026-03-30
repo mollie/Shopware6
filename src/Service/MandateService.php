@@ -11,6 +11,7 @@ use Kiener\MolliePayments\Struct\Mandate\CreditCardDetailStruct;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Kiener\MolliePayments\Struct\Mandate\MandateStruct;
 use Mollie\Api\Resources\Mandate;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -27,11 +28,15 @@ class MandateService implements MandateServiceInterface
     /** @var SubscriptionManager */
     private $subscriptionManager;
 
-    public function __construct(CustomerServiceInterface $customerService, MandateApiService $mandateApiService, SubscriptionManager $subscriptionManager)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(CustomerServiceInterface $customerService, MandateApiService $mandateApiService, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
     {
         $this->customerService = $customerService;
         $this->mandateApiService = $mandateApiService;
         $this->subscriptionManager = $subscriptionManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -69,10 +74,20 @@ class MandateService implements MandateServiceInterface
         );
 
         $mandatesArray = [];
+
+        if (strlen($mollieCustomerId) === 0) {
+            return new MandateCollection();
+        }
+
         try {
             $mandates = $this->mandateApiService->getMandatesByMollieCustomerId($mollieCustomerId, $context->getSalesChannelId());
             $mandatesArray = $mandates->getArrayCopy();
         } catch (CouldNotFetchMollieCustomerMandatesException $e) {
+            $this->logger->warning('Could not fetch mandates for customer, resetting customer IDs', [
+                'customerId' => $customerId,
+                'mollieCustomerId' => $mollieCustomerId,
+                'exception' => $e->getMessage(),
+            ]);
             $customFields = $this->customerService->getCustomerStruct($customerId, $context->getContext());
             $customFields->setCustomerIds([]);
             $this->customerService->saveCustomerCustomFields($customerId, $customFields->toCustomFieldsArray(), $context->getContext());

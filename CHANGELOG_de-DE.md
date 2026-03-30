@@ -1,4 +1,5 @@
 # unreleased
+- Behoben: Kreditkartendaten konnten nicht korrekt gespeichert werden.
 - Behoben: Der Submit-Button des Kreditkartenformulars auf der Bestellbearbeitungsseite setzt seinen Ladezustand nun korrekt zurück, wenn ein Validierungsfehler auftritt, anstatt deaktiviert mit einem Spinner zu bleiben.
 - Behoben: Kompatibilität mit dem ProductBundle-Plugin (zeobv) - Bundle-Produkte werden nun korrekt in ihre einzelnen Positionen aufgeteilt für die Mollie API.
 - Behoben: Webhooks für POS-Terminal-Zahlungen funktionieren nun korrekt.
