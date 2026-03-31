@@ -198,7 +198,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             $this->loggerService
         );
 
-        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $transactionConverter, $this->transitionService, $this->loggerService);
+        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $transactionConverter, $this->transitionService, $this->loggerService, new \Symfony\Component\HttpFoundation\RequestStack());
         $this->finalizeAction = new FinalizeAction($this->molliePaymentFinalize, $transactionConverter, $this->loggerService);
     }
 }

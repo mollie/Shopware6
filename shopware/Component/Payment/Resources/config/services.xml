@@ -10,6 +10,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Transaction\TransactionConverter"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
             <argument type="service" id="monolog.logger.mollie"/>
+            <argument type="service" id="request_stack"/>
         </service>
 
         <service id="Mollie\Shopware\Component\Payment\FinalizeAction">

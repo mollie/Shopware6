@@ -247,16 +247,12 @@ class Order
             );
         }
 
-        // TODO does not yet work and I'm not quite sure if that is even happening?!
-        // we have to update the payment method, if it switches.
-        // otherwise one would still see the previous one
-        // $existingOpenPayment = $this->updateExistingPayment(
-        //     $existingOpenPayment,
-        //     $paymentMethod,
-        //     $salesChannelContext->getSalesChannelId()
-        // );
-
-        return $existingOpenPayment;
+        // the open payment is not cancelable, so we cannot create a new payment for this order.
+        // Mollie also does not allow canceling orders with open payments,
+        // so we let the old order expire on its own at Mollie.
+        // By throwing this exception, the caller will create a completely new
+        // Mollie order with the new payment method.
+        throw new MollieOrderCancelledException($mollieOrderId);
     }
 
     public function getPaidPayment(MollieOrder $mollieOrder): ?Payment

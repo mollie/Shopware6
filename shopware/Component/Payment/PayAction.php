@@ -14,20 +14,25 @@ use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class PayAction
 {
+    public const SESSION_KEY_PENDING_ORDER = 'mollie_pending_order_id';
+
     private LoggerInterface $logger;
     private MolliePaymentDoPay $payFacade;
     private TransactionTransitionService $transactionTransitionService;
     private TransactionConverterInterface $transactionConverter;
+    private RequestStack $requestStack;
 
-    public function __construct(MolliePaymentDoPay $payFacade, TransactionConverterInterface $transactionConverter, TransactionTransitionService $transactionTransitionService, LoggerInterface $logger)
+    public function __construct(MolliePaymentDoPay $payFacade, TransactionConverterInterface $transactionConverter, TransactionTransitionService $transactionTransitionService, LoggerInterface $logger, RequestStack $requestStack)
     {
         $this->payFacade = $payFacade;
         $this->transactionTransitionService = $transactionTransitionService;
         $this->logger = $logger;
         $this->transactionConverter = $transactionConverter;
+        $this->requestStack = $requestStack;
     }
 
     /** @param AsyncPaymentTransactionStruct|PaymentTransactionStruct $transaction */
@@ -75,6 +80,14 @@ final class PayAction
             $this->logger->warning(
                 sprintf('Could not set payment to in progress. Got error %s', $exception->getMessage())
             );
+        }
+
+        $currentRequest = $this->requestStack->getCurrentRequest();
+        $isInitialCheckout = $currentRequest !== null && str_contains($currentRequest->getPathInfo(), '/checkout/');
+
+        if ($isInitialCheckout) {
+            $session = $this->requestStack->getSession();
+            $session->set(self::SESSION_KEY_PENDING_ORDER, $transaction->getOrder()->getId());
         }
 
         /*

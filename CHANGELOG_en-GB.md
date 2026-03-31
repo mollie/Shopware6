@@ -1,4 +1,5 @@
 # unreleased
+- Fixed: Switching the payment method after using the browser back button from Mollie now works correctly. If the open payment is not cancelable, the entire Mollie order is canceled and a new order is created with the new payment method.
 - Fixed: Credit card details could not be saved correctly.
 - Fixed: Credit card form submit button on the Edit Order page now properly resets its loading state when a validation error occurs, instead of remaining disabled with a spinner.
 - Fixed: Compatibility with ProductBundle plugin (zeobv) - bundle products are now correctly split into their child line items for the Mollie API.

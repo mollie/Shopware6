@@ -80,6 +80,11 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="Kiener\MolliePayments\Subscriber\PendingOrderRedirectSubscriber">
+            <argument type="service" id="router"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Kiener\MolliePayments\Subscriber\SalesChannelContextTokenChangedSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\Cart\CartBackupService"/>
             <tag name="kernel.event_subscriber"/>
