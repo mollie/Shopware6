@@ -618,7 +618,7 @@ class CustomerService implements CustomerServiceInterface
         $customer = [
             'id' => $customer->getId(),
             'defaultBillingAddressId' => $defaultBillingAddressId,
-            'defaultShippingAddressId' => $defaultBillingAddressId,
+            'defaultShippingAddressId' => $defaultShippingAddressId,
         ];
 
         if (count($addresses) > 0) {
@@ -680,7 +680,7 @@ class CustomerService implements CustomerServiceInterface
             ]);
             $billingAddressData->set('customFields', $customFields);
 
-            $data->set('billingAddress', $shippingAddressData);
+            $data->set('billingAddress', $billingAddressData);
         }
 
         try {

@@ -26,9 +26,11 @@ class PayPalExpress
     private const SESSION_MAX_RETRY = 5;
 
     /**
-     * define how long we will wait for the session response
+     * define how long we will wait between session retries (in microseconds).
+     * 500_000 µs = 0.5 seconds per step, max total wait: 0.5+1+1.5+2+2.5 = 7.5 seconds.
+     * Mollie can take a few seconds to propagate address data from PayPal after the user is redirected back.
      */
-    private const SESSION_BASE_TIMEOUT = 2000;
+    private const SESSION_BASE_TIMEOUT = 500_000;
 
     /**
      * @var PaymentMethodRepository
@@ -152,12 +154,13 @@ class PayPalExpress
          * so we try to load the session at least 5 times with increased waiting time.
          */
         for ($i = 0; $i < self::SESSION_MAX_RETRY; ++$i) {
-            $sleepTimer = self::SESSION_BASE_TIMEOUT * ($i + 1);
-            usleep($sleepTimer);
             $session = $mollie->sessions->get($sessionId);
             if ($session->methodDetails !== null && property_exists($session->methodDetails, 'shippingAddress') && $session->methodDetails->shippingAddress !== null) {
                 break;
             }
+            // Sleep between retries only — not before the first attempt
+            $sleepTimer = self::SESSION_BASE_TIMEOUT * ($i + 1);
+            usleep($sleepTimer);
         }
 
         return $session;
