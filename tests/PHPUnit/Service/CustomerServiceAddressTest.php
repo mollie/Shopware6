@@ -33,49 +33,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @covers \Kiener\MolliePayments\Service\CustomerService::reuseOrCreateAddresses
  * @covers \Kiener\MolliePayments\Service\CustomerService::createGuestAccount
+ * @covers \Kiener\MolliePayments\Service\CustomerService::reuseOrCreateAddresses
  */
 class CustomerServiceAddressTest extends TestCase
 {
-    private function buildAddress(string $street, string $city, string $zip = '12345'): AddressStruct
-    {
-        return new AddressStruct('John', 'Doe', 'john@example.com', $street, '', $zip, $city, 'DE', '+49000');
-    }
-
-    private function buildIdSearchResult(array $ids): IdSearchResult
-    {
-        $result = $this->createMock(IdSearchResult::class);
-        $result->method('getIds')->willReturn($ids);
-        return $result;
-    }
-
-    private function buildCustomerService(
-        FakeCustomerRepository $customerRepo,
-        EntityRepository $customerAddressRepo,
-        EntityRepository $countryRepo,
-        EntityRepository $salutationRepo,
-        ContainerInterface $container,
-        SettingsService $settingsService
-    ): CustomerService {
-        return new CustomerService(
-            $countryRepo,
-            $customerRepo,
-            $customerAddressRepo,
-            $this->createMock(Customer::class),
-            $this->createMock(EventDispatcherInterface::class),
-            new NullLogger(),
-            $this->createMock(SalesChannelContextPersister::class),
-            $salutationRepo,
-            $settingsService,
-            '6.5.0',
-            $this->createMock(ConfigService::class),
-            $container,
-            $this->createMock(RequestStack::class),
-            new FakeTranslator(),
-        );
-    }
-
     /**
      * When existing customer addresses are found for both shipping and billing Mollie IDs,
      * the upserted customer data must map each ID to the correct Shopware key.
@@ -84,10 +46,10 @@ class CustomerServiceAddressTest extends TestCase
     {
         // Arrange: two distinct addresses with different streets → different Mollie IDs
         $shipping = $this->buildAddress('Shipping Street 1', 'Berlin', '10115');
-        $billing  = $this->buildAddress('Billing Avenue 5', 'Munich', '80331');
+        $billing = $this->buildAddress('Billing Avenue 5', 'Munich', '80331');
 
         $shippingEntityId = 'entity-shipping';
-        $billingEntityId  = 'entity-billing';
+        $billingEntityId = 'entity-billing';
 
         $shippingEntity = $this->createMock(CustomerAddressEntity::class);
         $shippingEntity->method('getId')->willReturn($shippingEntityId);
@@ -204,7 +166,7 @@ class CustomerServiceAddressTest extends TestCase
     public function testCreateGuestAccountSetsBillingAddressDataFromBillingNotShipping(): void
     {
         $shippingAddress = $this->buildAddress('Shipping Road 1', 'Berlin', '10115');
-        $billingAddress  = $this->buildAddress('Billing Lane 99', 'Hamburg', '20095');
+        $billingAddress = $this->buildAddress('Billing Lane 99', 'Hamburg', '20095');
 
         // Country / salutation lookups must succeed
         $countryIdResult = $this->buildIdSearchResult(['country-id']);
@@ -221,7 +183,7 @@ class CustomerServiceAddressTest extends TestCase
         $settingsService->method('getSettings')->willReturn($settings);
 
         // Capture the RequestDataBag passed to RegisterRoute::register()
-        /** @var RequestDataBag|null $capturedBag */
+        /** @var null|RequestDataBag $capturedBag */
         $capturedBag = null;
 
         $mockCustomer = $this->createMock(CustomerEntity::class);
@@ -232,8 +194,10 @@ class CustomerServiceAddressTest extends TestCase
             ->method('register')
             ->willReturnCallback(static function (RequestDataBag $data) use (&$capturedBag, $customerResponse): CustomerResponse {
                 $capturedBag = $data;
+
                 return $customerResponse;
-            });
+            })
+        ;
 
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')->with(RegisterRoute::class)->willReturn($registerRoute);
@@ -275,5 +239,43 @@ class CustomerServiceAddressTest extends TestCase
             'billingAddress street must differ from shippingAddress street'
         );
     }
-}
 
+    private function buildAddress(string $street, string $city, string $zip = '12345'): AddressStruct
+    {
+        return new AddressStruct('John', 'Doe', 'john@example.com', $street, '', $zip, $city, 'DE', '+49000');
+    }
+
+    private function buildIdSearchResult(array $ids): IdSearchResult
+    {
+        $result = $this->createMock(IdSearchResult::class);
+        $result->method('getIds')->willReturn($ids);
+
+        return $result;
+    }
+
+    private function buildCustomerService(
+        FakeCustomerRepository $customerRepo,
+        EntityRepository $customerAddressRepo,
+        EntityRepository $countryRepo,
+        EntityRepository $salutationRepo,
+        ContainerInterface $container,
+        SettingsService $settingsService
+    ): CustomerService {
+        return new CustomerService(
+            $countryRepo,
+            $customerRepo,
+            $customerAddressRepo,
+            $this->createMock(Customer::class),
+            $this->createMock(EventDispatcherInterface::class),
+            new NullLogger(),
+            $this->createMock(SalesChannelContextPersister::class),
+            $salutationRepo,
+            $settingsService,
+            '6.5.0',
+            $this->createMock(ConfigService::class),
+            $container,
+            $this->createMock(RequestStack::class),
+            new FakeTranslator(),
+        );
+    }
+}

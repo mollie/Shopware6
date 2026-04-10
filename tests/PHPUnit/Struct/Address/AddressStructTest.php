@@ -87,4 +87,3 @@ class AddressStructTest extends TestCase
         $this->assertSame('Doe', $struct->getLastName());
     }
 }
-

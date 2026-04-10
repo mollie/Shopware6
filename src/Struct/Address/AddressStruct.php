@@ -76,7 +76,7 @@ final class AddressStruct
         // Only split familyName when givenName is absent from the response.
         // Splitting unconditionally overwrites a non-empty givenName with an empty string
         // when familyName is a single word, which fails Shopware's required-firstName validation.
-        if (property_exists($address, 'familyName') && !property_exists($address, 'givenName')) {
+        if (property_exists($address, 'familyName') && ! property_exists($address, 'givenName')) {
             $nameParts = explode(' ', $address->familyName);
             $address->familyName = array_pop($nameParts);
             $address->givenName = implode(' ', $nameParts);
