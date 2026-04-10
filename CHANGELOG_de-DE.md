@@ -1,6 +1,7 @@
 # unreleased
 - Behoben: PayPal Express schlägt nicht mehr sporadisch mit einem "fehlende Versandadresse"-Fehler fehl. Die Session-Polling-Schleife wartet nun lange genug (bis zu 7,5 s), bis Mollie die Adressdaten von PayPal erhalten hat.
 - Behoben: Der PayPal Express Gast-Checkout schlägt nicht mehr fehl, wenn PayPal einen einwortigen Kontonamen ohne separaten Vornamen zurückgibt, was zuvor dazu führte, dass Shopwares Vorname-Validierung die Registrierung ablehnte.
+- Behoben: PayPal Express weist nun Versand- und Rechnungsadresse korrekt zu, wenn der Kunde eine separate Rechnungsadresse hat. Zwei Copy-Paste-Fehler führten dazu, dass beide Adressen immer die Rechnungsadressdaten verwendeten.
 - Behoben: Der Wechsel der Zahlungsmethode nach Verwendung des Browser-Zurueck-Buttons von Mollie funktioniert nun korrekt. Wenn die offene Zahlung nicht stornierbar ist, wird die gesamte Mollie-Bestellung storniert und eine neue Bestellung mit der neuen Zahlungsmethode erstellt.
 - Behoben: Kreditkartendaten konnten nicht korrekt gespeichert werden.
 - Verändert: Speicherung von Kreditkartendaten bei Single-Click-Zahlungen.

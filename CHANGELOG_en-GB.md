@@ -1,6 +1,7 @@
 # unreleased
 - Fixed: PayPal Express no longer fails intermittently with a "missing shipping address" error. The session polling retry loop now waits long enough (up to 7.5 s) for Mollie to receive address data from PayPal.
 - Fixed: PayPal Express guest checkout no longer fails when PayPal returns a single-word account name without a separate first name, which previously caused Shopware's firstName validation to reject the registration.
+- Fixed: PayPal Express now correctly assigns shipping and billing addresses when the customer has a distinct billing address. Two copy-paste bugs caused both addresses to always use the billing address data.
 - Fixed: Switching the payment method after using the browser back button from Mollie now works correctly. If the open payment is not cancelable, the entire Mollie order is canceled and a new order is created with the new payment method.
 - Fixed: Credit card details could not be saved correctly.
 - Changed: Saving credit card data for Single-Click payments.
