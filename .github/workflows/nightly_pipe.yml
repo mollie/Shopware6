@@ -45,6 +45,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - shopware: '6.7.9.0'
+            php: '8.3'
+            image: 'dockware/shopware'
           - shopware: '6.7.7.1'
             php: '8.3'
             image: 'dockware/shopware'
