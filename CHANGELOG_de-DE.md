@@ -9,6 +9,7 @@
 - Behoben: Der PayPal Express Finish-Endpunkt gibt jetzt immer den korrekten Session-Token zurück, der nach dem Ablauf verwendet werden soll, auch wenn ein Gastkunde erstellt wird und sich die Session ändert.
 - Behoben: Der Apple Pay Direct Zahlungsendpunkt gibt jetzt immer den korrekten Session-Token zurück, der nach dem Zahlungsabschluss verwendet werden soll.
 - Behoben: Der PayPal Express Start-Endpunkt akzeptiert jetzt optional `redirectUrl` und `cancelUrl` fuer Store-API-Flows und behaelt die bisherigen Fallbacks bei, wenn Felder fehlen.
+- Behoben: Steuern auf Gutschriften, die aus Teilerstattungen erzeugt werden, werden nun proportional zum erstatteten Betrag neu berechnet, statt die volle Steuer der ursprünglichen Bestellposition zu übernehmen.
 
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.

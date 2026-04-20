@@ -10,8 +10,10 @@ use Mollie\Api\Resources\Refund;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Cart\Tax\TaxCalculator;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -33,6 +35,11 @@ class RefundCreditNoteService
      * @var EntityRepository<EntityCollection<OrderLineItemEntity>>
      */
     private $orderLineItemRepository;
+
+    /**
+     * @var TaxCalculator
+     */
+    private $taxCalculator;
 
     /**
      * @var bool
@@ -62,10 +69,12 @@ class RefundCreditNoteService
         $orderRepository,
         $orderLineItemRepository,
         SettingsService $settingsService,
+        TaxCalculator $taxCalculator,
         LoggerInterface $logger
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderLineItemRepository = $orderLineItemRepository;
+        $this->taxCalculator = $taxCalculator;
         $settings = $settingsService->getSettings();
         $this->enabled = $settings->isRefundManagerCreateCreditNotesEnabled();
         $this->prefix = $settings->getRefundManagerCreateCreditNotesPrefix();
@@ -82,6 +91,7 @@ class RefundCreditNoteService
         }
         $orderId = $order->getId();
         $refundId = $refund->id;
+        $taxStatus = (string) $order->getTaxStatus();
 
         $lineItems = [];
 
@@ -123,17 +133,17 @@ class RefundCreditNoteService
                     }
 
                     $orderDelivery = $filteredOrderDeliveries->first();
-                    $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, null, $orderDelivery);
+                    $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, $taxStatus, null, $orderDelivery);
                     continue;
                 }
                 $orderLineItem = $filteredOrderLineItems->first();
 
-                $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, $orderLineItem);
+                $lineItems[] = $this->getLineItemArray($orderId, $refundId, $unitPrice, $quantity, $totalAmount, $taxStatus, $orderLineItem);
             }
         }
 
         if ($refundAmount > 0) {
-            $lineItems[] = $this->getLineItemArray($orderId, $refundId, $refundAmount, 1, $refundAmount);
+            $lineItems[] = $this->getLineItemArray($orderId, $refundId, $refundAmount, 1, $refundAmount, $taxStatus);
         }
 
         $this->logger->debug('Adding credit note to order', ['orderId' => $orderId, 'refundId' => $refundId, 'lineItems' => $lineItems]);
@@ -170,12 +180,11 @@ class RefundCreditNoteService
     /**
      * @return array<mixed>
      */
-    private function getLineItemArray(string $orderId, string $refundId, float $unitPrice, int $quantity, float $totalAmount, ?OrderLineItemEntity $orderLineItemEntity = null, ?OrderDeliveryEntity $orderDeliveryEntity = null): array
+    private function getLineItemArray(string $orderId, string $refundId, float $unitPrice, int $quantity, float $totalAmount, string $taxStatus, ?OrderLineItemEntity $orderLineItemEntity = null, ?OrderDeliveryEntity $orderDeliveryEntity = null): array
     {
         $id = $orderId . 'custom-amount';
         $label = $totalAmount;
 
-        $taxCollection = new CalculatedTaxCollection();
         $taxRuleCollection = new TaxRuleCollection();
 
         if ($orderLineItemEntity !== null) {
@@ -183,7 +192,6 @@ class RefundCreditNoteService
             $label = $orderLineItemEntity->getLabel();
             $price = $orderLineItemEntity->getPrice();
             if ($price !== null) {
-                $taxCollection = $price->getCalculatedTaxes();
                 $taxRuleCollection = $price->getTaxRules();
             }
         }
@@ -194,11 +202,10 @@ class RefundCreditNoteService
             if ($shippingMethod !== null) {
                 $label = $shippingMethod->getName();
             }
-            $price = $orderDeliveryEntity->getShippingCosts();
-
-            $taxCollection = $price->getCalculatedTaxes();
-            $taxRuleCollection = $price->getTaxRules();
+            $taxRuleCollection = $orderDeliveryEntity->getShippingCosts()->getTaxRules();
         }
+
+        $taxCollection = $this->calculateTaxes($totalAmount, $taxRuleCollection, $taxStatus);
 
         $label = trim(sprintf('%s%s%s', $this->prefix, $label, $this->suffix));
 
@@ -216,5 +223,23 @@ class RefundCreditNoteService
                 ],
             ],
         ];
+    }
+
+    /**
+     * Recalculate taxes for a refund/credit-note amount based on the order's tax state.
+     * Delegates to Shopware's TaxCalculator so that tax rounding and multi-rate handling
+     * match the platform standard.
+     */
+    private function calculateTaxes(float $totalAmount, TaxRuleCollection $taxRules, string $taxStatus): CalculatedTaxCollection
+    {
+        if ($taxStatus === CartPrice::TAX_STATE_FREE || $taxRules->count() === 0) {
+            return new CalculatedTaxCollection();
+        }
+
+        if ($taxStatus === CartPrice::TAX_STATE_NET) {
+            return $this->taxCalculator->calculateNetTaxes($totalAmount, $taxRules);
+        }
+
+        return $this->taxCalculator->calculateGrossTaxes($totalAmount, $taxRules);
     }
 }

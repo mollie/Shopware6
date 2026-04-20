@@ -9,6 +9,7 @@
 - Fixed: PayPal Express finish endpoint now always returns the correct session token to continue with, including when a guest customer is created and the session changes.
 - Fixed: Apple Pay Direct payment endpoint now always returns the correct session token to continue with after payment completion.
 - Fixed: PayPal Express start endpoint now accepts optional `redirectUrl` and `cancelUrl` for Store API flows and keeps existing fallbacks when fields are omitted.
+- Fixed: Taxes on credit notes created from partial refunds are now recalculated proportionally to the refunded amount instead of carrying the full tax of the original line item.
 
 # 4.23.0
 - New: Added Vipps as a payment method.
