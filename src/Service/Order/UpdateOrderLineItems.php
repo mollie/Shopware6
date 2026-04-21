@@ -51,7 +51,7 @@ class UpdateOrderLineItems
             }
 
             // # we need some customFields for later when we edit an order, for example subscription information
-            $customFields = $shopwareLine->getPayload()['customFields'] ?? [];
+            $customFields = $shopwareLine->getCustomFields() ?? [];
 
             $customFields[CustomFieldsInterface::MOLLIE_KEY] = [
                 'order_line_id' => $orderLine->id,
