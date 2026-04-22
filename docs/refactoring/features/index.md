@@ -24,6 +24,21 @@ phases, and open questions a second developer can pick up from.
   a shared `AddressSynchronizer`, extend the match hash with phone
   and company, add missing tests. **Status:** Plan — decisions
   recorded, ready for implementation.
+- [PayPal Express — Temporary Orders-API Bridge](paypal-express-orders-api.md)
+  — carve PayPal Express out of the Payments-API migration via a
+  new `OrdersApiAwareInterface` marker and a
+  `CreatePaymentBuilder` → `PayloadBuilder` rename with
+  `buildPayment` / `buildOrder`. Revert in one step when Mollie
+  ships the missing `authenticationId` field on the Payments API.
+  **Status:** Plan — decisions recorded, ready for implementation.
+- [Payment Links for Admin-Created Orders](payment-links.md) —
+  use Mollie's Payment Links API so customers can pay
+  admin-created orders directly from the confirmation email
+  without logging into the shop. Triggered off
+  `createdById !== null` + `AdminApiSource`; delete + recreate
+  on order-total changes; shared webhook endpoint with `pl_*`
+  fallback; gateway stays on Guzzle (no SDK). **Status:** Plan —
+  decisions recorded, implementation deferred.
 
 ## Conventions
 
