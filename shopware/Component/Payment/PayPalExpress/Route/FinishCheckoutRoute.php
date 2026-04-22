@@ -81,6 +81,6 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $cart->addExtension(Mollie::EXTENSION, $session);
         $this->cartService->recalculate($cart, $salesChannelContext);
 
-        return new FinishCheckoutResponse($session->getId(), $session->getAuthenticationId());
+        return new FinishCheckoutResponse($session->getId(), $session->getAuthenticationId(),$newContext->getToken());
     }
 }

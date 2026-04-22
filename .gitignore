@@ -21,3 +21,4 @@ package-lock.json
 .tmp
 
 .php-cs-fixer.cache
+/.ai/
