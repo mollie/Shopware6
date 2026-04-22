@@ -52,18 +52,21 @@ Raw data: `Mollie_SW6_Unit_Tests_xml` (Clover).
 
 ## Coverage goals
 
-Ratcheting and CI gates are explicitly **out of scope for now** — we want to
-establish the testing discipline before wiring up automation. Progress is
-tracked per package (see below) and reviewed periodically.
+Ratcheting and CI gates are explicitly **out of scope until ≥ 80 %** — we
+want to establish the testing discipline before wiring up automation. Gates
+land post-5.1.0 so the ratchet starts from a healthy number rather than
+locking in the current 18.1 %. Progress is tracked per package (see below)
+and reviewed per release (see [`release-plan.md`](release-plan.md)).
 
-Informal quarterly targets as a direction, not a contract:
+Targets align with the release plan:
 
-| Checkpoint | Target line coverage |
-|---|---|
-| Baseline 2026-04-22 | 18.1 % |
-| End Q2 2026 | ~35 % |
-| End Q3 2026 | ~55 % |
-| End Q4 2026 | ~70 % |
+| Checkpoint           | Target line coverage |
+|----------------------|----------------------|
+| Baseline 2026-04-22  | 18.1 %               |
+| `5.0.0-beta.3`       | ~40 %                |
+| `5.0.0-beta.4`       | ~50 %                |
+| **`5.0.0` (End Q2 2026)** | **~60 %**        |
+| `5.1.0` (End Q3 2026)    | **~80 %**        |
 
 Targets are achieved through three waves:
 
@@ -74,6 +77,13 @@ Targets are achieved through three waves:
    transaction, Mollie gateway extensions, routes with fake dependencies.
 3. **Wave 3 — subscribers, controllers, express methods:** requires richer
    fakes (events, HTTP context).
+
+## Release plan
+
+The release schedule, per-version scope, and feature → version mapping
+live in [`release-plan.md`](release-plan.md). **Hard deadline:
+`5.0.0` ships by the end of Q2 2026.** Payment Links and the final
+`src/` + `vendor_manual/` removal are deferred to `5.1.0` (end Q3 2026).
 
 ## Release features
 
@@ -92,6 +102,13 @@ Currently drafted:
 - [Express Checkout — Address & Guest Account Sync](features/express-checkout-address-sync.md)
   — guest / address reuse parity between Apple Pay Direct and PayPal
   Express, ID-swap bug fix, missing tests.
+- [PayPal Express — Temporary Orders-API Bridge](features/paypal-express-orders-api.md)
+  — keep PayPal Express on the Orders API via a new
+  `OrdersApiAwareInterface` marker until Mollie ships the missing
+  Payments-API parameter.
+- [Payment Links for Admin-Created Orders](features/payment-links.md)
+  — let customers pay admin-created orders directly from the
+  email via Mollie's Payment Links API; no shop login required.
 
 ## Rules
 
@@ -170,6 +187,8 @@ Mollie-facing services).
 
 ## References
 
+- [`release-plan.md`](release-plan.md) — timeline, per-version scope,
+  feature → version mapping, coverage targets per release
 - [`docs/coding-guidelines.md`](../coding-guidelines.md) — `final`, strict
   types, DTOs, early returns
 - [`docs/testing-guidelines.md`](../testing-guidelines.md) — fakes, builders,
