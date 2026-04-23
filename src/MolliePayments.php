@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-    public const PLUGIN_VERSION = '4.23.0';
+    public const PLUGIN_VERSION = '4.24.0';
 
     /**
      * @throws \Exception

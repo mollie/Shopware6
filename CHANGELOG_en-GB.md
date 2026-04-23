@@ -1,4 +1,4 @@
-# unreleased
+# 4.24.0
 - Fixed: PayPal Express no longer fails intermittently with a "missing shipping address" error. The session polling retry loop now waits long enough (up to 7.5 s) for Mollie to receive address data from PayPal.
 - Fixed: PayPal Express guest checkout no longer fails when PayPal returns a single-word account name without a separate first name, which previously caused Shopware's firstName validation to reject the registration.
 - Fixed: PayPal Express now correctly assigns shipping and billing addresses when the customer has a distinct billing address. Two copy-paste bugs caused both addresses to always use the billing address data.
