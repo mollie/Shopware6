@@ -164,6 +164,12 @@ class SettingsService implements PluginSettingsServiceInterface
         } else {
             $this->delete($key, $salesChannelId);
         }
+
+        // Invalidate the cached MollieSettingStruct so subsequent getSettings() calls
+        // reflect the new profile id instead of returning the stale cached struct.
+        // Clearing the full cache is safe since config changes are infrequent and
+        // sales-channel-specific values can inherit from the global ('all') scope.
+        $this->cachedStructs = [];
     }
 
     /**
