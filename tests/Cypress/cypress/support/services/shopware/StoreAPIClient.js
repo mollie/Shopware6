@@ -36,6 +36,36 @@ export default class StoreAPIClient {
     }
 
     /**
+     * Logs in the given customer against the Store API and stores the
+     * returned context token on this client, so that subsequent requests
+     * are authenticated as this customer.
+     *
+     * @param email
+     * @param password
+     * @returns {Promise}
+     */
+    login(email, password) {
+        return this.post('/account/login', {
+            email: email,
+            password: password,
+        }).then((response) => {
+            let token;
+
+            if (response && response.data && response.data.contextToken) {
+                token = response.data.contextToken;
+            } else if (response && response.headers && response.headers['sw-context-token']) {
+                token = response.headers['sw-context-token'];
+            }
+
+            if (token) {
+                this.setContextToken(token);
+            }
+
+            return response;
+        });
+    }
+
+    /**
      *
      * @param url
      * @param data

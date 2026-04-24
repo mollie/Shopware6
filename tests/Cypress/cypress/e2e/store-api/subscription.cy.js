@@ -1,6 +1,5 @@
 import StoreAPIClient from "Services/shopware/StoreAPIClient";
 import Shopware from "Services/shopware/Shopware"
-import StoreApiLoginAction from "Actions/store-api/StoreApiLoginAction";
 
 
 const shopware = new Shopware();
@@ -11,11 +10,17 @@ const client = new StoreAPIClient(shopware.getStoreApiToken());
 // that ones just made up to have a valid URL
 const fakeSubscriptionID = '0d8eefdd6d12456335280e2ff42431b9';
 
-const loginAction = new StoreApiLoginAction(client);
+const customerEmail = 'cypress@mollie.com';
+const customerPassword = 'cypress123';
 
 
 function beforeEach() {
     client.clearContextToken();
+}
+
+
+function loginAsCustomer() {
+    return cy.wrap(client.login(customerEmail, customerPassword));
 }
 
 
@@ -35,7 +40,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -43,9 +48,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.get(url).then(response => {
@@ -77,7 +80,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -85,9 +88,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -118,7 +119,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -126,9 +127,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -159,7 +158,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -167,9 +166,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -199,7 +196,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -207,9 +204,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -239,7 +234,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -247,9 +242,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -279,7 +272,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
@@ -287,9 +280,7 @@ context("Store API Subscription Routes", () => {
 
             beforeEach();
 
-            loginAction.login('loginDone');
-
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -320,17 +311,15 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 401)
+                cy.wrap(response).its('status').should('eq', 403)
             });
         })
 
         it('C330672: /cancel with authorized customer @core', () => {
 
             beforeEach();
-            
-            loginAction.login('loginDone');
 
-            cy.wait('@loginDone').then(() => {
+            loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
                     client.post(url, {}).then(response => {
@@ -348,4 +337,3 @@ context("Store API Subscription Routes", () => {
     });
 
 })
-
