@@ -14,6 +14,7 @@ use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoader;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class AccountControllerBase extends AbstractStoreFrontController
@@ -46,7 +47,7 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
     {
-        if (! $this->isLoggedIn($salesChannelContext)) {
+        if ($this->getLoggedInCustomer($salesChannelContext) === null) {
             return $this->redirectToLoginPage();
         }
 
@@ -62,8 +63,8 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function mandatesList(Request $request, SalesChannelContext $salesChannelContext): Response
     {
-        $customer = $salesChannelContext->getCustomer();
-        if (! $customer instanceof CustomerEntity) {
+        $customer = $this->getLoggedInCustomer($salesChannelContext);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
@@ -79,11 +80,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
-        if (! $this->isLoggedIn($salesChannelContext)) {
+        $customer = $this->getLoggedInCustomer($salesChannelContext);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($subscriptionId, $customer, $salesChannelContext);
+
             $address = $data->get('address', null);
 
             if (! $address instanceof RequestDataBag) {
@@ -136,11 +140,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
     {
-        if (! $this->isLoggedIn($salesChannelContext)) {
+        $customer = $this->getLoggedInCustomer($salesChannelContext);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($subscriptionId, $customer, $salesChannelContext);
+
             $address = $data->get('address', null);
 
             if (! $address instanceof RequestDataBag) {
@@ -193,11 +200,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function updatePaymentStart(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
-        if (! $this->isLoggedIn($salesChannelContext)) {
+        $customer = $this->getLoggedInCustomer($salesChannelContext);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($swSubscriptionId, $customer, $salesChannelContext);
+
             $redirectUrl = $this->generateUrl(
                 'frontend.account.mollie.subscriptions.payment.update-success',
                 [
@@ -219,11 +229,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function updatePaymentFinish(string $swSubscriptionId, SalesChannelContext $salesChannelContext): Response
     {
-        if (! $this->isLoggedIn($salesChannelContext)) {
+        $customer = $this->getLoggedInCustomer($salesChannelContext);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($swSubscriptionId, $customer, $salesChannelContext);
+
             $this->subscriptionManager->updatePaymentMethodConfirm($swSubscriptionId, $salesChannelContext->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdatePayment'));
@@ -239,11 +252,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function pauseSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
-        if (! $this->isLoggedIn($context)) {
+        $customer = $this->getLoggedInCustomer($context);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($swSubscriptionId, $customer, $context);
+
             $this->subscriptionManager->pauseSubscription($swSubscriptionId, $context->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successPause'));
@@ -259,11 +275,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function skipSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
-        if (! $this->isLoggedIn($context)) {
+        $customer = $this->getLoggedInCustomer($context);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($swSubscriptionId, $customer, $context);
+
             $this->subscriptionManager->skipSubscription($swSubscriptionId, 1, $context->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successSkip'));
@@ -279,11 +298,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function resumeSubscription(string $swSubscriptionId, SalesChannelContext $context): Response
     {
-        if (! $this->isLoggedIn($context)) {
+        $customer = $this->getLoggedInCustomer($context);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($swSubscriptionId, $customer, $context);
+
             $this->subscriptionManager->resumeSubscription($swSubscriptionId, new \DateTime(), $context->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successResume'));
@@ -299,11 +321,14 @@ class AccountControllerBase extends AbstractStoreFrontController
 
     public function cancelSubscription(string $subscriptionId, SalesChannelContext $context): Response
     {
-        if (! $this->isLoggedIn($context)) {
+        $customer = $this->getLoggedInCustomer($context);
+        if ($customer === null) {
             return $this->redirectToLoginPage();
         }
 
         try {
+            $this->assertOwnership($subscriptionId, $customer, $context);
+
             $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
             $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.cancelSubscription'));
@@ -331,8 +356,26 @@ class AccountControllerBase extends AbstractStoreFrontController
         return new RedirectResponse($this->generateUrl('frontend.account.login'), 302);
     }
 
-    private function isLoggedIn(SalesChannelContext $context): bool
+    private function getLoggedInCustomer(SalesChannelContext $context): ?CustomerEntity
     {
-        return $context->getCustomer() instanceof CustomerEntity;
+        $customer = $context->getCustomer();
+
+        return $customer instanceof CustomerEntity ? $customer : null;
+    }
+
+    /**
+     * Ensures that the given customer is the owner of the given subscription.
+     * Prevents IDOR: a signed-in customer must not be able to manage another customer's subscription.
+     * The caller must have already verified that a customer is signed in (see getLoggedInCustomer()).
+     *
+     * @throws AccessDeniedHttpException when the subscription does not belong to the given customer
+     */
+    private function assertOwnership(string $subscriptionId, CustomerEntity $customer, SalesChannelContext $context): void
+    {
+        $subscription = $this->subscriptionManager->findSubscription($subscriptionId, $context->getContext());
+
+        if ($subscription->getCustomerId() !== $customer->getId()) {
+            throw new AccessDeniedHttpException('You are not allowed to access this subscription.');
+        }
     }
 }

@@ -21,6 +21,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class SubscriptionControllerBase
@@ -54,10 +55,7 @@ class SubscriptionControllerBase
      */
     public function getSubscriptions(SalesChannelContext $context): StoreApiResponse
     {
-        $this->validateRoute($context);
-
-        /** @var CustomerEntity $customer */
-        $customer = $context->getCustomer();
+        $customer = $this->validateRoute($context);
 
         $result = $this->repoSubscriptions->findByCustomer(
             $customer->getId(),
@@ -82,11 +80,13 @@ class SubscriptionControllerBase
     public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
 
             // make sure its lower case
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $salutationId = strtolower($data->get('salutationId', ''));
             $title = $data->get('title', '');
@@ -135,11 +135,13 @@ class SubscriptionControllerBase
     public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
 
             // make sure its lower case
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $salutationId = strtolower($data->get('salutationId', ''));
             $title = $data->get('title', '');
@@ -189,11 +191,13 @@ class SubscriptionControllerBase
     public function updatePayment(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
 
             // make sure its lower case
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $redirectUrl = $data->get('redirectUrl', '');
 
@@ -214,11 +218,13 @@ class SubscriptionControllerBase
     public function pause(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
 
             // make sure its lower case
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $this->subscriptionManager->pauseSubscription($subscriptionId, $context->getContext());
 
@@ -237,11 +243,13 @@ class SubscriptionControllerBase
     public function resume(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
 
             // make sure its lower case
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $this->subscriptionManager->resumeSubscription($subscriptionId, new \DateTime(), $context->getContext());
 
@@ -260,11 +268,13 @@ class SubscriptionControllerBase
     public function skip(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
 
             // make sure its lower case
             // this is better for handling and testing (it only works lower case
             $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $this->subscriptionManager->skipSubscription($subscriptionId, 1, $context->getContext());
 
@@ -283,7 +293,13 @@ class SubscriptionControllerBase
     public function cancel(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
     {
         try {
-            $this->validateRoute($context);
+            $customer = $this->validateRoute($context);
+
+            // make sure its lower case
+            // this is better for handling and testing (it only works lower case
+            $subscriptionId = strtolower($subscriptionId);
+
+            $this->assertOwnership($subscriptionId, $customer, $context);
 
             $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
 
@@ -294,12 +310,30 @@ class SubscriptionControllerBase
         }
     }
 
-    private function validateRoute(SalesChannelContext $context): void
+    private function validateRoute(SalesChannelContext $context): CustomerEntity
     {
         $customer = $context->getCustomer();
 
         if (! $customer instanceof CustomerEntity) {
             throw new UnauthorizedHttpException('Unauthorized request! No customer is signed in!');
+        }
+
+        return $customer;
+    }
+
+    /**
+     * Ensures that the given customer is the owner of the given subscription.
+     * Prevents IDOR: a signed-in customer must not be able to manage another customer's subscription.
+     * The caller must have already verified that a customer is signed in (see validateRoute()).
+     *
+     * @throws AccessDeniedHttpException when the subscription does not belong to the given customer
+     */
+    private function assertOwnership(string $subscriptionId, CustomerEntity $customer, SalesChannelContext $context): void
+    {
+        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context->getContext());
+
+        if ($subscription->getCustomerId() !== $customer->getId()) {
+            throw new AccessDeniedHttpException('You are not allowed to access this subscription.');
         }
     }
 }

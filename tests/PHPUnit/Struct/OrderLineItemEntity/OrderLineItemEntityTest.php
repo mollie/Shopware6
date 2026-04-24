@@ -64,8 +64,7 @@ class OrderLineItemEntityTest extends TestCase
         $item = new OrderLineItemEntity();
         $item->setPayload([
             'customFields' => [
-                'mollie_payments' => [
-                ],
+                'mollie_payments' => [],
             ],
         ]);
 

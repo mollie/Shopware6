@@ -14,6 +14,7 @@
 - Fixed: PayPal Express start endpoint now accepts optional `redirectUrl` and `cancelUrl` for Store API flows and keeps existing fallbacks when fields are omitted.
 - Fixed: Taxes on credit notes created from partial refunds are now recalculated proportionally to the refunded amount instead of carrying the full tax of the original line item.
 - Fixed: When updating order line items, custom fields are now read directly from the order line item entity instead of the payload. This ensures existing custom fields from other vendors are reliably preserved.
+- Fixed: Subscription endpoints in the Store API and account area now verify that the requested subscription belongs to the logged-in customer.
 
 # 4.23.0
 - New: Added Vipps as a payment method.

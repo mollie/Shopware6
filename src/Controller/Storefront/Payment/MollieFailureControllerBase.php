@@ -151,8 +151,7 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
 
         $this->logger->debug(
             'Customer is returning to Shopware for order: ' . $order->getOrderNumber() . ' and Mollie ID: ' . $orderAttributes->getMollieOrderId(),
-            [
-            ]
+            []
         );
 
         $customFields = new OrderAttributes($order);
