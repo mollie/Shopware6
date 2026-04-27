@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusOpenEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPendingEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Framework\Event\FlowEventAware;
 
 enum PaymentStatus: string
 {
@@ -39,7 +40,7 @@ enum PaymentStatus: string
     }
 
     /**
-     * @return class-string[]
+     * @return class-string<FlowEventAware>[]
      */
     public static function getAllWebhookEvents(): array
     {
