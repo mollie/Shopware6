@@ -47,12 +47,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.7.4.0'
-            php: '8.3'
-            image: 'dockware/shopware'
-          - shopware: '6.6.10.9'
+          - shopware: '6.7.9.1'
             php: '8.2'
             image: 'dockware/shopware'
+          - shopware: '6.6.10.16'
+            php: '8.2'
+            image: 'dockware/play'
+          - shopware: '6.5.8.18'
+            php: '8.2'
+            image: 'dockware/play'
     steps:
 
       - name: Clone Code
