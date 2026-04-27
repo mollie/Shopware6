@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class BusinessEventSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var class-string[]
+     * @var class-string<Shopware\Core\Framework\Event\FlowEventAware>[]|class-string[]
      */
     private array $flowEventList = [
         SuccessEvent::class,
