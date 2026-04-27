@@ -16,12 +16,12 @@ final class Address implements \JsonSerializable
     private string $title;
     private string $givenName;
     private string $familyName;
-    private string $organizationName;
+    private string $organizationName = '';
     private string $streetAndNumber;
-    private string $streetAdditional;
+    private string $streetAdditional = '';
     private string $postalCode;
     private string $email;
-    private string $phone;
+    private string $phone = '';
     private string $city;
     private string $country;
 
@@ -208,5 +208,37 @@ final class Address implements \JsonSerializable
         }
 
         return md5(implode('-', $keys));
+    }
+
+    /**
+     * Override to omit optional fields when empty so the Mollie API payload
+     * stays clean and the JSON representation stays backward-compatible.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $data = [
+            'title' => $this->title,
+            'givenName' => $this->givenName,
+            'familyName' => $this->familyName,
+            'streetAndNumber' => $this->streetAndNumber,
+            'postalCode' => $this->postalCode,
+            'email' => $this->email,
+            'city' => $this->city,
+            'country' => $this->country,
+        ];
+
+        if ($this->streetAdditional !== '') {
+            $data['streetAdditional'] = $this->streetAdditional;
+        }
+        if ($this->phone !== '') {
+            $data['phone'] = $this->phone;
+        }
+        if ($this->organizationName !== '') {
+            $data['organizationName'] = $this->organizationName;
+        }
+
+        return $data;
     }
 }

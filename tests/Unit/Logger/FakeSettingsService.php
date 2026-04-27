@@ -44,6 +44,7 @@ final class FakeSettingsService extends AbstractSettingsService
         // TODO: Implement getPaypalExpressSettings() method.
     }
 
+
     public function getEnvironmentSettings(): EnvironmentSettings
     {
         // TODO: Implement getEnvironmentSettings() method.

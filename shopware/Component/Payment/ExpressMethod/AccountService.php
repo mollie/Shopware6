@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ExpressMethod;
 
 use Mollie\Shopware\Component\Mollie\Address;
-use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
@@ -16,7 +15,6 @@ use Shopware\Core\Checkout\Customer\SalesChannel\AccountService as ShopwareAccou
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
@@ -46,7 +44,6 @@ final class AccountService extends AbstractAccountService
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
      * @param EntityRepository<SalutationCollection<SalutationEntity>> $salutationRepository
-     * @param EntityRepository<CustomerAddressCollection<CustomerAddressEntity>> $customerAddressRepository
      */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
@@ -55,8 +52,6 @@ final class AccountService extends AbstractAccountService
         private EntityRepository $countryRepository,
         #[Autowire(service: 'salutation.repository')]
         private EntityRepository $salutationRepository,
-        #[Autowire(service: 'customer_address.repository')]
-        private EntityRepository $customerAddressRepository,
         #[Autowire(service: RegisterRoute::class)]
         private AbstractRegisterRoute $registerRoute,
         private ShopwareAccountService $accountService,
@@ -64,6 +59,7 @@ final class AccountService extends AbstractAccountService
         private AbstractContextSwitchRoute $contextSwitchRoute,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
+        private AddressSynchronizer $addressSynchronizer,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -97,7 +93,7 @@ final class AccountService extends AbstractAccountService
                 $logData['customerNumber'] = $customer->getCustomerNumber();
                 $this->logger->debug('Customer was found by email', $logData);
                 $this->accountService->loginById($customer->getId(), $salesChannelContext);
-                $requestDataBag = $this->createOrReuseAddresses($requestDataBag,$customer,$billingAddress,$shippingAddress,$salesChannelContext);
+                $this->addressSynchronizer->syncAddresses($customer, $shippingAddress, $billingAddress, $salesChannelContext);
             } catch (\Throwable $e) {
                 $customer = $this->createNewGuestAccount($billingAddress, $shippingAddress, $salesChannelContext);
                 $logData['customerId'] = $customer->getId();
@@ -282,19 +278,4 @@ final class AccountService extends AbstractAccountService
         return $resultArray[0];
     }
 
-    private function createOrReuseAddresses(RequestDataBag $requestDataBag, CustomerEntity $customer, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): RequestDataBag
-    {
-        $mollieAddressIds[] = $billingAddress->getId();
-        $mollieAddressIds[] = $shippingAddress->getId();
-        $mollieAddressIds = array_unique($mollieAddressIds);
-
-        $criteria = new Criteria();
-        $criteria->addFilter(new AndFilter([
-            new EqualsFilter('customerId', $customer->getId()),
-            new EqualsAnyFilter('customFields.' . Mollie::EXTENSION . '.' . Address::CUSTOM_FIELDS_KEY, $mollieAddressIds),
-        ]));
-        $addressSearchResult = $this->customerAddressRepository->search($criteria, $salesChannelContext->getContext());
-
-        return $requestDataBag;
-    }
 }
