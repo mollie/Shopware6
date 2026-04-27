@@ -68,7 +68,7 @@
     "require": {
         "php": ">=8.2",
         "ext-curl": "*",
-        "shopware/core": ">=6.6.10.0 <6.8",
+        "shopware/core": ">=6.5.8.0 <6.8",
         "ext-mbstring": "*"
     },
     "require-dev": {
