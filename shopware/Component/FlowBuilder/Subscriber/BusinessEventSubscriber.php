@@ -10,12 +10,13 @@ use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
+use Shopware\Core\Framework\Event\FlowEventAware;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class BusinessEventSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var class-string<Shopware\Core\Framework\Event\FlowEventAware>[]|class-string[]
+     * @var class-string<FlowEventAware>[]
      */
     private array $flowEventList = [
         SuccessEvent::class,
