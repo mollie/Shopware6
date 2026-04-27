@@ -10,7 +10,6 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Cart\Error\InvalidGuestAccountError;
 use Mollie\Shopware\Component\Subscription\Cart\Error\InvalidPaymentMethodError;
-use Mollie\Shopware\Component\Subscription\Cart\Error\MixedCartBlockError;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartValidatorInterface;
@@ -61,9 +60,10 @@ class SubscriptionCartValidator implements CartValidatorInterface
             return;
         }
 
-        if ($this->lineItemAnalyzer->hasMixedLineItems($lineItems)) {
-            $errors->add(new MixedCartBlockError());
-        }
+        // Mixed carts (subscription + one-off + vouchers) are now allowed — the
+        // single-subscription cart lock (MixedCartBlockError) was removed in beta.3.
+        // The payment-method capability check below stays: a cart that contains any
+        // subscription product still requires a subscription-aware payment method.
 
         if (! $paymentMethodHandler instanceof SubscriptionAwareInterface) {
             $errors->add(new InvalidPaymentMethodError());
@@ -76,7 +76,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
 
         foreach ($cart->getErrors() as $error) {
             if (! $error instanceof InvalidGuestAccountError
-                && ! $error instanceof MixedCartBlockError
                 && ! $error instanceof InvalidPaymentMethodError) {
                 $list->add($error);
             }
