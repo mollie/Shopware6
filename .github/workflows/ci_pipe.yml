@@ -24,7 +24,7 @@ jobs:
     name: Review Pipeline
     uses: ./.github/workflows/step_review.yml
     with:
-      PHP_VERSION: 8.0
+      PHP_VERSION: 8.2
 
   # ------------------------------------------------------------------------------------------------------------------------
 
@@ -57,31 +57,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.7.9.0'
-            php: '8.3'
-            image: 'dockware/shopware'
-          - shopware: '6.7.7.1'
-            php: '8.3'
-            image: 'dockware/shopware'
-          - shopware: '6.7.6.2'
-            php: '8.3'
+          - shopware: '6.7.9.1'
+            php: '8.2'
             image: 'dockware/shopware'
           - shopware: '6.7.5.1'
-            php: '8.3'
+            php: '8.2'
             image: 'dockware/shopware'
-          - shopware: '6.6.10.5'
-            php: '8.3'
-            image: 'dockware/play'
-          - shopware: '6.6.9.0'
+          - shopware: '6.7.0.1'
+            php: '8.2'
+            image: 'dockware/shopware'
+          - shopware: '6.6.10.16'
             php: '8.2'
             image: 'dockware/play'
-          - shopware: '6.5.8.12'
+          - shopware: '6.6.5.1'
             php: '8.2'
             image: 'dockware/play'
-          - shopware: '6.5.6.1'
+          - shopware: '6.6.0.3'
             php: '8.2'
             image: 'dockware/play'
-          - shopware: '6.5.5.2'
+          - shopware: '6.5.8.18'
             php: '8.2'
             image: 'dockware/play'
 
