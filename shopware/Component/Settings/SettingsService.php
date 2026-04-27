@@ -115,7 +115,6 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
-
     public function getEnvironmentSettings(): EnvironmentSettings
     {
         return new EnvironmentSettings($this->devMode, $this->cypressMode);
