@@ -50,7 +50,7 @@ final class SubscriptionContext extends ShopwareContext
 
         $subscriptions = $this->getOrderSubscriptions($orderId, $context);
 
-        Assert::assertGreaterThan(0, $subscriptions->count(), sprintf('No subscriptions found for order %s', $orderId));
+        Assert::assertSame(2, $subscriptions->count(), sprintf('Expected 2 subscriptions for order %s, got %d', $orderId, $subscriptions->count()));
 
         foreach ($subscriptions as $subscription) {
             Assert::assertNotEmpty(
