@@ -14,6 +14,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
@@ -54,6 +55,20 @@ trait CheckoutTestBehaviour
         ]);
 
         return $cartLineItemController->addLineItems($cart, $requestDataBag, $request, $salesChannelContext);
+    }
+
+    public function addPromotionToCart(string $code, SalesChannelContext $salesChannelContext): void
+    {
+        $cartService = $this->getContainer()->get(CartService::class);
+        $cart = $cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+
+        $lineItem = (new LineItem(Uuid::randomHex(), LineItem::PROMOTION_LINE_ITEM_TYPE))
+            ->setReferencedId($code)
+            ->setStackable(false)
+            ->setRemovable(true)
+        ;
+
+        $cartService->add($cart, $lineItem, $salesChannelContext);
     }
 
     public function setPaymentMethod(PaymentMethodEntity $paymentMethod, SalesChannelContext $salesChannelContext): SalesChannelContext

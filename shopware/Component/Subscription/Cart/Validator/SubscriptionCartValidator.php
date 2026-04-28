@@ -11,11 +11,9 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Cart\Error\InvalidGuestAccountError;
 use Mollie\Shopware\Component\Subscription\Cart\Error\InvalidPaymentMethodError;
 use Mollie\Shopware\Component\Subscription\Cart\Error\MixedCartBlockError;
-use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartValidatorInterface;
 use Shopware\Core\Checkout\Cart\Error\ErrorCollection;
-use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -24,8 +22,7 @@ class SubscriptionCartValidator implements CartValidatorInterface
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        private readonly PaymentHandlerLocator $paymentHandlerLocator,
-        private readonly LineItemAnalyzer $lineItemAnalyzer
+        private readonly PaymentHandlerLocator $paymentHandlerLocator
     ) {
     }
 
@@ -53,16 +50,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
 
         if ($customer->getGuest()) {
             $errors->add(new InvalidGuestAccountError());
-        }
-
-        $lineItems = new LineItemCollection($cart->getLineItems()->getFlat());
-
-        if (! $this->lineItemAnalyzer->hasSubscriptionProduct($lineItems)) {
-            return;
-        }
-
-        if ($this->lineItemAnalyzer->hasMixedLineItems($lineItems)) {
-            $errors->add(new MixedCartBlockError());
         }
 
         if (! $paymentMethodHandler instanceof SubscriptionAwareInterface) {

@@ -15,7 +15,10 @@ trait SubscriptionTestBehaviour
 {
     use IntegrationTestBehaviour;
 
-    public function getSubscriptionByOrderId(string $orderId, Context $context): SubscriptionEntity
+    /**
+     * @return SubscriptionCollection<SubscriptionEntity>
+     */
+    public function getOrderSubscriptions(string $orderId, Context $context): SubscriptionCollection
     {
         /** @var EntityRepository<SubscriptionCollection<SubscriptionEntity>> $repository */
         $repository = $this->getContainer()->get('mollie_subscription.repository');
@@ -24,6 +27,7 @@ trait SubscriptionTestBehaviour
 
         $criteria->addFilter(new EqualsFilter('orderId', $orderId));
 
-        return $repository->search($criteria, $context)->first();
+        /** @var SubscriptionCollection<SubscriptionEntity> $entities */
+        return $repository->search($criteria, $context)->getEntities();
     }
 }
