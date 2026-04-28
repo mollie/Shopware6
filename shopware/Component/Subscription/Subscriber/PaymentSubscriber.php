@@ -72,10 +72,9 @@ final class PaymentSubscriber implements EventSubscriberInterface
         if ($lineItems === null) {
             return;
         }
-        /** @var ?OrderLineItemEntity $firstSubscriptionProduct */
-        $firstSubscriptionProduct = $this->lineItemAnalyzer->getFirstSubscriptionProduct($lineItems);
 
-        if ($firstSubscriptionProduct === null) {
+        $subscriptionLineItems = $this->lineItemAnalyzer->getSubscriptionLineItems($lineItems);
+        if (count($subscriptionLineItems) === 0) {
             return;
         }
 
@@ -84,18 +83,30 @@ final class PaymentSubscriber implements EventSubscriberInterface
         ];
         $shippingAddress = $transactionData->getShippingOrderAddress();
         $billingAddress = $transactionData->getBillingOrderAddress();
-        $subscriptionData = $this->getSubscriptionData($order, $firstSubscriptionProduct, $transactionData->getCustomer());
-        $subscriptionData['billingAddress'] = $this->getAddressData($billingAddress, $subscriptionData['id']);
-        $subscriptionData['shippingAddress'] = $this->getAddressData($shippingAddress, $subscriptionData['id']);
 
-        $subscriptionData['historyEntries'][] = [
-            'statusFrom' => '',
-            'statusTo' => SubscriptionStatus::PENDING->value,
-            'comment' => 'created'
-        ];
+        $subscriptionsData = [];
+        foreach ($subscriptionLineItems as $index => $subscriptionLineItem) {
+            /** @var OrderLineItemEntity $subscriptionLineItem */
+            $subscriptionData = $this->getSubscriptionData($order, $subscriptionLineItem, $transactionData->getCustomer());
+            $subscriptionData['billingAddress'] = $this->getAddressData($billingAddress, $subscriptionData['id']);
+            $subscriptionData['shippingAddress'] = $this->getAddressData($shippingAddress, $subscriptionData['id']);
 
-        $this->logger->info('Pending subscription created', $logData);
-        $this->subscriptionRepository->upsert([$subscriptionData], $context);
+            $subscriptionData['historyEntries'][] = [
+                'statusFrom' => '',
+                'statusTo' => SubscriptionStatus::PENDING->value,
+                'comment' => 'created'
+            ];
+
+            if ($index > 0) {
+                unset($subscriptionData['order']);
+            }
+
+            $subscriptionsData[] = $subscriptionData;
+        }
+
+        $logData['count'] = count($subscriptionsData);
+        $this->logger->info('Pending subscriptions created', $logData);
+        $this->subscriptionRepository->upsert($subscriptionsData, $context);
     }
 
     /**
@@ -104,6 +115,13 @@ final class PaymentSubscriber implements EventSubscriberInterface
     private function getSubscriptionData(OrderEntity $order, OrderLineItemEntity $lineItem, CustomerEntity $customer): array
     {
         $description = 'Order #' . $order->getOrderNumber();
+
+        /** @var ?Product $productExtension */
+        $productExtension = $lineItem->getExtension(Mollie::EXTENSION);
+        if ($productExtension instanceof Product) {
+            $description .= ' (' . $productExtension->getInterval() . ')';
+        }
+
         $totalRoundingValue = null;
         $totalRounding = $order->getTotalRounding();
         if ($totalRounding instanceof CashRoundingConfig) {
