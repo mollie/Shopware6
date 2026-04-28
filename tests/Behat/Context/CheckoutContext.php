@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Behat\Context;
 
+use Behat\Hook\BeforeScenario;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
@@ -30,9 +31,7 @@ final class CheckoutContext extends ShopwareContext
     public const STORAGE_ORDER_ID = 'orderId';
     public const STORAGE_RETURN_URL = 'shopwareReturnUrl';
 
-    /**
-     * @BeforeScenario
-     */
+    #[BeforeScenario]
     public function setUp(): void
     {
     }
