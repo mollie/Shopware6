@@ -7,8 +7,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItemFactoryRegistry;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
-use Shopware\Core\Checkout\CheckoutPermissions;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
+use Shopware\Core\Checkout\CheckoutPermissions;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -31,46 +31,12 @@ final class SubscriptionAmountCalculator implements SubscriptionAmountCalculator
 
     public function calculateGroupAmount(OrderEntity $order, string $intervalKey, Context $context): float
     {
-        $orderLineItems = $order->getLineItems();
-        if (! $orderLineItems instanceof OrderLineItemCollection) {
+        $groupCart = $this->buildGroupCart($order, $intervalKey, $context);
+        if ($groupCart === null) {
             return $order->getAmountTotal();
         }
 
-        $groups = $this->lineItemAnalyzer->groupSubscriptionLineItemsByInterval($orderLineItems);
-        $groupLineItems = $groups[$intervalKey] ?? [];
-
-        if (count($groupLineItems) === 0) {
-            return $order->getAmountTotal();
-        }
-
-        $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context, [
-            SalesChannelContextService::PERMISSIONS => [
-                CheckoutPermissions::SKIP_CART_PERSISTENCE => true,
-            ],
-        ]);
-
-        $cartToken = Uuid::randomHex();
-        $cart = $this->cartService->createNew($cartToken);
-
-        $cartLineItems = [];
-        foreach ($groupLineItems as $orderLineItem) {
-            $productId = $orderLineItem->getProductId();
-            if ($productId === null) {
-                continue;
-            }
-            $cartLineItems[] = $this->lineItemFactoryRegistry->create([
-                'id' => $productId,
-                'referencedId' => $productId,
-                'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
-                'quantity' => $orderLineItem->getQuantity(),
-            ], $salesChannelContext);
-        }
-
-        if (count($cartLineItems) === 0) {
-            return $order->getAmountTotal();
-        }
-
-        $cart = $this->cartService->add($cart, $cartLineItems, $salesChannelContext);
+        $cart = $groupCart->getCart();
 
         // CartPrice::getTotalPrice() is always the gross amount the customer pays — even for
         // TAX_STATE_FREE carts, where AmountCalculator::calculateNetDeliveryAmount sets
@@ -92,5 +58,65 @@ final class SubscriptionAmountCalculator implements SubscriptionAmountCalculator
         ]);
 
         return $total;
+    }
+
+    public function buildGroupCart(
+        OrderEntity $order,
+        string $intervalKey,
+        Context $context,
+        ?string $billingAddressId = null,
+        ?string $shippingAddressId = null
+    ): ?SubscriptionGroupCart {
+        $orderLineItems = $order->getLineItems();
+        if (! $orderLineItems instanceof OrderLineItemCollection) {
+            return null;
+        }
+
+        $groups = $this->lineItemAnalyzer->groupSubscriptionLineItemsByInterval($orderLineItems);
+        $groupLineItems = $groups[$intervalKey] ?? [];
+
+        if (count($groupLineItems) === 0) {
+            return null;
+        }
+
+        $overrideOptions = [
+            SalesChannelContextService::PERMISSIONS => [
+                CheckoutPermissions::SKIP_CART_PERSISTENCE => true,
+            ],
+        ];
+
+        if ($billingAddressId !== null) {
+            $overrideOptions[SalesChannelContextService::BILLING_ADDRESS_ID] = $billingAddressId;
+        }
+        if ($shippingAddressId !== null) {
+            $overrideOptions[SalesChannelContextService::SHIPPING_ADDRESS_ID] = $shippingAddressId;
+        }
+
+        $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context, $overrideOptions);
+
+        $cartToken = Uuid::randomHex();
+        $cart = $this->cartService->createNew($cartToken);
+
+        $cartLineItems = [];
+        foreach ($groupLineItems as $orderLineItem) {
+            $productId = $orderLineItem->getReferencedId();
+            if ($productId === null || $productId === '') {
+                continue;
+            }
+            $cartLineItems[] = $this->lineItemFactoryRegistry->create([
+                'id' => $productId,
+                'referencedId' => $productId,
+                'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
+                'quantity' => $orderLineItem->getQuantity(),
+            ], $salesChannelContext);
+        }
+
+        if (count($cartLineItems) === 0) {
+            return null;
+        }
+
+        $cart = $this->cartService->add($cart, $cartLineItems, $salesChannelContext);
+
+        return new SubscriptionGroupCart($cart, $salesChannelContext);
     }
 }

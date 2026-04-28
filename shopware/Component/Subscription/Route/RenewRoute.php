@@ -13,20 +13,30 @@ use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute as PaymentWebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Component\Subscription\CopyOrderService;
-use Mollie\Shopware\Component\Subscription\CopyOrderServiceInterface;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionEndedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
+use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncer;
+use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncerInterface;
+use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculator;
+use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculatorInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataService;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataServiceInterface;
+use Mollie\Shopware\Component\Subscription\SubscriptionTag;
+use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderCollection;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
+use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -38,16 +48,23 @@ final class RenewRoute extends AbstractRenewRoute
 {
     /**
      * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
+     * @param EntityRepository<OrderCollection<OrderEntity>> $orderRepository
      */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: 'mollie_subscription.repository')]
         private readonly EntityRepository $subscriptionRepository,
+        #[Autowire(service: 'order.repository')]
+        private readonly EntityRepository $orderRepository,
         #[Autowire(service: SubscriptionDataService::class)]
         private readonly SubscriptionDataServiceInterface $subscriptionDataService,
-        #[Autowire(service: CopyOrderService::class)]
-        private readonly CopyOrderServiceInterface $copyOrderService,
+        #[Autowire(service: SubscriptionAmountCalculator::class)]
+        private readonly SubscriptionAmountCalculatorInterface $amountCalculator,
+        #[Autowire(service: SubscriptionAddressSyncer::class)]
+        private readonly SubscriptionAddressSyncerInterface $addressSyncer,
+        #[Autowire(service: CartOrderRoute::class)]
+        private readonly AbstractCartOrderRoute $cartOrderRoute,
         #[Autowire(service: SubscriptionGateway::class)]
         private readonly SubscriptionGatewayInterface $subscriptionGateway,
         #[Autowire(service: MollieGateway::class)]
@@ -144,7 +161,47 @@ final class RenewRoute extends AbstractRenewRoute
             $shopwareSubscriptionStatus = SubscriptionStatus::RESUMED;
         }
 
-        $transaction = $this->copyOrderService->copy($subscriptionData,$molliePayment,$context);
+        $intervalKey = (string) $subscriptionEntity->getMetadata()->getInterval();
+        $addresses = $this->addressSyncer->syncFromSubscription($subscriptionEntity, $context);
+        $groupCart = $this->amountCalculator->buildGroupCart(
+            $order,
+            $intervalKey,
+            $context,
+            $addresses['billingAddressId'],
+            $addresses['shippingAddressId']
+        );
+        if ($groupCart === null) {
+            $this->logger->error('Failed to build renewal cart for subscription group', $logData);
+            throw RenewException::invalidPaymentId($subscriptionId, $molliePaymentId);
+        }
+
+        $orderResponse = $this->cartOrderRoute->order(
+            $groupCart->getCart(),
+            $groupCart->getSalesChannelContext(),
+            (new DataBag())->toRequestDataBag()
+        );
+        $newOrder = $orderResponse->getOrder();
+
+        $transaction = $newOrder->getTransactions()?->first();
+        if (! $transaction instanceof OrderTransactionEntity) {
+            $this->logger->error('Renewal order has no transaction', $logData);
+            throw RenewException::invalidPaymentId($subscriptionId, $molliePaymentId);
+        }
+
+        $this->orderRepository->upsert([[
+            'id' => $newOrder->getId(),
+            'tags' => [
+                ['id' => SubscriptionTag::ID]
+            ],
+            'transactions' => [[
+                'id' => $transaction->getId(),
+                'customFields' => [
+                    Mollie::EXTENSION => $molliePayment->toArray(),
+                ],
+            ]],
+        ]], $context);
+
+        $molliePayment->setShopwareTransaction($transaction);
 
         $today = new \DateTime();
         $nextPaymentDate = $subscription->getNextPaymentDate() ?? $today;
