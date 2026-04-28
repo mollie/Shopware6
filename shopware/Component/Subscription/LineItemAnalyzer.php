@@ -43,6 +43,25 @@ final class LineItemAnalyzer
 
     /**
      * @param LineItemCollection|OrderLineItemCollection $lineItems
+     *
+     * @return array<LineItem|OrderLineItemEntity>
+     */
+    public function getSubscriptionLineItems(Collection $lineItems): array
+    {
+        $result = [];
+        foreach ($lineItems as $lineItem) {
+            /** @var ?Product $extension */
+            $extension = $lineItem->getExtension(Mollie::EXTENSION);
+            if ($extension instanceof Product && $extension->isSubscription() === true) {
+                $result[] = $lineItem;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param LineItemCollection|OrderLineItemCollection $lineItems
      */
     public function hasMixedLineItems(Collection $lineItems): bool
     {

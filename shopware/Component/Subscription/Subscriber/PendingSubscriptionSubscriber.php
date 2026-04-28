@@ -63,47 +63,52 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
     public function onCancelledWebhook(WebhookStatusCancelledEvent $event): void
     {
         $order = $event->getOrder();
-
-        $subscriptionEntity = $this->getSubscription($order);
-        if (! $subscriptionEntity instanceof SubscriptionEntity) {
+        $subscriptions = $this->getSubscriptions($order);
+        if (! $subscriptions instanceof SubscriptionCollection) {
             return;
         }
-
-        $subscriptionId = $subscriptionEntity->getId();
-        $subscriptionStatus = $subscriptionEntity->getStatus();
-        $orderNumber = (string) $order->getOrderNumber();
 
         $logData = [
-            'orderNumber' => $orderNumber,
-            'subscriptionId' => $subscriptionId,
-            'subscriptionStatus' => $subscriptionStatus
+            'orderNumber' => (string) $order->getOrderNumber(),
         ];
+        $context = $event->getContext();
+        $updates = [];
 
-        $this->logger->info('Payment was cancelled, cancel subscription', $logData);
+        foreach ($subscriptions as $subscriptionEntity) {
+            $subscriptionId = $subscriptionEntity->getId();
+            $subscriptionStatus = $subscriptionEntity->getStatus();
 
-        if ($subscriptionStatus !== SubscriptionStatus::PENDING->value) {
-            $this->logger->warning('Subscription is not pending, nothing to do', $logData);
+            $logData['subscriptionId'] = $subscriptionId;
+            $logData['subscriptionStatus'] = $subscriptionStatus;
 
+            $this->logger->info('Payment was cancelled, cancel subscription', $logData);
+
+            if ($subscriptionStatus !== SubscriptionStatus::PENDING->value) {
+                $this->logger->warning('Subscription is not pending, nothing to do', $logData);
+
+                continue;
+            }
+
+            $newSubscriptionStatus = SubscriptionStatus::CANCELED->value;
+            $updates[] = [
+                'id' => $subscriptionId,
+                'status' => $newSubscriptionStatus,
+                'canceledAt' => (new \DateTime())->format('Y-m-d H:i:s'),
+                'historyEntries' => [
+                    [
+                        'statusFrom' => $subscriptionStatus,
+                        'statusTo' => $newSubscriptionStatus,
+                        'comment' => 'canceled'
+                    ]
+                ]
+            ];
+        }
+
+        if (count($updates) === 0) {
             return;
         }
 
-        $newSubscriptionStatus = SubscriptionStatus::CANCELED->value;
-        $subscriptionData = [
-            'id' => $subscriptionId,
-            'status' => $newSubscriptionStatus,
-            'canceledAt' => (new \DateTime())->format('Y-m-d H:i:s'),
-            'historyEntries' => [
-                [
-                    'statusFrom' => $subscriptionStatus,
-                    'statusTo' => $newSubscriptionStatus,
-                    'comment' => 'canceled'
-                ]
-            ]
-        ];
-
-        $context = $event->getContext();
-
-        $this->subscriptionRepository->upsert([$subscriptionData], $context);
+        $this->subscriptionRepository->upsert($updates, $context);
     }
 
     public function onPaidWebhook(WebhookStatusPaidEvent $event): void
@@ -111,31 +116,21 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
         $order = $event->getOrder();
         $payment = $event->getPayment();
 
-        $subscriptionEntity = $this->getSubscription($order);
-        if (! $subscriptionEntity instanceof SubscriptionEntity) {
+        $subscriptions = $this->getSubscriptions($order);
+        if (! $subscriptions instanceof SubscriptionCollection) {
             return;
         }
 
-        $subscriptionId = $subscriptionEntity->getId();
-        $subscriptionStatus = $subscriptionEntity->getStatus();
-        $orderNumber = (string) $order->getOrderNumber();
+        $pendingSubscriptions = $subscriptions->filterByStatus(SubscriptionStatus::PENDING->value);
+        if ($pendingSubscriptions->count() === 0) {
+            return;
+        }
 
         $logData = [
-            'orderNumber' => $orderNumber,
-            'subscriptionId' => $subscriptionId,
-            'subscriptionStatus' => $subscriptionStatus
+            'orderNumber' => (string) $order->getOrderNumber(),
         ];
 
-        $this->logger->info('Start finalize subscription', $logData);
-
-        if ($subscriptionStatus !== SubscriptionStatus::PENDING->value) {
-            $this->logger->warning('Subscription is not pending, nothing to do', $logData);
-
-            return;
-        }
-
         $mollieCustomerId = $payment->getCustomerId();
-
         if ($mollieCustomerId === null) {
             $this->logger->error('Failed to get mollie customer id from payment', $logData);
             throw new \Exception('Failed to get mollie customer id');
@@ -154,42 +149,58 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
         }
 
         $mandateId = $payment->getMandateId();
-
         if ($mandateId === null) {
             $this->logger->error('Failed to get mollie mandate id from payment', $logData);
             throw new \Exception('Failed to get mollie mandate id');
         }
 
         $context = $event->getContext();
-        $subscription = $this->createSubscription($subscriptionEntity, $order, $currency, $mandateId, $logData, $mollieCustomerId, $context);
-        $nextPaymentDate = $subscription->getNextPaymentDate();
-        if (! $nextPaymentDate instanceof \DateTimeInterface) {
-            $this->logger->error('Subscription created without next payment date', $logData);
-            throw new \Exception('Subscription created without next payment date');
-        }
-        $newSubscriptionStatus = $subscription->getStatus()->value;
+        $startedEvents = [];
+        $updates = [];
 
-        $subscriptionData = [
-            'id' => $subscriptionId,
-            'status' => $subscription->getStatus()->value,
-            'mollieId' => $subscription->getId(),
-            'mollieCustomerId' => $mollieCustomerId,
-            'mandateId' => $mandateId,
-            'nextPaymentAt' => $nextPaymentDate->format('Y-m-d'),
-            'canceledAt' => null,
-            'historyEntries' => [
-                [
-                    'statusFrom' => $subscriptionStatus,
-                    'statusTo' => $newSubscriptionStatus,
-                    'mollieId' => $subscription->getId(),
-                    'comment' => 'confirmed'
+        foreach ($pendingSubscriptions as $subscriptionEntity) {
+            $subscriptionId = $subscriptionEntity->getId();
+            $subscriptionStatus = $subscriptionEntity->getStatus();
+
+            $logData['subscriptionId'] = $subscriptionId;
+            $logData['subscriptionStatus'] = $subscriptionStatus;
+
+            $this->logger->info('Start finalize subscription', $logData);
+
+            $subscription = $this->createSubscription($subscriptionEntity, $order, $currency, $mandateId, $logData, $mollieCustomerId, $context);
+            $nextPaymentDate = $subscription->getNextPaymentDate();
+            if (! $nextPaymentDate instanceof \DateTimeInterface) {
+                $this->logger->error('Subscription created without next payment date', $logData);
+                throw new \Exception('Subscription created without next payment date');
+            }
+            $newSubscriptionStatus = $subscription->getStatus()->value;
+
+            $updates[] = [
+                'id' => $subscriptionId,
+                'status' => $newSubscriptionStatus,
+                'mollieId' => $subscription->getId(),
+                'mollieCustomerId' => $mollieCustomerId,
+                'mandateId' => $mandateId,
+                'nextPaymentAt' => $nextPaymentDate->format('Y-m-d'),
+                'canceledAt' => null,
+                'historyEntries' => [
+                    [
+                        'statusFrom' => $subscriptionStatus,
+                        'statusTo' => $newSubscriptionStatus,
+                        'mollieId' => $subscription->getId(),
+                        'comment' => 'confirmed'
+                    ]
                 ]
-            ]
-        ];
+            ];
 
-        $this->subscriptionRepository->upsert([$subscriptionData], $context);
-        $startedEvent = new SubscriptionStartedEvent($subscriptionEntity, $customer, $context);
-        $this->eventDispatcher->dispatch($startedEvent);
+            $startedEvents[] = new SubscriptionStartedEvent($subscriptionEntity, $customer, $context);
+        }
+
+        $this->subscriptionRepository->upsert($updates, $context);
+
+        foreach ($startedEvents as $startedEvent) {
+            $this->eventDispatcher->dispatch($startedEvent);
+        }
     }
 
     /**
@@ -232,7 +243,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
         return $this->subscriptionGateway->createSubscription($createSubscription, $mollieCustomerId, $orderNumber, $salesChannelId);
     }
 
-    private function getSubscription(OrderEntity $order): ?SubscriptionEntity
+    private function getSubscriptions(OrderEntity $order): ?SubscriptionCollection
     {
         $salesChannelId = $order->getSalesChannelId();
         $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
@@ -245,6 +256,6 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
             return null;
         }
 
-        return $subscriptionCollection->first();
+        return $subscriptionCollection;
     }
 }
