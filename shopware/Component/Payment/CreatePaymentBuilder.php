@@ -26,6 +26,7 @@ use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Entity\Customer\Customer as CustomerExtension;
 use Mollie\Shopware\Mollie;
@@ -50,7 +51,8 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
         private AbstractSettingsService $settingsService,
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
-        private LineItemAnalyzer $lineItemAnalyzer,
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: 'customer.repository')]
         private EntityRepository $customerRepository,
         #[Autowire(service: 'monolog.logger.mollie')]

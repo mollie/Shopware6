@@ -59,6 +59,7 @@ final class TransactionService implements TransactionServiceInterface
         $criteria->addAssociation('order.lineItems.product.media');
         $criteria->addAssociation('order.stateMachineState.stateMachine');
         $criteria->addAssociation('order.mollieSubscriptions');
+        $criteria->addAssociation('order.transactions');
         $criteria->addAssociation('paymentMethod');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);

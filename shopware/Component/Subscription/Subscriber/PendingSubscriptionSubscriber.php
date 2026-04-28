@@ -167,7 +167,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
 
             $this->logger->info('Start finalize subscription', $logData);
 
-            $subscription = $this->createSubscription($subscriptionEntity, $order, $currency, $mandateId, $logData, $mollieCustomerId, $context);
+            $subscription = $this->createSubscription($subscriptionEntity, $currency, $mandateId, $logData, $mollieCustomerId, $context);
             $nextPaymentDate = $subscription->getNextPaymentDate();
             if (! $nextPaymentDate instanceof \DateTimeInterface) {
                 $this->logger->error('Subscription created without next payment date', $logData);
@@ -206,7 +206,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
     /**
      * @param array<mixed> $logData
      */
-    private function createSubscription(SubscriptionEntity $subscriptionEntity, OrderEntity $order, CurrencyEntity $currency, string $mandateId, array $logData, string $mollieCustomerId, Context $context): Subscription
+    private function createSubscription(SubscriptionEntity $subscriptionEntity, CurrencyEntity $currency, string $mandateId, array $logData, string $mollieCustomerId, Context $context): Subscription
     {
         $metaData = $subscriptionEntity->getMetadata();
         $subscriptionId = $subscriptionEntity->getId();
@@ -214,7 +214,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
         $createSubscription = new CreateSubscription(
             $subscriptionEntity->getDescription(),
             $metaData->getInterval(),
-            new Money($order->getAmountTotal(), $currency->getIsoCode())
+            new Money($subscriptionEntity->getAmount(), $currency->getIsoCode())
         );
 
         $createSubscription->setWebhookUrl($this->routeBuilder->getSubscriptionWebhookUrl($subscriptionId));
@@ -230,8 +230,8 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
             $createSubscription->setTimes($repetition);
         }
 
-        $orderNumber = (string) $order->getOrderNumber();
-        $salesChannelId = $order->getSalesChannelId();
+        $orderNumber = $logData['orderNumber'] ?? '';
+        $salesChannelId = (string) $subscriptionEntity->getSalesChannelId();
 
         /** @var ModifyCreateSubscriptionPayloadEvent $event */
         $event = $this->eventDispatcher->dispatch(new ModifyCreateSubscriptionPayloadEvent($createSubscription, $context));
@@ -240,7 +240,7 @@ final class PendingSubscriptionSubscriber implements EventSubscriberInterface
 
         $this->logger->info('Send create subscription payload to mollie API', $logData);
 
-        return $this->subscriptionGateway->createSubscription($createSubscription, $mollieCustomerId, $orderNumber, $salesChannelId);
+        return $this->subscriptionGateway->createSubscription($createSubscription, $mollieCustomerId, (string) $orderNumber, $salesChannelId);
     }
 
     private function getSubscriptions(OrderEntity $order): ?SubscriptionCollection

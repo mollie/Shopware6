@@ -64,7 +64,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('customFields.' . Mollie::EXTENSION . '.id', $molliePaymentId));
-        $criteria->addFilter(new EqualsFilter('order.customFields.' . Mollie::EXTENSION . '.swSubscriptionId', $subscriptionId));
+        $criteria->addFilter(new EqualsFilter('order.mollieSubscriptions.id', $subscriptionId));
 
         $searchIdResult = $this->transactionRepository->searchIds($criteria, $context);
         $transactionId = $searchIdResult->firstId();

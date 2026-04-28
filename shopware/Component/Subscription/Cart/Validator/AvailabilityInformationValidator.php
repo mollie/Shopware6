@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Cart\Error\PaymentMethodAvailabilityNotice;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartValidatorInterface;
 use Shopware\Core\Checkout\Cart\Error\ErrorCollection;
@@ -20,7 +21,8 @@ class AvailabilityInformationValidator implements CartValidatorInterface
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        private readonly LineItemAnalyzer $lineItemAnalyzer
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private readonly LineItemAnalyzerInterface $lineItemAnalyzer
     ) {
     }
 

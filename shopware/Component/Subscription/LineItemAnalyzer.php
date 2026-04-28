@@ -13,7 +13,7 @@ use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Framework\Struct\Collection;
 use Shopware\Core\Framework\Struct\Struct;
 
-final class LineItemAnalyzer
+final class LineItemAnalyzer implements LineItemAnalyzerInterface
 {
     /**
      * @param LineItemCollection|OrderLineItemCollection $lineItems
@@ -58,6 +58,34 @@ final class LineItemAnalyzer
         }
 
         return $result;
+    }
+
+    /**
+     * @param LineItemCollection|OrderLineItemCollection $lineItems
+     *
+     * @return array<string, array<LineItem|OrderLineItemEntity>>
+     */
+    public function groupSubscriptionLineItemsByInterval(Collection $lineItems): array
+    {
+        $groups = [];
+        foreach ($lineItems as $lineItem) {
+            /** @var ?Product $extension */
+            $extension = $lineItem->getExtension(Mollie::EXTENSION);
+            if (! $extension instanceof Product) {
+                continue;
+            }
+            if ($extension->isSubscription() !== true) {
+                continue;
+            }
+
+            $key = (string) $extension->getInterval();
+            if (! isset($groups[$key])) {
+                $groups[$key] = [];
+            }
+            $groups[$key][] = $lineItem;
+        }
+
+        return $groups;
     }
 
     /**
