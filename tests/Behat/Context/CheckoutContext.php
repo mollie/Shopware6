@@ -150,6 +150,34 @@ final class CheckoutContext extends ShopwareContext
         Assert::assertSame($expectedPaymentStatus, $actualOrderState);
     }
 
+    #[Then('order total is :arg1')]
+    public function orderTotalIs(string $expectedTotal): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        Assert::assertSame((float) $expectedTotal, $order->getAmountTotal(), sprintf('Order %s total mismatch', $orderId));
+    }
+
+    #[Then('the order shipping country is :arg1')]
+    public function theOrderShippingCountryIs(string $expectedIsoCode): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        /** @var ?OrderDeliveryEntity $delivery */
+        $delivery = $order->getDeliveries()?->first();
+        Assert::assertNotNull($delivery, sprintf('Order %s has no delivery', $orderId));
+
+        $shippingAddress = $delivery->getShippingOrderAddress();
+        Assert::assertNotNull($shippingAddress, sprintf('Order %s delivery has no shipping address', $orderId));
+
+        $country = $shippingAddress->getCountry();
+        Assert::assertNotNull($country, sprintf('Order %s shipping address has no country', $orderId));
+
+        Assert::assertSame($expectedIsoCode, $country->getIso(), sprintf('Order %s shipping country mismatch', $orderId));
+    }
+
     #[Then('i remember the mollie payment id')]
     public function iRememberTheMolliePaymentId(): void
     {
