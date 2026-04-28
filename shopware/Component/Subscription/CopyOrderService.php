@@ -42,7 +42,6 @@ final class CopyOrderService implements CopyOrderServiceInterface
     public function copy(SubscriptionDataStruct $subscriptionData, Payment $payment, Context $context): OrderTransactionEntity
     {
         $order = $subscriptionData->getOrder();
-        $subscriptionId = $subscriptionData->getSubscription()->getId();
         $subscriptionBillingAddress = $subscriptionData->getBillingAddress();
         $subscriptionShippingAddress = $subscriptionData->getShippingAddress();
 
@@ -70,7 +69,7 @@ final class CopyOrderService implements CopyOrderServiceInterface
             throw new OrderWithoutDeliveriesException($newOrder->getId());
         }
 
-        $orderData = $this->getOrderData($subscriptionId, $newOrder, $orderDeliveries, $firstTransaction, $subscriptionBillingAddress, $subscriptionShippingAddress, $payment);
+        $orderData = $this->getOrderData($newOrder, $orderDeliveries, $firstTransaction, $subscriptionBillingAddress, $subscriptionShippingAddress, $payment);
 
         $this->orderRepository->upsert([$orderData], $context);
 
@@ -122,7 +121,7 @@ final class CopyOrderService implements CopyOrderServiceInterface
     /**
      * @return array<mixed>
      */
-    private function getOrderData(string $subscriptionId, OrderEntity $newOrder, OrderDeliveryCollection $deliveryCollection, OrderTransactionEntity $firstTransaction, SubscriptionAddressEntity $subscriptionBillingAddress, SubscriptionAddressEntity $subscriptionShippingAddress, Payment $molliePayment): array
+    private function getOrderData(OrderEntity $newOrder, OrderDeliveryCollection $deliveryCollection, OrderTransactionEntity $firstTransaction, SubscriptionAddressEntity $subscriptionBillingAddress, SubscriptionAddressEntity $subscriptionShippingAddress, Payment $molliePayment): array
     {
         $billingAddress = $this->getAddressData($subscriptionBillingAddress);
         $billingAddress['id'] = $newOrder->getBillingAddressId();
@@ -155,11 +154,6 @@ final class CopyOrderService implements CopyOrderServiceInterface
                     'id' => SubscriptionTag::ID
                 ]
             ],
-            'customFields' => [
-                Mollie::EXTENSION => [
-                    'swSubscriptionId' => $subscriptionId,
-                ]
-            ]
         ];
     }
 

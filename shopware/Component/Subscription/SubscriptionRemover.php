@@ -29,7 +29,8 @@ final class SubscriptionRemover extends AbstractPaymentRemover
         #[Autowire(service: 'order.repository')]
         private EntityRepository $orderRepository,
         private PaymentHandlerLocator $paymentHandlerLocator,
-        private LineItemAnalyzer $lineItemAnalyzer,
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
     ) {
