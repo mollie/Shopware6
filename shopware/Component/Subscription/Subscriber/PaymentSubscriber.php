@@ -10,6 +10,9 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
+use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculator;
+use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculatorInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Entity\Product\Product;
@@ -35,7 +38,10 @@ final class PaymentSubscriber implements EventSubscriberInterface
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        private readonly LineItemAnalyzer $lineItemAnalyzer,
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private readonly LineItemAnalyzerInterface $lineItemAnalyzer,
+        #[Autowire(service: SubscriptionAmountCalculator::class)]
+        private readonly SubscriptionAmountCalculatorInterface $amountCalculator,
         #[Autowire(service: 'mollie_subscription.repository')]
         private readonly EntityRepository $subscriptionRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -73,8 +79,8 @@ final class PaymentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $subscriptionLineItems = $this->lineItemAnalyzer->getSubscriptionLineItems($lineItems);
-        if (count($subscriptionLineItems) === 0) {
+        $subscriptionGroups = $this->lineItemAnalyzer->groupSubscriptionLineItemsByInterval($lineItems);
+        if (count($subscriptionGroups) === 0) {
             return;
         }
 
@@ -85,21 +91,19 @@ final class PaymentSubscriber implements EventSubscriberInterface
         $billingAddress = $transactionData->getBillingOrderAddress();
 
         $subscriptionsData = [];
-        foreach ($subscriptionLineItems as $index => $subscriptionLineItem) {
-            /** @var OrderLineItemEntity $subscriptionLineItem */
-            $subscriptionData = $this->getSubscriptionData($order, $subscriptionLineItem, $transactionData->getCustomer());
+        foreach ($subscriptionGroups as $intervalKey => $groupLineItems) {
+            $primaryLineItem = $groupLineItems[0];
+            /** @var OrderLineItemEntity $primaryLineItem */
+            $subscriptionData = $this->getSubscriptionData($order, $primaryLineItem, $transactionData->getCustomer());
             $subscriptionData['billingAddress'] = $this->getAddressData($billingAddress, $subscriptionData['id']);
             $subscriptionData['shippingAddress'] = $this->getAddressData($shippingAddress, $subscriptionData['id']);
+            $subscriptionData['amount'] = $this->amountCalculator->calculateGroupAmount($order, (string) $intervalKey, $context);
 
             $subscriptionData['historyEntries'][] = [
                 'statusFrom' => '',
                 'statusTo' => SubscriptionStatus::PENDING->value,
                 'comment' => 'created'
             ];
-
-            if ($index > 0) {
-                unset($subscriptionData['order']);
-            }
 
             $subscriptionsData[] = $subscriptionData;
         }
@@ -159,11 +163,6 @@ final class PaymentSubscriber implements EventSubscriberInterface
                         'id' => SubscriptionTag::ID
                     ]
                 ],
-                'customFields' => [
-                    Mollie::EXTENSION => [
-                        'swSubscriptionId' => $subscriptionId
-                    ]
-                ]
             ]
         ];
     }
