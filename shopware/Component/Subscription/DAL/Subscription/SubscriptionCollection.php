@@ -26,6 +26,18 @@ class SubscriptionCollection extends EntityCollection
         return $this->buildFlat($this);
     }
 
+    public function filterByStatus(string $status): self
+    {
+        $filtered = new self();
+        foreach ($this as $subscription) {
+            if ($subscription->getStatus() === $status) {
+                $filtered->add($subscription);
+            }
+        }
+
+        return $filtered;
+    }
+
     protected function getExpectedClass(): string
     {
         return SubscriptionEntity::class;
