@@ -5,11 +5,21 @@ namespace Kiener\MolliePayments\Service;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 class MolliePaymentExtractor
 {
     public const MOLLIE_PAYMENT_HANDLER_NAMESPACE = 'Kiener\MolliePayments\Handler\Method';
+
+    public function isLastTransactionMollie(?OrderEntity $order): bool
+    {
+        if (! $order instanceof OrderEntity) {
+            return false;
+        }
+
+        return $this->extractLastMolliePayment($order->getTransactions()) instanceof OrderTransactionEntity;
+    }
 
     /**
      * method extracts last created transaction if it is a mollie payment transaction.

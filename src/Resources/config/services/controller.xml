@@ -72,6 +72,7 @@
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundService"/>
             <argument type="service" id="monolog.logger.mollie"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -83,6 +84,7 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
             <argument type="service" id="monolog.logger.mollie"/>
+            <argument type="service" id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

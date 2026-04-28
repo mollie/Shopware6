@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 
@@ -67,6 +68,53 @@ class MolliePaymentExtractorTest extends TestCase
         $collection = new OrderTransactionCollection([$transactionTwo, $transactionOne, $transactionThree]);
         $extractor = new MolliePaymentExtractor();
         self::assertNull($extractor->extractLastMolliePayment($collection));
+    }
+
+    public function testIsLastTransactionMollieReturnsFalseForNullOrder(): void
+    {
+        $extractor = new MolliePaymentExtractor();
+        self::assertFalse($extractor->isLastTransactionMollie(null));
+    }
+
+    public function testIsLastTransactionMollieReturnsFalseForOrderWithoutTransactions(): void
+    {
+        $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
+
+        $extractor = new MolliePaymentExtractor();
+        self::assertFalse($extractor->isLastTransactionMollie($order));
+    }
+
+    public function testIsLastTransactionMollieReturnsTrueWhenLatestTransactionIsMollie(): void
+    {
+        $twoDaysAgo = (new \DateTime())->modify('-2 days');
+        $yesterday = (new \DateTime())->modify('-1 day');
+
+        $older = $this->createTransaction($twoDaysAgo, 'foo');
+        $latest = $this->createTransaction($yesterday, self::MOLLIE_PAYMENT_METHOD);
+
+        $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
+        $order->setTransactions(new OrderTransactionCollection([$older, $latest]));
+
+        $extractor = new MolliePaymentExtractor();
+        self::assertTrue($extractor->isLastTransactionMollie($order));
+    }
+
+    public function testIsLastTransactionMollieReturnsFalseWhenLatestTransactionIsNotMollie(): void
+    {
+        $twoDaysAgo = (new \DateTime())->modify('-2 days');
+        $yesterday = (new \DateTime())->modify('-1 day');
+
+        $failedMollieAttempt = $this->createTransaction($twoDaysAgo, self::MOLLIE_PAYMENT_METHOD);
+        $finalNonMollie = $this->createTransaction($yesterday, 'Some\\Other\\Handler\\Invoice');
+
+        $order = new OrderEntity();
+        $order->setId(Uuid::randomHex());
+        $order->setTransactions(new OrderTransactionCollection([$failedMollieAttempt, $finalNonMollie]));
+
+        $extractor = new MolliePaymentExtractor();
+        self::assertFalse($extractor->isLastTransactionMollie($order));
     }
 
     private function createTransaction(\DateTime $createdAt, ?string $paymentMethodName): OrderTransactionEntity

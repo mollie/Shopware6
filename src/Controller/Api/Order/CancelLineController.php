@@ -26,8 +26,13 @@ class CancelLineController extends AbstractController
 
     public function statusAction(Request $request, Context $context): Response
     {
-        $orderId = $request->get('mollieOrderId');
+        $orderId = (string) $request->get('mollieOrderId');
         $result = [];
+
+        if ($orderId === '') {
+            return new JsonResponse($result);
+        }
+
         $client = $this->clientFactory->getClient();
         try {
             $mollieOrder = $client->orders->get($orderId);

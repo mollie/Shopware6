@@ -15,6 +15,7 @@
 - Behoben: Steuern auf Gutschriften, die aus Teilerstattungen erzeugt werden, werden nun proportional zum erstatteten Betrag neu berechnet, statt die volle Steuer der ursprünglichen Bestellposition zu übernehmen.
 - Behoben: Beim Aktualisieren von OrderLineItems werden Custom Fields nun direkt vom OrderLineItem-Entity ausgelesen statt aus dem Payload. Dadurch bleiben bestehende Custom Fields anderer Hersteller zuverlaessig erhalten.
 - Behoben: Subscription-Endpunkte in der Store API und im Kundenkonto prüfen nun, ob das angefragte Abonnement zum eingeloggten Kunden gehört.
+- Behoben: Keine Fehler-Logs mehr für nicht-Mollie-Bestellungen in der Bestellübersicht.
 
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.

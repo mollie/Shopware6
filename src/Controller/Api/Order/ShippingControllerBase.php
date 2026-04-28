@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\ShipmentManager\Models\ShipmentLineItem;
 use Kiener\MolliePayments\Components\ShipmentManager\Models\TrackingData;
 use Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieOrderException;
+use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
@@ -42,11 +43,17 @@ class ShippingControllerBase extends AbstractController
      */
     private $logger;
 
-    public function __construct(ShipmentManager $shipmentFacade, OrderService $orderService, LoggerInterface $logger)
+    /**
+     * @var MolliePaymentExtractor
+     */
+    private $molliePaymentExtractor;
+
+    public function __construct(ShipmentManager $shipmentFacade, OrderService $orderService, LoggerInterface $logger, MolliePaymentExtractor $molliePaymentExtractor)
     {
         $this->shipment = $shipmentFacade;
         $this->orderService = $orderService;
         $this->logger = $logger;
+        $this->molliePaymentExtractor = $molliePaymentExtractor;
     }
 
     public function status(RequestDataBag $data, Context $context): JsonResponse
@@ -483,6 +490,10 @@ class ShippingControllerBase extends AbstractController
     private function getTotalResponse(string $orderId, Context $context): JsonResponse
     {
         try {
+            if (! $this->molliePaymentExtractor->isLastTransactionMollie($this->orderService->getOrder($orderId, $context))) {
+                return $this->json($this->emptyTotals());
+            }
+
             $totals = $this->shipment->getTotals($orderId, $context);
         } catch (ShopwareHttpException $e) {
             $this->logger->error($e->getMessage());
@@ -500,6 +511,10 @@ class ShippingControllerBase extends AbstractController
     private function getStatusResponse(string $orderId, Context $context): JsonResponse
     {
         try {
+            if (! $this->molliePaymentExtractor->isLastTransactionMollie($this->orderService->getOrder($orderId, $context))) {
+                return $this->json([]);
+            }
+
             $status = $this->shipment->getStatus($orderId, $context);
         } catch (CouldNotFetchMollieOrderException $e) {
             $status = $this->shipment->getShopwareStatus($orderId, $context);
@@ -514,6 +529,18 @@ class ShippingControllerBase extends AbstractController
         }
 
         return $this->json($status);
+    }
+
+    /**
+     * @return array<string, numeric>
+     */
+    private function emptyTotals(): array
+    {
+        return [
+            'amount' => 0.0,
+            'quantity' => 0,
+            'shippable' => 0,
+        ];
     }
 
     /**

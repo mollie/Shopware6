@@ -7,6 +7,7 @@ use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
+use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
@@ -41,16 +42,23 @@ class RefundControllerBase extends AbstractController
      */
     private $logger;
 
+    /**
+     * @var MolliePaymentExtractor
+     */
+    private $molliePaymentExtractor;
+
     public function __construct(
         OrderService $orderService,
         RefundManagerInterface $refundManager,
         RefundService $refundService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MolliePaymentExtractor $molliePaymentExtractor
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;
         $this->refundService = $refundService;
         $this->logger = $logger;
+        $this->molliePaymentExtractor = $molliePaymentExtractor;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -96,6 +104,10 @@ class RefundControllerBase extends AbstractController
             $orderId = $data->getAlnum('orderId');
 
             $order = $this->orderService->getOrder($orderId, $context);
+
+            if (! $this->molliePaymentExtractor->isLastTransactionMollie($order)) {
+                return $this->json($this->emptyRefundManagerData((string) $order->getTaxStatus()));
+            }
 
             $refundData = $this->refundManager->getData($order, $context);
 
@@ -178,6 +190,25 @@ class RefundControllerBase extends AbstractController
     public function cancelLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->cancelRefundAction($data->getAlnum('orderId'), $data->get('refundId'), $context);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function emptyRefundManagerData(string $taxStatus): array
+    {
+        return [
+            'totals' => [
+                'remaining' => 0.0,
+                'voucherAmount' => 0.0,
+                'pendingRefunds' => 0.0,
+                'refunded' => 0.0,
+                'roundingDiff' => 0.0,
+            ],
+            'cart' => [],
+            'refunds' => [],
+            'taxStatus' => $taxStatus,
+        ];
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------
