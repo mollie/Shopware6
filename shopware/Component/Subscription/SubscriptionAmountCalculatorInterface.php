@@ -9,4 +9,12 @@ use Shopware\Core\Framework\Context;
 interface SubscriptionAmountCalculatorInterface
 {
     public function calculateGroupAmount(OrderEntity $order, string $intervalKey, Context $context): float;
+
+    public function buildGroupCart(
+        OrderEntity $order,
+        string $intervalKey,
+        Context $context,
+        ?string $billingAddressId = null,
+        ?string $shippingAddressId = null
+    ): ?SubscriptionGroupCart;
 }

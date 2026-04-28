@@ -10,10 +10,12 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Cart\Error\InvalidGuestAccountError;
 use Mollie\Shopware\Component\Subscription\Cart\Error\InvalidPaymentMethodError;
-use Mollie\Shopware\Component\Subscription\Cart\Error\MixedCartBlockError;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartValidatorInterface;
 use Shopware\Core\Checkout\Cart\Error\ErrorCollection;
+use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -22,7 +24,9 @@ class SubscriptionCartValidator implements CartValidatorInterface
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        private readonly PaymentHandlerLocator $paymentHandlerLocator
+        private readonly PaymentHandlerLocator $paymentHandlerLocator,
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private readonly LineItemAnalyzerInterface $lineItemAnalyzer
     ) {
     }
 
@@ -35,6 +39,12 @@ class SubscriptionCartValidator implements CartValidatorInterface
         if (! $subscriptionSettings->isEnabled()) {
             return;
         }
+
+        $lineItems = new LineItemCollection($cart->getLineItems()->getFlat());
+        if (! $this->lineItemAnalyzer->hasSubscriptionProduct($lineItems)) {
+            return;
+        }
+
         $shopwarePaymentMethod = $context->getPaymentMethod();
 
         $paymentMethodHandler = $this->paymentHandlerLocator->findByIdentifier($shopwarePaymentMethod->getHandlerIdentifier());
@@ -63,7 +73,6 @@ class SubscriptionCartValidator implements CartValidatorInterface
 
         foreach ($cart->getErrors() as $error) {
             if (! $error instanceof InvalidGuestAccountError
-                && ! $error instanceof MixedCartBlockError
                 && ! $error instanceof InvalidPaymentMethodError) {
                 $list->add($error);
             }
