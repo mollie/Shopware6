@@ -15,6 +15,7 @@ use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Shopware\Integration\MolliePage\MolliePage;
+use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -30,6 +31,7 @@ final class CheckoutContext extends ShopwareContext
     public const STORAGE_MOLLIE_URL = 'mollieUrl';
     public const STORAGE_ORDER_ID = 'orderId';
     public const STORAGE_RETURN_URL = 'shopwareReturnUrl';
+    public const STORAGE_REMEMBERED_PAYMENT_ID = 'rememberedMolliePaymentId';
 
     #[BeforeScenario]
     public function setUp(): void
@@ -146,6 +148,25 @@ final class CheckoutContext extends ShopwareContext
         $actualOrderState = $oderTransaction->getStateMachineState()->getTechnicalName();
 
         Assert::assertSame($expectedPaymentStatus, $actualOrderState);
+    }
+
+    #[Then('i remember the mollie payment id')]
+    public function iRememberTheMolliePaymentId(): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        /** @var ?OrderTransactionEntity $transaction */
+        $transaction = $order->getTransactions()->first();
+        Assert::assertNotNull($transaction, sprintf('No transaction found for order %s', $orderId));
+
+        $customFields = $transaction->getCustomFields() ?? [];
+        $mollieData = $customFields[Mollie::EXTENSION] ?? [];
+        $paymentId = $mollieData['id'] ?? null;
+
+        Assert::assertNotEmpty($paymentId, sprintf('No Mollie payment id on transaction of order %s', $orderId));
+
+        Storage::set(self::STORAGE_REMEMBERED_PAYMENT_ID, $paymentId);
     }
 
     #[When('i select delivery status action :arg1')]
