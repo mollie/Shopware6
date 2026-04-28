@@ -33,10 +33,30 @@ final class SubscriptionContext extends ShopwareContext
         $orderId = Storage::get('orderId');
         $context = $this->getCurrentSalesChannelContext()->getContext();
 
-        $subscription = $this->getSubscriptionByOrderId($orderId, $context);
+        $subscription = $this->getOrderSubscriptions($orderId, $context)->first();
+
+        Assert::assertNotNull($subscription, sprintf('No subscription found for order %s', $orderId));
 
         Storage::set(self::STORAGE_SUBSCRIPTION, $subscription);
 
         Assert::assertSame($status, $subscription->getStatus());
+    }
+
+    #[Then('all subscriptions of the order have a mollie id')]
+    public function allSubscriptionsOfTheOrderHaveAMollieId(): void
+    {
+        $orderId = Storage::get('orderId');
+        $context = $this->getCurrentSalesChannelContext()->getContext();
+
+        $subscriptions = $this->getOrderSubscriptions($orderId, $context);
+
+        Assert::assertGreaterThan(0, $subscriptions->count(), sprintf('No subscriptions found for order %s', $orderId));
+
+        foreach ($subscriptions as $subscription) {
+            Assert::assertNotEmpty(
+                $subscription->getMollieId(),
+                sprintf('Subscription %s has no Mollie id', $subscription->getId())
+            );
+        }
     }
 }

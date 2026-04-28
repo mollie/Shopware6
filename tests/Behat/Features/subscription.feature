@@ -23,3 +23,17 @@ Feature: Subscription checkout
     Then i "cancel" the subscription
     And the subscription status is "canceled"
 
+  Scenario: mixed cart with one-off product, daily and weekly subscription and a 5 euro voucher creates a Mollie subscription per subscription product
+    Given payment method "trustly" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And product "MOL_SUB_1" with quantity "1" is in cart
+    And product "MOL_SUB_2" with quantity "1" is in cart
+    And i apply promotion code "mollie_5"
+    When i start checkout with payment method "trustly"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And all subscriptions of the order have a mollie id
+

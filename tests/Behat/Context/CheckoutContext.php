@@ -44,6 +44,13 @@ final class CheckoutContext extends ShopwareContext
         $this->addItemToCart($productNumber, $salesChannelContext, $quantity);
     }
 
+    #[Given('i apply promotion code :arg1')]
+    public function iApplyPromotionCode(string $code): void
+    {
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $this->addPromotionToCart($code, $salesChannelContext);
+    }
+
     #[When('i start checkout with payment method :arg1')]
     public function iStartCheckoutWithPaymentMethod(string $paymentMethodTechnicalName): void
     {
@@ -55,6 +62,7 @@ final class CheckoutContext extends ShopwareContext
         $response = $this->startCheckout($this->getCurrentSalesChannelContext());
 
         $mollieSandboxPage = $response->getTargetUrl();
+
         Storage::set(self::STORAGE_MOLLIE_URL, $mollieSandboxPage);
         Assert::assertStringContainsString('mollie.com', $mollieSandboxPage);
     }
