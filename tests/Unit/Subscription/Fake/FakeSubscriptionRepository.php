@@ -15,7 +15,7 @@ use Shopware\Core\Framework\Event\NestedEventCollection;
 final class FakeSubscriptionRepository extends EntityRepository
 {
     /** @var list<array<string,mixed>> */
-    public array $upsertedPayloads = [];
+    private array $upsertedPayloads = [];
 
     public function __construct(private SubscriptionCollection $collection = new SubscriptionCollection())
     {
@@ -24,6 +24,31 @@ final class FakeSubscriptionRepository extends EntityRepository
     public function add(SubscriptionEntity $subscription): void
     {
         $this->collection->add($subscription);
+    }
+
+    public function getUpsertCount(): int
+    {
+        return count($this->upsertedPayloads);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getLastUpsert(): array
+    {
+        if ($this->upsertedPayloads === []) {
+            throw new \RuntimeException('FakeSubscriptionRepository has no upsert payloads recorded.');
+        }
+
+        return $this->upsertedPayloads[array_key_last($this->upsertedPayloads)];
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    public function getUpserts(): array
+    {
+        return $this->upsertedPayloads;
     }
 
     public function search(Criteria $criteria, Context $context): EntitySearchResult
