@@ -14,7 +14,7 @@ context(storeApiPrefix + "/mollie/creditcard/store-token", () => {
     it('C266682: Store Credit Card Token with invalid customer ID (Store API) @core', () => {
 
         const request = new Promise((resolve) => {
-            client.post('/mollie/creditcard/store-token/tk_123').then(response => {
+            client.post('/mollie/creditcard/store-token/cust-123/tk_123').then(response => {
                 resolve({'data': response.data});
             });
         })

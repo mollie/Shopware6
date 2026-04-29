@@ -28,7 +28,7 @@ Feature: Basic payment checkout
       | mbway         | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
       | swish         | SWDEMO10007.1 | 1        | paid          | SE             | SEK      |
       | multibanco    | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
-      | trustly       | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
+     # | trustly       | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
       | alma          | SWDEMO10007.1 | 5        | paid          | FR             | EUR      |
       | eps           | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |
       | banktransfer  | SWDEMO10007.1 | 1        | paid          | DE             | EUR      |

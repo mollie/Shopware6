@@ -33,7 +33,7 @@ context(storeApiPrefix +"/mollie/ideal/store-issuer", () => {
     it('C1341123: POS store terminal with invalid customer id (Store API) @core', () => {
 
         const request = new Promise((resolve) => {
-            client.post('/mollie/pos/store-terminal/ideal_ABNANL2A').then(response => {
+            client.post('/mollie/pos/store-terminal/cust-123/ideal_ABNANL2A').then(response => {
                 resolve({'data': response.data});
             });
         })
