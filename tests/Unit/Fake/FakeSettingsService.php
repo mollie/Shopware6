@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Unit\Logger;
+namespace Mollie\Shopware\Unit\Fake;
 
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -23,6 +23,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?ApiSettings $apiSettings = null,
         private ?string $profileId = null,
         private ?OrderStateSettings $orderStateSettings = null,
+        private ?SubscriptionSettings $subscriptionSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -36,6 +37,9 @@ final class FakeSettingsService extends AbstractSettingsService
         }
         if ($this->orderStateSettings === null) {
             $this->orderStateSettings = new OrderStateSettings();
+        }
+        if ($this->subscriptionSettings === null) {
+            $this->subscriptionSettings = new SubscriptionSettings();
         }
     }
 
@@ -81,7 +85,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings
     {
-        // TODO: Implement getSubscriptionSettings() method.
+        return $this->subscriptionSettings;
     }
 
     public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings

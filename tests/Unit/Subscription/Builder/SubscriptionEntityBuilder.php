@@ -1,0 +1,163 @@
+<?php
+declare(strict_types=1);
+
+namespace Mollie\Shopware\Unit\Subscription\Builder;
+
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
+use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
+
+final class SubscriptionEntityBuilder
+{
+    private string $id = 'subscription-id';
+    private string $mollieId = 'sub_test123';
+    private string $mollieCustomerId = 'cst_test123';
+    private string $salesChannelId = 'sales-channel-id';
+    private string $orderId = 'order-id';
+    private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
+    private bool $withOrder = true;
+    private bool $withCustomer = true;
+    private bool $withBillingAddress = true;
+    private bool $withShippingAddress = true;
+
+    public static function create(): self
+    {
+        return new self();
+    }
+
+    public function withId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function withMollieId(string $mollieId): self
+    {
+        $this->mollieId = $mollieId;
+
+        return $this;
+    }
+
+    public function withStatus(SubscriptionStatus $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function withoutOrder(): self
+    {
+        $this->withOrder = false;
+
+        return $this;
+    }
+
+    public function withoutCustomer(): self
+    {
+        $this->withCustomer = false;
+
+        return $this;
+    }
+
+    public function withoutBillingAddress(): self
+    {
+        $this->withBillingAddress = false;
+
+        return $this;
+    }
+
+    public function withoutShippingAddress(): self
+    {
+        $this->withShippingAddress = false;
+
+        return $this;
+    }
+
+    public function build(): SubscriptionEntity
+    {
+        $entity = new SubscriptionEntity();
+        $entity->setId($this->id);
+        $entity->setMollieId($this->mollieId);
+        $entity->setMollieCustomerId($this->mollieCustomerId);
+        $entity->setSalesChannelId($this->salesChannelId);
+        $entity->setOrderId($this->orderId);
+        $entity->setOrderVersionId('order-version-id');
+        $entity->setStatus($this->status->value);
+        $entity->setMetadata(new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS));
+
+        $this->assignNullableTypedProperty($entity, 'order', null);
+
+        if ($this->withOrder) {
+            $entity->setOrder($this->buildOrder());
+        }
+
+        if ($this->withBillingAddress) {
+            $entity->setBillingAddress($this->buildAddress('billing'));
+        }
+
+        if ($this->withShippingAddress) {
+            $entity->setShippingAddress($this->buildAddress('shipping'));
+        }
+
+        return $entity;
+    }
+
+    private function buildOrder(): OrderEntity
+    {
+        $order = new OrderEntity();
+        $order->setId($this->orderId);
+        $order->setOrderNumber('10000');
+        $order->setSalesChannelId($this->salesChannelId);
+
+        if ($this->withCustomer) {
+            $orderCustomer = new OrderCustomerEntity();
+            $orderCustomer->setUniqueIdentifier('order-customer-id');
+            $orderCustomer->setCustomerId('customer-id');
+            $orderCustomer->setCustomer($this->buildCustomer());
+
+            $order->setOrderCustomer($orderCustomer);
+        }
+
+        return $order;
+    }
+
+    private function buildCustomer(): CustomerEntity
+    {
+        $customer = new CustomerEntity();
+        $customer->setId('customer-id');
+        $customer->setEmail('test@example.com');
+        $customer->setFirstName('Test');
+        $customer->setLastName('Customer');
+        $customer->setGuest(false);
+
+        $defaultBillingAddress = new CustomerAddressEntity();
+        $defaultBillingAddress->setId('default-billing-address-id');
+        $customer->setDefaultBillingAddress($defaultBillingAddress);
+
+        return $customer;
+    }
+
+    private function buildAddress(string $type): SubscriptionAddressEntity
+    {
+        $address = new SubscriptionAddressEntity();
+        $address->setId($type . '-address-id');
+        $address->setSubscriptionId($this->id);
+        $address->setFirstName('Test');
+        $address->setLastName('Customer');
+
+        return $address;
+    }
+
+    private function assignNullableTypedProperty(SubscriptionEntity $entity, string $property, mixed $value): void
+    {
+        $reflection = new \ReflectionProperty($entity, $property);
+        $reflection->setValue($entity, $value);
+    }
+}

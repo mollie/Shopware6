@@ -164,10 +164,9 @@ final class Subscription
         if (! $nextPaymentDate instanceof \DateTimeInterface) {
             return true;
         }
-        /** @var \DateTime $latestCancellation */
-        $latestCancellation = clone $nextPaymentDate;
 
-        $latestCancellation->modify('-' . $daysBeforeRenewal . ' day');
+        $latestCancellation = clone $nextPaymentDate;
+        $latestCancellation = $latestCancellation->modify('-' . $daysBeforeRenewal . ' day');
 
         return $now <= $latestCancellation;
     }

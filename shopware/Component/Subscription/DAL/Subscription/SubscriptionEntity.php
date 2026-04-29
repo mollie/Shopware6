@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\DAL\Subscription;
 
+use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionHistory\SubscriptionHistoryCollection;
@@ -369,36 +370,36 @@ class SubscriptionEntity extends Entity
             return $this->canceledAt === null;
         }
 
-        return $this->getStatus() === SubscriptionStatus::ACTIVE || $this->getStatus() === SubscriptionStatus::RESUMED;
+        return $this->getStatus() === SubscriptionStatus::ACTIVE->value || $this->getStatus() === SubscriptionStatus::RESUMED->value;
     }
 
     public function isPaused(): bool
     {
-        return $this->getStatus() === SubscriptionStatus::PAUSED;
+        return $this->getStatus() === SubscriptionStatus::PAUSED->value;
     }
 
     public function isSkipped(): bool
     {
-        return $this->getStatus() === SubscriptionStatus::SKIPPED;
+        return $this->getStatus() === SubscriptionStatus::SKIPPED->value;
     }
 
     public function isRenewingAllowed(): bool
     {
         $status = $this->getStatus();
 
-        if ($status === SubscriptionStatus::ACTIVE) {
+        if ($status === SubscriptionStatus::ACTIVE->value) {
             return true;
         }
 
-        if ($status === SubscriptionStatus::COMPLETED) {
+        if ($status === SubscriptionStatus::COMPLETED->value) {
             return true;
         }
 
-        if ($status === SubscriptionStatus::RESUMED) {
+        if ($status === SubscriptionStatus::RESUMED->value) {
             return true;
         }
 
-        if ($status === SubscriptionStatus::SKIPPED) {
+        if ($status === SubscriptionStatus::SKIPPED->value) {
             return true;
         }
 
@@ -407,11 +408,11 @@ class SubscriptionEntity extends Entity
 
     public function isResumeAllowed(): bool
     {
-        if ($this->getStatus() === SubscriptionStatus::PAUSED) {
+        if ($this->getStatus() === SubscriptionStatus::PAUSED->value) {
             return true;
         }
 
-        if ($this->getStatus() === SubscriptionStatus::CANCELED) {
+        if ($this->getStatus() === SubscriptionStatus::CANCELED->value) {
             return true;
         }
 
@@ -425,16 +426,16 @@ class SubscriptionEntity extends Entity
 
     public function isCancellationAllowed(): bool
     {
-        return $this->getStatus() !== SubscriptionStatus::CANCELED && $this->status !== SubscriptionStatus::PENDING;
+        return $this->getStatus() !== SubscriptionStatus::CANCELED->value && $this->status !== SubscriptionStatus::PENDING->value;
     }
 
     public function isSkipAllowed(): bool
     {
-        if ($this->getStatus() === SubscriptionStatus::ACTIVE) {
+        if ($this->getStatus() === SubscriptionStatus::ACTIVE->value) {
             return true;
         }
 
-        if ($this->getStatus() === SubscriptionStatus::RESUMED) {
+        if ($this->getStatus() === SubscriptionStatus::RESUMED->value) {
             return true;
         }
 
@@ -443,11 +444,11 @@ class SubscriptionEntity extends Entity
 
     public function isPauseAllowed(): bool
     {
-        if ($this->getStatus() === SubscriptionStatus::ACTIVE) {
+        if ($this->getStatus() === SubscriptionStatus::ACTIVE->value) {
             return true;
         }
 
-        if ($this->getStatus() === SubscriptionStatus::RESUMED) {
+        if ($this->getStatus() === SubscriptionStatus::RESUMED->value) {
             return true;
         }
 

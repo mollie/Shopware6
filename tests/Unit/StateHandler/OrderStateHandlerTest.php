@@ -7,7 +7,7 @@ use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
-use Mollie\Shopware\Unit\Logger\FakeSettingsService;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\StateHandler\Fake\FakeStateMachineRegistry;
 use Mollie\Shopware\Unit\StateHandler\Fake\FakeStateMachineRepository;
 use PHPUnit\Framework\Attributes\CoversClass;

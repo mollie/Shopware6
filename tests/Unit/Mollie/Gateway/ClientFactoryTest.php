@@ -9,7 +9,7 @@ use Mollie\Shopware\Component\Mollie\Exception\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
-use Mollie\Shopware\Unit\Logger\FakeSettingsService;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Test\TestDefaults;
