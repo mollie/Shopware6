@@ -8,7 +8,7 @@ use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
-use Mollie\Shopware\Unit\Logger\FakeSettingsService;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;

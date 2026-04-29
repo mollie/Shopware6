@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Logger;
 use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Logger\PluginSettingsHandler;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Monolog\Level;
 use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;
