@@ -55,8 +55,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
         ]);
 
         // Submit handler
-        this._submitButton.addEventListener('click', (event) => {
-            event.preventDefault();
+        this._paymentForm.addEventListener('submit', (event) => {
             me.submitForm(event, componentsObject, this._paymentForm);
         });
 
@@ -168,9 +167,11 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
     }
 
     async submitForm(event, componentsObject, paymentForm) {
-        event.preventDefault();
+        if (event.defaultPrevented) {
+            return;
+        }
+
         const me = this;
-        this.disableForm();
 
         if (
             (this._creditCardRadioInput === undefined ||
@@ -178,10 +179,13 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                 this._creditCardRadioInput.checked === false) &&
             !!paymentForm
         ) {
-            paymentForm.submit();
+            return;
         }
 
         if (!!this._creditCardRadioInput && this._creditCardRadioInput.checked === true) {
+            event.preventDefault();
+            this.disableForm();
+
             const mandateId = this.getMandateCheckedValue();
             // If the mandateId is valid, that means there is a mandate already selected,
             // so we have to call the API to save it
@@ -224,11 +228,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                 // the credit card token for the user and the current checkout
                 // and then we continue by submitting our original payment form.
                 this.client.post(
-                    me.options.shopUrl +
-                        '/mollie/components/store-card-token/' +
-                        me.options.customerId +
-                        '/' +
-                        token,
+                    me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
                     JSON.stringify({
                         shouldSaveCardDetail: this.shouldSaveCardDetail(),
                     }),

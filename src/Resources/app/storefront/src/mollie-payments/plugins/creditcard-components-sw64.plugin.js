@@ -188,6 +188,10 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
      * @returns {Promise<void>}
      */
     async submitForm(event) {
+        if (event.defaultPrevented) {
+            return;
+        }
+
         const me = this;
         const paymentForm = this._confirmForm;
 
