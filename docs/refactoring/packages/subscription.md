@@ -27,12 +27,12 @@ Legend: `[x]` = test exists & covers ≥ 80 %, `[/]` = test exists but < 80 %, `
 | [/] | `Component/Subscription/DAL/Subscription/SubscriptionEntity.php` | 90 | 62 % | – | – |
 | [ ] | `Component/Subscription/Route/RenewRoute.php` | 86 | 0 % | – | – |
 | [ ] | `Component/Subscription/Action/SkipAction.php` | 61 | 0 % | – | – |
-| [ ] | `Component/Subscription/Action/PauseAction.php` | 58 | 0 % | – | – |
-| [ ] | `Component/Subscription/Action/CancelAction.php` | 55 | 0 % | – | – |
+| [x] | `Component/Subscription/Action/PauseAction.php` | 58 | – | `tests/Unit/Subscription/Action/PauseActionTest.php` | – |
+| [x] | `Component/Subscription/Action/CancelAction.php` | 55 | – | `tests/Unit/Subscription/Action/CancelActionTest.php` | – |
 | [ ] | `Component/Subscription/Route/RenewException.php` | 53 | 0 % | – | – |
-| [ ] | `Component/Subscription/Action/ResumeAction.php` | 50 | 0 % | – | – |
-| [ ] | `Component/Subscription/SubscriptionDataService.php` | 49 | 0 % | – | – |
-| [ ] | `Component/Subscription/SubscriptionActionHandler.php` | 47 | 0 % | – | – |
+| [x] | `Component/Subscription/Action/ResumeAction.php` | 50 | – | `tests/Unit/Subscription/Action/ResumeActionTest.php` | – |
+| [x] | `Component/Subscription/SubscriptionDataService.php` | 49 | – | `tests/Unit/Subscription/SubscriptionDataServiceTest.php` | – |
+| [x] | `Component/Subscription/SubscriptionActionHandler.php` | 47 | – | `tests/Unit/Subscription/SubscriptionActionHandlerTest.php` | – |
 | [ ] | `Component/Subscription/DAL/Subscription/Aggregate/SubscriptionAddress/SubscriptionAddressEntity.php` | 44 | 0 % | – | – |
 | [ ] | `Component/Subscription/Controller/SubscriptionController.php` | 40 | 0 % | – | – |
 | [x] | `Component/Subscription/SubscriptionMetadata.php` | 39 | 82 % | – | – |
@@ -108,7 +108,7 @@ pure config.
 
 | | Class | Reason | Test file | PR |
 |---|---|---|---|---|
-| [ ] | _(to be filled per wave)_ | – | – | – |
+| [ ] | `Component/Mollie/Gateway/SubscriptionGateway` | Verify `timesRemaining` survives a Mollie-side cancel — drives whether the plugin needs to persist `times` in metadata before pause, or can rely on Mollie returning it on the next read. | – | – |
 
 ## Notes
 

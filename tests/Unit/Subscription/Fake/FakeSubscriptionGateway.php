@@ -12,11 +12,19 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
     /** @var array<string,Subscription> */
     private array $subscriptions = [];
 
+    private ?Subscription $copyResponse = null;
+
     /** @var list<array{method:string,subscriptionId:string,customerId:string,orderNumber:string,salesChannelId:string}> */
     private array $calls = [];
 
     public function register(Subscription $subscription): void
     {
+        $this->subscriptions[$subscription->getId()] = $subscription;
+    }
+
+    public function setCopyResponse(Subscription $subscription): void
+    {
+        $this->copyResponse = $subscription;
         $this->subscriptions[$subscription->getId()] = $subscription;
     }
 
@@ -71,7 +79,19 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
 
     public function copySubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
     {
-        throw new \LogicException('FakeSubscriptionGateway::copySubscription not implemented');
+        $this->calls[] = [
+            'method' => 'copySubscription',
+            'subscriptionId' => $mollieSubscription->getId(),
+            'customerId' => $customerId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+
+        if (! $this->copyResponse instanceof Subscription) {
+            throw new \RuntimeException('FakeSubscriptionGateway::copySubscription called without a configured copy response. Use setCopyResponse() in the test.');
+        }
+
+        return $this->copyResponse;
     }
 
     public function cancelSubscription(string $mollieSubscriptionId, string $customerId, string $orderNumber, string $salesChannelId): Subscription
