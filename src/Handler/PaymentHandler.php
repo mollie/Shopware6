@@ -14,6 +14,8 @@ if (class_exists(AbstractPaymentHandler::class)) {
         use PaymentHandlerTrait;
         public const PAYMENT_SEQUENCE_TYPE_FIRST = 'first';
         public const PAYMENT_SEQUENCE_TYPE_RECURRING = 'recurring';
+
+        public const PAYMENT_SEQUENCE_TYPE_ONE_OFF = 'oneoff';
     }
 
     return;
@@ -25,5 +27,7 @@ if (interface_exists(AsynchronousPaymentHandlerInterface::class) && ! class_exis
         use PaymentHandlerLegacyTrait;
         public const PAYMENT_SEQUENCE_TYPE_FIRST = 'first';
         public const PAYMENT_SEQUENCE_TYPE_RECURRING = 'recurring';
+
+        public const PAYMENT_SEQUENCE_TYPE_ONE_OFF = 'oneoff';
     }
 }
