@@ -4,7 +4,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="frontend.mollie.pos.storeTerminal" path="/mollie/pos/store-terminal/{terminalId}" methods="POST">
+    <route id="frontend.mollie.pos.storeTerminal" path="/mollie/pos/store-terminal/{customerId}/{terminalId}" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\POS\PosControllerBase::storeTerminal</default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <option key="seo">false</option>

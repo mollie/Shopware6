@@ -193,6 +193,7 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                         me.options.customerId +
                         '/' +
                         mandateId,
+                    null,
                     () => {
                         paymentForm.submit();
                     },
@@ -223,7 +224,11 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                 // the credit card token for the user and the current checkout
                 // and then we continue by submitting our original payment form.
                 this.client.post(
-                    me.options.shopUrl + '/mollie/components/store-card-token/' + token,
+                    me.options.shopUrl +
+                        '/mollie/components/store-card-token/' +
+                        me.options.customerId +
+                        '/' +
+                        token,
                     JSON.stringify({
                         shouldSaveCardDetail: this.shouldSaveCardDetail(),
                     }),

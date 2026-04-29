@@ -20,7 +20,7 @@ interface CustomerServiceInterface
 
     public function setCardToken(CustomerEntity $customer, string $cardToken, SalesChannelContext $context, bool $shouldSaveCardDetail = false): EntityWrittenContainerEvent;
 
-    public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent;
+    public function setMandateId(CustomerEntity $customer, string $mandateId, Context $context): EntityWrittenContainerEvent;
 
     /**
      * @param array<mixed> $customFields

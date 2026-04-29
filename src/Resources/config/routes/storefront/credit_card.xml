@@ -4,7 +4,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="frontend.mollie.components.storeCardToken" path="/mollie/components/store-card-token/{cardToken}" methods="POST">
+    <route id="frontend.mollie.components.storeCardToken" path="/mollie/components/store-card-token/{customerId}/{cardToken}" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase::storeCardToken</default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
@@ -12,7 +12,7 @@
         <option key="seo">false</option>
     </route>
 
-    <route id="frontend.mollie.components.storeMandateId" path="/mollie/components/store-mandate-id/{mandateId}" methods="POST">
+    <route id="frontend.mollie.components.storeMandateId" path="/mollie/components/store-mandate-id/{customerId}/{mandateId}" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase::storeMandateId</default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="auth_required"><bool>true</bool></default>
@@ -20,7 +20,7 @@
         <option key="seo">false</option>
     </route>
 
-    <route id="frontend.mollie.components.revokeMandate" path="/mollie/components/revoke-mandate/{mandateId}" methods="POST">
+    <route id="frontend.mollie.components.revokeMandate" path="/mollie/components/revoke-mandate/{customerId}/{mandateId}" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Storefront\CreditCard\CreditCardControllerBase::revokeMandate</default>
         <default key="_routeScope"><list><string>storefront</string></list></default>
         <default key="auth_required"><bool>true</bool></default>

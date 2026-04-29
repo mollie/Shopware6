@@ -42,7 +42,7 @@ final class FakeCustomerService implements CustomerServiceInterface
         return $this->setCardTokenResponse;
     }
 
-    public function setMandateId(CustomerEntity $customer, string $cardToken, Context $context): EntityWrittenContainerEvent
+    public function setMandateId(CustomerEntity $customer, string $mandateId, Context $context): EntityWrittenContainerEvent
     {
         return $this->setMandateIdResponse;
     }
