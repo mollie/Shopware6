@@ -108,7 +108,7 @@ final class SkipAction extends AbstractAction
 
             $mollieSubscriptionId = $newSubscription->getId();
             $nextPaymentAt = $newSubscription->getNextPaymentDate();
-            if (! $nextPaymentAt instanceof \DateTime) {
+            if (! $nextPaymentAt instanceof \DateTimeInterface) {
                 throw new NextPaymentAtNotFoundException($mollieSubscriptionId);
             }
             $logData['newNextPaymentDate'] = $nextPaymentAt->format('Y-m-d');
