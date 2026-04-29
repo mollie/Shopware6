@@ -115,7 +115,7 @@ class PayPalExpress
         Cart $cart,
         SalesChannelContext $context,
         ?string $redirectUrl = null,
-        ?string $cancelUrl = null,
+        ?string $cancelUrl = null
     ): Session {
         $mollie = $this->mollieApiFactory->getLiveClient($context->getSalesChannelId());
 

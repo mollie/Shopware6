@@ -16,7 +16,7 @@ class PaymentResponse extends StoreApiResponse
         string $redirectUrl,
         string $message,
         string $orderId,
-        ?string $contextToken = null,
+        ?string $contextToken = null
     ) {
         $object = new ArrayStruct(
             [
