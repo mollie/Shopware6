@@ -21,6 +21,7 @@ final class SubscriptionEntityBuilder
     private string $salesChannelId = 'sales-channel-id';
     private string $orderId = 'order-id';
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
+    private ?SubscriptionMetadata $metadata = null;
     private bool $withOrder = true;
     private bool $withCustomer = true;
     private bool $withBillingAddress = true;
@@ -48,6 +49,13 @@ final class SubscriptionEntityBuilder
     public function withStatus(SubscriptionStatus $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function withMetadata(SubscriptionMetadata $metadata): self
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }
@@ -90,7 +98,7 @@ final class SubscriptionEntityBuilder
         $entity->setOrderId($this->orderId);
         $entity->setOrderVersionId('order-version-id');
         $entity->setStatus($this->status->value);
-        $entity->setMetadata(new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS));
+        $entity->setMetadata($this->metadata ?? new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS));
 
         $this->assignNullableTypedProperty($entity, 'order', null);
 
