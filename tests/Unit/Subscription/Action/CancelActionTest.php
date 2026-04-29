@@ -49,8 +49,8 @@ final class CancelActionTest extends TestCase
 
         $this->assertSame($mollieSubscription, $result);
         $this->assertSame(1, $gateway->getCallCount('cancelSubscription'));
-        $this->assertCount(1, $repository->upsertedPayloads);
-        $payload = $repository->upsertedPayloads[0];
+        $this->assertSame(1, $repository->getUpsertCount());
+        $payload = $repository->getLastUpsert();
         $this->assertSame(SubscriptionStatus::CANCELED->value, $payload['status']);
         $this->assertInstanceOf(\DateTimeInterface::class, $payload['canceledAt']);
         $this->assertNull($payload['nextPaymentAt']);
@@ -81,7 +81,7 @@ final class CancelActionTest extends TestCase
 
         $this->assertSame($mollieSubscription, $result);
         $this->assertSame(0, $gateway->getCallCount('cancelSubscription'));
-        $payload = $repository->upsertedPayloads[0];
+        $payload = $repository->getLastUpsert();
         $this->assertSame(SubscriptionStatus::CANCELED_AFTER_RENEWAL->value, $payload['status']);
         $this->assertNull($payload['canceledAt']);
         $this->assertSame($nextPaymentDate, $payload['nextPaymentAt']);
@@ -111,7 +111,7 @@ final class CancelActionTest extends TestCase
                 $this->getContext()
             );
         } finally {
-            $this->assertSame([], $repository->upsertedPayloads);
+            $this->assertSame(0, $repository->getUpsertCount());
         }
     }
 

@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Subscription\Action;
 
-use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
+use Mollie\Shopware\Component\Subscription\Action\Exception\NextPaymentAtNotFoundException;
 use Mollie\Shopware\Component\Subscription\Action\Exception\PauseAndResumeNotAllowedException;
-use Mollie\Shopware\Component\Subscription\Action\Exception\SubscriptionActiveException;
-use Mollie\Shopware\Component\Subscription\Action\ResumeAction;
-use Mollie\Shopware\Component\Subscription\Event\SubscriptionResumedEvent;
+use Mollie\Shopware\Component\Subscription\Action\Exception\SubscriptionNotActiveException;
+use Mollie\Shopware\Component\Subscription\Action\SkipAction;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionSkippedEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataService;
-use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionGateway;
@@ -22,108 +21,119 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
-#[CoversClass(ResumeAction::class)]
-final class ResumeActionTest extends TestCase
+#[CoversClass(SkipAction::class)]
+final class SkipActionTest extends TestCase
 {
     private const SUBSCRIPTION_ID = 'subscription-id';
     private const OLD_MOLLIE_ID = 'sub_old123';
     private const NEW_MOLLIE_ID = 'sub_new456';
     private const ORDER_NUMBER = '10000';
 
-    public function testExecuteCopiesSubscriptionAndPersistsResumedState(): void
+    public function testExecuteSkipsImmediatelyWhenWithinCancelWindow(): void
     {
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
+
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::CANCELED)
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withNextPaymentDate(new \DateTime('+30 days'))
             ->build();
+        $newNextPaymentDate = new \DateTime('+60 days');
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
+            ->withNextPaymentDate($newNextPaymentDate)
             ->build();
         $gateway->register($oldMollieSubscription);
         $gateway->setCopyResponse($newMollieSubscription);
 
-        $action = new ResumeAction($repository, $gateway, new NullLogger());
+        $action = new SkipAction($repository, $gateway, new NullLogger());
 
-        $result = $action->execute(
+        $action->execute(
             $this->loadSubscriptionData($repository),
-            new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
+            new SubscriptionSettings(enabled: true, allowPauseAndResume: true, cancelDays: 5),
             $oldMollieSubscription,
             self::ORDER_NUMBER,
             $this->getContext()
         );
 
-        $this->assertSame($newMollieSubscription, $result);
+        $this->assertSame(1, $gateway->getCallCount('cancelSubscription'));
         $this->assertSame(1, $gateway->getCallCount('copySubscription'));
-        $this->assertSame(1, $repository->getUpsertCount());
         $payload = $repository->getLastUpsert();
-        $this->assertSame(SubscriptionStatus::RESUMED->value, $payload['status']);
+        $this->assertSame(SubscriptionStatus::SKIPPED->value, $payload['status']);
         $this->assertSame(self::NEW_MOLLIE_ID, $payload['mollieId']);
-        $this->assertSame($newMollieSubscription->getNextPaymentDate(), $payload['nextPaymentAt']);
+        $this->assertSame($newNextPaymentDate, $payload['nextPaymentAt']);
         $this->assertNull($payload['canceledAt']);
-        $this->assertSame('resumed', $payload['historyEntries'][0]['comment']);
+        $this->assertSame('skipped', $payload['historyEntries'][0]['comment']);
+        $this->assertSame(self::NEW_MOLLIE_ID, $payload['historyEntries'][0]['mollieId']);
     }
 
-    public function testExecuteUsesNextPossiblePaymentDateWhenInTheFuture(): void
+    public function testExecuteSchedulesDeferredSkipWhenOutsideCancelWindow(): void
     {
-        $futureDate = (new \DateTime('+30 days'))->format('Y-m-d');
-        $repository = $this->prepareRepositoryWithSubscription(
-            new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS, 0, '', $futureDate)
-        );
+        $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
+
+        $nextPaymentDate = new \DateTime('+1 day');
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::CANCELED)
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withNextPaymentDate($nextPaymentDate)
             ->build();
         $gateway->register($oldMollieSubscription);
-        $gateway->setCopyResponse(
-            MollieSubscriptionBuilder::create()->withId(self::NEW_MOLLIE_ID)->build()
-        );
 
-        $action = new ResumeAction($repository, $gateway, new NullLogger());
+        $action = new SkipAction($repository, $gateway, new NullLogger());
 
         $action->execute(
             $this->loadSubscriptionData($repository),
-            new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
+            new SubscriptionSettings(enabled: true, allowPauseAndResume: true, cancelDays: 5),
             $oldMollieSubscription,
             self::ORDER_NUMBER,
             $this->getContext()
         );
 
-        $this->assertSame($futureDate, $oldMollieSubscription->getStartDate()->format('Y-m-d'));
+        $this->assertSame(0, $gateway->getCallCount('cancelSubscription'));
+        $this->assertSame(0, $gateway->getCallCount('copySubscription'));
+        $payload = $repository->getLastUpsert();
+        $this->assertSame(SubscriptionStatus::SKIPPED_AFTER_RENEWAL->value, $payload['status']);
+        $this->assertSame(self::OLD_MOLLIE_ID, $payload['mollieId']);
+        $this->assertSame($nextPaymentDate, $payload['nextPaymentAt']);
+        $this->assertNull($payload['canceledAt']);
+        $this->assertStringStartsWith('skipped after ', $payload['historyEntries'][0]['comment']);
     }
 
-    public function testExecuteFallsBackToTodayWhenNextPossiblePaymentDateIsInThePast(): void
+    public function testExecuteThrowsWhenNewSubscriptionHasNoNextPaymentDate(): void
     {
-        $pastDate = (new \DateTime('-10 days'))->format('Y-m-d');
-        $today = (new \DateTime())->format('Y-m-d');
-        $repository = $this->prepareRepositoryWithSubscription(
-            new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS, 0, '', $pastDate)
-        );
+        $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
+
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::CANCELED)
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withNextPaymentDate(new \DateTime('+30 days'))
+            ->build();
+        $newMollieSubscription = MollieSubscriptionBuilder::create()
+            ->withId(self::NEW_MOLLIE_ID)
+            ->withStatus(SubscriptionStatus::ACTIVE)
             ->build();
         $gateway->register($oldMollieSubscription);
-        $gateway->setCopyResponse(
-            MollieSubscriptionBuilder::create()->withId(self::NEW_MOLLIE_ID)->build()
-        );
+        $gateway->setCopyResponse($newMollieSubscription);
 
-        $action = new ResumeAction($repository, $gateway, new NullLogger());
+        $action = new SkipAction($repository, $gateway, new NullLogger());
 
-        $action->execute(
-            $this->loadSubscriptionData($repository),
-            new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
-            $oldMollieSubscription,
-            self::ORDER_NUMBER,
-            $this->getContext()
-        );
+        $this->expectException(NextPaymentAtNotFoundException::class);
 
-        $this->assertSame($today, $oldMollieSubscription->getStartDate()->format('Y-m-d'));
+        try {
+            $action->execute(
+                $this->loadSubscriptionData($repository),
+                new SubscriptionSettings(enabled: true, allowPauseAndResume: true, cancelDays: 5),
+                $oldMollieSubscription,
+                self::ORDER_NUMBER,
+                $this->getContext()
+            );
+        } finally {
+            $this->assertSame(0, $repository->getUpsertCount());
+        }
     }
 
     public function testExecuteThrowsWhenPauseAndResumeIsNotAllowed(): void
@@ -132,11 +142,11 @@ final class ResumeActionTest extends TestCase
         $gateway = new FakeSubscriptionGateway();
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::CANCELED)
+            ->withStatus(SubscriptionStatus::ACTIVE)
             ->build();
         $gateway->register($oldMollieSubscription);
 
-        $action = new ResumeAction($repository, $gateway, new NullLogger());
+        $action = new SkipAction($repository, $gateway, new NullLogger());
 
         $this->expectException(PauseAndResumeNotAllowedException::class);
 
@@ -150,23 +160,24 @@ final class ResumeActionTest extends TestCase
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
+            $this->assertSame(0, $gateway->getCallCount('cancelSubscription'));
             $this->assertSame(0, $gateway->getCallCount('copySubscription'));
         }
     }
 
-    public function testExecuteThrowsWhenMollieSubscriptionIsActive(): void
+    public function testExecuteThrowsWhenMollieSubscriptionIsNotActive(): void
     {
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withStatus(SubscriptionStatus::COMPLETED)
             ->build();
         $gateway->register($oldMollieSubscription);
 
-        $action = new ResumeAction($repository, $gateway, new NullLogger());
+        $action = new SkipAction($repository, $gateway, new NullLogger());
 
-        $this->expectException(SubscriptionActiveException::class);
+        $this->expectException(SubscriptionNotActiveException::class);
 
         try {
             $action->execute(
@@ -178,35 +189,33 @@ final class ResumeActionTest extends TestCase
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
+            $this->assertSame(0, $gateway->getCallCount('cancelSubscription'));
             $this->assertSame(0, $gateway->getCallCount('copySubscription'));
         }
     }
 
-    public function testGetEventClassReturnsResumedEvent(): void
+    public function testGetEventClassReturnsSkippedEvent(): void
     {
-        $action = new ResumeAction(new FakeSubscriptionRepository(), new FakeSubscriptionGateway(), new NullLogger());
+        $action = new SkipAction(new FakeSubscriptionRepository(), new FakeSubscriptionGateway(), new NullLogger());
 
-        $this->assertSame(SubscriptionResumedEvent::class, $action->getEventClass());
+        $this->assertSame(SubscriptionSkippedEvent::class, $action->getEventClass());
     }
 
-    public function testActionNameIsResume(): void
+    public function testActionNameIsSkip(): void
     {
-        $this->assertSame('resume', ResumeAction::getActioName());
+        $this->assertSame('skip', SkipAction::getActioName());
     }
 
-    private function prepareRepositoryWithSubscription(?SubscriptionMetadata $metadata = null): FakeSubscriptionRepository
+    private function prepareRepositoryWithSubscription(): FakeSubscriptionRepository
     {
-        $builder = SubscriptionEntityBuilder::create()
+        $subscription = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
             ->withMollieId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::PAUSED);
-
-        if ($metadata instanceof SubscriptionMetadata) {
-            $builder = $builder->withMetadata($metadata);
-        }
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->build();
 
         $repository = new FakeSubscriptionRepository();
-        $repository->add($builder->build());
+        $repository->add($subscription);
 
         return $repository;
     }

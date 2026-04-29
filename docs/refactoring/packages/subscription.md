@@ -26,7 +26,7 @@ Legend: `[x]` = test exists & covers ≥ 80 %, `[/]` = test exists but < 80 %, `
 | [ ] | `Component/Subscription/CopyOrderService.php` | 105 | 0 % | – | – |
 | [/] | `Component/Subscription/DAL/Subscription/SubscriptionEntity.php` | 90 | 62 % | – | – |
 | [ ] | `Component/Subscription/Route/RenewRoute.php` | 86 | 0 % | – | – |
-| [ ] | `Component/Subscription/Action/SkipAction.php` | 61 | 0 % | – | – |
+| [x] | `Component/Subscription/Action/SkipAction.php` | 61 | – | `tests/Unit/Subscription/Action/SkipActionTest.php` | – |
 | [x] | `Component/Subscription/Action/PauseAction.php` | 58 | – | `tests/Unit/Subscription/Action/PauseActionTest.php` | – |
 | [x] | `Component/Subscription/Action/CancelAction.php` | 55 | – | `tests/Unit/Subscription/Action/CancelActionTest.php` | – |
 | [ ] | `Component/Subscription/Route/RenewException.php` | 53 | 0 % | – | – |
