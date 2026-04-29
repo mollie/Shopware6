@@ -67,7 +67,7 @@ class CreditCardPayment extends PaymentHandler
         }
 
         // if mandateId is not empty, it means this is recurring payment
-        $orderData['payment']['sequenceType'] = PaymentHandler::PAYMENT_SEQUENCE_TYPE_RECURRING;
+        $orderData['payment']['sequenceType'] = PaymentHandler::PAYMENT_SEQUENCE_TYPE_ONE_OFF;
         $orderData['payment']['mandateId'] = $mandateId;
         $this->customerService->setMandateId($customer, '', $salesChannelContext->getContext());
 
