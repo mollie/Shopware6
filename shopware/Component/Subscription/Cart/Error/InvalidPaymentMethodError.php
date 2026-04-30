@@ -7,7 +7,7 @@ use Shopware\Core\Checkout\Cart\Error\Error;
 
 class InvalidPaymentMethodError extends Error
 {
-    private const KEY = 'mollie-payments-cart-error-method-invalid';
+    public const KEY = 'mollie-payments-cart-error-method-invalid';
 
     public function getId(): string
     {

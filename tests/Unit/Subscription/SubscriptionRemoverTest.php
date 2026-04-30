@@ -7,8 +7,8 @@ use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Component\Subscription\SubscriptionRemover;
-use Mollie\Shopware\Entity\Product\Product;
-use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemBuilder;
+use Mollie\Shopware\Unit\Builder\PaymentMethodBuilder;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
@@ -16,22 +16,18 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionAwarePaymentHandler;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionLineItemsResolver;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 
 #[CoversClass(SubscriptionRemover::class)]
 final class SubscriptionRemoverTest extends TestCase
 {
     public function testRemoveReturnsAllMethodsWhenSubscriptionsAreDisabled(): void
     {
-        $resolver = new FakeSubscriptionLineItemsResolver($this->buildLineItems(['subscription']));
+        $resolver = new FakeSubscriptionLineItemsResolver(new LineItemCollection([LineItemBuilder::subscription('item-0')->build()]));
         $remover = $this->getRemover($resolver, enabled: false);
 
-        $methods = $this->buildPaymentMethods();
-
-        $result = $remover->remove($methods, '', new FakeSalesChannelContext());
+        $result = $remover->remove($this->buildPaymentMethods(), '', new FakeSalesChannelContext());
 
         $this->assertCount(2, $result);
         $this->assertSame(0, $resolver->getCallCount());
@@ -39,24 +35,23 @@ final class SubscriptionRemoverTest extends TestCase
 
     public function testRemoveReturnsAllMethodsWhenNoSubscriptionProductInLineItems(): void
     {
-        $resolver = new FakeSubscriptionLineItemsResolver($this->buildLineItems(['regular']));
+        $resolver = new FakeSubscriptionLineItemsResolver(new LineItemCollection([LineItemBuilder::regular('item-0')->build()]));
         $remover = $this->getRemover($resolver, enabled: true);
 
-        $methods = $this->buildPaymentMethods();
-
-        $result = $remover->remove($methods, '', new FakeSalesChannelContext());
+        $result = $remover->remove($this->buildPaymentMethods(), '', new FakeSalesChannelContext());
 
         $this->assertCount(2, $result);
     }
 
     public function testRemoveFiltersOutNonSubscriptionAwareMethodsWhenSubscriptionProductPresent(): void
     {
-        $resolver = new FakeSubscriptionLineItemsResolver($this->buildLineItems(['regular', 'subscription']));
+        $resolver = new FakeSubscriptionLineItemsResolver(new LineItemCollection([
+            LineItemBuilder::regular('item-0')->build(),
+            LineItemBuilder::subscription('item-1')->build(),
+        ]));
         $remover = $this->getRemover($resolver, enabled: true);
 
-        $methods = $this->buildPaymentMethods();
-
-        $result = $remover->remove($methods, '', new FakeSalesChannelContext());
+        $result = $remover->remove($this->buildPaymentMethods(), '', new FakeSalesChannelContext());
 
         $this->assertCount(1, $result);
         $this->assertNotNull($result->get('subscription-aware-id'));
@@ -65,7 +60,7 @@ final class SubscriptionRemoverTest extends TestCase
 
     public function testRemovePassesOrderIdToResolver(): void
     {
-        $resolver = new FakeSubscriptionLineItemsResolver($this->buildLineItems(['regular']));
+        $resolver = new FakeSubscriptionLineItemsResolver(new LineItemCollection([LineItemBuilder::regular('item-0')->build()]));
         $remover = $this->getRemover($resolver, enabled: true);
 
         $remover->remove($this->buildPaymentMethods(), 'order-id-42', new FakeSalesChannelContext());
@@ -88,33 +83,16 @@ final class SubscriptionRemoverTest extends TestCase
 
     private function buildPaymentMethods(): PaymentMethodCollection
     {
-        $subscriptionAware = new PaymentMethodEntity();
-        $subscriptionAware->setId('subscription-aware-id');
-        $subscriptionAware->setHandlerIdentifier(FakeSubscriptionAwarePaymentHandler::class);
+        $subscriptionAware = PaymentMethodBuilder::create()
+            ->withId('subscription-aware-id')
+            ->withHandlerIdentifier(FakeSubscriptionAwarePaymentHandler::class)
+            ->build();
 
-        $regular = new PaymentMethodEntity();
-        $regular->setId('regular-id');
-        $regular->setHandlerIdentifier(FakePaymentMethodHandler::class);
+        $regular = PaymentMethodBuilder::create()
+            ->withId('regular-id')
+            ->withHandlerIdentifier(FakePaymentMethodHandler::class)
+            ->build();
 
         return new PaymentMethodCollection([$subscriptionAware, $regular]);
-    }
-
-    /**
-     * @param list<'subscription'|'regular'> $kinds
-     */
-    private function buildLineItems(array $kinds): LineItemCollection
-    {
-        $items = [];
-        foreach ($kinds as $index => $kind) {
-            $lineItem = new LineItem('item-' . $index, LineItem::PRODUCT_LINE_ITEM_TYPE);
-
-            $product = new Product();
-            $product->setIsSubscription($kind === 'subscription');
-            $lineItem->addExtension(Mollie::EXTENSION, $product);
-
-            $items[] = $lineItem;
-        }
-
-        return new LineItemCollection($items);
     }
 }

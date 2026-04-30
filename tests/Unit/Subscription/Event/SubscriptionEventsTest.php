@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionResumedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionSkippedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionStartedEvent;
+use Mollie\Shopware\Unit\Builder\CustomerBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -121,12 +122,10 @@ final class SubscriptionEventsTest extends TestCase
 
     private function buildCustomer(string $email = 'test@example.com', string $firstName = 'Test', string $lastName = 'Customer'): CustomerEntity
     {
-        $customer = new CustomerEntity();
-        $customer->setId('customer-id');
-        $customer->setEmail($email);
-        $customer->setFirstName($firstName);
-        $customer->setLastName($lastName);
-
-        return $customer;
+        return CustomerBuilder::create()
+            ->withEmail($email)
+            ->withFirstName($firstName)
+            ->withLastName($lastName)
+            ->build();
     }
 }

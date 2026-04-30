@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\Subscripti
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressId;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncer;
+use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionAddressBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeCustomerAddressRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -116,28 +117,18 @@ final class SubscriptionAddressSyncerTest extends TestCase
     }
 
     /**
-     * @param array<string,?string> $overrides
+     * @param array{firstName?:string,street?:string} $overrides
      */
     private function buildAddress(array $overrides = []): SubscriptionAddressEntity
     {
-        $address = new SubscriptionAddressEntity();
-        $address->setId('subscription-address-' . ($overrides['firstName'] ?? 'default'));
-        $address->setSubscriptionId('subscription-id');
-        $address->setSalutationId($overrides['salutationId'] ?? 'salutation-id');
-        $address->setFirstName($overrides['firstName'] ?? 'John');
-        $address->setLastName($overrides['lastName'] ?? 'Doe');
-        $address->setCompany($overrides['company'] ?? null);
-        $address->setDepartment($overrides['department'] ?? null);
-        $address->setStreet($overrides['street'] ?? 'Default Street 1');
-        $address->setZipcode($overrides['zipcode'] ?? '12345');
-        $address->setCity($overrides['city'] ?? 'Berlin');
-        $address->setCountryId($overrides['countryId'] ?? 'country-id');
-        $address->setCountryStateId($overrides['countryStateId'] ?? null);
-        $address->setPhoneNumber($overrides['phoneNumber'] ?? null);
-        $address->setAdditionalAddressLine1($overrides['additionalAddressLine1'] ?? null);
-        $address->setAdditionalAddressLine2($overrides['additionalAddressLine2'] ?? null);
+        $firstName = $overrides['firstName'] ?? 'John';
 
-        return $address;
+        return SubscriptionAddressBuilder::create()
+            ->withId('subscription-address-' . $firstName)
+            ->withSubscriptionId('subscription-id')
+            ->withFirstName($firstName)
+            ->withLastName($overrides['lastName'] ?? 'Doe')
+            ->withStreet($overrides['street'] ?? 'Default Street 1')
+            ->build();
     }
-
 }
