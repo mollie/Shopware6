@@ -22,6 +22,9 @@ final class SubscriptionEntityBuilder
     private string $orderId = 'order-id';
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
     private ?SubscriptionMetadata $metadata = null;
+    private ?SubscriptionAddressEntity $billingAddressOverride = null;
+    private ?SubscriptionAddressEntity $shippingAddressOverride = null;
+    private string $customerId = 'customer-id';
     private bool $withOrder = true;
     private bool $withCustomer = true;
     private bool $withBillingAddress = true;
@@ -60,6 +63,29 @@ final class SubscriptionEntityBuilder
         return $this;
     }
 
+    public function withCustomerId(string $customerId): self
+    {
+        $this->customerId = $customerId;
+
+        return $this;
+    }
+
+    public function withBillingAddress(SubscriptionAddressEntity $address): self
+    {
+        $this->billingAddressOverride = $address;
+        $this->withBillingAddress = true;
+
+        return $this;
+    }
+
+    public function withShippingAddress(SubscriptionAddressEntity $address): self
+    {
+        $this->shippingAddressOverride = $address;
+        $this->withShippingAddress = true;
+
+        return $this;
+    }
+
     public function withoutOrder(): self
     {
         $this->withOrder = false;
@@ -92,6 +118,7 @@ final class SubscriptionEntityBuilder
     {
         $entity = new SubscriptionEntity();
         $entity->setId($this->id);
+        $entity->setCustomerId($this->customerId);
         $entity->setMollieId($this->mollieId);
         $entity->setMollieCustomerId($this->mollieCustomerId);
         $entity->setSalesChannelId($this->salesChannelId);
@@ -107,11 +134,11 @@ final class SubscriptionEntityBuilder
         }
 
         if ($this->withBillingAddress) {
-            $entity->setBillingAddress($this->buildAddress('billing'));
+            $entity->setBillingAddress($this->billingAddressOverride ?? $this->buildAddress('billing'));
         }
 
         if ($this->withShippingAddress) {
-            $entity->setShippingAddress($this->buildAddress('shipping'));
+            $entity->setShippingAddress($this->shippingAddressOverride ?? $this->buildAddress('shipping'));
         }
 
         return $entity;

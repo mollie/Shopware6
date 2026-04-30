@@ -19,7 +19,6 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(SubscriptionActionHandler::class)]
@@ -39,7 +38,7 @@ final class SubscriptionActionHandlerTest extends TestCase
 
         $handler = $this->getHandler($repository, $gateway, $eventDispatcher, [$cancelAction, $pauseAction], enabled: true);
 
-        $result = $handler->handle('cancel', self::SUBSCRIPTION_ID, $this->getContext());
+        $result = $handler->handle('cancel', self::SUBSCRIPTION_ID, Context::createDefaultContext());
 
         $this->assertSame(self::MOLLIE_SUBSCRIPTION_ID, $result->getId());
         $this->assertSame(1, $cancelAction->getExecutionCount());
@@ -56,7 +55,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $cancelAction = new FakeAction('cancel');
         $handler = $this->getHandler($repository, $gateway, new FakeEventDispatcher(), [$cancelAction], enabled: true);
 
-        $handler->handle('cancel', strtoupper(self::SUBSCRIPTION_ID), $this->getContext());
+        $handler->handle('cancel', strtoupper(self::SUBSCRIPTION_ID), Context::createDefaultContext());
 
         $this->assertSame(self::SUBSCRIPTION_ID, $cancelAction->getExecutions()[0]['subscriptionId']);
     }
@@ -70,7 +69,7 @@ final class SubscriptionActionHandlerTest extends TestCase
 
         $this->expectException(SubscriptionDisabledException::class);
 
-        $handler->handle('cancel', self::SUBSCRIPTION_ID, $this->getContext());
+        $handler->handle('cancel', self::SUBSCRIPTION_ID, Context::createDefaultContext());
     }
 
     public function testHandleThrowsWhenNoActionMatches(): void
@@ -83,7 +82,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No action handler found for action: cancel');
 
-        $handler->handle('cancel', self::SUBSCRIPTION_ID, $this->getContext());
+        $handler->handle('cancel', self::SUBSCRIPTION_ID, Context::createDefaultContext());
     }
 
     public function testGetActionEventsReturnsEventClassesOfRegisteredActions(): void
@@ -153,8 +152,4 @@ final class SubscriptionActionHandlerTest extends TestCase
         );
     }
 
-    private function getContext(): Context
-    {
-        return new Context(new SystemSource());
-    }
 }

@@ -17,7 +17,6 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(PauseAction::class)]
@@ -29,6 +28,7 @@ final class PauseActionTest extends TestCase
 
     public function testExecutePausesImmediatelyWhenWithinCancelWindow(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $mollieSubscription = MollieSubscriptionBuilder::create()
@@ -41,11 +41,11 @@ final class PauseActionTest extends TestCase
         $action = new PauseAction($repository, $gateway, new NullLogger());
 
         $result = $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, allowPauseAndResume: true, cancelDays: 5),
             $mollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($mollieSubscription, $result);
@@ -60,6 +60,7 @@ final class PauseActionTest extends TestCase
 
     public function testExecuteSchedulesDeferredPauseWhenOutsideCancelWindow(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $nextPaymentDate = new \DateTimeImmutable('+1 day');
@@ -73,11 +74,11 @@ final class PauseActionTest extends TestCase
         $action = new PauseAction($repository, $gateway, new NullLogger());
 
         $result = $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, allowPauseAndResume: true, cancelDays: 5),
             $mollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($mollieSubscription, $result);
@@ -91,6 +92,7 @@ final class PauseActionTest extends TestCase
 
     public function testExecuteThrowsWhenPauseAndResumeIsNotAllowed(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $mollieSubscription = MollieSubscriptionBuilder::create()
@@ -105,11 +107,11 @@ final class PauseActionTest extends TestCase
 
         try {
             $action->execute(
-                $this->loadSubscriptionData($repository),
+                $this->loadSubscriptionData($repository, $context),
                 new SubscriptionSettings(enabled: true, allowPauseAndResume: false),
                 $mollieSubscription,
                 self::ORDER_NUMBER,
-                $this->getContext()
+                $context
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
@@ -119,6 +121,7 @@ final class PauseActionTest extends TestCase
 
     public function testExecuteThrowsWhenMollieSubscriptionIsNotActive(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $mollieSubscription = MollieSubscriptionBuilder::create()
@@ -133,11 +136,11 @@ final class PauseActionTest extends TestCase
 
         try {
             $action->execute(
-                $this->loadSubscriptionData($repository),
+                $this->loadSubscriptionData($repository, $context),
                 new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
                 $mollieSubscription,
                 self::ORDER_NUMBER,
-                $this->getContext()
+                $context
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
@@ -171,13 +174,8 @@ final class PauseActionTest extends TestCase
         return $repository;
     }
 
-    private function loadSubscriptionData(FakeSubscriptionRepository $repository): \Mollie\Shopware\Component\Subscription\SubscriptionDataStruct
+    private function loadSubscriptionData(FakeSubscriptionRepository $repository, Context $context): \Mollie\Shopware\Component\Subscription\SubscriptionDataStruct
     {
-        return (new SubscriptionDataService($repository, new NullLogger()))->findById(self::SUBSCRIPTION_ID, $this->getContext());
-    }
-
-    private function getContext(): Context
-    {
-        return new Context(new SystemSource());
+        return (new SubscriptionDataService($repository, new NullLogger()))->findById(self::SUBSCRIPTION_ID, $context);
     }
 }

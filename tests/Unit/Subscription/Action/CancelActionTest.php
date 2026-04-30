@@ -16,7 +16,6 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(CancelAction::class)]
@@ -28,6 +27,7 @@ final class CancelActionTest extends TestCase
 
     public function testExecuteCancelsImmediatelyWhenWithinCancelWindow(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $mollieSubscription = MollieSubscriptionBuilder::create()
@@ -40,11 +40,11 @@ final class CancelActionTest extends TestCase
         $action = new CancelAction($repository, $gateway, new NullLogger());
 
         $result = $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, cancelDays: 5),
             $mollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($mollieSubscription, $result);
@@ -59,6 +59,7 @@ final class CancelActionTest extends TestCase
 
     public function testExecuteSchedulesDeferredCancelWhenOutsideCancelWindow(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $nextPaymentDate = new \DateTimeImmutable('+1 day');
@@ -72,11 +73,11 @@ final class CancelActionTest extends TestCase
         $action = new CancelAction($repository, $gateway, new NullLogger());
 
         $result = $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, cancelDays: 5),
             $mollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($mollieSubscription, $result);
@@ -90,6 +91,7 @@ final class CancelActionTest extends TestCase
 
     public function testExecuteThrowsWhenMollieSubscriptionIsNotActive(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $mollieSubscription = MollieSubscriptionBuilder::create()
@@ -104,11 +106,11 @@ final class CancelActionTest extends TestCase
 
         try {
             $action->execute(
-                $this->loadSubscriptionData($repository),
+                $this->loadSubscriptionData($repository, $context),
                 new SubscriptionSettings(enabled: true, cancelDays: 5),
                 $mollieSubscription,
                 self::ORDER_NUMBER,
-                $this->getContext()
+                $context
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
@@ -141,13 +143,8 @@ final class CancelActionTest extends TestCase
         return $repository;
     }
 
-    private function loadSubscriptionData(FakeSubscriptionRepository $repository): \Mollie\Shopware\Component\Subscription\SubscriptionDataStruct
+    private function loadSubscriptionData(FakeSubscriptionRepository $repository, Context $context): \Mollie\Shopware\Component\Subscription\SubscriptionDataStruct
     {
-        return (new SubscriptionDataService($repository, new NullLogger()))->findById(self::SUBSCRIPTION_ID, $this->getContext());
-    }
-
-    private function getContext(): Context
-    {
-        return new Context(new SystemSource());
+        return (new SubscriptionDataService($repository, new NullLogger()))->findById(self::SUBSCRIPTION_ID, $context);
     }
 }

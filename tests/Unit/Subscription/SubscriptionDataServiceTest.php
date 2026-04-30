@@ -13,7 +13,6 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(SubscriptionDataService::class)]
@@ -30,7 +29,7 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $service = $this->getService($repository);
 
-        $result = $service->findById('subscription-id', $this->getContext());
+        $result = $service->findById('subscription-id', Context::createDefaultContext());
 
         $this->assertSame($subscription, $result->getSubscription());
         $this->assertSame($subscription->getOrder(), $result->getOrder());
@@ -45,7 +44,7 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $this->expectException(SubscriptionNotFoundException::class);
 
-        $service->findById('unknown-id', $this->getContext());
+        $service->findById('unknown-id', Context::createDefaultContext());
     }
 
     public function testFindByIdThrowsWhenSubscriptionHasNoOrder(): void
@@ -62,7 +61,7 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $this->expectException(SubscriptionWithoutOrderException::class);
 
-        $service->findById('subscription-id', $this->getContext());
+        $service->findById('subscription-id', Context::createDefaultContext());
     }
 
     public function testFindByIdThrowsWhenOrderHasNoCustomer(): void
@@ -79,7 +78,7 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $this->expectException(OrderWithoutCustomerException::class);
 
-        $service->findById('subscription-id', $this->getContext());
+        $service->findById('subscription-id', Context::createDefaultContext());
     }
 
     public function testFindByIdThrowsWhenBillingAddressIsMissing(): void
@@ -96,7 +95,7 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $this->expectException(SubscriptionWithoutAddressException::class);
 
-        $service->findById('subscription-id', $this->getContext());
+        $service->findById('subscription-id', Context::createDefaultContext());
     }
 
     public function testFindByIdThrowsWhenShippingAddressIsMissing(): void
@@ -113,16 +112,11 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $this->expectException(SubscriptionWithoutAddressException::class);
 
-        $service->findById('subscription-id', $this->getContext());
+        $service->findById('subscription-id', Context::createDefaultContext());
     }
 
     private function getService(FakeSubscriptionRepository $repository): SubscriptionDataService
     {
         return new SubscriptionDataService($repository, new NullLogger());
-    }
-
-    private function getContext(): Context
-    {
-        return new Context(new SystemSource());
     }
 }
