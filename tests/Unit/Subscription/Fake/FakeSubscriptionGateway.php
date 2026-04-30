@@ -14,6 +14,11 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
 
     private ?Subscription $copyResponse = null;
 
+    private ?Subscription $createResponse = null;
+
+    /** @var list<CreateSubscription> */
+    private array $createPayloads = [];
+
     /** @var list<array{method:string,subscriptionId:string,customerId:string,orderNumber:string,salesChannelId:string}> */
     private array $calls = [];
 
@@ -26,6 +31,20 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
     {
         $this->copyResponse = $subscription;
         $this->subscriptions[$subscription->getId()] = $subscription;
+    }
+
+    public function setCreateResponse(Subscription $subscription): void
+    {
+        $this->createResponse = $subscription;
+        $this->subscriptions[$subscription->getId()] = $subscription;
+    }
+
+    /**
+     * @return list<CreateSubscription>
+     */
+    public function getCreatePayloads(): array
+    {
+        return $this->createPayloads;
     }
 
     public function getCallCount(string $method): int
@@ -74,7 +93,20 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
 
     public function createSubscription(CreateSubscription $createSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
     {
-        throw new \LogicException('FakeSubscriptionGateway::createSubscription not implemented');
+        $this->createPayloads[] = $createSubscription;
+        $this->calls[] = [
+            'method' => 'createSubscription',
+            'subscriptionId' => '',
+            'customerId' => $customerId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+
+        if (! $this->createResponse instanceof Subscription) {
+            throw new \RuntimeException('FakeSubscriptionGateway::createSubscription called without a configured create response. Use setCreateResponse() in the test.');
+        }
+
+        return $this->createResponse;
     }
 
     public function copySubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
