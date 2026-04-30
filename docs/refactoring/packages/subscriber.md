@@ -11,7 +11,7 @@ Event subscribers under `shopware/Subscriber/`: Customer, LineItem, OrderTransac
 
 ## Priority
 
-Wave 3: subscribers need FakeEvent/FakeEventDispatcher setups and component-specific fakes. Usually 2-4 tests per subscriber are enough.
+Wave 3: subscribers need EventSpy and component-specific fakes. Usually 2-4 tests per subscriber are enough.
 
 ## Files
 

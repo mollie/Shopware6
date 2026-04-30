@@ -9,7 +9,7 @@ use Mollie\Shopware\Component\Subscription\Event\SubscriptionPausedEvent;
 use Mollie\Shopware\Component\Subscription\Exception\SubscriptionDisabledException;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataService;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
@@ -32,7 +32,7 @@ final class SubscriptionActionHandlerTest extends TestCase
     {
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = $this->prepareGatewayWithMollieSubscription();
-        $eventDispatcher = new FakeEventDispatcher();
+        $eventDispatcher = new EventSpy();
 
         $cancelAction = new FakeAction('cancel', SubscriptionCancelledEvent::class);
         $pauseAction = new FakeAction('pause', SubscriptionPausedEvent::class);
@@ -45,7 +45,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $this->assertSame(1, $cancelAction->getExecutionCount());
         $this->assertSame(self::SUBSCRIPTION_ID, $cancelAction->getExecutions()[0]['subscriptionId']);
         $this->assertSame(0, $pauseAction->getExecutionCount());
-        $this->assertInstanceOf(SubscriptionCancelledEvent::class, $eventDispatcher->getDispatchedEvent());
+        $this->assertInstanceOf(SubscriptionCancelledEvent::class, $eventDispatcher->getEvent());
     }
 
     public function testHandleNormalizesSubscriptionIdToLowerCase(): void
@@ -54,7 +54,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $gateway = $this->prepareGatewayWithMollieSubscription();
 
         $cancelAction = new FakeAction('cancel');
-        $handler = $this->getHandler($repository, $gateway, new FakeEventDispatcher(), [$cancelAction], enabled: true);
+        $handler = $this->getHandler($repository, $gateway, new EventSpy(), [$cancelAction], enabled: true);
 
         $handler->handle('cancel', strtoupper(self::SUBSCRIPTION_ID), Context::createDefaultContext());
 
@@ -66,7 +66,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = $this->prepareGatewayWithMollieSubscription();
 
-        $handler = $this->getHandler($repository, $gateway, new FakeEventDispatcher(), [new FakeAction('cancel')], enabled: false);
+        $handler = $this->getHandler($repository, $gateway, new EventSpy(), [new FakeAction('cancel')], enabled: false);
 
         $this->expectException(SubscriptionDisabledException::class);
 
@@ -78,7 +78,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = $this->prepareGatewayWithMollieSubscription();
 
-        $handler = $this->getHandler($repository, $gateway, new FakeEventDispatcher(), [new FakeAction('pause')], enabled: true);
+        $handler = $this->getHandler($repository, $gateway, new EventSpy(), [new FakeAction('pause')], enabled: true);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No action handler found for action: cancel');
@@ -94,7 +94,7 @@ final class SubscriptionActionHandlerTest extends TestCase
         $handler = $this->getHandler(
             $repository,
             $gateway,
-            new FakeEventDispatcher(),
+            new EventSpy(),
             [
                 new FakeAction('cancel', SubscriptionCancelledEvent::class),
                 new FakeAction('pause', SubscriptionPausedEvent::class),
@@ -139,7 +139,7 @@ final class SubscriptionActionHandlerTest extends TestCase
     private function getHandler(
         FakeSubscriptionRepository $repository,
         FakeSubscriptionGateway $gateway,
-        FakeEventDispatcher $eventDispatcher,
+        EventSpy $eventDispatcher,
         iterable $actions,
         bool $enabled
     ): SubscriptionActionHandler {

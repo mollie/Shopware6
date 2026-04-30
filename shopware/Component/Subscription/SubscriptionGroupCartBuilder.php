@@ -30,8 +30,7 @@ final class SubscriptionGroupCartBuilder implements SubscriptionGroupCartBuilder
         OrderEntity $order,
         string $intervalKey,
         Context $context,
-        ?string $billingAddressId = null,
-        ?string $shippingAddressId = null
+        ?RenewalAddresses $addresses = null
     ): ?SubscriptionGroupCart {
         $orderLineItems = $order->getLineItems();
         if (! $orderLineItems instanceof OrderLineItemCollection) {
@@ -51,11 +50,9 @@ final class SubscriptionGroupCartBuilder implements SubscriptionGroupCartBuilder
             ],
         ];
 
-        if ($billingAddressId !== null) {
-            $overrideOptions[SalesChannelContextService::BILLING_ADDRESS_ID] = $billingAddressId;
-        }
-        if ($shippingAddressId !== null) {
-            $overrideOptions[SalesChannelContextService::SHIPPING_ADDRESS_ID] = $shippingAddressId;
+        if ($addresses !== null) {
+            $overrideOptions[SalesChannelContextService::BILLING_ADDRESS_ID] = $addresses->getBillingAddressId();
+            $overrideOptions[SalesChannelContextService::SHIPPING_ADDRESS_ID] = $addresses->getShippingAddressId();
         }
 
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context, $overrideOptions);
