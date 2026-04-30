@@ -21,6 +21,9 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(SkipAction::class)]
+#[CoversClass(NextPaymentAtNotFoundException::class)]
+#[CoversClass(PauseAndResumeNotAllowedException::class)]
+#[CoversClass(SubscriptionNotActiveException::class)]
 final class SkipActionTest extends TestCase
 {
     private const SUBSCRIPTION_ID = 'subscription-id';

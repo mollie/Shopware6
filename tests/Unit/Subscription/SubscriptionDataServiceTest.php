@@ -16,6 +16,9 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(SubscriptionDataService::class)]
+#[CoversClass(SubscriptionNotFoundException::class)]
+#[CoversClass(SubscriptionWithoutOrderException::class)]
+#[CoversClass(SubscriptionWithoutAddressException::class)]
 final class SubscriptionDataServiceTest extends TestCase
 {
     public function testFindByIdReturnsStructWhenAllAssociationsArePresent(): void
