@@ -20,6 +20,8 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(PauseAction::class)]
+#[CoversClass(PauseAndResumeNotAllowedException::class)]
+#[CoversClass(SubscriptionNotActiveException::class)]
 final class PauseActionTest extends TestCase
 {
     private const SUBSCRIPTION_ID = 'subscription-id';

@@ -22,6 +22,8 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(ResumeAction::class)]
+#[CoversClass(PauseAndResumeNotAllowedException::class)]
+#[CoversClass(SubscriptionActiveException::class)]
 final class ResumeActionTest extends TestCase
 {
     private const SUBSCRIPTION_ID = 'subscription-id';

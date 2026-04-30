@@ -22,6 +22,7 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(SubscriptionActionHandler::class)]
+#[CoversClass(SubscriptionDisabledException::class)]
 final class SubscriptionActionHandlerTest extends TestCase
 {
     private const SUBSCRIPTION_ID = 'subscription-id';
