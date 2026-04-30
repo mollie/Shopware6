@@ -19,6 +19,7 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(CancelAction::class)]
+#[CoversClass(SubscriptionNotActiveException::class)]
 final class CancelActionTest extends TestCase
 {
     private const SUBSCRIPTION_ID = 'subscription-id';
