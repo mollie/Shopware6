@@ -7,7 +7,7 @@ use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeCustomerRepository;
@@ -57,7 +57,7 @@ final class PayTest extends TestCase
 
     private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl): Pay
     {
-        $eventDispatcher = new FakeEventDispatcher();
+        $eventDispatcher = new EventSpy();
         $fakeRouteBuilder = new FakeRouteBuilder();
         $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings);

@@ -8,8 +8,5 @@ use Shopware\Core\Framework\Context;
 
 interface SubscriptionAddressSyncerInterface
 {
-    /**
-     * @return array{billingAddressId: string, shippingAddressId: string}
-     */
-    public function syncFromSubscription(SubscriptionEntity $subscription, Context $context): array;
+    public function syncFromSubscription(SubscriptionEntity $subscription, Context $context): RenewalAddresses;
 }

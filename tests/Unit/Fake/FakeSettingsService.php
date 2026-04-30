@@ -24,6 +24,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?string $profileId = null,
         private ?OrderStateSettings $orderStateSettings = null,
         private ?SubscriptionSettings $subscriptionSettings = null,
+        private ?EnvironmentSettings $environmentSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -50,7 +51,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getEnvironmentSettings(): EnvironmentSettings
     {
-        // TODO: Implement getEnvironmentSettings() method.
+        return $this->environmentSettings ?? new EnvironmentSettings(false, false);
     }
 
     public function getDecorated(): AbstractSettingsService

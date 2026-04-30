@@ -30,7 +30,7 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use MolliePayments\Shopware\Tests\Fakes\FakePluginSettings;
 use MolliePayments\Shopware\Tests\Traits\OrderTrait;
 use MolliePayments\Shopware\Tests\Utils\Traits\PaymentBuilderTrait;
@@ -193,7 +193,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieOrderCustomerEnricher($this->createMock(CustomerService::class)),
             $routingBuilder,
             $this->mollieLocaleService,
-            new FakeEventDispatcher(),
+            new EventSpy(),
             $this->loggerService
         );
 
