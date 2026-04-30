@@ -8,8 +8,8 @@ use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
+use Mollie\Shopware\Unit\Builder\CustomerBuilder;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
@@ -150,10 +150,17 @@ final class SubscriptionEntityBuilder
         $order->setSalesChannelId($this->salesChannelId);
 
         if ($this->withCustomer) {
+            $defaultBillingAddress = new CustomerAddressEntity();
+            $defaultBillingAddress->setId('default-billing-address-id');
+
+            $customer = CustomerBuilder::create()
+                ->withDefaultBillingAddress($defaultBillingAddress)
+                ->build();
+
             $orderCustomer = new OrderCustomerEntity();
             $orderCustomer->setUniqueIdentifier('order-customer-id');
             $orderCustomer->setCustomerId('customer-id');
-            $orderCustomer->setCustomer($this->buildCustomer());
+            $orderCustomer->setCustomer($customer);
 
             $order->setOrderCustomer($orderCustomer);
         }
@@ -161,30 +168,11 @@ final class SubscriptionEntityBuilder
         return $order;
     }
 
-    private function buildCustomer(): CustomerEntity
-    {
-        $customer = new CustomerEntity();
-        $customer->setId('customer-id');
-        $customer->setEmail('test@example.com');
-        $customer->setFirstName('Test');
-        $customer->setLastName('Customer');
-        $customer->setGuest(false);
-
-        $defaultBillingAddress = new CustomerAddressEntity();
-        $defaultBillingAddress->setId('default-billing-address-id');
-        $customer->setDefaultBillingAddress($defaultBillingAddress);
-
-        return $customer;
-    }
-
     private function buildAddress(string $type): SubscriptionAddressEntity
     {
-        $address = new SubscriptionAddressEntity();
-        $address->setId($type . '-address-id');
-        $address->setSubscriptionId($this->id);
-        $address->setFirstName('Test');
-        $address->setLastName('Customer');
-
-        return $address;
+        return SubscriptionAddressBuilder::create()
+            ->withId($type . '-address-id')
+            ->withSubscriptionId($this->id)
+            ->build();
     }
 }

@@ -123,8 +123,12 @@ final class SubscriptionActionHandlerTest extends TestCase
 
     private function prepareGatewayWithMollieSubscription(): FakeSubscriptionGateway
     {
+        $mollieSubscription = MollieSubscriptionBuilder::create()
+            ->withId(self::MOLLIE_SUBSCRIPTION_ID)
+            ->build();
+
         $gateway = new FakeSubscriptionGateway();
-        $gateway->register(MollieSubscriptionBuilder::create()->withId(self::MOLLIE_SUBSCRIPTION_ID)->build());
+        $gateway->register($mollieSubscription);
 
         return $gateway;
     }

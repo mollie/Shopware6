@@ -7,7 +7,7 @@ use Shopware\Core\Checkout\Cart\Error\Error;
 
 class PaymentMethodAvailabilityNotice extends Error
 {
-    private const KEY = 'mollie-payments-cart-error-paymentmethod-availability';
+    public const KEY = 'mollie-payments-cart-error-paymentmethod-availability';
 
     public function __construct(private string $lineItemId)
     {
@@ -16,7 +16,7 @@ class PaymentMethodAvailabilityNotice extends Error
 
     public function getId(): string
     {
-        return $this->lineItemId;
+        return self::KEY;
     }
 
     public function getMessageKey(): string
