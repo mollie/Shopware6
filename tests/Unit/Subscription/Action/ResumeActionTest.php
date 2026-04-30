@@ -19,7 +19,6 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
 #[CoversClass(ResumeAction::class)]
@@ -32,6 +31,7 @@ final class ResumeActionTest extends TestCase
 
     public function testExecuteCopiesSubscriptionAndPersistsResumedState(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
@@ -49,11 +49,11 @@ final class ResumeActionTest extends TestCase
         $action = new ResumeAction($repository, $gateway, new NullLogger());
 
         $result = $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
             $oldMollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($newMollieSubscription, $result);
@@ -69,6 +69,7 @@ final class ResumeActionTest extends TestCase
 
     public function testExecuteUsesNextPossiblePaymentDateWhenInTheFuture(): void
     {
+        $context = Context::createDefaultContext();
         $futureDate = (new \DateTime('+30 days'))->format('Y-m-d');
         $repository = $this->prepareRepositoryWithSubscription(
             new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS, 0, '', $futureDate)
@@ -86,11 +87,11 @@ final class ResumeActionTest extends TestCase
         $action = new ResumeAction($repository, $gateway, new NullLogger());
 
         $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
             $oldMollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($futureDate, $oldMollieSubscription->getStartDate()->format('Y-m-d'));
@@ -98,6 +99,7 @@ final class ResumeActionTest extends TestCase
 
     public function testExecuteFallsBackToTodayWhenNextPossiblePaymentDateIsInThePast(): void
     {
+        $context = Context::createDefaultContext();
         $pastDate = (new \DateTime('-10 days'))->format('Y-m-d');
         $today = (new \DateTime())->format('Y-m-d');
         $repository = $this->prepareRepositoryWithSubscription(
@@ -116,11 +118,11 @@ final class ResumeActionTest extends TestCase
         $action = new ResumeAction($repository, $gateway, new NullLogger());
 
         $action->execute(
-            $this->loadSubscriptionData($repository),
+            $this->loadSubscriptionData($repository, $context),
             new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
             $oldMollieSubscription,
             self::ORDER_NUMBER,
-            $this->getContext()
+            $context
         );
 
         $this->assertSame($today, $oldMollieSubscription->getStartDate()->format('Y-m-d'));
@@ -128,6 +130,7 @@ final class ResumeActionTest extends TestCase
 
     public function testExecuteThrowsWhenPauseAndResumeIsNotAllowed(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
@@ -142,11 +145,11 @@ final class ResumeActionTest extends TestCase
 
         try {
             $action->execute(
-                $this->loadSubscriptionData($repository),
+                $this->loadSubscriptionData($repository, $context),
                 new SubscriptionSettings(enabled: true, allowPauseAndResume: false),
                 $oldMollieSubscription,
                 self::ORDER_NUMBER,
-                $this->getContext()
+                $context
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
@@ -156,6 +159,7 @@ final class ResumeActionTest extends TestCase
 
     public function testExecuteThrowsWhenMollieSubscriptionIsActive(): void
     {
+        $context = Context::createDefaultContext();
         $repository = $this->prepareRepositoryWithSubscription();
         $gateway = new FakeSubscriptionGateway();
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
@@ -170,11 +174,11 @@ final class ResumeActionTest extends TestCase
 
         try {
             $action->execute(
-                $this->loadSubscriptionData($repository),
+                $this->loadSubscriptionData($repository, $context),
                 new SubscriptionSettings(enabled: true, allowPauseAndResume: true),
                 $oldMollieSubscription,
                 self::ORDER_NUMBER,
-                $this->getContext()
+                $context
             );
         } finally {
             $this->assertSame(0, $repository->getUpsertCount());
@@ -211,13 +215,8 @@ final class ResumeActionTest extends TestCase
         return $repository;
     }
 
-    private function loadSubscriptionData(FakeSubscriptionRepository $repository): \Mollie\Shopware\Component\Subscription\SubscriptionDataStruct
+    private function loadSubscriptionData(FakeSubscriptionRepository $repository, Context $context): \Mollie\Shopware\Component\Subscription\SubscriptionDataStruct
     {
-        return (new SubscriptionDataService($repository, new NullLogger()))->findById(self::SUBSCRIPTION_ID, $this->getContext());
-    }
-
-    private function getContext(): Context
-    {
-        return new Context(new SystemSource());
+        return (new SubscriptionDataService($repository, new NullLogger()))->findById(self::SUBSCRIPTION_ID, $context);
     }
 }
