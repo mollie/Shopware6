@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Subscription\Controller;
 use Mollie\Shopware\Component\Subscription\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Subscription\Route\WebhookRoute;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
+use Mollie\Shopware\Component\Subscription\SubscriptionActionHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\PlatformRequest;
@@ -26,7 +27,8 @@ final class SubscriptionController extends StorefrontController
     public function __construct(
         #[Autowire(service: WebhookRoute::class)]
         private readonly AbstractWebhookRoute $webhookRoute,
-        private readonly SubscriptionActionHandler $actionHandler,
+        #[Autowire(service: SubscriptionActionHandler::class)]
+        private readonly SubscriptionActionHandlerInterface $actionHandler,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger
     ) {

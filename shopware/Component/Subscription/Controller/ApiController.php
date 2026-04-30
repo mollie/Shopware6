@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Subscription\Controller;
 
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
+use Mollie\Shopware\Component\Subscription\SubscriptionActionHandlerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Routing\ApiRouteScope;
 use Shopware\Core\PlatformRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +21,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ApiController extends AbstractController
 {
     public function __construct(
-        private readonly SubscriptionActionHandler $actionHandler
+        #[Autowire(service: SubscriptionActionHandler::class)]
+        private readonly SubscriptionActionHandlerInterface $actionHandler
     ) {
     }
 
