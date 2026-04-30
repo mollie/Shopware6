@@ -10,7 +10,6 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SubscriptionAddressSyncer implements SubscriptionAddressSyncerInterface
@@ -40,7 +39,7 @@ final class SubscriptionAddressSyncer implements SubscriptionAddressSyncerInterf
 
         $billingId = $this->ensureCustomerAddress($customerId, $billingAddress, $context);
 
-        if ($this->buildAddressId($customerId, $shippingAddress) === $billingId) {
+        if ((string) new SubscriptionAddressId($customerId, $shippingAddress) === $billingId) {
             return [
                 'billingAddressId' => $billingId,
                 'shippingAddressId' => $billingId,
@@ -55,7 +54,7 @@ final class SubscriptionAddressSyncer implements SubscriptionAddressSyncerInterf
 
     private function ensureCustomerAddress(string $customerId, SubscriptionAddressEntity $subAddress, Context $context): string
     {
-        $candidateId = $this->buildAddressId($customerId, $subAddress);
+        $candidateId = (string) new SubscriptionAddressId($customerId, $subAddress);
 
         $existing = $this->customerAddressRepository->searchIds(new Criteria([$candidateId]), $context)->firstId();
         if ($existing !== null) {
@@ -81,27 +80,5 @@ final class SubscriptionAddressSyncer implements SubscriptionAddressSyncerInterf
         ]], $context);
 
         return $candidateId;
-    }
-
-    private function buildAddressId(string $customerId, SubscriptionAddressEntity $subAddress): string
-    {
-        $hash = implode('|', [
-            $customerId,
-            (string) $subAddress->getSalutationId(),
-            (string) $subAddress->getFirstName(),
-            (string) $subAddress->getLastName(),
-            (string) $subAddress->getCompany(),
-            (string) $subAddress->getDepartment(),
-            (string) $subAddress->getStreet(),
-            (string) $subAddress->getZipcode(),
-            (string) $subAddress->getCity(),
-            (string) $subAddress->getCountryId(),
-            (string) $subAddress->getCountryStateId(),
-            (string) $subAddress->getPhoneNumber(),
-            (string) $subAddress->getAdditionalAddressLine1(),
-            (string) $subAddress->getAdditionalAddressLine2(),
-        ]);
-
-        return Uuid::fromStringToHex($hash);
     }
 }

@@ -11,8 +11,9 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollecti
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
-use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculator;
-use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculatorInterface;
+use Mollie\Shopware\Component\Subscription\SubscriptionGroupAmount;
+use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilder;
+use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilderInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Entity\Product\Product;
@@ -40,8 +41,8 @@ final class PaymentSubscriber implements EventSubscriberInterface
         private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: LineItemAnalyzer::class)]
         private readonly LineItemAnalyzerInterface $lineItemAnalyzer,
-        #[Autowire(service: SubscriptionAmountCalculator::class)]
-        private readonly SubscriptionAmountCalculatorInterface $amountCalculator,
+        #[Autowire(service: SubscriptionGroupCartBuilder::class)]
+        private readonly SubscriptionGroupCartBuilderInterface $groupCartBuilder,
         #[Autowire(service: 'mollie_subscription.repository')]
         private readonly EntityRepository $subscriptionRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -97,7 +98,8 @@ final class PaymentSubscriber implements EventSubscriberInterface
             $subscriptionData = $this->getSubscriptionData($order, $primaryLineItem, $transactionData->getCustomer());
             $subscriptionData['billingAddress'] = $this->getAddressData($billingAddress, $subscriptionData['id']);
             $subscriptionData['shippingAddress'] = $this->getAddressData($shippingAddress, $subscriptionData['id']);
-            $subscriptionData['amount'] = $this->amountCalculator->calculateGroupAmount($order, (string) $intervalKey, $context);
+            $groupCart = $this->groupCartBuilder->buildGroupCart($order, (string) $intervalKey, $context);
+            $subscriptionData['amount'] = SubscriptionGroupAmount::fromGroupCartOrOrder($groupCart, $order)->gross();
 
             $subscriptionData['historyEntries'][] = [
                 'statusFrom' => '',

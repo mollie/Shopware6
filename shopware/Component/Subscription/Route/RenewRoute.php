@@ -20,10 +20,10 @@ use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncer;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncerInterface;
-use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculator;
-use Mollie\Shopware\Component\Subscription\SubscriptionAmountCalculatorInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataService;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataServiceInterface;
+use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilder;
+use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilderInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -59,8 +59,8 @@ final class RenewRoute extends AbstractRenewRoute
         private readonly EntityRepository $orderRepository,
         #[Autowire(service: SubscriptionDataService::class)]
         private readonly SubscriptionDataServiceInterface $subscriptionDataService,
-        #[Autowire(service: SubscriptionAmountCalculator::class)]
-        private readonly SubscriptionAmountCalculatorInterface $amountCalculator,
+        #[Autowire(service: SubscriptionGroupCartBuilder::class)]
+        private readonly SubscriptionGroupCartBuilderInterface $groupCartBuilder,
         #[Autowire(service: SubscriptionAddressSyncer::class)]
         private readonly SubscriptionAddressSyncerInterface $addressSyncer,
         #[Autowire(service: CartOrderRoute::class)]
@@ -163,7 +163,7 @@ final class RenewRoute extends AbstractRenewRoute
 
         $intervalKey = (string) $subscriptionEntity->getMetadata()->getInterval();
         $addresses = $this->addressSyncer->syncFromSubscription($subscriptionEntity, $context);
-        $groupCart = $this->amountCalculator->buildGroupCart(
+        $groupCart = $this->groupCartBuilder->buildGroupCart(
             $order,
             $intervalKey,
             $context,
