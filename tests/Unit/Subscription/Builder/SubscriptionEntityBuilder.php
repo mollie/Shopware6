@@ -127,8 +127,6 @@ final class SubscriptionEntityBuilder
         $entity->setStatus($this->status->value);
         $entity->setMetadata($this->metadata ?? new SubscriptionMetadata('2026-01-01', 1, IntervalUnit::MONTHS));
 
-        $this->assignNullableTypedProperty($entity, 'order', null);
-
         if ($this->withOrder) {
             $entity->setOrder($this->buildOrder());
         }
@@ -188,11 +186,5 @@ final class SubscriptionEntityBuilder
         $address->setLastName('Customer');
 
         return $address;
-    }
-
-    private function assignNullableTypedProperty(SubscriptionEntity $entity, string $property, mixed $value): void
-    {
-        $reflection = new \ReflectionProperty($entity, $property);
-        $reflection->setValue($entity, $value);
     }
 }
