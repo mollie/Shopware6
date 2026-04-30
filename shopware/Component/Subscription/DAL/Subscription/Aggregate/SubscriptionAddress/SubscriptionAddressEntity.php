@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress;
 
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
@@ -15,120 +14,49 @@ class SubscriptionAddressEntity extends Entity
 {
     use EntityIdTrait;
 
-    /**
-     * @var string
-     */
-    protected $subscriptionId;
+    protected string $subscriptionId = '';
 
-    /**
-     * @var null|string
-     */
-    protected $salutationId;
+    protected ?string $salutationId = null;
 
-    /**
-     * @var null|string
-     */
-    protected $title;
+    protected ?string $title = null;
 
-    /**
-     * @var string
-     */
-    protected $firstName;
+    protected string $firstName = '';
 
-    /**
-     * @var string
-     */
-    protected $lastName;
+    protected string $lastName = '';
 
-    /**
-     * @var null|string
-     */
-    protected $company;
+    protected ?string $company = null;
 
-    /**
-     * @var null|string
-     */
-    protected $department;
+    protected ?string $department = null;
 
-    /**
-     * @var null|string
-     */
-    protected $vatId;
+    protected ?string $vatId = null;
 
-    /**
-     * @var string
-     */
-    protected $street;
+    protected string $street = '';
 
-    /**
-     * @var string
-     */
-    protected $zipcode;
+    protected string $zipcode = '';
 
-    /**
-     * @var string
-     */
-    protected $city;
+    protected string $city = '';
 
-    /**
-     * @var string
-     */
-    protected $countryId;
+    protected string $countryId = '';
 
-    /**
-     * @var null|string
-     */
-    protected $countryStateId;
+    protected ?string $countryStateId = null;
 
-    /**
-     * @var null|CountryEntity
-     */
-    protected $country;
+    protected ?CountryEntity $country = null;
 
-    /**
-     * @var null|CountryStateEntity
-     */
-    protected $countryState;
+    protected ?CountryStateEntity $countryState = null;
 
-    /**
-     * @var null|string
-     */
-    protected $phoneNumber;
+    protected ?string $phoneNumber = null;
 
-    /**
-     * @var null|string
-     */
-    protected $additionalAddressLine1;
+    protected ?string $additionalAddressLine1 = null;
 
-    /**
-     * @var null|string
-     */
-    protected $additionalAddressLine2;
+    protected ?string $additionalAddressLine2 = null;
 
-    // --------------------------------------------------------------------------------
-    // loaded entities
+    protected ?SubscriptionEntity $subscription = null;
 
-    /**
-     * @var null|SubscriptionEntity
-     */
-    protected $subscription;
+    protected ?SalutationEntity $salutation = null;
 
-    /**
-     * @var null|SalutationEntity
-     */
-    protected $salutation;
+    protected ?SubscriptionEntity $billingSubscription = null;
 
-    /**
-     * @var SubscriptionDefinition
-     */
-    protected $billingSubscription;
-
-    /**
-     * @var SubscriptionDefinition
-     */
-    protected $shippingSubscription;
-
-    // --------------------------------------------------------------------------------
+    protected ?SubscriptionEntity $shippingSubscription = null;
 
     public function getSubscriptionId(): string
     {
@@ -330,22 +258,22 @@ class SubscriptionAddressEntity extends Entity
         $this->additionalAddressLine2 = $additionalAddressLine2;
     }
 
-    public function getBillingSubscription(): SubscriptionDefinition
+    public function getBillingSubscription(): ?SubscriptionEntity
     {
         return $this->billingSubscription;
     }
 
-    public function setBillingSubscription(SubscriptionDefinition $billingSubscription): void
+    public function setBillingSubscription(SubscriptionEntity $billingSubscription): void
     {
         $this->billingSubscription = $billingSubscription;
     }
 
-    public function getShippingSubscription(): SubscriptionDefinition
+    public function getShippingSubscription(): ?SubscriptionEntity
     {
         return $this->shippingSubscription;
     }
 
-    public function setShippingSubscription(SubscriptionDefinition $shippingSubscription): void
+    public function setShippingSubscription(SubscriptionEntity $shippingSubscription): void
     {
         $this->shippingSubscription = $shippingSubscription;
     }

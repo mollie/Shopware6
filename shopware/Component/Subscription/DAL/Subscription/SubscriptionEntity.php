@@ -19,140 +19,62 @@ class SubscriptionEntity extends Entity
 {
     use EntityIdTrait;
 
-    /**
-     * @var string
-     */
-    protected $customerId;
+    protected string $customerId = '';
 
-    /**
-     * @var CustomerEntity
-     */
-    protected $customer;
+    protected ?CustomerEntity $customer = null;
 
-    /**
-     * @var string
-     */
-    protected $mollieId;
+    protected string $mollieId = '';
 
-    /**
-     * @var string
-     */
-    protected $mollieCustomerId;
+    protected string $mollieCustomerId = '';
 
-    /**
-     * @var string
-     */
-    protected $status;
+    protected string $status = '';
 
-    /**
-     * @var string
-     */
-    protected $description;
+    protected string $description = '';
 
-    /**
-     * @var float
-     */
-    protected $amount;
+    protected float $amount = 0.0;
 
-    /**
-     * @var ?CurrencyEntity
-     */
-    protected $currency;
+    protected ?CurrencyEntity $currency = null;
 
-    /**
-     * @var string
-     */
-    protected $orderId;
+    protected string $orderId = '';
 
-    protected string $orderVersionId;
+    protected string $orderVersionId = '';
 
-    /**
-     * @var string
-     */
-    protected $salesChannelId;
+    protected string $salesChannelId = '';
 
-    /**
-     * @var ?string
-     */
-    protected $billingAddressId;
+    protected ?string $billingAddressId = null;
 
-    /**
-     * @var ?string
-     */
-    protected $shippingAddressId;
+    protected ?string $shippingAddressId = null;
 
     /**
      * @var null|array<mixed>
      */
-    protected $metadata;
+    protected ?array $metadata = null;
 
-    /**
-     * @var string
-     */
-    protected $mandateId;
+    protected string $mandateId = '';
 
-    /**
-     * @var null|\DateTimeInterface
-     */
-    protected $lastRemindedAt;
+    protected ?\DateTimeInterface $lastRemindedAt = null;
 
-    /**
-     * @var null|\DateTimeInterface
-     */
-    protected $nextPaymentAt;
+    protected ?\DateTimeInterface $nextPaymentAt = null;
 
-    /**
-     * @var null|\DateTimeInterface
-     */
-    protected $canceledAt;
+    protected ?\DateTimeInterface $canceledAt = null;
 
-    // --------------------------------------------------------------------------------
-    // manually loaded data
+    protected ?\DateTimeInterface $cancelUntil = null;
 
-    /**
-     * @var null|\DateTimeInterface
-     */
-    protected $cancelUntil;
+    protected ?SubscriptionAddressCollection $addresses = null;
 
-    // --------------------------------------------------------------------------------
-    // loaded entities
+    protected ?SubscriptionAddressEntity $billingAddress = null;
 
-    /**
-     * @var SubscriptionAddressCollection
-     */
-    protected $addresses;
+    protected ?SubscriptionAddressEntity $shippingAddress = null;
 
-    /**
-     * @var null|SubscriptionAddressEntity
-     */
-    protected $billingAddress;
+    protected ?SubscriptionHistoryCollection $historyEntries = null;
 
-    /**
-     * @var null|SubscriptionAddressEntity
-     */
-    protected $shippingAddress;
+    protected ?string $currencyId = null;
 
-    /**
-     * @var SubscriptionHistoryCollection
-     */
-    protected $historyEntries;
+    protected ?CashRoundingConfig $totalRounding = null;
 
-    /**
-     * @var string
-     */
-    protected $currencyId;
+    protected ?CashRoundingConfig $itemRounding = null;
 
-    /**
-     * @var ?CashRoundingConfig
-     */
-    protected $totalRounding;
-
-    /**
-     * @var ?CashRoundingConfig
-     */
-    protected $itemRounding;
-
-    protected ?OrderEntity $order;
+    protected ?OrderEntity $order = null;
 
     public function getOrder(): ?OrderEntity
     {
@@ -163,7 +85,6 @@ class SubscriptionEntity extends Entity
     {
         $this->order = $order;
     }
-    // --------------------------------------------------------------------------------
 
     public function setMetadata(SubscriptionMetadata $metadata): void
     {
@@ -172,14 +93,12 @@ class SubscriptionEntity extends Entity
 
     public function getMetadata(): SubscriptionMetadata
     {
-        $data = ($this->metadata !== null) ? $this->metadata : [];
-
-        return SubscriptionMetadata::fromArray($data);
+        return SubscriptionMetadata::fromArray($this->metadata ?? []);
     }
 
     public function getCustomerId(): string
     {
-        return (string) $this->customerId;
+        return $this->customerId;
     }
 
     public function setCustomerId(string $customerId): void
@@ -189,7 +108,7 @@ class SubscriptionEntity extends Entity
 
     public function getMollieId(): string
     {
-        return (string) $this->mollieId;
+        return $this->mollieId;
     }
 
     public function setMollieId(string $mollieId): void
@@ -199,7 +118,7 @@ class SubscriptionEntity extends Entity
 
     public function getMollieCustomerId(): string
     {
-        return (string) $this->mollieCustomerId;
+        return $this->mollieCustomerId;
     }
 
     public function setMollieCustomerId(string $mollieCustomerId): void
@@ -209,7 +128,7 @@ class SubscriptionEntity extends Entity
 
     public function getStatus(): string
     {
-        return (string) $this->status;
+        return $this->status;
     }
 
     public function setStatus(string $status): void
@@ -229,7 +148,7 @@ class SubscriptionEntity extends Entity
 
     public function getAmount(): float
     {
-        return (float) $this->amount;
+        return $this->amount;
     }
 
     public function setAmount(float $amount): void
@@ -249,7 +168,7 @@ class SubscriptionEntity extends Entity
 
     public function getOrderId(): string
     {
-        return (string) $this->orderId;
+        return $this->orderId;
     }
 
     public function setOrderId(string $orderId): void
@@ -269,7 +188,7 @@ class SubscriptionEntity extends Entity
 
     public function getMandateId(): string
     {
-        return (string) $this->mandateId;
+        return $this->mandateId;
     }
 
     public function setMandateId(string $mandateId): void
@@ -279,7 +198,7 @@ class SubscriptionEntity extends Entity
 
     public function getSalesChannelId(): string
     {
-        return (string) $this->salesChannelId;
+        return $this->salesChannelId;
     }
 
     public function setSalesChannelId(string $salesChannelId): void
@@ -365,8 +284,6 @@ class SubscriptionEntity extends Entity
     public function isActive(): bool
     {
         if ($this->getStatus() === '') {
-            // we might not have data somehow
-            // we treat this as "active" as long as we don't have a cancelled date
             return $this->canceledAt === null;
         }
 
@@ -455,9 +372,6 @@ class SubscriptionEntity extends Entity
         return false;
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // manually loaded data
-
     public function setCancelUntil(?\DateTimeInterface $cancelUntil): void
     {
         $this->cancelUntil = $cancelUntil;
@@ -468,9 +382,7 @@ class SubscriptionEntity extends Entity
         return $this->cancelUntil;
     }
 
-    // -----------------------------------------------------------------------------------------------------
-
-    public function getCustomer(): CustomerEntity
+    public function getCustomer(): ?CustomerEntity
     {
         return $this->customer;
     }
@@ -482,7 +394,7 @@ class SubscriptionEntity extends Entity
 
     public function getAddresses(): SubscriptionAddressCollection
     {
-        return $this->addresses;
+        return $this->addresses ?? new SubscriptionAddressCollection();
     }
 
     public function setAddresses(SubscriptionAddressCollection $addresses): void
@@ -492,11 +404,7 @@ class SubscriptionEntity extends Entity
 
     public function getHistoryEntries(): SubscriptionHistoryCollection
     {
-        if ($this->historyEntries === null) {
-            return new SubscriptionHistoryCollection();
-        }
-
-        return $this->historyEntries;
+        return $this->historyEntries ?? new SubscriptionHistoryCollection();
     }
 
     public function setHistoryEntries(SubscriptionHistoryCollection $historyEntries): void

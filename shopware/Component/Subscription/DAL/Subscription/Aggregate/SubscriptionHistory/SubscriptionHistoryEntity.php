@@ -11,40 +11,17 @@ class SubscriptionHistoryEntity extends Entity
 {
     use EntityIdTrait;
 
-    /**
-     * @var string
-     */
-    protected $subscriptionId;
+    protected string $subscriptionId = '';
 
-    /**
-     * @var string
-     */
-    protected $statusFrom;
+    protected string $statusFrom = '';
 
-    /**
-     * @var string
-     */
-    protected $statusTo;
+    protected string $statusTo = '';
 
-    /**
-     * @var string
-     */
-    protected $comment;
+    protected string $comment = '';
 
-    /**
-     * @var string
-     */
-    protected $mollieId;
+    protected string $mollieId = '';
 
-    // --------------------------------------------------------------------------------
-    // loaded entities
-
-    /**
-     * @var null|SubscriptionEntity
-     */
-    protected $subscription;
-
-    // --------------------------------------------------------------------------------
+    protected ?SubscriptionEntity $subscription = null;
 
     public function getSubscriptionId(): string
     {
@@ -95,8 +72,6 @@ class SubscriptionHistoryEntity extends Entity
     {
         $this->mollieId = $mollieId;
     }
-
-    // --------------------------------------------------------------------------------
 
     public function getSubscription(): ?SubscriptionEntity
     {
