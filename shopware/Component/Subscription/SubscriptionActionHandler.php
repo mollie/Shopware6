@@ -17,7 +17,7 @@ use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-final class SubscriptionActionHandler
+final class SubscriptionActionHandler implements SubscriptionActionHandlerInterface
 {
     /**
      * @var AbstractAction[]

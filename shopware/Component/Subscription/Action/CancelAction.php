@@ -13,6 +13,7 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollecti
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionCancelledEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataStruct;
+use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -39,68 +40,61 @@ final class CancelAction extends AbstractAction
     public function execute(SubscriptionDataStruct $subscriptionData, SubscriptionSettings $settings, Subscription $mollieSubscription, string $orderNumber, Context $context): Subscription
     {
         $subscription = $subscriptionData->getSubscription();
-        $subscriptionId = $subscription->getId();
-        $salesChannelId = $subscription->getSalesChannelId();
-        $mollieSubscriptionId = $subscription->getMollieId();
-        $mollieCustomerId = $subscription->getMollieCustomerId();
-        $shopwareSubscriptionStatus = SubscriptionStatus::from($subscription->getStatus());
+        $shopwareStatus = $subscription->getStatus();
         $mollieSubscriptionStatus = $mollieSubscription->getStatus();
+
         $logData = [
-            'subscriptionId' => $subscriptionId,
-            'salesChannelId' => $salesChannelId,
-            'mollieSubscriptionId' => $mollieSubscriptionId,
-            'mollieCustomerId' => $mollieCustomerId,
+            'subscriptionId' => $subscription->getId(),
+            'salesChannelId' => $subscription->getSalesChannelId(),
+            'mollieSubscriptionId' => $subscription->getMollieId(),
+            'mollieCustomerId' => $subscription->getMollieCustomerId(),
             'orderNumber' => $orderNumber,
-            'shopwareSubscriptionStatus' => $shopwareSubscriptionStatus->value,
-            'mollieSubscriptionStatus' => $mollieSubscriptionStatus->value
+            'shopwareSubscriptionStatus' => $shopwareStatus,
+            'mollieSubscriptionStatus' => $mollieSubscriptionStatus->value,
         ];
 
         $this->logger->info('Starting to cancel subscription', $logData);
 
+        if ($shopwareStatus === SubscriptionStatus::PENDING->value) {
+            $this->logger->info('Subscription is pending, persisting cancellation without Mollie API call', $logData);
+
+            return $this->persistImmediateCancellation($subscription, $context, $mollieSubscription, 'canceled');
+        }
+
         if (! $mollieSubscriptionStatus->isActive()) {
             $this->logger->error('Subscription status is not active', $logData);
-            throw new SubscriptionNotActiveException($subscriptionId);
+
+            throw new SubscriptionNotActiveException($subscription->getId());
         }
 
         $today = new \DateTime();
-        $newStatus = SubscriptionStatus::CANCELED_AFTER_RENEWAL;
-        $canceledAt = null;
         $nextPaymentAt = $mollieSubscription->getNextPaymentDate() ?? $today;
-        $nextPaymentAtDate = $nextPaymentAt->format('Y-m-d');
 
         $metaData = $subscription->getMetadata();
-        $metaData->setNextPossiblePaymentDate($nextPaymentAtDate);
+        $metaData->setNextPossiblePaymentDate($nextPaymentAt->format('Y-m-d'));
 
-        $subscriptionHistories = [
-            'statusFrom' => $shopwareSubscriptionStatus->value,
-            'statusTo' => $newStatus->value,
-            'mollieId' => $mollieSubscriptionId,
-            'comment' => 'cancelled after ' . $nextPaymentAtDate
-        ];
-
-        if ($mollieSubscription->isStateChangeWindowOpen($today, $settings->getCancelDays())) {
-            $newStatus = SubscriptionStatus::CANCELED;
-            $canceledAt = $today;
-            $nextPaymentAt = null;
-            $subscriptionHistories['comment'] = 'cancelled';
-            $subscriptionHistories['statusTo'] = $newStatus->value;
-            $this->logger->info('Subscription will be cancelled immediately', $logData);
-            $mollieSubscription = $this->mollieGateway->cancelSubscription($mollieSubscriptionId, $mollieCustomerId, $orderNumber, $salesChannelId);
+        if (! $mollieSubscription->isStateChangeWindowOpen($today, $settings->getCancelDays())) {
+            return $this->persistDeferredCancellation($subscription, $nextPaymentAt, $metaData, $context, $mollieSubscription);
         }
 
-        $upsertData = [
-            'id' => $subscriptionId,
-            'status' => $newStatus->value,
-            'nextPaymentAt' => $nextPaymentAt,
-            'canceledAt' => $canceledAt,
-            'metadata' => $metaData->toArray(),
-            'historyEntries' => [$subscriptionHistories]
-        ];
+        $this->logger->info('Subscription will be cancelled immediately', $logData);
+        $mollieSubscription = $this->mollieGateway->cancelSubscription(
+            $subscription->getMollieId(),
+            $subscription->getMollieCustomerId(),
+            $orderNumber,
+            $subscription->getSalesChannelId(),
+        );
 
-        $this->subscriptionRepository->upsert([$upsertData], $context);
-        $this->logger->info('Cancel subscription finished', $logData);
+        return $this->persistImmediateCancellation($subscription, $context, $mollieSubscription, 'cancelled', $metaData);
+    }
 
-        return $mollieSubscription;
+    public function cancelPending(SubscriptionEntity $subscription, Context $context): void
+    {
+        if ($subscription->getStatus() !== SubscriptionStatus::PENDING->value) {
+            throw new \LogicException(sprintf('CancelAction::cancelPending called for non-pending subscription "%s"', $subscription->getId()));
+        }
+
+        $this->persistImmediateCancellation($subscription, $context, null, 'canceled');
     }
 
     public function getEventClass(): string
@@ -111,5 +105,67 @@ final class CancelAction extends AbstractAction
     public static function getActioName(): string
     {
         return self::ACTION_NAME;
+    }
+
+    private function persistImmediateCancellation(
+        SubscriptionEntity $subscription,
+        Context $context,
+        ?Subscription $mollieSubscription,
+        string $comment = 'cancelled',
+        ?SubscriptionMetadata $metadata = null
+    ): ?Subscription {
+        $statusFrom = $subscription->getStatus();
+        $newStatus = SubscriptionStatus::CANCELED->value;
+
+        $upsertData = [
+            'id' => $subscription->getId(),
+            'status' => $newStatus,
+            'canceledAt' => new \DateTime(),
+            'nextPaymentAt' => null,
+            'historyEntries' => [[
+                'statusFrom' => $statusFrom,
+                'statusTo' => $newStatus,
+                'mollieId' => $subscription->getMollieId(),
+                'comment' => $comment,
+            ]],
+        ];
+
+        if ($metadata instanceof SubscriptionMetadata) {
+            $upsertData['metadata'] = $metadata->toArray();
+        }
+
+        $this->subscriptionRepository->upsert([$upsertData], $context);
+
+        return $mollieSubscription;
+    }
+
+    private function persistDeferredCancellation(
+        SubscriptionEntity $subscription,
+        \DateTimeInterface $nextPaymentAt,
+        SubscriptionMetadata $metadata,
+        Context $context,
+        Subscription $mollieSubscription
+    ): Subscription {
+        $statusFrom = $subscription->getStatus();
+        $newStatus = SubscriptionStatus::CANCELED_AFTER_RENEWAL->value;
+        $nextPaymentAtDate = $nextPaymentAt->format('Y-m-d');
+
+        $upsertData = [
+            'id' => $subscription->getId(),
+            'status' => $newStatus,
+            'canceledAt' => null,
+            'nextPaymentAt' => $nextPaymentAt,
+            'metadata' => $metadata->toArray(),
+            'historyEntries' => [[
+                'statusFrom' => $statusFrom,
+                'statusTo' => $newStatus,
+                'mollieId' => $subscription->getMollieId(),
+                'comment' => 'cancelled after ' . $nextPaymentAtDate,
+            ]],
+        ];
+
+        $this->subscriptionRepository->upsert([$upsertData], $context);
+
+        return $mollieSubscription;
     }
 }

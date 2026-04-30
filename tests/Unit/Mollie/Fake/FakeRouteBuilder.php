@@ -8,8 +8,12 @@ use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 
 final class FakeRouteBuilder implements RouteBuilderInterface
 {
-    public function __construct(private string $returnUrl = '', private string $webhookUrl = '',private string $posCheckoutUrl = '')
-    {
+    public function __construct(
+        private string $returnUrl = '',
+        private string $webhookUrl = '',
+        private string $posCheckoutUrl = '',
+        private string $subscriptionWebhookUrl = '',
+    ) {
     }
 
     public function getReturnUrl(string $transactionId): string
@@ -39,6 +43,6 @@ final class FakeRouteBuilder implements RouteBuilderInterface
 
     public function getSubscriptionWebhookUrl(string $subscriptionId): string
     {
-        // TODO: Implement getSubscriptionWebhookUrl() method.
+        return $this->subscriptionWebhookUrl;
     }
 }
