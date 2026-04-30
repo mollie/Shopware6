@@ -58,8 +58,10 @@ final class FakeOrderRepository
     {
         $orderAddress = $this->getOrderAddressWithoutCountry($customerEntity);
         $country = new CountryEntity();
+        $country->setId('country-id');
         $country->setIso('DE');
         $orderAddress->setCountry($country);
+        $orderAddress->setCountryId('country-id');
 
         return $orderAddress;
     }

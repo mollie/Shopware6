@@ -14,6 +14,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +66,8 @@ final class WebhookRoute extends AbstractWebhookRoute
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('customFields.' . Mollie::EXTENSION . '.id', $molliePaymentId));
         $criteria->addFilter(new EqualsFilter('order.mollieSubscriptions.id', $subscriptionId));
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
+        $criteria->setLimit(1);
 
         $searchIdResult = $this->transactionRepository->searchIds($criteria, $context);
         $transactionId = $searchIdResult->firstId();
