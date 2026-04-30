@@ -3,29 +3,18 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Subscriber;
 
-use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\Action\CreateAction;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupAmount;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilder;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilderInterface;
-use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
-use Mollie\Shopware\Component\Subscription\SubscriptionTag;
-use Mollie\Shopware\Entity\Product\Product;
-use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -33,9 +22,6 @@ final class PaymentSubscriber implements EventSubscriberInterface
 {
     public const PRIORITY = 0;
 
-    /**
-     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
-     */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
@@ -43,8 +29,7 @@ final class PaymentSubscriber implements EventSubscriberInterface
         private readonly LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: SubscriptionGroupCartBuilder::class)]
         private readonly SubscriptionGroupCartBuilderInterface $groupCartBuilder,
-        #[Autowire(service: 'mollie_subscription.repository')]
-        private readonly EntityRepository $subscriptionRepository,
+        private readonly CreateAction $createAction,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger
     ) {
@@ -60,18 +45,15 @@ final class PaymentSubscriber implements EventSubscriberInterface
     public function onPaymentCreated(PaymentCreatedEvent $event): void
     {
         $transactionData = $event->getTransactionDataStruct();
-
         $order = $transactionData->getOrder();
-
-        $salesChannelId = $order->getSalesChannelId();
         $context = $event->getContext();
-        $subscriptionSettings = $this->settingsService->getSubscriptionSettings($salesChannelId);
-        if (! $subscriptionSettings->isEnabled()) {
+
+        if (! $this->settingsService->getSubscriptionSettings($order->getSalesChannelId())->isEnabled()) {
             return;
         }
 
-        $subscriptionCollection = $order->getExtension('mollieSubscriptions');
-        if ($subscriptionCollection instanceof SubscriptionCollection && $subscriptionCollection->count() > 0) {
+        $existingSubscriptions = $order->getExtension('mollieSubscriptions');
+        if ($existingSubscriptions instanceof SubscriptionCollection && $existingSubscriptions->count() > 0) {
             return;
         }
 
@@ -87,143 +69,22 @@ final class PaymentSubscriber implements EventSubscriberInterface
 
         $logData = [
             'orderNumber' => (string) $order->getOrderNumber(),
+            'count' => count($subscriptionGroups),
         ];
-        $shippingAddress = $transactionData->getShippingOrderAddress();
+        $this->logger->info('Creating pending subscriptions for order', $logData);
+
         $billingAddress = $transactionData->getBillingOrderAddress();
+        $shippingAddress = $transactionData->getShippingOrderAddress();
+        $customer = $transactionData->getCustomer();
 
-        $subscriptionsData = [];
         foreach ($subscriptionGroups as $intervalKey => $groupLineItems) {
-            $primaryLineItem = $groupLineItems[0];
             /** @var OrderLineItemEntity $primaryLineItem */
-            $subscriptionData = $this->getSubscriptionData($order, $primaryLineItem, $transactionData->getCustomer());
-            $subscriptionData['billingAddress'] = $this->getAddressData($billingAddress, $subscriptionData['id']);
-            $subscriptionData['shippingAddress'] = $this->getAddressData($shippingAddress, $subscriptionData['id']);
+            $primaryLineItem = $groupLineItems[0];
+
             $groupCart = $this->groupCartBuilder->buildGroupCart($order, (string) $intervalKey, $context);
-            $subscriptionData['amount'] = SubscriptionGroupAmount::fromGroupCartOrOrder($groupCart, $order)->gross();
+            $amount = SubscriptionGroupAmount::fromGroupCartOrOrder($groupCart, $order)->gross();
 
-            $subscriptionData['historyEntries'][] = [
-                'statusFrom' => '',
-                'statusTo' => SubscriptionStatus::PENDING->value,
-                'comment' => 'created'
-            ];
-
-            $subscriptionsData[] = $subscriptionData;
+            $this->createAction->create($order, $primaryLineItem, $customer, $billingAddress, $shippingAddress, $amount, $context);
         }
-
-        $logData['count'] = count($subscriptionsData);
-        $this->logger->info('Pending subscriptions created', $logData);
-        $this->subscriptionRepository->upsert($subscriptionsData, $context);
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function getSubscriptionData(OrderEntity $order, OrderLineItemEntity $lineItem, CustomerEntity $customer): array
-    {
-        $description = 'Order #' . $order->getOrderNumber();
-
-        /** @var ?Product $productExtension */
-        $productExtension = $lineItem->getExtension(Mollie::EXTENSION);
-        if ($productExtension instanceof Product) {
-            $description .= ' (' . $productExtension->getInterval() . ')';
-        }
-
-        $totalRoundingValue = null;
-        $totalRounding = $order->getTotalRounding();
-        if ($totalRounding instanceof CashRoundingConfig) {
-            $totalRoundingValue = $totalRounding->jsonSerialize();
-        }
-        $itemRoundingValue = null;
-        $itemRounding = $order->getItemRounding();
-        if ($itemRounding instanceof CashRoundingConfig) {
-            $itemRoundingValue = $itemRounding->jsonSerialize();
-        }
-        $subscriptionId = Uuid::randomHex();
-
-        return [
-            'id' => $subscriptionId,
-            'customerId' => $customer->getId(),
-            'mollieCustomerId' => null,
-            'mollieSubscriptionId' => null,
-            'lastRemindedAt' => null,
-            'canceledAt' => null,
-            'status' => SubscriptionStatus::PENDING->value,
-            'description' => $description,
-            'amount' => $order->getAmountTotal(),
-            'currencyId' => $order->getCurrencyId(),
-            'metadata' => $this->getMetaDataArray($lineItem, $order->getOrderDate()),
-            'orderId' => $order->getId(),
-            'orderVersionId' => $order->getVersionId(),
-            'salesChannelId' => $order->getSalesChannelId(),
-            'totalRounding' => $totalRoundingValue,
-            'itemRounding' => $itemRoundingValue,
-            'order' => [
-                'id' => $order->getId(),
-                'orderVersionId' => $order->getVersionId(),
-                'tags' => [
-                    [
-                        'id' => SubscriptionTag::ID
-                    ]
-                ],
-            ]
-        ];
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function getAddressData(OrderAddressEntity $address, string $subscriptionId): array
-    {
-        $address = [
-            'subscriptionId' => $subscriptionId,
-            'salutationId' => $address->getSalutationId(),
-            'firstName' => $address->getFirstName(),
-            'lastName' => $address->getLastName(),
-            'company' => $address->getCompany(),
-            'department' => $address->getDepartment(),
-            'vatId' => $address->getVatId(),
-            'street' => $address->getStreet(),
-            'zipcode' => (string) $address->getZipcode(),
-            'city' => $address->getCity(),
-            'countryId' => $address->getCountryId(),
-            'countryStateId' => $address->getCountryStateId(),
-            'phoneNumber' => $address->getPhoneNumber(),
-            'additionalAddressLine1' => $address->getAdditionalAddressLine1(),
-            'additionalAddressLine2' => $address->getAdditionalAddressLine2(),
-        ];
-        $address['id'] = Uuid::fromStringToHex(implode('-',array_values($address)));
-
-        return $address;
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function getMetaDataArray(OrderLineItemEntity $lineItem, \DateTimeInterface $orderDate): array
-    {
-        /** @var ?Product $productExtension */
-        $productExtension = $lineItem->getExtension(Mollie::EXTENSION);
-        if (! $productExtension instanceof Product) {
-            return [];
-        }
-
-        $repetitions = 0;
-        $hasRepetitions = $productExtension->getRepetition() > 0;
-        if ($hasRepetitions) {
-            // Since we already paid once, we get then the next start date as first date and also reduce the amount of repetitions
-            $repetitions = $productExtension->getRepetition() - 1;
-        }
-
-        $startDate = \DateTime::createFromFormat('Y-m-d', $orderDate->format('Y-m-d'));
-
-        if (! $startDate instanceof \DateTimeInterface) {
-            throw new \RuntimeException('Failed to create date object');
-        }
-        $interval = $productExtension->getInterval();
-
-        $startDate->modify('+' . (string) $interval);
-        $metaData = new SubscriptionMetadata($startDate->format('Y-m-d'), $interval->getIntervalValue(), $interval->getIntervalUnit(), $repetitions);
-
-        return $metaData->toArray();
     }
 }
