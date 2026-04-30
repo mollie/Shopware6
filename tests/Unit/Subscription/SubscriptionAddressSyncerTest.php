@@ -32,9 +32,9 @@ final class SubscriptionAddressSyncerTest extends TestCase
         $result = $syncer->syncFromSubscription($subscription, Context::createDefaultContext());
 
         $this->assertSame(2, $repository->getUpsertCount());
-        $this->assertNotSame($result['billingAddressId'], $result['shippingAddressId']);
-        $this->assertSame($result['billingAddressId'], $repository->getUpserts()[0]['id']);
-        $this->assertSame($result['shippingAddressId'], $repository->getUpserts()[1]['id']);
+        $this->assertNotSame($result->getBillingAddressId(), $result->getShippingAddressId());
+        $this->assertSame($result->getBillingAddressId(), $repository->getUpserts()[0]['id']);
+        $this->assertSame($result->getShippingAddressId(), $repository->getUpserts()[1]['id']);
     }
 
     public function testSyncReusesExistingAddressIdsWhenAlreadyPersisted(): void
@@ -54,8 +54,8 @@ final class SubscriptionAddressSyncerTest extends TestCase
         $result = $syncer->syncFromSubscription($this->buildSubscription($billing, $shipping), Context::createDefaultContext());
 
         $this->assertSame(0, $repository->getUpsertCount());
-        $this->assertSame($billingId, $result['billingAddressId']);
-        $this->assertSame($shippingId, $result['shippingAddressId']);
+        $this->assertSame($billingId, $result->getBillingAddressId());
+        $this->assertSame($shippingId, $result->getShippingAddressId());
     }
 
     public function testSyncReusesBillingIdForShippingWhenAddressesAreIdentical(): void
@@ -69,7 +69,7 @@ final class SubscriptionAddressSyncerTest extends TestCase
         $result = $syncer->syncFromSubscription($this->buildSubscription($billing, $shipping), Context::createDefaultContext());
 
         $this->assertSame(1, $repository->getUpsertCount());
-        $this->assertSame($result['billingAddressId'], $result['shippingAddressId']);
+        $this->assertSame($result->getBillingAddressId(), $result->getShippingAddressId());
     }
 
     public function testSyncThrowsWhenBillingAddressMissing(): void

@@ -63,7 +63,7 @@ Two levels of shared-ness:
 
 - **Shared across components** → goes to `tests/Unit/Fake/` or
   `tests/Unit/Builder/`.
-  Examples: `FakeCustomerRepository`, `FakeEventDispatcher`, `OrderBuilder`,
+  Examples: `FakeCustomerRepository`, `EventSpy`, `OrderBuilder`,
   `CustomerBuilder`.
 - **Component-local** → stays in `tests/Unit/<Component>/Fake/` or
   `tests/Unit/<Component>/Builder/`.
@@ -97,7 +97,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Payment\Action;
 
 use Mollie\Shopware\Component\Payment\Action\Pay;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

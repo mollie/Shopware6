@@ -8,7 +8,7 @@ use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Subscription\Action\ConfirmAction;
 use Mollie\Shopware\Component\Subscription\Event\ModifyCreateSubscriptionPayloadEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
@@ -50,7 +50,7 @@ final class ConfirmActionTest extends TestCase
             ->build();
         $gateway->setCreateResponse($newMollieSubscription);
 
-        $action = $this->getAction($repository, $gateway, new FakeEventDispatcher());
+        $action = $this->getAction($repository, $gateway, new EventSpy());
         $result = $action->confirm($subscription, $this->buildCurrency('EUR'), self::MANDATE_ID, self::MOLLIE_CUSTOMER_ID, self::ORDER_NUMBER, $context);
 
         $this->assertSame($newMollieSubscription, $result);
@@ -86,7 +86,7 @@ final class ConfirmActionTest extends TestCase
             ->build();
         $gateway->setCreateResponse($newMollieSubscription);
 
-        $action = $this->getAction($repository, $gateway, new FakeEventDispatcher());
+        $action = $this->getAction($repository, $gateway, new EventSpy());
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageMatches('/has no next payment date/');
@@ -103,7 +103,7 @@ final class ConfirmActionTest extends TestCase
         $context = Context::createDefaultContext();
         $repository = new FakeSubscriptionRepository();
         $gateway = new FakeSubscriptionGateway();
-        $eventDispatcher = new FakeEventDispatcher();
+        $eventDispatcher = new EventSpy();
 
         $subscription = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
@@ -122,7 +122,7 @@ final class ConfirmActionTest extends TestCase
         $action = $this->getAction($repository, $gateway, $eventDispatcher);
         $action->confirm($subscription, $this->buildCurrency('EUR'), self::MANDATE_ID, self::MOLLIE_CUSTOMER_ID, self::ORDER_NUMBER, $context);
 
-        $this->assertInstanceOf(ModifyCreateSubscriptionPayloadEvent::class, $eventDispatcher->getDispatchedEvent());
+        $this->assertInstanceOf(ModifyCreateSubscriptionPayloadEvent::class, $eventDispatcher->getEvent());
     }
 
     public function testConfirmForwardsTimesFromMetadataIntoCreateSubscriptionPayload(): void
@@ -147,7 +147,7 @@ final class ConfirmActionTest extends TestCase
             ->build();
         $gateway->setCreateResponse($newMollieSubscription);
 
-        $action = $this->getAction($repository, $gateway, new FakeEventDispatcher());
+        $action = $this->getAction($repository, $gateway, new EventSpy());
         $action->confirm($subscription, $this->buildCurrency('EUR'), self::MANDATE_ID, self::MOLLIE_CUSTOMER_ID, self::ORDER_NUMBER, $context);
 
         $payloads = $gateway->getCreatePayloads();
@@ -156,7 +156,7 @@ final class ConfirmActionTest extends TestCase
         $this->assertSame(12, $payloadArray['times']);
     }
 
-    private function getAction(FakeSubscriptionRepository $repository, FakeSubscriptionGateway $gateway, FakeEventDispatcher $eventDispatcher): ConfirmAction
+    private function getAction(FakeSubscriptionRepository $repository, FakeSubscriptionGateway $gateway, EventSpy $eventDispatcher): ConfirmAction
     {
         return new ConfirmAction(
             $repository,

@@ -9,7 +9,7 @@ use Mollie\Shopware\Component\Payment\Route\WebhookException;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
@@ -71,7 +71,7 @@ final class WebhookRouteTest extends TestCase
         return new WebhookRoute(
             $gateway,
             new FakeOrderTransactionStateHandler(),
-            new FakeEventDispatcher(),
+            new EventSpy(),
             new FakePaymentMethodUpdater(),
             new FakeOrderStateHandler(),
             new FakeOrderService(),

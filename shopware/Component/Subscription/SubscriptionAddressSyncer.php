@@ -23,7 +23,7 @@ final class SubscriptionAddressSyncer implements SubscriptionAddressSyncerInterf
     ) {
     }
 
-    public function syncFromSubscription(SubscriptionEntity $subscription, Context $context): array
+    public function syncFromSubscription(SubscriptionEntity $subscription, Context $context): RenewalAddresses
     {
         $customerId = (string) $subscription->getCustomerId();
 
@@ -40,16 +40,13 @@ final class SubscriptionAddressSyncer implements SubscriptionAddressSyncerInterf
         $billingId = $this->ensureCustomerAddress($customerId, $billingAddress, $context);
 
         if ((string) new SubscriptionAddressId($customerId, $shippingAddress) === $billingId) {
-            return [
-                'billingAddressId' => $billingId,
-                'shippingAddressId' => $billingId,
-            ];
+            return new RenewalAddresses($billingId, $billingId);
         }
 
-        return [
-            'billingAddressId' => $billingId,
-            'shippingAddressId' => $this->ensureCustomerAddress($customerId, $shippingAddress, $context),
-        ];
+        return new RenewalAddresses(
+            $billingId,
+            $this->ensureCustomerAddress($customerId, $shippingAddress, $context)
+        );
     }
 
     private function ensureCustomerAddress(string $customerId, SubscriptionAddressEntity $subAddress, Context $context): string

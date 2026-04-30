@@ -21,10 +21,15 @@ Legend: `[x]` = test exists & covers ≥ 80 %, `[/]` = test exists but < 80 %, `
 
 | | File | Stmts | Cov % | Test file | PR |
 |---|---|---:|---:|---|---|
-| [ ] | `Component/Subscription/Subscriber/PendingSubscriptionSubscriber.php` | 127 | 0 % | – | – |
-| [ ] | `Component/Subscription/Subscriber/PaymentSubscriber.php` | 110 | 0 % | – | – |
+| [x] | `Component/Subscription/Subscriber/PendingSubscriptionSubscriber.php` | 127 | – | `tests/Unit/Subscription/Subscriber/PendingSubscriptionSubscriberTest.php` | – |
+| [x] | `Component/Subscription/Action/ConfirmAction.php` | – | – | `tests/Unit/Subscription/Action/ConfirmActionTest.php` | – |
+| [x] | `Component/Subscription/Subscriber/PaymentSubscriber.php` | 110 | – | `tests/Unit/Subscription/Subscriber/PaymentSubscriberTest.php` | – |
+| [x] | `Component/Subscription/Action/CreateAction.php` | – | – | `tests/Unit/Subscription/Action/CreateActionTest.php` | – |
 | [x] | `Component/Subscription/DAL/Subscription/SubscriptionEntity.php` | 90 | – | `tests/Unit/Subscription/DAL/SubscriptionEntityTest.php` | – |
-| [ ] | `Component/Subscription/Route/RenewRoute.php` | 86 | 0 % | – | – |
+| [x] | `Component/Subscription/Route/RenewRoute.php` | 86 | – | `tests/Unit/Subscription/Route/RenewRouteTest.php` | – |
+| [x] | `Component/Subscription/Action/RenewAction.php` | – | – | `tests/Unit/Subscription/Action/RenewActionTest.php` | – |
+| [x] | `Component/Subscription/RenewalOrderCreator.php` | – | – | `tests/Unit/Subscription/RenewalOrderCreatorTest.php` | – |
+| [x] | `Component/Subscription/RenewalAddresses.php` | – | – | _trivial VO — covered transitively_ | – |
 | [x] | `Component/Subscription/Action/SkipAction.php` | 61 | – | `tests/Unit/Subscription/Action/SkipActionTest.php` | – |
 | [x] | `Component/Subscription/Action/PauseAction.php` | 58 | – | `tests/Unit/Subscription/Action/PauseActionTest.php` | – |
 | [x] | `Component/Subscription/Action/CancelAction.php` | 55 | – | `tests/Unit/Subscription/Action/CancelActionTest.php` | – |
@@ -33,7 +38,7 @@ Legend: `[x]` = test exists & covers ≥ 80 %, `[/]` = test exists but < 80 %, `
 | [x] | `Component/Subscription/SubscriptionDataService.php` | 49 | – | `tests/Unit/Subscription/SubscriptionDataServiceTest.php` | – |
 | [x] | `Component/Subscription/SubscriptionActionHandler.php` | 47 | – | `tests/Unit/Subscription/SubscriptionActionHandlerTest.php` | – |
 | [x] | `Component/Subscription/DAL/Subscription/Aggregate/SubscriptionAddress/SubscriptionAddressEntity.php` | 44 | – | `tests/Unit/Subscription/DAL/SubscriptionAddressEntityTest.php` | – |
-| [ ] | `Component/Subscription/Controller/SubscriptionController.php` | 40 | 0 % | – | – |
+| [/] | `Component/Subscription/Controller/SubscriptionController.php` | 40 | – | `tests/Unit/Subscription/Controller/SubscriptionControllerTest.php` (only `webhook()`; `changeState()` uses `StorefrontController::trans/addFlash/redirectToRoute` and is Behat-territory) | – |
 | [x] | `Component/Subscription/SubscriptionMetadata.php` | 39 | 82 % | – | – |
 | [x] | `Component/Subscription/DAL/Subscription/SubscriptionDefinition.php` | 36 | – | `tests/Unit/Subscription/DAL/EntityDefinitionsTest.php` | – |
 | [x] | `Component/Subscription/DAL/Subscription/Aggregate/SubscriptionAddress/SubscriptionAddressDefinition.php` | 30 | – | `tests/Unit/Subscription/DAL/EntityDefinitionsTest.php` | – |
@@ -44,12 +49,12 @@ Legend: `[x]` = test exists & covers ≥ 80 %, `[/]` = test exists but < 80 %, `
 | [ ] | `Component/Subscription/SubscriptionGroupCartBuilder.php` | – | 0 % | – | – |
 | [x] | `Component/Subscription/SubscriptionAddressSyncer.php` | – | – | `tests/Unit/Subscription/SubscriptionAddressSyncerTest.php` | – |
 | [/] | `Component/Subscription/SubscriptionAddressId.php` | – | – | `tests/Unit/Subscription/SubscriptionAddressSyncerTest.php` (indirect) | – |
-| [ ] | `Component/Subscription/SubscriptionGroupCart.php` | – | 0 % | – | – |
-| [ ] | `Component/Subscription/Route/WebhookRoute.php` | 25 | 0 % | – | – |
+| [x] | `Component/Subscription/SubscriptionGroupCart.php` | – | – | `tests/Unit/Subscription/SubscriptionGroupCartTest.php` | – |
+| [x] | `Component/Subscription/Route/WebhookRoute.php` | 25 | – | `tests/Unit/Subscription/Route/WebhookRouteTest.php` | – |
 | [x] | `Component/Subscription/Cart/Validator/AvailabilityInformationValidator.php` | 16 | – | `tests/Unit/Subscription/Cart/AvailabilityInformationValidatorTest.php` | – |
 | [x] | `Component/Subscription/LineItemAnalyzer.php` | 16 | – | `tests/Unit/Subscription/LineItemAnalyzerTest.php` | – |
 | [x] | `Component/Subscription/Event/SubscriptionActionEvent.php` | 15 | – | `tests/Unit/Subscription/Event/SubscriptionEventsTest.php` | – |
-| [ ] | `Component/Subscription/Controller/ApiController.php` | 14 | 0 % | – | – |
+| [x] | `Component/Subscription/Controller/ApiController.php` | 14 | – | `tests/Unit/Subscription/Controller/ApiControllerTest.php` | – |
 | [x] | `Component/Subscription/DAL/Subscription/Aggregate/SubscriptionHistory/SubscriptionHistoryDefinition.php` | 14 | – | `tests/Unit/Subscription/DAL/EntityDefinitionsTest.php` | – |
 | [x] | `Component/Subscription/DAL/Subscription/Aggregate/SubscriptionHistory/SubscriptionHistoryEntity.php` | 12 | – | `tests/Unit/Subscription/DAL/SubscriptionHistoryEntityTest.php` | – |
 | [x] | `Component/Subscription/DAL/Subscription/SubscriptionStatus.php` | 11 | 100 % | – | – |

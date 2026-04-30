@@ -15,7 +15,7 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionStartedEvent;
 use Mollie\Shopware\Component\Subscription\Subscriber\PendingSubscriptionSubscriber;
 use Mollie\Shopware\Unit\Builder\CustomerBuilder;
-use Mollie\Shopware\Unit\Fake\FakeEventDispatcher;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
@@ -167,7 +167,7 @@ final class PendingSubscriptionSubscriberTest extends TestCase
             ->build();
         $gateway->setCreateResponse($newMollieSubscription);
 
-        $eventDispatcher = new FakeEventDispatcher();
+        $eventDispatcher = new EventSpy();
         [$subscriber] = $this->buildSubscriber($repository, enabled: true, gateway: $gateway, eventDispatcher: $eventDispatcher);
 
         $pending = $this->buildPendingSubscription('subscription-id-1');
@@ -178,7 +178,7 @@ final class PendingSubscriptionSubscriberTest extends TestCase
         $this->assertSame(1, $gateway->getCallCount('createSubscription'));
         $this->assertSame(1, $repository->getUpsertCount());
         $this->assertSame('confirmed', $repository->getLastUpsert()['historyEntries'][0]['comment']);
-        $this->assertInstanceOf(SubscriptionStartedEvent::class, $eventDispatcher->getDispatchedEvent());
+        $this->assertInstanceOf(SubscriptionStartedEvent::class, $eventDispatcher->getEvent());
     }
 
     public function testOnPaidWebhookThrowsWhenPaymentHasNoCustomerId(): void
@@ -270,10 +270,10 @@ final class PendingSubscriptionSubscriberTest extends TestCase
         FakeSubscriptionRepository $repository,
         bool $enabled,
         ?FakeSubscriptionGateway $gateway = null,
-        ?FakeEventDispatcher $eventDispatcher = null
+        ?EventSpy $eventDispatcher = null
     ): array {
         $gateway ??= new FakeSubscriptionGateway();
-        $eventDispatcher ??= new FakeEventDispatcher();
+        $eventDispatcher ??= new EventSpy();
         $settingsService = new FakeSettingsService(subscriptionSettings: new SubscriptionSettings(enabled: $enabled));
 
         $cancelAction = new CancelAction($repository, $gateway, new NullLogger());
