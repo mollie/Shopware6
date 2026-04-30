@@ -50,14 +50,6 @@ class AvailabilityInformationValidator implements CartValidatorInterface
 
     private function clearError(Cart $cart): void
     {
-        $list = new ErrorCollection();
-
-        foreach ($cart->getErrors() as $error) {
-            if (! $error instanceof PaymentMethodAvailabilityNotice) {
-                $list->add($error);
-            }
-        }
-
-        $cart->setErrors($list);
+        $cart->getErrors()->remove(PaymentMethodAvailabilityNotice::KEY);
     }
 }

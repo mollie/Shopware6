@@ -62,7 +62,7 @@ final class CartErrorsTest extends TestCase
             ],
             'payment-method-availability-notice' => [
                 static fn (): PaymentMethodAvailabilityNotice => new PaymentMethodAvailabilityNotice('line-item-1'),
-                'line-item-1',
+                'mollie-payments-cart-error-paymentmethod-availability',
                 'mollie-payments-cart-error-paymentmethod-availability',
                 Error::LEVEL_NOTICE,
                 false,

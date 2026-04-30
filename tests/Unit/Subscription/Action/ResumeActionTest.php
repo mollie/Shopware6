@@ -81,10 +81,11 @@ final class ResumeActionTest extends TestCase
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::CANCELED)
             ->build();
+        $newMollieSubscription = MollieSubscriptionBuilder::create()
+            ->withId(self::NEW_MOLLIE_ID)
+            ->build();
         $gateway->register($oldMollieSubscription);
-        $gateway->setCopyResponse(
-            MollieSubscriptionBuilder::create()->withId(self::NEW_MOLLIE_ID)->build()
-        );
+        $gateway->setCopyResponse($newMollieSubscription);
 
         $action = new ResumeAction($repository, $gateway, new NullLogger());
 
@@ -112,10 +113,11 @@ final class ResumeActionTest extends TestCase
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::CANCELED)
             ->build();
+        $newMollieSubscription = MollieSubscriptionBuilder::create()
+            ->withId(self::NEW_MOLLIE_ID)
+            ->build();
         $gateway->register($oldMollieSubscription);
-        $gateway->setCopyResponse(
-            MollieSubscriptionBuilder::create()->withId(self::NEW_MOLLIE_ID)->build()
-        );
+        $gateway->setCopyResponse($newMollieSubscription);
 
         $action = new ResumeAction($repository, $gateway, new NullLogger());
 
