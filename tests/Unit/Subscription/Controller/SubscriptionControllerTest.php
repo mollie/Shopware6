@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Subscription\Controller\SubscriptionController;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionActionHandler;
+use Mollie\Shopware\Unit\Subscription\Fake\FakeUpdateAddressRoute;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeWebhookRoute;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -69,6 +70,11 @@ final class SubscriptionControllerTest extends TestCase
 
     private function getController(FakeWebhookRoute $webhookRoute): SubscriptionController
     {
-        return new SubscriptionController($webhookRoute, new FakeSubscriptionActionHandler(), new NullLogger());
+        return new SubscriptionController(
+            $webhookRoute,
+            new FakeUpdateAddressRoute(),
+            new FakeSubscriptionActionHandler(),
+            new NullLogger()
+        );
     }
 }
