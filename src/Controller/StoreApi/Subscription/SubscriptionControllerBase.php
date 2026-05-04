@@ -5,11 +5,7 @@ namespace Kiener\MolliePayments\Controller\StoreApi\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionCancelResponse;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionPauseResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionPaymentUpdateResponse;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionResumeResponse;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionSkipResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionsListResponse;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
@@ -94,106 +90,6 @@ class SubscriptionControllerBase
             return new SubscriptionPaymentUpdateResponse($checkoutUrl);
         } catch (\Throwable $ex) {
             $this->logger->error('Error when updating payment method of subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
-    }
-
-    /**
-     * @throws \Throwable
-     *
-     * @return SubscriptionPauseResponse
-     */
-    public function pause(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $this->subscriptionManager->pauseSubscription($subscriptionId, $context->getContext());
-
-            return new SubscriptionPauseResponse();
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when pausing subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
-    }
-
-    /**
-     * @throws \Throwable
-     *
-     * @return SubscriptionResumeResponse
-     */
-    public function resume(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $this->subscriptionManager->resumeSubscription($subscriptionId, new \DateTime(), $context->getContext());
-
-            return new SubscriptionResumeResponse();
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when resuming subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
-    }
-
-    /**
-     * @throws \Throwable
-     *
-     * @return SubscriptionSkipResponse
-     */
-    public function skip(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $this->subscriptionManager->skipSubscription($subscriptionId, 1, $context->getContext());
-
-            return new SubscriptionSkipResponse();
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when skipping subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
-    }
-
-    /**
-     * @throws \Throwable
-     *
-     * @return SubscriptionCancelResponse
-     */
-    public function cancel(string $subscriptionId, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $this->subscriptionManager->cancelSubscription($subscriptionId, $context->getContext());
-
-            return new SubscriptionCancelResponse();
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when canceling subscription ' . $subscriptionId . ': ' . $ex->getMessage());
             throw $ex;
         }
     }

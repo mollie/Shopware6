@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
@@ -17,18 +16,12 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SubscriptionControllerBase extends AbstractController
 {
     use ApiTrait;
-
-    /**
-     * @var SubscriptionManager
-     */
-    private $subscriptionManager;
 
     private MollieApiFactory $mollieApiFactory;
 
@@ -49,97 +42,17 @@ class SubscriptionControllerBase extends AbstractController
      * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
      */
     public function __construct(
-        SubscriptionManager $subscriptionManager,
         MollieApiFactory $mollieApiFactory,
         EntityRepository $customerRepository,
         EntityRepository $subscriptionRepository,
         SettingsService $settingsService,
         LoggerInterface $logger
     ) {
-        $this->subscriptionManager = $subscriptionManager;
         $this->mollieApiFactory = $mollieApiFactory;
         $this->customerRepository = $customerRepository;
         $this->settingsService = $settingsService;
         $this->logger = $logger;
         $this->subscriptionRepository = $subscriptionRepository;
-    }
-
-    public function cancel(RequestDataBag $data, Context $context): JsonResponse
-    {
-        try {
-            $this->subscriptionManager->cancelSubscription(
-                $data->get('id'),
-                $context
-            );
-
-            return new JsonResponse(['success' => true]);
-        } catch (\Throwable $ex) {
-            return $this->buildErrorResponse($ex->getMessage());
-        }
-    }
-
-    public function cancelLegacy(RequestDataBag $data, Context $context): JsonResponse
-    {
-        return $this->cancel($data, $context);
-    }
-
-    public function pause(RequestDataBag $data, Context $context): JsonResponse
-    {
-        try {
-            $this->subscriptionManager->pauseSubscription(
-                $data->get('id'),
-                $context
-            );
-
-            return new JsonResponse(['success' => true]);
-        } catch (\Throwable $ex) {
-            return $this->buildErrorResponse($ex->getMessage());
-        }
-    }
-
-    public function pauseLegacy(RequestDataBag $data, Context $context): JsonResponse
-    {
-        return $this->pause($data, $context);
-    }
-
-    public function resume(RequestDataBag $data, Context $context): JsonResponse
-    {
-        try {
-            $this->subscriptionManager->resumeSubscription(
-                $data->get('id'),
-                new \DateTime(),
-                $context
-            );
-
-            return new JsonResponse(['success' => true]);
-        } catch (\Throwable $ex) {
-            return $this->buildErrorResponse($ex->getMessage());
-        }
-    }
-
-    public function resumeLegacy(RequestDataBag $data, Context $context): JsonResponse
-    {
-        return $this->resume($data, $context);
-    }
-
-    public function skip(RequestDataBag $data, Context $context): JsonResponse
-    {
-        try {
-            $this->subscriptionManager->skipSubscription(
-                $data->get('id'),
-                1,
-                $context
-            );
-
-            return new JsonResponse(['success' => true]);
-        } catch (\Throwable $ex) {
-            return $this->buildErrorResponse($ex->getMessage());
-        }
-    }
-
-    public function skipLegacy(RequestDataBag $data, Context $context): JsonResponse
-    {
-        return $this->skip($data, $context);
     }
 
     public function listUserMollieSubscriptions(string $customerId, Context $context): JsonResponse

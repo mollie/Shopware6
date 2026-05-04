@@ -5,9 +5,7 @@ namespace Kiener\MolliePayments\Facade;
 
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\MissingMollieOrderIdException;
-use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order;
@@ -52,11 +50,6 @@ class MolliePaymentFinalize
     private $orderService;
 
     /**
-     * @var SubscriptionManager
-     */
-    private $subscriptionManager;
-
-    /**
      * @var EntityRepository<EntityCollection<CustomerEntity>>
      */
     private $repoCustomer;
@@ -75,13 +68,12 @@ class MolliePaymentFinalize
     /**
      * @param EntityRepository<EntityCollection<CustomerEntity>> $repoCustomer
      */
-    public function __construct(OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, SubscriptionManager $subscriptionManager, $repoCustomer, OrderStatusUpdater $orderStatusUpdater, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
+    public function __construct(OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, Order $mollieOrderService, OrderService $orderService, $repoCustomer, OrderStatusUpdater $orderStatusUpdater, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory)
     {
         $this->orderStatusConverter = $orderStatusConverter;
         $this->settingsService = $settingsService;
         $this->mollieOrderService = $mollieOrderService;
         $this->orderService = $orderService;
-        $this->subscriptionManager = $subscriptionManager;
         $this->repoCustomer = $repoCustomer;
         $this->flowBuilderFactory = $flowBuilderFactory;
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
@@ -174,23 +166,6 @@ class MolliePaymentFinalize
             $transactionStruct->getOrderTransactionId(),
             $context
         );
-
-        // --------------------------------------------------------------------------------------------------------------------
-        // attention this is indeed a "hack".
-        // we don't have real webhooks in our cypress pipeline tests.
-        // this means the real subscription-handshake cannot be done.
-        // but we still need a mollie subscription. so there is a hidden cypress ENV mode.
-        // if enabled, we immediately create a subscription in this RETURN url instead of the webhook
-        $orderAttributes = new OrderAttributes($order);
-
-        if ($this->settingsService->getMollieCypressMode() && $orderAttributes->isTypeSubscription()) {
-            if ($mollieOrder->payments() !== null && count($mollieOrder->payments()) > 0) {
-                $paymentDetails = new MolliePaymentDetails();
-                $lasMolliePayment = count($mollieOrder->payments()) - 1;
-                $mandateId = $paymentDetails->getMandateId($mollieOrder->payments()[$lasMolliePayment]);
-                $this->subscriptionManager->confirmSubscription($order, $mandateId, $context);
-            }
-        }
 
         // --------------------------------------------------------------------------------------------------------------------
         // FLOW BUILDER
