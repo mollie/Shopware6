@@ -3147,16 +3147,100 @@
             <defaultValue>true</defaultValue>
             <label>Allow customers to reorder the subscription product</label>
             <label lang="de-DE">Kunden erlauben, das Abo-Produkt erneut zu bestellen</label>
+            <label lang="nl-NL">Sta klanten toe het abonnementsproduct opnieuw te bestellen</label>
+            <label lang="it-IT">Consenti ai clienti di riordinare il prodotto in abbonamento</label>
+            <label lang="pt-PT">Permitir que os clientes voltem a encomendar o produto da subscrição</label>
+            <label lang="es-ES">Permite que los clientes vuelvan a pedir el producto de la suscripción</label>
+            <label lang="sv-SE">Tillåt kunder att beställa prenumerationsprodukten på nytt</label>
+            <label lang="nb-NO">Tillat kunder å bestille abonnementsproduktet på nytt</label>
+            <label lang="pl-PL">Pozwól klientom ponownie zamówić produkt subskrypcji</label>
+            <label lang="cs-CZ">Povolit zákazníkům znovu objednat předplatný produkt</label>
+            <label lang="sl-SL">Dovoli strankam, da znova naročijo izdelek naročnine</label>
+            <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy újra megrendeljék az előfizetési terméket</label>
+            <label lang="fi-FI">Salli asiakkaiden tilata tilaustuote uudelleen</label>
+            <label lang="da-DK">Tillad kunder at genbestille abonnementsproduktet</label>
+            <label lang="el-GR">Επιτρέψτε στους πελάτες να παραγγείλουν ξανά το προϊόν της συνδρομής</label>
+            <label lang="hr-HR">Dopusti korisnicima ponovno naručivanje proizvoda pretplate</label>
+            <label lang="et-EE">Luba klientidel tellimuse toode uuesti tellida</label>
+            <label lang="is-IS">Leyfa viðskiptavinum að panta áskriftarvöruna aftur</label>
+            <label lang="lt-LT">Leisti klientams iš naujo užsisakyti prenumeratos produktą</label>
+            <label lang="lv-LV">Atļaut klientiem atkārtoti pasūtīt abonementa produktu</label>
+            <label lang="ro-RO">Permiteți clienților să recomande produsul de abonament</label>
+            <label lang="sk-SK">Povoliť zákazníkom znovu objednať predplatený produkt</label>
+            <label lang="bg-BG">Позволете на клиентите да поръчат отново продукта на абонамента</label>
             <helpText>If enabled, customers see a reorder action on each subscription that adds the original product to the cart again.</helpText>
             <helpText lang="de-DE">Wenn aktiviert, sehen Kunden in jeder Subscription eine Aktion, die das ursprüngliche Produkt erneut in den Warenkorb legt.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, zien klanten bij elk abonnement een actie waarmee het oorspronkelijke product opnieuw aan de winkelwagen wordt toegevoegd.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti vedono un'azione di riordino su ogni abbonamento che aggiunge nuovamente il prodotto originale al carrello.</helpText>
+            <helpText lang="pt-PT">Se ativado, os clientes veem uma ação de nova encomenda em cada subscrição que adiciona novamente o produto original ao carrinho.</helpText>
+            <helpText lang="es-ES">Si se habilita, los clientes ven una acción para volver a pedir en cada suscripción que añade el producto original al carrito de nuevo.</helpText>
+            <helpText lang="sv-SE">Om aktiverad ser kunder en åtgärd på varje prenumeration som lägger originalprodukten i varukorgen igen.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, ser kundene en handling på hvert abonnement som legger det opprinnelige produktet i handlekurven igjen.</helpText>
+            <helpText lang="pl-PL">Jeśli ta opcja jest włączona, klienci widzą akcję ponownego zamówienia w każdej subskrypcji, która ponownie dodaje pierwotny produkt do koszyka.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci vidí u každého předplatného akci, která znovu přidá původní produkt do košíku.</helpText>
+            <helpText lang="sl-SL">Če je omogočeno, stranke vidijo dejanje za ponovno naročilo pri vsaki naročnini, ki znova doda izvirni izdelek v košarico.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, az ügyfelek minden előfizetésnél láthatnak egy újrarendelési műveletet, amely visszahelyezi az eredeti terméket a kosárba.</helpText>
+            <helpText lang="fi-FI">Jos käytössä, asiakkaat näkevät jokaisen tilauksen kohdalla toiminnon, joka lisää alkuperäisen tuotteen takaisin ostoskoriin.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, ser kunderne en handling på hvert abonnement, der tilføjer det originale produkt til kurven igen.</helpText>
+            <helpText lang="el-GR">Αν είναι ενεργοποιημένο, οι πελάτες βλέπουν μια ενέργεια επαναληπτικής παραγγελίας σε κάθε συνδρομή που προσθέτει ξανά το αρχικό προϊόν στο καλάθι.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, korisnici vide akciju ponovne narudžbe na svakoj pretplati koja ponovno dodaje izvorni proizvod u košaricu.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, näevad kliendid igal tellimusel uuesti tellimise tegevust, mis lisab algse toote uuesti ostukorvi.</helpText>
+            <helpText lang="is-IS">Ef virkjað, sjá viðskiptavinir aðgerð á hverri áskrift sem bætir upprunalegu vörunni aftur í körfuna.</helpText>
+            <helpText lang="lt-LT">Jei aktyvuota, klientai mato veiksmą kiekvienoje prenumeratoje, kuris vėl prideda pradinį produktą į krepšelį.</helpText>
+            <helpText lang="lv-LV">Ja ir ieslēgts, klienti redz darbību katrā abonementā, kas atkal pievieno sākotnējo produktu grozam.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, clienții văd o acțiune de recomandare la fiecare abonament care adaugă din nou produsul original în coș.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, zákazníci vidia akciu opätovného objednania pri každom predplatnom, ktorá znovu pridá pôvodný produkt do košíka.</helpText>
+            <helpText lang="bg-BG">Ако е активирано, клиентите виждат действие за повторна поръчка при всеки абонамент, което добавя оригиналния продукт обратно в количката.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionsAllowUpdatePayment</name>
             <defaultValue>true</defaultValue>
             <label>Allow customers to change the payment method of a running subscription</label>
             <label lang="de-DE">Kunden erlauben, die Zahlungsart einer laufenden Subscription zu ändern</label>
+            <label lang="nl-NL">Sta klanten toe de betaalmethode van een lopend abonnement te wijzigen</label>
+            <label lang="it-IT">Consenti ai clienti di modificare il metodo di pagamento di un abbonamento in corso</label>
+            <label lang="pt-PT">Permitir que os clientes alterem o método de pagamento de uma subscrição em curso</label>
+            <label lang="es-ES">Permite que los clientes cambien el método de pago de una suscripción en curso</label>
+            <label lang="sv-SE">Tillåt kunder att ändra betalningsmetoden för en pågående prenumeration</label>
+            <label lang="nb-NO">Tillat kunder å endre betalingsmetoden for et aktivt abonnement</label>
+            <label lang="pl-PL">Pozwól klientom zmienić metodę płatności aktywnej subskrypcji</label>
+            <label lang="cs-CZ">Povolit zákazníkům změnit platební metodu aktivního předplatného</label>
+            <label lang="sl-SL">Dovoli strankam, da spremenijo način plačila aktivne naročnine</label>
+            <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy módosítsák az aktív előfizetés fizetési módját</label>
+            <label lang="fi-FI">Salli asiakkaiden vaihtaa käynnissä olevan tilauksen maksutapa</label>
+            <label lang="da-DK">Tillad kunder at ændre betalingsmetoden for et aktivt abonnement</label>
+            <label lang="el-GR">Επιτρέψτε στους πελάτες να αλλάξουν τη μέθοδο πληρωμής μιας ενεργής συνδρομής</label>
+            <label lang="hr-HR">Dopusti korisnicima promjenu načina plaćanja aktivne pretplate</label>
+            <label lang="et-EE">Luba klientidel muuta käimasoleva tellimuse makseviisi</label>
+            <label lang="is-IS">Leyfa viðskiptavinum að breyta greiðslumáta virkrar áskriftar</label>
+            <label lang="lt-LT">Leisti klientams pakeisti vykdomos prenumeratos mokėjimo būdą</label>
+            <label lang="lv-LV">Atļaut klientiem mainīt aktīva abonementa maksājuma veidu</label>
+            <label lang="ro-RO">Permiteți clienților să schimbe metoda de plată a unui abonament activ</label>
+            <label lang="sk-SK">Povoliť zákazníkom zmeniť spôsob platby aktívneho predplatného</label>
+            <label lang="bg-BG">Позволете на клиентите да променят начина на плащане на активен абонамент</label>
             <helpText>If enabled, customers can update the payment method (mandate) for an active subscription. The action is still hidden if the subscription is not active.</helpText>
             <helpText lang="de-DE">Wenn aktiviert, können Kunden die Zahlungsart (Mandat) eines aktiven Abos ändern. Die Aktion bleibt verborgen, solange die Subscription nicht aktiv ist.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, kunnen klanten de betaalmethode (mandaat) van een actief abonnement bijwerken. De actie blijft verborgen zolang het abonnement niet actief is.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti possono aggiornare il metodo di pagamento (mandato) di un abbonamento attivo. L'azione rimane nascosta se l'abbonamento non è attivo.</helpText>
+            <helpText lang="pt-PT">Se ativado, os clientes podem atualizar o método de pagamento (mandato) de uma subscrição ativa. A ação permanece oculta enquanto a subscrição não estiver ativa.</helpText>
+            <helpText lang="es-ES">Si se habilita, los clientes pueden actualizar el método de pago (mandato) de una suscripción activa. La acción permanece oculta mientras la suscripción no esté activa.</helpText>
+            <helpText lang="sv-SE">Om aktiverad kan kunder uppdatera betalningsmetoden (mandatet) för en aktiv prenumeration. Åtgärden förblir dold om prenumerationen inte är aktiv.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, kan kunder oppdatere betalingsmetoden (mandatet) for et aktivt abonnement. Handlingen er fortsatt skjult hvis abonnementet ikke er aktivt.</helpText>
+            <helpText lang="pl-PL">Jeśli ta opcja jest włączona, klienci mogą zaktualizować metodę płatności (mandat) aktywnej subskrypcji. Akcja pozostaje ukryta, dopóki subskrypcja nie jest aktywna.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci mohou aktualizovat platební metodu (mandát) aktivního předplatného. Akce zůstává skrytá, pokud předplatné není aktivní.</helpText>
+            <helpText lang="sl-SL">Če je omogočeno, lahko stranke posodobijo način plačila (pooblastilo) aktivne naročnine. Dejanje ostane skrito, dokler naročnina ni aktivna.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, az ügyfelek frissíthetik az aktív előfizetés fizetési módját (megbízását). A művelet rejtve marad, amíg az előfizetés nem aktív.</helpText>
+            <helpText lang="fi-FI">Jos käytössä, asiakkaat voivat päivittää aktiivisen tilauksen maksutavan (valtuutuksen). Toiminto pysyy piilossa, jos tilaus ei ole aktiivinen.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, kan kunderne opdatere betalingsmetoden (mandatet) for et aktivt abonnement. Handlingen forbliver skjult, hvis abonnementet ikke er aktivt.</helpText>
+            <helpText lang="el-GR">Αν είναι ενεργοποιημένο, οι πελάτες μπορούν να ενημερώσουν τη μέθοδο πληρωμής (εντολή) μιας ενεργής συνδρομής. Η ενέργεια παραμένει κρυφή όσο η συνδρομή δεν είναι ενεργή.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, korisnici mogu ažurirati način plaćanja (ovlaštenje) aktivne pretplate. Akcija ostaje skrivena dok pretplata nije aktivna.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, saavad kliendid värskendada aktiivse tellimuse makseviisi (volitust). Toiming jääb peidetuks, kui tellimus pole aktiivne.</helpText>
+            <helpText lang="is-IS">Ef virkjað, geta viðskiptavinir uppfært greiðslumáta (umboð) virkrar áskriftar. Aðgerðin er falin svo lengi sem áskriftin er ekki virk.</helpText>
+            <helpText lang="lt-LT">Jei aktyvuota, klientai gali atnaujinti aktyvios prenumeratos mokėjimo būdą (įgaliojimą). Veiksmas lieka paslėptas, kol prenumerata nėra aktyvi.</helpText>
+            <helpText lang="lv-LV">Ja ir ieslēgts, klienti var atjaunināt aktīva abonementa maksājuma veidu (pilnvarojumu). Darbība paliek slēpta, kamēr abonements nav aktīvs.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, clienții pot actualiza metoda de plată (mandatul) unui abonament activ. Acțiunea rămâne ascunsă dacă abonamentul nu este activ.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, zákazníci môžu aktualizovať spôsob platby (mandát) aktívneho predplatného. Akcia zostáva skrytá, pokiaľ predplatné nie je aktívne.</helpText>
+            <helpText lang="bg-BG">Ако е активирано, клиентите могат да актуализират начина на плащане (мандата) на активен абонамент. Действието остава скрито, докато абонаментът не е активен.</helpText>
         </input-field>
         <input-field type="bool">
             <name>subscriptionSkipRenewalsOnFailedPayments</name>
