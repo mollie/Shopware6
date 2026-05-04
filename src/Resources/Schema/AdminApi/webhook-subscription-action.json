@@ -6,13 +6,13 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/webhook/subscription/{swSubscriptionId}": {
+    "/mollie/webhook/subscription/{subscriptionId}": {
       "get": {
         "summary": "Handle Mollie Subscription Webhook Notification (GET)",
         "operationId": "handleMollieSubscriptionWebhookGet",
         "parameters": [
           {
-            "name": "swSubscriptionId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -77,7 +77,7 @@
         "operationId": "handleMollieSubscriptionWebhookPost",
         "parameters": [
           {
-            "name": "swSubscriptionId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
