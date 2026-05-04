@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Components\Subscription\Actions\CancelAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\CreateAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\PauseAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\RemindAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\RenewAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\SkipAction;
@@ -63,16 +62,11 @@ class SubscriptionManager implements SubscriptionManagerInterface
     private $actionCancel;
 
     /**
-     * @var RemindAction
-     */
-    private $actionRemind;
-
-    /**
      * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
-    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, RemindAction $actionRemind, SubscriptionRepository $repoSubscriptions)
+    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, SubscriptionRepository $repoSubscriptions)
     {
         $this->actionCreate = $actionCreate;
         $this->actionConfirm = $actionConfirm;
@@ -82,7 +76,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
         $this->actionResume = $actionResume;
         $this->actionSkip = $actionSkip;
         $this->actionCancel = $actionCancel;
-        $this->actionRemind = $actionRemind;
         $this->repoSubscriptions = $repoSubscriptions;
     }
 
@@ -124,14 +117,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
     public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
     {
         $this->actionConfirm->confirmSubscription($order, $mandateId, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function remindSubscriptionRenewal(Context $context): int
-    {
-        return $this->actionRemind->remindSubscriptionRenewal($context);
     }
 
     /**
