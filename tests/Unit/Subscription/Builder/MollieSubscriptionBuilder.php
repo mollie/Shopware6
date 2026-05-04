@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Subscription\Builder;
 use Mollie\Shopware\Component\Mollie\Interval;
 use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Subscription;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 
@@ -24,6 +25,7 @@ final class MollieSubscriptionBuilder
     private \DateTimeInterface $startDate;
     private ?\DateTimeInterface $nextPaymentDate = null;
     private ?int $timesRemaining = null;
+    private ?PaymentCollection $payments = null;
 
     public function __construct()
     {
@@ -72,6 +74,13 @@ final class MollieSubscriptionBuilder
         return $this;
     }
 
+    public function withPayments(PaymentCollection $payments): self
+    {
+        $this->payments = $payments;
+
+        return $this;
+    }
+
     public function build(): Subscription
     {
         $subscription = new Subscription(
@@ -93,6 +102,10 @@ final class MollieSubscriptionBuilder
 
         if ($this->timesRemaining !== null) {
             $subscription->setTimesRemaining($this->timesRemaining);
+        }
+
+        if ($this->payments instanceof PaymentCollection) {
+            $subscription->setPayments($this->payments);
         }
 
         return $subscription;

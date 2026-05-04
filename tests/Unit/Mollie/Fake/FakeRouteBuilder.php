@@ -13,6 +13,8 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         private string $webhookUrl = '',
         private string $posCheckoutUrl = '',
         private string $subscriptionWebhookUrl = '',
+        private string $subscriptionPaymentUpdateReturnUrl = '',
+        private string $subscriptionPaymentUpdateWebhookUrl = '',
     ) {
     }
 
@@ -44,5 +46,15 @@ final class FakeRouteBuilder implements RouteBuilderInterface
     public function getSubscriptionWebhookUrl(string $subscriptionId): string
     {
         return $this->subscriptionWebhookUrl;
+    }
+
+    public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string
+    {
+        return $this->subscriptionPaymentUpdateReturnUrl;
+    }
+
+    public function getSubscriptionPaymentUpdateWebhookUrl(string $subscriptionId): string
+    {
+        return $this->subscriptionPaymentUpdateWebhookUrl;
     }
 }

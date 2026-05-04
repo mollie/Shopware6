@@ -145,6 +145,16 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
 
     public function updateSubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
     {
-        throw new \LogicException('FakeSubscriptionGateway::updateSubscription not implemented');
+        $this->calls[] = [
+            'method' => 'updateSubscription',
+            'subscriptionId' => $mollieSubscription->getId(),
+            'customerId' => $customerId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+
+        $this->subscriptions[$mollieSubscription->getId()] = $mollieSubscription;
+
+        return $mollieSubscription;
     }
 }

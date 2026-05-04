@@ -51,7 +51,9 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId);
 
-            $response = $client->get('customers/' . $customerId . '/subscriptions/' . $mollieSubscriptionId);
+            $response = $client->get('customers/' . $customerId . '/subscriptions/' . $mollieSubscriptionId, [
+                'query' => ['embed' => 'payments'],
+            ]);
             $body = json_decode($response->getBody()->getContents(), true);
             $this->logger->info('Subscription loaded from mollie api', [
                 'responseParameter' => $body,
@@ -138,4 +140,5 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
             throw $this->convertException($exception, $orderNumber);
         }
     }
+
 }

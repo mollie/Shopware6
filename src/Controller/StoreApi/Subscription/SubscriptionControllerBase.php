@@ -4,42 +4,24 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Controller\StoreApi\Subscription;
 
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionPaymentUpdateResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionsListResponse;
-use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class SubscriptionControllerBase
 {
     /**
-     * @var SubscriptionManager
-     */
-    private $subscriptionManager;
-
-    /**
      * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(SubscriptionManager $subscriptionManager, SubscriptionRepository $repoSubscriptions, LoggerInterface $logger)
+    public function __construct(SubscriptionRepository $repoSubscriptions)
     {
-        $this->subscriptionManager = $subscriptionManager;
         $this->repoSubscriptions = $repoSubscriptions;
-        $this->logger = $logger;
     }
 
     /**
@@ -49,7 +31,10 @@ class SubscriptionControllerBase
      */
     public function getSubscriptions(SalesChannelContext $context): StoreApiResponse
     {
-        $customer = $this->validateRoute($context);
+        $customer = $context->getCustomer();
+        if (! $customer instanceof CustomerEntity) {
+            throw new UnauthorizedHttpException('Unauthorized request! No customer is signed in!');
+        }
 
         $result = $this->repoSubscriptions->findByCustomer(
             $customer->getId(),
@@ -64,60 +49,5 @@ class SubscriptionControllerBase
         $flatList = $collection->getFlatList();
 
         return new SubscriptionsListResponse($flatList);
-    }
-
-    /**
-     * @throws \Throwable
-     * @throws CustomerCouldNotBeFoundException
-     *
-     * @return SubscriptionPaymentUpdateResponse
-     */
-    public function updatePayment(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $redirectUrl = $data->get('redirectUrl', '');
-
-            $checkoutUrl = $this->subscriptionManager->updatePaymentMethodStart($subscriptionId, $redirectUrl, $context->getContext());
-
-            return new SubscriptionPaymentUpdateResponse($checkoutUrl);
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when updating payment method of subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
-    }
-
-    private function validateRoute(SalesChannelContext $context): CustomerEntity
-    {
-        $customer = $context->getCustomer();
-
-        if (! $customer instanceof CustomerEntity) {
-            throw new UnauthorizedHttpException('Unauthorized request! No customer is signed in!');
-        }
-
-        return $customer;
-    }
-
-    /**
-     * Ensures that the given customer is the owner of the given subscription.
-     * Prevents IDOR: a signed-in customer must not be able to manage another customer's subscription.
-     * The caller must have already verified that a customer is signed in (see validateRoute()).
-     *
-     * @throws AccessDeniedHttpException when the subscription does not belong to the given customer
-     */
-    private function assertOwnership(string $subscriptionId, CustomerEntity $customer, SalesChannelContext $context): void
-    {
-        $subscription = $this->repoSubscriptions->findById($subscriptionId, $context->getContext());
-
-        if ($subscription->getCustomerId() !== $customer->getId()) {
-            throw new AccessDeniedHttpException('You are not allowed to access this subscription.');
-        }
     }
 }
