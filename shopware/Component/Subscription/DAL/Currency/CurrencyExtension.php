@@ -12,7 +12,7 @@ use Shopware\Core\System\Currency\CurrencyDefinition;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('shopware.entity.extension')]
-class CurrencyExtension extends EntityExtension
+final class CurrencyExtension extends EntityExtension
 {
     public function getDefinitionClass(): string
     {

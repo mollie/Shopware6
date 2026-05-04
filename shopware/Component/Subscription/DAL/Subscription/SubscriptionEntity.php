@@ -15,7 +15,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 use Shopware\Core\Framework\DataAbstractionLayer\Pricing\CashRoundingConfig;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
-class SubscriptionEntity extends Entity
+final class SubscriptionEntity extends Entity
 {
     use EntityIdTrait;
 

@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('shopware.entity.definition',['entity' => 'mollie_subscription'])]
 #[AutoconfigureTag('shopware.composite_search.definition',['priority' => '1500'])]
-class SubscriptionDefinition extends EntityDefinition
+final class SubscriptionDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription';
 

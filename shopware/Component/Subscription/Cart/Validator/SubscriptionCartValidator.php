@@ -19,7 +19,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class SubscriptionCartValidator implements CartValidatorInterface
+final class SubscriptionCartValidator implements CartValidatorInterface
 {
     public function __construct(
         #[Autowire(service: SettingsService::class)]

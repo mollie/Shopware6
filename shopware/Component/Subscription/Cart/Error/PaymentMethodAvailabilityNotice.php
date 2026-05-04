@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Subscription\Cart\Error;
 
 use Shopware\Core\Checkout\Cart\Error\Error;
 
-class PaymentMethodAvailabilityNotice extends Error
+final class PaymentMethodAvailabilityNotice extends Error
 {
     public const KEY = 'mollie-payments-cart-error-paymentmethod-availability';
 
