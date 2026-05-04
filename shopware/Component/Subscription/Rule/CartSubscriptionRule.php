@@ -1,28 +1,24 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\Rule;
+namespace Mollie\Shopware\Component\Subscription\Rule;
 
-use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
+use Mollie\Shopware\Entity\Product\Product;
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Rule\CartRuleScope;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Rule\RuleScope;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Validator\Constraints\Type;
 
+#[AutoconfigureTag('shopware.rule.definition')]
 class CartSubscriptionRule extends Rule
 {
     /**
      * @var bool
      */
-    protected $isSubscription;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->isSubscription = false;
-    }
+    protected $isSubscription = false;
 
     public function getName(): string
     {
@@ -36,22 +32,14 @@ class CartSubscriptionRule extends Rule
         }
 
         $hasCartSubscription = false;
-
         foreach ($scope->getCart()->getLineItems() as $item) {
-            $tmpSubscription = $this->isItemSubscription($item);
-            if ($tmpSubscription) {
+            if ($this->isItemSubscription($item)) {
                 $hasCartSubscription = true;
                 break;
             }
         }
 
-        $lookingForSubscription = $this->isSubscription;
-
-        if ($lookingForSubscription) {
-            return $hasCartSubscription;
-        }
-
-        return ! $hasCartSubscription;
+        return $this->isSubscription ? $hasCartSubscription : ! $hasCartSubscription;
     }
 
     /**
@@ -66,12 +54,8 @@ class CartSubscriptionRule extends Rule
 
     private function isItemSubscription(LineItem $lineItem): bool
     {
-        try {
-            $attributes = new LineItemAttributes($lineItem);
+        $extension = $lineItem->getExtension(Mollie::EXTENSION);
 
-            return $attributes->isSubscriptionProduct();
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $extension instanceof Product && $extension->isSubscription() === true;
     }
 }
