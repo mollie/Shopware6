@@ -3,12 +3,15 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Controller;
 
+use Mollie\Shopware\Component\Subscription\Route\AbstractUpdateAddressRoute;
 use Mollie\Shopware\Component\Subscription\Route\AbstractWebhookRoute;
+use Mollie\Shopware\Component\Subscription\Route\UpdateAddressRoute;
 use Mollie\Shopware\Component\Subscription\Route\WebhookRoute;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\ShopwareHttpException;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -27,6 +30,8 @@ final class SubscriptionController extends StorefrontController
     public function __construct(
         #[Autowire(service: WebhookRoute::class)]
         private readonly AbstractWebhookRoute $webhookRoute,
+        #[Autowire(service: UpdateAddressRoute::class)]
+        private readonly AbstractUpdateAddressRoute $updateAddressRoute,
         #[Autowire(service: SubscriptionActionHandler::class)]
         private readonly SubscriptionActionHandlerInterface $actionHandler,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -95,6 +100,58 @@ final class SubscriptionController extends StorefrontController
             ]);
 
             $this->addFlash(self::DANGER, $this->trans($translationKey));
+        }
+
+        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+    }
+
+    #[Route(
+        path: '/account/mollie/subscriptions/{subscriptionId}/billing/update',
+        name: 'frontend.account.mollie.subscriptions.billing.update',
+        defaults: ['_loginRequired' => true],
+        methods: ['POST']
+    )]
+    public function updateBillingAddress(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
+    {
+        if ($salesChannelContext->getCustomer() === null) {
+            return $this->redirectToRoute('frontend.account.login.page');
+        }
+
+        try {
+            $this->updateAddressRoute->updateBilling($subscriptionId, $data, $salesChannelContext);
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdateAddress'));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Error when updating billing address of subscription', [
+                'subscriptionId' => $subscriptionId,
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
+        }
+
+        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+    }
+
+    #[Route(
+        path: '/account/mollie/subscriptions/{subscriptionId}/shipping/update',
+        name: 'frontend.account.mollie.subscriptions.shipping.update',
+        defaults: ['_loginRequired' => true],
+        methods: ['POST']
+    )]
+    public function updateShippingAddress(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
+    {
+        if ($salesChannelContext->getCustomer() === null) {
+            return $this->redirectToRoute('frontend.account.login.page');
+        }
+
+        try {
+            $this->updateAddressRoute->updateShipping($subscriptionId, $data, $salesChannelContext);
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdateAddress'));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Error when updating shipping address of subscription', [
+                'subscriptionId' => $subscriptionId,
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
         }
 
         return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');

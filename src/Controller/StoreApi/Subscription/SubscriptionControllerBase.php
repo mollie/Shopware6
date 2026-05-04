@@ -11,8 +11,6 @@ use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\Subscription
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionResumeResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionSkipResponse;
 use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionsListResponse;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionUpdateBillingResponse;
-use Kiener\MolliePayments\Controller\StoreApi\Subscription\Response\SubscriptionUpdateShippingResponse;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -70,116 +68,6 @@ class SubscriptionControllerBase
         $flatList = $collection->getFlatList();
 
         return new SubscriptionsListResponse($flatList);
-    }
-
-    /**
-     * @throws \Throwable
-     *
-     * @return SubscriptionUpdateBillingResponse
-     */
-    public function updateBilling(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $salutationId = strtolower($data->get('salutationId', ''));
-            $title = $data->get('title', '');
-            $firstname = $data->get('firstName', '');
-            $lastname = $data->get('lastName', '');
-            $company = $data->get('company', '');
-            $department = $data->get('department', '');
-            $additional1 = $data->get('additionalField1', '');
-            $additional2 = $data->get('additionalField2', '');
-            $phone = $data->get('phoneNumber', '');
-            $street = $data->get('street', '');
-            $zipcode = $data->get('zipcode', '');
-            $city = $data->get('city', '');
-            $countryStateId = ''; // currently not supported
-
-            $this->subscriptionManager->updateBillingAddress(
-                $subscriptionId,
-                $salutationId,
-                $title,
-                $firstname,
-                $lastname,
-                $company,
-                $department,
-                $additional1,
-                $additional2,
-                $phone,
-                $street,
-                $zipcode,
-                $city,
-                $countryStateId,
-                $context->getContext()
-            );
-
-            return new SubscriptionUpdateBillingResponse();
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when updating billing of subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
-    }
-
-    /**
-     * @throws \Throwable
-     *
-     * @return SubscriptionUpdateShippingResponse
-     */
-    public function updateShipping(string $subscriptionId, RequestDataBag $data, SalesChannelContext $context): StoreApiResponse
-    {
-        try {
-            $customer = $this->validateRoute($context);
-
-            // make sure its lower case
-            // this is better for handling and testing (it only works lower case
-            $subscriptionId = strtolower($subscriptionId);
-
-            $this->assertOwnership($subscriptionId, $customer, $context);
-
-            $salutationId = strtolower($data->get('salutationId', ''));
-            $title = $data->get('title', '');
-            $firstname = $data->get('firstName', '');
-            $lastname = $data->get('lastName', '');
-            $company = $data->get('company', '');
-            $department = $data->get('department', '');
-            $additional1 = $data->get('additionalField1', '');
-            $additional2 = $data->get('additionalField2', '');
-            $phone = $data->get('phoneNumber', '');
-            $street = $data->get('street', '');
-            $zipcode = $data->get('zipcode', '');
-            $city = $data->get('city', '');
-            $countryStateId = ''; // currently not supported
-
-            $this->subscriptionManager->updateShippingAddress(
-                $subscriptionId,
-                $salutationId,
-                $title,
-                $firstname,
-                $lastname,
-                $company,
-                $department,
-                $additional1,
-                $additional2,
-                $phone,
-                $street,
-                $zipcode,
-                $city,
-                $countryStateId,
-                $context->getContext()
-            );
-
-            return new SubscriptionUpdateShippingResponse();
-        } catch (\Throwable $ex) {
-            $this->logger->error('Error when updating shipping of subscription ' . $subscriptionId . ': ' . $ex->getMessage());
-            throw $ex;
-        }
     }
 
     /**
