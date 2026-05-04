@@ -3,11 +3,12 @@
 {% block component_delivery_information %}
     {{ parent() }}
 
-    {% if page.extensions.mollieSubscription.isSubscriptionProduct and page.extensions.mollieSubscription.showIndicator %}
+    {% set mollieProduct = page.product.extensions.mollie_payments %}
+    {% if mollie_subscriptions_show_indicator and mollieProduct and mollieProduct.subscription %}
         <div class="product-mollie-subscriptions-information">
             <p class="delivery-information mollie-subscriptions">
                 <span class="delivery-status-indicator bg-info"></span>
-                {{ "molliePayments.subscriptions.product.information"|trans|sw_sanitize }}, {{ page.extensions.mollieSubscription.translatedInterval }}
+                {{ "molliePayments.subscriptions.product.information"|trans|sw_sanitize }}, {{ mollieProduct|mollie_subscription_interval }}
             </p>
         </div>
     {% endif %}

@@ -48,12 +48,6 @@
 
 
 
-        <service id="Kiener\MolliePayments\Subscriber\SubscriptionSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="translator"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Subscriber\WebhookTimezoneSubscriber">
             <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
