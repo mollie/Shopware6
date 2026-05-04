@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\Elasticsearch;
+namespace Mollie\Shopware\Component\Subscription\Search;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionDefinition;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -18,28 +17,23 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Elasticsearch\Admin\Indexer\AbstractAdminIndexer;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
+#[AutoconfigureTag('shopware.elastic.admin-searcher-index', ['key' => 'mollie_subscription'])]
+final class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
 {
-    private Connection $connection;
-    private IteratorFactory $factory;
-    /** @var EntityRepository<SubscriptionCollection<SubscriptionEntity>> */
-    private $repository;
-    private int $indexingBatchSize;
-
     /**
      * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $repository
      */
     public function __construct(
-        Connection $connection,
-        IteratorFactory $factory,
-        $repository,
-        int $indexingBatchSize
+        private readonly Connection $connection,
+        private readonly IteratorFactory $factory,
+        #[Autowire(service: 'mollie_subscription.repository')]
+        private readonly EntityRepository $repository,
+        #[Autowire(value: '%elasticsearch.indexing_batch_size%')]
+        private readonly int $indexingBatchSize
     ) {
-        $this->connection = $connection;
-        $this->factory = $factory;
-        $this->repository = $repository;
-        $this->indexingBatchSize = $indexingBatchSize;
     }
 
     public function getDecorated(): AbstractAdminIndexer
@@ -69,40 +63,28 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
      */
     public function fetch(array $ids): array
     {
-        if (class_exists(ArrayParameterType::class)) {
-            $type = ArrayParameterType::BINARY;
-        } else {
-            $type = ParameterType::BINARY + Connection::ARRAY_PARAM_OFFSET;
-        }
-
         $data = $this->connection->fetchAllAssociative(
-            '
-            SELECT LOWER(HEX(mollie_subscription.id)) as id,
-                   mollie_id,
-                   mollie_customer_id,
-                   description,
-                   next_payment_at,
-                   last_reminded_at,
-                   canceled_at,
-                   mandate_id,
-                   status
-            FROM mollie_subscription
-            WHERE mollie_subscription.id IN (:ids)
-            GROUP BY mollie_subscription.id
-        ',
-            [
-                'ids' => Uuid::fromHexToBytesList($ids),
-            ],
-            [
-                'ids' => $type, //  elasticsearch below 6.6 install old doctrine dbal where binary type does not exists yet
-            ]
+            'SELECT LOWER(HEX(mollie_subscription.id)) as id,
+                    mollie_id,
+                    mollie_customer_id,
+                    description,
+                    next_payment_at,
+                    last_reminded_at,
+                    canceled_at,
+                    mandate_id,
+                    status
+             FROM mollie_subscription
+             WHERE mollie_subscription.id IN (:ids)
+             GROUP BY mollie_subscription.id',
+            ['ids' => Uuid::fromHexToBytesList($ids)],
+            ['ids' => ArrayParameterType::BINARY]
         );
 
         $mapped = [];
         foreach ($data as $row) {
             $id = (string) $row['id'];
-            $text = \implode(' ', array_filter($row));
-            $mapped[$id] = ['id' => $id, 'text' => \strtolower($text)];
+            $text = implode(' ', array_filter($row));
+            $mapped[$id] = ['id' => $id, 'text' => strtolower($text)];
         }
 
         return $mapped;
@@ -112,8 +94,6 @@ class SubscriptionAdminSearchIndexer extends AbstractAdminIndexer
      * @param array<string, mixed> $result
      *
      * @return array{total:int, data:EntityCollection<SubscriptionEntity>}
-     *
-     * Return EntityCollection<Entity> and their total by ids in the result parameter
      */
     public function globalData(array $result, Context $context): array
     {
