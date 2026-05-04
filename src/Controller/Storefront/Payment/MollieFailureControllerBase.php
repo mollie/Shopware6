@@ -230,27 +230,24 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
         // if its a failed status, then we have to create a new payment
         // otherwise no payment would exist, and we are not able to redirect to the payment screen
         if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
-            $settings = $this->settingsService->getSettings($context->getSalesChannelId());
             $paymentData = [];
 
-            if ($settings->isSubscriptionsEnabled()) {
-                /** @var OrderLineItemCollection $lineItems */
-                $lineItems = $order->getLineItems();
-                /** @var OrderCustomerEntity $customer */
-                $customer = $order->getOrderCustomer();
-                /** @var string $customerId */
-                $customerId = $customer->getCustomerId();
+            /** @var OrderLineItemCollection $lineItems */
+            $lineItems = $order->getLineItems();
+            /** @var OrderCustomerEntity $customer */
+            $customer = $order->getOrderCustomer();
+            /** @var string $customerId */
+            $customerId = $customer->getCustomerId();
 
-                // mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
-                $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
+            // mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
+            $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
 
-                foreach ($lineItems as $lineItem) {
-                    $attributes = new OrderLineItemEntityAttributes($lineItem);
-                    if ($attributes->isSubscriptionProduct()) {
-                        $paymentData['sequenceType'] = 'first';
-                        $paymentData['customerId'] = $mollieCustomerId;
-                        break;
-                    }
+            foreach ($lineItems as $lineItem) {
+                $attributes = new OrderLineItemEntityAttributes($lineItem);
+                if ($attributes->isSubscriptionProduct()) {
+                    $paymentData['sequenceType'] = 'first';
+                    $paymentData['customerId'] = $mollieCustomerId;
+                    break;
                 }
             }
             $mollieOrder->createPayment($paymentData);

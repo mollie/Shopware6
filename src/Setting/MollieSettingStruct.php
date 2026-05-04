@@ -182,46 +182,6 @@ class MollieSettingStruct extends Struct
     /**
      * @var bool
      */
-    protected $subscriptionsShowIndicator;
-
-    /**
-     * @var bool
-     */
-    protected $subscriptionsAllowAddressEditing;
-
-    /**
-     * @var bool
-     */
-    protected $subscriptionsAllowPauseResume;
-
-    /**
-     * @var bool
-     */
-    protected $subscriptionsAllowSkip;
-
-    /**
-     * @var int
-     */
-    protected $subscriptionsReminderDays;
-
-    /**
-     * @var int
-     */
-    protected $subscriptionsCancellationDays;
-
-    /**
-     * @var bool
-     */
-    protected $subscriptionSkipRenewalsOnFailedPayments;
-
-    /**
-     * @var bool
-     */
-    protected $subscriptionsEnabled;
-
-    /**
-     * @var bool
-     */
     protected $fixRoundingDiffEnabled = false;
 
     /**
@@ -669,71 +629,6 @@ class MollieSettingStruct extends Struct
     public function setOrderStateWithRefundTransaction(string $orderStateWithRefundTransaction): void
     {
         $this->orderStateWithRefundTransaction = $orderStateWithRefundTransaction;
-    }
-
-    public function isSubscriptionsShowIndicator(): bool
-    {
-        return (bool) $this->subscriptionsShowIndicator;
-    }
-
-    public function getSubscriptionsReminderDays(): int
-    {
-        return (int) $this->subscriptionsReminderDays;
-    }
-
-    public function getSubscriptionsCancellationDays(): int
-    {
-        return (int) $this->subscriptionsCancellationDays;
-    }
-
-    public function isSubscriptionsAllowAddressEditing(): bool
-    {
-        return (bool) $this->subscriptionsAllowAddressEditing;
-    }
-
-    public function setSubscriptionsAllowAddressEditing(bool $subscriptionsAllowAddressEditing): void
-    {
-        $this->subscriptionsAllowAddressEditing = $subscriptionsAllowAddressEditing;
-    }
-
-    public function isSubscriptionsAllowPauseResume(): bool
-    {
-        return (bool) $this->subscriptionsAllowPauseResume;
-    }
-
-    public function setSubscriptionsAllowPauseResume(bool $subscriptionsAllowPauseResume): void
-    {
-        $this->subscriptionsAllowPauseResume = $subscriptionsAllowPauseResume;
-    }
-
-    public function isSubscriptionsAllowSkip(): bool
-    {
-        return (bool) $this->subscriptionsAllowSkip;
-    }
-
-    public function setSubscriptionsAllowSkip(bool $subscriptionsAllowSkip): void
-    {
-        $this->subscriptionsAllowSkip = $subscriptionsAllowSkip;
-    }
-
-    public function isSubscriptionSkipRenewalsOnFailedPayments(): bool
-    {
-        return (bool) $this->subscriptionSkipRenewalsOnFailedPayments;
-    }
-
-    public function setSubscriptionSkipRenewalsOnFailedPayments(bool $subscriptionSkipRenewalsOnFailedPayments): void
-    {
-        $this->subscriptionSkipRenewalsOnFailedPayments = $subscriptionSkipRenewalsOnFailedPayments;
-    }
-
-    public function isSubscriptionsEnabled(): bool
-    {
-        return (bool) $this->subscriptionsEnabled;
-    }
-
-    public function setSubscriptionsEnabled(bool $subscriptionsEnabled): void
-    {
-        $this->subscriptionsEnabled = $subscriptionsEnabled;
     }
 
     public function isFixRoundingDiffEnabled(): bool
