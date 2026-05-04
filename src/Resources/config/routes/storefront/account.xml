@@ -22,20 +22,6 @@
         <option key="seo">false</option>
     </route>
 
-    <route id="frontend.account.mollie.subscriptions.billing.update"
-           path="/account/mollie/subscriptions/{subscriptionId}/billing/update"
-           methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::updateBilling</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-    </route>
-
-    <route id="frontend.account.mollie.subscriptions.shipping.update"
-           path="/account/mollie/subscriptions/{subscriptionId}/shipping/update"
-           methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase::updateShipping</default>
-        <default key="_routeScope"><list><string>storefront</string></list></default>
-    </route>
-
     <route id="frontend.account.mollie.subscriptions.payment.update"
            path="/account/mollie/subscriptions/{swSubscriptionId}/payment/update"
            methods="POST">

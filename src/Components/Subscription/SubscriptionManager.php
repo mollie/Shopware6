@@ -11,7 +11,6 @@ use Kiener\MolliePayments\Components\Subscription\Actions\RemindAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\RenewAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\SkipAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\UpdateAddressAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
@@ -32,11 +31,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
      * @var ConfirmAction
      */
     private $actionConfirm;
-
-    /**
-     * @var UpdateAddressAction
-     */
-    private $actionUpdateAddress;
 
     /**
      * @var UpdatePaymentAction
@@ -78,11 +72,10 @@ class SubscriptionManager implements SubscriptionManagerInterface
      */
     private $repoSubscriptions;
 
-    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdateAddressAction $actionUpdateAddress, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, RemindAction $actionRemind, SubscriptionRepository $repoSubscriptions)
+    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, RemindAction $actionRemind, SubscriptionRepository $repoSubscriptions)
     {
         $this->actionCreate = $actionCreate;
         $this->actionConfirm = $actionConfirm;
-        $this->actionUpdateAddress = $actionUpdateAddress;
         $this->actionUpdatePayment = $actionUpdatePayment;
         $this->actionRenew = $actionRenew;
         $this->actionPause = $actionPause;
@@ -147,54 +140,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
     public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
     {
         return $this->actionRenew->renewSubscription($swSubscriptionId, $molliePaymentId, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function updateBillingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
-    {
-        $this->actionUpdateAddress->updateBillingAddress(
-            $subscriptionId,
-            $salutationId,
-            $title,
-            $firstname,
-            $lastname,
-            $company,
-            $department,
-            $additional1,
-            $additional2,
-            $phoneNumber,
-            $street,
-            $zipcode,
-            $city,
-            $countryStateId,
-            $context
-        );
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function updateShippingAddress(string $subscriptionId, string $salutationId, string $title, string $firstname, string $lastname, string $company, string $department, string $additional1, string $additional2, string $phoneNumber, string $street, string $zipcode, string $city, string $countryStateId, Context $context): void
-    {
-        $this->actionUpdateAddress->updateShippingAddress(
-            $subscriptionId,
-            $salutationId,
-            $title,
-            $firstname,
-            $lastname,
-            $company,
-            $department,
-            $additional1,
-            $additional2,
-            $phoneNumber,
-            $street,
-            $zipcode,
-            $city,
-            $countryStateId,
-            $context
-        );
     }
 
     /**
