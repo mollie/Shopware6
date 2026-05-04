@@ -83,6 +83,7 @@ class SubscriptionPageLoader
             ->addSorting(new FieldSorting('position'))
             ->addSorting(new FieldSorting('name'))
             ->addSorting(new FieldSorting('states.position'))
-            ->addSorting(new FieldSorting('states.name'));
+            ->addSorting(new FieldSorting('states.name'))
+        ;
     }
 }

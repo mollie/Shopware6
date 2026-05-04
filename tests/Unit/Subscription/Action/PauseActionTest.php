@@ -37,7 +37,8 @@ final class PauseActionTest extends TestCase
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new PauseAction($repository, $gateway, new NullLogger());
@@ -70,7 +71,8 @@ final class PauseActionTest extends TestCase
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate($nextPaymentDate)
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new PauseAction($repository, $gateway, new NullLogger());
@@ -100,7 +102,8 @@ final class PauseActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new PauseAction($repository, $gateway, new NullLogger());
@@ -129,7 +132,8 @@ final class PauseActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::COMPLETED)
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new PauseAction($repository, $gateway, new NullLogger());
@@ -168,7 +172,8 @@ final class PauseActionTest extends TestCase
             ->withId(self::SUBSCRIPTION_ID)
             ->withMollieId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);

@@ -25,7 +25,6 @@ use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -97,7 +96,8 @@ final class PendingSubscriptionSubscriberTest extends TestCase
         $active = SubscriptionEntityBuilder::create()
             ->withId('subscription-id-1')
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $event = $this->buildCancelledEvent($this->buildOrderWithSubscriptions([$active]));
 
         $subscriber->onCancelledWebhook($event);
@@ -114,7 +114,8 @@ final class PendingSubscriptionSubscriberTest extends TestCase
         $active = SubscriptionEntityBuilder::create()
             ->withId('subscription-id-active')
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $event = $this->buildCancelledEvent($this->buildOrderWithSubscriptions([$pending, $active]));
 
         $subscriber->onCancelledWebhook($event);
@@ -147,7 +148,8 @@ final class PendingSubscriptionSubscriberTest extends TestCase
         $active = SubscriptionEntityBuilder::create()
             ->withId('subscription-id-active')
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $event = $this->buildPaidEvent($this->buildOrderWithCustomer([$active]), $this->buildPaymentWithMandate());
 
         $subscriber->onPaidWebhook($event);
@@ -164,7 +166,8 @@ final class PendingSubscriptionSubscriberTest extends TestCase
             ->withId('sub_new123')
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->setCreateResponse($newMollieSubscription);
 
         $eventDispatcher = new EventSpy();
@@ -295,7 +298,8 @@ final class PendingSubscriptionSubscriberTest extends TestCase
         return SubscriptionEntityBuilder::create()
             ->withId($id)
             ->withStatus(SubscriptionStatus::PENDING)
-            ->build();
+            ->build()
+        ;
     }
 
     /**

@@ -32,7 +32,8 @@ final class SubscriptionCartValidatorTest extends TestCase
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
             ->withError(new InvalidGuestAccountError())
             ->withError(new InvalidPaymentMethodError())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->build();
         $context = $this->buildContext($customer, aware: true);
@@ -49,7 +50,8 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::regular('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->build();
         $context = $this->buildContext($customer, aware: true);
@@ -65,12 +67,14 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->asGuest()->build();
         $paymentMethod = PaymentMethodBuilder::create()
-            ->withHandlerIdentifier('Some\\NonMollie\\Handler')
-            ->build();
+            ->withHandlerIdentifier('Some\NonMollie\Handler')
+            ->build()
+        ;
 
         $context = new FakeSalesChannelContext();
         $context->setCustomer($customer);
@@ -87,7 +91,8 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $context = $this->buildContext(null, aware: true);
 
@@ -102,7 +107,8 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->build();
         $context = $this->buildContext($customer, aware: true);
@@ -118,7 +124,8 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->asGuest()->build();
         $context = $this->buildContext($customer, aware: true);
@@ -135,7 +142,8 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->build();
         $context = $this->buildContext($customer, aware: false);
@@ -152,7 +160,8 @@ final class SubscriptionCartValidatorTest extends TestCase
     {
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->asGuest()->build();
         $context = $this->buildContext($customer, aware: false);
@@ -172,7 +181,8 @@ final class SubscriptionCartValidatorTest extends TestCase
             ->withError(new InvalidGuestAccountError())
             ->withError(new InvalidPaymentMethodError())
             ->withError($unrelated)
-            ->build();
+            ->build()
+        ;
 
         $customer = CustomerBuilder::create()->build();
         $context = $this->buildContext($customer, aware: true);
@@ -201,7 +211,8 @@ final class SubscriptionCartValidatorTest extends TestCase
         $handlerClass = $aware ? FakeSubscriptionAwarePaymentHandler::class : FakePaymentMethodHandler::class;
         $paymentMethod = PaymentMethodBuilder::create()
             ->withHandlerIdentifier($handlerClass)
-            ->build();
+            ->build()
+        ;
 
         $context = new FakeSalesChannelContext();
         $context->setCustomer($customer);

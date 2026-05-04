@@ -8,15 +8,14 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Subscription\Action\UpdatePaymentMethodAction;
 use Mollie\Shopware\Component\Subscription\Action\UpdatePaymentMethodActionException;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
-use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionGateway;
-use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeTrackingMollieGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -42,7 +41,8 @@ final class UpdatePaymentMethodActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId('sub_test123')
             ->withPayments($payments)
-            ->build();
+            ->build()
+        ;
 
         $subscriptionGateway = new FakeSubscriptionGateway();
         $subscriptionGateway->register($mollieSubscription);
@@ -59,7 +59,8 @@ final class UpdatePaymentMethodActionTest extends TestCase
             ->withMollieId('sub_test123')
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withMetadata(new SubscriptionMetadata('2026-06-01', 1, IntervalUnit::MONTHS))
-            ->build();
+            ->build()
+        ;
 
         $action = new UpdatePaymentMethodAction(
             $repository,
@@ -100,7 +101,8 @@ final class UpdatePaymentMethodActionTest extends TestCase
             ->withId('subscription-id')
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withMetadata(new SubscriptionMetadata('2026-06-01', 1, IntervalUnit::MONTHS))
-            ->build();
+            ->build()
+        ;
 
         $this->expectException(UpdatePaymentMethodActionException::class);
         $this->expectExceptionMessage('No temporary transaction is registered');
@@ -129,7 +131,8 @@ final class UpdatePaymentMethodActionTest extends TestCase
             ->withId('subscription-id')
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withMetadata($metadata)
-            ->build();
+            ->build()
+        ;
 
         $this->expectException(UpdatePaymentMethodActionException::class);
         $this->expectExceptionMessage('is not in an approved state');
@@ -145,7 +148,8 @@ final class UpdatePaymentMethodActionTest extends TestCase
 
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId('sub_test123')
-            ->build();
+            ->build()
+        ;
 
         $subscriptionGateway = new FakeSubscriptionGateway();
         $subscriptionGateway->register($mollieSubscription);
@@ -160,7 +164,8 @@ final class UpdatePaymentMethodActionTest extends TestCase
             ->withMollieId('sub_test123')
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withMetadata($metadata)
-            ->build();
+            ->build()
+        ;
 
         $action = new UpdatePaymentMethodAction(
             $repository,

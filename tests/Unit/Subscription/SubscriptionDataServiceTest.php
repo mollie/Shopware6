@@ -25,7 +25,8 @@ final class SubscriptionDataServiceTest extends TestCase
     {
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);
@@ -55,7 +56,8 @@ final class SubscriptionDataServiceTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
             ->withoutOrder()
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);
@@ -72,7 +74,8 @@ final class SubscriptionDataServiceTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
             ->withoutCustomer()
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);
@@ -89,7 +92,8 @@ final class SubscriptionDataServiceTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
             ->withoutBillingAddress()
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);
@@ -106,7 +110,8 @@ final class SubscriptionDataServiceTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
             ->withoutShippingAddress()
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);

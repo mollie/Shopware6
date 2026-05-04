@@ -17,7 +17,6 @@ use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\MollieApi\Order as MollieServiceOrder;
 use Kiener\MolliePayments\Service\Order\OrderStateService;
-use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\TransactionService;
 use Kiener\MolliePayments\Service\Transition\TransactionTransitionServiceInterface;
 use Kiener\MolliePayments\Struct\Order\OrderAttributes;
@@ -83,16 +82,11 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
     private $orderStatusConverter;
 
     /**
-     * @var SettingsService
-     */
-    private $settingsService;
-
-    /**
      * @var CustomerService
      */
     private $customerService;
 
-    public function __construct(RouterInterface $router, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter, SettingsService $settingsService, CustomerService $customerService)
+    public function __construct(RouterInterface $router, MollieApiFactory $apiFactory, OrderStateService $orderStateService, TransactionService $transactionService, LoggerInterface $logger, TransactionTransitionServiceInterface $transactionTransitionService, FlowBuilderFactoryInterface $flowBuilderFactory, MollieServiceOrder $mollieOrderService, OrderStatusConverter $orderStatusConverter, CustomerService $customerService)
     {
         $this->router = $router;
 
@@ -105,7 +99,6 @@ class MollieFailureControllerBase extends AbstractStoreFrontController
         $this->orderStatusConverter = $orderStatusConverter;
 
         $this->eventDispatcher = $flowBuilderFactory->createDispatcher();
-        $this->settingsService = $settingsService;
         $this->customerService = $customerService;
     }
 

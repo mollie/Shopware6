@@ -5,7 +5,6 @@ namespace Mollie\Shopware\Unit\Subscription\Action;
 
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
-use Mollie\Shopware\Component\Mollie\Subscription;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Subscription\Action\CancelAction;
 use Mollie\Shopware\Component\Subscription\Action\PauseAction;
@@ -36,7 +35,8 @@ final class RenewActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId('sub_test123')
             ->withNextPaymentDate(new \DateTimeImmutable('2099-06-01'))
-            ->build();
+            ->build()
+        ;
         $payment = new Payment('payment-id');
         $payment->setStatus(PaymentStatus::PAID);
 
@@ -115,7 +115,8 @@ final class RenewActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withStatus(SubscriptionStatus::COMPLETED)
             ->withNextPaymentDate(new \DateTimeImmutable('2099-06-01'))
-            ->build();
+            ->build()
+        ;
 
         $action->execute(
             SubscriptionEntityBuilder::create()->build(),

@@ -126,6 +126,7 @@ final class SubscriptionEventsTest extends TestCase
             ->withEmail($email)
             ->withFirstName($firstName)
             ->withLastName($lastName)
-            ->build();
+            ->build()
+        ;
     }
 }

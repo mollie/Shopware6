@@ -12,7 +12,8 @@ final class ReminderValidator
         }
 
         $nextReminderDate = (new \DateTimeImmutable($nextRenewal->format('Y-m-d H:i:s')))
-            ->modify('-' . $daysOffset . ' day');
+            ->modify('-' . $daysOffset . ' day')
+        ;
 
         $nextRenewal = new \DateTimeImmutable($nextRenewal->format('Y-m-d H:i:s'));
 

@@ -35,7 +35,8 @@ final class CancelActionTest extends TestCase
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new CancelAction($repository, $gateway, new NullLogger());
@@ -68,7 +69,8 @@ final class CancelActionTest extends TestCase
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate($nextPaymentDate)
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new CancelAction($repository, $gateway, new NullLogger());
@@ -98,7 +100,8 @@ final class CancelActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::COMPLETED)
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new CancelAction($repository, $gateway, new NullLogger());
@@ -126,7 +129,8 @@ final class CancelActionTest extends TestCase
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $gateway->register($mollieSubscription);
 
         $action = new CancelAction($repository, $gateway, new NullLogger());
@@ -157,7 +161,8 @@ final class CancelActionTest extends TestCase
             ->withId(self::SUBSCRIPTION_ID)
             ->withMollieId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::PENDING)
-            ->build();
+            ->build()
+        ;
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);
 
@@ -181,7 +186,8 @@ final class CancelActionTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $repository = new FakeSubscriptionRepository();
 
         $action = new CancelAction($repository, new FakeSubscriptionGateway(), new NullLogger());
@@ -213,7 +219,8 @@ final class CancelActionTest extends TestCase
             ->withId(self::SUBSCRIPTION_ID)
             ->withMollieId(self::MOLLIE_SUBSCRIPTION_ID)
             ->withStatus($status)
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);
