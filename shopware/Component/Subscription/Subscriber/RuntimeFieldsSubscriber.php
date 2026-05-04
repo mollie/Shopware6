@@ -9,9 +9,9 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEvents;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityLoadedEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class RuntimeFieldsSubscriber
+final class RuntimeFieldsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         #[Autowire(service: SettingsService::class)]
@@ -19,10 +19,16 @@ final class RuntimeFieldsSubscriber
     ) {
     }
 
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            SubscriptionEvents::SUBSCRIPTIONS_LOADED_EVENT => 'onSubscriptionsLoaded',
+        ];
+    }
+
     /**
      * @param EntityLoadedEvent<SubscriptionEntity> $event
      */
-    #[AsEventListener(event: SubscriptionEvents::SUBSCRIPTIONS_LOADED_EVENT)]
     public function onSubscriptionsLoaded(EntityLoadedEvent $event): void
     {
         foreach ($event->getEntities() as $subscription) {
