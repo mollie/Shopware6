@@ -10,6 +10,8 @@ final class Subscription
     private ?\DateTimeInterface $nextPaymentDate = null;
     private ?int $timesRemaining = null;
 
+    private PaymentCollection $payments;
+
     /**
      * @param array<mixed> $metadata
      */
@@ -25,6 +27,7 @@ final class Subscription
         private array $metadata,
         private \DateTimeInterface $startDate
     ) {
+        $this->payments = new PaymentCollection();
     }
 
     /**
@@ -66,6 +69,12 @@ final class Subscription
         if ($timesRemaining !== null) {
             $subscription->setTimesRemaining((int) $timesRemaining);
         }
+
+        $payments = new PaymentCollection();
+        foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
+            $payments->add(Payment::createFromClientResponse($paymentBody));
+        }
+        $subscription->setPayments($payments);
 
         return $subscription;
     }
@@ -116,6 +125,21 @@ final class Subscription
     public function getMandateId(): string
     {
         return $this->mandateId;
+    }
+
+    public function setMandateId(string $mandateId): void
+    {
+        $this->mandateId = $mandateId;
+    }
+
+    public function getPayments(): PaymentCollection
+    {
+        return $this->payments;
+    }
+
+    public function setPayments(PaymentCollection $payments): void
+    {
+        $this->payments = $payments;
     }
 
     public function getStartDate(): \DateTimeInterface
@@ -198,16 +222,26 @@ final class Subscription
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string,mixed>
      */
     public function toArray(): array
     {
-        $createSubscriptionBody = json_decode((string) json_encode($this), true);
-        $createSubscriptionBody['interval'] = (string) $this->interval;
+        $body = [
+            'amount' => $this->amount->toArray(),
+            'description' => $this->description,
+            'interval' => (string) $this->interval,
+            'mandateId' => $this->mandateId,
+            'metadata' => $this->metadata,
+            'startDate' => $this->startDate->format('Y-m-d'),
+            'webhookUrl' => $this->webhookUrl,
+        ];
 
-        // Remove all entries with null values
-        return array_filter($createSubscriptionBody, function ($entry) {
-            return $entry !== null;
+        if ($this->timesRemaining !== null) {
+            $body['times'] = $this->timesRemaining;
+        }
+
+        return array_filter($body, function ($entry) {
+            return $entry !== null && $entry !== '';
         });
     }
 }

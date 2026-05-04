@@ -37,8 +37,20 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?Money $amount = null;
 
+    private bool $cancelable = false;
+
     public function __construct(private string $id)
     {
+    }
+
+    public function isCancelable(): bool
+    {
+        return $this->cancelable;
+    }
+
+    public function setCancelable(bool $cancelable): void
+    {
+        $this->cancelable = $cancelable;
     }
 
     public function getId(): string
@@ -168,6 +180,8 @@ final class Payment extends Struct implements \JsonSerializable
         if ($amount !== null) {
             $payment->setAmount(new Money((float) $amount['value'], $amount['currency']));
         }
+
+        $payment->setCancelable((bool) ($body['isCancelable'] ?? false));
 
         return $payment;
     }

@@ -73,6 +73,11 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->payment;
     }
 
+    public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
+    {
+        return $this->payment;
+    }
+
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
     {
         // TODO: Implement createCapture() method.

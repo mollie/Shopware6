@@ -39,6 +39,16 @@ enum PaymentStatus: string
         return $this === self::CANCELED;
     }
 
+    public function isApproved(): bool
+    {
+        return in_array($this, [
+            self::OPEN,
+            self::PENDING,
+            self::AUTHORIZED,
+            self::PAID,
+        ], true);
+    }
+
     /**
      * @return class-string<FlowEventAware>[]
      */
