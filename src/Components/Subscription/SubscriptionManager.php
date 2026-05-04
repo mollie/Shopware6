@@ -3,79 +3,28 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\Actions\CancelAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\ConfirmAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\CreateAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\PauseAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\RenewAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\ResumeAction;
-use Kiener\MolliePayments\Components\Subscription\Actions\SkipAction;
 use Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction;
 use Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
-class SubscriptionManager implements SubscriptionManagerInterface
+class SubscriptionManager
 {
-    /**
-     * @var CreateAction
-     */
-    private $actionCreate;
-
-    /**
-     * @var ConfirmAction
-     */
-    private $actionConfirm;
-
     /**
      * @var UpdatePaymentAction
      */
     private $actionUpdatePayment;
 
     /**
-     * @var RenewAction
-     */
-    private $actionRenew;
-
-    /**
-     * @var PauseAction
-     */
-    private $actionPause;
-
-    /**
-     * @var ResumeAction
-     */
-    private $actionResume;
-
-    /**
-     * @var SkipAction
-     */
-    private $actionSkip;
-
-    /**
-     * @var CancelAction
-     */
-    private $actionCancel;
-
-    /**
      * @var SubscriptionRepository
      */
     private $repoSubscriptions;
 
-    public function __construct(CreateAction $actionCreate, ConfirmAction $actionConfirm, UpdatePaymentAction $actionUpdatePayment, RenewAction $actionRenew, PauseAction $actionPause, ResumeAction $actionResume, SkipAction $actionSkip, CancelAction $actionCancel, SubscriptionRepository $repoSubscriptions)
+    public function __construct(UpdatePaymentAction $actionUpdatePayment, SubscriptionRepository $repoSubscriptions)
     {
-        $this->actionCreate = $actionCreate;
-        $this->actionConfirm = $actionConfirm;
         $this->actionUpdatePayment = $actionUpdatePayment;
-        $this->actionRenew = $actionRenew;
-        $this->actionPause = $actionPause;
-        $this->actionResume = $actionResume;
-        $this->actionSkip = $actionSkip;
-        $this->actionCancel = $actionCancel;
         $this->repoSubscriptions = $repoSubscriptions;
     }
 
@@ -104,30 +53,6 @@ class SubscriptionManager implements SubscriptionManagerInterface
     }
 
     /**
-     * @throws \Exception
-     */
-    public function createSubscription(OrderEntity $order, SalesChannelContext $context): string
-    {
-        return $this->actionCreate->createSubscription($order, $context);
-    }
-
-    /**
-     * @throws CustomerCouldNotBeFoundException
-     */
-    public function confirmSubscription(OrderEntity $order, string $mandateId, Context $context): void
-    {
-        $this->actionConfirm->confirmSubscription($order, $mandateId, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function renewSubscription(string $swSubscriptionId, string $molliePaymentId, Context $context): OrderEntity
-    {
-        return $this->actionRenew->renewSubscription($swSubscriptionId, $molliePaymentId, $context);
-    }
-
-    /**
      * @throws CustomerCouldNotBeFoundException
      */
     public function updatePaymentMethodStart(string $subscriptionId, string $redirectUrl, Context $context): string
@@ -141,53 +66,5 @@ class SubscriptionManager implements SubscriptionManagerInterface
     public function updatePaymentMethodConfirm(string $subscriptionId, Context $context): void
     {
         $this->actionUpdatePayment->updatePaymentMethodConfirm($subscriptionId, $context);
-    }
-
-    public function cancelPendingSubscriptions(OrderEntity $order, Context $context): void
-    {
-        // does nothing for now, not necessary
-        // because it is not even confirmed yet.
-        // but maybe we should add an even in here....
-        // let's keep this for now to have it (speaking of the wrapper) fully implemented...
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function pauseSubscription(string $subscriptionId, Context $context): void
-    {
-        $this->actionPause->pauseSubscription($subscriptionId, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function resumeSubscription(string $subscriptionId, \DateTimeInterface $today, Context $context): void
-    {
-        $this->actionResume->resumeSubscription($subscriptionId, $today, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function skipSubscription(string $subscriptionId, int $skipCount, Context $context): void
-    {
-        $this->actionSkip->skipSubscription($subscriptionId, $skipCount, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function cancelSubscription(string $subscriptionId, Context $context): void
-    {
-        $this->actionCancel->cancelSubscription($subscriptionId, $context);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function isCancelable(SubscriptionEntity $subscription, Context $context): bool
-    {
-        return $this->actionCancel->isCancelable($subscription, $context);
     }
 }
