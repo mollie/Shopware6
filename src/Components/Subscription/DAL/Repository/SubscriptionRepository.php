@@ -93,26 +93,6 @@ class SubscriptionRepository
     /**
      * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
-    public function findByCustomer(string $swCustomerId, bool $includedPending, Context $context): EntitySearchResult
-    {
-        $criteria = new Criteria();
-        $criteria->addAssociation('customer');
-        $criteria->addAssociation('historyEntries');
-        $criteria->addAssociation('currency');
-        $criteria->addFilter(new EqualsFilter('customerId', $swCustomerId));
-
-        if (! $includedPending) {
-            $criteria->addFilter(
-                new NotFilter(
-                    MultiFilter::CONNECTION_AND,
-                    [new EqualsFilter('mollieId', null)]
-                )
-            );
-        }
-
-        return $this->repository->search($criteria, $context);
-    }
-
     /**
      * @throws \Exception
      *
