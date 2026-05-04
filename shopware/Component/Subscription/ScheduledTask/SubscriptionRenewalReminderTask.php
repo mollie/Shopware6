@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder;
+namespace Mollie\Shopware\Component\Subscription\ScheduledTask;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-class RenewalReminderTask extends ScheduledTask
+#[AutoconfigureTag('shopware.scheduled_task')]
+final class SubscriptionRenewalReminderTask extends ScheduledTask
 {
     public static function getTaskName(): string
     {
@@ -14,6 +16,6 @@ class RenewalReminderTask extends ScheduledTask
 
     public static function getDefaultInterval(): int
     {
-        return 60 * 60; // 1 hour
+        return 3600;
     }
 }
