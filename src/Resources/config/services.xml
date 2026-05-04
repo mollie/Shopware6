@@ -210,12 +210,6 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Service\Tags\OrderTagService">
-            <argument id="order.repository" type="service"/>
-            <argument id="tag.repository" type="service"/>
-        </service>
-
-
 
     </services>
 
