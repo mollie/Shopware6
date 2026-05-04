@@ -140,12 +140,6 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionCartCollector">
-            <tag name="shopware.cart.collector" priority="1999" />
-            <argument type="service" id="event_dispatcher"/>
-        </service>
-
-
 
 
         <service id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator">
