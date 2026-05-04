@@ -12,12 +12,5 @@
         <default key="_loginRequired">true</default>
     </route>
 
-    <route id="store-api.mollie.subscription.payment_update"
-           path="/store-api/mollie/subscription/{subscriptionId}/payment/update"
-           methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\StoreApi\Subscription\SubscriptionControllerBase::updatePayment</default>
-        <default key="_routeScope"><list><string>store-api</string></list></default>
-        <default key="_loginRequired">true</default>
-    </route>
 
 </routes>

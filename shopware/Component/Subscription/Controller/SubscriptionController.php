@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Subscription\Controller;
 
 use Mollie\Shopware\Component\Subscription\Route\AbstractUpdateAddressRoute;
+use Mollie\Shopware\Component\Subscription\Route\AbstractUpdatePaymentMethodRoute;
 use Mollie\Shopware\Component\Subscription\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Subscription\Route\UpdateAddressRoute;
+use Mollie\Shopware\Component\Subscription\Route\UpdatePaymentMethodRoute;
 use Mollie\Shopware\Component\Subscription\Route\WebhookRoute;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandlerInterface;
@@ -32,6 +34,8 @@ final class SubscriptionController extends StorefrontController
         private readonly AbstractWebhookRoute $webhookRoute,
         #[Autowire(service: UpdateAddressRoute::class)]
         private readonly AbstractUpdateAddressRoute $updateAddressRoute,
+        #[Autowire(service: UpdatePaymentMethodRoute::class)]
+        private readonly AbstractUpdatePaymentMethodRoute $updatePaymentMethodRoute,
         #[Autowire(service: SubscriptionActionHandler::class)]
         private readonly SubscriptionActionHandlerInterface $actionHandler,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -152,6 +156,60 @@ final class SubscriptionController extends StorefrontController
                 'message' => $exception->getMessage(),
             ]);
             $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdateAddress'));
+        }
+
+        return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+    }
+
+    #[Route(
+        path: '/account/mollie/subscriptions/{subscriptionId}/payment/update',
+        name: 'frontend.account.mollie.subscriptions.payment.update',
+        defaults: ['_loginRequired' => true],
+        methods: ['POST']
+    )]
+    public function updatePaymentStart(string $subscriptionId, RequestDataBag $data, SalesChannelContext $salesChannelContext): Response
+    {
+        if ($salesChannelContext->getCustomer() === null) {
+            return $this->redirectToRoute('frontend.account.login.page');
+        }
+
+        try {
+            $response = $this->updatePaymentMethodRoute->start($subscriptionId, $data, $salesChannelContext);
+            $checkoutUrl = (string) $response->getObject()->get('checkoutUrl');
+
+            return $this->redirect($checkoutUrl);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Error when starting payment method update of subscription', [
+                'subscriptionId' => $subscriptionId,
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
+
+            return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');
+        }
+    }
+
+    #[Route(
+        path: '/account/mollie/subscriptions/{subscriptionId}/payment/update/finish',
+        name: 'frontend.account.mollie.subscriptions.payment.update-success',
+        defaults: ['_loginRequired' => true],
+        methods: ['GET', 'POST']
+    )]
+    public function updatePaymentFinish(string $subscriptionId, SalesChannelContext $salesChannelContext): Response
+    {
+        if ($salesChannelContext->getCustomer() === null) {
+            return $this->redirectToRoute('frontend.account.login.page');
+        }
+
+        try {
+            $this->updatePaymentMethodRoute->confirm($subscriptionId, $salesChannelContext);
+            $this->addFlash(self::SUCCESS, $this->trans('molliePayments.subscriptions.account.successUpdatePayment'));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Error when finishing payment method update of subscription', [
+                'subscriptionId' => $subscriptionId,
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash(self::DANGER, $this->trans('molliePayments.subscriptions.account.errorUpdatePayment'));
         }
 
         return $this->redirectToRoute('frontend.account.mollie.subscriptions.page');

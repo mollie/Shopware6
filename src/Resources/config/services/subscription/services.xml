@@ -53,63 +53,6 @@
 
         <!-- ============================================================================================== -->
 
-        <service id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
-        </service>
-
-        <!-- ============================================================================================== -->
-        <!-- ACTIONS -->
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Actions\UpdatePaymentAction">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
-        </service>
-
-        <!-- ============================================================================================== -->
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionCancellation\CancellationValidator">
-        </service>
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionHistory\SubscriptionHistoryHandler">
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\DAL\Repository\SubscriptionRepository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\MollieDataBuilder">
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\Builder\SubscriptionBuilder">
-        </service>
-
-
-
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService">
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\Order\OrderConverter"/>
-            <argument type="service" id="Shopware\Core\Checkout\Cart\Processor"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\SubscriptionRenewing">
-            <argument type="service" id="Shopware\Core\System\NumberRange\ValueGenerator\NumberRangeValueGeneratorInterface"/>
-            <argument type="service" id="order_address.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\Services\SubscriptionRenewing\OrderCloneService"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Components\Subscription\Elasticsearch\SubscriptionAdminSearchIndexer">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\IteratorFactory" />

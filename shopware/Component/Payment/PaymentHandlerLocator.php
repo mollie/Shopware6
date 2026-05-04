@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment;
 
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class PaymentHandlerLocator
@@ -29,6 +30,22 @@ final class PaymentHandlerLocator
     public function getPaymentMethods(): array
     {
         return $this->paymentMethods;
+    }
+
+    /**
+     * @return AbstractMolliePaymentHandler[]
+     */
+    public function getSubscriptionMethods(): array
+    {
+        $subscriptionMethods = [];
+        foreach ($this->paymentMethods as $paymentMethod) {
+            if (! $paymentMethod instanceof SubscriptionAwareInterface) {
+                continue;
+            }
+            $subscriptionMethods[] = $paymentMethod;
+        }
+
+        return $subscriptionMethods;
     }
 
     public function findByPaymentMethod(string $paymentMethodName): ?AbstractMolliePaymentHandler
