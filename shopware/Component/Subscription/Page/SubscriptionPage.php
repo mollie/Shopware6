@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Components\Subscription\Page\Account;
+namespace Mollie\Shopware\Component\Subscription\Page;
 
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -15,42 +15,17 @@ class SubscriptionPage extends Page
     /**
      * @var EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
-    protected $subscriptions;
+    protected EntitySearchResult $subscriptions;
 
-    /**
-     * @var null|string
-     */
-    protected $deepLinkCode;
+    protected CountryCollection $countries;
 
-    /**
-     * @var null|int
-     */
-    protected $total;
+    protected SalutationCollection $salutations;
 
-    /**
-     * @var CountryCollection
-     */
-    protected $countries;
+    protected bool $allowAddressEditing = false;
 
-    /**
-     * @var SalutationCollection
-     */
-    protected $salutations;
+    protected bool $allowPauseResume = false;
 
-    /**
-     * @var bool
-     */
-    protected $allowAddressEditing;
-
-    /**
-     * @var bool
-     */
-    protected $allowPauseResume;
-
-    /**
-     * @var bool
-     */
-    protected $allowSkip;
+    protected bool $allowSkip = false;
 
     /**
      * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
@@ -68,34 +43,14 @@ class SubscriptionPage extends Page
         $this->subscriptions = $subscriptions;
     }
 
-    public function getDeepLinkCode(): ?string
+    public function getCountries(): CountryCollection
     {
-        return $this->deepLinkCode;
-    }
-
-    public function setDeepLinkCode(?string $deepLinkCode): void
-    {
-        $this->deepLinkCode = $deepLinkCode;
-    }
-
-    public function getTotal(): ?int
-    {
-        return $this->total;
-    }
-
-    public function setTotal(?int $total): void
-    {
-        $this->total = $total;
+        return $this->countries;
     }
 
     public function setCountries(CountryCollection $countries): void
     {
         $this->countries = $countries;
-    }
-
-    public function getCountries(): CountryCollection
-    {
-        return $this->countries;
     }
 
     public function getSalutations(): SalutationCollection
@@ -108,11 +63,6 @@ class SubscriptionPage extends Page
         $this->salutations = $salutations;
     }
 
-    /**
-     * ATTENTION: DON'T DELETE.
-     * The IDE says it's not used, but it's
-     * indeed used in the TWIG storefront :)
-     */
     public function isAllowAddressEditing(): bool
     {
         return $this->allowAddressEditing;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Controller;
 
+use Mollie\Shopware\Component\Subscription\Page\SubscriptionPageLoader;
 use Mollie\Shopware\Component\Subscription\Route\AbstractUpdateAddressRoute;
 use Mollie\Shopware\Component\Subscription\Route\AbstractUpdatePaymentMethodRoute;
 use Mollie\Shopware\Component\Subscription\Route\AbstractWebhookRoute;
@@ -36,11 +37,33 @@ final class SubscriptionController extends StorefrontController
         private readonly AbstractUpdateAddressRoute $updateAddressRoute,
         #[Autowire(service: UpdatePaymentMethodRoute::class)]
         private readonly AbstractUpdatePaymentMethodRoute $updatePaymentMethodRoute,
+        private readonly SubscriptionPageLoader $pageLoader,
         #[Autowire(service: SubscriptionActionHandler::class)]
         private readonly SubscriptionActionHandlerInterface $actionHandler,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger
     ) {
+    }
+
+    #[Route(
+        path: '/account/mollie/subscriptions',
+        name: 'frontend.account.mollie.subscriptions.page',
+        options: ['seo' => false],
+        defaults: ['_loginRequired' => true, 'XmlHttpRequest' => true],
+        methods: ['GET', 'POST']
+    )]
+    public function subscriptionsList(Request $request, SalesChannelContext $salesChannelContext): Response
+    {
+        if ($salesChannelContext->getCustomer() === null) {
+            return $this->redirectToRoute('frontend.account.login.page');
+        }
+
+        $page = $this->pageLoader->load($request, $salesChannelContext);
+
+        return $this->renderStorefront(
+            '@Storefront/storefront/page/account/subscriptions/index.html.twig',
+            ['page' => $page]
+        );
     }
 
     #[Route(path: '/mollie/webhook/subscription/{subscriptionId}', name: 'frontend.mollie.webhook.subscription', options: ['seo' => false], methods: ['GET', 'POST'])]

@@ -18,7 +18,6 @@
         <import resource="services/builder.xml"/>
         <import resource="services/handlers.xml"/>
         <import resource="services/scheduled_tasks.xml"/>
-        <import resource="services/subscription/services.xml"/>
         <import resource="services/refundmanager/services.xml"/>
         <import resource="services/controller.xml"/>
         <import resource="services/snippets.xml"/>
