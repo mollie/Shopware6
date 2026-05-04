@@ -35,7 +35,7 @@ final class EntityExtensionsTest extends TestCase
 {
     /**
      * @param class-string<EntityExtension> $extensionClass
-     * @param class-string                  $expectedDefinitionClass
+     * @param class-string $expectedDefinitionClass
      */
     #[DataProvider('extensionProvider')]
     public function testGetDefinitionClassReturnsExpectedDefinition(string $extensionClass, string $expectedDefinitionClass, string $expectedEntityName): void
@@ -48,7 +48,7 @@ final class EntityExtensionsTest extends TestCase
 
     /**
      * @param class-string<EntityExtension> $extensionClass
-     * @param class-string                  $expectedReferenceClass
+     * @param class-string $expectedReferenceClass
      */
     #[DataProvider('extensionProvider')]
     public function testExtendFieldsAddsExpectedAssociation(
@@ -69,17 +69,6 @@ final class EntityExtensionsTest extends TestCase
         $this->assertInstanceOf(OneToManyAssociationField::class, $field);
         $this->assertSame($expectedReferenceClass, $field->getReferenceClass());
         $this->assertSame($expectedCascadeDelete, $field->getFlag(CascadeDelete::class) instanceof CascadeDelete);
-    }
-
-    private function findAssociationField(FieldCollection $collection, string $propertyName): ?OneToManyAssociationField
-    {
-        foreach ($collection as $field) {
-            if ($field instanceof OneToManyAssociationField && $field->getPropertyName() === $propertyName) {
-                return $field;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -137,5 +126,16 @@ final class EntityExtensionsTest extends TestCase
                 true,
             ],
         ];
+    }
+
+    private function findAssociationField(FieldCollection $collection, string $propertyName): ?OneToManyAssociationField
+    {
+        foreach ($collection as $field) {
+            if ($field instanceof OneToManyAssociationField && $field->getPropertyName() === $propertyName) {
+                return $field;
+            }
+        }
+
+        return null;
     }
 }

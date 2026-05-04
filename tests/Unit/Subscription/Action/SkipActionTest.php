@@ -41,13 +41,15 @@ final class SkipActionTest extends TestCase
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTime('+30 days'))
-            ->build();
+            ->build()
+        ;
         $newNextPaymentDate = new \DateTime('+60 days');
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate($newNextPaymentDate)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
         $gateway->setCopyResponse($newMollieSubscription);
 
@@ -83,7 +85,8 @@ final class SkipActionTest extends TestCase
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate($nextPaymentDate)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
 
         $action = new SkipAction($repository, $gateway, new NullLogger());
@@ -116,11 +119,13 @@ final class SkipActionTest extends TestCase
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTime('+30 days'))
-            ->build();
+            ->build()
+        ;
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
         $gateway->setCopyResponse($newMollieSubscription);
 
@@ -149,7 +154,8 @@ final class SkipActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
 
         $action = new SkipAction($repository, $gateway, new NullLogger());
@@ -179,7 +185,8 @@ final class SkipActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::COMPLETED)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
 
         $action = new SkipAction($repository, $gateway, new NullLogger());
@@ -219,7 +226,8 @@ final class SkipActionTest extends TestCase
             ->withId(self::SUBSCRIPTION_ID)
             ->withMollieId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
 
         $repository = new FakeSubscriptionRepository();
         $repository->add($subscription);

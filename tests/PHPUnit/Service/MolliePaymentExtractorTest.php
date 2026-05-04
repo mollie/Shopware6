@@ -107,7 +107,7 @@ class MolliePaymentExtractorTest extends TestCase
         $yesterday = (new \DateTime())->modify('-1 day');
 
         $failedMollieAttempt = $this->createTransaction($twoDaysAgo, self::MOLLIE_PAYMENT_METHOD);
-        $finalNonMollie = $this->createTransaction($yesterday, 'Some\\Other\\Handler\\Invoice');
+        $finalNonMollie = $this->createTransaction($yesterday, 'Some\Other\Handler\Invoice');
 
         $order = new OrderEntity();
         $order->setId(Uuid::randomHex());

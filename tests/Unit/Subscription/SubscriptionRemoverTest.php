@@ -86,12 +86,14 @@ final class SubscriptionRemoverTest extends TestCase
         $subscriptionAware = PaymentMethodBuilder::create()
             ->withId('subscription-aware-id')
             ->withHandlerIdentifier(FakeSubscriptionAwarePaymentHandler::class)
-            ->build();
+            ->build()
+        ;
 
         $regular = PaymentMethodBuilder::create()
             ->withId('regular-id')
             ->withHandlerIdentifier(FakePaymentMethodHandler::class)
-            ->build();
+            ->build()
+        ;
 
         return new PaymentMethodCollection([$subscriptionAware, $regular]);
     }

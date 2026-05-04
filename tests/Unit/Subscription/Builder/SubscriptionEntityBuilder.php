@@ -155,7 +155,8 @@ final class SubscriptionEntityBuilder
 
             $customer = CustomerBuilder::create()
                 ->withDefaultBillingAddress($defaultBillingAddress)
-                ->build();
+                ->build()
+            ;
 
             $orderCustomer = new OrderCustomerEntity();
             $orderCustomer->setUniqueIdentifier('order-customer-id');
@@ -173,6 +174,7 @@ final class SubscriptionEntityBuilder
         return SubscriptionAddressBuilder::create()
             ->withId($type . '-address-id')
             ->withSubscriptionId($this->id)
-            ->build();
+            ->build()
+        ;
     }
 }

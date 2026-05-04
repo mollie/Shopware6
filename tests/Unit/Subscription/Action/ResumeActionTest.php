@@ -39,12 +39,14 @@ final class ResumeActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::CANCELED)
-            ->build();
+            ->build()
+        ;
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
         $gateway->setCopyResponse($newMollieSubscription);
 
@@ -80,10 +82,12 @@ final class ResumeActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::CANCELED)
-            ->build();
+            ->build()
+        ;
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
         $gateway->setCopyResponse($newMollieSubscription);
 
@@ -112,10 +116,12 @@ final class ResumeActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::CANCELED)
-            ->build();
+            ->build()
+        ;
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
         $gateway->setCopyResponse($newMollieSubscription);
 
@@ -140,7 +146,8 @@ final class ResumeActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::CANCELED)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
 
         $action = new ResumeAction($repository, $gateway, new NullLogger());
@@ -169,7 +176,8 @@ final class ResumeActionTest extends TestCase
         $oldMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::OLD_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
-            ->build();
+            ->build()
+        ;
         $gateway->register($oldMollieSubscription);
 
         $action = new ResumeAction($repository, $gateway, new NullLogger());
@@ -207,7 +215,8 @@ final class ResumeActionTest extends TestCase
         $builder = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
             ->withMollieId(self::OLD_MOLLIE_ID)
-            ->withStatus(SubscriptionStatus::PAUSED);
+            ->withStatus(SubscriptionStatus::PAUSED)
+        ;
 
         if ($metadata instanceof SubscriptionMetadata) {
             $builder = $builder->withMetadata($metadata);

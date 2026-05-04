@@ -57,8 +57,9 @@ final class CancelAction extends AbstractAction
 
         if ($shopwareStatus === SubscriptionStatus::PENDING->value) {
             $this->logger->info('Subscription is pending, persisting cancellation without Mollie API call', $logData);
+            $this->persistImmediateCancellation($subscription, $context, 'canceled');
 
-            return $this->persistImmediateCancellation($subscription, $context, $mollieSubscription, 'canceled');
+            return $mollieSubscription;
         }
 
         if (! $mollieSubscriptionStatus->isActive()) {
@@ -85,7 +86,9 @@ final class CancelAction extends AbstractAction
             $subscription->getSalesChannelId(),
         );
 
-        return $this->persistImmediateCancellation($subscription, $context, $mollieSubscription, 'cancelled', $metaData);
+        $this->persistImmediateCancellation($subscription, $context, 'cancelled', $metaData);
+
+        return $mollieSubscription;
     }
 
     public function cancelPending(SubscriptionEntity $subscription, Context $context): void
@@ -94,7 +97,7 @@ final class CancelAction extends AbstractAction
             throw new \LogicException(sprintf('CancelAction::cancelPending called for non-pending subscription "%s"', $subscription->getId()));
         }
 
-        $this->persistImmediateCancellation($subscription, $context, null, 'canceled');
+        $this->persistImmediateCancellation($subscription, $context, 'canceled');
     }
 
     public function getEventClass(): string
@@ -110,10 +113,9 @@ final class CancelAction extends AbstractAction
     private function persistImmediateCancellation(
         SubscriptionEntity $subscription,
         Context $context,
-        ?Subscription $mollieSubscription,
         string $comment = 'cancelled',
         ?SubscriptionMetadata $metadata = null
-    ): ?Subscription {
+    ): void {
         $statusFrom = $subscription->getStatus();
         $newStatus = SubscriptionStatus::CANCELED->value;
 
@@ -135,8 +137,6 @@ final class CancelAction extends AbstractAction
         }
 
         $this->subscriptionRepository->upsert([$upsertData], $context);
-
-        return $mollieSubscription;
     }
 
     private function persistDeferredCancellation(

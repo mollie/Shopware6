@@ -79,7 +79,8 @@ final class SubscriptionAddressSyncerTest extends TestCase
             ->withCustomerId(self::CUSTOMER_ID)
             ->withoutBillingAddress()
             ->withShippingAddress($this->buildAddress(['firstName' => 'Jane']))
-            ->build();
+            ->build()
+        ;
 
         $syncer = new SubscriptionAddressSyncer(new FakeCustomerAddressRepository());
 
@@ -96,7 +97,8 @@ final class SubscriptionAddressSyncerTest extends TestCase
             ->withCustomerId(self::CUSTOMER_ID)
             ->withBillingAddress($this->buildAddress(['firstName' => 'John']))
             ->withoutShippingAddress()
-            ->build();
+            ->build()
+        ;
 
         $syncer = new SubscriptionAddressSyncer(new FakeCustomerAddressRepository());
 
@@ -113,7 +115,8 @@ final class SubscriptionAddressSyncerTest extends TestCase
             ->withCustomerId(self::CUSTOMER_ID)
             ->withBillingAddress($billing)
             ->withShippingAddress($shipping)
-            ->build();
+            ->build()
+        ;
     }
 
     /**
@@ -129,6 +132,7 @@ final class SubscriptionAddressSyncerTest extends TestCase
             ->withFirstName($firstName)
             ->withLastName($overrides['lastName'] ?? 'Doe')
             ->withStreet($overrides['street'] ?? 'Default Street 1')
-            ->build();
+            ->build()
+        ;
     }
 }

@@ -189,8 +189,9 @@ final class Subscription
             return true;
         }
 
-        $latestCancellation = clone $nextPaymentDate;
-        $latestCancellation = $latestCancellation->modify('-' . $daysBeforeRenewal . ' day');
+        $latestCancellation = (new \DateTimeImmutable($nextPaymentDate->format('Y-m-d H:i:s')))
+            ->modify('-' . $daysBeforeRenewal . ' day')
+        ;
 
         return $now <= $latestCancellation;
     }
@@ -241,7 +242,7 @@ final class Subscription
         }
 
         return array_filter($body, function ($entry) {
-            return $entry !== null && $entry !== '';
+            return $entry !== '';
         });
     }
 }

@@ -8,7 +8,7 @@ parameters:
         - ./../src/Migration/*
         - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
         - ./../src/Components/RefundManager/Elasticsearch/RefundAdminSearchIndexer.php
-        - ./../src/Components/Subscription/Elasticsearch/SubscriptionAdminSearchIndexer.php
+        - ./../shopware/Component/Subscription/Search/SubscriptionAdminSearchIndexer.php
         # legacy code that is not working with abstract/interface changes
         - ./../src/Service/Mail/MailService63.php
     disallowedFunctionCalls:

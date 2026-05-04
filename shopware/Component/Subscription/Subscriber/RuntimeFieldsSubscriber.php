@@ -45,7 +45,8 @@ final class RuntimeFieldsSubscriber implements EventSubscriberInterface
 
         $cancellationDays = $this->settingsService
             ->getSubscriptionSettings($subscription->getSalesChannelId())
-            ->getCancelDays();
+            ->getCancelDays()
+        ;
 
         if ($cancellationDays <= 0) {
             $subscription->setCancelUntil($nextPayment);

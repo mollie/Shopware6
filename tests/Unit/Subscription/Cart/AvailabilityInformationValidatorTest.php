@@ -24,7 +24,8 @@ final class AvailabilityInformationValidatorTest extends TestCase
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::subscription('item-1')->build())
             ->withError(new PaymentMethodAvailabilityNotice('item-1'))
-            ->build();
+            ->build()
+        ;
 
         $validator = $this->getValidator(enabled: false);
         $validator->validate($cart, new ErrorCollection(), new FakeSalesChannelContext());
@@ -37,7 +38,8 @@ final class AvailabilityInformationValidatorTest extends TestCase
         $cart = CartBuilder::create()
             ->withLineItem(LineItemBuilder::regular('item-1')->build())
             ->withError(new PaymentMethodAvailabilityNotice('item-1'))
-            ->build();
+            ->build()
+        ;
 
         $validator = $this->getValidator(enabled: true);
         $validator->validate($cart, new ErrorCollection(), new FakeSalesChannelContext());
@@ -53,7 +55,8 @@ final class AvailabilityInformationValidatorTest extends TestCase
                 LineItemBuilder::subscription('subscription-2')->build(),
                 LineItemBuilder::subscription('subscription-3')->build(),
             ])
-            ->build();
+            ->build()
+        ;
 
         $errors = new ErrorCollection();
         $validator = $this->getValidator(enabled: true);
@@ -72,7 +75,8 @@ final class AvailabilityInformationValidatorTest extends TestCase
             ->withLineItem(LineItemBuilder::regular('item-1')->build())
             ->withError(new PaymentMethodAvailabilityNotice('item-1'))
             ->withError(new InvalidGuestAccountError())
-            ->build();
+            ->build()
+        ;
 
         $validator = $this->getValidator(enabled: true);
         $validator->validate($cart, new ErrorCollection(), new FakeSalesChannelContext());
