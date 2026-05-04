@@ -18,7 +18,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('shopware.entity.definition',['entity' => 'mollie_subscription_history'])]
-class SubscriptionHistoryDefinition extends EntityDefinition
+final class SubscriptionHistoryDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription_history';
 

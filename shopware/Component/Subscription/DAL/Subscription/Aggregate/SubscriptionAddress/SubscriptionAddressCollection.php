@@ -17,7 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
  * @method null|SubscriptionAddressEntity first()
  * @method null|SubscriptionAddressEntity last()
  */
-class SubscriptionAddressCollection extends EntityCollection
+final class SubscriptionAddressCollection extends EntityCollection
 {
     protected function getExpectedClass(): string
     {

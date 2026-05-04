@@ -10,7 +10,7 @@ use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Salutation\SalutationCollection;
 use Shopware\Storefront\Page\Page;
 
-class SubscriptionPage extends Page
+final class SubscriptionPage extends Page
 {
     /**
      * @var EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>

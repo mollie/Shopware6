@@ -12,7 +12,7 @@ use Shopware\Core\System\Salutation\SalutationDefinition;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('shopware.entity.extension')]
-class SalutationExtension extends EntityExtension
+final class SalutationExtension extends EntityExtension
 {
     public function getDefinitionClass(): string
     {

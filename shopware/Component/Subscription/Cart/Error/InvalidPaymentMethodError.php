@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Subscription\Cart\Error;
 
 use Shopware\Core\Checkout\Cart\Error\Error;
 
-class InvalidPaymentMethodError extends Error
+final class InvalidPaymentMethodError extends Error
 {
     public const KEY = 'mollie-payments-cart-error-method-invalid';
 

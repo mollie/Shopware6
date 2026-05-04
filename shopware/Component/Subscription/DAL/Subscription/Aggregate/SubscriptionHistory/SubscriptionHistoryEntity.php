@@ -7,7 +7,7 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
 
-class SubscriptionHistoryEntity extends Entity
+final class SubscriptionHistoryEntity extends Entity
 {
     use EntityIdTrait;
 
