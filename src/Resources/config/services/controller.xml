@@ -101,18 +101,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Subscription\SubscriptionControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="customer.repository"/>
-            <argument type="service" id="mollie_subscription.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Controller\Api\Order\CancelLineController">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade"/>
