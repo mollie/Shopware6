@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Subscription\Controller;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Subscription\Controller\SubscriptionController;
+use Mollie\Shopware\Component\Subscription\Page\SubscriptionPageLoader;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionActionHandler;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeUpdateAddressRoute;
@@ -75,6 +76,7 @@ final class SubscriptionControllerTest extends TestCase
             $webhookRoute,
             new FakeUpdateAddressRoute(),
             new FakeUpdatePaymentMethodRoute(),
+            $this->createMock(SubscriptionPageLoader::class),
             new FakeSubscriptionActionHandler(),
             new NullLogger()
         );
