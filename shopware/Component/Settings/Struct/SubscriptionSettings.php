@@ -12,6 +12,8 @@ final class SubscriptionSettings extends Struct
     public const KEY_ALLOW_EDIT_ADDRESS = 'subscriptionsAllowAddressEditing';
     public const KEY_ALLOW_PAUSE_RESUME = 'subscriptionsAllowPauseResume';
     public const KEY_ALLOW_SKIP = 'subscriptionsAllowSkip';
+    public const KEY_ALLOW_REORDER = 'subscriptionsAllowReorder';
+    public const KEY_ALLOW_UPDATE_PAYMENT = 'subscriptionsAllowUpdatePayment';
     public const KEY_SKIP_IF_FAILED = 'subscriptionSkipRenewalsOnFailedPayments';
     public const KEY_REMINDER_DAYS = 'subscriptionsReminderDays';
     public const KEY_CANCEL_DAYS = 'subscriptionsCancellationDays';
@@ -21,6 +23,8 @@ final class SubscriptionSettings extends Struct
         private bool $allowEditAddress = false,
         private bool $allowPauseAndResume = false,
         private bool $allowSkip = false,
+        private bool $allowReorder = true,
+        private bool $allowUpdatePayment = true,
         private bool $skipIfFailed = false,
         private int $reminderDays = 0,
         private int $cancelDays = 0,
@@ -37,15 +41,20 @@ final class SubscriptionSettings extends Struct
         $allowEditAddress = $settings[self::KEY_ALLOW_EDIT_ADDRESS] ?? false;
         $allowPauseAndResume = $settings[self::KEY_ALLOW_PAUSE_RESUME] ?? false;
         $allowSkip = $settings[self::KEY_ALLOW_SKIP] ?? false;
+        $allowReorder = $settings[self::KEY_ALLOW_REORDER] ?? true;
+        $allowUpdatePayment = $settings[self::KEY_ALLOW_UPDATE_PAYMENT] ?? true;
         $skipIfFailed = $settings[self::KEY_SKIP_IF_FAILED] ?? false;
         $reminderDays = $settings[self::KEY_REMINDER_DAYS] ?? 0;
         $cancelDays = $settings[self::KEY_CANCEL_DAYS] ?? 0;
 
-        return new self((bool) $enabled,
+        return new self(
+            (bool) $enabled,
             (bool) $showIndicator,
             (bool) $allowEditAddress,
             (bool) $allowPauseAndResume,
             (bool) $allowSkip,
+            (bool) $allowReorder,
+            (bool) $allowUpdatePayment,
             (bool) $skipIfFailed,
             (int) $reminderDays,
             (int) $cancelDays
@@ -75,6 +84,16 @@ final class SubscriptionSettings extends Struct
     public function isAllowSkip(): bool
     {
         return $this->allowSkip;
+    }
+
+    public function isAllowReorder(): bool
+    {
+        return $this->allowReorder;
+    }
+
+    public function isAllowUpdatePayment(): bool
+    {
+        return $this->allowUpdatePayment;
     }
 
     public function isSkipIfFailed(): bool
