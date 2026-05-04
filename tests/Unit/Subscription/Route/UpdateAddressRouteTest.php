@@ -129,7 +129,8 @@ final class UpdateAddressRouteTest extends TestCase
             ->withCustomerId('customer-id')
             ->withoutBillingAddress()
             ->withShippingAddress($shipping)
-            ->build();
+            ->build()
+        ;
         $order = new OrderEntity();
         $order->setId('order-id');
         $struct = new SubscriptionDataStruct(
@@ -236,7 +237,8 @@ final class UpdateAddressRouteTest extends TestCase
             ->withCustomerId($customerId)
             ->withBillingAddress($billingAddress)
             ->withShippingAddress($shippingAddress)
-            ->build();
+            ->build()
+        ;
 
         $order = new OrderEntity();
         $order->setId('order-id');

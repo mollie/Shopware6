@@ -70,7 +70,7 @@ final class EntityDefinitionsTest extends TestCase
 
     /**
      * @param class-string<EntityDefinition> $definitionClass
-     * @param class-string                   $expectedEntityClass
+     * @param class-string $expectedEntityClass
      */
     #[DataProvider('definitionProvider')]
     public function testGetEntityClassReturnsExpectedEntityClass(string $definitionClass, string $expectedEntityName, string $expectedEntityClass): void
@@ -82,7 +82,7 @@ final class EntityDefinitionsTest extends TestCase
 
     /**
      * @param class-string<EntityDefinition> $definitionClass
-     * @param class-string                   $expectedCollectionClass
+     * @param class-string $expectedCollectionClass
      */
     #[DataProvider('definitionProvider')]
     public function testGetCollectionClassReturnsExpectedCollectionClass(
@@ -114,7 +114,7 @@ final class EntityDefinitionsTest extends TestCase
      * before `dal:validate` ever runs.
      *
      * @param class-string<EntityDefinition> $definitionClass
-     * @param class-string                   $expectedEntityClass
+     * @param class-string $expectedEntityClass
      */
     #[DataProvider('definitionProvider')]
     public function testEveryDeclaredFieldHasGetterAndSetterOnEntity(string $definitionClass, string $expectedEntityName, string $expectedEntityClass): void
@@ -182,8 +182,6 @@ final class EntityDefinitionsTest extends TestCase
         $reflection->setAccessible(true);
 
         /** @var FieldCollection $fields */
-        $fields = $reflection->invoke($definition);
-
-        return $fields;
+        return $reflection->invoke($definition);
     }
 }

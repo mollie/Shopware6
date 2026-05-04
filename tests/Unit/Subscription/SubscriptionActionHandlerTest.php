@@ -112,7 +112,8 @@ final class SubscriptionActionHandlerTest extends TestCase
     {
         $subscription = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
-            ->build();
+            ->build()
+        ;
         $subscription->setMollieId(self::MOLLIE_SUBSCRIPTION_ID);
 
         $repository = new FakeSubscriptionRepository();
@@ -125,7 +126,8 @@ final class SubscriptionActionHandlerTest extends TestCase
     {
         $mollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::MOLLIE_SUBSCRIPTION_ID)
-            ->build();
+            ->build()
+        ;
 
         $gateway = new FakeSubscriptionGateway();
         $gateway->register($mollieSubscription);
@@ -156,5 +158,4 @@ final class SubscriptionActionHandlerTest extends TestCase
             $logger
         );
     }
-
 }

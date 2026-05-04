@@ -5,7 +5,6 @@ namespace Mollie\Shopware\Unit\Subscription\Controller;
 
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Shopware\Component\Subscription\Controller\RescueApiController;
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;

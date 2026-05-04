@@ -10,7 +10,6 @@ use Mollie\Shopware\Component\Subscription\Action\UpdatePaymentMethodAction;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataService;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataServiceInterface;
-use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -29,9 +28,7 @@ final class UpdatePaymentMethodRoute extends AbstractUpdatePaymentMethodRoute
         private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: SubscriptionDataService::class)]
         private readonly SubscriptionDataServiceInterface $subscriptionDataService,
-        private readonly UpdatePaymentMethodAction $action,
-        #[Autowire(service: 'monolog.logger.mollie')]
-        private readonly LoggerInterface $logger
+        private readonly UpdatePaymentMethodAction $action
     ) {
     }
 

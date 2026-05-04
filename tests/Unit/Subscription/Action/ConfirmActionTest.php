@@ -39,7 +39,8 @@ final class ConfirmActionTest extends TestCase
             ->withId(self::SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::PENDING)
             ->withMetadata(new SubscriptionMetadata('2026-05-01', 1, IntervalUnit::MONTHS))
-            ->build();
+            ->build()
+        ;
         $subscription->setDescription('Monthly box');
         $subscription->setAmount(19.99);
 
@@ -47,7 +48,8 @@ final class ConfirmActionTest extends TestCase
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->setCreateResponse($newMollieSubscription);
 
         $action = $this->getAction($repository, $gateway, new EventSpy());
@@ -79,11 +81,13 @@ final class ConfirmActionTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::PENDING)
-            ->build();
+            ->build()
+        ;
 
         $newMollieSubscription = MollieSubscriptionBuilder::create()
             ->withId(self::NEW_MOLLIE_ID)
-            ->build();
+            ->build()
+        ;
         $gateway->setCreateResponse($newMollieSubscription);
 
         $action = $this->getAction($repository, $gateway, new EventSpy());
@@ -108,7 +112,8 @@ final class ConfirmActionTest extends TestCase
         $subscription = SubscriptionEntityBuilder::create()
             ->withId(self::SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::PENDING)
-            ->build();
+            ->build()
+        ;
         $subscription->setDescription('Monthly box');
         $subscription->setAmount(19.99);
 
@@ -116,7 +121,8 @@ final class ConfirmActionTest extends TestCase
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->setCreateResponse($newMollieSubscription);
 
         $action = $this->getAction($repository, $gateway, $eventDispatcher);
@@ -136,7 +142,8 @@ final class ConfirmActionTest extends TestCase
             ->withId(self::SUBSCRIPTION_ID)
             ->withStatus(SubscriptionStatus::PENDING)
             ->withMetadata($metadata)
-            ->build();
+            ->build()
+        ;
         $subscription->setDescription('Year box');
         $subscription->setAmount(9.99);
 
@@ -144,7 +151,8 @@ final class ConfirmActionTest extends TestCase
             ->withId(self::NEW_MOLLIE_ID)
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('+30 days'))
-            ->build();
+            ->build()
+        ;
         $gateway->setCreateResponse($newMollieSubscription);
 
         $action = $this->getAction($repository, $gateway, new EventSpy());

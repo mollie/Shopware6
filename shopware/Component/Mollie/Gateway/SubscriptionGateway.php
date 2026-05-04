@@ -140,5 +140,4 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
             throw $this->convertException($exception, $orderNumber);
         }
     }
-
 }

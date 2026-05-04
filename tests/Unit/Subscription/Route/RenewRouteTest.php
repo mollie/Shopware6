@@ -10,7 +10,6 @@ use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\Action\RenewAction;
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Mollie\Shopware\Component\Subscription\RenewalOrderCreator;
 use Mollie\Shopware\Component\Subscription\Route\RenewException;
 use Mollie\Shopware\Component\Subscription\Route\RenewRoute;
@@ -173,7 +172,8 @@ final class RenewRouteTest extends TestCase
             ->withId('sub_test123')
             ->withStatus(SubscriptionStatus::ACTIVE)
             ->withNextPaymentDate(new \DateTimeImmutable('2099-06-01'))
-            ->build();
+            ->build()
+        ;
         $subscriptionGateway->register($mollieSubscription);
 
         $mollieGateway = new FakeGateway(payment: $payment);
@@ -239,7 +239,8 @@ final class RenewRouteTest extends TestCase
             ->withMetadata(new SubscriptionMetadata('2026-06-01', 1, IntervalUnit::MONTHS, 0))
             ->withBillingAddress($billingAddress)
             ->withShippingAddress($shippingAddress)
-            ->build();
+            ->build()
+        ;
 
         $order = new OrderEntity();
         $order->setId('order-id');
