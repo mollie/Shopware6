@@ -410,7 +410,7 @@ class Order
 
         $lineItems = $order->getLineItems();
 
-        if ($settings->isSubscriptionsEnabled() && $lineItems instanceof OrderLineItemCollection) {
+        if ($lineItems instanceof OrderLineItemCollection) {
             // mollie customer ID is required for recurring payments, see https://docs.mollie.com/reference/v2/orders-api/create-order-payment
 
             foreach ($lineItems as $lineItem) {

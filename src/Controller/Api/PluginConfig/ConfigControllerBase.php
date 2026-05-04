@@ -140,15 +140,6 @@ class ConfigControllerBase extends AbstractController
         return $this->getRefundManagerConfig($request, $context);
     }
 
-    public function getSubscriptionConfig(): JsonResponse
-    {
-        $config = $this->settings->getSettings();
-
-        return new JsonResponse([
-            'enabled' => $config->isSubscriptionsEnabled(),
-        ]);
-    }
-
     private function testApiKeysAction(string $liveApiKey, string $testApiKey): JsonResponse
     {
         $keys = [
