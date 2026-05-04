@@ -16,7 +16,7 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class AvailabilityInformationValidator implements CartValidatorInterface
+final class AvailabilityInformationValidator implements CartValidatorInterface
 {
     public function __construct(
         #[Autowire(service: SettingsService::class)]

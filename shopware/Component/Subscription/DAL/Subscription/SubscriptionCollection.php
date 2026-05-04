@@ -16,7 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
  * @method null|SubscriptionEntity first()
  * @method null|SubscriptionEntity last()
  */
-class SubscriptionCollection extends EntityCollection
+final class SubscriptionCollection extends EntityCollection
 {
     /**
      * @return array<SubscriptionEntity>

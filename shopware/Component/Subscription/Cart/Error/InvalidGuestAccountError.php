@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Subscription\Cart\Error;
 
 use Shopware\Core\Checkout\Cart\Error\Error;
 
-class InvalidGuestAccountError extends Error
+final class InvalidGuestAccountError extends Error
 {
     public const KEY = 'mollie-payments-cart-guest-account';
 

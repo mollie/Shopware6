@@ -12,7 +12,7 @@ use Shopware\Core\System\Country\Aggregate\CountryState\CountryStateDefinition;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('shopware.entity.extension')]
-class CountryStateExtension extends EntityExtension
+final class CountryStateExtension extends EntityExtension
 {
     public function getDefinitionClass(): string
     {

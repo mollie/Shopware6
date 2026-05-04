@@ -13,12 +13,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Validator\Constraints\Type;
 
 #[AutoconfigureTag('shopware.rule.definition')]
-class LineItemSubscriptionRule extends Rule
+final class LineItemSubscriptionRule extends Rule
 {
-    /**
-     * @var bool
-     */
-    protected $isSubscription = false;
+    protected bool $isSubscription = false;
 
     public function getName(): string
     {

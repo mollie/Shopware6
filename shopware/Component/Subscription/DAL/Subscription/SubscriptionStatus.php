@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\DAL\Subscription;
 
-class SubscriptionStatus
+final class SubscriptionStatus
 {
     public const PENDING = 'pending';
     public const ACTIVE = 'active';
@@ -15,10 +15,7 @@ class SubscriptionStatus
     public const RESUMED = 'resumed';
     public const SKIPPED = 'skipped';
 
-    /**
-     * @return string
-     */
-    public static function fromMollieStatus(string $status)
+    public static function fromMollieStatus(string $status): string
     {
         switch ($status) {
             case 'pending':

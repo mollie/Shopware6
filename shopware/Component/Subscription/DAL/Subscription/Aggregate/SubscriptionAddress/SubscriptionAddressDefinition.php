@@ -23,7 +23,7 @@ use Shopware\Core\System\Salutation\SalutationDefinition;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('shopware.entity.definition',['entity' => 'mollie_subscription_address'])]
-class SubscriptionAddressDefinition extends EntityDefinition
+final class SubscriptionAddressDefinition extends EntityDefinition
 {
     public const ENTITY_NAME = 'mollie_subscription_address';
 
