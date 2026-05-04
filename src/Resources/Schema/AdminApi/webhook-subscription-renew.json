@@ -6,13 +6,13 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/webhook/subscription/{swSubscriptionId}/renew": {
+    "/mollie/webhook/subscription/{subscriptionId}/renew": {
       "get": {
         "summary": "Handle Mollie Subscription Renewal Webhook Notification (GET)",
         "operationId": "handleMollieSubscriptionRenewalWebhookGet",
         "parameters": [
           {
-            "name": "swSubscriptionId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -77,7 +77,7 @@
         "operationId": "handleMollieSubscriptionRenewalWebhookPost",
         "parameters": [
           {
-            "name": "swSubscriptionId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
