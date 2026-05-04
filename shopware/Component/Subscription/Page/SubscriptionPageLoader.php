@@ -57,6 +57,8 @@ class SubscriptionPageLoader
         $page->setAllowAddressEditing($settings->isAllowEditAddress());
         $page->setAllowPauseResume($settings->isAllowPauseAndResume());
         $page->setAllowSkip($settings->isAllowSkip());
+        $page->setAllowReorder($settings->isAllowReorder());
+        $page->setAllowUpdatePayment($settings->isAllowUpdatePayment());
 
         return $page;
     }

@@ -27,6 +27,10 @@ class SubscriptionPage extends Page
 
     protected bool $allowSkip = false;
 
+    protected bool $allowReorder = true;
+
+    protected bool $allowUpdatePayment = true;
+
     /**
      * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
@@ -91,5 +95,25 @@ class SubscriptionPage extends Page
     public function setAllowSkip(bool $allowSkip): void
     {
         $this->allowSkip = $allowSkip;
+    }
+
+    public function isAllowReorder(): bool
+    {
+        return $this->allowReorder;
+    }
+
+    public function setAllowReorder(bool $allowReorder): void
+    {
+        $this->allowReorder = $allowReorder;
+    }
+
+    public function isAllowUpdatePayment(): bool
+    {
+        return $this->allowUpdatePayment;
+    }
+
+    public function setAllowUpdatePayment(bool $allowUpdatePayment): void
+    {
+        $this->allowUpdatePayment = $allowUpdatePayment;
     }
 }

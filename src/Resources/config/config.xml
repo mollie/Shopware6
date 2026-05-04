@@ -3143,6 +3143,22 @@
             <helpText lang="sk-SK">Ak je povolené, zákazníci môžu preskočiť nadchádzajúce obnovenie aktívneho predplatného. To tiež zohľadňuje posledné obdobie oznámenia.</helpText><helpText lang="bg-BG">Ако е активиране, клиентите могат да пропуснат предстоящо подновяване на текущ абонамент. Това също взема предвид последния уведомителен период.</helpText>
         </input-field>
         <input-field type="bool">
+            <name>subscriptionsAllowReorder</name>
+            <defaultValue>true</defaultValue>
+            <label>Allow customers to reorder the subscription product</label>
+            <label lang="de-DE">Kunden erlauben, das Abo-Produkt erneut zu bestellen</label>
+            <helpText>If enabled, customers see a reorder action on each subscription that adds the original product to the cart again.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, sehen Kunden in jeder Subscription eine Aktion, die das ursprüngliche Produkt erneut in den Warenkorb legt.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionsAllowUpdatePayment</name>
+            <defaultValue>true</defaultValue>
+            <label>Allow customers to change the payment method of a running subscription</label>
+            <label lang="de-DE">Kunden erlauben, die Zahlungsart einer laufenden Subscription zu ändern</label>
+            <helpText>If enabled, customers can update the payment method (mandate) for an active subscription. The action is still hidden if the subscription is not active.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, können Kunden die Zahlungsart (Mandat) eines aktiven Abos ändern. Die Aktion bleibt verborgen, solange die Subscription nicht aktiv ist.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>subscriptionSkipRenewalsOnFailedPayments</name>
             <defaultValue>false</defaultValue>
             <label>Skip subscription renewal if payment fails</label>
