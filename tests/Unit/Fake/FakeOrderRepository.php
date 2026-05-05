@@ -3,194 +3,54 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
-use Mollie\Shopware\Component\Mollie\VoucherCategory;
-use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
-use Mollie\Shopware\Entity\Product\Product;
-use Mollie\Shopware\Mollie;
-use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
-use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
-use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
-use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
-use Shopware\Core\Content\Product\ProductEntity;
-use Shopware\Core\System\Country\CountryEntity;
-use Shopware\Core\System\Salutation\SalutationEntity;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
-use Shopware\Core\Test\TestDefaults;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
+use Shopware\Core\Framework\Event\NestedEventCollection;
 
-final class FakeOrderRepository
+final class FakeOrderRepository extends EntityRepository
 {
-    public function getDefaultOrder($customer): OrderEntity
-    {
-        $order = new OrderEntity();
-        $order->setId('fakeShopwareOrderId');
-        $order->setOrderNumber('10000');
-        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
-        $order->setBillingAddress($this->getOrderAddress($customer));
+    /** @var list<array<string,mixed>> */
+    private array $upsertedPayloads = [];
 
-        $order->setDeliveries($this->getOrderDeliveries($customer));
-        $order->setAmountTotal(100.00);
-        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
-        $order->setLineItems($this->getLineItems());
-        if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
-            $order->setPrimaryOrderDeliveryId('fake-delivery-id');
+    public function __construct()
+    {
+    }
+
+    public function getUpsertCount(): int
+    {
+        return count($this->upsertedPayloads);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getLastUpsert(): array
+    {
+        if ($this->upsertedPayloads === []) {
+            throw new \RuntimeException('FakeOrderRepository has no upsert payloads recorded.');
         }
 
-        $stateMachineState = new StateMachineStateEntity();
-        $stateMachineState->setTechnicalName('open');
-        $stateMachineState->setId('openFakeStateId');
-
-        $order->setStateId($stateMachineState->getId());
-        $order->setStateMachineState($stateMachineState);
-
-        return $order;
+        return $this->upsertedPayloads[array_key_last($this->upsertedPayloads)];
     }
 
-    public function getOrderAddress(CustomerEntity $customerEntity): OrderAddressEntity
+    /**
+     * @return list<array<string,mixed>>
+     */
+    public function getUpserts(): array
     {
-        $orderAddress = $this->getOrderAddressWithoutCountry($customerEntity);
-        $country = new CountryEntity();
-        $country->setId('country-id');
-        $country->setIso('DE');
-        $orderAddress->setCountry($country);
-        $orderAddress->setCountryId('country-id');
-
-        return $orderAddress;
+        return $this->upsertedPayloads;
     }
 
-    public function getOrderAddressWithoutCountry(CustomerEntity $customerEntity): OrderAddressEntity
+    /**
+     * @param array<int,array<string,mixed>> $data
+     */
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $orderAddress = new OrderAddressEntity();
-        if ($customerEntity->getSalutation() instanceof SalutationEntity) {
-            $orderAddress->setSalutation($customerEntity->getSalutation());
-        }
-        $orderAddress->setFirstName($customerEntity->getFirstName());
-        $orderAddress->setLastName($customerEntity->getLastName());
-        $orderAddress->setStreet('Test Street');
-        $orderAddress->setZipCode('12345');
-        $orderAddress->setCity('Test City');
-
-        return $orderAddress;
-    }
-
-    public function getOrderDeliveries(CustomerEntity $customer): OrderDeliveryCollection
-    {
-        $collection = new OrderDeliveryCollection();
-
-        $shippingMethod = new ShippingMethodEntity();
-        $shippingMethod->setId('fake-shipping-method-id');
-        $shippingMethod->setName('DHL');
-
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId('fake-delivery-id');
-        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
-        $delivery->setShippingCosts($this->getPrice(4.99, 19.0));
-        $delivery->setShippingMethod($shippingMethod);
-
-        $collection->add($delivery);
-
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId('fake-free-delivery-id');
-        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
-        $delivery->setShippingCosts($this->getPrice(0.0, 19.0));
-        $delivery->setShippingMethod($shippingMethod);
-        $collection->add($delivery);
-
-        return $collection;
-    }
-
-    public function getOrderDeliveryWithoutShippingCosts(): OrderDeliveryEntity
-    {
-        $shippingMethod = new ShippingMethodEntity();
-        $shippingMethod->setId('fake-shipping-method-id');
-        $shippingMethod->setName('DHL');
-
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId('fake-delivery-without-costs');
-        $delivery->setShippingMethod($shippingMethod);
-        $shippingCosts = new CalculatedPrice(4.99, 4.99, new CalculatedTaxCollection(), new TaxRuleCollection(), 1);
-        $delivery->setShippingCosts($shippingCosts);
-
-        return $delivery;
-    }
-
-    public function getOrderLineItemWithoutPrice(): OrderLineItemEntity
-    {
-        $orderLineItem = new OrderLineItemEntity();
-        $orderLineItem->setId('fake-line-item-id');
-        $orderLineItem->setLabel('Fake product');
-
-        return $orderLineItem;
-    }
-
-    public function getLineItems(): OrderLineItemCollection
-    {
-        $collection = new OrderLineItemCollection();
-        $orderLineItem = $this->createOrderLineItem('fake-line-item-id', 'SW1000', 'Fake product', 10.99);
-        $collection->add($orderLineItem);
-
-        return $collection;
-    }
-
-    public function getLineItemWithVoucherCategory(): OrderLineItemEntity
-    {
-        return $this->createOrderLineItem('fake-line-item-voucher-id', 'SW1001', 'Voucher product', 25.00, [1, 2]);
-    }
-
-    public function getLineItemWithSingleVoucherCategory(): OrderLineItemEntity
-    {
-        return $this->createOrderLineItem(
-            'fake-line-item-single-voucher-id', 'SW1002', 'Single voucher product', 30.00, [1]);
-    }
-
-    public function getLineItemWithMixedVoucherCategories(): OrderLineItemEntity
-    {
-        return $this->createOrderLineItem('fake-line-item-mixed-voucher-id', 'SW1003', 'Mixed voucher product', 35.00, [1, 99, 2]);
-    }
-
-    private function createOrderLineItem(string $id, string $productNumber, string $label, float $price, $voucherCategories = null): OrderLineItemEntity
-    {
-        $product = new ProductEntity();
-        $product->setProductNumber($productNumber);
-        $extension = new Product();
-        if ($voucherCategories !== null) {
-            $voucherCategoriesCollection = new VoucherCategoryCollection();
-            foreach ($voucherCategories as $voucherCategory) {
-                $voucherCategory = VoucherCategory::tryFromNumber($voucherCategory);
-                if ($voucherCategory === null) {
-                    continue;
-                }
-                $voucherCategoriesCollection->add($voucherCategory);
-            }
-            $extension->setVoucherCategories($voucherCategoriesCollection);
-            $product->addExtension(Mollie::EXTENSION,$extension);
+        foreach ($data as $entry) {
+            $this->upsertedPayloads[] = $entry;
         }
 
-        $orderLineItem = new OrderLineItemEntity();
-        $orderLineItem->setId($id);
-        $orderLineItem->setPrice($this->getPrice($price, 19));
-        $orderLineItem->setLabel($label);
-        $orderLineItem->setProduct($product);
-
-        return $orderLineItem;
-    }
-
-    private function getPrice(float $unitPrice, float $taxRate, int $quantity = 1): CalculatedPrice
-    {
-        $totalPrice = $unitPrice * $quantity;
-
-        $taxAmount = $totalPrice * ($taxRate / 100);
-
-        $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);
-
-        return new CalculatedPrice($totalPrice, $unitPrice, new CalculatedTaxCollection([$calculatedTax]), new TaxRuleCollection(), $quantity);
+        return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
     }
 }

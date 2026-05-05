@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -23,6 +24,8 @@ interface MollieGatewayInterface
     public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment;
 
     public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment;
+
+    public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection;
 
     public function getCurrentProfile(?string $salesChannelId = null): Profile;
 

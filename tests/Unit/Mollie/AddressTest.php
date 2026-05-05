@@ -6,21 +6,21 @@ namespace Mollie\Shopware\Unit\Mollie;
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
-use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
-use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
+use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Address::class)]
 final class AddressTest extends TestCase
 {
-    private FakeCustomerRepository $customerRepository;
-    private FakeOrderRepository $orderRepository;
+    private CustomerEntityBuilder $customerRepository;
+    private OrderEntityBuilder $orderRepository;
 
     public function setUp(): void
     {
-        $this->customerRepository = new FakeCustomerRepository();
-        $this->orderRepository = new FakeOrderRepository();
+        $this->customerRepository = new CustomerEntityBuilder();
+        $this->orderRepository = new OrderEntityBuilder();
     }
 
     public function testCanCreateFromEntity(): void

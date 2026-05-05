@@ -6,7 +6,7 @@ namespace Mollie\Shopware\Unit\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\PaymentMethodUpdater;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
-use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionRepository;
+use Mollie\Shopware\Unit\Fake\FakeOrderTransactionRepository;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

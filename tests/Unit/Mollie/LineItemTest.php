@@ -7,8 +7,8 @@ use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
-use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
-use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
+use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -17,11 +17,11 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 #[CoversClass(LineItem::class)]
 final class LineItemTest extends TestCase
 {
-    private FakeOrderRepository $orderRepository;
+    private OrderEntityBuilder $orderRepository;
 
     public function setUp(): void
     {
-        $this->orderRepository = new FakeOrderRepository();
+        $this->orderRepository = new OrderEntityBuilder();
     }
 
     public function testSettersAndGetters(): void
@@ -63,7 +63,7 @@ final class LineItemTest extends TestCase
 
     public function testCanCreateFromDelivery(): void
     {
-        $customerRepository = new FakeCustomerRepository();
+        $customerRepository = new CustomerEntityBuilder();
         $customer = $customerRepository->getDefaultCustomer();
         $delivery = $this->orderRepository->getOrderDeliveries($customer)->first();
         $currency = new CurrencyEntity();

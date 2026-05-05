@@ -7,9 +7,9 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\Subscripti
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressId;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncer;
+use Mollie\Shopware\Unit\Fake\FakeCustomerAddressRepository;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionAddressBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
-use Mollie\Shopware\Unit\Subscription\Fake\FakeCustomerAddressRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;

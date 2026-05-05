@@ -45,7 +45,16 @@
                             {% block page_account_subscriptions_item_context_menu_content %}
                                 <div class="dropdown-menu dropdown-menu-right order-table-header-context-menu-content" aria-labelledby="accountOrderDropdown">
 
-                                {% if page.allowReorder %}
+                                {% set reorderableLineItems = [] %}
+                                {% if subscription.order and subscription.order.lineItems %}
+                                    {% for lineItem in subscription.order.lineItems %}
+                                        {% if lineItem.type and lineItem.referencedId %}
+                                            {% set reorderableLineItems = reorderableLineItems|merge([lineItem]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if page.allowReorder and reorderableLineItems|length > 0 %}
                                 {% block page_account_subscriptions_item_context_menu_reorder %}
                                     {% set action %}
                                         {% block page_account_subscriptions_item_context_menu_reorder_form_action %}
@@ -72,26 +81,28 @@
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_line_items_input %}
-                                                {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][id]"
-                                                           value="{{ subscription.productId }}">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][referencedId]"
-                                                           value="{{ subscription.productId }}">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][type]"
-                                                           value="product">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][stackable]"
-                                                           value="1">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][removable]"
-                                                           value="1">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][quantity]"
-                                                           value="1">
-                                                {% endblock %}
+                                                {% for lineItem in reorderableLineItems %}
+                                                    {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][id]"
+                                                               value="{{ lineItem.referencedId }}">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][referencedId]"
+                                                               value="{{ lineItem.referencedId }}">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][type]"
+                                                               value="{{ lineItem.type }}">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][stackable]"
+                                                               value="1">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][removable]"
+                                                               value="1">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][quantity]"
+                                                               value="{{ lineItem.quantity }}">
+                                                    {% endblock %}
+                                                {% endfor %}
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_button %}
