@@ -19,6 +19,7 @@ use Mollie\Shopware\Component\Subscription\SubscriptionGroupCart;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use Mollie\Shopware\Unit\Builder\CustomerBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
+use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
@@ -26,7 +27,6 @@ use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionAddressBuilder;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeCartOrderRoute;
-use Mollie\Shopware\Unit\Subscription\Fake\FakeOrderEntityRepository;
 use Mollie\Shopware\Unit\Subscription\Fake\FakePaymentWebhookRoute;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionActionHandler;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionAddressSyncer;
@@ -83,7 +83,7 @@ final class RenewRouteTest extends TestCase
         $payment = $this->buildPayment();
         $payment->setStatus(PaymentStatus::FAILED);
 
-        $orderRepository = new FakeOrderEntityRepository();
+        $orderRepository = new FakeOrderRepository();
         $subscriptionRepository = new FakeSubscriptionRepository();
         $paymentWebhookRoute = new FakePaymentWebhookRoute();
 
@@ -133,7 +133,7 @@ final class RenewRouteTest extends TestCase
 
     public function testRenewDelegatesToOrderCreatorAndPersistsRenewal(): void
     {
-        $orderRepository = new FakeOrderEntityRepository();
+        $orderRepository = new FakeOrderRepository();
         $subscriptionRepository = new FakeSubscriptionRepository();
         $paymentWebhookRoute = new FakePaymentWebhookRoute();
 
@@ -156,14 +156,14 @@ final class RenewRouteTest extends TestCase
         ?FakeSettingsService $settings = null,
         ?FakeSubscriptionDataService $dataService = null,
         ?Payment $payment = null,
-        ?FakeOrderEntityRepository $orderRepository = null,
+        ?FakeOrderRepository $orderRepository = null,
         ?FakeSubscriptionRepository $subscriptionRepository = null,
         ?FakePaymentWebhookRoute $paymentWebhookRoute = null,
     ): RenewRoute {
         $settings ??= new FakeSettingsService(subscriptionSettings: new SubscriptionSettings(enabled: true));
         $dataService ??= new FakeSubscriptionDataService($this->buildSubscriptionData());
         $payment ??= $this->buildPayment();
-        $orderRepository ??= new FakeOrderEntityRepository();
+        $orderRepository ??= new FakeOrderRepository();
         $subscriptionRepository ??= new FakeSubscriptionRepository();
         $paymentWebhookRoute ??= new FakePaymentWebhookRoute();
 

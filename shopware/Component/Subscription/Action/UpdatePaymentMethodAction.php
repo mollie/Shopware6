@@ -46,14 +46,14 @@ final class UpdatePaymentMethodAction
         $salesChannelId = $subscription->getSalesChannelId();
         $mollieCustomerId = $subscription->getMollieCustomerId();
 
-        $mollieSubscription = $this->subscriptionGateway->getSubscription(
-            $subscription->getMollieId(),
+        $subscriptionPayments = $this->mollieGateway->listSubscriptionPayments(
             $mollieCustomerId,
+            $subscription->getMollieId(),
             $orderNumber,
             $salesChannelId
         );
 
-        foreach ($mollieSubscription->getPayments()->filterCancelable() as $cancelablePayment) {
+        foreach ($subscriptionPayments->filterCancelable() as $cancelablePayment) {
             $this->mollieGateway->cancelPayment($cancelablePayment->getId(), $orderNumber, $salesChannelId);
         }
 

@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
@@ -19,6 +20,15 @@ use Shopware\Core\Framework\Context;
 
 final class FakeGateway implements MollieGatewayInterface
 {
+    /** @var list<CreatePayment> */
+    private array $createPayloads = [];
+
+    /** @var list<string> */
+    private array $cancelledPaymentIds = [];
+
+    /** @var array<string,PaymentCollection> */
+    private array $subscriptionPayments = [];
+
     public function __construct(private string $checkoutUrl = '',private ?Payment $payment = null)
     {
         if ($payment === null) {
@@ -29,8 +39,31 @@ final class FakeGateway implements MollieGatewayInterface
         }
     }
 
+    public function registerSubscriptionPayments(string $mollieSubscriptionId, PaymentCollection $payments): void
+    {
+        $this->subscriptionPayments[$mollieSubscriptionId] = $payments;
+    }
+
+    /**
+     * @return list<CreatePayment>
+     */
+    public function getCreatePayloads(): array
+    {
+        return $this->createPayloads;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getCancelledPaymentIds(): array
+    {
+        return $this->cancelledPaymentIds;
+    }
+
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
+        $this->createPayloads[] = $molliePayment;
+
         return $this->payment;
     }
 
@@ -75,7 +108,14 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
     {
+        $this->cancelledPaymentIds[] = $molliePaymentId;
+
         return $this->payment;
+    }
+
+    public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection
+    {
+        return $this->subscriptionPayments[$mollieSubscriptionId] ?? new PaymentCollection();
     }
 
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture

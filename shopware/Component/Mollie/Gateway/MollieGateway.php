@@ -13,6 +13,7 @@ use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Terminal;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
@@ -233,6 +234,33 @@ final class MollieGateway implements MollieGatewayInterface
             ]);
 
             return Payment::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $response = $client->get(sprintf('customers/%s/subscriptions/%s/payments', $mollieCustomerId, $mollieSubscriptionId));
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $collection = new PaymentCollection();
+            foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
+                $payment = Payment::createFromClientResponse($paymentBody);
+                $collection->set($payment->getId(), $payment);
+            }
+
+            $this->logger->debug('Subscription payments loaded from mollie api', [
+                'customerId' => $mollieCustomerId,
+                'subscriptionId' => $mollieSubscriptionId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+                'paymentCount' => $collection->count(),
+            ]);
+
+            return $collection;
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }

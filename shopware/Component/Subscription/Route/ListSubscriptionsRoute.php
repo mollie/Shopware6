@@ -53,6 +53,7 @@ final class ListSubscriptionsRoute extends AbstractListSubscriptionsRoute
         $criteria->setTotalCountMode(Criteria::TOTAL_COUNT_MODE_EXACT);
         $criteria->addAssociation('historyEntries');
         $criteria->addAssociation('currency');
+        $criteria->addAssociation('order.lineItems');
 
         /** @var EntitySearchResult<SubscriptionCollection<SubscriptionEntity>> $result */
         $result = $this->subscriptionRepository->search($criteria, $context->getContext());
