@@ -43,7 +43,7 @@ final class UpdatePaymentMethodActionTest extends TestCase
         $newPayment = new Payment('tr_new');
         $newPayment->setCheckoutUrl('https://mollie.test/checkout');
 
-        $mollieGateway = new FakeGateway(payment:$newPayment);
+        $mollieGateway = new FakeGateway(payment: $newPayment);
         $mollieGateway->registerSubscriptionPayments('sub_test123', $payments);
 
         $repository = new FakeSubscriptionRepository();
@@ -85,7 +85,7 @@ final class UpdatePaymentMethodActionTest extends TestCase
         $action = new UpdatePaymentMethodAction(
             new FakeSubscriptionRepository(),
             new FakeSubscriptionGateway(),
-            new FakeGateway(payment:new Payment('tr_unused')),
+            new FakeGateway(payment: new Payment('tr_unused')),
             new FakeRouteBuilder(),
             new PaymentHandlerLocator([]),
             new NullLogger()
@@ -112,7 +112,7 @@ final class UpdatePaymentMethodActionTest extends TestCase
         $action = new UpdatePaymentMethodAction(
             new FakeSubscriptionRepository(),
             new FakeSubscriptionGateway(),
-            new FakeGateway(payment:$payment),
+            new FakeGateway(payment: $payment),
             new FakeRouteBuilder(),
             new PaymentHandlerLocator([]),
             new NullLogger()
@@ -164,7 +164,7 @@ final class UpdatePaymentMethodActionTest extends TestCase
         $action = new UpdatePaymentMethodAction(
             $repository,
             $subscriptionGateway,
-            new FakeGateway(payment:$payment),
+            new FakeGateway(payment: $payment),
             new FakeRouteBuilder(),
             new PaymentHandlerLocator([]),
             new NullLogger()

@@ -23,6 +23,27 @@ Feature: Subscription checkout
     Then i "cancel" the subscription
     And the subscription status is "canceled"
 
+  Scenario: pause, resume and cancel keep timesRemaining so the count stays correct across state changes
+    Given payment method "eps" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_SUB_5" with quantity "1" is in cart
+    When i start checkout with payment method "eps"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And the subscription status is "active"
+    And the mollie subscription reports "9" times remaining
+    Then i "pause" the subscription
+    And the subscription status is "paused"
+    And the mollie subscription reports "9" times remaining
+    Then i "resume" the subscription
+    And the subscription status is "resumed"
+    And the mollie subscription reports "9" times remaining
+    Then i "cancel" the subscription
+    And the subscription status is "canceled"
+    And the mollie subscription reports "9" times remaining
+
   Scenario: mixed cart with one-off product, daily and weekly subscription and a 5 euro voucher creates a Mollie subscription per subscription product
     Given payment method "eps" exists and active
     And i select "DE" as billing country
