@@ -6,6 +6,8 @@ namespace Mollie\Shopware\Behat\Context;
 use Behat\Step\Then;
 use Behat\Step\When;
 use Mollie\Shopware\Behat\Storage;
+use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Aggregate\SubscriptionAddress\SubscriptionAddressEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
@@ -51,6 +53,31 @@ final class SubscriptionContext extends ShopwareContext
         Storage::set(self::STORAGE_SUBSCRIPTION, $subscription);
 
         Assert::assertSame($status, $subscription->getStatus());
+    }
+
+    #[Then('the mollie subscription reports :arg1 times remaining')]
+    public function theMollieSubscriptionReportsTimesRemaining(string $expected): void
+    {
+        /** @var SubscriptionEntity $subscription */
+        $subscription = Storage::get(self::STORAGE_SUBSCRIPTION);
+
+        $mollieId = $subscription->getMollieId();
+        $mollieCustomerId = $subscription->getMollieCustomerId();
+        $salesChannelId = $subscription->getSalesChannelId();
+
+        Assert::assertNotEmpty($mollieId, sprintf('Local subscription %s has no Mollie id yet', $subscription->getId()));
+        Assert::assertNotEmpty($mollieCustomerId, sprintf('Local subscription %s has no Mollie customer id', $subscription->getId()));
+        Assert::assertNotNull($salesChannelId, sprintf('Local subscription %s has no sales channel id', $subscription->getId()));
+
+        /** @var SubscriptionGatewayInterface $gateway */
+        $gateway = $this->getContainer()->get(SubscriptionGateway::class);
+        $mollieSubscription = $gateway->getSubscription($mollieId, $mollieCustomerId, '', $salesChannelId);
+
+        Assert::assertSame(
+            (int) $expected,
+            $mollieSubscription->getTimesRemaining(),
+            sprintf('Expected timesRemaining=%s on Mollie subscription %s, got %s', $expected, $mollieId, var_export($mollieSubscription->getTimesRemaining(), true))
+        );
     }
 
     #[Then('all subscriptions of the order have a mollie id')]
