@@ -10,9 +10,9 @@ use Mollie\Shopware\Component\Subscription\Route\RenewException;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCart;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeCartOrderRoute;
-use Mollie\Shopware\Unit\Subscription\Fake\FakeOrderEntityRepository;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionGroupCartBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -32,7 +32,7 @@ final class RenewalOrderCreatorTest extends TestCase
         $creator = new RenewalOrderCreator(
             $groupCartBuilder,
             new FakeCartOrderRoute(),
-            new FakeOrderEntityRepository(),
+            new FakeOrderRepository(),
             new NullLogger()
         );
 
@@ -63,7 +63,7 @@ final class RenewalOrderCreatorTest extends TestCase
         $creator = new RenewalOrderCreator(
             $groupCartBuilder,
             $cartOrderRoute,
-            new FakeOrderEntityRepository(),
+            new FakeOrderRepository(),
             new NullLogger()
         );
 
@@ -95,7 +95,7 @@ final class RenewalOrderCreatorTest extends TestCase
         $cartOrderRoute = new FakeCartOrderRoute();
         $cartOrderRoute->setResponse($newOrder);
 
-        $orderRepository = new FakeOrderEntityRepository();
+        $orderRepository = new FakeOrderRepository();
         $creator = new RenewalOrderCreator($groupCartBuilder, $cartOrderRoute, $orderRepository, new NullLogger());
 
         $payment = new Payment('payment-id');
@@ -138,7 +138,7 @@ final class RenewalOrderCreatorTest extends TestCase
         $creator = new RenewalOrderCreator(
             $groupCartBuilder,
             $cartOrderRoute,
-            new FakeOrderEntityRepository(),
+            new FakeOrderRepository(),
             new NullLogger()
         );
 
@@ -177,7 +177,7 @@ final class RenewalOrderCreatorTest extends TestCase
         $creator = new RenewalOrderCreator(
             $groupCartBuilder,
             $cartOrderRoute,
-            new FakeOrderEntityRepository(),
+            new FakeOrderRepository(),
             new NullLogger()
         );
 

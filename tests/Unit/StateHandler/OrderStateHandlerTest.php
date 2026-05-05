@@ -5,8 +5,8 @@ namespace Mollie\Shopware\Unit\StateHandler;
 
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
-use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
-use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
+use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\StateHandler\Fake\FakeStateMachineRegistry;
 use Mollie\Shopware\Unit\StateHandler\Fake\FakeStateMachineRepository;
@@ -140,8 +140,8 @@ final class OrderStateHandlerTest extends TestCase
 
     private function getOrder(): OrderEntity
     {
-        $customerRepository = new FakeCustomerRepository();
-        $orderRepository = new FakeOrderRepository();
+        $customerRepository = new CustomerEntityBuilder();
+        $orderRepository = new OrderEntityBuilder();
 
         return $orderRepository->getDefaultOrder($customerRepository->getDefaultCustomer());
     }

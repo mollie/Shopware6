@@ -10,8 +10,11 @@ use Mollie\Shopware\Component\Subscription\Route\ListSubscriptionsRoute;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\Country\SalesChannel\AbstractCountryRoute;
+use Shopware\Core\System\Country\SalesChannel\CountryRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\Salutation\SalesChannel\AbstractSalutationRoute;
+use Shopware\Core\System\Salutation\SalesChannel\SalutationRoute;
+use Shopware\Storefront\Page\GenericPageLoader;
 use Shopware\Storefront\Page\GenericPageLoaderInterface;
 use Shopware\Storefront\Page\MetaInformation;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -20,10 +23,13 @@ use Symfony\Component\HttpFoundation\Request;
 class SubscriptionPageLoader
 {
     public function __construct(
+        #[Autowire(service: GenericPageLoader::class)]
         private readonly GenericPageLoaderInterface $genericLoader,
         #[Autowire(service: ListSubscriptionsRoute::class)]
         private readonly AbstractListSubscriptionsRoute $listSubscriptionsRoute,
+        #[Autowire(service: CountryRoute::class)]
         private readonly AbstractCountryRoute $countryRoute,
+        #[Autowire(service: SalutationRoute::class)]
         private readonly AbstractSalutationRoute $salutationRoute,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService

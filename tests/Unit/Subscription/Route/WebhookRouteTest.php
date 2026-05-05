@@ -5,9 +5,9 @@ namespace Mollie\Shopware\Unit\Subscription\Route;
 
 use Mollie\Shopware\Component\Subscription\Route\WebhookException;
 use Mollie\Shopware\Component\Subscription\Route\WebhookRoute;
+use Mollie\Shopware\Unit\Fake\FakeOrderTransactionRepository;
 use Mollie\Shopware\Unit\Subscription\Fake\FakePaymentWebhookRoute;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeRenewRoute;
-use Mollie\Shopware\Unit\Subscription\Fake\FakeTransactionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -19,7 +19,7 @@ final class WebhookRouteTest extends TestCase
 {
     public function testNotifyThrowsWhenPaymentIdMissing(): void
     {
-        $route = $this->buildRoute(new FakeTransactionRepository(), new FakePaymentWebhookRoute(), new FakeRenewRoute());
+        $route = $this->buildRoute(new FakeOrderTransactionRepository(), new FakePaymentWebhookRoute(), new FakeRenewRoute());
 
         $this->expectException(WebhookException::class);
 
@@ -28,7 +28,7 @@ final class WebhookRouteTest extends TestCase
 
     public function testNotifyDelegatesToPaymentWebhookWhenTransactionExists(): void
     {
-        $repository = new FakeTransactionRepository();
+        $repository = new FakeOrderTransactionRepository();
         $repository->setMatchingIds('transaction-id-42');
 
         $paymentWebhook = new FakePaymentWebhookRoute();
@@ -45,7 +45,7 @@ final class WebhookRouteTest extends TestCase
 
     public function testNotifyDelegatesToRenewRouteWhenNoTransactionFound(): void
     {
-        $repository = new FakeTransactionRepository();
+        $repository = new FakeOrderTransactionRepository();
         // no matching ids configured
         $paymentWebhook = new FakePaymentWebhookRoute();
         $renewRoute = new FakeRenewRoute();
@@ -61,7 +61,7 @@ final class WebhookRouteTest extends TestCase
 
     public function testNotifyLowercasesSubscriptionIdBeforeDelegating(): void
     {
-        $repository = new FakeTransactionRepository();
+        $repository = new FakeOrderTransactionRepository();
         $renewRoute = new FakeRenewRoute();
         $route = $this->buildRoute($repository, new FakePaymentWebhookRoute(), $renewRoute);
 
@@ -71,7 +71,7 @@ final class WebhookRouteTest extends TestCase
         $this->assertSame('subscription-id', $renewRoute->getCalls()[0]['subscriptionId']);
     }
 
-    private function buildRoute(FakeTransactionRepository $repository, FakePaymentWebhookRoute $paymentWebhook, FakeRenewRoute $renewRoute): WebhookRoute
+    private function buildRoute(FakeOrderTransactionRepository $repository, FakePaymentWebhookRoute $paymentWebhook, FakeRenewRoute $renewRoute): WebhookRoute
     {
         return new WebhookRoute($repository, $paymentWebhook, $renewRoute, new NullLogger());
     }

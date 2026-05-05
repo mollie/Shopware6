@@ -11,8 +11,8 @@ use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
-use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
-use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
+use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
+use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
@@ -36,8 +36,8 @@ final class FakeTransactionService implements TransactionServiceInterface
     private bool $withPayment = false;
     private ?TransactionDataStruct $transaction = null;
 
-    private FakeCustomerRepository $customerRepository;
-    private FakeOrderRepository $orderRepository;
+    private CustomerEntityBuilder $customerRepository;
+    private OrderEntityBuilder $orderRepository;
     private array $orderCustomFields = [];
     private array $mollieCustomerIds = [];
     private bool $withNullLineItems = false;
@@ -47,8 +47,8 @@ final class FakeTransactionService implements TransactionServiceInterface
 
     public function __construct()
     {
-        $this->customerRepository = new FakeCustomerRepository();
-        $this->orderRepository = new FakeOrderRepository();
+        $this->customerRepository = new CustomerEntityBuilder();
+        $this->orderRepository = new OrderEntityBuilder();
     }
 
     public function findById(string $transactionId, Context $context): TransactionDataStruct

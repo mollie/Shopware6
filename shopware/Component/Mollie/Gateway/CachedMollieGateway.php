@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -81,6 +82,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
         unset($this->paymentIdPayments[$molliePaymentId]);
 
         return $this->decorated->cancelPayment($molliePaymentId, $orderNumber, $salesChannelId);
+    }
+
+    public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection
+    {
+        return $this->decorated->listSubscriptionPayments($mollieCustomerId, $mollieSubscriptionId, $orderNumber, $salesChannelId);
     }
 
     public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer

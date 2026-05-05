@@ -3,31 +3,22 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
-use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\System\Salutation\SalutationEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
+use Shopware\Core\Framework\Event\NestedEventCollection;
 
-final class FakeCustomerRepository
+final class FakeCustomerRepository extends EntityRepository
 {
-    public function getDefaultCustomer(): CustomerEntity
+    public function __construct()
     {
-        $salutation = new SalutationEntity();
-        $salutation->setDisplayName('Not specified');
-        $orderCustomer = $this->getDefaultCustomerWithoutSalutation();
-        $orderCustomer->setSalutation($salutation);
-
-        return $orderCustomer;
     }
 
-    public function getDefaultCustomerWithoutSalutation(): CustomerEntity
+    /**
+     * @param array<mixed> $data
+     */
+    public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
-        $orderCustomer = new CustomerEntity();
-        $orderCustomer->setCustomerNumber('100');
-        $orderCustomer->setEmail('fake@unit.test');
-        $orderCustomer->setFirstName('Tester');
-        $orderCustomer->setLastName('Test');
-        $orderCustomer->setGuest(false);
-        $orderCustomer->setId('test-customer-id');
-
-        return $orderCustomer;
+        return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
     }
 }

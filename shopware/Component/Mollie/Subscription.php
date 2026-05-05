@@ -10,8 +10,6 @@ final class Subscription
     private ?\DateTimeInterface $nextPaymentDate = null;
     private ?int $timesRemaining = null;
 
-    private PaymentCollection $payments;
-
     /**
      * @param array<mixed> $metadata
      */
@@ -27,7 +25,6 @@ final class Subscription
         private array $metadata,
         private \DateTimeInterface $startDate
     ) {
-        $this->payments = new PaymentCollection();
     }
 
     /**
@@ -69,12 +66,6 @@ final class Subscription
         if ($timesRemaining !== null) {
             $subscription->setTimesRemaining((int) $timesRemaining);
         }
-
-        $payments = new PaymentCollection();
-        foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
-            $payments->add(Payment::createFromClientResponse($paymentBody));
-        }
-        $subscription->setPayments($payments);
 
         return $subscription;
     }
@@ -130,16 +121,6 @@ final class Subscription
     public function setMandateId(string $mandateId): void
     {
         $this->mandateId = $mandateId;
-    }
-
-    public function getPayments(): PaymentCollection
-    {
-        return $this->payments;
-    }
-
-    public function setPayments(PaymentCollection $payments): void
-    {
-        $this->payments = $payments;
     }
 
     public function getStartDate(): \DateTimeInterface
