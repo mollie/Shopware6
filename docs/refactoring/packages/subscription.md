@@ -117,18 +117,31 @@ pure config.
 
 | | Class | Reason | Test file | PR |
 |---|---|---|---|---|
-| [ ] | `Component/Mollie/Gateway/SubscriptionGateway` | Verify `timesRemaining` survives a Mollie-side cancel — drives whether the plugin needs to persist `times` in metadata before pause, or can rely on Mollie returning it on the next read. | – | – |
-| [ ] | `Component/Subscription/SubscriptionLineItemsResolver` | Resolves cart vs. order line items via `CartService` and `order.repository`. Pure Shopware integration surface — extracted from `SubscriptionRemover` so the remover stays unit-testable. | – | – |
-| [ ] | `Component/Subscription/SubscriptionGroupCartBuilder` | Assembles a temporary cart from order line items via `OrderConverter`, `CartService`, `LineItemFactoryRegistry`. Pure Shopware integration surface — extracted from `SubscriptionAmountCalculator` so the calculator stays unit-testable. | – | – |
+| [x] | `Component/Mollie/Gateway/SubscriptionGateway` | Verify `timesRemaining` survives Mollie-side state changes (cancel, pause-via-cancel, resume-via-copy) — drives whether the plugin needs to persist `times` in metadata before pause, or can rely on Mollie returning it on the next read. **Result:** Mollie keeps `timesRemaining` after cancel, and `ResumeAction::copySubscription` carries it into the new subscription, so the plugin does **not** need to mirror `times` into local metadata. | `tests/Behat/Features/subscription.feature` (scenario "pause, resume and cancel keep timesRemaining…") | – |
+| [x] | `Component/Subscription/SubscriptionLineItemsResolver` | Resolves cart vs. order line items via `CartService` and `order.repository`. Pure Shopware integration surface — extracted from `SubscriptionRemover` so the remover stays unit-testable. | `tests/Integration/Subscription/SubscriptionLineItemsResolverTest.php` | – |
+| [x] | `Component/Subscription/SubscriptionGroupCartBuilder` | Assembles a temporary cart from order line items via `OrderConverter`, `CartService`, `LineItemFactoryRegistry`. Pure Shopware integration surface — extracted from `SubscriptionAmountCalculator` so the calculator stays unit-testable. | `tests/Integration/Subscription/SubscriptionGroupCartBuilderTest.php` | – |
 
 ## Notes
 
-A release-level feature redesign is planned for this package — see
+**Migration status (2026-05-05):** The `src/` → `shopware/` move is
+complete for this package. No subscription PHP remains under
+`Kiener\MolliePayments\*`; `src/Resources/config/routes/{admin-api,store-api}/subscription.xml`
+have been removed. What still lives under `src/` for subscriptions is
+intentional and out of scope for this refactor: admin module
+(`Resources/app/administration/.../mollie-subscriptions-*`,
+`subscription.service.js`, `mollie-subscription.service.js`), storefront
+Twig (`Resources/views/storefront/csrf/account/subscriptions-index-*`,
+`page/account/subscriptions/subscription-item.html.twig`),
+`subscriptions.scss`, and the OpenAPI/JSON schemas under
+`Resources/Schema/`.
+
+**Multi-subscription feature progress:** see
 [`../features/subscriptions.md`](../features/subscriptions.md) for the
-multi-subscription checkout plan. Several classes listed above are slated
-to change shape or be removed by that feature (notably `CopyOrderService`,
-`SubscriptionCartValidator`, `LineItemAnalyzer`). Coordinate test work with
-the feature phases to avoid writing tests for classes that are about to go
-away.
+authoritative status. Phases 1, 3, 4 and the `CopyOrderService` removal
+are live; data-model expansion (Phase 2 — new columns + `mollie_subscription_line_item`
+aggregate), Phase 5 (price-update workflow) and the storefront
+two-button control are pending. `LineItemAnalyzer` and
+`SubscriptionCartValidator` have been retained — only the mixed-cart
+block was removed.
 
 _(Space for package-specific decisions, fake requirements, special setups.)_

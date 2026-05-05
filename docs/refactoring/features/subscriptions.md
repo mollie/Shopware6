@@ -1,9 +1,56 @@
 # Feature: Multi-Subscription Checkout
 
-**Status:** Plan — decisions recorded, ready for implementation.
+**Status:** Partially implemented — `src/` → `shopware/` migration done, multi-subscription checkout + per-interval renewal live; data-model expansion, price-update workflow, and storefront two-button control still pending (planned for this week).
 **Owner:** Vitalij Mik
 **Created:** 2026-04-22
-**Last updated:** 2026-04-22
+**Last updated:** 2026-05-05
+
+---
+
+## Progress (2026-05-05)
+
+### Done
+
+- **`src/` → `shopware/` migration of subscription PHP code.** All
+  subscription PHP under `Mollie\Shopware\Component\Subscription\*`;
+  `Kiener\MolliePayments\*` namespace no longer carries subscription
+  classes. Only intentionally out-of-scope assets remain in `src/`:
+  admin Twig/JS/SCSS (`Resources/app/administration/.../mollie-subscriptions-*`,
+  `subscription.service.js`, `mollie-subscription.service.js`),
+  storefront Twig (`Resources/views/storefront/csrf/account/subscriptions-index-*`,
+  `page/account/subscriptions/subscription-item.html.twig`),
+  storefront SCSS (`subscriptions.scss`), and OpenAPI/JSON schema
+  snippets (`Resources/Schema/{AdminApi,StoreApi}/...subscription*.json`).
+- **Phase 1 — cart lock removed.** Mixed cart (subscription + one-off +
+  voucher) accepted by `LineItemAnalyzer::groupSubscriptionLineItemsByInterval()`.
+  Payment-method capability check stays as designed.
+- **Phase 3 — multi-subscription creation after first payment.**
+  `PaymentSubscriber` iterates interval groups and calls `CreateAction`
+  per group (`shopware/Component/Subscription/Subscriber/PaymentSubscriber.php`).
+- **Phase 4 — per-interval renewal.** `RenewalOrderCreator` builds the
+  renewal order from the group's line items;
+  `CopyOrderService` deleted.
+- Supporting components in place: `SubscriptionGroupCart`,
+  `SubscriptionGroupCartBuilder`, `SubscriptionGroupAmount`,
+  `SubscriptionLineItemsResolver`, `RenewalAddresses`.
+
+### Pending — to land this week
+
+- **Phase 2 — data model expansion.** Today `interval_unit` /
+  `interval_value` live inside the JSON `metadata` field
+  (`SubscriptionMetadata`). The plan calls for promoting them to
+  dedicated columns and adding the `mollie_subscription_line_item`
+  aggregate plus the price-update bookkeeping columns
+  (`price_update_state`, `next_notified_price`, `notified_at`).
+- **Phase 5 — price-update workflow.** `PriceDriftDetector`,
+  `PriceMigrationHandler`, `priceUpdateEnabled` /
+  `priceUpdateNoticeDays` settings, and the price-change mail
+  template are all unimplemented.
+- **Phase 1 — storefront two-button control.** `mollieAllowStandalonePurchase`
+  product field and the "Add to cart" / "Subscribe" template variant
+  are still on the to-do list.
+- **Backfill data migration** for existing active/paused subscriptions
+  is tied to Phase 2 and lands with it.
 
 ---
 
