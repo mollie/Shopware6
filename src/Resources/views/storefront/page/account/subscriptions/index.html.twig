@@ -41,7 +41,9 @@
 
                         {% block page_account_mollie_subscriptions_paging %}
                             {% set criteria = page.subscriptions.criteria %}
-                            {% set totalPages = (criteria.limit)|round(0,'ceil') %}
+                            {% set limit = criteria.limit ?: 10 %}
+                            {% set currentPage = (criteria.offset / limit + 1)|round(0, 'floor') %}
+                            {% set totalPages = (page.subscriptions.total / limit)|round(0, 'ceil') %}
 
                             {% if totalPages > 1 %}
                                 {% set formAjaxSubmitOptions = {
@@ -64,8 +66,10 @@
                                             {% endif %}
 
                                             {% sw_include '@Storefront/storefront/component/pagination.html.twig' with {
-                                                entities: page,
-                                                criteria: criteria
+                                                entities: page.subscriptions,
+                                                criteria: criteria,
+                                                currentPage: currentPage,
+                                                totalPages: totalPages
                                             } %}
                                         </form>
                                     </div>
