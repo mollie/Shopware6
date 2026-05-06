@@ -31,6 +31,8 @@ final class SubscriptionPage extends Page
 
     protected bool $allowUpdatePayment = true;
 
+    protected int $priceUpdateNoticeDays = 0;
+
     /**
      * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
@@ -115,5 +117,15 @@ final class SubscriptionPage extends Page
     public function setAllowUpdatePayment(bool $allowUpdatePayment): void
     {
         $this->allowUpdatePayment = $allowUpdatePayment;
+    }
+
+    public function getPriceUpdateNoticeDays(): int
+    {
+        return $this->priceUpdateNoticeDays;
+    }
+
+    public function setPriceUpdateNoticeDays(int $priceUpdateNoticeDays): void
+    {
+        $this->priceUpdateNoticeDays = $priceUpdateNoticeDays;
     }
 }

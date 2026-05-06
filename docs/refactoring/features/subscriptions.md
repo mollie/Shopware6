@@ -42,10 +42,11 @@
   dedicated columns and adding the `mollie_subscription_line_item`
   aggregate plus the price-update bookkeeping columns
   (`price_update_state`, `next_notified_price`, `notified_at`).
-- **Phase 5 — price-update workflow.** `PriceDriftDetector`,
-  `PriceMigrationHandler`, `priceUpdateEnabled` /
-  `priceUpdateNoticeDays` settings, and the price-change mail
-  template are all unimplemented.
+- **Phase 5 — price-update workflow.** Live. See
+  [`subscription-price-update.md`](./subscription-price-update.md) for the
+  step-by-step plan and
+  [`docs/configuration/subscription-price-updates.md`](../../configuration/subscription-price-updates.md)
+  for the merchant view.
 - **Phase 1 — storefront two-button control.** Dropped after a prototype showed
   Shopware's cart merges line items by referenced product id, so the same product
   added once as subscription and once as one-off collapses into a single
@@ -405,12 +406,21 @@ fixed.
 - Remove voucher/promotion carry-over.
 - Delete `CopyOrderService`.
 
-### Phase 5 — Price update workflow
+### Phase 5 — Price update workflow (live)
 
-- `PriceDriftDetector` scheduled task + `priceUpdateMode` setting.
-- Email template + account-page surface for the notice (TBD).
-- `PriceMigrationHandler` that cancels + re-creates on deadline.
-- New history transitions (`price_notified`, `price_migrated`).
+Done. Implementation broken out into eight steps in
+[`subscription-price-update.md`](./subscription-price-update.md):
+
+- `PriceDriftDetector` scheduled task + `subscriptionsPriceUpdateMode`
+  and `subscriptionsPriceUpdateNoticeDays` settings (per sales channel).
+- `mollie_subscription_price_change` mail template (DE + EN) and the
+  matching `mollie.subscription.priceChangeNotice` Flow Builder event.
+- Storefront account-page notice with the prominent cancel button.
+- `PriceMigrationHandler` updating Mollie subscriptions via the PATCH
+  endpoint (verified against sandbox in `MollieSubscriptionPatchTest`).
+  No cancel + recreate fallback — Mollie's PATCH is reliable.
+- History transitions `price_notified`, `price_migrated`,
+  `price_check_skipped`, `price_migration_failed`.
 
 ### Phase 6 — Clean-up
 
