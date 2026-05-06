@@ -20,6 +20,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -211,6 +212,10 @@ final class PriceDriftDetector
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
         $criteria->addFilter(new EqualsFilter('priceUpdateState', self::STATE_NONE));
         $criteria->addAssociation('order.lineItems');
+        $criteria->addAssociation('order.deliveries');
+        $criteria->addAssociation('order.transactions');
+        $criteria->addAssociation('order.orderCustomer');
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
         $criteria->setLimit(self::CANDIDATE_LIMIT);
 
         return $this->subscriptionRepository->search($criteria, $context)->getEntities();
