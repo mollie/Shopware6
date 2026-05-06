@@ -3386,6 +3386,160 @@
             <helpText lang="ro-RO">Setați o perioadă de notificare pentru clienți înainte de a reînnoi abonamentul. Dacă un abonament se reînnoiește vineri și folosiți "2", atunci acesta poate fi anulat sau suspendat cel târziu miercuri. Folosiți "0" pentru a permite întotdeauna anulările.</helpText>
             <helpText lang="sk-SK">Nastavte výpovednú lehotu pre zákazníkov pred obnovením predplatného. Ak sa predplatné obnovuje v piatok a nastavíte „2“, je ho možné zrušiť alebo pozastaviť najneskôr v stredu. Použite „0“, aby bolo zrušenie vždy povolené.</helpText><helpText lang="bg-BG">Задайте период на предизвестие за клиентите преди подновяване на абонамента. Ако абонаментът се подновява в петък и използвате "2", тогава може да бъде прекратен или поставен на пауза най-късно в сряда. Използвайте "0", за да винаги позволите откази.</helpText>
         </input-field>
+        <input-field type="single-select">
+            <name>subscriptionsPriceUpdateMode</name>
+            <defaultValue>keep</defaultValue>
+            <label>Behaviour when a subscription product price changes</label>
+            <label lang="de-DE">Verhalten bei Preisänderung eines Abonnement-Produkts</label>
+            <label lang="nl-NL">Gedrag bij een prijswijziging van een abonnementsproduct</label>
+            <label lang="it-IT">Comportamento al cambio prezzo di un prodotto in abbonamento</label>
+            <label lang="pt-PT">Comportamento quando o preço de um produto de subscrição muda</label>
+            <label lang="es-ES">Comportamiento al cambiar el precio de un producto de suscripción</label>
+            <label lang="sv-SE">Beteende när priset på en prenumerationsprodukt ändras</label>
+            <label lang="nb-NO">Atferd når prisen på et abonnementsprodukt endres</label>
+            <label lang="pl-PL">Zachowanie przy zmianie ceny produktu subskrypcyjnego</label>
+            <label lang="cs-CZ">Chování při změně ceny předplaceného produktu</label>
+            <label lang="sl-SL">Vedenje ob spremembi cene naročniškega izdelka</label>
+            <label lang="hu-HU">Viselkedés az előfizetéses termék árának változásakor</label>
+            <label lang="fi-FI">Toiminta tilaustuotteen hinnan muuttuessa</label>
+            <label lang="da-DK">Adfærd når prisen på et abonnementsprodukt ændres</label>
+            <label lang="el-GR">Συμπεριφορά όταν αλλάζει η τιμή ενός προϊόντος συνδρομής</label>
+            <label lang="hr-HR">Ponašanje kada se promijeni cijena pretplatničkog proizvoda</label>
+            <label lang="et-EE">Käitumine, kui tellimuse toote hind muutub</label>
+            <label lang="is-IS">Hegðun þegar verð á áskriftarvöru breytist</label>
+            <label lang="lt-LT">Veikimas, kai pasikeičia prenumeratos produkto kaina</label>
+            <label lang="lv-LV">Darbība, mainot abonēšanas produkta cenu</label>
+            <label lang="ro-RO">Comportament la schimbarea prețului unui produs de abonament</label>
+            <label lang="sk-SK">Správanie pri zmene ceny predplatného produktu</label>
+            <label lang="bg-BG">Поведение при промяна на цената на абонаментен продукт</label>
+            <helpText>Choose how running subscriptions react when the price of a subscription product changes. "Keep current price" leaves running subscriptions untouched. "Notify and migrate" notifies the customer, gives them a cancel window and then updates the subscription amount automatically.</helpText>
+            <helpText lang="de-DE">Legen Sie fest, wie laufende Abonnements auf eine Preisänderung des Abonnement-Produkts reagieren sollen. "Preis beibehalten" lässt laufende Abonnements unberührt. "Benachrichtigen und migrieren" informiert den Kunden, gewährt eine Kündigungsfrist und passt anschließend den Abonnementbetrag automatisch an.</helpText>
+            <helpText lang="nl-NL">Bepaal hoe lopende abonnementen reageren op een prijswijziging van een abonnementsproduct. "Prijs behouden" laat lopende abonnementen ongewijzigd. "Klant informeren en migreren" stelt de klant op de hoogte, biedt een opzegtermijn en past daarna het abonnementsbedrag automatisch aan.</helpText>
+            <helpText lang="it-IT">Scegli come reagiscono gli abbonamenti attivi al cambio prezzo di un prodotto in abbonamento. "Mantieni il prezzo attuale" lascia invariati gli abbonamenti attivi. "Notifica e migra" avvisa il cliente, concede un periodo di disdetta e aggiorna automaticamente l'importo dell'abbonamento.</helpText>
+            <helpText lang="pt-PT">Escolha como as subscrições ativas reagem à alteração do preço de um produto de subscrição. "Manter o preço atual" deixa as subscrições inalteradas. "Notificar e migrar" informa o cliente, concede um período de cancelamento e atualiza automaticamente o valor da subscrição.</helpText>
+            <helpText lang="es-ES">Elige cómo reaccionan las suscripciones activas ante un cambio de precio del producto de suscripción. "Mantener precio actual" deja las suscripciones sin cambios. "Notificar y migrar" avisa al cliente, ofrece un periodo de cancelación y actualiza el importe de la suscripción automáticamente.</helpText>
+            <helpText lang="sv-SE">Välj hur aktiva prenumerationer reagerar när priset på en prenumerationsprodukt ändras. "Behåll nuvarande pris" lämnar prenumerationerna orörda. "Meddela och migrera" informerar kunden, ger en uppsägningsperiod och uppdaterar sedan prenumerationsbeloppet automatiskt.</helpText>
+            <helpText lang="nb-NO">Velg hvordan aktive abonnementer reagerer når prisen på et abonnementsprodukt endres. "Behold nåværende pris" lar abonnementene være uendret. "Varsle og migrere" informerer kunden, gir en oppsigelsesperiode og oppdaterer så abonnementsbeløpet automatisk.</helpText>
+            <helpText lang="pl-PL">Wybierz, jak aktywne subskrypcje mają reagować na zmianę ceny produktu subskrypcyjnego. "Zachowaj obecną cenę" pozostawia subskrypcje bez zmian. "Powiadom i migruj" informuje klienta, daje okres na anulowanie i automatycznie aktualizuje kwotę subskrypcji.</helpText>
+            <helpText lang="cs-CZ">Zvolte, jak se mají aktivní předplatná chovat při změně ceny předplaceného produktu. „Ponechat aktuální cenu" nechá předplatná beze změny. „Upozornit a migrovat" informuje zákazníka, poskytne lhůtu na zrušení a poté automaticky upraví částku předplatného.</helpText>
+            <helpText lang="sl-SL">Izberite, kako se bodo aktivne naročnine odzvale na spremembo cene naročniškega izdelka. "Ohrani trenutno ceno" pusti naročnine nespremenjene. "Obvesti in preseli" obvesti stranko, omogoči odpovedni rok in nato samodejno posodobi znesek naročnine.</helpText>
+            <helpText lang="hu-HU">Válassza ki, hogyan reagáljanak az aktív előfizetések, ha az előfizetéses termék ára megváltozik. „Jelenlegi ár megtartása" érintetlenül hagyja az előfizetéseket. „Értesítés és migrálás" értesíti az ügyfelet, lemondási időszakot biztosít, majd automatikusan frissíti az előfizetés összegét.</helpText>
+            <helpText lang="fi-FI">Valitse, miten aktiiviset tilaukset reagoivat tilaustuotteen hinnanmuutokseen. "Säilytä nykyinen hinta" jättää tilaukset ennalleen. "Ilmoita ja migroi" ilmoittaa asiakkaalle, antaa peruutusajan ja päivittää sitten tilauksen summan automaattisesti.</helpText>
+            <helpText lang="da-DK">Vælg hvordan aktive abonnementer skal reagere, når prisen på et abonnementsprodukt ændres. "Behold nuværende pris" lader abonnementerne være uændrede. "Underret og migrer" informerer kunden, giver en opsigelsesperiode og opdaterer derefter abonnementsbeløbet automatisk.</helpText>
+            <helpText lang="el-GR">Επιλέξτε πώς θα αντιδρούν οι ενεργές συνδρομές όταν αλλάζει η τιμή ενός προϊόντος συνδρομής. "Διατήρηση τρέχουσας τιμής" αφήνει τις συνδρομές ανέπαφες. "Ειδοποίηση και μετάπτωση" ειδοποιεί τον πελάτη, παρέχει περίοδο ακύρωσης και ενημερώνει αυτόματα το ποσό συνδρομής.</helpText>
+            <helpText lang="hr-HR">Odaberite kako će aktivne pretplate reagirati na promjenu cijene pretplatničkog proizvoda. "Zadrži trenutnu cijenu" ostavlja pretplate netaknutima. "Obavijesti i migriraj" obavještava kupca, daje rok za otkazivanje i potom automatski ažurira iznos pretplate.</helpText>
+            <helpText lang="et-EE">Valige, kuidas aktiivsed tellimused reageerivad tellimuse toote hinna muutusele. „Säilita praegune hind" jätab tellimused puutumata. „Teavita ja migreeri" teavitab klienti, annab tühistamise tähtaja ja seejärel uuendab tellimuse summa automaatselt.</helpText>
+            <helpText lang="is-IS">Veldu hvernig virkar áskriftir bregðast við þegar verð á áskriftarvöru breytist. "Halda núverandi verði" lætur áskriftirnar óbreyttar. "Tilkynna og flytja" tilkynnir viðskiptavininum, gefur uppsagnarfrest og uppfærir svo upphæð áskriftarinnar sjálfvirkt.</helpText>
+            <helpText lang="lt-LT">Pasirinkite, kaip aktyvios prenumeratos reaguos į prenumeratos produkto kainos pokytį. „Išlaikyti dabartinę kainą" palieka prenumeratas nepakitusias. „Informuoti ir migruoti" praneša klientui, suteikia atšaukimo laikotarpį ir tada automatiškai atnaujina prenumeratos sumą.</helpText>
+            <helpText lang="lv-LV">Izvēlieties, kā aktīvajiem abonementiem jāreaģē, ja mainās abonēšanas produkta cena. "Saglabāt pašreizējo cenu" atstāj abonementus neskartus. "Paziņot un migrēt" informē klientu, dod atcelšanas periodu un pēc tam automātiski atjaunina abonementa summu.</helpText>
+            <helpText lang="ro-RO">Alegeți cum reacționează abonamentele active când se schimbă prețul unui produs de abonament. „Păstrează prețul curent" lasă abonamentele neatinse. „Notifică și migrează" anunță clientul, oferă o perioadă de anulare și apoi actualizează automat valoarea abonamentului.</helpText>
+            <helpText lang="sk-SK">Vyberte, ako sa majú aktívne predplatné správať pri zmene ceny predplateného produktu. „Ponechať aktuálnu cenu" nechá predplatné nezmenené. „Upozorniť a migrovať" informuje zákazníka, poskytne lehotu na zrušenie a potom automaticky upraví sumu predplatného.</helpText>
+            <helpText lang="bg-BG">Изберете как активните абонаменти да реагират при промяна на цената на абонаментен продукт. „Запази текущата цена" оставя абонаментите непроменени. „Уведоми и мигрирай" уведомява клиента, предоставя срок за отказ и след това автоматично обновява сумата на абонамента.</helpText>
+            <options>
+                <option>
+                    <id>keep</id>
+                    <name>Keep current price</name>
+                    <name lang="de-DE">Preis beibehalten</name>
+                    <name lang="nl-NL">Huidige prijs behouden</name>
+                    <name lang="it-IT">Mantieni il prezzo attuale</name>
+                    <name lang="pt-PT">Manter o preço atual</name>
+                    <name lang="es-ES">Mantener el precio actual</name>
+                    <name lang="sv-SE">Behåll nuvarande pris</name>
+                    <name lang="nb-NO">Behold nåværende pris</name>
+                    <name lang="pl-PL">Zachowaj obecną cenę</name>
+                    <name lang="cs-CZ">Ponechat aktuální cenu</name>
+                    <name lang="sl-SL">Ohrani trenutno ceno</name>
+                    <name lang="hu-HU">Jelenlegi ár megtartása</name>
+                    <name lang="fi-FI">Säilytä nykyinen hinta</name>
+                    <name lang="da-DK">Behold nuværende pris</name>
+                    <name lang="el-GR">Διατήρηση τρέχουσας τιμής</name>
+                    <name lang="hr-HR">Zadrži trenutnu cijenu</name>
+                    <name lang="et-EE">Säilita praegune hind</name>
+                    <name lang="is-IS">Halda núverandi verði</name>
+                    <name lang="lt-LT">Išlaikyti dabartinę kainą</name>
+                    <name lang="lv-LV">Saglabāt pašreizējo cenu</name>
+                    <name lang="ro-RO">Păstrează prețul curent</name>
+                    <name lang="sk-SK">Ponechať aktuálnu cenu</name>
+                    <name lang="bg-BG">Запази текущата цена</name>
+                </option>
+                <option>
+                    <id>auto</id>
+                    <name>Notify customer and migrate after notice period</name>
+                    <name lang="de-DE">Kunden benachrichtigen und nach Frist migrieren</name>
+                    <name lang="nl-NL">Klant informeren en na opzegtermijn migreren</name>
+                    <name lang="it-IT">Notifica il cliente e migra dopo il periodo di preavviso</name>
+                    <name lang="pt-PT">Notificar o cliente e migrar após o período de aviso</name>
+                    <name lang="es-ES">Notificar al cliente y migrar tras el período de aviso</name>
+                    <name lang="sv-SE">Meddela kunden och migrera efter uppsägningstiden</name>
+                    <name lang="nb-NO">Varsle kunden og migrere etter oppsigelsesperioden</name>
+                    <name lang="pl-PL">Powiadom klienta i migruj po okresie wypowiedzenia</name>
+                    <name lang="cs-CZ">Upozornit zákazníka a migrovat po lhůtě</name>
+                    <name lang="sl-SL">Obvesti stranko in preseli po odpovednem roku</name>
+                    <name lang="hu-HU">Ügyfél értesítése és migrálás a határidő után</name>
+                    <name lang="fi-FI">Ilmoita asiakkaalle ja migroi peruutusajan jälkeen</name>
+                    <name lang="da-DK">Underret kunden og migrer efter opsigelsesperioden</name>
+                    <name lang="el-GR">Ειδοποίηση πελάτη και μετάπτωση μετά την περίοδο ειδοποίησης</name>
+                    <name lang="hr-HR">Obavijesti kupca i migriraj nakon roka</name>
+                    <name lang="et-EE">Teavita klienti ja migreeri pärast etteteatamistähtaega</name>
+                    <name lang="is-IS">Tilkynna viðskiptavini og flytja eftir uppsagnarfrest</name>
+                    <name lang="lt-LT">Pranešti klientui ir migruoti po įspėjimo laikotarpio</name>
+                    <name lang="lv-LV">Paziņot klientam un migrēt pēc paziņošanas perioda</name>
+                    <name lang="ro-RO">Notifică clientul și migrează după perioada de notificare</name>
+                    <name lang="sk-SK">Upozorniť zákazníka a migrovať po lehote</name>
+                    <name lang="bg-BG">Уведоми клиента и мигрирай след срока</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="int">
+            <name>subscriptionsPriceUpdateNoticeDays</name>
+            <defaultValue>0</defaultValue>
+            <label>Notice period before price update takes effect (days)</label>
+            <label lang="de-DE">Frist vor Wirksamwerden der Preisänderung (Tagen)</label>
+            <label lang="nl-NL">Opzegtermijn voordat de prijswijziging in werking treedt (dagen)</label>
+            <label lang="it-IT">Periodo di preavviso prima che la modifica del prezzo abbia effetto (giorni)</label>
+            <label lang="pt-PT">Período de pré-aviso antes da alteração do preço entrar em vigor (dias)</label>
+            <label lang="es-ES">Período de aviso antes de aplicar la nueva tarifa (días)</label>
+            <label lang="sv-SE">Uppsägningstid innan prisändringen träder i kraft (dagar)</label>
+            <label lang="nb-NO">Varslingsperiode før prisendringen trer i kraft (dager)</label>
+            <label lang="pl-PL">Okres wypowiedzenia przed wejściem w życie zmiany ceny (dni)</label>
+            <label lang="cs-CZ">Výpovědní lhůta před účinností změny ceny (dny)</label>
+            <label lang="sl-SL">Odpovedni rok pred uveljavitvijo spremembe cene (dni)</label>
+            <label lang="hu-HU">Értesítési időszak az árváltoztatás hatálybalépése előtt (napok)</label>
+            <label lang="fi-FI">Ilmoitusaika ennen hinnanmuutoksen voimaantuloa (päivinä)</label>
+            <label lang="da-DK">Varslingsperiode før prisændringen træder i kraft (dage)</label>
+            <label lang="el-GR">Περίοδος ειδοποίησης πριν τεθεί σε ισχύ η αλλαγή τιμής (ημέρες)</label>
+            <label lang="hr-HR">Rok obavijesti prije nego što promjena cijene stupi na snagu (u danima)</label>
+            <label lang="et-EE">Etteteatamistähtaeg enne hinnamuudatuse jõustumist (päevades)</label>
+            <label lang="is-IS">Tilkynningartímabilið áður en verðbreytingin tekur gildi (dagar)</label>
+            <label lang="lt-LT">Įspėjimo laikotarpis prieš įsigaliojant kainos pakeitimui (dienomis)</label>
+            <label lang="lv-LV">Paziņošanas periods pirms cenas izmaiņu spēkā stāšanās (dienas)</label>
+            <label lang="ro-RO">Perioada de notificare înainte ca modificarea prețului să intre în vigoare (zile)</label>
+            <label lang="sk-SK">Výpovedná lehota pred nadobudnutím účinnosti zmeny ceny (dni)</label>
+            <label lang="bg-BG">Срок за известяване преди влизане в сила на промяната на цената (дни)</label>
+            <helpText>Days between notifying the customer of an upcoming subscription price change and applying the new amount. Customers can cancel within this window. Used only when the mode is set to "Notify and migrate".</helpText>
+            <helpText lang="de-DE">Tage zwischen der Kundenbenachrichtigung über eine bevorstehende Preisänderung und der Übernahme des neuen Betrags. Kunden können innerhalb dieser Frist kündigen. Wird nur verwendet, wenn der Modus auf "Benachrichtigen und migrieren" steht.</helpText>
+            <helpText lang="nl-NL">Aantal dagen tussen de melding aan de klant over een aanstaande prijswijziging en het toepassen van het nieuwe bedrag. Klanten kunnen binnen deze termijn opzeggen. Wordt alleen gebruikt als de modus op "Klant informeren en migreren" staat.</helpText>
+            <helpText lang="it-IT">Giorni tra la notifica al cliente di un imminente cambio prezzo dell'abbonamento e l'applicazione del nuovo importo. Il cliente può disdire entro questo periodo. Usato solo quando la modalità è "Notifica e migra".</helpText>
+            <helpText lang="pt-PT">Dias entre a notificação ao cliente sobre uma alteração de preço da subscrição e a aplicação do novo valor. Os clientes podem cancelar dentro deste período. Utilizado apenas quando o modo está definido como "Notificar e migrar".</helpText>
+            <helpText lang="es-ES">Días entre la notificación al cliente sobre un próximo cambio de precio y la aplicación del nuevo importe. Los clientes pueden cancelar dentro de este periodo. Solo se utiliza cuando el modo está en "Notificar y migrar".</helpText>
+            <helpText lang="sv-SE">Dagar mellan att meddela kunden om en kommande prisändring och att tillämpa det nya beloppet. Kunder kan säga upp inom denna period. Används endast när läget är "Meddela och migrera".</helpText>
+            <helpText lang="nb-NO">Dager mellom varsling av kunden om en kommende prisendring og bruk av det nye beløpet. Kunder kan si opp innenfor dette tidsrommet. Brukes kun når modusen er "Varsle og migrere".</helpText>
+            <helpText lang="pl-PL">Liczba dni między powiadomieniem klienta o zbliżającej się zmianie ceny a zastosowaniem nowej kwoty. Klienci mogą anulować w tym okresie. Używane tylko, gdy tryb jest ustawiony na "Powiadom i migruj".</helpText>
+            <helpText lang="cs-CZ">Počet dní mezi upozorněním zákazníka na nadcházející změnu ceny předplatného a uplatněním nové částky. Zákazníci mohou v této lhůtě zrušit předplatné. Používá se pouze v režimu „Upozornit a migrovat".</helpText>
+            <helpText lang="sl-SL">Dnevi med obvestilom stranki o prihajajoči spremembi cene naročnine in uporabo novega zneska. Stranke lahko v tem obdobju odpovedo. Uporablja se samo v načinu "Obvesti in preseli".</helpText>
+            <helpText lang="hu-HU">Napok száma az ügyfél értesítése és az új összeg alkalmazása között a közelgő előfizetés-árváltozásnál. Az ügyfelek ebben az időszakban mondhatnak le. Csak az „Értesítés és migrálás" módban használt.</helpText>
+            <helpText lang="fi-FI">Päivien lukumäärä tulevasta tilaushinnan muutoksesta ilmoittamisen ja uuden summan käyttöönoton välillä. Asiakkaat voivat peruuttaa tänä aikana. Käytetään vain, kun tila on "Ilmoita ja migroi".</helpText>
+            <helpText lang="da-DK">Dage mellem at underrette kunden om en kommende prisændring og at anvende det nye beløb. Kunder kan opsige inden for dette tidsrum. Bruges kun, når tilstanden er sat til "Underret og migrer".</helpText>
+            <helpText lang="el-GR">Ημέρες μεταξύ της ειδοποίησης του πελάτη για επικείμενη αλλαγή τιμής συνδρομής και της εφαρμογής του νέου ποσού. Οι πελάτες μπορούν να ακυρώσουν εντός αυτού του διαστήματος. Χρησιμοποιείται μόνο όταν η λειτουργία είναι "Ειδοποίηση και μετάπτωση".</helpText>
+            <helpText lang="hr-HR">Broj dana između obavijesti kupcu o nadolazećoj promjeni cijene pretplate i primjene novog iznosa. Kupci mogu otkazati u ovom razdoblju. Koristi se samo kada je način postavljen na "Obavijesti i migriraj".</helpText>
+            <helpText lang="et-EE">Päevade arv kliendi teavitamise ja uue summa rakendamise vahel eeloleva tellimuse hinnamuudatuse korral. Kliendid saavad selle aja jooksul tühistada. Kasutatakse ainult režiimis „Teavita ja migreeri".</helpText>
+            <helpText lang="is-IS">Dagar á milli þess að tilkynna viðskiptavininum um væntanlega verðbreytingu á áskrift og að beita nýju upphæðinni. Viðskiptavinir geta sagt upp innan þessa tímabils. Aðeins notað þegar stillingin er „Tilkynna og flytja".</helpText>
+            <helpText lang="lt-LT">Dienų skaičius tarp pranešimo klientui apie būsimą prenumeratos kainos pakeitimą ir naujos sumos pritaikymo. Per šį laikotarpį klientai gali atšaukti. Naudojama tik tada, kai režimas „Informuoti ir migruoti".</helpText>
+            <helpText lang="lv-LV">Dienu skaits starp klienta informēšanu par gaidāmo abonementa cenas izmaiņu un jaunās summas piemērošanu. Šajā laikā klienti var atcelt. Tiek izmantots tikai tad, kad režīms ir iestatīts uz "Paziņot un migrēt".</helpText>
+            <helpText lang="ro-RO">Numărul de zile între notificarea clientului despre o viitoare modificare a prețului abonamentului și aplicarea noii sume. Clienții pot anula în acest interval. Utilizat doar când modul este setat la „Notifică și migrează".</helpText>
+            <helpText lang="sk-SK">Počet dní medzi upozornením zákazníka na nadchádzajúcu zmenu ceny predplatného a uplatnením novej sumy. Zákazníci môžu v tejto lehote zrušiť. Používa sa iba v režime „Upozorniť a migrovať".</helpText>
+            <helpText lang="bg-BG">Брой дни между уведомяването на клиента за предстояща промяна на цената на абонамента и прилагането на новата сума. Клиентите могат да откажат в този период. Използва се само когато режимът е „Уведоми и мигрирай".</helpText>
+        </input-field>
     </card>
 
     <card>
