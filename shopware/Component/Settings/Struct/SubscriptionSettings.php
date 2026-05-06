@@ -17,6 +17,11 @@ final class SubscriptionSettings extends Struct
     public const KEY_SKIP_IF_FAILED = 'subscriptionSkipRenewalsOnFailedPayments';
     public const KEY_REMINDER_DAYS = 'subscriptionsReminderDays';
     public const KEY_CANCEL_DAYS = 'subscriptionsCancellationDays';
+    public const KEY_PRICE_UPDATE_MODE = 'subscriptionsPriceUpdateMode';
+    public const KEY_PRICE_UPDATE_NOTICE_DAYS = 'subscriptionsPriceUpdateNoticeDays';
+
+    public const PRICE_UPDATE_MODE_KEEP = 'keep';
+    public const PRICE_UPDATE_MODE_AUTO = 'auto';
 
     public function __construct(private bool $enabled = false,
         private bool $showIndicator = false,
@@ -28,6 +33,8 @@ final class SubscriptionSettings extends Struct
         private bool $skipIfFailed = false,
         private int $reminderDays = 0,
         private int $cancelDays = 0,
+        private string $priceUpdateMode = self::PRICE_UPDATE_MODE_KEEP,
+        private int $priceUpdateNoticeDays = 0,
     ) {
     }
 
@@ -46,6 +53,8 @@ final class SubscriptionSettings extends Struct
         $skipIfFailed = $settings[self::KEY_SKIP_IF_FAILED] ?? false;
         $reminderDays = $settings[self::KEY_REMINDER_DAYS] ?? 0;
         $cancelDays = $settings[self::KEY_CANCEL_DAYS] ?? 0;
+        $priceUpdateMode = $settings[self::KEY_PRICE_UPDATE_MODE] ?? self::PRICE_UPDATE_MODE_KEEP;
+        $priceUpdateNoticeDays = $settings[self::KEY_PRICE_UPDATE_NOTICE_DAYS] ?? 0;
 
         return new self(
             (bool) $enabled,
@@ -57,7 +66,9 @@ final class SubscriptionSettings extends Struct
             (bool) $allowUpdatePayment,
             (bool) $skipIfFailed,
             (int) $reminderDays,
-            (int) $cancelDays
+            (int) $cancelDays,
+            (string) $priceUpdateMode,
+            (int) $priceUpdateNoticeDays
         );
     }
 
@@ -109,5 +120,20 @@ final class SubscriptionSettings extends Struct
     public function getCancelDays(): int
     {
         return $this->cancelDays;
+    }
+
+    public function getPriceUpdateMode(): string
+    {
+        return $this->priceUpdateMode;
+    }
+
+    public function getPriceUpdateNoticeDays(): int
+    {
+        return $this->priceUpdateNoticeDays;
+    }
+
+    public function isAutoPriceUpdate(): bool
+    {
+        return $this->priceUpdateMode === self::PRICE_UPDATE_MODE_AUTO;
     }
 }
