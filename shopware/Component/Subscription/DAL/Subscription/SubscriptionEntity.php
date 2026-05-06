@@ -60,6 +60,12 @@ final class SubscriptionEntity extends Entity
 
     protected ?\DateTimeInterface $cancelUntil = null;
 
+    protected string $priceUpdateState = 'none';
+
+    protected ?float $nextNotifiedPrice = null;
+
+    protected ?\DateTimeInterface $notifiedAt = null;
+
     protected ?SubscriptionAddressCollection $addresses = null;
 
     protected ?SubscriptionAddressEntity $billingAddress = null;
@@ -234,6 +240,36 @@ final class SubscriptionEntity extends Entity
     public function setCanceledAt(?\DateTimeInterface $canceledAt): void
     {
         $this->canceledAt = $canceledAt;
+    }
+
+    public function getPriceUpdateState(): string
+    {
+        return $this->priceUpdateState;
+    }
+
+    public function setPriceUpdateState(string $priceUpdateState): void
+    {
+        $this->priceUpdateState = $priceUpdateState;
+    }
+
+    public function getNextNotifiedPrice(): ?float
+    {
+        return $this->nextNotifiedPrice;
+    }
+
+    public function setNextNotifiedPrice(?float $nextNotifiedPrice): void
+    {
+        $this->nextNotifiedPrice = $nextNotifiedPrice;
+    }
+
+    public function getNotifiedAt(): ?\DateTimeInterface
+    {
+        return $this->notifiedAt;
+    }
+
+    public function setNotifiedAt(?\DateTimeInterface $notifiedAt): void
+    {
+        $this->notifiedAt = $notifiedAt;
     }
 
     public function getBillingAddress(): ?SubscriptionAddressEntity
