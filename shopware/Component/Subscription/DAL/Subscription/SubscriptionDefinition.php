@@ -79,6 +79,10 @@ final class SubscriptionDefinition extends EntityDefinition
             (new DateTimeField('last_reminded_at', 'lastRemindedAt'))->addFlags(new ApiAware()),
             (new DateTimeField('canceled_at', 'canceledAt'))->addFlags(new ApiAware()),
 
+            (new StringField('price_update_state', 'priceUpdateState'))->addFlags(new ApiAware()),
+            (new FloatField('next_notified_price', 'nextNotifiedPrice'))->addFlags(new ApiAware()),
+            (new DateTimeField('notified_at', 'notifiedAt'))->addFlags(new ApiAware()),
+
             (new FkField('order_id', 'orderId', OrderDefinition::class))->addFlags(new ApiAware(),new Required()),
             (new ReferenceVersionField(OrderDefinition::class))->addFlags(new ApiAware(), new Required()),
             (new FkField('sales_channel_id', 'salesChannelId', SalesChannelDefinition::class))->addFlags(new ApiAware()),

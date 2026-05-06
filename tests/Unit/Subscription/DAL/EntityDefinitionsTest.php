@@ -16,8 +16,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Field;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Runtime;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -173,6 +176,42 @@ final class EntityDefinitionsTest extends TestCase
                 SubscriptionHistoryEntity::class,
                 SubscriptionHistoryCollection::class,
             ],
+        ];
+    }
+
+    /**
+     * @param class-string<Field> $expectedFieldClass
+     */
+    #[DataProvider('priceUpdateFieldProvider')]
+    public function testSubscriptionDefinitionDeclaresPriceUpdateField(string $storageName, string $propertyName, string $expectedFieldClass): void
+    {
+        $fields = $this->invokeDefineFields(new SubscriptionDefinition());
+
+        $match = null;
+        foreach ($fields as $field) {
+            if (! $field instanceof Field) {
+                continue;
+            }
+            if ($field->getPropertyName() === $propertyName) {
+                $match = $field;
+                break;
+            }
+        }
+
+        $this->assertNotNull($match, sprintf('SubscriptionDefinition is missing field "%s"', $propertyName));
+        $this->assertInstanceOf($expectedFieldClass, $match);
+        $this->assertSame($storageName, $match->getStorageName());
+    }
+
+    /**
+     * @return array<string,array{0:string,1:string,2:class-string<Field>}>
+     */
+    public static function priceUpdateFieldProvider(): array
+    {
+        return [
+            'price_update_state' => ['price_update_state', 'priceUpdateState', StringField::class],
+            'next_notified_price' => ['next_notified_price', 'nextNotifiedPrice', FloatField::class],
+            'notified_at' => ['notified_at', 'notifiedAt', DateTimeField::class],
         ];
     }
 

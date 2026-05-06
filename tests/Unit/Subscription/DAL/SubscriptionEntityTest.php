@@ -43,10 +43,14 @@ final class SubscriptionEntityTest extends TestCase
         $nextPayment = new \DateTime('2026-05-01');
         $canceledAt = new \DateTime('2026-04-15');
         $cancelUntil = new \DateTime('2026-04-30');
+        $notifiedAt = new \DateTime('2026-04-20');
         $entity->setLastRemindedAt($lastReminded);
         $entity->setNextPaymentAt($nextPayment);
         $entity->setCanceledAt($canceledAt);
         $entity->setCancelUntil($cancelUntil);
+        $entity->setPriceUpdateState('notified');
+        $entity->setNextNotifiedPrice(24.99);
+        $entity->setNotifiedAt($notifiedAt);
 
         $currency = new CurrencyEntity();
         $entity->setCurrency($currency);
@@ -89,6 +93,9 @@ final class SubscriptionEntityTest extends TestCase
         $this->assertSame($nextPayment, $entity->getNextPaymentAt());
         $this->assertSame($canceledAt, $entity->getCanceledAt());
         $this->assertSame($cancelUntil, $entity->getCancelUntil());
+        $this->assertSame('notified', $entity->getPriceUpdateState());
+        $this->assertSame(24.99, $entity->getNextNotifiedPrice());
+        $this->assertSame($notifiedAt, $entity->getNotifiedAt());
         $this->assertSame($currency, $entity->getCurrency());
         $this->assertSame($totalRounding, $entity->getTotalRounding());
         $this->assertSame($itemRounding, $entity->getItemRounding());
@@ -147,6 +154,15 @@ final class SubscriptionEntityTest extends TestCase
         $entity = new SubscriptionEntity();
 
         $this->assertCount(0, $entity->getHistoryEntries());
+    }
+
+    public function testPriceUpdateStateDefaultsToNone(): void
+    {
+        $entity = new SubscriptionEntity();
+
+        $this->assertSame('none', $entity->getPriceUpdateState());
+        $this->assertNull($entity->getNextNotifiedPrice());
+        $this->assertNull($entity->getNotifiedAt());
     }
 
     /**
