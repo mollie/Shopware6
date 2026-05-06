@@ -48,8 +48,8 @@ class SubscriptionPageLoader
 
         $page->setSubscriptions(
             $this->listSubscriptionsRoute
-                ->list($this->buildSubscriptionCriteria($request), $salesChannelContext)
-                ->getObject()
+                ->list($request, $salesChannelContext)
+                ->getEntitySearchResult()
         );
 
         $page->setCountries(
@@ -67,19 +67,6 @@ class SubscriptionPageLoader
         $page->setAllowUpdatePayment($settings->isAllowUpdatePayment());
 
         return $page;
-    }
-
-    private function buildSubscriptionCriteria(Request $request): Criteria
-    {
-        $limit = (int) $request->get('limit', 10);
-        $page = (int) $request->get('p', 1);
-
-        $criteria = new Criteria();
-        $criteria->setLimit(max(1, $limit));
-        $criteria->setOffset(max(0, ($page - 1) * $limit));
-        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
-
-        return $criteria;
     }
 
     private function buildCountryCriteria(): Criteria

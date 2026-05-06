@@ -10,10 +10,12 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -42,13 +44,20 @@ final class ListSubscriptionsRoute extends AbstractListSubscriptionsRoute
         defaults: ['_loginRequired' => true],
         methods: ['GET', 'POST']
     )]
-    public function list(Criteria $criteria, SalesChannelContext $context): SubscriptionsListResponse
+    public function list(Request $request, SalesChannelContext $context): SubscriptionsListResponse
     {
         $customer = $context->getCustomer();
         if (! $customer instanceof CustomerEntity) {
             throw new UnauthorizedHttpException('No customer is signed in');
         }
 
+        $limit = max(1, (int) $request->get('limit', 10));
+        $page = max(1, (int) $request->get('p', 1));
+
+        $criteria = new Criteria();
+        $criteria->setLimit($limit);
+        $criteria->setOffset(($page - 1) * $limit);
+        $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
         $criteria->addFilter(new EqualsFilter('customerId', $customer->getId()));
         $criteria->setTotalCountMode(Criteria::TOTAL_COUNT_MODE_EXACT);
         $criteria->addAssociation('historyEntries');
