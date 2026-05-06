@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Subscription\Fake;
 use Mollie\Shopware\Component\Mollie\CreateSubscription;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Subscription;
+use Mollie\Shopware\Component\Mollie\SubscriptionCollection;
 
 final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
 {
@@ -22,6 +23,9 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
     /** @var list<array{method:string,subscriptionId:string,customerId:string,orderNumber:string,salesChannelId:string}> */
     private array $calls = [];
 
+    /** @var array<string,\Throwable> */
+    private array $exceptionsByMethod = [];
+
     public function register(Subscription $subscription): void
     {
         $this->subscriptions[$subscription->getId()] = $subscription;
@@ -37,6 +41,54 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
     {
         $this->createResponse = $subscription;
         $this->subscriptions[$subscription->getId()] = $subscription;
+    }
+
+    public function throwOnUpdate(\Throwable $exception): void
+    {
+        $this->exceptionsByMethod['updateSubscription'] = $exception;
+    }
+
+    public function throwOnGet(\Throwable $exception): void
+    {
+        $this->exceptionsByMethod['getSubscription'] = $exception;
+    }
+
+    public function throwOnList(\Throwable $exception): void
+    {
+        $this->exceptionsByMethod['listSubscriptions'] = $exception;
+    }
+
+    public function listSubscriptions(?string $from, int $limit, string $salesChannelId): SubscriptionCollection
+    {
+        $this->calls[] = [
+            'method' => 'listSubscriptions',
+            'subscriptionId' => (string) $from,
+            'customerId' => '',
+            'orderNumber' => (string) $limit,
+            'salesChannelId' => $salesChannelId,
+        ];
+
+        if (isset($this->exceptionsByMethod['listSubscriptions'])) {
+            throw $this->exceptionsByMethod['listSubscriptions'];
+        }
+
+        $sortedIds = array_keys($this->subscriptions);
+        sort($sortedIds);
+
+        $collection = new SubscriptionCollection();
+        $taken = 0;
+        foreach ($sortedIds as $id) {
+            if ($from !== null && $from !== '' && $id < $from) {
+                continue;
+            }
+            if ($taken >= $limit) {
+                break;
+            }
+            $collection->set($id, $this->subscriptions[$id]);
+            ++$taken;
+        }
+
+        return $collection;
     }
 
     /**
@@ -83,6 +135,10 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannelId,
         ];
+
+        if (isset($this->exceptionsByMethod['getSubscription'])) {
+            throw $this->exceptionsByMethod['getSubscription'];
+        }
 
         if (! isset($this->subscriptions[$mollieSubscriptionId])) {
             throw new \RuntimeException(sprintf('FakeSubscriptionGateway has no subscription registered for id "%s"', $mollieSubscriptionId));
@@ -152,6 +208,10 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannelId,
         ];
+
+        if (isset($this->exceptionsByMethod['updateSubscription'])) {
+            throw $this->exceptionsByMethod['updateSubscription'];
+        }
 
         $this->subscriptions[$mollieSubscription->getId()] = $mollieSubscription;
 

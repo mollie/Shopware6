@@ -11,26 +11,22 @@ use Mollie\Shopware\Component\Subscription\PriceDrift\PriceDriftDetector;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCart;
 use Mollie\Shopware\Unit\Builder\CustomerBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
+use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
+use Mollie\Shopware\Unit\Fake\FakeSalesChannelRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Subscription\Builder\SubscriptionEntityBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionGroupCartBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
-use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 #[CoversClass(PriceDriftDetector::class)]
@@ -143,7 +139,7 @@ final class PriceDriftDetectorTest extends TestCase
         $this->assertSame(0, $cartBuilder->getCallCount());
     }
 
-    public function testCartBuildExceptionLogsErrorWritesHistoryAndDispatchesNoEvent(): void
+    public function testCartBuildExceptionWritesSkipHistoryAndDispatchesNoEvent(): void
     {
         $subscription = $this->buildSubscription('subscription-id');
         $subscription->setAmount(50.00);
@@ -153,22 +149,12 @@ final class PriceDriftDetectorTest extends TestCase
 
         $cartBuilder = new FakeSubscriptionGroupCartBuilder(null); // returns null → triggers RuntimeException
         $eventSpy = new EventSpy();
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error')->with(
-            $this->equalTo('Failed to check subscription for price drift'),
-            $this->callback(function (array $context): bool {
-                return ($context['subscriptionId'] ?? null) === 'subscription-id';
-            })
-        );
-        $logger->method('info');
-        $logger->method('debug');
 
         $detector = $this->buildDetector(
             settings: $this->autoSettings(),
             subscriptionRepository: $repository,
             cartBuilder: $cartBuilder,
-            eventDispatcher: $eventSpy,
-            logger: $logger
+            eventDispatcher: $eventSpy
         );
 
         $count = $detector->detect(Context::createDefaultContext());
@@ -212,8 +198,7 @@ final class PriceDriftDetectorTest extends TestCase
         SubscriptionSettings $settings,
         FakeSubscriptionRepository $subscriptionRepository,
         FakeSubscriptionGroupCartBuilder $cartBuilder,
-        EventSpy $eventDispatcher,
-        ?LoggerInterface $logger = null
+        EventSpy $eventDispatcher
     ): PriceDriftDetector {
         return new PriceDriftDetector(
             $this->buildSalesChannelRepository(),
@@ -222,7 +207,7 @@ final class PriceDriftDetectorTest extends TestCase
             new FakeSettingsService(subscriptionSettings: $settings),
             $cartBuilder,
             $eventDispatcher,
-            $logger ?? new NullLogger()
+            new NullLogger()
         );
     }
 
@@ -267,41 +252,23 @@ final class PriceDriftDetectorTest extends TestCase
         );
     }
 
-    /**
-     * @return EntityRepository<SalesChannelCollection>
-     */
-    private function buildSalesChannelRepository(): EntityRepository
+    private function buildSalesChannelRepository(): FakeSalesChannelRepository
     {
         $salesChannel = new SalesChannelEntity();
         $salesChannel->setId('sales-channel-id');
         $salesChannel->setUniqueIdentifier('sales-channel-id');
         $salesChannel->setName('Storefront');
 
-        $repository = $this->createMock(EntityRepository::class);
-        $repository->method('search')->willReturnCallback(
-            function (Criteria $criteria, Context $context) use ($salesChannel): EntitySearchResult {
-                $collection = new SalesChannelCollection([$salesChannel]);
-
-                return new EntitySearchResult(SalesChannelEntity::class, $collection->count(), $collection, null, $criteria, $context);
-            }
-        );
+        $repository = new FakeSalesChannelRepository();
+        $repository->add($salesChannel);
 
         return $repository;
     }
 
-    /**
-     * @return EntityRepository<CustomerCollection<CustomerEntity>>
-     */
-    private function buildCustomerRepository(CustomerEntity $customer): EntityRepository
+    private function buildCustomerRepository(CustomerEntity $customer): FakeCustomerRepository
     {
-        $repository = $this->createMock(EntityRepository::class);
-        $repository->method('search')->willReturnCallback(
-            function (Criteria $criteria, Context $context) use ($customer): EntitySearchResult {
-                $collection = new CustomerCollection([$customer]);
-
-                return new EntitySearchResult(CustomerEntity::class, $collection->count(), $collection, null, $criteria, $context);
-            }
-        );
+        $repository = new FakeCustomerRepository();
+        $repository->add($customer);
 
         return $repository;
     }

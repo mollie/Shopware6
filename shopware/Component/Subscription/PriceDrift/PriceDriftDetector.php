@@ -30,6 +30,13 @@ final class PriceDriftDetector
     public const STATE_NONE = 'none';
     public const STATE_NOTIFIED = 'notified';
 
+    /**
+     * Cap candidates per scheduled run. The task runs daily so a backlog still
+     * drains within days even on shops with many subscriptions, but each run
+     * stays bounded in DB load and event dispatch volume.
+     */
+    public const CANDIDATE_LIMIT = 50;
+
     private const EPSILON = 0.005;
 
     /**
@@ -79,7 +86,10 @@ final class PriceDriftDetector
 
         $this->logger->info(sprintf('Starting subscription price drift detection for sales channel "%s"', $salesChannel->getName()));
 
-        $notifiedCount = 0;
+        /** @var array<int,array<string,mixed>> $upsertPayloads */
+        $upsertPayloads = [];
+        /** @var array<int,array{0:SubscriptionEntity,1:CustomerEntity}> $eventQueue */
+        $eventQueue = [];
 
         foreach ($this->findCandidates($salesChannel->getId(), $context) as $subscription) {
             if (! $this->isMollieActive($subscription)) {
@@ -92,15 +102,32 @@ final class PriceDriftDetector
                 continue;
             }
 
-            if ($this->checkAndNotify($subscription, $context)) {
-                ++$notifiedCount;
+            $result = $this->checkOne($subscription, $context);
+            if ($result === null) {
+                continue;
+            }
+
+            $upsertPayloads[] = $result['payload'];
+            if (isset($result['event'])) {
+                $eventQueue[] = $result['event'];
             }
         }
 
-        return $notifiedCount;
+        if ($upsertPayloads !== []) {
+            $this->subscriptionRepository->upsert($upsertPayloads, $context);
+        }
+
+        foreach ($eventQueue as [$subscription, $customer]) {
+            $this->eventDispatcher->dispatch(new SubscriptionPriceChangeNoticeEvent($subscription, $customer, $context));
+        }
+
+        return count($eventQueue);
     }
 
-    private function checkAndNotify(SubscriptionEntity $subscription, Context $context): bool
+    /**
+     * @return null|array{payload:array<string,mixed>,event?:array{0:SubscriptionEntity,1:CustomerEntity}}
+     */
+    private function checkOne(SubscriptionEntity $subscription, Context $context): ?array
     {
         try {
             $order = $subscription->getOrder();
@@ -118,7 +145,7 @@ final class PriceDriftDetector
             $currentAmount = $subscription->getAmount();
 
             if (abs($expectedAmount - $currentAmount) < self::EPSILON) {
-                return false;
+                return null;
             }
 
             $customer = $this->loadCustomer($subscription->getCustomerId(), $context);
@@ -128,29 +155,29 @@ final class PriceDriftDetector
                     'customerId' => $subscription->getCustomerId(),
                 ]);
 
-                return false;
+                return null;
             }
 
-            $this->subscriptionRepository->upsert([[
-                'id' => $subscription->getId(),
-                'priceUpdateState' => self::STATE_NOTIFIED,
-                'nextNotifiedPrice' => $expectedAmount,
-                'notifiedAt' => new \DateTime(),
-                'historyEntries' => [[
-                    'statusFrom' => $subscription->getStatus(),
-                    'statusTo' => $subscription->getStatus(),
-                    'comment' => sprintf('price_notified: %s -> %s', $currentAmount, $expectedAmount),
-                    'mollieId' => $subscription->getMollieId(),
-                ]],
-            ]], $context);
-
+            $now = new \DateTime();
             $subscription->setPriceUpdateState(self::STATE_NOTIFIED);
             $subscription->setNextNotifiedPrice($expectedAmount);
-            $subscription->setNotifiedAt(new \DateTime());
+            $subscription->setNotifiedAt($now);
 
-            $this->eventDispatcher->dispatch(new SubscriptionPriceChangeNoticeEvent($subscription, $customer, $context));
-
-            return true;
+            return [
+                'payload' => [
+                    'id' => $subscription->getId(),
+                    'priceUpdateState' => self::STATE_NOTIFIED,
+                    'nextNotifiedPrice' => $expectedAmount,
+                    'notifiedAt' => $now,
+                    'historyEntries' => [[
+                        'statusFrom' => $subscription->getStatus(),
+                        'statusTo' => $subscription->getStatus(),
+                        'comment' => sprintf('price_notified: %s -> %s', $currentAmount, $expectedAmount),
+                        'mollieId' => $subscription->getMollieId(),
+                    ]],
+                ],
+                'event' => [$subscription, $customer],
+            ];
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to check subscription for price drift', [
                 'subscriptionId' => $subscription->getId(),
@@ -160,8 +187,8 @@ final class PriceDriftDetector
                 'exception' => $exception->getMessage(),
             ]);
 
-            try {
-                $this->subscriptionRepository->upsert([[
+            return [
+                'payload' => [
                     'id' => $subscription->getId(),
                     'historyEntries' => [[
                         'statusFrom' => $subscription->getStatus(),
@@ -169,15 +196,8 @@ final class PriceDriftDetector
                         'comment' => 'price_check_skipped: ' . $exception->getMessage(),
                         'mollieId' => $subscription->getMollieId(),
                     ]],
-                ]], $context);
-            } catch (\Throwable $historyException) {
-                $this->logger->error('Failed to write price_check_skipped history entry', [
-                    'subscriptionId' => $subscription->getId(),
-                    'exception' => $historyException->getMessage(),
-                ]);
-            }
-
-            return false;
+                ],
+            ];
         }
     }
 
@@ -191,6 +211,7 @@ final class PriceDriftDetector
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
         $criteria->addFilter(new EqualsFilter('priceUpdateState', self::STATE_NONE));
         $criteria->addAssociation('order.lineItems');
+        $criteria->setLimit(self::CANDIDATE_LIMIT);
 
         return $this->subscriptionRepository->search($criteria, $context)->getEntities();
     }

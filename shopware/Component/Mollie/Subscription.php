@@ -34,9 +34,9 @@ final class Subscription
     {
         $id = $body['id'];
         $customerId = $body['customerId'];
-        $mandateId = $body['mandateId'];
-        $description = $body['description'];
-        $webhookUrl = $body['webhookUrl'];
+        $mandateId = (string) ($body['mandateId'] ?? '');
+        $description = (string) ($body['description'] ?? '');
+        $webhookUrl = (string) ($body['webhookUrl'] ?? '');
         $amount = new Money((float) $body['amount']['value'], $body['amount']['currency']);
         $startDateValue = $body['startDate'] ?? '';
         $startDate = \DateTime::createFromFormat('Y-m-d', $startDateValue);
@@ -156,6 +156,11 @@ final class Subscription
     public function getAmount(): Money
     {
         return $this->amount;
+    }
+
+    public function setAmount(Money $amount): void
+    {
+        $this->amount = $amount;
     }
 
     public function getDescription(): string

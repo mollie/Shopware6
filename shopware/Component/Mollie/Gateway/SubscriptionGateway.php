@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreateSubscription;
 use Mollie\Shopware\Component\Mollie\Subscription;
+use Mollie\Shopware\Component\Mollie\SubscriptionCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -111,6 +112,38 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
             return Subscription::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function listSubscriptions(?string $from, int $limit, string $salesChannelId): SubscriptionCollection
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $query = ['limit' => $limit];
+            if ($from !== null && $from !== '') {
+                $query['from'] = $from;
+            }
+
+            $response = $client->get('subscriptions', ['query' => $query]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $collection = new SubscriptionCollection();
+            foreach ($body['_embedded']['subscriptions'] ?? [] as $subscriptionData) {
+                $subscription = Subscription::createFromClientResponse($subscriptionData);
+                $collection->set($subscription->getId(), $subscription);
+            }
+
+            $this->logger->info('Subscriptions listed from mollie api', [
+                'count' => $collection->count(),
+                'from' => $from,
+                'limit' => $limit,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return $collection;
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
         }
     }
 
