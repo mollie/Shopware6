@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Subscription\Controller;
 
 use Mollie\Shopware\Component\Subscription\Controller\ApiController;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Subscription\Builder\MollieSubscriptionBuilder;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionActionHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,7 +22,7 @@ final class ApiControllerTest extends TestCase
         $handler = new FakeSubscriptionActionHandler();
         $handler->setResponse($mollieSubscription);
 
-        $controller = new ApiController($handler);
+        $controller = new ApiController($handler, new FakeSettingsService());
 
         $request = $this->buildRequest('subscription-id-42', 'pause');
         $response = $controller->changeState($request, Context::createDefaultContext());
@@ -40,7 +41,7 @@ final class ApiControllerTest extends TestCase
         $handler = new FakeSubscriptionActionHandler();
         $handler->setException(new \RuntimeException('something broke'));
 
-        $controller = new ApiController($handler);
+        $controller = new ApiController($handler, new FakeSettingsService());
 
         $request = $this->buildRequest('subscription-id-42', 'cancel');
         $response = $controller->changeState($request, Context::createDefaultContext());
@@ -57,7 +58,7 @@ final class ApiControllerTest extends TestCase
         $handler = new FakeSubscriptionActionHandler();
         $handler->setResponse(MollieSubscriptionBuilder::create()->build());
 
-        $controller = new ApiController($handler);
+        $controller = new ApiController($handler, new FakeSettingsService());
 
         $request = $this->buildRequest('explicit-id', 'skip');
         $controller->changeState($request, Context::createDefaultContext());
