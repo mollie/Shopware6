@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Subscription\Event\SubscriptionActionEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionCancelledEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionEndedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionPausedEvent;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionPriceChangeNoticeEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionResumedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionSkippedEvent;
@@ -23,6 +24,7 @@ use Shopware\Core\Framework\Context;
 #[CoversClass(SubscriptionCancelledEvent::class)]
 #[CoversClass(SubscriptionEndedEvent::class)]
 #[CoversClass(SubscriptionPausedEvent::class)]
+#[CoversClass(SubscriptionPriceChangeNoticeEvent::class)]
 #[CoversClass(SubscriptionRenewedEvent::class)]
 #[CoversClass(SubscriptionResumedEvent::class)]
 #[CoversClass(SubscriptionSkippedEvent::class)]
@@ -99,6 +101,7 @@ final class SubscriptionEventsTest extends TestCase
             'cancelled' => [SubscriptionCancelledEvent::class, 'mollie.subscription.cancelled'],
             'ended' => [SubscriptionEndedEvent::class, 'mollie.subscription.ended'],
             'paused' => [SubscriptionPausedEvent::class, 'mollie.subscription.paused'],
+            'priceChangeNotice' => [SubscriptionPriceChangeNoticeEvent::class, 'mollie.subscription.priceChangeNotice'],
             'renewed' => [SubscriptionRenewedEvent::class, 'mollie.subscription.renewed'],
             'resumed' => [SubscriptionResumedEvent::class, 'mollie.subscription.resumed'],
             'skipped' => [SubscriptionSkippedEvent::class, 'mollie.subscription.skipped'],
