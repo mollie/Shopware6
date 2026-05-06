@@ -63,7 +63,6 @@ const payments = [
     {caseId: 'C4127', key: 'belfius', name: 'Belfius', sanity: false},
     {caseId: 'C4121', key: 'giftcard', name: 'Gift cards', sanity: false},
     {caseId: 'C4143', key: 'voucher', name: 'Voucher', sanity: false},
- //   {caseId: 'C3362894', key: 'trustly', name: 'Trustly', sanity: false},
     {caseId: 'C3713510', key: 'riverty', name: 'Riverty', sanity: false},
     {caseId: 'C3713512', key: 'satispay', name: 'Satispay', sanity: false},
     {caseId: 'C4212005', key: 'paybybank', name: 'Pay by Bank', sanity: false},
