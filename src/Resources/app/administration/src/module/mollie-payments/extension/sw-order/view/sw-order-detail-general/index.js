@@ -244,8 +244,7 @@ Component.override('sw-order-detail-general', {
          */
         _extensionSubscription() {
             const order = this.order;
-            const subscriptions =
-                order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
+            const subscriptions = order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
 
             if (!subscriptions) {
                 return null;

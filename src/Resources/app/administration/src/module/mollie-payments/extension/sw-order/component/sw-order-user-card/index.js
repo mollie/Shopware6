@@ -155,8 +155,7 @@ Component.override('sw-order-user-card', {
          */
         _extensionSubscription() {
             const order = this.currentOrder;
-            const subscriptions =
-                order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
+            const subscriptions = order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
 
             if (!subscriptions) {
                 return null;
