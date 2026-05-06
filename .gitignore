@@ -16,6 +16,7 @@ config-*
 /.phpunuhi/
 /node_modules/
 /src/Resources/public/administration/.vite
+/src/Resources/public/administration/assets/
 composer.lock
 package-lock.json
 .tmp
