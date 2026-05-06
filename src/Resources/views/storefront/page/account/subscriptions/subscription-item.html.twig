@@ -269,6 +269,63 @@
                         </div>
                     {% endblock %}
 
+                    {% block page_account_mollie_subscriptions_item_price_update_notice %}
+
+                        {% if subscription.priceUpdateState == 'notified' and subscription.nextNotifiedPrice is not null and subscription.notifiedAt is not null %}
+                            {% set effectiveDate = subscription.notifiedAt|date_modify('+' ~ page.priceUpdateNoticeDays ~ ' day') %}
+                            <div class="col-12 px-0 subscription-price-update-notice"
+                                 data-test="subscription-price-update-notice">
+                                <div class="alert alert-warning" role="alert">
+                                    {% block page_account_mollie_subscriptions_item_price_update_notice_title %}
+                                        <h4 class="alert-heading">
+                                            {{ "molliePayments.subscriptions.account.priceChangeNoticeHeadline"|trans|sw_sanitize }}
+                                        </h4>
+                                    {% endblock %}
+
+                                    {% block page_account_mollie_subscriptions_item_price_update_notice_message %}
+                                        <p class="mb-2">
+                                            {{ "molliePayments.subscriptions.account.priceChangeNoticeMessage"|trans|sw_sanitize }}
+                                        </p>
+                                    {% endblock %}
+
+                                    {% block page_account_mollie_subscriptions_item_price_update_notice_details %}
+                                        <ul class="list-unstyled mb-3">
+                                            <li>
+                                                <strong>{{ "molliePayments.subscriptions.account.priceChangeNoticeCurrentLabel"|trans|sw_sanitize }}:</strong>
+                                                <span data-test="subscription-price-update-current">{{ subscription.amount|currency(currencyIsoCode) }}</span>
+                                            </li>
+                                            <li>
+                                                <strong>{{ "molliePayments.subscriptions.account.priceChangeNoticeNewLabel"|trans|sw_sanitize }}:</strong>
+                                                <span data-test="subscription-price-update-new">{{ subscription.nextNotifiedPrice|currency(currencyIsoCode) }}</span>
+                                            </li>
+                                            <li>
+                                                <strong>{{ "molliePayments.subscriptions.account.priceChangeNoticeEffectiveLabel"|trans|sw_sanitize }}:</strong>
+                                                <span data-test="subscription-price-update-effective">{{ effectiveDate|format_date('short', locale=app.request.locale) }}</span>
+                                            </li>
+                                        </ul>
+                                    {% endblock %}
+
+                                    {% if subscription.isCancellationAllowed %}
+                                        {% block page_account_mollie_subscriptions_item_price_update_notice_cancel %}
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.cancel', { 'subscriptionId': subscription.id }) }}"
+                                                  method="post"
+                                                  data-form-csrf-handler="true">
+                                                {% if mollie_csrf_available %}
+                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
+                                                {% endif %}
+                                                <button class="btn btn-primary btn-mollie-subscription-price-update-cancel"
+                                                        type="submit"
+                                                        data-test="btn-subscription-price-update-cancel">
+                                                    {{ "molliePayments.subscriptions.account.priceChangeNoticeCancelButton"|trans|sw_sanitize }}
+                                                </button>
+                                            </form>
+                                        {% endblock %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endblock %}
+
                     {% block page_account_mollie_subscriptions_order_table_toggle_button %}
                         <div class="col-12 subscription-toggle-button-wrapper">
                             <button class="btn btn-light btn-sm subscription-hide-btn collapsed"

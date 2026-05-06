@@ -132,3 +132,68 @@ Feature: Subscription checkout
     And order payment status is "paid"
     And the order shipping country is "NL"
 
+  Scenario: price drift in keep mode leaves running subscriptions untouched
+    Given payment method "eps" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And i select "mollie_fixture_shipment" as shipping method
+    And i change the price of product "MOL_SUB_1" to "19"
+    And the subscriptions price update mode is "keep"
+    And product "MOL_SUB_1" with quantity "1" is in cart
+    When i start checkout with payment method "eps"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And the subscription status is "active"
+    When i change the price of product "MOL_SUB_1" to "24"
+    And the subscription price drift detector runs
+    Then the subscription price update state is "none"
+    And the subscription amount is "23.99"
+
+  Scenario: price drift in auto mode notifies the customer and skips migration when the customer cancels in the notice window
+    Given payment method "eps" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And i select "mollie_fixture_shipment" as shipping method
+    And i change the price of product "MOL_SUB_1" to "19"
+    And the subscriptions price update mode is "auto"
+    And the subscriptions price update notice days is "7"
+    And product "MOL_SUB_1" with quantity "1" is in cart
+    When i start checkout with payment method "eps"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And the subscription status is "active"
+    When i change the price of product "MOL_SUB_1" to "24"
+    And the subscription price drift detector runs
+    Then the subscription price update state is "notified"
+    And the subscription next notified price is "28.99"
+    And the subscription history contains "price_notified"
+    Then i "cancel" the subscription
+    And the subscription status is "canceled"
+    When the subscription price migration handler runs
+    Then the subscription amount is "23.99"
+
+  Scenario: price drift in auto mode migrates the subscription once the notice window has elapsed
+    Given payment method "eps" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And i select "mollie_fixture_shipment" as shipping method
+    And i change the price of product "MOL_SUB_1" to "19"
+    And the subscriptions price update mode is "auto"
+    And the subscriptions price update notice days is "0"
+    And product "MOL_SUB_1" with quantity "1" is in cart
+    When i start checkout with payment method "eps"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And the subscription status is "active"
+    When i change the price of product "MOL_SUB_1" to "24"
+    And the subscription price drift detector runs
+    Then the subscription price update state is "notified"
+    And the subscription next notified price is "28.99"
+    When the subscription price migration handler runs
+    Then the subscription price update state is "none"
+    And the subscription amount is "28.99"
+    And the subscription history contains "price_migrated"
+

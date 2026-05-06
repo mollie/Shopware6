@@ -65,6 +65,7 @@ class SubscriptionPageLoader
         $page->setAllowSkip($settings->isAllowSkip());
         $page->setAllowReorder($settings->isAllowReorder());
         $page->setAllowUpdatePayment($settings->isAllowUpdatePayment());
+        $page->setPriceUpdateNoticeDays($settings->getPriceUpdateNoticeDays());
 
         return $page;
     }
