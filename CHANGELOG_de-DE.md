@@ -46,6 +46,7 @@
 - Payconiq ist eingestellt und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
 - Das Event PaymentCreatedEvent wurde eingeführt, damit ist es möglich vor der Weiterleitung zum Zahlungsanbieter noch eigene Logik einzubauen
 - Neues Event ModifyCreateSubscriptionPayloadEvent hinzugefügt. Damit können Entwickler den Payload für die Mollie Subscription API vor dem Erstellen einer Subscription anpassen und erweitern.
+- Trustly ist veraltet und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
 
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.

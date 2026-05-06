@@ -38,7 +38,6 @@ Feature: Basic payment checkout
       | riverty       | MOL_REGULAR   | 1        | authorized    | NL             | EUR      |
       | satispay      | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | swish         | MOL_REGULAR   | 1        | paid          | SE             | SEK      |
-      | trustly       | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | twint         | MOL_REGULAR   | 1        | paid          | DE             | CHF      |
       | vipps         | MOL_REGULAR   | 1        | paid          | NO             | NOK      |
       | mobilepay     | MOL_REGULAR   | 1        | paid          | DK             | DKK      |
