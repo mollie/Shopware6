@@ -1,0 +1,24 @@
+Dear {{ customer.firstName }} {{ customer.lastName }},<br/>
+<br/>
+We are writing to inform you that the price of your subscription with {{ salesChannel.name }} will change.<br/>
+<br/>
+<strong>Subscription</strong>: {{ subscription.description }}<br/>
+<strong>Current amount</strong>: {{ subscription.amount }} {{ subscription.currency.symbol }}<br/>
+<strong>New amount</strong>: {{ subscription.nextNotifiedPrice }} {{ subscription.currency.symbol }}<br/>
+<strong>Effective from next renewal on</strong>: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}<br/>
+<br/>
+{% if subscription.order and subscription.order.lineItems %}
+<strong>Items in this subscription:</strong><br/>
+<ul>
+{% for lineItem in subscription.order.lineItems %}
+    <li>{{ lineItem.label }} &mdash; {{ lineItem.quantity }} &times; {{ lineItem.unitPrice }} {{ subscription.currency.symbol }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+<br/>
+If you do not agree with the new price, you can cancel your subscription before the next renewal date by logging into your account on {{ salesChannel.name }}.<br/>
+<br/>
+If we do not hear from you, the new price will automatically apply from the next renewal.<br/>
+<br/>
+Thank you,<br/>
+{{ salesChannel.name }}
