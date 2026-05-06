@@ -10,6 +10,18 @@ const client = new StoreAPIClient(shopware.getStoreApiToken());
 // that ones just made up to have a valid URL
 const fakeSubscriptionID = '0d8eefdd6d12456335280e2ff42431b9';
 
+// dummy ids / strings that satisfy the route's required-field validation;
+// the subscription lookup that follows is what we actually want to trigger.
+const validAddressPayload = {
+    salutationId: '00000000000000000000000000000001',
+    firstName: 'Cypress',
+    lastName: 'Tester',
+    street: 'Test Street 1',
+    zipcode: '12345',
+    city: 'Testville',
+    countryId: '00000000000000000000000000000002',
+};
+
 const customerEmail = 'cypress@mollie.com';
 const customerPassword = 'cypress123';
 
@@ -91,14 +103,14 @@ context("Store API Subscription Routes", () => {
             loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
+                    client.post(url, validAddressPayload).then(response => {
                         resolve({'data': response.data});
                     });
                 })
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
@@ -130,14 +142,14 @@ context("Store API Subscription Routes", () => {
             loginAsCustomer().then(() => {
 
                 const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
+                    client.post(url, validAddressPayload).then(response => {
                         resolve({'data': response.data});
                     });
                 })
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
@@ -176,7 +188,7 @@ context("Store API Subscription Routes", () => {
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
@@ -214,7 +226,7 @@ context("Store API Subscription Routes", () => {
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
@@ -252,7 +264,7 @@ context("Store API Subscription Routes", () => {
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
@@ -290,7 +302,7 @@ context("Store API Subscription Routes", () => {
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
@@ -329,7 +341,7 @@ context("Store API Subscription Routes", () => {
 
                 cy.wrap(request).its('data').then(response => {
                     cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription ' + fakeSubscriptionID + ' not found in Shopware');
+                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
                 });
             });
         })
