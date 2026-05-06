@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Payment\CancelledEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionPriceChangeNoticeEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
@@ -22,6 +23,7 @@ final class BusinessEventSubscriber implements EventSubscriberInterface
         SuccessEvent::class,
         FailedEvent::class,
         CancelledEvent::class,
+        SubscriptionPriceChangeNoticeEvent::class,
     ];
 
     public function __construct(
