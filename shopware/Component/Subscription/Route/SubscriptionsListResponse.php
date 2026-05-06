@@ -6,18 +6,37 @@ namespace Mollie\Shopware\Component\Subscription\Route;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 /**
- * @extends StoreApiResponse<EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>>
+ * @extends StoreApiResponse<ArrayStruct<array{subscriptions: array<SubscriptionEntity>}>>
  */
 final class SubscriptionsListResponse extends StoreApiResponse
 {
     /**
-     * @param EntitySearchResult<SubscriptionCollection<SubscriptionEntity>> $subscriptions
+     * @var EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
-    public function __construct(EntitySearchResult $subscriptions)
+    private EntitySearchResult $entitySearchResult;
+
+    /**
+     * @param EntitySearchResult<SubscriptionCollection<SubscriptionEntity>> $entitySearchResult
+     */
+    public function __construct(EntitySearchResult $entitySearchResult)
     {
-        parent::__construct($subscriptions);
+        $this->entitySearchResult = $entitySearchResult;
+
+        parent::__construct(new ArrayStruct(
+            ['subscriptions' => $entitySearchResult->getEntities()->getFlatList()],
+            'mollie_payments_subscriptions_list'
+        ));
+    }
+
+    /**
+     * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
+     */
+    public function getEntitySearchResult(): EntitySearchResult
+    {
+        return $this->entitySearchResult;
     }
 }

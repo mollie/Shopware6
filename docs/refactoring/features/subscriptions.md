@@ -46,9 +46,15 @@
   `PriceMigrationHandler`, `priceUpdateEnabled` /
   `priceUpdateNoticeDays` settings, and the price-change mail
   template are all unimplemented.
-- **Phase 1 — storefront two-button control.** `mollieAllowStandalonePurchase`
-  product field and the "Add to cart" / "Subscribe" template variant
-  are still on the to-do list.
+- **Phase 1 — storefront two-button control.** Dropped after a prototype showed
+  Shopware's cart merges line items by referenced product id, so the same product
+  added once as subscription and once as one-off collapses into a single
+  line item with quantity = 2 and a single mode. The recommendation for
+  merchants who need both modes for the same SKU is to model them as
+  **variants** of one parent product — one variant flagged as subscription,
+  one as one-off. Each variant has its own product id, so the cart keeps
+  them as distinct line items. To be documented in the merchant wiki; no
+  plugin code changes required.
 - **Backfill data migration** for existing active/paused subscriptions
   is tied to Phase 2 and lands with it.
 

@@ -79,21 +79,24 @@ Component.override('sw-order-user-card', {
         },
 
         /**
+         * Subscription either via legacy customField (older orders) or via
+         * the mollieSubscriptions extension association (loaded by the
+         * sw-order-detail override).
          *
-         * @returns {null|*}
+         * @returns {boolean}
          */
         isSubscription() {
             const orderAttributes = new OrderAttributes(this.currentOrder);
-            return orderAttributes.isSubscription();
+            return orderAttributes.isSubscription() || this._extensionSubscription() !== null;
         },
 
         /**
          *
-         * @returns {string|*}
+         * @returns {string}
          */
         subscriptionId() {
             const orderAttributes = new OrderAttributes(this.currentOrder);
-            return orderAttributes.getSwSubscriptionId();
+            return orderAttributes.getSwSubscriptionId() || this._extensionSubscription()?.id || '';
         },
 
         /**
@@ -140,6 +143,30 @@ Component.override('sw-order-user-card', {
         _creditCardData() {
             const orderAttributes = new OrderAttributes(this.currentOrder);
             return orderAttributes.getCreditCardAttributes();
+        },
+
+        /**
+         * Reads mollieSubscriptions from either the entity extension bag
+         * (Shopware default for EntityExtension associations) or directly
+         * from the order — depending on the Shopware version the DAL
+         * sometimes hoists the association onto the entity itself.
+         *
+         * @returns {object|null}
+         */
+        _extensionSubscription() {
+            const order = this.currentOrder;
+            const subscriptions =
+                order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
+
+            if (!subscriptions) {
+                return null;
+            }
+
+            if (typeof subscriptions.first === 'function') {
+                return subscriptions.first() ?? null;
+            }
+
+            return subscriptions.length > 0 ? subscriptions[0] : null;
         },
 
         /**
