@@ -85,7 +85,9 @@ final class VoucherFixture extends AbstractFixture
                     'id' => Uuid::fromStringToHex('promotion-discount-' . $code),
                     'scope' => $scope,
                     'type' => $type,
-                    'value' => $value
+                    'value' => $value,
+                    // Required NOT NULL column added in Shopware 6.3; must be set explicitly.
+                    'considerAdvancedRules' => false,
                 ]
             ],
             'active' => true,
