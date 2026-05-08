@@ -14,6 +14,7 @@ use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\ShopwareHttpException;
+use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -198,7 +199,9 @@ final class SubscriptionController extends StorefrontController
 
         try {
             $response = $this->updatePaymentMethodRoute->start($subscriptionId, $data, $salesChannelContext);
-            $checkoutUrl = (string) $response->getObject()->get('checkoutUrl');
+            /** @var ArrayStruct<string, mixed> $arrayResponse */
+            $arrayResponse = $response->getObject();
+            $checkoutUrl = (string) $arrayResponse->get('checkoutUrl');
 
             return $this->redirect($checkoutUrl);
         } catch (\Throwable $exception) {

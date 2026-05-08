@@ -234,6 +234,6 @@ final class PriceDriftDetector
         $criteria = new Criteria([$customerId]);
         $criteria->addAssociation('defaultBillingAddress');
 
-        return $this->customerRepository->search($criteria, $context)->first();
+        return $this->customerRepository->search($criteria, $context)->first(); // @phpstan-ignore return.type
     }
 }

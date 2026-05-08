@@ -143,6 +143,7 @@ final class RescueApiController extends AbstractController
 
             if ($localSubscriptions->count() > 0) {
                 $upsert = [];
+                /** @var SubscriptionEntity $localSubscription */
                 foreach ($localSubscriptions as $localSubscription) {
                     $upsert[] = [
                         'id' => $localSubscription->getId(),

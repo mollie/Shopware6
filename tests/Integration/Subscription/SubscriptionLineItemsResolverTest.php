@@ -10,6 +10,7 @@ use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
 use Mollie\Shopware\Integration\Data\OrderTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -20,6 +21,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 
 final class SubscriptionLineItemsResolverTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
     use CustomerTestBehaviour;
     use ProductTestBehaviour;

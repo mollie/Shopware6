@@ -9,8 +9,8 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\FakeApplePayAddress;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Gateway\SalesChannel\AbstractCheckoutGatewayRoute;
-use Shopware\Core\Checkout\Gateway\SalesChannel\CheckoutGatewayRoute;
+use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
+use Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -40,8 +40,8 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
      */
     public function __construct(
-        #[Autowire(service: CheckoutGatewayRoute::class)]
-        private AbstractCheckoutGatewayRoute $checkoutGatewayRoute,
+        #[Autowire(service: ShippingMethodRoute::class)]
+        private AbstractShippingMethodRoute $shippingMethodRoute,
         #[Autowire(service: SetShippingMethodRoute::class)]
         private AbstractSetShippingMethodRoute $setShippingMethodRoute,
         #[Autowire(service: SalesChannelContextService::class)]
@@ -91,7 +91,6 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
         $requestDataBag->set(SalesChannelContextService::COUNTRY_ID, $countryId);
 
         $customer = $salesChannelContext->getCustomer();
-
         $customerId = null;
         if ($customer !== null) {
             $customerId = $customer->getId();
@@ -112,10 +111,8 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
 
         $this->logger->info('Finished - set shipping country for apple pay', $logData);
 
-        $cartResponse = $this->getCartRoute->cart($request, $newContext);
-
         $request->query->set('onlyAvailable', '1');
-        $checkoutResponse = $this->checkoutGatewayRoute->load($request, $cartResponse->getShopwareCart(), $salesChannelContext);
+        $shippingMethods = $this->shippingMethodRoute->load($request, $newContext, new Criteria())->getShippingMethods();
 
         $selectedShippingMethodId = $salesChannelContext->getShippingMethod()->getId();
         $salesChannelId = $salesChannelContext->getSalesChannelId();
@@ -127,7 +124,6 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
         $this->logger->info('Start - get shipping methods for apple pay express', $logData);
 
         $applePayMethods = [];
-        $shippingMethods = $checkoutResponse->getShippingMethods();
 
         /** @var ShippingMethodEntity $shippingMethod */
         foreach ($shippingMethods as $shippingMethod) {
@@ -166,9 +162,11 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
         if ($customer === null) {
             return $requestDataBag;
         }
+
         $customerId = $customer->getId();
         $fakeApplePayAddress = new FakeApplePayAddress($customer, $countryId);
         $fakeApplePayAddressId = FakeApplePayAddress::getId($customer);
+
         $logData['customerId'] = $customerId;
         $logData['addressId'] = $fakeApplePayAddressId;
         $this->logger->info('Customer is logged in, fake apple pay address added for cart rules', $logData);
@@ -190,11 +188,7 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
         }
 
         $fakeAddressId = FakeApplePayAddress::getId($customer);
-        $this->customerAddressRepository->delete([
-            [
-                'id' => $fakeAddressId,
-            ]
-        ], $salesChannelContext->getContext());
+        $this->customerAddressRepository->delete([['id' => $fakeAddressId]], $salesChannelContext->getContext());
     }
 
     private function setShippingMethod(string $shippingMethodId, SalesChannelContext $salesChannelContext): SalesChannelContext

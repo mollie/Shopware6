@@ -31,6 +31,7 @@ final class RuntimeFieldsSubscriber implements EventSubscriberInterface
      */
     public function onSubscriptionsLoaded(EntityLoadedEvent $event): void
     {
+        /** @var SubscriptionEntity $subscription */
         foreach ($event->getEntities() as $subscription) {
             $this->setCancelUntil($subscription);
         }

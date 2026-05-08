@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Integration\Migration;
 
 use Doctrine\DBAL\Connection;
 use Kiener\MolliePayments\Migration\Migration1778100100SubscriptionPriceChangeMailTemplate;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -12,6 +13,7 @@ use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 #[CoversClass(Migration1778100100SubscriptionPriceChangeMailTemplate::class)]
 final class SubscriptionPriceChangeMailTemplateTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
 
     private const TECHNICAL_NAME = 'mollie_subscription_price_change';

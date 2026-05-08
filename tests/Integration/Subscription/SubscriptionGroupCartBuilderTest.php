@@ -14,6 +14,7 @@ use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
 use Mollie\Shopware\Integration\Data\OrderTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class SubscriptionGroupCartBuilderTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
     use CustomerTestBehaviour;
     use ProductTestBehaviour;

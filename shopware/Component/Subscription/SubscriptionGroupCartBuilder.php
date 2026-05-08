@@ -7,7 +7,6 @@ use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItemFactoryRegistry;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
-use Shopware\Core\Checkout\CheckoutPermissions;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -46,7 +45,9 @@ final class SubscriptionGroupCartBuilder implements SubscriptionGroupCartBuilder
 
         $overrideOptions = [
             SalesChannelContextService::PERMISSIONS => [
-                CheckoutPermissions::SKIP_CART_PERSISTENCE => true,
+                // CheckoutPermissions::SKIP_CART_PERSISTENCE does not exist in Shopware 6.5.x.
+                // Once 6.5 support is dropped, replace this string with the class constant.
+                'skipCartPersistence' => true,
             ],
         ];
 

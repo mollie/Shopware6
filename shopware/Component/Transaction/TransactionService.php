@@ -19,7 +19,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\Currency\CurrencyEntity;
-use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -93,7 +92,8 @@ final class TransactionService implements TransactionServiceInterface
         }
 
         $language = $order->getLanguage();
-        if (! $language instanceof LanguageEntity) {
+        /** @phpstan-ignore identical.alwaysFalse */
+        if ($language === null) {
             throw TransactionDataException::orderWithoutLanguage($order->getId());
         }
 

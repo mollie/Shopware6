@@ -62,6 +62,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         try {
             $apiSettings = $this->settings->getApiSettings($salesChannelId);
 
+            /** @phpstan-ignore-next-line */
             $languageInfo = $salesChannelContext->getLanguageInfo();
             /** @phpstan-ignore-next-line */
             if ($languageInfo instanceof LanguageInfo) {

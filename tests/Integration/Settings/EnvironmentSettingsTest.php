@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Integration\Settings;
 
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
@@ -13,6 +14,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 #[CoversClass(SettingsService::class)]
 final class EnvironmentSettingsTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
 
     public function testSettingsAreLoadedFromEnvironment(): void
@@ -24,8 +26,8 @@ final class EnvironmentSettingsTest extends TestCase
          */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
 
-        $devMode = (int) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', 0);
-        $cypressMode = (int) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', 0);
+        $devMode = (string) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', '0');
+        $cypressMode = (string) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', '0');
         $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
 
         $environmentSettings = $settingsService->getEnvironmentSettings();
