@@ -199,7 +199,7 @@ final class SubscriptionController extends StorefrontController
 
         try {
             $response = $this->updatePaymentMethodRoute->start($subscriptionId, $data, $salesChannelContext);
-            /** @var ArrayStruct<string, mixed> $arrayResponse */
+            /** @var ArrayStruct<array<string, mixed>> $arrayResponse */
             $arrayResponse = $response->getObject();
             $checkoutUrl = (string) $arrayResponse->get('checkoutUrl');
 
