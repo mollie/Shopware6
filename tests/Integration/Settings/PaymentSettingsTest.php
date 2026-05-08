@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Integration\Settings;
 
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
@@ -15,6 +16,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 #[CoversClass(SettingsService::class)]
 final class PaymentSettingsTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
 
     public function testSettingsAreLoadedFromDatabase(): void
@@ -25,8 +27,8 @@ final class PaymentSettingsTest extends TestCase
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
         $oldNumberFormat = $systemConfigService->get(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT);
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT, 'test_{ordernumber}_{customernumber}');
-        $devMode = (int) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', 0);
-        $cypressMode = (int) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', 0);
+        $devMode = (string) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', '0');
+        $cypressMode = (string) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', '0');
         $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
         $paymentSettings = $settingsService->getPaymentSettings();
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT, $oldNumberFormat);

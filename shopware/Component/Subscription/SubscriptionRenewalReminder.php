@@ -141,6 +141,8 @@ final class SubscriptionRenewalReminder
         $criteria = new Criteria([$customerId]);
         $criteria->addAssociation('defaultBillingAddress');
 
-        return $this->customerRepository->search($criteria, $context)->first();
+        $result = $this->customerRepository->search($criteria, $context);
+
+        return $result->first(); // @phpstan-ignore return.type
     }
 }

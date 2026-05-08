@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Integration\Settings;
 
 use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
 use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -15,6 +16,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
  */
 final class ShippingMethodsTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
     use SalesChannelTestBehaviour;
 

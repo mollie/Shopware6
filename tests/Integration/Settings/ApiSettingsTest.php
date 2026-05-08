@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Integration\Settings;
 
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
@@ -15,6 +16,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 #[CoversClass(SettingsService::class)]
 final class ApiSettingsTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
 
     public function testSettingsAreLoadedFromDatabase(): void
@@ -30,8 +32,8 @@ final class ApiSettingsTest extends TestCase
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_LIVE_API_KEY, 'live_key');
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_TEST_API_KEY, 'test_key');
 
-        $devMode = (int) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', 0);
-        $cypressMode = (int) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', 0);
+        $devMode = (string) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', '0');
+        $cypressMode = (string) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', '0');
         $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
         $apiSettings = $settingsService->getApiSettings();
 

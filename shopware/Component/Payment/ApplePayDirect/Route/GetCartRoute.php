@@ -50,8 +50,9 @@ final class GetCartRoute extends AbstractGetCartRoute
     {
         $localeCode = '';
         $salesChannelId = $salesChannelContext->getSalesChannelId();
+        /** @phpstan-ignore-next-line */
         $languageInfo = $salesChannelContext->getLanguageInfo();
-        /** @phpstan-ignore-next-line  */
+        /** @phpstan-ignore-next-line */
         if ($languageInfo instanceof LanguageInfo) {
             $localeCode = $languageInfo->localeCode;
         }

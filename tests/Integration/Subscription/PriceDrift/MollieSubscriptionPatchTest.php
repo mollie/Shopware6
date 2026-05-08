@@ -15,6 +15,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,6 +28,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class MollieSubscriptionPatchTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use SalesChannelTestBehaviour;
 
     private const TEST_IBAN = 'NL55INGB0000000000';

@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Unit\Payment\Action;
 
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
+use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\EventSpy;
@@ -18,7 +19,6 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -35,7 +35,7 @@ final class PayTest extends TestCase
 
         $payAction = $this->getPayAction($transactionService, $expectedUrl);
 
-        $response = $payAction->execute(new FakePaymentMethodHandler(), new PaymentTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame($expectedUrl, $response->getTargetUrl());
@@ -49,7 +49,7 @@ final class PayTest extends TestCase
 
         $payAction = $this->getPayAction($transactionService, $expectedUrl);
 
-        $response = $payAction->execute(new FakePaymentMethodHandler(), new PaymentTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame($expectedUrl, $response->getTargetUrl());

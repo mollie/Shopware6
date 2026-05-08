@@ -9,11 +9,11 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
+use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,7 +32,7 @@ final class Finalize
     ) {
     }
 
-    public function execute(PaymentTransactionStruct $transaction, Context $context): void
+    public function execute(MollieTransactionStruct $transaction, Context $context): void
     {
         $transactionId = $transaction->getOrderTransactionId();
         $transactionData = $this->transactionDataLoader->findById($transactionId,$context);

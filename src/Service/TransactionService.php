@@ -55,6 +55,7 @@ class TransactionService
             throw TransactionDataException::transactionNotFound($transactionId);
         }
 
+        /** @var ?OrderTransactionEntity $transaction */
         $transaction = $transactions->first();
         if ($transaction === null) {
             throw TransactionDataException::transactionNotFound($transactionId);
