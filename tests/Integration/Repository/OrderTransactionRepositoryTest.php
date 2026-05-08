@@ -9,6 +9,7 @@ use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
 use Mollie\Shopware\Integration\Data\OrderTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Mollie\Shopware\Integration\Data\ProductTestBehaviour;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use Mollie\Shopware\Repository\OrderTransactionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 #[CoversClass(OrderTransactionRepository::class)]
 class OrderTransactionRepositoryTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
     use CustomerTestBehaviour;
     use ProductTestBehaviour;

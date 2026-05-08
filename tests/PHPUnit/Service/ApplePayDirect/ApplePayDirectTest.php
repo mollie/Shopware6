@@ -118,8 +118,7 @@ class ApplePayDirectTest extends TestCase
 
         $this->applePay = new ApplePayDirect(
             $domainVerification,
-            $payment,
-            $doPay,
+
             $fakeCartService,
             $formatter,
             $shippingBuilder,
@@ -130,7 +129,7 @@ class ApplePayDirectTest extends TestCase
             $this->apiFactory,
             $shopService,
             $orderService,
-            $repoOrderAdresses,
+
             $this->validationUrlAllowListGateway,
             $validationUrlSanitizer
         );

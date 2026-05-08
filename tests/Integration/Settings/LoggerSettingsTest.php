@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Integration\Settings;
 
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
@@ -15,6 +16,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 #[CoversClass(SettingsService::class)]
 final class LoggerSettingsTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
 
     public function testSettingsCanBeReadFromDatabase(): void
@@ -29,8 +31,8 @@ final class LoggerSettingsTest extends TestCase
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS, 10);
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE, false);
 
-        $devMode = (int) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', 0);
-        $cypressMode = (int) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', 0);
+        $devMode = (string) EnvironmentHelper::getVariable('MOLLIE_DEV_MODE', '0');
+        $cypressMode = (string) EnvironmentHelper::getVariable('MOLLIE_CYPRESS_MODE', '0');
         $settingsService = new SettingsService($systemConfigService, $devMode, $cypressMode);
 
         $actualSettings = $settingsService->getLoggerSettings();

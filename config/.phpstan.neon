@@ -11,6 +11,10 @@ parameters:
         - ./../shopware/Component/Subscription/Search/SubscriptionAdminSearchIndexer.php
         # legacy code that is not working with abstract/interface changes
         - ./../src/Service/Mail/MailService63.php
+        # AbstractPaymentHandler only exists in Shopware 6.6+; the if/else feature-flag
+        # pattern used here cannot be statically analysed against the 6.5 vendor.
+        - ./../shopware/Component/Payment/Handler/AbstractMolliePaymentHandler.php
+        - ./../src/Handler/PaymentHandler.php
     disallowedFunctionCalls:
         - function: 'var_dump()'
           message: 'use some logger instead'
@@ -36,6 +40,9 @@ parameters:
     		- identifier: varTag.unresolvableType
     		- identifier: attribute.notFound
     		- identifier: function.alreadyNarrowedType
+    		# Traits used only in AbstractMolliePaymentHandler.php which is excluded from analysis
+    		# because it uses the Feature::isActive() if/else pattern for 6.5/6.7 compatibility.
+    		- identifier: trait.unused
 
 services:
     - class: MolliePayments\Shopware\PHPStan\Rules\NoManufacturerRule

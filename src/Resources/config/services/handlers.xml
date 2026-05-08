@@ -6,51 +6,6 @@
 
     <services>
 
-        <!-- Default PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\PaymentHandler" >
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-        </service>
-
-        <!-- Apple Pay PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\ApplePayPayment" public="true">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <!-- MobilePay PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\MobilePayPayment">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
-
-        <!-- Vipps PaymentHandler -->
-        <service id="Kiener\MolliePayments\Handler\Method\VippsPayment">
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PayAction"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\FinalizeAction"/>
-            <tag name="shopware.payment.method.async"/>
-            <tag name="shopware.payment.method"/>
-        </service>
 
 
 

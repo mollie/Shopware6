@@ -47,10 +47,11 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
         foreach ($this->paymentMethodRemovers as $paymentMethodRemover) {
             $paymentMethods = $paymentMethodRemover->remove($paymentMethods, $orderId, $context);
         }
-        $response = $response->getObject();
-        $response->assign(['entities' => $paymentMethods, 'elements' => $paymentMethods, 'total' => $paymentMethods->count()]);
+        $responseObject = $response->getObject();
+        $responseObject->assign(['entities' => $paymentMethods, 'elements' => $paymentMethods, 'total' => $paymentMethods->count()]);
 
-        return new PaymentMethodRouteResponse($response);
+        /** @var \Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult<\Shopware\Core\Checkout\Payment\PaymentMethodCollection> $responseObject */
+        return new PaymentMethodRouteResponse($responseObject);
     }
 
     private function getControllerClass(Request $request): ?string
