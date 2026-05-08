@@ -75,7 +75,7 @@ jobs:
           - shopware: '6.7.0.1'
             php: '8.2'
             image: 'dockware/shopware'
-          - shopware: '6.6.10.16'
+          - shopware: '6.6.10.17'
             php: '8.2'
             image: 'dockware/shopware'
           - shopware: '6.6.9.0'
