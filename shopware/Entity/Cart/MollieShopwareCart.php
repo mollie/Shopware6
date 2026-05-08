@@ -11,7 +11,7 @@ class MollieShopwareCart
 {
     private Cart $cart;
 
-    /** @var ArrayStruct<string, mixed> */
+    /** @var ArrayStruct<array<string, mixed>> */
     private ArrayStruct $cartExtension;
 
     public function __construct(Cart $cart)

@@ -43,6 +43,9 @@ parameters:
     		# Traits used only in AbstractMolliePaymentHandler.php which is excluded from analysis
     		# because it uses the Feature::isActive() if/else pattern for 6.5/6.7 compatibility.
     		- identifier: trait.unused
+    		# ArrayStruct changed from <TKey, TValue> in 6.5 to <TData extends array> in 6.7.
+    		# <array<string, mixed>> is correct for 6.7; on 6.5 the second type param is missing.
+    		- identifier: missingType.generics
 
 services:
     - class: MolliePayments\Shopware\PHPStan\Rules\NoManufacturerRule
