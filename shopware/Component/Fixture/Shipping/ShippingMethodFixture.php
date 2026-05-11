@@ -12,9 +12,13 @@ use Shopware\Core\Content\Rule\RuleEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\DeliveryTime\DeliveryTimeCollection;
 use Shopware\Core\System\DeliveryTime\DeliveryTimeEntity;
+use Shopware\Core\System\SalesChannel\SalesChannelCollection;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ShippingMethodFixture extends AbstractFixture
@@ -23,6 +27,7 @@ final class ShippingMethodFixture extends AbstractFixture
      * @param EntityRepository<ShippingMethodCollection<ShippingMethodEntity>> $shippingMethodRepository
      * @param EntityRepository<RuleCollection<RuleEntity>> $ruleRepository
      * @param EntityRepository<DeliveryTimeCollection<DeliveryTimeEntity>> $deliveryTimeRepository
+     * @param EntityRepository<SalesChannelCollection<SalesChannelEntity>> $salesChannelRepository
      */
     public function __construct(
         #[Autowire(service: 'shipping_method.repository')]
@@ -31,6 +36,8 @@ final class ShippingMethodFixture extends AbstractFixture
         private readonly EntityRepository $ruleRepository,
         #[Autowire(service: 'delivery_time.repository')]
         private readonly EntityRepository $deliveryTimeRepository,
+        #[Autowire(service: 'sales_channel.repository')]
+        private readonly EntityRepository $salesChannelRepository,
     ) {
     }
 
@@ -87,6 +94,18 @@ final class ShippingMethodFixture extends AbstractFixture
             ],
         ];
         $this->shippingMethodRepository->upsert([$data], $context);
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', true));
+        $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
+        $salesChannelUpsert = [];
+        foreach ($salesChannels as $salesChannel) {
+            $salesChannelUpsert[] = [
+                'id' => $salesChannel->getId(),
+                'shippingMethods' => [['id' => $data['id']]],
+            ];
+        }
+        $this->salesChannelRepository->upsert($salesChannelUpsert, $context);
     }
 
     public function uninstall(Context $context): void

@@ -9,13 +9,13 @@ use Mollie\Shopware\Component\Payment\Mandate\Route\AbstractListMandatesRoute;
 use Mollie\Shopware\Component\Payment\Mandate\Route\ListMandatesRoute;
 use Mollie\Shopware\Component\Payment\PointOfSale\Route\AbstractListTerminalsRoute;
 use Mollie\Shopware\Component\Payment\PointOfSale\Route\ListTerminalsRoute;
+use Mollie\Shopware\Component\SalesChannel\LocaleProvider;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\System\SalesChannel\Context\LanguageInfo;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
@@ -33,6 +33,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         private AbstractListMandatesRoute $listMandatesRoute,
         #[Autowire(service: ListTerminalsRoute::class)]
         private AbstractListTerminalsRoute $listTerminalsRoute,
+        private LocaleProvider $localeProvider,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -57,17 +58,17 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         if ($mollieExtension === null) {
             return;
         }
+
         /** @var Page $page */
         $page = $event->getPage();
         try {
             $apiSettings = $this->settings->getApiSettings($salesChannelId);
 
-            /** @phpstan-ignore-next-line */
-            $languageInfo = $salesChannelContext->getLanguageInfo();
-            /** @phpstan-ignore-next-line */
-            if ($languageInfo instanceof LanguageInfo) {
-                $this->addMollieLocale($page, $languageInfo);
-            }
+            $localeCode = $this->localeProvider->getLocaleCode(
+                $salesChannelContext->getLanguageId(),
+                $salesChannelContext->getContext()
+            );
+            $this->addMollieLocale($page, $localeCode);
 
             $this->addTestMode($page, $apiSettings);
             $this->addProfileId($page, $apiSettings);
@@ -128,10 +129,10 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    private function addMollieLocale(Page $page, LanguageInfo $languageInfo): void
+    private function addMollieLocale(Page $page, string $localeCode): void
     {
         $page->assign([
-            'mollie_locale' => Locale::fromLocaleCode($languageInfo->localeCode)
+            'mollie_locale' => Locale::fromLocaleCode($localeCode)
         ]);
     }
 }
