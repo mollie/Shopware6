@@ -71,13 +71,13 @@ jobs:
             image: 'dockware/shopware'
           - shopware: '6.6.5.1'
             php: '8.2'
-            image: 'dockware/play'
+            image: 'dockware/shopware'
           - shopware: '6.6.0.3'
             php: '8.2'
-            image: 'dockware/play'
+            image: 'dockware/shopware'
           - shopware: '6.5.8.18'
             php: '8.2'
-            image: 'dockware/play'
+            image: 'dockware/shopware'
 
     steps:
 
