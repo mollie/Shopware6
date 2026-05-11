@@ -13,7 +13,7 @@ final class WebhookException extends HttpException
     public static function paymentIdNotProvided(string $subscriptionId): self
     {
         return new self(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             self::SUBSCRIPTION_WITHOUT_PAYMENT_ID,
             'Subscription webhook without mollie payment id: {{subscriptionId}}',[
                 'subscriptionId' => $subscriptionId,

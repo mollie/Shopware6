@@ -51,7 +51,7 @@ final class RouteExceptionsTest extends TestCase
             ],
             'webhook-payment-id-not-provided' => [
                 static fn (): WebhookException => WebhookException::paymentIdNotProvided('sub-123'),
-                Response::HTTP_BAD_REQUEST,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 WebhookException::SUBSCRIPTION_WITHOUT_PAYMENT_ID,
                 ['sub-123'],
             ],

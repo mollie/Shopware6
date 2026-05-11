@@ -60,9 +60,11 @@ final class RouteBuilder implements RouteBuilderInterface
 
     public function getSubscriptionPaymentUpdateWebhookUrl(string $subscriptionId): string
     {
-        // Sync-only flow: the customer return triggers the confirm endpoint.
-        // No dedicated webhook is wired up yet.
-        return '';
+        return $this->router->generate(
+            'api.mollie.webhook.subscription.mandate.update',
+            ['subscriptionId' => $subscriptionId],
+            RouterInterface::ABSOLUTE_URL
+        );
     }
 
     public function getPaypalExpressRedirectUrl(): string
