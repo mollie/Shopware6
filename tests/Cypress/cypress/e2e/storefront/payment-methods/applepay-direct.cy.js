@@ -103,20 +103,6 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('C266701: /mollie/apple-pay/add-product without product ID @core', () => {
-
-            const request = new Promise((resolve) => {
-                storefrontClient.post('/mollie/apple-pay/add-product', {}).then(response => {
-                    resolve({'data': response.data.data});
-                });
-            })
-
-            cy.wrap(request).its('data').then(data => {
-                cy.wrap(data).its('success').should('eq', false)
-                cy.wrap(data).its('error').should('contain', 'Please provide a product ID');
-            });
-        })
-
         it('C266702: /mollie/apple-pay/validate without data @core', () => {
 
             const request = new Promise((resolve) => {

@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayAmount;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayCart;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayLineItem;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingLineItem;
+use Mollie\Shopware\Component\SalesChannel\LocaleProvider;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -18,7 +19,6 @@ use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Framework\Adapter\Translation\AbstractTranslator;
 use Shopware\Core\Framework\Adapter\Translation\Translator;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
-use Shopware\Core\System\SalesChannel\Context\LanguageInfo;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +35,7 @@ final class GetCartRoute extends AbstractGetCartRoute
         private AbstractSettingsService $settingsService,
         #[Autowire(service: Translator::class)]
         private AbstractTranslator $translator,
+        private LocaleProvider $localeProvider,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -48,14 +49,11 @@ final class GetCartRoute extends AbstractGetCartRoute
     #[Route(name: 'store-api.mollie.apple-pay.cart', path: '/store-api/mollie/applepay/cart', methods: ['GET'])]
     public function cart(Request $request, SalesChannelContext $salesChannelContext): GetCartResponse
     {
-        $localeCode = '';
         $salesChannelId = $salesChannelContext->getSalesChannelId();
-        /** @phpstan-ignore-next-line */
-        $languageInfo = $salesChannelContext->getLanguageInfo();
-        /** @phpstan-ignore-next-line */
-        if ($languageInfo instanceof LanguageInfo) {
-            $localeCode = $languageInfo->localeCode;
-        }
+        $localeCode = $this->localeProvider->getLocaleCode(
+            $salesChannelContext->getLanguageId(),
+            $salesChannelContext->getContext()
+        );
         $logData = [
             'localeCode' => $localeCode,
             'salesChannelId' => $salesChannelId,

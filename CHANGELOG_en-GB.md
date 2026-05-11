@@ -51,6 +51,7 @@
 - Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
 - Added new event ModifyCreateSubscriptionPayloadEvent. This allows developers to modify and extend the payload for the Mollie Subscription API before a subscription is created.
 - Trustly is deprecated and will not be activated after the update. Please deactivate the payment method and remove it from the sales channel.
+- Removed: The Apple Pay Direct route `POST /mollie/apple-pay/add-product` (storefront) and `POST /store-api/mollie/applepay/add-product` (Store API) have been removed. Use Shopware's native add-to-cart route (`POST /store-api/checkout/cart/line-item`) with `isExpressCheckout: true` in the request body instead.
 - Added: price changes on subscription products can now be applied to running subscriptions.
 
 # 4.23.0
