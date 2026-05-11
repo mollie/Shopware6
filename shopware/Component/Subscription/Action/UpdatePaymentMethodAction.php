@@ -69,7 +69,7 @@ final class UpdatePaymentMethodAction
         $createPayment->setSequenceType(SequenceType::FIRST);
         $createPayment->setCustomerId($mollieCustomerId);
         $createPayment->setMethods($this->collectSubscriptionMethods());
-
+        $createPayment->setShopwareOrderNumber($orderNumber);
         $webhookUrl = $this->routeBuilder->getSubscriptionPaymentUpdateWebhookUrl($subscription->getId());
         if ($webhookUrl !== '') {
             $createPayment->setWebhookUrl($webhookUrl);

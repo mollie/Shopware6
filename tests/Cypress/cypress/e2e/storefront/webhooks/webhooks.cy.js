@@ -23,7 +23,7 @@ context("Storefront Subscription Webhooks", () => {
             expect(response.status).to.eq(422);
             // also verify the content
             expect(response.body.success).to.eq(false);
-            expect(response.body.error).to.eq('Subscription with ID 0d8eefdd6d12456335280e2ff42431b9 not found in Shopware');
+            expect(response.body.error).to.eq('Subscription with id 0d8eefdd6d12456335280e2ff42431b9 was not found');
         })
     })
 
@@ -34,7 +34,7 @@ context("Storefront Subscription Webhooks", () => {
             expect(response.status).to.eq(422);
             // also verify the content
             expect(response.body.success).to.eq(false);
-            expect(response.body.error).to.eq('Please provide a Mollie Payment ID with the payment that has been done for this subscription');
+            expect(response.body.error).to.eq('Subscription webhook without mollie payment id: abc');
         })
     })
 
@@ -48,29 +48,24 @@ context("Storefront Subscription Webhooks", () => {
     })
 
 
-    describe('Legacy (since Plugin > v3.3.0)', function () {
-        // these are legacy URLs
-        // but we need to keep them for old payments (unfortunately)
+    describe('Legacy /renew routes (removed in v5.0)', function () {
+        // these legacy URLs are dropped in v5.0 — renewals go through the unified webhook
 
-        it('C266657: Legacy Subscription Webhook reachable @core', () => {
+        it('C266657: Legacy /renew Storefront Webhook is gone @core', () => {
 
             cy.request({url: '/mollie/webhook/subscription/0d8eefdd6d12456335280e2ff42431b9/renew?id=tr_123', failOnStatusCode: false,}).then((response) => {
-                // status code needs to be 422 unprocessable entity
-                expect(response.status).to.eq(422);
-                // also verify the content
-                expect(response.body.success).to.eq(false);
-                expect(response.body.error).to.eq('Subscription with ID 0d8eefdd6d12456335280e2ff42431b9 not found in Shopware');
+
+                expect(response.status).to.eq(404);
+
             })
         })
 
-        it('C266658: Legacy Subscription Webhook requires Payment ID @core', () => {
+        it('C266658: Legacy /renew Storefront Webhook is gone @core', () => {
 
             cy.request({url: '/mollie/webhook/subscription/abc/renew', failOnStatusCode: false,}).then((response) => {
-                // status code needs to be 422 unprocessable entity
-                expect(response.status).to.eq(422);
-                // also verify the content
-                expect(response.body.success).to.eq(false);
-                expect(response.body.error).to.eq('Please provide a Mollie Payment ID with the payment that has been done for this subscription');
+
+                expect(response.status).to.eq(404);
+
             })
         })
 
