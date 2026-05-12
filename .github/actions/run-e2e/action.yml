@@ -90,7 +90,7 @@ runs:
       run: |
         docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
         sleep 15
-        docker exec shop bash -c "bin/console theme:compile"
+        docker exec shop bash -c "bin/console theme:change --all Storefront"
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
@@ -123,11 +123,11 @@ runs:
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:11.* -W' 
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
+        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W' 
 
     - name: Install Plugin
       shell: bash
