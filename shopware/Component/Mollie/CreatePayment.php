@@ -283,4 +283,9 @@ final class CreatePayment implements \JsonSerializable
     {
         $this->storeCredentials = true;
     }
+
+    public function isStoreCredentials(): bool
+    {
+        return $this->storeCredentials;
+    }
 }

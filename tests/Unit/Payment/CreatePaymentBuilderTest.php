@@ -125,7 +125,8 @@ final class CreatePaymentBuilderTest extends TestCase
             'cardToken' => 'testCard',
             'metadata' => [
                 'shopwareOrderNumber' => '10000'
-            ]
+            ],
+            'storeCredentials' => false
         ];
         $this->assertEquals($expected, $actual->toArray());
 
