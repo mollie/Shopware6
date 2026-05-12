@@ -7,7 +7,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\System\SystemConfig\Event\SystemConfigMultipleChangedEvent;
+use Shopware\Core\System\SystemConfig\Event\SystemConfigChangedEvent;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,14 +28,13 @@ final class SystemConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            SystemConfigMultipleChangedEvent::class => 'updateProfileId',
+            SystemConfigChangedEvent::class => 'updateProfileId',
         ];
     }
 
-    public function updateProfileId(SystemConfigMultipleChangedEvent $event): void
+    public function updateProfileId(SystemConfigChangedEvent $event): void
     {
-        $config = $event->getConfig();
-        if (! $this->hasNeededConfig($config)) {
+        if (! $this->hasNeededConfig($event->getKey())) {
             return;
         }
         $salesChannelId = $event->getSalesChannelId();
@@ -57,15 +56,17 @@ final class SystemConfigSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param array<string, null|array<mixed>|bool|float|int|string> $config
-     */
-    private function hasNeededConfig(array $config): bool
+    private function hasNeededConfig(string $key): bool
     {
         $testModeConfigKey = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_TEST_MODE;
         $liveApiConfigKey = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_LIVE_API_KEY;
         $testApiConfigKey = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_TEST_API_KEY;
+        $neededKeys = [
+            $testApiConfigKey,
+            $liveApiConfigKey,
+            $testModeConfigKey,
+        ];
 
-        return isset($config[$testModeConfigKey]) || isset($config[$liveApiConfigKey]) || isset($config[$testApiConfigKey]);
+        return in_array($key, $neededKeys, true);
     }
 }
