@@ -158,7 +158,7 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c 'php bin/console assets:install'
-        docker exec shop bash -c 'php bin/console theme:compile --all'
+        docker exec shop bash -c 'php bin/console theme:compile'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     - name: Install Fixtures
