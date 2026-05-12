@@ -157,7 +157,13 @@ final class MollieGateway implements MollieGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $response = $client->get(sprintf('customers/%s/mandates', $mollieCustomerId));
+            $response = $client->get(sprintf('customers/%s/mandates', $mollieCustomerId),[
+                'query' => [
+                    'scopes' => [
+                        'customer-present'
+                    ]
+                ]
+            ]);
             $body = json_decode($response->getBody()->getContents(), true);
             $collection = new MandateCollection();
             foreach ($body['_embedded']['mandates'] as $mandateData) {
