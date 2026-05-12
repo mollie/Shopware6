@@ -23,6 +23,9 @@ export default class LoginAction {
         }, {
             cacheAcrossSpecs: false,
             validate() {
+                cy.intercept('GET', '/account**', (req) => {
+                    req.headers['cache-control'] = 'no-cache, no-store';
+                });
                 cy.visit('/account');
                 cy.url().should('not.include', '/login');
             }
