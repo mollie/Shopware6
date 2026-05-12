@@ -73,7 +73,7 @@
     },
     "require-dev": {
         "shopware/storefront": ">=6.5.8.0 <6.8",
-        "phpunit/phpunit": "^10",
+        "phpunit/phpunit": ">=10",
         "phpstan/phpstan": "^2",
         "friendsofphp/php-cs-fixer": "^3",
         "phpcompatibility/php-compatibility": "^9",
