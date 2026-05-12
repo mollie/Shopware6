@@ -23,10 +23,12 @@ export default class LoginAction {
         }, {
             cacheAcrossSpecs: false,
             validate() {
+                cy.visit('/account');
+                cy.url().should('not.include', '/login');
             }
         });
 
-        cy.visit('/account');
+        cy.visit('/');
     }
 
 }
