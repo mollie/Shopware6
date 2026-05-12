@@ -39,6 +39,8 @@ final class CreatePayment implements \JsonSerializable
      */
     private array $methods = [];
 
+    private bool $storeCredentials = false;
+
     public function __construct(private string $description,private string $redirectUrl,private Money $amount)
     {
         $this->setSequenceType(SequenceType::ONEOFF);
@@ -275,5 +277,10 @@ final class CreatePayment implements \JsonSerializable
     public function setAuthenticationId(string $authenticationId): void
     {
         $this->authenticationId = $authenticationId;
+    }
+
+    public function storeCredentials(): void
+    {
+        $this->storeCredentials = true;
     }
 }

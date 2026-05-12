@@ -227,21 +227,9 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
                 // now we finish by first calling our URL to store
                 // the credit card token for the user and the current checkout
                 // and then we continue by submitting our original payment form.
-                this.client.post(
-                    me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
-                    JSON.stringify({
-                        shouldSaveCardDetail: this.shouldSaveCardDetail(),
-                    }),
-                    () => {
-                        const tokenInput = document.getElementById('cardToken');
-                        tokenInput.setAttribute('value', token);
-                        paymentForm.submit();
-                    },
-                    () => {
-                        paymentForm.submit();
-                    },
-                    'application/json; charset=utf-8',
-                );
+                const tokenInput = document.getElementById('cardToken');
+                tokenInput.setAttribute('value', token);
+                paymentForm.submit();
             }
         }
     }

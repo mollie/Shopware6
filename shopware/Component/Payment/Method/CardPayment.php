@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
@@ -16,6 +17,8 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
     public function applyPaymentSpecificParameters(CreatePayment $payment, RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
     {
         if ($payment->getMandateId() !== null) {
+            $payment->setSequenceType(SequenceType::ONEOFF);
+
             return $payment;
         }
 
@@ -24,6 +27,12 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
             return $payment;
         }
         $payment->setCardToken($cardToken);
+
+        $savePaymentDetails = $dataBag->get('savePaymentDetails', false);
+        if ($savePaymentDetails) {
+            $payment->storeCredentials();
+            $payment->setSequenceType(SequenceType::ONEOFF);
+        }
 
         return $payment;
     }
