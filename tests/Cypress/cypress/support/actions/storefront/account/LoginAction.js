@@ -20,17 +20,13 @@ export default class LoginAction {
 
             repo.getSubmitButton().click();
 
+            //cy.url().should('not.include', '/login');
+
         }, {
             cacheAcrossSpecs: false,
             validate() {
-                cy.request({
-                    url: '/account',
-                    headers: {'cache-control': 'no-cache, no-store'},
-                    failOnStatusCode: false,
-                }).then(response => {
-                    const loginRedirect = (response.redirects || []).some(r => r.includes('/login'));
-                    expect(loginRedirect, 'session should be valid').to.be.false;
-                });
+                cy.visit('/account');
+                cy.url().should('not.include', '/login');
             }
         });
 
