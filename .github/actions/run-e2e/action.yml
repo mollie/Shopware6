@@ -126,8 +126,7 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W' 
-        docker exec shop bash -c "bin/console theme:change --all Storefront"
+        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W'
 
     - name: Install Plugin
       shell: bash
@@ -153,6 +152,13 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowAddressEditing true'
         # clean settings inheritance
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
+        docker exec shop bash -c 'php bin/console cache:clear'
+
+    - name: Compile Theme
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console assets:install'
+        docker exec shop bash -c 'php bin/console theme:compile --all'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     - name: Install Fixtures
