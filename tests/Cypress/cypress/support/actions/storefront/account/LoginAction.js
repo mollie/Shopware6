@@ -23,11 +23,14 @@ export default class LoginAction {
         }, {
             cacheAcrossSpecs: false,
             validate() {
-                cy.intercept('GET', '/account**', (req) => {
-                    req.headers['cache-control'] = 'no-cache, no-store';
+                cy.request({
+                    url: '/account',
+                    headers: {'cache-control': 'no-cache, no-store'},
+                    failOnStatusCode: false,
+                }).then(response => {
+                    const loginRedirect = (response.redirects || []).some(r => r.includes('/login'));
+                    expect(loginRedirect, 'session should be valid').to.be.false;
                 });
-                cy.visit('/account');
-                cy.url().should('not.include', '/login');
             }
         });
 
