@@ -1,7 +1,3 @@
-import LoginRepository from 'Repositories/storefront/account/LoginRepository';
-
-const repo = new LoginRepository();
-
 export default class LoginAction {
 
     /**
@@ -13,12 +9,19 @@ export default class LoginAction {
 
         cy.session('login', () => {
 
-            cy.visit('/account');
-
-            repo.getEmail().clear().type(email, {'force': true});
-            repo.getPassword().clear().type(password, {'force': true});
-
-            repo.getSubmitButton().click({force: true});
+            cy.request({
+                method: 'POST',
+                url: '/account/login',
+                form: true,
+                followRedirect: false,
+                failOnStatusCode: false,
+                body: {
+                    username: email,
+                    password: password,
+                    redirectTo: 'frontend.account.home.page',
+                    redirectParameters: '[]',
+                },
+            });
 
         }, {
             cacheAcrossSpecs: false,
