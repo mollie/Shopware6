@@ -20,10 +20,8 @@ export default class LoginAction {
 
             repo.getSubmitButton().click();
 
-            //cy.url().should('not.include', '/login');
-
         }, {
-            cacheAcrossSpecs: false,
+            cacheAcrossSpecs: true,
             validate() {
                 cy.visit('/account');
                 cy.url().should('not.include', '/login');
