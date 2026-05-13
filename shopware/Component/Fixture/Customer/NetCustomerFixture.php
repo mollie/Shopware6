@@ -50,6 +50,7 @@ final class NetCustomerFixture extends AbstractFixture
             'firstName' => 'Cypress',
             'lastName' => 'TestUser',
             'active' => true,
+            'doubleOptInRegistration' => false,
             'createCustomerAccount' => true,
             'password' => $password,
             'email' => $email,
