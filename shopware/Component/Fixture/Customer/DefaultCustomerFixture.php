@@ -50,6 +50,7 @@ final class DefaultCustomerFixture extends AbstractFixture
             'customerNumber' => 'mollie-CYPRESS',
             'firstName' => 'Cypress',
             'lastName' => 'TestUser',
+            'active' => true,
             'createCustomerAccount' => true,
             'password' => $password,
             'email' => $email,
