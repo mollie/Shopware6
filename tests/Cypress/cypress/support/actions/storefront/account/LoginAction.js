@@ -18,7 +18,7 @@ export default class LoginAction {
             repo.getEmail().clear().type(email, {'force': true});
             repo.getPassword().clear().type(password, {'force': true});
 
-            repo.getSubmitButton().click();
+            repo.getSubmitButton().click({force: true});
 
         }, {
             cacheAcrossSpecs: false,
