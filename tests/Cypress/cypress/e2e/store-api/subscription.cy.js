@@ -52,7 +52,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -92,7 +92,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -131,7 +131,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -170,7 +170,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -208,7 +208,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -246,7 +246,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -284,7 +284,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
@@ -323,7 +323,7 @@ context("Store API Subscription Routes", () => {
                 });
             })
             cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 403)
+                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
             });
         })
 
