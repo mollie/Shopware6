@@ -49,6 +49,7 @@ final class NetCustomerFixture extends AbstractFixture
             'customerNumber' => 'mollie-net-CYPRESS',
             'firstName' => 'Cypress',
             'lastName' => 'TestUser',
+            'active' => true,
             'createCustomerAccount' => true,
             'password' => $password,
             'email' => $email,
