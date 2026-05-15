@@ -38,6 +38,9 @@ export default class OrderAttributes {
         }
         this._isMolliePayments = true;
 
+        this._paymentId = latestTransaction?.customFields?.mollie_payments?.id ?? '';
+
+
         this.customFields = orderEntity.customFields;
 
         if (this.customFields === null || this.customFields === undefined) {
@@ -62,7 +65,7 @@ export default class OrderAttributes {
      * @returns {boolean}
      */
     isMollieOrder() {
-        return this._isMolliePayments && this.customFields !== null && 'mollie_payments' in this.customFields;
+        return this._isMolliePayments;
     }
 
     /**
