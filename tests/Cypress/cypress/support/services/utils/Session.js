@@ -6,7 +6,6 @@ export default class Session {
      * needs to be done.
      */
     resetBrowserSession() {
-        return;
         // we have to clear cookies 2x to really make it work
         cy.clearCookies();
         cy.clearCookies();
