@@ -23,6 +23,8 @@ jobs:
 
       - name: Clone Code
         uses: actions/checkout@v3
+        with:
+          path: MolliePayments
 
       - name: Create Cache Directories
         run: |

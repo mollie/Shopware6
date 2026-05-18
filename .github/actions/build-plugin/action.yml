@@ -5,39 +5,18 @@ runs:
   using: "composite"
   steps:
 
-    - name: Start Docker
-      shell: bash
-      run: |
-        docker run --rm --name shop --env NODE_VERSION=22 --env PHP_VERSION=8.3 -d dockware/shopware:6.7.3.0
-        sleep 20
-        docker logs shop
-
-    - name: Update Shopware Config
-      shell: bash
-      run: |
-        docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
-
-    - name: Upload into Docker
-      shell: bash
-      run: |
-        docker cp $(pwd)/. shop:/var/www/html/custom/plugins/MolliePayments
-        docker exec shop bash -c 'sudo chown www-data:www-data /var/www/html/custom/plugins -R'
-
-
     - name: Build Plugin
       shell: bash
-      run: |
-        docker exec shop bash -c 'cd /var/www/html/custom/plugins/MolliePayments && make release'
+      working-directory: MolliePayments
+      run: make release -B
 
-    # --------------------------------------------------------------------------------------------------------------------------------------
-
-    - name: Download ZIP File
+    - name: Copy ZIP files to build cache
       shell: bash
       run: |
-        docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments.zip ~/.build/MolliePayments.zip
-        docker cp shop:/var/www/html/custom/plugins/.build/MolliePayments-e2e.zip ~/.build/MolliePayments-e2e.zip
+        cp .build/MolliePayments.zip ~/.build/MolliePayments.zip
+        cp .build/MolliePayments-e2e.zip ~/.build/MolliePayments-e2e.zip
 
-    - name: Extract ZIP file for artifact
+    - name: Extract ZIP files for artifact
       shell: bash
       run: |
         unzip ~/.build/MolliePayments.zip -d ~/.build/MolliePayments
