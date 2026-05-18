@@ -39,7 +39,7 @@ jobs:
           path: ~/.build
 
       - name: Build Plugin
-        uses: ./.github/actions/build-plugin
+        uses: ./MolliePayments/.github/actions/build-plugin
 
   e2e:
     name: E2E Core | Shopware ${{ matrix.shopware }}
