@@ -42,10 +42,10 @@ jobs:
     steps:
 
       - name: Clone Latest Code for Workflows
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Clone specific plugin version for (old) Cypress tests
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           ref: refs/tags/v${{ matrix.plugin }}
           path: repo-old-version
