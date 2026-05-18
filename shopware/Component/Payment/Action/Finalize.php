@@ -18,7 +18,7 @@ use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class Finalize
+final class Finalize implements FinalizeInterface
 {
     public function __construct(
         #[Autowire(service: TransactionService::class)]

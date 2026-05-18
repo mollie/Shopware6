@@ -31,6 +31,7 @@ final class FakeOrderService extends OrderService
 
     public function orderDeliveryStateTransition(string $orderDeliveryId, string $transition, ParameterBag $data, Context $context): StateMachineStateEntity
     {
+        return new StateMachineStateEntity();
     }
 
     public function isPaymentChangeableByTransactionState(OrderEntity $order): bool

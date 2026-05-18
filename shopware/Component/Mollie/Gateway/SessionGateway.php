@@ -18,6 +18,9 @@ final class SessionGateway implements SessionGatewayInterface
 {
     use ExceptionTrait;
 
+    private const SESSION_MAX_RETRY = 5;
+    private const SESSION_BASE_TIMEOUT = 500_000;
+
     public function __construct(
         #[Autowire(service: ClientFactory::class)]
         private ClientFactoryInterface $clientFactory,
@@ -70,18 +73,23 @@ final class SessionGateway implements SessionGatewayInterface
     {
         try {
             $salesChannelId = $salesChannelContext->getSalesChannelId();
-
             $client = $this->clientFactory->create($salesChannelId);
+
             $response = $client->get('sessions/' . $sessionId);
-            $body = json_decode($response->getBody()->getContents(), true);
+            $session = Session::createFromClientResponse(json_decode($response->getBody()->getContents(), true));
+
+            for ($i = 0; $i < self::SESSION_MAX_RETRY && $session->getShippingAddress() === null; ++$i) {
+                usleep(self::SESSION_BASE_TIMEOUT * ($i + 1));
+                $response = $client->get('sessions/' . $sessionId);
+                $session = Session::createFromClientResponse(json_decode($response->getBody()->getContents(), true));
+            }
 
             $this->logger->info('Session loaded', [
                 'sessionId' => $sessionId,
-                'responseParameter' => $body,
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            return Session::createFromClientResponse($body);
+            return $session;
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }

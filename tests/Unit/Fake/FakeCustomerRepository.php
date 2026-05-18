@@ -14,6 +14,9 @@ use Shopware\Core\Framework\Event\NestedEventCollection;
 
 final class FakeCustomerRepository extends EntityRepository
 {
+    /** @var list<array<string, mixed>> */
+    private array $upserts = [];
+
     public function __construct(private CustomerCollection $collection = new CustomerCollection())
     {
     }
@@ -41,10 +44,24 @@ final class FakeCustomerRepository extends EntityRepository
     }
 
     /**
-     * @param array<mixed> $data
+     * @param array<int, array<string, mixed>> $data
      */
     public function upsert(array $data, Context $context): EntityWrittenContainerEvent
     {
+        foreach ($data as $entry) {
+            $this->upserts[] = $entry;
+        }
+
         return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
+    }
+
+    /** @return array<string, mixed> */
+    public function getLastUpsert(): array
+    {
+        if ($this->upserts === []) {
+            throw new \RuntimeException('No upserts recorded.');
+        }
+
+        return $this->upserts[array_key_last($this->upserts)];
     }
 }

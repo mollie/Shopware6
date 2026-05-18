@@ -9,8 +9,19 @@ use Shopware\Core\Framework\Context;
 
 final class FakeOrderStateHandler implements OrderStateHandlerInterface
 {
+    private bool $shouldThrow = false;
+
+    public function setShouldThrow(bool $shouldThrow): void
+    {
+        $this->shouldThrow = $shouldThrow;
+    }
+
     public function performTransition(OrderEntity $shopwareOrder, string $shopwarePaymentStatus, string $currentState, string $salesChannelId, Context $context): string
     {
+        if ($this->shouldThrow) {
+            throw new \RuntimeException('FakeOrderStateHandler: forced failure');
+        }
+
         return '';
     }
 }

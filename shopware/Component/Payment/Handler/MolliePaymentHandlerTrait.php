@@ -6,7 +6,9 @@ namespace Mollie\Shopware\Component\Payment\Handler;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Action\Finalize;
+use Mollie\Shopware\Component\Payment\Action\FinalizeInterface;
 use Mollie\Shopware\Component\Payment\Action\Pay;
+use Mollie\Shopware\Component\Payment\Action\PayInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -15,14 +17,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 trait MolliePaymentHandlerTrait
 {
     protected LoggerInterface $logger;
-    private Pay $pay;
-    private Finalize $finalize;
+    private PayInterface $pay;
+    private FinalizeInterface $finalize;
 
     public function __construct(
         #[Autowire(service: Pay::class)]
-        Pay $pay,
+        PayInterface $pay,
         #[Autowire(service: Finalize::class)]
-        Finalize $finalize,
+        FinalizeInterface $finalize,
         #[Autowire(service: 'monolog.logger.mollie')]
         LoggerInterface $logger,
     ) {

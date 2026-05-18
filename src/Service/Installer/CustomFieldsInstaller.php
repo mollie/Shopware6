@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Installer;
 
+use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
@@ -22,6 +23,10 @@ class CustomFieldsInstaller
     private const ID_SUBSCRIPTION_INTERVAL = 'e2ee7ee0fcb44b2c8fb41d91edcc0b16';
     private const ID_SUBSCRIPTION_INTERVAL_UNIT = '5dde0b79c6804c2a93e6137e8699cd0f';
     private const ID_SUBSCRIPTION_REPETITION = '786f49b48bf34a418c5edb5503f31de5';
+    // --------------------------------------------------------------------------------
+    private const ID_ADDRESS_FIELDSET = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4';
+    private const ID_RELATION_ADDRESS = 'b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5';
+    private const ID_EXPRESS_ADDRESS_ID = 'c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6';
 
     /**
      * @var EntityRepository<EntityCollection<CustomFieldSetEntity>>
@@ -39,6 +44,38 @@ class CustomFieldsInstaller
     public function install(Context $context): void
     {
         $this->installProductData($context);
+        $this->installAddressData($context);
+    }
+
+    private function installAddressData(Context $context): void
+    {
+        $this->repoCustomFields->upsert([
+            [
+                'id' => self::ID_ADDRESS_FIELDSET,
+                'name' => 'mollie_payments_address',
+                'active' => true,
+                'relations' => [
+                    [
+                        'id' => self::ID_RELATION_ADDRESS,
+                        'entityName' => 'customer_address',
+                    ],
+                ],
+                'customFields' => [
+                    [
+                        'id' => self::ID_EXPRESS_ADDRESS_ID,
+                        'name' => Address::CUSTOM_FIELDS_KEY,
+                        'active' => true,
+                        'allowCustomerWrite' => true,
+                        'type' => CustomFieldTypes::TEXT,
+                        'config' => [
+                            'customFieldPosition' => 1,
+                            'componentName' => 'sw-field',
+                            'customFieldType' => 'text',
+                        ],
+                    ],
+                ],
+            ],
+        ], $context);
     }
 
     private function installProductData(Context $context): void
