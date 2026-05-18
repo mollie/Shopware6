@@ -7,6 +7,7 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 final class FakeSalesChannelContext extends SalesChannelContext
 {
@@ -39,6 +40,15 @@ final class FakeSalesChannelContext extends SalesChannelContext
     public function getSalesChannelId(): string
     {
         return $this->fakeSalesChannelId;
+    }
+
+    public function getSalesChannel(): SalesChannelEntity
+    {
+        $salesChannel = new SalesChannelEntity();
+        $salesChannel->setId($this->fakeSalesChannelId);
+        $salesChannel->setName('Fake Sales Channel');
+
+        return $salesChannel;
     }
 
     public function getToken(): string

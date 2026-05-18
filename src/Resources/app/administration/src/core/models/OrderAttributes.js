@@ -40,7 +40,6 @@ export default class OrderAttributes {
 
         this._paymentId = latestTransaction?.customFields?.mollie_payments?.id ?? '';
 
-
         this.customFields = orderEntity.customFields;
 
         if (this.customFields === null || this.customFields === undefined) {

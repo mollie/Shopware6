@@ -34,7 +34,7 @@ final class Session extends Struct implements \JsonSerializable
         $billingAddress = $body['billingAddress'] ?? null;
 
         if ($shippingAddress) {
-            if (! isset($shippingAddress['givenName'])) {
+            if (! isset($shippingAddress['givenName']) || mb_strlen((string) $shippingAddress['givenName']) === 0) {
                 $shippingAddress['givenName'] = $billingAddress['givenName'] ?? null;
                 $shippingAddress['familyName'] = $billingAddress['familyName'] ?? null;
             }

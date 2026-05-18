@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Mollie;
 
 use Mollie\Shopware\Component\Mollie\Exception\MissingCountryException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
@@ -12,16 +13,16 @@ use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 final class Address implements \JsonSerializable
 {
     use JsonSerializableTrait;
-    public const CUSTOM_FIELDS_KEY = 'express_address_id';
+    public const CUSTOM_FIELDS_KEY = 'mollie_payments_express_address_id';
     private string $title;
     private string $givenName;
     private string $familyName;
-    private string $organizationName;
+    private string $organizationName = '';
     private string $streetAndNumber;
-    private string $streetAdditional;
+    private string $streetAdditional = '';
     private string $postalCode;
     private string $email;
-    private string $phone;
+    private string $phone = '';
     private string $city;
     private string $country;
 
@@ -77,6 +78,46 @@ final class Address implements \JsonSerializable
         return $address;
     }
 
+    public static function fromCustomerAddress(CustomerAddressEntity $customerAddress): self
+    {
+        $customer = $customerAddress->getCustomer();
+        $country = $customerAddress->getCountry();
+
+        $address = new self(
+            $customer !== null ? $customer->getEmail() : '',
+            '',
+            (string) $customerAddress->getFirstName(),
+            (string) $customerAddress->getLastName(),
+            (string) $customerAddress->getStreet(),
+            (string) $customerAddress->getZipcode(),
+            (string) $customerAddress->getCity(),
+            $country !== null ? (string) $country->getIso() : '',
+        );
+
+        $additionalAddressLines = [];
+        if ($customerAddress->getAdditionalAddressLine1()) {
+            $additionalAddressLines[] = $customerAddress->getAdditionalAddressLine1();
+        }
+        if ($customerAddress->getAdditionalAddressLine2()) {
+            $additionalAddressLines[] = $customerAddress->getAdditionalAddressLine2();
+        }
+        if (count($additionalAddressLines) > 0) {
+            $address->setStreetAdditional(implode(' ', $additionalAddressLines));
+        }
+
+        $phone = $customerAddress->getPhoneNumber();
+        if ($phone !== null && $phone !== '') {
+            $address->setPhone($phone);
+        }
+
+        $company = $customerAddress->getCompany();
+        if ($company !== null && $company !== '') {
+            $address->setOrganizationName($company);
+        }
+
+        return $address;
+    }
+
     /**
      * @param array<string, mixed> $body
      */
@@ -101,6 +142,35 @@ final class Address implements \JsonSerializable
         }
 
         return $address;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $data = [
+            'title' => $this->title,
+            'givenName' => $this->givenName,
+            'familyName' => $this->familyName,
+            'streetAndNumber' => $this->streetAndNumber,
+            'postalCode' => $this->postalCode,
+            'email' => $this->email,
+            'city' => $this->city,
+            'country' => $this->country,
+        ];
+
+        if ($this->streetAdditional !== '') {
+            $data['streetAdditional'] = $this->streetAdditional;
+        }
+        if ($this->organizationName !== '') {
+            $data['organizationName'] = $this->organizationName;
+        }
+        if ($this->phone !== '') {
+            $data['phone'] = $this->phone;
+        }
+
+        return $data;
     }
 
     /**

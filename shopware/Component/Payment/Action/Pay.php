@@ -31,7 +31,7 @@ use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-final class Pay
+final class Pay implements PayInterface
 {
     public function __construct(
         #[Autowire(service: TransactionService::class)]
