@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Fake;
 
 use Mollie\Shopware\Component\Mollie\Mode;
+use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
@@ -25,6 +26,8 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?OrderStateSettings $orderStateSettings = null,
         private ?SubscriptionSettings $subscriptionSettings = null,
         private ?EnvironmentSettings $environmentSettings = null,
+        private ?PayPalExpressSettings $paypalExpressSettings = null,
+        private ?ApplePaySettings $applePaySettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -42,11 +45,14 @@ final class FakeSettingsService extends AbstractSettingsService
         if ($this->subscriptionSettings === null) {
             $this->subscriptionSettings = new SubscriptionSettings();
         }
+        if ($this->paypalExpressSettings === null) {
+            $this->paypalExpressSettings = new PayPalExpressSettings(false);
+        }
     }
 
     public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings
     {
-        // TODO: Implement getPaypalExpressSettings() method.
+        return $this->paypalExpressSettings;
     }
 
     public function getEnvironmentSettings(): EnvironmentSettings
@@ -91,7 +97,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getApplePaySettings(?string $salesChannelId = null): ApplePaySettings
     {
-        // TODO: Implement getApplePaySettings() method.
+        return $this->applePaySettings ?? new ApplePaySettings(false, new VisibilityRestrictionCollection(), []);
     }
 
     public function getOrderStateSettings(?string $salesChannelId = null): OrderStateSettings

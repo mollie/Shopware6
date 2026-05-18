@@ -19,6 +19,7 @@ final class FakeClient extends Client
         private ?PaymentMethod $method = PaymentMethod::PAYPAL,
         private ?bool $embed = false,
         private ?string $checkoutUrl = null,
+        private ?array $amountCaptured = null,
     ) {
         if ($id === null) {
             $this->response = new Response(status: 500, body: json_encode([
@@ -29,9 +30,15 @@ final class FakeClient extends Client
 
             return;
         }
-        $body = ['id' => $id, 'status' => $status, 'method' => $method->value];
+        $body = ['id' => $id, 'status' => $status];
+        if ($method !== null) {
+            $body['method'] = $method->value;
+        }
         if ($this->checkoutUrl !== null) {
             $body['_links']['checkout']['href'] = $this->checkoutUrl;
+        }
+        if ($this->amountCaptured !== null) {
+            $body['amountCaptured'] = $this->amountCaptured;
         }
         if ($embed) {
             $body['_embedded']['payments'][0] = $body;

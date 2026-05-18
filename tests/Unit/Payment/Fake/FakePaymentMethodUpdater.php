@@ -10,8 +10,19 @@ use Shopware\Core\Framework\Context;
 
 final class FakePaymentMethodUpdater implements PaymentMethodUpdaterInterface
 {
+    private bool $shouldThrow = false;
+
+    public function setShouldThrow(bool $shouldThrow): void
+    {
+        $this->shouldThrow = $shouldThrow;
+    }
+
     public function updatePaymentMethod(PaymentMethodExtension $paymentMethodExtension, PaymentMethod $molliePaymentMethod, string $transactionId, string $orderNumber, string $salesChannelId, Context $context): string
     {
+        if ($this->shouldThrow) {
+            throw new \RuntimeException('FakePaymentMethodUpdater: forced failure');
+        }
+
         return '';
     }
 }

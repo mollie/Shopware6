@@ -44,6 +44,8 @@ final class FakeTransactionService implements TransactionServiceInterface
     private bool $withZeroShippingCosts = false;
 
     private bool $withoutOrder = false;
+    private bool $withoutPaymentMethod = false;
+    private bool $withoutMollieExtensionOnPaymentMethod = false;
 
     public function __construct()
     {
@@ -77,6 +79,16 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function withoutOrder(): void
     {
         $this->withoutOrder = true;
+    }
+
+    public function withoutPaymentMethod(): void
+    {
+        $this->withoutPaymentMethod = true;
+    }
+
+    public function withoutMollieExtensionOnPaymentMethod(): void
+    {
+        $this->withoutMollieExtensionOnPaymentMethod = true;
     }
 
     public function withOrderCustomFields(array $customFields): void
@@ -131,10 +143,15 @@ final class FakeTransactionService implements TransactionServiceInterface
 
             $paymentMethod = new PaymentMethodEntity();
             $paymentMethod->setId('testShopwareId');
-            $paymentMethod->addExtension(Mollie::EXTENSION, new PaymentMethodExtension('testShopwareId', PaymentMethod::CREDIT_CARD));
 
-            $transaction->setPaymentMethodId($paymentMethod->getId());
-            $transaction->setPaymentMethod($paymentMethod);
+            if (! $this->withoutMollieExtensionOnPaymentMethod) {
+                $paymentMethod->addExtension(Mollie::EXTENSION, new PaymentMethodExtension('testShopwareId', PaymentMethod::CREDIT_CARD));
+            }
+
+            if (! $this->withoutPaymentMethod) {
+                $transaction->setPaymentMethodId($paymentMethod->getId());
+                $transaction->setPaymentMethod($paymentMethod);
+            }
         }
         $order = $this->orderRepository->getDefaultOrder($customer);
         $order->setCurrency($currency);

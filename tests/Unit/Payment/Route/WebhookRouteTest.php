@@ -5,10 +5,10 @@ namespace Mollie\Shopware\Unit\Payment\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Route\WebhookException;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
-use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
@@ -49,31 +49,173 @@ final class WebhookRouteTest extends TestCase
 
         $webhookRoute = $this->getRoute($transactionService);
         try {
-            $response = $webhookRoute->notify('test', $this->context);
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
         } catch (WebhookException $exception) {
-            $this->assertSame(WebhookException::TRANSACTION_WITHOUT_ORDER,$exception->getErrorCode());
+            $this->assertSame(WebhookException::TRANSACTION_WITHOUT_ORDER, $exception->getErrorCode());
         }
     }
 
-    private function getRoute(?TransactionServiceInterface $transactionService = null): WebhookRoute
+    public function testWebhookWithOpenStatusSkipsPaymentStatusChange(): void
     {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $fakeClient = new FakeClient('mollieTestId', 'open');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient);
+
+        $response = $webhookRoute->notify('test', $this->context);
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+    }
+
+    public function testPaymentStatusChangeFailedThrowsWebhookException(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $stateHandler = new FakeOrderTransactionStateHandler();
+        $stateHandler->setShouldThrow(true);
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $stateHandler);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::PAYMENT_STATUS_CHANGE_FAILED, $exception->getErrorCode());
+        }
+    }
+
+    public function testPaymentWithoutMethodThrowsWebhookException(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid', null);
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::PAYMENT_WITHOUT_METHOD, $exception->getErrorCode());
+        }
+    }
+
+    public function testTransactionWithoutPaymentMethodThrowsWebhookException(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withoutPaymentMethod();
+
+        $webhookRoute = $this->getRoute($transactionService);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::TRANSACTION_WITHOUT_PAYMENT_METHOD, $exception->getErrorCode());
+        }
+    }
+
+    public function testTransactionWithoutMolliePaymentThrowsWebhookException(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withoutMollieExtensionOnPaymentMethod();
+
+        $webhookRoute = $this->getRoute($transactionService);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::TRANSACTION_WITHOUT_MOLLIE_PAYMENT, $exception->getErrorCode());
+        }
+    }
+
+    public function testPaymentMethodChangeFailedThrowsWebhookException(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $paymentMethodUpdater = new FakePaymentMethodUpdater();
+        $paymentMethodUpdater->setShouldThrow(true);
+
+        $webhookRoute = $this->getRoute($transactionService, null, null, $paymentMethodUpdater);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::PAYMENT_METHOD_CHANGE_FAILED, $exception->getErrorCode());
+        }
+    }
+
+    public function testOrderStatusChangeFailedThrowsWebhookException(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $orderStateHandler = new FakeOrderStateHandler();
+        $orderStateHandler->setShouldThrow(true);
+
+        $webhookRoute = $this->getRoute($transactionService, null, null, null, $orderStateHandler);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::ORDER_STATUS_CHANGE_FAILED, $exception->getErrorCode());
+        }
+    }
+
+    public function testWebhookWithCapturedAmountShipsOrder(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $fakeClient = new FakeClient(
+            'mollieTestId',
+            'paid',
+            PaymentMethod::PAYPAL,
+            false,
+            null,
+            ['value' => '100.00', 'currency' => 'EUR'],
+        );
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient);
+
+        $response = $webhookRoute->notify('test', $this->context);
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+    }
+
+    private function getRoute(
+        ?FakeTransactionService $transactionService = null,
+        ?FakeClient $fakeClient = null,
+        ?FakeOrderTransactionStateHandler $stateHandler = null,
+        ?FakePaymentMethodUpdater $paymentMethodUpdater = null,
+        ?FakeOrderStateHandler $orderStateHandler = null,
+    ): WebhookRoute {
         if ($transactionService === null) {
             $transactionService = new FakeTransactionService();
             $transactionService->createValidStruct();
         }
 
-        $logger = new NullLogger();
-        $fakeClient = new FakeClient('mollieTestId', 'paid');
-        $fakeClientFactory = new FakeClientFactory($fakeClient);
+        if ($fakeClient === null) {
+            $fakeClient = new FakeClient('mollieTestId', 'paid');
+        }
 
+        $logger = new NullLogger();
+        $fakeClientFactory = new FakeClientFactory($fakeClient);
         $gateway = new MollieGateway($fakeClientFactory, $transactionService, $logger);
 
         return new WebhookRoute(
             $gateway,
-            new FakeOrderTransactionStateHandler(),
+            $stateHandler ?? new FakeOrderTransactionStateHandler(),
             new EventSpy(),
-            new FakePaymentMethodUpdater(),
-            new FakeOrderStateHandler(),
+            $paymentMethodUpdater ?? new FakePaymentMethodUpdater(),
+            $orderStateHandler ?? new FakeOrderStateHandler(),
             new FakeOrderService(),
             $logger
         );
