@@ -181,33 +181,20 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 
 # -------------------------------------------------------------------------------------------------
 IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' 'MolliePayments/package.json' 'MolliePayments/package-lock.json' 'MolliePayments/composer.lock'
-IGNORED_FINAL = $(IGNORED)  '*/tests*' 'MolliePayments/config/*' '*/makefile'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
-ifneq (,$(findstring v12,$(NODE_VERSION)))
-	$(warning Attention, reqruires Node v14 or higher to build a release!)
-	@exit 1
-endif
-
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	# -------------------------------------------------------------------------------------------------
-	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
-	make clean -B
-	cd src/Resources/app/administration && npm install
+	cp ./config/.shopware-extension.yml .shopware-extension.yml
 	cd src/Resources/app/storefront && npm install
-	make build use67=true -B
-	# -------------------------------------------------------------------------------------------------
-	@echo "INSTALL PRODUCTION DEPENDENCIES"
-	# DELETE distribution file. that ones not compatible between 6.5 and 6.4
-	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
-	# in our plugin configuration! (use shopware standard js)
-	rm -rf ./src/Resources/app/storefront/dist/storefront
-	# -------------------------------------------------------------------------------------------------
-	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x $(IGNORED_FINAL)
+	# Marketplace ZIP: shopware-cli baut JS + erstellt ZIP mit Excludes aus .shopware-extension.yml
+	docker run --rm \
+		-v "$(CURDIR)/..":/plugins \
+		-w /plugins/.build \
+		ghcr.io/shopware/shopware-cli:latest \
+		extension zip /plugins/MolliePayments --disable-git
+	rm -f .shopware-extension.yml
+	# E2E ZIP: JS-Artefakte sind jetzt durch den docker run vorhanden, Tests bleiben drin
 	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x $(IGNORED)
-	# -------------------------------------------------------------------------------------------------
-	# -------------------------------------------------------------------------------------------------
 	@echo ""
 	@echo "CONGRATULATIONS"
-	@echo "The new ZIP file is available at plugins/.build/MolliePayments.zip"
+	@echo "ZIP files available at plugins/.build/"
