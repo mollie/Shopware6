@@ -25,4 +25,4 @@ jobs:
           path: ~/.build
 
       - name: Build Plugin
-        uses: ./.github/actions/build-plugin
+        uses: ./MolliePayments/.github/actions/build-plugin
