@@ -9,8 +9,5 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js'],
-        alias: {
-            '@shopware-storefront-sdk': resolve(join(__dirname, 'src_vendor', 'shopware-storefront-sdk')),
-        },
     },
 };

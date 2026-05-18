@@ -1,4 +1,3 @@
-import MollieCreditCardComponents from './mollie-payments/plugins/creditcard-components.plugin';
 import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard-components-sw64.plugin';
 import MollieApplePayDirect from './mollie-payments/plugins/express/apple-pay-direct.plugin';
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
@@ -36,13 +35,7 @@ export default class MollieRegistration {
         );
 
         // showing credit card components in the checkout
-        // we have 2 versions for < Shopware 6.4 and >= Shopware 6.4
         // -----------------------------------------------------------------------------
-        pluginManager.register(
-            'MollieCreditCardComponents',
-            MollieCreditCardComponents,
-            '[data-mollie-template-creditcard-components]',
-        );
         pluginManager.register(
             'MollieCreditCardComponentsSw64',
             MollieCreditCardComponentsSw64,

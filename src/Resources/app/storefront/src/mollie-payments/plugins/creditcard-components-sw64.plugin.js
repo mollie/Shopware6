@@ -1,4 +1,3 @@
-import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 import DeviceDetectionHelper from '../helper/device-detection.helper';
 import CsrfAjaxModeHelper from '../helper/csrf-ajax-mode.helper';
@@ -12,14 +11,15 @@ const ERROR_CLS = 'error';
 const FOCUS_CLS = 'is-focused';
 
 export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
-    static options = deepmerge(MollieCreditCardMandate.options, {
+    static options = {
+        ...MollieCreditCardMandate.options,
         paymentId: null,
         customerId: null,
         locale: null,
         profileId: null,
         shopUrl: null,
         testMode: true,
-    });
+    };
 
     /**
      *

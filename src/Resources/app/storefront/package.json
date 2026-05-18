@@ -4,7 +4,7 @@
     "description": "",
     "author": "Mollie B.V.",
     "devDependencies": {
-        "deepmerge": "^4.2.2",
+        "@friendsofshopware/storefront-sdk": "^0.1.8",
         "webpack": "^5.102.1",
         "webpack-cli": "^6.0.1"
     }
