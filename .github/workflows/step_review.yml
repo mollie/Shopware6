@@ -16,7 +16,7 @@ jobs:
     name: Install Dev Dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         # -----------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -24,7 +24,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
         # -----------------------------------
       - name: Mount Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -65,7 +65,7 @@ jobs:
     needs: install_dev
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -73,7 +73,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -91,10 +91,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -112,10 +112,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -133,10 +133,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -154,10 +154,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -194,7 +194,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -202,7 +202,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -220,7 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -228,7 +228,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -247,7 +247,7 @@ jobs:
     steps:
 
       - name: Clone Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -255,7 +255,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
