@@ -38,8 +38,8 @@ final class RecordAnonymizer implements ProcessorInterface
             channel: $record->channel,
             level: $record->level,
             message: $record->message,
-            context: $recordArray['context'] ?? [],
-            extra: $recordArray['extra'] ?? [],
+            context: $recordArray['context'],
+            extra: $recordArray['extra'],
             formatted: $record->formatted,
         );
     }

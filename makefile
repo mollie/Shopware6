@@ -61,23 +61,7 @@ clean: ##1 Cleans all dependencies and files
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 
 
-build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
-	sudo apt-get update --allow-releaseinfo-change -y
-	sudo apt-get install zip
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
-	# CUSTOM WEBPACK
-	cd ./src/Resources/app/storefront && make build -B
-	rm -f .shopware-extension.yml
-ifeq ($(use67),true)
-	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
-	cd ../../.. && $(EXPORT_CMD) shopware-cli extension build custom/plugins/MolliePayments
-endif
-	cp ./config/.shopware-extension.yml .shopware-extension.yml
-	cd ../../.. && $(EXPORT_CMD) shopware-cli extension build custom/plugins/MolliePayments
-
-	rm -f .shopware-extension.yml
-	# -----------------------------------------------------
-	# -----------------------------------------------------
+build: ##2 Runs the Shopware theme and asset pipeline (JS assets must be built beforehand via shopware-cli).
 	cd ../../.. && php bin/console --no-debug theme:refresh
 	cd ../../.. && php bin/console --no-debug theme:compile
 	cd ../../.. && php bin/console --no-debug theme:refresh
@@ -184,15 +168,13 @@ IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.ph
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	cp ./config/.shopware-extension.yml .shopware-extension.yml
-	cd src/Resources/app/storefront && npm install
 	# Marketplace ZIP: shopware-cli baut JS + erstellt ZIP mit Excludes aus .shopware-extension.yml
 	docker run --rm \
 		-v "$(CURDIR)/..":/plugins \
+		-v "$(CURDIR)/config/.shopware-extension.yml":/plugins/MolliePayments/.shopware-extension.yml \
 		-w /plugins/.build \
 		ghcr.io/shopware/shopware-cli:latest \
 		extension zip /plugins/MolliePayments --disable-git
-	rm -f .shopware-extension.yml
 	# E2E ZIP: JS-Artefakte sind jetzt durch den docker run vorhanden, Tests bleiben drin
 	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x $(IGNORED)
 	@echo ""
