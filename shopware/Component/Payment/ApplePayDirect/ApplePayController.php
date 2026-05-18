@@ -64,10 +64,8 @@ final class ApplePayController extends StorefrontController
         }
 
         return new JsonResponse([
-            'data' => [
-                'success' => $success,
-                'session' => json_encode($session),
-            ]
+            'success' => $success,
+            'session' => json_encode($session),
         ]);
     }
 
@@ -92,11 +90,8 @@ final class ApplePayController extends StorefrontController
         return new JsonResponse([
             'success' => $success,
             'shippingmethods' => $shippingMethods,
-            'data' => [
-                'cart' => $cart,
-                'error' => $error,
-                'success' => $success,
-            ]
+            'cart' => $cart,
+            'error' => $error,
         ]);
     }
 
@@ -117,11 +112,9 @@ final class ApplePayController extends StorefrontController
         }
 
         return new JsonResponse([
-            'data' => [
-                'success' => $success,
-                'cart' => $cart,
-                'error' => $error,
-            ]
+            'success' => $success,
+            'cart' => $cart,
+            'error' => $error,
         ]);
     }
 
