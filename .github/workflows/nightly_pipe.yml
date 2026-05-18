@@ -22,7 +22,7 @@ jobs:
     steps:
 
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: MolliePayments
 
@@ -31,7 +31,7 @@ jobs:
           mkdir -p ~/.build
 
       - name: Mount Build Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: cache-plugin-${{ github.run_id }}
           path: ~/.build
@@ -116,10 +116,10 @@ jobs:
     steps:
 
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Mount Build Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: cache-plugin-${{ github.run_id }}
           path: ~/.build
