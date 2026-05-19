@@ -49,6 +49,8 @@
 - Trustly is deprecated and will not be activated after the update. Please deactivate the payment method and remove it from the sales channel.
 - Removed: The Apple Pay Direct route `POST /mollie/apple-pay/add-product` (storefront) and `POST /store-api/mollie/applepay/add-product` (Store API) have been removed. Use Shopware's native add-to-cart route (`POST /store-api/checkout/cart/line-item`) with `isExpressCheckout: true` in the request body instead.
 - Added: price changes on subscription products can now be applied to running subscriptions.
+- Reworked: Subscriptions now support mixed carts. Customers can combine subscription products, regular products, and vouchers in a single order. Previously only one subscription product per order was allowed.
+- Changed: Storefront JavaScript has been migrated to native Shopware JavaScript.
 
 # 4.23.0
 - New: Added Vipps as a payment method.
