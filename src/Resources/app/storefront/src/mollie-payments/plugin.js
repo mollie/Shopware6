@@ -9,7 +9,10 @@ export default class Plugin {
     }
 
     _mergeOptions(options) {
-        const dashedName = this._pluginName.replace(/([A-Z])/g, '-$1').replace(/^-/, '').toLowerCase();
+        const dashedName = this._pluginName
+            .replace(/([A-Z])/g, '-$1')
+            .replace(/^-/, '')
+            .toLowerCase();
         let dataAttrOptions = {};
         if (this.el && typeof this.el.getAttribute === 'function') {
             const raw = this.el.getAttribute(`data-${dashedName}-options`);
