@@ -72,7 +72,7 @@ inputs:
     required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
-    default: '~/.build/MolliePayments-e2e.zip'
+    default: '~/.build/MolliePayments.zip'
     required: false
 
 
@@ -111,6 +111,13 @@ runs:
       run: |
         docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
+
+    - name: Copy test files into Docker
+      shell: bash
+      run: |
+        docker cp tests/ shop:/var/www/html/custom/plugins/MolliePayments/tests/
+        docker cp config/ shop:/var/www/html/custom/plugins/MolliePayments/config/
+        docker cp makefile shop:/var/www/html/custom/plugins/MolliePayments/makefile
 
     - name: Configure Shopware
       shell: bash

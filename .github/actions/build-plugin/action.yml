@@ -10,19 +10,15 @@ runs:
       working-directory: MolliePayments
       run: make release -B
 
-    - name: Copy ZIP files to build cache
+    - name: Copy ZIP to build cache
       shell: bash
-      run: |
-        cp .build/MolliePayments.zip ~/.build/MolliePayments.zip
-        cp .build/MolliePayments-e2e.zip ~/.build/MolliePayments-e2e.zip
+      run: cp .build/MolliePayments.zip ~/.build/MolliePayments.zip
 
-    - name: Extract ZIP files for artifact
+    - name: Extract ZIP for artifact
       shell: bash
-      run: |
-        unzip ~/.build/MolliePayments.zip -d ~/.build/MolliePayments
-        unzip ~/.build/MolliePayments-e2e.zip -d ~/.build/MolliePayments-e2e
+      run: unzip ~/.build/MolliePayments.zip -d ~/.build/MolliePayments
 
-    - name: Store ZIP file in Github
+    - name: Store ZIP in Github
       uses: actions/upload-artifact@v4
       with:
         name: MolliePayments-Shopware
@@ -30,16 +26,6 @@ runs:
         retention-days: 4
         path: ~/.build/MolliePayments
 
-    - name: Store e2e ZIP file in Github
-      uses: actions/upload-artifact@v4
-      with:
-        name: MolliePayments-Shopware-e2e
-        include-hidden-files: true
-        retention-days: 4
-        path: ~/.build/MolliePayments-e2e
-
     - name: Delete TMP files
       shell: bash
-      run: |
-        rm -rf ~/.build/MolliePayments
-        rm -rf ~/.build/MolliePayments-e2e
+      run: rm -rf ~/.build/MolliePayments
