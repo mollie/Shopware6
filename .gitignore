@@ -20,6 +20,7 @@ config-*
 composer.lock
 package-lock.json
 .tmp
+.shopware-extension.yml
 
 .php-cs-fixer.cache
 /.ai/
