@@ -57,5 +57,9 @@ export default class MollieRegistration {
         // UNIVERSAL PHONE VALIDATION
         // -----------------------------------------------------------------------------
         pluginManager.register('MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]');
+
+        // Our bundle loads after Shopware's main initializePlugins() call, so we
+        // must trigger another initialization round for our newly registered plugins.
+        pluginManager.initializePlugins();
     }
 }
