@@ -38,6 +38,8 @@
 - Neues Event ModifyCreateSubscriptionPayloadEvent hinzugefügt. Damit können Entwickler den Payload für die Mollie Subscription API vor dem Erstellen einer Subscription anpassen und erweitern.
 - Trustly ist veraltet und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
 - Hinzugefügt: Preisanpassungen bei Abo-Produkten können nun berücksichtigt werden.
+- Überarbeitet: Abonnements unterstützen nun gemischte Warenkörbe. Kunden können Abo-Produkte, reguläre Produkte und Gutscheine in einer einzigen Bestellung kombinieren. Bisher war nur ein Abo-Produkt pro Bestellung möglich.
+- Geändert: Das Storefront-JavaScript wurde auf natives Shopware-JavaScript umgestellt.
 
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.
