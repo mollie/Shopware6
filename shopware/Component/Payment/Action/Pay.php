@@ -47,7 +47,7 @@ final class Pay implements PayInterface
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
