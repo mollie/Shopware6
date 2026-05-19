@@ -107,7 +107,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/validate').then(response => {
-                    resolve({'data': response.data.data});
+                    resolve({'data': response.data});
                 });
             })
 
@@ -136,7 +136,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/shipping-methods', {}).then(response => {
-                    resolve({'data': response.data.data});
+                    resolve({'data': response.data});
                 });
             })
 
@@ -150,7 +150,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/set-shipping').then(response => {
-                    resolve({'data': response.data.data});
+                    resolve({'data': response.data});
                 });
             })
 
