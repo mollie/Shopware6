@@ -130,7 +130,7 @@ insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
 vitest: ##3 Starts all Vitest tests
-	./dev/node_modules/.bin/vitest -c ./config/vitest.config.ts
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/vitest -c ./config/vitest.config.ts
 
 eslint: ##3 Starts the ESLinter
 ifndef mode
