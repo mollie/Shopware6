@@ -168,15 +168,12 @@ IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.ph
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	# Marketplace ZIP: shopware-cli baut JS + erstellt ZIP mit Excludes aus .shopware-extension.yml
 	docker run --rm \
 		-v "$(CURDIR)/..":/plugins \
 		-v "$(CURDIR)/config/.shopware-extension.yml":/plugins/MolliePayments/.shopware-extension.yml \
 		-w /plugins/.build \
 		ghcr.io/shopware/shopware-cli:latest \
 		extension zip /plugins/MolliePayments --disable-git
-	# E2E ZIP: JS-Artefakte sind jetzt durch den docker run vorhanden, Tests bleiben drin
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x $(IGNORED)
 	@echo ""
 	@echo "CONGRATULATIONS"
-	@echo "ZIP files available at plugins/.build/"
+	@echo "ZIP file available at plugins/.build/"
