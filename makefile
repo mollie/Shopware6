@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-.PHONY: help
+.PHONY: help prod dev clean build fixtures pr release
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
@@ -35,15 +35,14 @@ prod: ##1 Installs all production dependencies
 	# ----------------------------------------------------------------
 	composer validate
 	composer install --no-dev
-	npm install --omit=dev
 	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
 	composer validate
 	composer install
-	npm install
-	chmod a+x node_modules/.bin/prettier
+	cd dev && npm install
+	chmod a+x dev/node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
 
@@ -53,7 +52,7 @@ clean: ##1 Cleans all dependencies and files
 	# ------------------------------------------------------
 	rm -rf .reports | true
 	# ------------------------------------------------------
-	rm -rf ./node_modules/*
+	rm -rf ./dev/node_modules/*
 	rm -rf config-*
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
@@ -131,30 +130,30 @@ insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
 vitest: ##3 Starts all Vitest tests
-	npx vitest -c ./config/vitest.config.ts
+	./dev/node_modules/.bin/vitest -c ./config/vitest.config.ts
 
 eslint: ##3 Starts the ESLinter
 ifndef mode
-	./node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
 endif
 
 stylelint: ##3 Starts the Stylelinter
 ifndef mode
-	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --config=./config/.stylelintrc
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --config=./config/.stylelintrc
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix --config=./config/.stylelintrc
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix --config=./config/.stylelintrc
 endif
 
 prettier: ##3 Starts the Prettier
 ifndef mode
-	./node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --check
+	./dev/node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --check
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --write
+	./dev/node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --write
 endif
 
 configcheck: ##3 Tests and verifies the plugin configuration file
@@ -164,7 +163,6 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
-IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' 'MolliePayments/package.json' 'MolliePayments/package-lock.json' 'MolliePayments/composer.lock'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build

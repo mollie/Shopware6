@@ -14,7 +14,7 @@ config-*
 /tests/Cypress/cypress/results
 /src/Resources/app/administration/.stryker-tmp
 /.phpunuhi/
-/node_modules/
+/dev/node_modules/
 /src/Resources/public/administration/.vite
 /src/Resources/public/administration/assets/
 composer.lock
