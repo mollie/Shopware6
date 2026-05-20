@@ -39,6 +39,8 @@ final class Payment extends Struct implements \JsonSerializable
 
     private bool $cancelable = false;
 
+    private ?string $orderId = null;
+
     public function __construct(private string $id)
     {
     }
@@ -265,6 +267,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setChangePaymentStateUrl(string $changePaymentStateUrl): void
     {
         $this->changePaymentStateUrl = $changePaymentStateUrl;
+    }
+
+    public function getOrderId(): ?string
+    {
+        return $this->orderId;
+    }
+
+    public function setOrderId(?string $orderId): void
+    {
+        $this->orderId = $orderId;
     }
 
     public function getAuthenticationId(): ?string

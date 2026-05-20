@@ -6,12 +6,14 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\Capture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
@@ -70,6 +72,7 @@ final class MollieGateway implements MollieGatewayInterface
 
             $payment = $this->getPayment($mollieTransaction->getId(), $orderNumber, $salesChannelId);
             $payment->setFinalizeUrl($mollieTransaction->getFinalizeUrl());
+            $payment->setOrderId($mollieTransaction->getOrderId());
         }
 
         if ($mollieTransaction === null) {
@@ -110,6 +113,31 @@ final class MollieGateway implements MollieGatewayInterface
             return Payment::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $shopwareOrderNumber);
+        }
+    }
+
+    public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
+    {
+        $orderNumber = $createOrder->getOrderNumber();
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $formParams = $createOrder->toArray();
+
+            $response = $client->post('orders', [
+                'form_params' => $formParams,
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Mollie Order created', [
+                'requestParameter' => $formParams,
+                'responseParameter' => $body,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Order::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
         }
     }
 
@@ -354,6 +382,7 @@ final class MollieGateway implements MollieGatewayInterface
         }
 
         $payment = $this->getPaymentByMollieOrderId($mollieOrderId, $orderNumber, $salesChannelId);
+        $payment->setOrderId($mollieOrderId);
         $payment->setFinalizeUrl($returnUrl);
 
         $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);

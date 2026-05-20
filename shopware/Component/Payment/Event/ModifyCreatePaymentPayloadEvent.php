@@ -17,6 +17,11 @@ final class ModifyCreatePaymentPayloadEvent
         return $this->payment;
     }
 
+    public function setPayment(CreatePayment $payment): void
+    {
+        $this->payment = $payment;
+    }
+
     public function getContext(): Context
     {
         return $this->context;

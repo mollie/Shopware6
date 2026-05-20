@@ -5,9 +5,11 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use Mollie\Shopware\Component\Mollie\Capture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
@@ -18,6 +20,8 @@ use Shopware\Core\Framework\Context;
 interface MollieGatewayInterface
 {
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment;
+
+    public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order;
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment;
 

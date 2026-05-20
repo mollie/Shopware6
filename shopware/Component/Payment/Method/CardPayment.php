@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Method;
 
-use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Mollie\PaymentParameterInterface;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
@@ -14,7 +14,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 final class CardPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface
 {
-    public function applyPaymentSpecificParameters(CreatePayment $payment, RequestDataBag $dataBag, CustomerEntity $customer): CreatePayment
+    public function applyPaymentSpecificParameters(PaymentParameterInterface $payment, RequestDataBag $dataBag, CustomerEntity $customer): PaymentParameterInterface
     {
         if ($payment->getMandateId() !== null) {
             $payment->setSequenceType(SequenceType::ONEOFF);
