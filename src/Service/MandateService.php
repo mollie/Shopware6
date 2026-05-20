@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CouldNotFetchMollieCustomerMandatesException;
 use Kiener\MolliePayments\Exception\CouldNotRevokeMollieCustomerMandateException;
 use Kiener\MolliePayments\Service\MollieApi\Mandate as MandateApiService;
@@ -11,8 +10,13 @@ use Kiener\MolliePayments\Struct\Mandate\CreditCardDetailStruct;
 use Kiener\MolliePayments\Struct\Mandate\MandateCollection;
 use Kiener\MolliePayments\Struct\Mandate\MandateStruct;
 use Mollie\Api\Resources\Mandate;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class MandateService implements MandateServiceInterface
@@ -25,17 +29,22 @@ class MandateService implements MandateServiceInterface
     /** @var MandateApiService */
     private $mandateApiService;
 
-    /** @var SubscriptionManager */
-    private $subscriptionManager;
+    /**
+     * @var EntityRepository<SubscriptionCollection<SubscriptionEntity>>
+     */
+    private EntityRepository $subscriptionRepository;
 
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(CustomerServiceInterface $customerService, MandateApiService $mandateApiService, SubscriptionManager $subscriptionManager, LoggerInterface $logger)
+    /**
+     * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
+     */
+    public function __construct(CustomerServiceInterface $customerService, MandateApiService $mandateApiService, EntityRepository $subscriptionRepository, LoggerInterface $logger)
     {
         $this->customerService = $customerService;
         $this->mandateApiService = $mandateApiService;
-        $this->subscriptionManager = $subscriptionManager;
+        $this->subscriptionRepository = $subscriptionRepository;
         $this->logger = $logger;
     }
 
@@ -46,9 +55,9 @@ class MandateService implements MandateServiceInterface
     {
         $mollieCustomerId = $this->customerService->getMollieCustomerId($customerId, $context->getSalesChannelId(), $context->getContext());
 
-        $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandateId, $context->getContext());
+        $subscriptions = $this->findSubscriptionsByMandateId($customerId, $mandateId, $context->getContext());
 
-        foreach ($subscriptions->getElements() as $subscription) {
+        foreach ($subscriptions as $subscription) {
             if ($subscription->isActive() || $subscription->isSkipped()) {
                 throw new \Exception('Active subscription found for this mandate');
             }
@@ -133,10 +142,8 @@ class MandateService implements MandateServiceInterface
             $mandateStruct->setDetails($details);
 
             // check if this mandate has connected subscriptions
-            $subscriptions = $this->subscriptionManager->findSubscriptionByMandateId($customerId, $mandate->id, $context);
             $beingUsedForSubscription = false;
-
-            foreach ($subscriptions->getElements() as $subscription) {
+            foreach ($this->findSubscriptionsByMandateId($customerId, $mandate->id, $context) as $subscription) {
                 if ($subscription->isActive() || $subscription->isSkipped()) {
                     $beingUsedForSubscription = true;
                     break;
@@ -148,5 +155,17 @@ class MandateService implements MandateServiceInterface
         }
 
         return $mandateCollection;
+    }
+
+    /**
+     * @return iterable<SubscriptionEntity>
+     */
+    private function findSubscriptionsByMandateId(string $customerId, string $mandateId, Context $context): iterable
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('customerId', $customerId));
+        $criteria->addFilter(new EqualsFilter('mandateId', $mandateId));
+
+        return $this->subscriptionRepository->search($criteria, $context)->getEntities();
     }
 }

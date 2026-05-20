@@ -7,20 +7,30 @@ use Symfony\Component\Dotenv\Dotenv;
 $_ENV['APP_ENV'] = 'test';
 $_ENV['KERNEL_CLASS'] = Shopware\Core\Kernel::class;
 $_ENV['APP_SECRET'] = '+g1fbgB/u0y45NSqftvvfvIksdBJUKSLjmxiNPDRyhGs6X+O625znsPHR0AUStElmDA21XOdn5lnwAoQR34Q5lamMXiUqn1DIT5LTHEVjtJ9CVUBX4FZwzldq9q6OmHDYjjXIV1P';
+$_ENV['MOLLIE_DEV_MODE'] = '1';
+putenv('MOLLIE_DEV_MODE=1');
 
 $projectDir = realpath(__DIR__ . '/../../../../');
 
-$envFilePath = $projectDir . '/.env';
+$envFilePath = [
+    $projectDir . '/.env',
+    $projectDir . '/.env.local',
+];
 
-if (\is_file($envFilePath) || \is_file($envFilePath . '.dist') || \is_file($envFilePath . '.local.php')) {
-    (new Dotenv())->usePutenv()->bootEnv($envFilePath);
+foreach ($envFilePath as $file) {
+    if(!file_exists($file)) {
+        continue;
+    }
+    (new Dotenv())->usePutenv()->bootEnv($file);
 }
+
 $dataBaseUrl = getenv('DATABASE_URL');
 
 
 $testBootstrapper = new TestBootstrapper();
 $testBootstrapper->setProjectDir($projectDir);
 $testBootstrapper->setDatabaseUrl($dataBaseUrl);
-$testBootstrapper->addActivePlugins('MolliePayments');
+$testBootstrapper->addCallingPlugin(realpath(__DIR__.'/../composer.json'));
+$testBootstrapper->setLoadEnvFile(false);
 $testBootstrapper->bootstrap();
 

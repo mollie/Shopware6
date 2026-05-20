@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service\Installer;
 
-use Kiener\MolliePayments\Struct\Voucher\VoucherType;
+use Mollie\Shopware\Component\Mollie\Address;
+use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -22,6 +23,10 @@ class CustomFieldsInstaller
     private const ID_SUBSCRIPTION_INTERVAL = 'e2ee7ee0fcb44b2c8fb41d91edcc0b16';
     private const ID_SUBSCRIPTION_INTERVAL_UNIT = '5dde0b79c6804c2a93e6137e8699cd0f';
     private const ID_SUBSCRIPTION_REPETITION = '786f49b48bf34a418c5edb5503f31de5';
+    // --------------------------------------------------------------------------------
+    private const ID_ADDRESS_FIELDSET = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4';
+    private const ID_RELATION_ADDRESS = 'b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5';
+    private const ID_EXPRESS_ADDRESS_ID = 'c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6';
 
     /**
      * @var EntityRepository<EntityCollection<CustomFieldSetEntity>>
@@ -39,6 +44,38 @@ class CustomFieldsInstaller
     public function install(Context $context): void
     {
         $this->installProductData($context);
+        $this->installAddressData($context);
+    }
+
+    private function installAddressData(Context $context): void
+    {
+        $this->repoCustomFields->upsert([
+            [
+                'id' => self::ID_ADDRESS_FIELDSET,
+                'name' => 'mollie_payments_address',
+                'active' => true,
+                'relations' => [
+                    [
+                        'id' => self::ID_RELATION_ADDRESS,
+                        'entityName' => 'customer_address',
+                    ],
+                ],
+                'customFields' => [
+                    [
+                        'id' => self::ID_EXPRESS_ADDRESS_ID,
+                        'name' => Address::CUSTOM_FIELDS_KEY,
+                        'active' => true,
+                        'allowCustomerWrite' => true,
+                        'type' => CustomFieldTypes::TEXT,
+                        'config' => [
+                            'customFieldPosition' => 1,
+                            'componentName' => 'sw-field',
+                            'customFieldType' => 'text',
+                        ],
+                    ],
+                ],
+            ],
+        ], $context);
     }
 
     private function installProductData(Context $context): void
@@ -67,10 +104,11 @@ class CustomFieldsInstaller
                         'id' => self::ID_VOUCHER_TYPE,
                         'name' => 'mollie_payments_product_voucher_type',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
                             'customFieldPosition' => 1,
-                            'componentName' => 'sw-single-select',
+                            'componentName' => 'sw-multi-select',
                             'customFieldType' => 'select',
                             'label' => [
                                 'en-GB' => 'Voucher Type',
@@ -94,7 +132,7 @@ class CustomFieldsInstaller
                                         'de_DE' => 'Öko',
                                         'nl-NL' => 'Eco',
                                     ],
-                                    'value' => VoucherType::TYPE_ECO,
+                                    'value' => VoucherCategory::ECO->value,
                                 ],
                                 [
                                     'label' => [
@@ -102,7 +140,7 @@ class CustomFieldsInstaller
                                         'de_DE' => 'Mahlzeit',
                                         'nl-NL' => 'Meal',
                                     ],
-                                    'value' => VoucherType::TYPE_MEAL,
+                                    'value' => VoucherCategory::MEAL->value,
                                 ],
                                 [
                                     'label' => [
@@ -110,7 +148,7 @@ class CustomFieldsInstaller
                                         'de_DE' => 'Geschenk',
                                         'nl-NL' => 'Geschenk',
                                     ],
-                                    'value' => VoucherType::TYPE_GIFT,
+                                    'value' => VoucherCategory::GIFT->value,
                                 ],
                             ],
                         ],
@@ -119,6 +157,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_ENABLED,
                         'name' => 'mollie_payments_product_subscription_enabled',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::SWITCH,
                         'config' => [
                             'customFieldPosition' => 2,
@@ -135,6 +174,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_INTERVAL,
                         'name' => 'mollie_payments_product_subscription_interval',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::INT,
                         'config' => [
                             'customFieldPosition' => 3,
@@ -161,6 +201,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_INTERVAL_UNIT,
                         'name' => 'mollie_payments_product_subscription_interval_unit',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::SELECT,
                         'config' => [
                             'customFieldPosition' => 4,
@@ -213,6 +254,7 @@ class CustomFieldsInstaller
                         'id' => self::ID_SUBSCRIPTION_REPETITION,
                         'name' => 'mollie_payments_product_subscription_repetition',
                         'active' => true,
+                        'allowCartExpose' => true,
                         'type' => CustomFieldTypes::TEXT,
                         'config' => [
                             'customFieldPosition' => 5,

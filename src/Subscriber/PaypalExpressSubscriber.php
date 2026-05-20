@@ -5,10 +5,10 @@ namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\PaypalExpress\PayPalExpress;
 use Kiener\MolliePayments\Handler\Method\PayPalExpressPayment;
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Traits\StringTrait;
+use Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService;
 use Mollie\Shopware\Entity\Cart\MollieShopwareCart;
 use Mollie\Shopware\Entity\Order\MollieShopwareOrder;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -58,7 +58,7 @@ class PaypalExpressSubscriber implements EventSubscriberInterface
         $this->mollieCartService = $mollieCartService;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StorefrontRenderEvent::class => 'onStorefrontRender',

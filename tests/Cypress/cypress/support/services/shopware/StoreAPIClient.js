@@ -32,7 +32,7 @@ export default class StoreAPIClient {
      *
      */
     clearContextToken() {
-        this.contextToken = '-'; // empty is not allowed
+        this.contextToken = null;
     }
 
     /**
@@ -208,12 +208,17 @@ export default class StoreAPIClient {
      * @returns {Object}
      */
     getHeaders() {
-        return {
+        const headers = {
             Accept: 'application/vnd.api+json',
             'sw-access-key': this.salesChannelApiKey,
-            'sw-context-token': this.contextToken,
             'Content-Type': 'application/json'
         };
+
+        if (this.contextToken) {
+            headers['sw-context-token'] = this.contextToken;
+        }
+
+        return headers;
     }
 
 }

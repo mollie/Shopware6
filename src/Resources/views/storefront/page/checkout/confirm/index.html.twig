@@ -6,6 +6,7 @@
         <div id="mollie_hide_applepay" data-mollie-template-applepay-checkout
              data-mollie-apple-pay-payment-method-options="{{ {
                  shopUrl: seoUrl('frontend.home.page'),
+                 applePayId: apple_pay_payment_method_id,
              }
              |json_encode }}"></div>
     {% endif %}

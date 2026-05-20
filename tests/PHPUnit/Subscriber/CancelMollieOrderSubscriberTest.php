@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Subscriber;
+namespace MolliePayments\Shopware\Tests\Subscriber;
 
 use Kiener\MolliePayments\Subscriber\CancelOrderSubscriber;
 use Mollie\Api\Types\OrderStatus;

@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-.PHONY: help
+.PHONY: help prod dev clean build fixtures pr release
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
@@ -33,53 +33,34 @@ help:
 
 prod: ##1 Installs all production dependencies
 	# ----------------------------------------------------------------
-	@composer validate
-	@composer install --no-dev
-	npm install --omit=dev
+	composer validate
+	composer install --no-dev
 	cd src/Resources/app/administration && npm install --omit=dev
 	cd src/Resources/app/storefront && npm install --omit=dev
 
 dev: ##1 Installs all dev dependencies
-	@composer validate
-	COMPOSER_NO_SECURITY_BLOCKING=1 composer update --ignore-platform-req=ext-amqp
-	npm install
-	chmod a+x node_modules/.bin/prettier
+	composer validate
+	composer install
+	cd dev && npm install
+	chmod a+x dev/node_modules/.bin/prettier
 	cd src/Resources/app/administration && npm install
 	cd src/Resources/app/storefront && npm install
 
-install: ##1 [deprecated] Installs all production dependencies. Please use "make prod" now.
-	@make prod -B
 
 clean: ##1 Cleans all dependencies and files
 	rm -rf vendor/*
 	# ------------------------------------------------------
 	rm -rf .reports | true
 	# ------------------------------------------------------
-	rm -rf ./node_modules/*
+	rm -rf ./dev/node_modules/*
+	rm -rf config-*
 	rm -rf ./src/Resources/app/administration/node_modules/*
 	rm -rf ./src/Resources/app/storefront/node_modules/*
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/dist/storefront
-	# ------------------------------------------------------
-	rm -rf ./src/Resources/public/administration
-	rm -rf ./src/Resources/public/mollie-payments.js
 
-build: ##2 Installs the plugin, and builds the artifacts using the Shopware build commands.
-	sudo apt-get update --allow-releaseinfo-change -y
-	curl -1sLf 'https://dl.cloudsmith.io/public/friendsofshopware/stable/setup.deb.sh' | sudo -E bash && sudo apt-get install shopware-cli -y && sudo apt-get autoremove -y &&  shopware-cli -v
-	# CUSTOM WEBPACK
-	cd ./src/Resources/app/storefront && make build -B
-	rm -f .shopware-extension.yml
-ifeq ($(use67),true)
-	cp ./config/.shopware-extension-6.7.yml .shopware-extension.yml
-	cd ../../.. && $(EXPORT_CMD) shopware-cli extension build custom/plugins/MolliePayments
-endif
-	cp ./config/.shopware-extension.yml .shopware-extension.yml
-	cd ../../.. && $(EXPORT_CMD) shopware-cli extension build custom/plugins/MolliePayments
 
-	rm -f .shopware-extension.yml
-	# -----------------------------------------------------
-	# -----------------------------------------------------
+build: ##2 Runs the Shopware theme and asset pipeline (JS assets must be built beforehand via shopware-cli).
 	cd ../../.. && php bin/console --no-debug theme:refresh
 	cd ../../.. && php bin/console --no-debug theme:compile
 	cd ../../.. && php bin/console --no-debug theme:refresh
@@ -88,7 +69,7 @@ endif
 
 fixtures: ##2 Installs all available testing fixtures of the Mollie plugin
 	cd ../../.. && php bin/console --no-debug cache:clear
-	cd ../../.. && php bin/console --no-debug mollie:fixtures:install
+	cd ../../.. && php bin/console --no-debug mollie:fixtures:load
 
 pr: ##2 Prepares everything for a Pull Request
 	# -----------------------------------------------------------------
@@ -103,12 +84,11 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpmin -B
 	@make stan -B
 	@make phpunit -B
+	@make phpintegration -B
+	@make behat -B
 	@make vitest -B
 	@make configcheck -B
 	@make phpunuhi -B
-	# -----------------------------------------------------------------
-	@make phpintegration -B
-	@make behat -B
 
 snippetexport: ##2 Exports all snippets
 	php vendor/bin/phpunuhi export --configuration=./config/.phpunuhi.xml --dir=./.phpunuhi
@@ -122,14 +102,15 @@ phpcheck: ##3 Starts the PHP syntax checks
 	@find . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" | xargs -n 1 -P4 php -l
 
 phpmin: ##3 Starts the PHP compatibility checks
-	@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.0 ./src ./shopware
+	echo "PHPCompatibility is in alpha right now and has issues with enums"
+	#@php vendor/bin/phpcs -p --standard=PHPCompatibility --extensions=php --runtime-set testVersion 8.2 ./src ./shopware
 
 csfix: ##3 Starts the PHP CS Fixer
 ifndef mode
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
+	php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --dry-run --show-progress=dots --verbose
 endif
 ifeq ($(mode), fix)
-	@PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
+	php vendor/bin/php-cs-fixer fix --config=./config/.php_cs.php --show-progress=dots --verbose
 endif
 
 stan: ##3 Starts the PHPStan Analyser
@@ -149,30 +130,30 @@ insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
 
 vitest: ##3 Starts all Vitest tests
-	npx vitest -c ./config/vitest.config.ts
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/vitest -c ./config/vitest.config.ts
 
 eslint: ##3 Starts the ESLinter
 ifndef mode
-	./node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
 endif
 
 stylelint: ##3 Starts the Stylelinter
 ifndef mode
-	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --config=./config/.stylelintrc
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --config=./config/.stylelintrc
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix --config=./config/.stylelintrc
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/stylelint --allow-empty-input ./src/Resources/app/**/*.scss --fix --config=./config/.stylelintrc
 endif
 
 prettier: ##3 Starts the Prettier
 ifndef mode
-	./node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --check
+	./dev/node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --check
 endif
 ifeq ($(mode), fix)
-	./node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --write
+	./dev/node_modules/.bin/prettier ./src/Resources/app/ --config=./config/.prettierrc  --write
 endif
 
 configcheck: ##3 Tests and verifies the plugin configuration file
@@ -182,35 +163,15 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 	php vendor/bin/phpunuhi validate --configuration=./config/.phpunuhi.xml --report-format=junit --report-output=./.phpunuhi/junit.xml
 
 # -------------------------------------------------------------------------------------------------
-IGNORED = '*/vendor/*' '*.git*' '*.reports*' '*/.idea*' '*/node_modules*' '*/.phpunuhi*' '*.DS_Store' '*.prettierignore' './package.json' './package-lock.json' 'composer.lock'
-IGNORED_FINAL = $(IGNORED)  '*/tests*' 'config/*' '*/makefile'
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
-ifneq (,$(findstring v12,$(NODE_VERSION)))
-	$(warning Attention, reqruires Node v14 or higher to build a release!)
-	@exit 1
-endif
-
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
-	# -------------------------------------------------------------------------------------------------
-	@echo "INSTALL DEV DEPENDENCIES AND BUILD"
-	make clean -B
-	make dev -B
-	make build -B
-	# -------------------------------------------------------------------------------------------------
-	@echo "INSTALL PRODUCTION DEPENDENCIES"
-	make prod -B
-	rm -rf ./src/Resources/app/storefront/node_modules/*
-	# DELETE distribution file. that ones not compatible between 6.5 and 6.4
-	# if one wants to use it, they need to run build-storefront.sh manually and activate that feature
-	# in our plugin configuration! (use shopware standard js)
-	rm -rf ./src/Resources/app/storefront/dist/storefront
-	# -------------------------------------------------------------------------------------------------
-	@echo "CREATE ZIP FILE"
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments.zip MolliePayments/ -x $(IGNORED_FINAL)
-	cd .. && zip -qq -r -D -0 ./.build/MolliePayments-e2e.zip MolliePayments/ -x $(IGNORED)
-	# -------------------------------------------------------------------------------------------------
-	# -------------------------------------------------------------------------------------------------
+	docker run --rm \
+		-v "$(CURDIR)/..":/plugins \
+		-v "$(CURDIR)/config/.shopware-extension.yml":/plugins/MolliePayments/.shopware-extension.yml \
+		-w /plugins/.build \
+		ghcr.io/shopware/shopware-cli:latest \
+		extension zip /plugins/MolliePayments --disable-git
 	@echo ""
 	@echo "CONGRATULATIONS"
-	@echo "The new ZIP file is available at plugins/.build/MolliePayments.zip"
+	@echo "ZIP file available at plugins/.build/"

@@ -53,41 +53,6 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
     })
 
-    context(storeApiPrefix + "/mollie/applepay/add-product", () => {
-
-        it('C266671: Apple Pay Direct add product with invalid quantity (Store API) @core', () => {
-
-            const request = new Promise((resolve) => {
-                storeApiClient.post('/mollie/applepay/add-product', {"productId": "unknown", quantity: 0}).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 500)
-                cy.wrap(response).its('data.errors').should('not.be.empty')
-                expect(response.data.errors[0].detail).to.contain('Please provide a valid quantity > 0!');
-            });
-
-        })
-
-        it('C266672: Apple Pay Direct add product with invalid ID (Store API) @core', () => {
-
-            const request = new Promise((resolve) => {
-                storeApiClient.post('/mollie/applepay/add-product', {"productId": "unknown", quantity: 1}).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('eq', 400)
-                expect(response.data.errors[0].detail).to.contain('Value is not a valid UUID: unknown');
-            });
-        })
-
-    })
-
-
     context(storeApiPrefix + "/mollie/applepay/cart", () => {
 
         it('C266673: Apple Pay Direct get cart structure (Store API) @core', () => {
@@ -119,7 +84,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('Please provide a validation url!');
+                expect(response.data.errors[0].detail).to.contain('Please provide a validation url');
             });
         })
 
@@ -137,7 +102,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('No Country Code provided!');
+                expect(response.data.errors[0].detail).to.contain('No Country Code provided');
             });
         })
 
@@ -170,7 +135,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('Please provide a Shipping Method identifier!');
+                expect(response.data.errors[0].detail).to.contain('Missing shipping method identifier');
             });
         })
 
@@ -203,7 +168,7 @@ describe('Apple Pay Direct - Store API Routes', () => {
 
             cy.wrap(request).its('data').then(response => {
                 cy.wrap(response).its('status').should('eq', 500)
-                expect(response.data.errors[0].detail).to.contain('PaymentToken not found!')
+                expect(response.data.errors[0].detail).to.contain('"paymentToken" not set in request body')
             });
         })
 

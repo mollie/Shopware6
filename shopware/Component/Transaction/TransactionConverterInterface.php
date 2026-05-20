@@ -8,8 +8,5 @@ use Shopware\Core\Framework\Context;
 
 interface TransactionConverterInterface
 {
-    /**
-     * @param AsyncPaymentTransactionStruct|ShopwarePaymentTransactionStruct $transactionStruct
-     */
-    public function convert($transactionStruct, Context $context): PaymentTransactionStruct;
+    public function convert(ShopwarePaymentTransactionStruct $transactionStruct, Context $context): PaymentTransactionStruct;
 }

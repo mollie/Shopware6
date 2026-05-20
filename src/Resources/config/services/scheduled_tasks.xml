@@ -6,29 +6,6 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\ScheduledTask\ScheduledTaskFactory">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTask">
-            <factory service="Kiener\MolliePayments\ScheduledTask\ScheduledTaskFactory" method="createRenewalReminderTask"/>
-            <tag name="shopware.scheduled.task"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTaskHandler">
-            <argument type="service" id="scheduled_task.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="messenger.message_handler"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\ScheduledTask\Subscription\RenewalReminder\RenewalReminderTaskDevHandler">
-            <argument type="service" id="scheduled_task.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\Subscription\SubscriptionManager"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="messenger.message_handler"/>
-        </service>
-
         <service id="Kiener\MolliePayments\ScheduledTask\OrderStatus\ExpireOrderTask">
             <tag name="shopware.scheduled.task"/>
         </service>

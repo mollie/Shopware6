@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct\OrderTransaction;
+namespace MolliePayments\Shopware\Tests\Struct\OrderTransaction;
 
 use Kiener\MolliePayments\Struct\OrderTransaction\OrderTransactionAttributes;
 use PHPUnit\Framework\TestCase;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Facade\MolliePaymentFinalize;
@@ -30,10 +30,10 @@ use Kiener\MolliePayments\Validator\IsOrderLineItemValid;
 use Mollie\Shopware\Component\Payment\FinalizeAction;
 use Mollie\Shopware\Component\Payment\PayAction;
 use Mollie\Shopware\Component\Transaction\TransactionConverterInterface;
-use MolliePayments\Tests\Fakes\FakeEventDispatcher;
-use MolliePayments\Tests\Fakes\FakePluginSettings;
-use MolliePayments\Tests\Traits\OrderTrait;
-use MolliePayments\Tests\Utils\Traits\PaymentBuilderTrait;
+use Mollie\Shopware\Unit\Fake\EventSpy;
+use MolliePayments\Shopware\Tests\Fakes\FakePluginSettings;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Utils\Traits\PaymentBuilderTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -44,7 +44,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
@@ -168,7 +167,7 @@ abstract class AbstractMollieOrderBuilder extends TestCase
 
         $transactionConverter = $this->createMock(TransactionConverterInterface::class);
 
-        $routingDetector = new RoutingDetector(new RequestStack(new Request()));
+        $routingDetector = new RoutingDetector(new RequestStack([]));
         $routingBuilder = new RoutingBuilder(
             $this->router,
             $routingDetector,
@@ -194,11 +193,11 @@ abstract class AbstractMollieOrderBuilder extends TestCase
             new MollieOrderCustomerEnricher($this->createMock(CustomerService::class)),
             $routingBuilder,
             $this->mollieLocaleService,
-            new FakeEventDispatcher(),
+            new EventSpy(),
             $this->loggerService
         );
 
-        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $transactionConverter, $this->transitionService, $this->loggerService, new RequestStack());
+        $this->payAction = new PayAction($this->mollieDoPaymentFacade, $transactionConverter, $this->transitionService, new RequestStack(),$this->loggerService);
         $this->finalizeAction = new FinalizeAction($this->molliePaymentFinalize, $transactionConverter, $this->loggerService);
     }
 }

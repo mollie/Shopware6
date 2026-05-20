@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi;
 
 use Kiener\MolliePayments\Service\MollieApi\PriceCalculator;
 use Kiener\MolliePayments\Struct\LineItemPriceStruct;
@@ -37,8 +37,6 @@ class PriceCalculatorTest extends TestCase
 
     /**
      * test that taxAmount is calculated like mollie expects it in api
-     *
-     * @dataProvider getVatAmountTestData
      */
     //    public function testRecalculationTaxAmount(string $expected, string $orderTaxType, string $currencyCode, OrderLineItemEntity $lineItem): void
     //    {

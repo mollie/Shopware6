@@ -48,12 +48,17 @@ Component.override('sw-order-detail-general', {
 
     computed: {
         /**
+         * Treat the order as "Mollie order" either via the legacy
+         * OrderAttributes (transaction + customFields.mollie_payments) or
+         * when a Mollie subscription is attached — the latter is needed
+         * since the refactor stopped writing customFields.mollie_payments
+         * on the order; that data now lives on the transaction.
          *
          * @returns {boolean}
          */
         isMollieOrder() {
             const attr = new OrderAttributes(this.order);
-            return attr.isMollieOrder();
+            return attr.isMollieOrder() || this._extensionSubscription() !== null;
         },
 
         /**
@@ -107,21 +112,27 @@ Component.override('sw-order-detail-general', {
         },
 
         /**
+         * Subscription either via legacy customField (older orders) or via
+         * the mollieSubscriptions extension association (loaded by the
+         * sw-order-detail orderCriteria override).
          *
-         * @returns {null|*}
+         * @returns {boolean}
          */
         isSubscription() {
             const orderAttributes = new OrderAttributes(this.order);
-            return orderAttributes.isSubscription();
+            const fromCustomField = orderAttributes.isSubscription();
+            const fromExtension = this._extensionSubscription();
+
+            return fromCustomField || fromExtension !== null;
         },
 
         /**
          *
-         * @returns {string|*}
+         * @returns {string}
          */
         subscriptionId() {
             const orderAttributes = new OrderAttributes(this.order);
-            return orderAttributes.getSwSubscriptionId();
+            return orderAttributes.getSwSubscriptionId() || this._extensionSubscription()?.id || '';
         },
 
         /**
@@ -221,6 +232,29 @@ Component.override('sw-order-detail-general', {
         _creditCardData() {
             const orderAttributes = new OrderAttributes(this.order);
             return orderAttributes.getCreditCardAttributes();
+        },
+
+        /**
+         * Reads mollieSubscriptions from either the entity extension bag
+         * or directly off the order — depending on the Shopware version
+         * the DAL sometimes hoists the association onto the entity.
+         *
+         * @returns {object|null}
+         * @private
+         */
+        _extensionSubscription() {
+            const order = this.order;
+            const subscriptions = order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
+
+            if (!subscriptions) {
+                return null;
+            }
+
+            if (typeof subscriptions.first === 'function') {
+                return subscriptions.first() ?? null;
+            }
+
+            return subscriptions.length > 0 ? subscriptions[0] : null;
         },
 
         /**

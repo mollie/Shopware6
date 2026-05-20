@@ -19,7 +19,7 @@ export default class MollieProductsAction {
 
     openRegularProduct() {
         this._visitDifferentPage();
-        cy.visit('/Regular-Mollie-Shirt/MOL-CHEAP-2', {failOnStatusCode: false});
+        cy.visit('/Cheap-Mollie-Shirt/MOL-CHEAP', {failOnStatusCode: false});
     }
 
     openEcoProduct() {

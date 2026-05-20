@@ -11,11 +11,9 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomai
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
-use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Kiener\MolliePayments\Service\Cart\CartBackupService;
 use Kiener\MolliePayments\Service\CartServiceInterface;
 use Kiener\MolliePayments\Service\CustomerService;
 use Kiener\MolliePayments\Service\DomainExtractor;
@@ -24,22 +22,15 @@ use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Service\ShopService;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Shopware\Component\Transaction\PaymentTransactionStruct;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractCartBackupService;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
-use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 class ApplePayDirect
@@ -48,16 +39,6 @@ class ApplePayDirect
      * @var ApplePayDomainVerificationService
      */
     private $domainFileDownloader;
-
-    /**
-     * @var ApplePayPayment
-     */
-    private $paymentHandler;
-
-    /**
-     * @var MolliePaymentDoPay
-     */
-    private $molliePayments;
 
     /**
      * @var CartServiceInterface
@@ -90,7 +71,7 @@ class ApplePayDirect
     private $repoPaymentMethods;
 
     /**
-     * @var CartBackupService
+     * @var AbstractCartBackupService
      */
     private $cartBackupService;
 
@@ -110,11 +91,6 @@ class ApplePayDirect
     private $orderService;
 
     /**
-     * @var EntityRepository<EntityCollection<OrderAddressEntity>>
-     */
-    private $repoOrderAdresses;
-
-    /**
      * @var ApplePayDirectDomainAllowListGateway
      */
     private $applePayDirectDomainAllowListGateway;
@@ -124,14 +100,20 @@ class ApplePayDirect
      */
     private $domainSanitizer;
 
-    /**
-     * @param EntityRepository<EntityCollection<OrderAddressEntity>> $repoOrderAdresses
-     */
-    public function __construct(ApplePayDomainVerificationService $domainFileDownloader, ApplePayPayment $paymentHandler, MolliePaymentDoPay $molliePayments, CartServiceInterface $cartService, ApplePayFormatter $formatter, ApplePayShippingBuilder $shippingBuilder, SettingsService $pluginSettings, CustomerService $customerService, PaymentMethodRepository $repoPaymentMethods, CartBackupService $cartBackupService, MollieApiFactory $mollieApiFactory, ShopService $shopService, OrderService $orderService, $repoOrderAdresses, ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
+    public function __construct(
+        ApplePayDomainVerificationService $domainFileDownloader,
+        CartServiceInterface $cartService,
+        ApplePayFormatter $formatter,
+        ApplePayShippingBuilder $shippingBuilder,
+        SettingsService $pluginSettings,
+        CustomerService $customerService,
+        PaymentMethodRepository $repoPaymentMethods,
+        AbstractCartBackupService $cartBackupService,
+        MollieApiFactory $mollieApiFactory,
+        ShopService $shopService, OrderService $orderService,  ApplePayDirectDomainAllowListGateway $domainAllowListGateway, ApplePayDirectDomainSanitizer $domainSanitizer)
     {
         $this->domainFileDownloader = $domainFileDownloader;
-        $this->paymentHandler = $paymentHandler;
-        $this->molliePayments = $molliePayments;
+
         $this->cartService = $cartService;
         $this->formatter = $formatter;
         $this->shippingBuilder = $shippingBuilder;
@@ -142,7 +124,6 @@ class ApplePayDirect
         $this->mollieApiFactory = $mollieApiFactory;
         $this->shopService = $shopService;
         $this->orderService = $orderService;
-        $this->repoOrderAdresses = $repoOrderAdresses;
         $this->applePayDirectDomainAllowListGateway = $domainAllowListGateway;
         $this->domainSanitizer = $domainSanitizer;
     }
@@ -381,66 +362,8 @@ class ApplePayDirect
      */
     public function createPayment(OrderEntity $order, string $shopwareReturnUrl, string $firstname, string $lastname, string $street, string $zipcode, string $city, string $countryCode, string $paymentToken, SalesChannelContext $context): string
     {
-        // immediately try to get the country of the buyer.
-        // maybe this could lead to an exception if that country is not possible.
-        // that's why we do it within these first steps.
-        $countryID = (string) $this->customerService->getCountryId($countryCode, $context->getContext());
-
-        // always make sure to use the correct address from Apple Pay
-        // and never the one from the customer (if already existing)
-        if ($order->getAddresses() instanceof OrderAddressCollection) {
-            foreach ($order->getAddresses() as $address) {
-                // attention, Apple Pay does not have a company name
-                // therefore we always need to make sure to remove the company field in our order
-                $this->repoOrderAdresses->update([
-                    [
-                        'id' => $address->getId(),
-                        'firstName' => $firstname,
-                        'lastName' => $lastname,
-                        'company' => '',
-                        'department' => '',
-                        'vatId' => '',
-                        'street' => $street,
-                        'zipcode' => $zipcode,
-                        'city' => $city,
-                        'countryId' => $countryID,
-                    ],
-                ], $context->getContext());
-            }
-        }
-
-        // get the latest new transaction.
-        // we need this for our payment handler
-        /** @var OrderTransactionCollection $transactions */
-        $transactions = $order->getTransactions();
-        $transaction = $transactions->last();
-
-        if (! $transaction instanceof OrderTransactionEntity) {
-            throw new \Exception('Created Apple Pay Direct order has not OrderTransaction!');
-        }
-
-        // generate the finish URL for our shopware page.
-        // This is required, because we will immediately bring the user to this page.
-        $asyncPaymentTransition = new PaymentTransactionStruct($transaction->getId(), $shopwareReturnUrl, $order, $transaction);
-
-        // now set the Apple Pay payment token for our payment handler.
-        // This is required for a smooth checkout with our already validated Apple Pay transaction.
-        $this->paymentHandler->setToken($paymentToken);
-
-        $paymentData = $this->molliePayments->startMolliePayment(ApplePayPayment::PAYMENT_METHOD_NAME, $asyncPaymentTransition, $context, $this->paymentHandler, new RequestDataBag());
-
-        // now also update the custom fields of our order
-        // we want to have the mollie metadata in the
-        // custom fields in Shopware too
-        $this->orderService->updateMollieDataCustomFields(
-            $order,
-            $paymentData->getMollieID(),
-            '',
-            $transaction->getId(),
-            $context->getContext()
-        );
-
-        return $paymentData->getMollieID();
+        // This is just because of refactoring process, we want to get rid of the payment handler
+        return '';
     }
 
     private function buildApplePayCart(Cart $cart, SalesChannelContext $context): ApplePayCart

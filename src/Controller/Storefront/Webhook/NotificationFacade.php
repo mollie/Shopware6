@@ -6,13 +6,11 @@ namespace Kiener\MolliePayments\Controller\Storefront\Webhook;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderDispatcherAdapterInterface;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory;
 use Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory;
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManager;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Gateway\MollieGatewayInterface;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\OrderTransactionRepository;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Kiener\MolliePayments\Service\Mollie\MolliePaymentDetails;
 use Kiener\MolliePayments\Service\Mollie\MolliePaymentStatus;
 use Kiener\MolliePayments\Service\Mollie\OrderStatusConverter;
 use Kiener\MolliePayments\Service\Order\OrderStatusUpdater;
@@ -69,16 +67,6 @@ class NotificationFacade
     private $flowBuilderEventFactory;
 
     /**
-     * @var SubscriptionManager
-     */
-    private $subscriptionManager;
-
-    /**
-     * @var MolliePaymentDetails
-     */
-    private $molliePaymentDetails;
-
-    /**
      * @var OrderService
      */
     private $orderService;
@@ -96,7 +84,7 @@ class NotificationFacade
     /**
      * @throws \Exception
      */
-    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepository $repoPaymentMethods, OrderTransactionRepository $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, SubscriptionManager $subscription, OrderService $orderService, LoggerInterface $logger)
+    public function __construct(MollieGatewayInterface $gatewayMollie, OrderStatusConverter $statusConverter, OrderStatusUpdater $statusUpdater, PaymentMethodRepository $repoPaymentMethods, OrderTransactionRepository $repoOrderTransactions, FlowBuilderFactory $flowBuilderFactory, FlowBuilderEventFactory $flowBuilderEventFactory, SettingsService $serviceService, OrderService $orderService, LoggerInterface $logger)
     {
         $this->gatewayMollie = $gatewayMollie;
         $this->statusConverter = $statusConverter;
@@ -104,12 +92,9 @@ class NotificationFacade
         $this->repoPaymentMethods = $repoPaymentMethods;
         $this->repoOrderTransactions = $repoOrderTransactions;
         $this->flowBuilderEventFactory = $flowBuilderEventFactory;
-        $this->subscriptionManager = $subscription;
         $this->settingsService = $serviceService;
         $this->orderService = $orderService;
         $this->logger = $logger;
-
-        $this->molliePaymentDetails = new MolliePaymentDetails();
 
         $this->flowBuilderDispatcher = $flowBuilderFactory->createDispatcher();
     }
@@ -220,28 +205,6 @@ class NotificationFacade
             && $mollieOrder->method !== $orderAttributes->getMolliePaymentMethod()
         ) {
             $this->updatePaymentMethod($swTransaction, $mollieOrder, $context);
-        }
-
-        // --------------------------------------------------------------------------------------------
-        // SUBSCRIPTION
-        // this will confirm our created subscriptions in all cases of successful payments.
-        // that path will create the actual subscription inside Mollie which will be used for recurring.
-        // if our payment expired, then we can also expire our local subscription in the database.
-
-        switch ($status) {
-            case MolliePaymentStatus::MOLLIE_PAYMENT_PAID:
-            case MolliePaymentStatus::MOLLIE_PAYMENT_PENDING:
-            case MolliePaymentStatus::MOLLIE_PAYMENT_AUTHORIZED:
-                // it is very important that we use the mandate from this payment
-                // for the subscription, because a customer could have different mandates!
-                // keep in mind, this might be empty here...our confirm endpoint does the final checks
-                $mandateId = $this->molliePaymentDetails->getMandateId($molliePayment);
-                $this->subscriptionManager->confirmSubscription($swOrder, $mandateId, $context);
-                break;
-
-            case MolliePaymentStatus::MOLLIE_PAYMENT_EXPIRED:
-                $this->subscriptionManager->cancelPendingSubscriptions($swOrder, $context);
-                break;
         }
 
         // now update the custom fields of the order

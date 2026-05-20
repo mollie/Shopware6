@@ -1,4 +1,3 @@
-import deepmerge from 'deepmerge';
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
 import DeviceDetectionHelper from '../helper/device-detection.helper';
 import CsrfAjaxModeHelper from '../helper/csrf-ajax-mode.helper';
@@ -12,14 +11,15 @@ const ERROR_CLS = 'error';
 const FOCUS_CLS = 'is-focused';
 
 export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
-    static options = deepmerge(MollieCreditCardMandate.options, {
+    static options = {
+        ...MollieCreditCardMandate.options,
         paymentId: null,
         customerId: null,
         locale: null,
         profileId: null,
         shopUrl: null,
         testMode: true,
-    });
+    };
 
     /**
      *
@@ -259,22 +259,10 @@ export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMand
             return;
         }
 
-        // now we finish by first calling our URL to store
-        // the credit card token for the user and the current checkout
-        // and then we continue by submitting our original payment form.
-        this.client.post(
-            me.options.shopUrl + '/mollie/components/store-card-token/' + me.options.customerId + '/' + token,
-            JSON.stringify({
-                shouldSaveCardDetail: this.shouldSaveCardDetail(),
-            }),
-            function () {
-                me.continueShopwareCheckout(paymentForm);
-            },
-            function () {
-                me.continueShopwareCheckout(paymentForm);
-            },
-            'application/json; charset=utf-8',
-        );
+        const tokenInput = document.getElementById('cardToken');
+        tokenInput.setAttribute('value', token);
+
+        me.continueShopwareCheckout(paymentForm);
     }
 
     /**

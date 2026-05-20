@@ -4,10 +4,10 @@
      data-shop-url="{{ seoUrl('frontend.home.page') }}">
 
     {% if page.mollie_terminals %}
-        <select id="posTerminals" name="mollie_pos_terminals" class="custom-select form-select" form="confirmOrderForm">
+        <select id="posTerminals" name="terminalId" class="custom-select form-select" form="confirmOrderForm">
             <option value="">{{ "molliePayments.components.pos.selectTerminal"|trans|striptags }}</option>
             {% for terminal in page.mollie_terminals %}
-                <option value="{{ terminal.id }}"{% if terminal.id is same as(page.preferred_terminal) %} selected{% endif %}>{{ terminal.name }}</option>
+                <option value="{{ terminal.id }}"{% if terminal.id is same as(page.preferred_terminal) %} selected{% endif %}>{{ terminal.description }}</option>
             {% endfor %}
         </select>
     {% endif %}

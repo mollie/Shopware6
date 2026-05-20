@@ -31,6 +31,7 @@ module.exports = (on, config) => {
     on('before:browser:launch', (browser = {}, launchOptions) => {
         if (browser.name === 'chrome' || browser.name === 'edge') {
             launchOptions.args.push('--disable-features=SameSiteByDefaultCookies')
+            launchOptions.args.push('--ignore-certificate-errors')
             return launchOptions
         }
     })
