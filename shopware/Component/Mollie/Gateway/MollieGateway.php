@@ -125,6 +125,7 @@ final class MollieGateway implements MollieGatewayInterface
 
             $response = $client->post('orders', [
                 'form_params' => $formParams,
+                'query' => ['embed' => 'payments'],
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 

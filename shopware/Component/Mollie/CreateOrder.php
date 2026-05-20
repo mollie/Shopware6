@@ -17,7 +17,6 @@ final class CreateOrder implements PaymentParameterInterface
     private ?Address $shippingAddress = null;
     private string $webhookUrl = '';
     private ?PaymentMethod $method = null;
-    private SequenceType $sequenceType = SequenceType::ONEOFF;
     /**
      * @var array<string, mixed>
      */
@@ -66,9 +65,14 @@ final class CreateOrder implements PaymentParameterInterface
         $this->paymentParams['customerReference'] = $customerReference;
     }
 
+    public function setCustomerId(string $customerId): void
+    {
+        $this->paymentParams['customerId'] = $customerId;
+    }
+
     public function setSequenceType(SequenceType $sequenceType): void
     {
-        $this->sequenceType = $sequenceType;
+        $this->paymentParams['sequenceType'] = $sequenceType->value;
     }
 
     public function getMandateId(): ?string
@@ -176,7 +180,6 @@ final class CreateOrder implements PaymentParameterInterface
         if ($this->method !== null) {
             $data['method'] = $this->method->value;
         }
-        $data['sequenceType'] = $this->sequenceType->value;
         if (count($this->metadata) > 0) {
             $data['metadata'] = $this->metadata;
         }

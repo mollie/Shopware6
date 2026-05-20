@@ -217,7 +217,12 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
         $createOrder->setMethod($createPayment->getMethod());
         $createOrder->setMetadata(['shopwareOrderNumber' => $createPayment->getShopwareOrderNumber()]);
 
-        $paymentHandler->applyPaymentSpecificParameters($createOrder, $dataBag, $transactionData->getCustomer());
+        if ($createPayment->getCustomerId() !== null) {
+            $createOrder->setCustomerId($createPayment->getCustomerId());
+        }
+
+        /** @var CreateOrder $createOrder */
+        $createOrder = $paymentHandler->applyPaymentSpecificParameters($createOrder, $dataBag, $transactionData->getCustomer());
 
         $this->logger->info('Order payload created for mollie API', [
             'orderNumber' => $createPayment->getShopwareOrderNumber(),
