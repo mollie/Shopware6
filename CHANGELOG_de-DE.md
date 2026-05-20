@@ -1,3 +1,6 @@
+# 4.24.1
+- Behoben: Die Installation des Plugins schlägt nicht mehr fehl, wenn ein Zahlungsarten-Icon ein SVG mit aktivem Inhalt (z.B. `data:`-URIs) enthält, das Shopware aus Sicherheitsgründen ablehnt. Der Installer fällt in diesem Fall auf die PNG-Version des Icons zurück.
+
 # 4.24.0
 - Behoben: PayPal Express schlägt nicht mehr sporadisch mit einem "fehlende Versandadresse"-Fehler fehl. Die Session-Polling-Schleife wartet nun lange genug (bis zu 7,5 s), bis Mollie die Adressdaten von PayPal erhalten hat.
 - Behoben: Der PayPal Express Gast-Checkout schlägt nicht mehr fehl, wenn PayPal einen einwortigen Kontonamen ohne separaten Vornamen zurückgibt, was zuvor dazu führte, dass Shopwares Vorname-Validierung die Registrierung ablehnte.

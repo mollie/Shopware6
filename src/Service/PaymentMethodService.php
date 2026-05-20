@@ -52,6 +52,7 @@ use Mollie\Api\Resources\Order;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Content\Media\MediaCollection;
+use Shopware\Core\Content\Media\MediaException;
 use Shopware\Core\Content\Media\MediaService;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
@@ -511,24 +512,35 @@ class PaymentMethodService
         }
 
         // Add icon to the media library
-        $iconMime = 'image/svg+xml';
-        $iconExt = 'svg';
-        $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
+        $svgBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.svg');
 
-        if ($iconBlob === '') {
-            $iconBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
-            $iconMime = 'image/png';
-            $iconExt = 'png';
+        if ($svgBlob !== '') {
+            try {
+                return $this->mediaService->saveFile(
+                    $svgBlob,
+                    'svg',
+                    'image/svg+xml',
+                    $fileName,
+                    $context,
+                    'Mollie Payments - Icons',
+                    null,
+                    false
+                );
+            } catch (MediaException $e) {
+                // SVG contains active content (e.g. data: URIs) which Shopware rejects — fall back to PNG
+            }
         }
 
-        if ($iconBlob === '') {
+        $pngBlob = $this->downloadFile('https://www.mollie.com/external/icons/payment-methods/' . $paymentMethod['name'] . '.png');
+
+        if ($pngBlob === '') {
             return null;
         }
 
         return $this->mediaService->saveFile(
-            $iconBlob,
-            $iconExt,
-            $iconMime,
+            $pngBlob,
+            'png',
+            'image/png',
             $fileName,
             $context,
             'Mollie Payments - Icons',
