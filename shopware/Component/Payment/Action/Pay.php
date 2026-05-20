@@ -7,16 +7,19 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
-use Mollie\Shopware\Component\Payment\CreatePaymentBuilderInterface;
+use Mollie\Shopware\Component\Payment\Event\ModifyCreateOrderPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\OrdersApiAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PosPayment;
+use Mollie\Shopware\Component\Payment\PayloadBuilder;
+use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
+use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
@@ -24,9 +27,11 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -36,8 +41,8 @@ final class Pay implements PayInterface
     public function __construct(
         #[Autowire(service: TransactionService::class)]
         private TransactionServiceInterface $transactionService,
-        #[Autowire(service: CreatePaymentBuilder::class)]
-        private CreatePaymentBuilderInterface $createPaymentBuilder,
+        #[Autowire(service: PayloadBuilder::class)]
+        private PayloadBuilderInterface $payloadBuilder,
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: OrderTransactionStateHandler::class)]
@@ -76,7 +81,75 @@ final class Pay implements PayInterface
 
         $this->logger->info('Payment Process - Start', $logData);
 
-        $createPaymentStruct = $this->createPaymentBuilder->build($transactionDataStruct, $paymentHandler, $dataBag, $context);
+        if ($paymentHandler instanceof OrdersApiAwareInterface) {
+            return $this->executeOrdersApi($paymentHandler, $transactionDataStruct, $dataBag, $context, $order, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
+        }
+
+        return $this->executePaymentsApi($paymentHandler, $transactionDataStruct, $transaction, $dataBag, $context, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
+    }
+
+    /**
+     * @param array<string, string> $logData
+     */
+    private function executeOrdersApi(
+        AbstractMolliePaymentHandler $paymentHandler,
+        TransactionDataStruct $transactionDataStruct,
+        RequestDataBag $dataBag,
+        Context $context,
+        OrderEntity $order,
+        SalesChannelEntity $salesChannel,
+        string $transactionId,
+        string $orderNumber,
+        string $shopwareFinalizeUrl,
+        array $logData
+    ): RedirectResponse {
+        $createOrderStruct = $this->payloadBuilder->buildOrder($transactionDataStruct, $paymentHandler, $dataBag, $context);
+
+        $orderEvent = new ModifyCreateOrderPayloadEvent($createOrderStruct, $context);
+        /** @var ModifyCreateOrderPayloadEvent $orderEvent */
+        $orderEvent = $this->eventDispatcher->dispatch($orderEvent);
+        $createOrderStruct = $orderEvent->getOrder();
+
+        $mollieOrder = $this->mollieGateway->createOrder($createOrderStruct, $salesChannel->getId());
+
+        $payment = new Payment($mollieOrder->getPaymentId());
+        $payment->setOrderId($mollieOrder->getId());
+        $payment->setFinalizeUrl($shopwareFinalizeUrl);
+
+        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
+
+        $this->processPaymentStatus($paymentHandler, $transactionId, $orderNumber, $context);
+
+        $redirectUrl = $mollieOrder->getCheckoutUrl();
+        if (mb_strlen($redirectUrl) === 0) {
+            $redirectUrl = $shopwareFinalizeUrl;
+        }
+
+        $paymentCreatedEvent = new PaymentCreatedEvent($redirectUrl, $payment, $transactionDataStruct, $dataBag, $context);
+        $this->eventDispatcher->dispatch($paymentCreatedEvent);
+
+        $logData['redirectUrl'] = $redirectUrl;
+        $this->logger->info('Payment Process - Finished (Orders API), redirecting customer to URL', $logData);
+
+        return new RedirectResponse($redirectUrl);
+    }
+
+    /**
+     * @param array<string, string> $logData
+     */
+    private function executePaymentsApi(
+        AbstractMolliePaymentHandler $paymentHandler,
+        TransactionDataStruct $transactionDataStruct,
+        OrderTransactionEntity $transaction,
+        RequestDataBag $dataBag,
+        Context $context,
+        SalesChannelEntity $salesChannel,
+        string $transactionId,
+        string $orderNumber,
+        string $shopwareFinalizeUrl,
+        array $logData
+    ): RedirectResponse {
+        $createPaymentStruct = $this->payloadBuilder->buildPayment($transactionDataStruct, $paymentHandler, $dataBag, $context);
 
         $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
 
@@ -91,15 +164,11 @@ final class Pay implements PayInterface
         $paymentEvent = $this->eventDispatcher->dispatch($paymentEvent);
         $createPaymentStruct = $paymentEvent->getPayment();
         $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
-        $paypalExpressAuthenticationId = $createPaymentStruct->getAuthenticationId();
-        if ($paypalExpressAuthenticationId !== null) {
-            $payment->setAuthenticationId($paypalExpressAuthenticationId);
-        }
 
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
 
-        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
+        $this->transactionService->savePaymentExtension($transactionId, $transactionDataStruct->getOrder(), $payment, $context);
 
         $this->processPaymentStatus($paymentHandler, $transactionId, $orderNumber, $context);
 

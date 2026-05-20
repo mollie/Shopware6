@@ -5,11 +5,13 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Mollie\Shopware\Component\Mollie\Capture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
@@ -22,6 +24,9 @@ final class FakeGateway implements MollieGatewayInterface
 {
     /** @var list<CreatePayment> */
     private array $createPayloads = [];
+
+    /** @var list<CreateOrder> */
+    private array $createOrderPayloads = [];
 
     /** @var list<string> */
     private array $cancelledPaymentIds = [];
@@ -53,6 +58,14 @@ final class FakeGateway implements MollieGatewayInterface
     }
 
     /**
+     * @return list<CreateOrder>
+     */
+    public function getCreateOrderPayloads(): array
+    {
+        return $this->createOrderPayloads;
+    }
+
+    /**
      * @return list<string>
      */
     public function getCancelledPaymentIds(): array
@@ -65,6 +78,13 @@ final class FakeGateway implements MollieGatewayInterface
         $this->createPayloads[] = $molliePayment;
 
         return $this->payment;
+    }
+
+    public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
+    {
+        $this->createOrderPayloads[] = $createOrder;
+
+        return new Order('ord_fake_' . uniqid(), $this->checkoutUrl, 'tr_fake_' . uniqid());
     }
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment

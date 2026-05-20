@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Mollie;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
-final class CreatePayment implements \JsonSerializable
+final class CreatePayment implements \JsonSerializable, PaymentParameterInterface
 {
     use JsonSerializableTrait;
 
@@ -199,9 +199,9 @@ final class CreatePayment implements \JsonSerializable
         return $this->metadata['shopwareOrderNumber'];
     }
 
-    public function setApplePayPaymentToken(?string $applePayPaymentToken): void
+    public function setApplePayPaymentToken(string $token): void
     {
-        $this->applePayPaymentToken = $applePayPaymentToken;
+        $this->applePayPaymentToken = $token;
     }
 
     public function getApplePayPaymentToken(): ?string
@@ -264,7 +264,7 @@ final class CreatePayment implements \JsonSerializable
         return $this->terminalId;
     }
 
-    public function setTerminalId(?string $terminalId): void
+    public function setTerminalId(string $terminalId): void
     {
         $this->terminalId = $terminalId;
     }

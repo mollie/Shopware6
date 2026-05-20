@@ -98,15 +98,12 @@ final class CreatePaymentTest extends TestCase
         $this->assertSame('SW-TERMINAL-123456', $payment->getTerminalId());
     }
 
-    public function testApplePayPaymentTokenCanBeSetToNull(): void
+    public function testApplePayPaymentTokenCanBeSet(): void
     {
         $payment = new CreatePayment('Test', 'https://example.com', new Money(50.00, 'EUR'));
 
         $payment->setApplePayPaymentToken('token');
         $this->assertSame('token', $payment->getApplePayPaymentToken());
-
-        $payment->setApplePayPaymentToken(null);
-        $this->assertNull($payment->getApplePayPaymentToken());
     }
 
     public function testDueDateCanBeSetToNull(): void

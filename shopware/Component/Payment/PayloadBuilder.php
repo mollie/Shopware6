@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Payment;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CaptureMode;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
@@ -39,7 +40,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterface
+final readonly class PayloadBuilder implements PayloadBuilderInterface
 {
     /**
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
@@ -60,7 +61,7 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
     ) {
     }
 
-    public function build(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreatePayment
+    public function buildPayment(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreatePayment
     {
         $transactionId = $transactionData->getTransaction()->getId();
         $order = $transactionData->getOrder();
@@ -189,12 +190,41 @@ final readonly class CreatePaymentBuilder implements CreatePaymentBuilderInterfa
             }
         }
 
+        /** @var CreatePayment $createPaymentStruct */
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $customer);
 
         $logData['payload'] = $createPaymentStruct->toArray();
         $this->logger->info('Payment payload created for mollie API', $logData);
 
         return $createPaymentStruct;
+    }
+
+    public function buildOrder(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreateOrder
+    {
+        $createPayment = $this->buildPayment($transactionData, $paymentHandler, $dataBag, $context);
+
+        $createOrder = new CreateOrder(
+            $createPayment->getShopwareOrderNumber(),
+            $createPayment->getRedirectUrl(),
+            $createPayment->getAmount(),
+            $createPayment->getLines(),
+            $createPayment->getBillingAddress(),
+            $createPayment->getLocale(),
+        );
+
+        $createOrder->setShippingAddress($createPayment->getShippingAddress());
+        $createOrder->setWebhookUrl($createPayment->getWebhookUrl());
+        $createOrder->setMethod($createPayment->getMethod());
+        $createOrder->setMetadata(['shopwareOrderNumber' => $createPayment->getShopwareOrderNumber()]);
+
+        $paymentHandler->applyPaymentSpecificParameters($createOrder, $dataBag, $transactionData->getCustomer());
+
+        $this->logger->info('Order payload created for mollie API', [
+            'orderNumber' => $createPayment->getShopwareOrderNumber(),
+            'payload' => $createOrder->toArray(),
+        ]);
+
+        return $createOrder;
     }
 
     private function modifySequenceType(CreatePayment $createPaymentStruct, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, string $salesChannelId, bool $hasSubscriptionLineItem): CreatePayment
