@@ -5,11 +5,12 @@ namespace Mollie\Shopware\Unit\Payment;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CaptureMode;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
-use Mollie\Shopware\Component\Payment\CreatePaymentBuilder;
+use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
@@ -18,6 +19,7 @@ use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeRecurringAwarePaymentHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
@@ -28,8 +30,8 @@ use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-#[CoversClass(CreatePaymentBuilder::class)]
-final class CreatePaymentBuilderTest extends TestCase
+#[CoversClass(PayloadBuilder::class)]
+final class PayloadBuilderTest extends TestCase
 {
     private Context $context;
 
@@ -44,7 +46,7 @@ final class CreatePaymentBuilderTest extends TestCase
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
         $actual->setCardToken('testCard');
         $actual->setMethod(PaymentMethod::PAYPAL);
 
@@ -158,7 +160,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $builder = $this->createBuilder();
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakeManualCaptureModeAwarePaymentHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakeManualCaptureModeAwarePaymentHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame(CaptureMode::MANUAL->value, $actual->getCaptureMode()->value);
@@ -174,7 +176,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $builder = $this->createBuilder($paymentSettings);
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakeBankTransferAwarePaymentHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakeBankTransferAwarePaymentHandler(), new RequestDataBag(), $this->context);
 
         $actualArray = $actual->toArray();
 
@@ -191,7 +193,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $builder = $this->createBuilder();
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakeBankTransferAwarePaymentHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakeBankTransferAwarePaymentHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertNull($actual->getDueDate());
@@ -208,7 +210,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionService->withMollieCustomerId($profileId, $mollieCustomerId);
         $transactionData = $transactionService->findById('test', $this->context);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame($mollieCustomerId, $actual->getCustomerId());
@@ -219,7 +221,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $builder = $this->createBuilder();
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertNull($actual->getCustomerId());
@@ -238,7 +240,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionService->withMollieCustomerId($profileId, $mollieCustomerId);
 
         $transactionData = $transactionService->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('first', $actual->getSequenceType()->value);
@@ -254,7 +256,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
         $transactionData->getCustomer()->setGuest(true);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('oneoff', $actual->getSequenceType()->value);
@@ -275,7 +277,7 @@ final class CreatePaymentBuilderTest extends TestCase
 
         $transactionData = $transactionService->findById('test', $this->context);
 
-        $actual = $builder->build($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('recurring', $actual->getSequenceType()->value);
@@ -295,7 +297,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionService->withMollieCustomerId($profileId, $mollieCustomerId);
 
         $transactionData = $transactionService->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('first', $actual->getSequenceType()->value);
@@ -317,7 +319,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionService->withMollieCustomerId($profileId, $mollieCustomerId);
         $transactionData = $transactionService->findById('test', $this->context);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('oneoff', $actual->getSequenceType()->value);
@@ -334,7 +336,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $requestDataBag->set('savePaymentDetails', true);
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('first', $actual->getSequenceType()->value);
@@ -349,7 +351,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $builder = $this->createBuilder(profileId: $profileId);
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('oneoff', $actual->getSequenceType()->value);
@@ -370,7 +372,7 @@ final class CreatePaymentBuilderTest extends TestCase
 
         $transactionData = $transactionService->findById('test', $this->context);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('first', $actual->getSequenceType()->value);
@@ -388,7 +390,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
         $transactionData->getCustomer()->setGuest(true);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('oneoff', $actual->getSequenceType()->value);
@@ -401,7 +403,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $builder = $this->createBuilder($paymentSettings);
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('10000', $actual->getDescription());
@@ -417,7 +419,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionService->withMollieCustomerId($profileId, 'cust_from_fallback_profile');
 
         $transactionData = $transactionService->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertSame('cust_from_fallback_profile', $actual->getCustomerId());
@@ -431,7 +433,7 @@ final class CreatePaymentBuilderTest extends TestCase
         $transactionService->withNullLineItems();
 
         $transactionData = $transactionService->findById('test', $this->context);
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
         $this->assertInstanceOf(LineItemCollection::class, $actual->getLines());
@@ -446,7 +448,7 @@ final class CreatePaymentBuilderTest extends TestCase
 
         $transactionData = $transactionService->findById('test', $this->context);
 
-        $actual = $builder->build($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
 
@@ -456,13 +458,94 @@ final class CreatePaymentBuilderTest extends TestCase
         }
     }
 
-    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null): CreatePaymentBuilder
+    public function testBuildOrderReturnsCreateOrderInstance(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertInstanceOf(CreateOrder::class, $actual);
+    }
+
+    public function testBuildOrderContainsAuthenticationIdInPaymentSubArray(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $dataBag = new RequestDataBag();
+        $dataBag->set('authenticationId', 'auth_test_123');
+
+        $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), $dataBag, $this->context);
+
+        $array = $actual->toArray();
+
+        $this->assertArrayHasKey('payment', $array);
+        $this->assertSame('auth_test_123', $array['payment']['authenticationId']);
+    }
+
+    public function testBuildOrderWithoutAuthenticationIdHasNoPaymentSubArray(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+
+        $this->assertArrayNotHasKey('payment', $array);
+    }
+
+    public function testBuildOrderContainsOrderNumberAndRedirectUrl(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+
+        $this->assertSame('10000', $array['orderNumber']);
+        $this->assertArrayHasKey('billingAddress', $array);
+        $this->assertArrayHasKey('lines', $array);
+        $this->assertArrayHasKey('amount', $array);
+    }
+
+    public function testBuildOrderLinesUseNameKey(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+        $lines = $array['lines'];
+
+        $this->assertNotEmpty($lines);
+        $this->assertArrayHasKey('name', $lines[0]);
+        $this->assertArrayNotHasKey('description', $lines[0]);
+    }
+
+    public function testBuildOrderSetsMetadataWithShopwareOrderNumber(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+
+        $this->assertArrayHasKey('metadata', $array);
+        $this->assertSame('10000', $array['metadata']['shopwareOrderNumber']);
+    }
+
+    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null): PayloadBuilder
     {
         if ($paymentSettings === null) {
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         }
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId);
 
-        return new CreatePaymentBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new NullLogger());
+        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new NullLogger());
     }
 }

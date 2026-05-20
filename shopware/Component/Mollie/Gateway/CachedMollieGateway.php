@@ -5,9 +5,11 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use Mollie\Shopware\Component\Mollie\Capture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
@@ -53,6 +55,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
         return $this->decorated->createPayment($molliePayment, $salesChannelId);
+    }
+
+    public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
+    {
+        return $this->decorated->createOrder($createOrder, $salesChannelId);
     }
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
