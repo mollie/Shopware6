@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
+use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
@@ -215,6 +216,20 @@ final class SettingsService extends AbstractSettingsService
         $shopwareSettings = $this->getMollieSettings($salesChannelId);
 
         $settings = OrderStateSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getRefundSettings(?string $salesChannelId = null): RefundSettings
+    {
+        $cacheKey = RefundSettings::class . '_' . ($salesChannelId ?? 'all');
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+
+        $settings = RefundSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;

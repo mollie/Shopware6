@@ -1,0 +1,215 @@
+{% block mollie_order_tab %}
+<div class="mollie-order-tab">
+
+    <sw-skeleton v-if="isDetailsLoading" />
+
+    <template v-else-if="isMollieOrder">
+
+        {% block mollie_order_tab_refund_modal %}
+            <sw-modal v-if="showRefundModal"
+                      variant="full"
+                      :title="$tc('sw-order.detailExtended.refundManager.title')"
+                      class="mollie-modal-refund-manager"
+                      @modal-close="onCloseRefundManager">
+                <mollie-refund-manager :order="order" />
+                <template #modal-footer>
+                    <sw-button size="large" @click="onCloseRefundManager">
+                        {{ $tc('sw-order.detailExtended.refundManager.btnCloseRefundManager') }}
+                    </sw-button>
+                </template>
+            </sw-modal>
+        {% endblock %}
+
+        {% block mollie_order_tab_shipping_modal %}
+            <sw-modal v-if="showShippingModal"
+                      :title="$tc('mollie-payments.modals.shipping.title')"
+                      variant="large"
+                      @modal-close="onCloseShippingManager">
+                <mollie-ship-order :order="order" />
+                <template #modal-footer>
+                    <sw-button size="small" @click="onCloseShippingManager">
+                        {{ $tc('mollie-payments.modals.shipping.cancelButton') }}
+                    </sw-button>
+                </template>
+            </sw-modal>
+        {% endblock %}
+
+        {% block mollie_order_tab_payment_card %}
+            <sw-card :title="$tc('mollie-payments.pluginTitle')"
+                     class="sw-order-detail-base__mollie-info"
+                     position-identifier="mollie-order-tab-payment-info">
+
+                <div class="mollie-property-column-left">
+
+                    {% block mollie_order_tab_creditcard %}
+                        <div v-if="hasCreditCardData" class="mollie-property-section">
+                            <dt class="mollie-property-title">
+                                {{ $tc('sw-order.detailExtended.titleCreditCardData') }}
+                            </dt>
+                            <dd class="mollie-property-creditcard-section">
+                                <mollie-credit-card-logo :creditCardCompany="creditCardLabel">
+                                    {{ creditCardLabel }}
+                                </mollie-credit-card-logo>
+                            </dd>
+                            <dd class="mollie-property-content">{{ creditCardNumber }}</dd>
+                            <dd class="mollie-property-content">{{ creditCardHolder }}</dd>
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_order_tab_mollie_id %}
+                        <div class="mollie-property-section">
+                            <dt class="mollie-property-title">
+                                {{ $tc('sw-order.detailExtended.labelMollieOrderId') }}
+                            </dt>
+                            <dd class="mollie-property-content">
+                                {{ mollieId }}
+                                <div v-if="isSubscription" style="margin-bottom:20px;">
+                                    <sw-label class="mollie-order-user-card-subscription-badge"
+                                              variant="info" size="medium" appearance="pill"
+                                              :ghost="true" :caps="true" :dismissable="false">
+                                        <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: subscriptionId } }">
+                                            {{ $tc('sw-order.detailExtended.subscriptionBadge') }}
+                                        </router-link>
+                                    </sw-label>
+                                </div>
+                            </dd>
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_order_tab_payment_ref %}
+                        <div v-if="thirdPartyPaymentId" class="mollie-property-section">
+                            <dt class="mollie-property-title mollie-order-user-card-payment-reference-title">
+                                {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
+                            </dt>
+                            <dd class="mollie-property-content">{{ thirdPartyPaymentId }}</dd>
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_order_tab_payment_link %}
+                        <div v-if="hasPaymentLink" class="mollie-property-section">
+                            <dt class="mollie-property-title">
+                                {{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}
+                            </dt>
+                            <dd>
+                                <sw-button-process size="x-small"
+                                                   class="mollie-property-paymentlink-button"
+                                                   :disabled="!molliePaymentUrl"
+                                                   :processSuccess="molliePaymentUrlCopied"
+                                                   @click="copyPaymentUrlToClipboard"
+                                                   @process-finish="onMolliePaymentUrlProcessFinished">
+                                    {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
+                                </sw-button-process>
+                            </dd>
+                        </div>
+                    {% endblock %}
+
+                </div>
+
+                <div class="mollie-property-column-right">
+                    {% block mollie_order_tab_actions %}
+                        <sw-button-group split-button>
+                            {% block mollie_order_tab_actions_ship %}
+                                <sw-button class="sw-order-line-items-grid__actions-ship-button"
+                                           size="small"
+                                           ghost="true"
+                                           :disabled="!isShippingPossible"
+                                           @click="onOpenShippingManager">
+                                    {{ $tc('mollie-payments.general.shipThroughMollie') }}
+                                </sw-button>
+                            {% endblock %}
+                            {% block mollie_order_tab_actions_refund %}
+                                <sw-button class="sw-order-line-items-grid__actions-refund-btn"
+                                           size="small"
+                                           ghost="true"
+                                           :disabled="!isRefundManagerPossible"
+                                           @click="onOpenRefundManager">
+                                    {{ $tc('sw-order.detailExtended.refundManager.btnOpenRefundManager') }}
+                                </sw-button>
+                            {% endblock %}
+                        </sw-button-group>
+                    {% endblock %}
+
+                    {% block mollie_order_tab_shipped_summary %}{% endblock %}
+                </div>
+
+            </sw-card>
+        {% endblock %}
+
+        {% block mollie_order_tab_line_items %}
+            <sw-card :title="$tc('sw-order.detailBase.cardTitleLineItems')"
+                     position-identifier="mollie-order-tab-line-items">
+                <template #grid>
+                    <sw-container type="row">
+                        <mollie-order-line-items-grid :order="order"
+                                                      :context="context"
+                                                      :editable="false"
+                                                      :initialShippingStatus="initialShippingStatus"
+                                                      :initialCancelStatus="initialCancelStatus">
+                        </mollie-order-line-items-grid>
+
+                        {% block mollie_order_tab_line_items_summary %}
+                            <sw-card-section divider="top" slim>
+                                <sw-description-list class="sw-order-detail__summary" grid="1fr 1fr">
+
+                                    {% block mollie_order_tab_summary_amount %}
+                                        <dt>{{ $tc('sw-order.detailBase.summaryLabelAmount') }}</dt>
+                                        <dd>{{ currencyFilter(order.positionPrice, currency.isoCode, order.totalRounding.decimals) }}</dd>
+                                    {% endblock %}
+
+                                    {% block mollie_order_tab_summary_shipping %}
+                                        <template v-if="delivery">
+                                            <dt>{{ $tc('sw-order.detailBase.summaryLabelShippingCosts') }}</dt>
+                                            <dd>{{ currencyFilter(delivery.shippingCosts.totalPrice, currency.isoCode, order.totalRounding.decimals) }}</dd>
+                                        </template>
+                                        <template v-for="(discount, index) in deliveryDiscounts" :key="index">
+                                            <dt>{{ $tc('sw-order.detailBase.discountLabelShippingCosts') }}</dt>
+                                            <dd>{{ currencyFilter(discount.shippingCosts.totalPrice, currency.isoCode, order.totalRounding.decimals) }}</dd>
+                                        </template>
+                                    {% endblock %}
+
+                                    {% block mollie_order_tab_summary_amount_net %}
+                                        <template v-if="taxStatus !== 'tax-free'">
+                                            <dt><strong>{{ $tc('sw-order.detailBase.summaryLabelAmountWithoutTaxes') }}</strong></dt>
+                                            <dd><strong>{{ currencyFilter(order.amountNet, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+                                        </template>
+                                    {% endblock %}
+
+                                    {% block mollie_order_tab_summary_taxes %}
+                                        <template v-if="taxStatus !== 'tax-free'">
+                                            <template v-for="(tax, index) in sortedCalculatedTaxes" :key="index">
+                                                <dt>{{ $tc('sw-order.detailBase.summaryLabelTaxes', 1, { taxRate: tax.taxRate }) }}</dt>
+                                                <dd>{{ currencyFilter(tax.tax, currency.isoCode, order.totalRounding.decimals) }}</dd>
+                                            </template>
+                                        </template>
+                                    {% endblock %}
+
+                                    {% block mollie_order_tab_summary_total %}
+                                        <template v-if="taxStatus !== 'tax-free'">
+                                            <dt><strong>{{ $tc('sw-order.detailBase.summaryLabelAmountTotal') }}</strong></dt>
+                                            <dd><strong>{{ currencyFilter(orderTotal, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+                                            <template v-if="displayRounded">
+                                                <dt><strong>{{ $tc('sw-order.detailBase.summaryLabelAmountTotalRounded') }}</strong></dt>
+                                                <dd><strong>{{ currencyFilter(order.price.totalPrice, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+                                            </template>
+                                        </template>
+                                    {% endblock %}
+
+                                    {% block mollie_order_tab_summary_total_free_tax %}
+                                        <template v-if="taxStatus === 'tax-free'">
+                                            <dt><strong>{{ $tc('sw-order.detailBase.summaryLabelAmount') }}</strong></dt>
+                                            <dd><strong>{{ currencyFilter(order.price.totalPrice, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+                                        </template>
+                                    {% endblock %}
+
+                                </sw-description-list>
+                            </sw-card-section>
+                        {% endblock %}
+                    </sw-container>
+                </template>
+            </sw-card>
+        {% endblock %}
+
+    </template>
+
+</div>
+{% endblock %}

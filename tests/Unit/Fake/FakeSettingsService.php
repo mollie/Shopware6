@@ -15,6 +15,7 @@ use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
+use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
@@ -104,4 +105,10 @@ final class FakeSettingsService extends AbstractSettingsService
     {
         return $this->orderStateSettings;
     }
+
+    public function getRefundSettings(?string $salesChannelId = null): RefundSettings
+    {
+        // TODO: Implement getRefundSettings() method.
+    }
+
 }
