@@ -41,6 +41,20 @@ configService
             icon: 'regular-shopping-bag',
             entity: 'mollie_subscription',
 
+            routeMiddleware(next, currentRoute) {
+                if (currentRoute.name === 'sw.order.detail') {
+                    currentRoute.children.push({
+                        name: 'sw.order.detail.mollie',
+                        path: 'mollie',
+                        component: 'mollie-order-tab',
+                        meta: {
+                            parentPath: 'sw.order.index',
+                        },
+                    });
+                }
+                next(currentRoute);
+            },
+
             routes: {
                 subscriptions: {
                     component: 'mollie-subscriptions-list',

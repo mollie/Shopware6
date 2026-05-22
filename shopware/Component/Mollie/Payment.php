@@ -17,6 +17,20 @@ final class Payment extends Struct implements \JsonSerializable
     private string $thirdPartyPaymentId = '';
     private string $checkoutUrl = '';
 
+    private string $creditCardLabel = '';
+    private string $creditCardNumber = '';
+    private string $creditCardHolder = '';
+
+    private string $paypalPayerId = '';
+
+    private string $bankName = '';
+    private string $bankAccount = '';
+    private string $bankBic = '';
+    private string $transferReference = '';
+    private string $consumerName = '';
+    private string $consumerAccount = '';
+    private string $consumerBic = '';
+
     private string $finalizeUrl = '';
     private int $countPayments = 1;
     private string $changePaymentStateUrl;
@@ -121,6 +135,164 @@ final class Payment extends Struct implements \JsonSerializable
     }
 
     /**
+     * @return null|array{label: string, number: string, holder: string}
+     */
+    public function getCreditCardDetails(): ?array
+    {
+        if ($this->creditCardLabel === '') {
+            return null;
+        }
+
+        return [
+            'label' => $this->creditCardLabel,
+            'number' => $this->creditCardNumber,
+            'holder' => $this->creditCardHolder,
+        ];
+    }
+
+    public function getCreditCardLabel(): string
+    {
+        return $this->creditCardLabel;
+    }
+
+    public function setCreditCardLabel(string $creditCardLabel): void
+    {
+        $this->creditCardLabel = $creditCardLabel;
+    }
+
+    public function getCreditCardNumber(): string
+    {
+        return $this->creditCardNumber;
+    }
+
+    public function setCreditCardNumber(string $creditCardNumber): void
+    {
+        $this->creditCardNumber = $creditCardNumber;
+    }
+
+    public function getCreditCardHolder(): string
+    {
+        return $this->creditCardHolder;
+    }
+
+    public function setCreditCardHolder(string $creditCardHolder): void
+    {
+        $this->creditCardHolder = $creditCardHolder;
+    }
+
+    public function getPaypalPayerId(): string
+    {
+        return $this->paypalPayerId;
+    }
+
+    public function setPaypalPayerId(string $paypalPayerId): void
+    {
+        $this->paypalPayerId = $paypalPayerId;
+    }
+
+    /**
+     * @return null|array{payerId: string}
+     */
+    public function getPaypalDetails(): ?array
+    {
+        if ($this->paypalPayerId === '') {
+            return null;
+        }
+
+        return ['payerId' => $this->paypalPayerId];
+    }
+
+    public function getBankName(): string
+    {
+        return $this->bankName;
+    }
+
+    public function setBankName(string $bankName): void
+    {
+        $this->bankName = $bankName;
+    }
+
+    public function getBankAccount(): string
+    {
+        return $this->bankAccount;
+    }
+
+    public function setBankAccount(string $bankAccount): void
+    {
+        $this->bankAccount = $bankAccount;
+    }
+
+    public function getBankBic(): string
+    {
+        return $this->bankBic;
+    }
+
+    public function setBankBic(string $bankBic): void
+    {
+        $this->bankBic = $bankBic;
+    }
+
+    public function getTransferReference(): string
+    {
+        return $this->transferReference;
+    }
+
+    public function setTransferReference(string $transferReference): void
+    {
+        $this->transferReference = $transferReference;
+    }
+
+    public function getConsumerName(): string
+    {
+        return $this->consumerName;
+    }
+
+    public function setConsumerName(string $consumerName): void
+    {
+        $this->consumerName = $consumerName;
+    }
+
+    public function getConsumerAccount(): string
+    {
+        return $this->consumerAccount;
+    }
+
+    public function setConsumerAccount(string $consumerAccount): void
+    {
+        $this->consumerAccount = $consumerAccount;
+    }
+
+    public function getConsumerBic(): string
+    {
+        return $this->consumerBic;
+    }
+
+    public function setConsumerBic(string $consumerBic): void
+    {
+        $this->consumerBic = $consumerBic;
+    }
+
+    /**
+     * @return null|array{bankName: string, bankAccount: string, bankBic: string, transferReference: string, consumerName: string, consumerAccount: string, consumerBic: string}
+     */
+    public function getBankTransferDetails(): ?array
+    {
+        if ($this->bankAccount === '') {
+            return null;
+        }
+
+        return [
+            'bankName' => $this->bankName,
+            'bankAccount' => $this->bankAccount,
+            'bankBic' => $this->bankBic,
+            'transferReference' => $this->transferReference,
+            'consumerName' => $this->consumerName,
+            'consumerAccount' => $this->consumerAccount,
+            'consumerBic' => $this->consumerBic,
+        ];
+    }
+
+    /**
      * @param array<mixed> $body
      */
     public static function createFromClientResponse(array $body): self
@@ -184,6 +356,29 @@ final class Payment extends Struct implements \JsonSerializable
         }
 
         $payment->setCancelable((bool) ($body['isCancelable'] ?? false));
+
+        $cardLabel = $body['details']['cardLabel'] ?? null;
+        if ($cardLabel !== null) {
+            $payment->setCreditCardLabel((string) $cardLabel);
+            $payment->setCreditCardNumber((string) ($body['details']['cardNumber'] ?? ''));
+            $payment->setCreditCardHolder((string) ($body['details']['cardHolder'] ?? ''));
+        }
+
+        $paypalPayerId = $body['details']['paypalPayerId'] ?? null;
+        if ($paypalPayerId !== null) {
+            $payment->setPaypalPayerId((string) $paypalPayerId);
+        }
+
+        $bankAccount = $body['details']['bankAccount'] ?? null;
+        if ($bankAccount !== null) {
+            $payment->setBankName((string) ($body['details']['bankName'] ?? ''));
+            $payment->setBankAccount((string) $bankAccount);
+            $payment->setBankBic((string) ($body['details']['bankBic'] ?? ''));
+            $payment->setTransferReference((string) ($body['details']['transferReference'] ?? ''));
+            $payment->setConsumerName((string) ($body['details']['consumerName'] ?? ''));
+            $payment->setConsumerAccount((string) ($body['details']['consumerAccount'] ?? ''));
+            $payment->setConsumerBic((string) ($body['details']['consumerBic'] ?? ''));
+        }
 
         return $payment;
     }

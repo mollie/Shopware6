@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
+use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 
 abstract class AbstractSettingsService
@@ -37,4 +38,6 @@ abstract class AbstractSettingsService
     abstract public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings;
 
     abstract public function getOrderStateSettings(?string $salesChannelId = null): OrderStateSettings;
+
+    abstract public function getRefundSettings(?string $salesChannelId = null): RefundSettings;
 }

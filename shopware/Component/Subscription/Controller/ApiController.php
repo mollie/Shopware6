@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Controller;
 
-use Mollie\Shopware\Component\Settings\AbstractSettingsService;
-use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandlerInterface;
 use Shopware\Core\Framework\Context;
@@ -25,17 +23,7 @@ final class ApiController extends AbstractController
     public function __construct(
         #[Autowire(service: SubscriptionActionHandler::class)]
         private readonly SubscriptionActionHandlerInterface $actionHandler,
-        #[Autowire(service: SettingsService::class)]
-        private readonly AbstractSettingsService $settingsService
     ) {
-    }
-
-    #[Route(path: '/api/_action/mollie/config/subscription', name: 'api.action.mollie.config.subscription', methods: ['POST'])]
-    public function subscriptionConfig(): JsonResponse
-    {
-        return new JsonResponse([
-            'enabled' => $this->settingsService->getSubscriptionSettings()->isEnabled(),
-        ]);
     }
 
     #[Route(path: '/api/_action/mollie/subscriptions/pause', name: 'api.action.mollie.subscription.pause', defaults: ['action' => 'pause'], methods: ['POST'])]

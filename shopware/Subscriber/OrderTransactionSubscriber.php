@@ -55,6 +55,11 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             $authenticationId = $mollieCustomFields['authenticationId'] ?? null;
             $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
             $orderId = $mollieCustomFields['orderId'] ?? null;
+            $creditCardLabel = $mollieCustomFields['creditCardLabel'] ?? null;
+            $creditCardNumber = $mollieCustomFields['creditCardNumber'] ?? null;
+            $creditCardHolder = $mollieCustomFields['creditCardHolder'] ?? null;
+            $checkoutUrl = $mollieCustomFields['checkoutUrl'] ?? null;
+            $changePaymentStateUrl = $mollieCustomFields['changePaymentStateUrl'] ?? null;
 
             $transactionExtension = new Payment($paymentId);
             $transactionExtension->setCountPayments($countPayments);
@@ -72,6 +77,21 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
             if ($authenticationId !== null) {
                 $transactionExtension->setAuthenticationId($authenticationId);
+            }
+            if ($creditCardLabel !== null) {
+                $transactionExtension->setCreditCardLabel($creditCardLabel);
+            }
+            if ($creditCardNumber !== null) {
+                $transactionExtension->setCreditCardNumber($creditCardNumber);
+            }
+            if ($creditCardHolder !== null) {
+                $transactionExtension->setCreditCardHolder($creditCardHolder);
+            }
+            if ($checkoutUrl !== null) {
+                $transactionExtension->setCheckoutUrl($checkoutUrl);
+            }
+            if ($changePaymentStateUrl !== null) {
+                $transactionExtension->setChangePaymentStateUrl($changePaymentStateUrl);
             }
 
             $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
