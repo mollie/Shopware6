@@ -110,5 +110,4 @@ final class FakeSettingsService extends AbstractSettingsService
     {
         // TODO: Implement getRefundSettings() method.
     }
-
 }

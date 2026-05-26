@@ -31,19 +31,7 @@
         <default key="auth_enabled"><bool>true</bool></default>
     </route>
 
-    <route id="api.action.mollie.refund" path="/api/_action/mollie/refund" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\RefundControllerBase::refundOrderID</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
 
-    <route id="api.action.mollie.refund.cancel" path="/api/_action/mollie/refund/cancel" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\RefundControllerBase::cancel</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
 
     <route id="api.action.mollie.refund-manager.data.legacy" path="/api/v{version}/_action/mollie/refund-manager/data" methods="POST">
         <default key="_controller">Kiener\MolliePayments\Controller\Api\Order\RefundControllerBase::refundManagerDataLegacy</default>

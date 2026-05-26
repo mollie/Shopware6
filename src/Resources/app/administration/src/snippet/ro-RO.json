@@ -131,8 +131,10 @@
                     "pending": "Rambursarea va fi trimisă băncii în următoarea zi lucrătoare. Puteți, de asemenea, să anulați rambursarea.",
                     "processing": "Rambursarea a fost trimisă băncii. Suma rambursată va fi transferată contului consumatorului cât mai curând posibil.",
                     "refunded": "Suma rambursării a fost transferată către consumator.",
-                    "failed": "Rambursarea a eșuat după procesare. De exemplu, clientul și-a închis contul bancar. Fondurile vor fi returnate în contul dvs."
-                }
+                    "failed": "Rambursarea a eșuat după procesare. De exemplu, clientul și-a închis contul bancar. Fondurile vor fi returnate în contul dvs.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

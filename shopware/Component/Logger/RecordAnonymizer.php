@@ -34,13 +34,13 @@ final class RecordAnonymizer implements ProcessorInterface
         }
 
         return new LogRecord(
-            datetime: $record->datetime,
-            channel: $record->channel,
-            level: $record->level,
-            message: $record->message,
-            context: $recordArray['context'],
-            extra: $recordArray['extra'],
-            formatted: $record->formatted,
+            $record->datetime,
+            $record->channel,
+            $record->level,
+            $record->message,
+            $recordArray['context'],
+            $recordArray['extra'],
+            $record->formatted,
         );
     }
 
