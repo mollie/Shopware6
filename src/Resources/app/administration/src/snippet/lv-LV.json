@@ -131,8 +131,10 @@
                     "pending": "Atmaksa tiks nosūtīta uz banku nākamajā darba dienā. Jūs joprojām varat atcelt atmaksu.",
                     "processing": "Atmaksa ir nosūtīta uz banku. Atmaksātā summa tiks pārskaitīta uz patērētāja kontu pēc iespējas ātrāk.",
                     "refunded": "Atmaksas summa ir pārsūtīts patērētājam.",
-                    "failed": "Atmaksa neizdevās pēc apstrādes. Piemēram, klients ir slēdzis savu bankas kontu. Līdzekļi tiks atgriezti jūsu kontā."
-                }
+                    "failed": "Atmaksa neizdevās pēc apstrādes. Piemēram, klients ir slēdzis savu bankas kontu. Līdzekļi tiks atgriezti jūsu kontā.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

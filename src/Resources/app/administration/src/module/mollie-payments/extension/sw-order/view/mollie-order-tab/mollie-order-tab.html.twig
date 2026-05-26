@@ -11,7 +11,7 @@
                       :title="$tc('sw-order.detailExtended.refundManager.title')"
                       class="mollie-modal-refund-manager"
                       @modal-close="onCloseRefundManager">
-                <mollie-refund-manager :order="order" />
+                <mollie-refund-manager :order="order" :refundManagerConfig="details.refundManager" />
                 <template #modal-footer>
                     <sw-button size="large" @click="onCloseRefundManager">
                         {{ $tc('sw-order.detailExtended.refundManager.btnCloseRefundManager') }}

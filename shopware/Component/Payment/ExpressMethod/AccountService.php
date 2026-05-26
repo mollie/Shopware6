@@ -108,10 +108,11 @@ final class AccountService extends AbstractAccountService
         $this->logger->debug('Switch customers payment method', $logData);
         $contextSwitchResponse = $this->contextSwitchRoute->switchContext($requestDataBag, $salesChannelContext);
 
-        $parameters = new SalesChannelContextServiceParameters($salesChannelContext->getSalesChannelId(),
+        $parameters = new SalesChannelContextServiceParameters(
+            $salesChannelContext->getSalesChannelId(),
             $contextSwitchResponse->getToken(),
             originalContext: $salesChannelContext->getContext(),
-            customerId: $customer->getId()
+            customerId: $customer->getId(),
         );
         $this->logger->debug('Finished - login or create express customer', $logData);
 

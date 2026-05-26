@@ -126,12 +126,14 @@
                 "processing": "Processing",
                 "refunded": "Erstattet",
                 "failed": "Gescheitert",
+                "canceled": "Storniert",
                 "description": {
                     "queued": "Die Rückerstattung steht in der Warteschlange, bis genügend Guthaben vorhanden ist, um die Rückerstattung zu verarbeiten. Sie können die Rückerstattung noch stornieren.",
                     "pending": "Die Rückerstattung wird am nächsten Werktag an die Bank gesendet. Sie können die Rückerstattung immer noch stornieren.",
                     "processing": "Die Rückerstattung wurde an die Bank gesendet. Der Rückerstattungsbetrag wird so schnell wie möglich auf das Kundenkonto überwiesen.",
                     "refunded": "Der Rückerstattungsbetrag wurde an den Kunden überwiesen.",
-                    "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen."
+                    "failed": "Die Rückerstattung ist nach der Bearbeitung fehlgeschlagen. Zum Beispiel hat der Kunde sein Bankkonto geschlossen. Das Geld wird auf das Konto zurücküberwiesen.",
+                    "canceled": "Die Rückerstattung wurde storniert."
                 }
             }
         },

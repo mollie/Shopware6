@@ -10,3 +10,4 @@ default:
         - Mollie\Shopware\Behat\Context\CustomerContext
         - Mollie\Shopware\Behat\Context\CheckoutContext
         - Mollie\Shopware\Behat\Context\SubscriptionContext
+        - Mollie\Shopware\Behat\Context\RefundContext

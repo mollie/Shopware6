@@ -126,12 +126,14 @@
                 "processing": "Processing",
                 "refunded": "Refunded",
                 "failed": "Failed",
+                "canceled": "Canceled",
                 "description": {
                     "queued": "The refund is queued until there is enough balance to process te refund. You can still cancel the refund.",
                     "pending": "The refund will be sent to the bank on the next business day. You can still cancel the refund.",
                     "processing": "The refund has been sent to the bank. The refund amount will be transferred to the consumer account as soon as possible.",
                     "refunded": "The refund amount has been transferred to the consumer.",
-                    "failed": "The refund has failed after processing. For example, the customer has closed his / her bank account. The funds will be returned to your account."
+                    "failed": "The refund has failed after processing. For example, the customer has closed his / her bank account. The funds will be returned to your account.",
+                    "canceled": "The refund has been cancelled."
                 }
             }
         },

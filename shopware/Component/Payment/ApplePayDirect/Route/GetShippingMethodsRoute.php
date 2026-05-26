@@ -104,7 +104,7 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
             $salesChannelContext->getSalesChannelId(),
             $contextSwitchResponse->getToken(),
             originalContext: $salesChannelContext->getContext(),
-            customerId: $customerId
+            customerId: $customerId,
         );
 
         $newContext = $this->salesChannelContextService->get($salesChannelContextServiceParameters);

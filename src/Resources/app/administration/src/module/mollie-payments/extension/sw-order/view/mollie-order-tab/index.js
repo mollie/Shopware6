@@ -158,13 +158,13 @@ Component.register('mollie-order-tab', {
             if (this.$root && this.$root.$on) {
                 this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
                     this.onCloseShippingManager();
-                    location.reload();
+                    this.loadData();
                 });
             } else {
                 // eslint-disable-next-line no-undef
                 Shopware.Utils.EventBus.on(MollieShippingEvents.EventShippedOrder, () => {
                     this.onCloseShippingManager();
-                    location.reload();
+                    this.loadData();
                 });
             }
 
@@ -222,7 +222,7 @@ Component.register('mollie-order-tab', {
 
         onCloseRefundManager() {
             this.showRefundModal = false;
-            location.reload();
+            this.loadData();
         },
 
         onOpenShippingManager() {

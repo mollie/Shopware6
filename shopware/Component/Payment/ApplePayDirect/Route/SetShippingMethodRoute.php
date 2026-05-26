@@ -61,7 +61,7 @@ final class SetShippingMethodRoute extends AbstractSetShippingMethodRoute
             $salesChannelContext->getSalesChannelId(),
             $contextSwitchResponse->getToken(),
             originalContext: $salesChannelContext->getContext(),
-            customerId: $salesChannelContext->getCustomerId()
+            customerId: $salesChannelContext->getCustomerId(),
         );
         $newContext = $this->salesChannelContextService->get($salesChannelContextServiceParameters);
         $this->logger->info('Finsihed - set apple pay shipping method', $logData);
