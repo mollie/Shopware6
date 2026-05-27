@@ -40,6 +40,17 @@ final class RefundCollection implements \JsonSerializable
         return round($total, Mollie::ROUNDING_PRECISION);
     }
 
+    public function findByMollieId(string $mollieRefundId): ?Refund
+    {
+        foreach ($this->refunds as $refund) {
+            if ($refund->getId() === $mollieRefundId) {
+                return $refund;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return Refund[]
      */

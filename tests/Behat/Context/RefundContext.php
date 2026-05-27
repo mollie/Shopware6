@@ -11,9 +11,13 @@ use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RefundStatus;
 use Mollie\Shopware\Component\Refund\Controller\RefundController;
+use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Component\HttpFoundation\Request;
 
 final class RefundContext extends ShopwareContext
@@ -22,6 +26,7 @@ final class RefundContext extends ShopwareContext
 
     private const STORAGE_LAST_REFUND_RESPONSE = 'lastRefundResponse';
     private const STORAGE_LAST_REFUND_ID = 'lastRefundId';
+    private const STORAGE_STORED_REFUND_ID = 'storedRefundId';
     private const STORAGE_REFUND_EXCEPTION = 'refundException';
 
     #[When('i create a full refund')]
@@ -30,10 +35,26 @@ final class RefundContext extends ShopwareContext
         $this->callCreateRefundRoute(['orderId' => Storage::get(CheckoutContext::STORAGE_ORDER_ID)]);
     }
 
+    #[When('i create a full refund with description :description and internal description :internalDescription')]
+    public function iCreateAFullRefundWithDescriptions(string $description, string $internalDescription): void
+    {
+        $this->callCreateRefundRoute([
+            'orderId' => Storage::get(CheckoutContext::STORAGE_ORDER_ID),
+            'description' => $description,
+            'internalDescription' => $internalDescription,
+        ]);
+    }
+
     #[When('i refund line item :productNumber with quantity :quantity')]
     public function iRefundLineItemWithQuantity(string $productNumber, int $quantity): void
     {
         $this->callRefundLineItem($productNumber, $quantity);
+    }
+
+    #[When('i refund line item :productNumber with quantity :quantity and description :description and internal description :internalDescription')]
+    public function iRefundLineItemWithQuantityAndDescriptions(string $productNumber, int $quantity, string $description, string $internalDescription): void
+    {
+        $this->callRefundLineItem($productNumber, $quantity, null, $description, $internalDescription);
     }
 
     #[When('i refund line item :productNumber with quantity :quantity and amount :amount')]
@@ -69,6 +90,24 @@ final class RefundContext extends ShopwareContext
         ]);
     }
 
+    #[When('i remember the refund id')]
+    public function iRememberTheRefundId(): void
+    {
+        $refundId = Storage::get(self::STORAGE_LAST_REFUND_ID);
+        Assert::assertNotNull($refundId, 'No refund ID to remember');
+        Storage::set(self::STORAGE_STORED_REFUND_ID, $refundId);
+    }
+
+    #[When('i cancel the stored refund')]
+    public function iCancelTheStoredRefund(): void
+    {
+        $orderId = Storage::get(CheckoutContext::STORAGE_ORDER_ID);
+        $refundId = Storage::get(self::STORAGE_STORED_REFUND_ID);
+        Assert::assertNotNull($refundId, 'No stored refund ID');
+
+        $this->cancelRefund($orderId, $refundId);
+    }
+
     #[When('i cancel the last refund')]
     public function iCancelTheLastRefund(): void
     {
@@ -76,15 +115,7 @@ final class RefundContext extends ShopwareContext
         $refundId = Storage::get(self::STORAGE_LAST_REFUND_ID);
         Assert::assertNotNull($refundId, 'No refund ID stored from previous refund');
 
-        $context = $this->getCurrentSalesChannelContext()->getContext();
-
-        /** @var RefundController $controller */
-        $controller = $this->getContainer()->get(RefundController::class);
-
-        $request = new Request();
-        $request->request->replace(['orderId' => $orderId, 'refundId' => $refundId]);
-
-        $controller->cancel($request, $context);
+        $this->cancelRefund($orderId, $refundId);
     }
 
     #[When('i refund the amount :amount')]
@@ -155,35 +186,92 @@ final class RefundContext extends ShopwareContext
         ));
     }
 
-    private function callRefundLineItem(string $productNumber, int $quantity, ?float $amount = null): void
+    #[Then('the refund public description is :expected')]
+    public function theRefundPublicDescriptionIs(string $expected): void
+    {
+        $refundId = Storage::get(self::STORAGE_LAST_REFUND_ID);
+        Assert::assertNotNull($refundId, 'No refund ID stored');
+        Assert::assertSame($expected, $this->findDalRefundByMollieId($refundId)->getPublicDescription());
+    }
+
+    #[Then('the refund internal description is :expected')]
+    public function theRefundInternalDescriptionIs(string $expected): void
+    {
+        $refundId = Storage::get(self::STORAGE_LAST_REFUND_ID);
+        Assert::assertNotNull($refundId, 'No refund ID stored');
+        Assert::assertSame($expected, $this->findDalRefundByMollieId($refundId)->getInternalDescription());
+    }
+
+    private function cancelRefund(string $orderId, string $refundId): void
+    {
+        $context = $this->getCurrentSalesChannelContext()->getContext();
+
+        /** @var RefundController $controller */
+        $controller = $this->getContainer()->get(RefundController::class);
+
+        $request = new Request();
+        $request->request->replace(['orderId' => $orderId, 'refundId' => $refundId]);
+
+        $controller->cancel($request, $context);
+    }
+
+    private function findDalRefundByMollieId(string $mollieRefundId): RefundEntity
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('mollie_refund.repository');
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('mollieRefundId', $mollieRefundId));
+
+        $context = $this->getCurrentSalesChannelContext()->getContext();
+        $result = $repository->search($criteria, $context)->first();
+
+        Assert::assertInstanceOf(RefundEntity::class, $result, sprintf('No DAL refund found for Mollie ID "%s"', $mollieRefundId));
+
+        return $result;
+    }
+
+    private function callRefundLineItem(string $identifier, int $quantity, ?float $amount = null, string $description = '', string $internalDescription = ''): void
     {
         $orderId = Storage::get(CheckoutContext::STORAGE_ORDER_ID);
         $salesChannelContext = $this->getCurrentSalesChannelContext();
 
         $order = $this->getOrderById($orderId, $salesChannelContext);
-        $lineItems = $order->getLineItems();
-        Assert::assertNotNull($lineItems, 'Order has no line items');
 
-        $lineItem = null;
-        foreach ($lineItems as $item) {
-            if ($item->getProduct()?->getProductNumber() === $productNumber) {
-                $lineItem = $item;
+        $itemId = null;
+
+        foreach ($order->getLineItems() ?? [] as $lineItem) {
+            if ($lineItem->getProduct()?->getProductNumber() === $identifier) {
+                $itemId = $lineItem->getId();
                 break;
             }
         }
 
-        Assert::assertNotNull($lineItem, sprintf('Line item with product number "%s" not found', $productNumber));
+        if ($itemId === null) {
+            foreach ($order->getDeliveries() ?? [] as $delivery) {
+                if ($delivery->getShippingMethod()?->getTechnicalName() === $identifier) {
+                    $itemId = $delivery->getId();
+                    break;
+                }
+            }
+        }
 
-        $item = ['id' => $lineItem->getId(), 'quantity' => $quantity];
+        Assert::assertNotNull($itemId, sprintf('Line item or delivery with identifier "%s" not found', $identifier));
+
+        $item = ['id' => $itemId, 'quantity' => $quantity];
 
         if ($amount !== null) {
             $item['amount'] = $amount;
         }
 
-        $params = [
-            'orderId' => $orderId,
-            'items' => [$item],
-        ];
+        $params = ['orderId' => $orderId, 'items' => [$item]];
+
+        if ($description !== '') {
+            $params['description'] = $description;
+        }
+
+        if ($internalDescription !== '') {
+            $params['internalDescription'] = $internalDescription;
+        }
 
         $this->callCreateRefundRoute($params);
     }

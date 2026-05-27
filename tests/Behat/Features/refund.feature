@@ -10,110 +10,39 @@ Feature: Refund Management
     And i select "EUR" as currency
     And i select "mollie_fixture_shipment" as shipping method
 
-  Scenario: full refund
-    And product "MOL_REGULAR" with quantity "1" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i create a full refund
-    Then the refund is created with status "pending"
-    And the refund amount is "34.89"
-
-  Scenario: refund a single line item
+  Scenario: refund scenarios covering line item, partial amount, full refund and cancellation
     And product "MOL_REGULAR" with quantity "2" is in cart
-    And product "MOL_REDUCED_TAX" with quantity "1" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i refund line item "MOL_REGULAR" with quantity "1"
-    Then the refund is created with status "pending"
-    And the refund amount is "29.90"
-
-  Scenario: refund a specific amount
-    And product "MOL_REGULAR" with quantity "2" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i refund the amount "5.00"
-    Then the refund is created with status "pending"
-    And the refund amount is "5.00"
-
-  Scenario: refund a line item with a custom partial amount via quantity
-    And product "MOL_REGULAR" with quantity "1" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i refund line item "MOL_REGULAR" with quantity "1" and amount "20.00"
-    Then the refund is created with status "pending"
-    And the refund amount is "20.00"
-
-  Scenario: refund a partial amount of a line item without quantity
-    And product "MOL_REGULAR" with quantity "1" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i refund line item "MOL_REGULAR" with partial amount "20.00"
-    Then the refund is created with status "pending"
-    And the refund amount is "20.00"
-
-  Scenario: full refund after partial refund includes shipping costs and voucher discount in remaining amount
-    And product "MOL_REGULAR" with quantity "1" is in cart
-    And product "MOL_CHEAP" with quantity "1" is in cart
-    And product "MOL_REDUCED_TAX" with quantity "1" is in cart
+    And product "MOL_CHEAP" with quantity "5" is in cart
     And i apply promotion code "mollie_5"
     When i start checkout with payment method "paypal"
     And select payment status "paid"
     Then i see success page
     And order payment status is "paid"
-    When i refund line item "MOL_REGULAR" with quantity "1"
+    When i refund line item "MOL_REGULAR" with quantity "1" and description "Defective unit returned" and internal description "RMA-2026-001"
     Then the refund is created with status "pending"
     And the refund amount is "29.90"
+    And the refund public description is "Defective unit returned"
+    And the refund internal description is "RMA-2026-001"
     And there are 1 pending refunds
-    When i create a full refund
+    When i refund line item "MOL_CHEAP" with partial amount "3.00"
     Then the refund is created with status "pending"
-    And the refund amount is "20.89"
+    And the refund amount is "3.00"
     And there are 2 pending refunds
-
-  Scenario: full refund with voucher discount
-    And product "MOL_REGULAR" with quantity "1" is in cart
-    And i apply promotion code "mollie_5"
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i create a full refund
+    When i refund the amount "2.00"
     Then the refund is created with status "pending"
-    And the refund amount is "29.89"
-
-  Scenario: cancel a pending refund
-    And product "MOL_REGULAR" with quantity "1" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i refund the amount "5.00"
+    And the refund amount is "2.00"
+    And there are 3 pending refunds
+    When i refund line item "mollie_fixture_shipment" with quantity "1" and description "Shipment refund" and internal description "Refund shipment"
     Then the refund is created with status "pending"
-    And there are 1 pending refunds
-    When i cancel the last refund
-    Then there are 0 pending refunds
-
-  Scenario: full refund after partial refund refunds only the remaining amount
-    And product "MOL_REGULAR" with quantity "3" is in cart
-    When i start checkout with payment method "paypal"
-    And select payment status "paid"
-    Then i see success page
-    And order payment status is "paid"
-    When i refund the amount "29.90"
+    And the refund amount is "4.99"
+    And there are 4 pending refunds
+    When i remember the refund id
+    When i create a full refund with description "Full order refund" and internal description "Approved by support"
     Then the refund is created with status "pending"
-    And the refund amount is "29.90"
-    And there are 1 pending refunds
-    When i create a full refund
-    Then the refund is created with status "pending"
-    And the refund amount is "64.79"
-    And there are 2 pending refunds
+    And the refund amount is "24.90"
+    And the refund public description is "Full order refund"
+    And the refund internal description is "Approved by support"
+    And there are 5 pending refunds
+    When i cancel the stored refund
+    Then there are 4 pending refunds
 

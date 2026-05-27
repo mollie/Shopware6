@@ -142,6 +142,7 @@ trait CheckoutTestBehaviour
         $criteria->addAssociation('currency');
         $criteria->addAssociation('deliveries.positions');
         $criteria->addAssociation('deliveries.shippingCosts');
+        $criteria->addAssociation('deliveries.shippingMethod');
         $criteria->addAssociation('deliveries.shippingOrderAddress.country');
 
         $searchResult = $repository->search($criteria, $salesChannelContext->getContext());
