@@ -3,8 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Refund\DAL\RefundItem\RefundItemCollection;
+
 final class Refund implements \JsonSerializable
 {
+    private ?RefundItemCollection $refundItems = null;
+    private string $internalDescription = '';
+
     public function __construct(
         private string $id,
         private string $paymentId,
@@ -13,6 +18,16 @@ final class Refund implements \JsonSerializable
         private string $description,
         private \DateTimeImmutable $createdAt,
     ) {
+    }
+
+    public function setRefundItems(RefundItemCollection $items): void
+    {
+        $this->refundItems = $items;
+    }
+
+    public function setInternalDescription(string $internalDescription): void
+    {
+        $this->internalDescription = $internalDescription;
     }
 
     /**
@@ -29,7 +44,8 @@ final class Refund implements \JsonSerializable
             'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
             'isPending' => $this->status === RefundStatus::Pending,
             'isQueued' => $this->status === RefundStatus::Queued,
-            'metadata' => ['composition' => []],
+            'internalDescription' => $this->internalDescription,
+            'metadata' => ['composition' => $this->refundItems ?? []],
         ];
     }
 

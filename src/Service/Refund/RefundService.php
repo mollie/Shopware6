@@ -67,6 +67,20 @@ class RefundService implements RefundServiceInterface
      */
     public function refundFull(OrderEntity $order, string $description, string $internalDescription, array $refundItems, Context $context): Refund
     {
+        $orderAttributes = new OrderAttributes($order);
+
+        // Payments API orders have no Mollie order — line-item refunds are not supported,
+        // so fall back to a full amount-based refund via the payment.
+        if ($orderAttributes->getMollieOrderId() === '') {
+            $remainingAmount = $this->getRemainingAmount($order);
+
+            if ($remainingAmount <= 0) {
+                throw new \Exception('No remaining amount to refund for order ' . $order->getOrderNumber());
+            }
+
+            return $this->refundPartial($order, $description, $internalDescription, $remainingAmount, [], $context);
+        }
+
         $mollieOrderId = $this->orders->getMollieOrderId($order);
 
         $mollieOrder = $this->mollie->getMollieOrder($mollieOrderId, $order->getSalesChannelId());
@@ -310,8 +324,8 @@ class RefundService implements RefundServiceInterface
     {
         $orderAttributes = new OrderAttributes($order);
 
-        if ($orderAttributes->isTypeSubscription()) {
-            // subscriptions do not have a mollie order
+        // Subscriptions and Payments API orders both have only a payment ID — no Mollie order.
+        if ($orderAttributes->isTypeSubscription() || $orderAttributes->getMollieOrderId() === '') {
             $this->gwMollie->switchClient($order->getSalesChannelId());
 
             return $this->gwMollie->getPayment($orderAttributes->getMolliePaymentId());
