@@ -33,6 +33,7 @@
 - Die minimale Shopware-Version ist 6.6.10.x.
 - Order Events und Flows werden nicht mehr ausgelöst.
 - Neue Payment Flows wurden hinzugefügt.
+- Das ModifyCreateRefundPayloadEvent wurde hinzugefügt, um den CreateRefund-Request vor dem Senden einer Rückerstattung an Mollie zu modifizieren.
 - Das Event ModifyCreatePaymentPayloadEvent wurde eingeführt, um die Anfrage vor der Erstellung einer Mollie-Zahlung anzupassen.
 - Alle zahlungsbezogenen Logs enthalten nun die Shopware-orderNumber.
 - Die URL zum Speichern des Kreditkarten-Tokens wird nicht mehr verwendet; übergebe stattdessen creditCardToken in der Checkout-Anfrage.

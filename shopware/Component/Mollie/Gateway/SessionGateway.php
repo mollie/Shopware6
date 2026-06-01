@@ -76,16 +76,19 @@ final class SessionGateway implements SessionGatewayInterface
             $client = $this->clientFactory->create($salesChannelId);
 
             $response = $client->get('sessions/' . $sessionId);
-            $session = Session::createFromClientResponse(json_decode($response->getBody()->getContents(), true));
+            $sessionBody = json_decode($response->getBody()->getContents(), true);
+            $session = Session::createFromClientResponse($sessionBody);
 
             for ($i = 0; $i < self::SESSION_MAX_RETRY && $session->getShippingAddress() === null; ++$i) {
                 usleep(self::SESSION_BASE_TIMEOUT * ($i + 1));
                 $response = $client->get('sessions/' . $sessionId);
-                $session = Session::createFromClientResponse(json_decode($response->getBody()->getContents(), true));
+                $sessionBody = json_decode($response->getBody()->getContents(), true);
+                $session = Session::createFromClientResponse($sessionBody);
             }
 
             $this->logger->info('Session loaded', [
                 'sessionId' => $sessionId,
+                'sessionBody' => $sessionBody,
                 'salesChannelId' => $salesChannelId,
             ]);
 

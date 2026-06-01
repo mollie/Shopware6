@@ -34,6 +34,7 @@
 - Order Events and Flows are no longer triggered.
 - New payment flows have been added.
 - Added the ModifyCreatePaymentPayloadEvent to modify the request before creating a payment in Mollie.
+- Added the ModifyCreateRefundPayloadEvent to modify the CreateRefund request before sending a refund to Mollie.
 - All payment-related logs now include the Shopware orderNumber.
 - The URL for saving the credit card token is no longer used; provide creditCardToken in the checkout request.
 - The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.

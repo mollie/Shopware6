@@ -36,6 +36,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
      */
     private array $paymentIdPayments = [];
 
+    /**
+     * @var array<string, Order>
+     */
+    private array $orders = [];
+
     public function __construct(
         private MollieGatewayInterface $decorated
     ) {
@@ -117,6 +122,17 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->decorated->listTerminals($salesChannelId);
     }
 
+    public function getOrder(string $mollieOrderId, string $salesChannelId): Order
+    {
+        $key = sprintf('%s', $mollieOrderId);
+        if (isset($this->orders[$key])) {
+            return $this->orders[$key];
+        }
+        $this->orders[$key] = $this->decorated->getOrder($mollieOrderId, $salesChannelId);
+
+        return $this->orders[$key];
+    }
+
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
     {
         return $this->decorated->createCapture($createCapture, $paymentId, $orderNumber, $salesChannelId);
@@ -126,5 +142,6 @@ final class CachedMollieGateway implements MollieGatewayInterface
     {
         $this->paymentIdPayments = [];
         $this->transactionPayments = [];
+        $this->orders = [];
     }
 }

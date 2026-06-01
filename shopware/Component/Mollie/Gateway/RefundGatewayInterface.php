@@ -9,9 +9,9 @@ use Mollie\Shopware\Component\Mollie\RefundCollection;
 
 interface RefundGatewayInterface
 {
-    public function createRefund(CreateRefund $createRefund, string $salesChannelId): Refund;
+    public function createRefund(CreateRefund $createRefund, string $orderNumber, string $salesChannelId): Refund;
 
-    public function cancelRefund(string $paymentId, string $refundId, string $salesChannelId): void;
+    public function cancelRefund(string $paymentId, string $refundId, string $orderNumber, string $salesChannelId): void;
 
-    public function listRefunds(string $paymentId, string $salesChannelId): RefundCollection;
+    public function listRefunds(string $paymentId, string $orderNumber, string $salesChannelId): RefundCollection;
 }

@@ -6,16 +6,21 @@ namespace Mollie\Shopware\Component\Refund\Controller;
 use Mollie\Shopware\Component\Mollie\CreateRefund;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
-use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\LineItemCollection;
+use Mollie\Shopware\Component\Mollie\LineItemType;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RefundCollection as MollieRefundCollection;
 use Mollie\Shopware\Component\Refund\DAL\Order\OrderExtension;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundCollection;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
+use Mollie\Shopware\Component\Refund\Event\ModifyCreateRefundPayloadEvent;
+use Mollie\Shopware\Component\Refund\RefundBuilder;
+use Mollie\Shopware\Component\Refund\RefundBuilderInterface;
 use Mollie\Shopware\Component\Refund\Struct\CartStruct;
 use Mollie\Shopware\Component\Refund\Struct\RefundOverviewStruct;
 use Mollie\Shopware\Mollie;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -30,6 +35,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -55,6 +61,11 @@ final class RefundController extends AbstractController
         private readonly EntityRepository $refundRepository,
         #[Autowire(service: StockStorage::class)]
         private readonly AbstractStockStorage $stockStorage,
+        #[Autowire(service: RefundBuilder::class)]
+        private readonly RefundBuilderInterface $refundBuilder,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -68,6 +79,12 @@ final class RefundController extends AbstractController
         $orderId = (string) $request->get('orderId');
 
         $order = $this->loadOrder($orderId, $context);
+        $orderNumber = (string) $order->getOrderNumber();
+
+        $this->logger->info('Refund overview requested', [
+            'orderId' => $orderId,
+            'orderNumber' => $orderNumber,
+        ]);
 
         $struct = new RefundOverviewStruct();
         $struct->setTaxStatus((string) $order->getTaxStatus());
@@ -75,6 +92,11 @@ final class RefundController extends AbstractController
         $mollieExtension = $order->getTransactions()?->first()?->getExtension(Mollie::EXTENSION);
 
         if (! $mollieExtension instanceof Payment) {
+            $this->logger->debug('No Mollie payment found for refund overview', [
+                'orderId' => $orderId,
+                'orderNumber' => $orderNumber,
+            ]);
+
             return $this->json($struct);
         }
 
@@ -82,7 +104,7 @@ final class RefundController extends AbstractController
 
         $struct->setCart(CartStruct::fromOrder($order));
 
-        $refunds = $this->refundGateway->listRefunds($payment->getId(), $order->getSalesChannelId());
+        $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $order->getSalesChannelId());
         $refunds = $this->enrichRefundsWithComposition($refunds, $order);
 
         $amountRefunded = $refunds->getSumRefunded();
@@ -109,57 +131,73 @@ final class RefundController extends AbstractController
 
         $order = $this->loadOrder($orderId, $context);
         $payment = $this->extractMolliePayment($order);
-
-        $currency = (string) $order->getCurrency()?->getIsoCode();
+        $orderNumber = (string) $order->getOrderNumber();
         $salesChannelId = (string) $order->getSalesChannelId();
 
         $requestAmount = $request->get('amount');
         $description = (string) $request->get('description', '');
         $internalDescription = (string) $request->get('internalDescription', '');
-        /** @var array<array{id: string, quantity: int, amount: float,resetStock:int}> $items */
+        /** @var array<array{id: string, quantity: int, amount: float, resetStock: int}> $items */
         $items = $request->get('items', []);
         $items = array_values(array_filter($items, function ($item) {
             return (int) ($item['quantity'] ?? 0) > 0 || (float) ($item['amount'] ?? 0.0) > 0.0;
         }));
+        $hasRequestedItems = count($items) > 0;
+        $isFullRefund = ($requestAmount === null && !$hasRequestedItems);
+        $refundType = $isFullRefund ? self::TYPE_FULL : self::TYPE_PARTIAL;
 
-        $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
-        $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
-        $isFullRefund = ($requestAmount === null && count($items) === 0);
-        $amount = (float) $requestAmount;
-        $refundItems = [];
+        $this->logger->info('Refund create started', [
+            'orderId' => $orderId,
+            'orderNumber' => $orderNumber,
+            'type' => $refundType,
+            'requestAmount' => $requestAmount,
+            'hasRequestedItems' => $hasRequestedItems,
+            'salesChannelId' => $salesChannelId,
+        ]);
 
-        if ($isFullRefund) {
-            $existingRefunds = $this->refundGateway->listRefunds($payment->getId(), $salesChannelId);
-            $amount = max(0.0, $order->getAmountTotal() - $existingRefunds->getSumRefunded() - $existingRefunds->getSumPending());
-            $refundItems = $this->buildItemsFromOrder($orderLineItems, $orderDeliveries);
-        }
-
-        if (count($items) > 0) {
-            [$amount, $refundItems] = $this->buildFromRequestItems($items, $orderLineItems, $orderDeliveries, $orderId, $context);
-        }
-
-        $createRefund = new CreateRefund(
-            $payment->getId(),
-            new Money($amount, $currency),
+        $createRefund = $this->refundBuilder->build(
+            $payment,
+            $order,
+            $items,
             $description,
+            $requestAmount !== null ? (float) $requestAmount : null,
         );
 
-        $refund = $this->refundGateway->createRefund($createRefund, $salesChannelId);
+        $refundPayloadEvent = new ModifyCreateRefundPayloadEvent($createRefund, $order, $context);
+        /** @var ModifyCreateRefundPayloadEvent $refundPayloadEvent */
+        $refundPayloadEvent = $this->eventDispatcher->dispatch($refundPayloadEvent);
+        $createRefund = $refundPayloadEvent->getCreateRefund();
+
+        $refund = $this->refundGateway->createRefund($createRefund, $orderNumber, $salesChannelId);
 
         $refundData = [
             'orderId' => $order->getId(),
             'orderVersionId' => $order->getVersionId(),
             'mollieRefundId' => $refund->getId(),
-            'type' => $isFullRefund ? self::TYPE_FULL : self::TYPE_PARTIAL,
+            'type' => $refundType,
             'publicDescription' => $description,
             'internalDescription' => $internalDescription,
         ];
 
-        if (count($refundItems) > 0) {
-            $refundData['refundItems'] = $refundItems;
+        $lineItems = $createRefund->getLines();
+        if ($lineItems->count() > 0) {
+            $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+            $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
+            $refundData['refundItems'] = $this->buildRefundItems($lineItems, $orderLineItems, $orderDeliveries);
+            if ($hasRequestedItems) {
+                $this->applyStockAlterations($items, $order, $context);
+            }
         }
 
         $this->refundRepository->upsert([$refundData], $context);
+
+        $this->logger->info('Refund created successfully', [
+            'orderId' => $order->getId(),
+            'orderNumber' => $orderNumber,
+            'mollieRefundId' => $refund->getId(),
+            'amount' => $createRefund->getAmount()?->getValue(),
+            'type' => $refundType,
+        ]);
 
         return $this->json($refund);
     }
@@ -176,117 +214,77 @@ final class RefundController extends AbstractController
 
         $order = $this->loadOrder($orderId, $context);
         $payment = $this->extractMolliePayment($order);
+        $orderNumber = (string) $order->getOrderNumber();
 
-        $this->refundGateway->cancelRefund($payment->getId(), $refundId, (string) $order->getSalesChannelId());
+        $this->logger->info('Refund cancel requested', [
+            'orderId' => $orderId,
+            'orderNumber' => $orderNumber,
+            'refundId' => $refundId,
+        ]);
+
+        $this->refundGateway->cancelRefund($payment->getId(), $refundId, $orderNumber, (string) $order->getSalesChannelId());
 
         return $this->json(['success' => true]);
     }
 
     /**
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
-     *
-     * @return array{float, array<array<string, mixed>>}
-     */
-    private function buildFromRequestItems(array $requestItems, OrderLineItemCollection $lineItems, OrderDeliveryCollection $deliveries, string $orderId, Context $context): array
-    {
-        $total = 0.0;
-        $result = [];
-        $stockAlterations = [];
-
-        foreach ($requestItems as $item) {
-            $lineItemId = (string) ($item['id'] ?? '');
-            $quantity = max(1, (int) ($item['quantity'] ?? 1));
-            $itemAmount = (float) ($item['amount'] ?? 0.0);
-
-            $lineItem = $lineItems->get($lineItemId);
-
-            if (! $lineItem instanceof OrderLineItemEntity) {
-                $delivery = $deliveries->get($lineItemId);
-
-                if ($delivery === null) {
-                    throw new \RuntimeException(sprintf('Line item "%s" not found in order "%s"', $lineItemId, $orderId));
-                }
-
-                if ($itemAmount <= 0.0) {
-                    $itemAmount = $delivery->getShippingCosts()->getTotalPrice();
-                }
-
-                $total += $itemAmount;
-
-                $result[] = [
-                    'label' => (string) $delivery->getShippingMethod()?->getName(),
-                    'quantity' => 1,
-                    'amount' => round($itemAmount, Mollie::ROUNDING_PRECISION),
-                    'orderLineItemId' => null,
-                    'orderLineItemVersionId' => null,
-                ];
-
-                continue;
-            }
-
-            if ($itemAmount <= 0.0) {
-                $itemAmount = $lineItem->getUnitPrice() * $quantity;
-            }
-
-            $total += $itemAmount;
-
-            $result[] = [
-                'label' => (string) $lineItem->getLabel(),
-                'quantity' => $quantity,
-                'amount' => round($itemAmount / $quantity, Mollie::ROUNDING_PRECISION),
-                'orderLineItemId' => $lineItem->getId(),
-                'orderLineItemVersionId' => $lineItem->getVersionId(),
-            ];
-
-            $stockQty = (int) ($item['resetStock'] ?? 0);
-            $productId = $lineItem->getReferencedId();
-
-            if ($stockQty > 0 && $productId !== null) {
-                $stockAlterations[] = new StockAlteration($lineItem->getId(), $productId, $stockQty, 0);
-            }
-        }
-
-        if (count($stockAlterations) > 0) {
-            $this->stockStorage->alter($stockAlterations, $context);
-        }
-
-        return [round($total, Mollie::ROUNDING_PRECISION), $result];
-    }
-
-    /**
      * @return array<array<string, mixed>>
      */
-    private function buildItemsFromOrder(OrderLineItemCollection $lineItems, OrderDeliveryCollection $deliveries): array
+    private function buildRefundItems(LineItemCollection $lineItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries): array
     {
         $result = [];
 
-        foreach ($lineItems as $lineItem) {
-            if ($lineItem->getType() === LineItem::CREDIT_LINE_ITEM_TYPE) {
-                continue;
+        foreach ($lineItems as $item) {
+            $shopwareId = $item->getShopwareLineItemId();
+
+            if ($item->getType() === LineItemType::SHIPPING) {
+                $orderLineItemId = null;
+                $orderLineItemVersionId = $orderDeliveries->get($shopwareId)?->getVersionId();
+            } else {
+                $orderLineItemId = $shopwareId ?: null;
+                $orderLineItemVersionId = $orderLineItems->get($shopwareId)?->getVersionId();
             }
 
-            $quantity = max(1, $lineItem->getQuantity());
-
             $result[] = [
-                'label' => (string) $lineItem->getLabel(),
-                'quantity' => $quantity,
-                'amount' => round($lineItem->getTotalPrice() / $quantity, Mollie::ROUNDING_PRECISION),
-                'orderLineItemId' => $lineItem->getId(),
-                'orderLineItemVersionId' => $lineItem->getVersionId(),
-            ];
-        }
-
-        foreach ($deliveries as $delivery) {
-            $result[] = [
-                'label' => (string) $delivery->getShippingMethod()?->getName(),
-                'quantity' => 1,
-                'amount' => round($delivery->getShippingCosts()->getTotalPrice(), Mollie::ROUNDING_PRECISION),
-                'orderLineItemId' => null,
-                'orderLineItemVersionId' => null,
+                'mollieLineId' => $item->getId(),
+                'label' => $item->getDescription(),
+                'quantity' => $item->getQuantity(),
+                'amount' => (float) $item->getUnitPrice()->getValue(),
+                'orderLineItemId' => $orderLineItemId,
+                'orderLineItemVersionId' => $orderLineItemVersionId,
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     */
+    private function applyStockAlterations(array $requestItems, OrderEntity $order, Context $context): void
+    {
+        $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+        $alterations = [];
+
+        foreach ($requestItems as $item) {
+            $lineItemId = (string) ($item['id'] ?? '');
+            $orderLineItem = $orderLineItems->get($lineItemId);
+
+            if (! $orderLineItem instanceof OrderLineItemEntity) {
+                continue;
+            }
+
+            $stockQty = min((int) ($item['resetStock'] ?? 0), $orderLineItem->getQuantity());
+            $productId = $orderLineItem->getReferencedId();
+
+            if ($stockQty > 0 && $productId !== null) {
+                $alterations[] = new StockAlteration($orderLineItem->getId(), $productId, $stockQty, 0);
+            }
+        }
+
+        if (count($alterations) > 0) {
+            $this->stockStorage->alter($alterations, $context);
+        }
     }
 
     private function enrichRefundsWithComposition(MollieRefundCollection $mollieRefunds, OrderEntity $order): MollieRefundCollection
@@ -315,7 +313,7 @@ final class RefundController extends AbstractController
     private function loadOrder(string $orderId, Context $context): OrderEntity
     {
         $criteria = new Criteria([$orderId]);
-        $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('lineItems.product');
         $criteria->addAssociation('deliveries.shippingMethod');
         $criteria->addAssociation('currency');
         $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME . '.refundItems');

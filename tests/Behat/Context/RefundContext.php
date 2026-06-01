@@ -6,6 +6,8 @@ namespace Mollie\Shopware\Behat\Context;
 use Behat\Step\Then;
 use Behat\Step\When;
 use Mollie\Shopware\Behat\Storage;
+use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -142,7 +144,7 @@ final class RefundContext extends ShopwareContext
 
         /** @var RefundGatewayInterface $gateway */
         $gateway = $this->getContainer()->get(RefundGateway::class);
-        $refunds = $gateway->listRefunds($mollieExtension->getId(), (string) $order->getSalesChannelId());
+        $refunds = $gateway->listRefunds($mollieExtension->getId(), (string) $order->getOrderNumber(), (string) $order->getSalesChannelId());
 
         $pendingCount = count(array_filter(
             $refunds->jsonSerialize(),
@@ -288,6 +290,10 @@ final class RefundContext extends ShopwareContext
 
         $request = new Request();
         $request->request->replace($params);
+
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+        $mollieGateway->clearCache();
 
         Storage::set(self::STORAGE_LAST_REFUND_RESPONSE, null);
         Storage::set(self::STORAGE_REFUND_EXCEPTION, null);
