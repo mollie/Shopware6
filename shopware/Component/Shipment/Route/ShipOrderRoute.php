@@ -173,7 +173,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
      */
     private function getLineItems(array $items, OrderLineItemCollection $lineItems, string $orderId, CreateCapture $createCapture): array
     {
-        $captureAmount = (float) $createCapture->getMoney()->getValue();
+        $captureAmount = (float) $createCapture->getAmount()->getValue();
         $descriptionArray = [];
         $lineUpserts = [];
         foreach ($items as $item) {
@@ -218,7 +218,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         }
 
         $createCapture->setDescription(implode(', ', $descriptionArray));
-        $createCapture->setMoney(new Money($captureAmount, $createCapture->getMoney()->getCurrency()));
+        $createCapture->setAmount(new Money($captureAmount, $createCapture->getAmount()->getCurrency()));
 
         return $lineUpserts;
     }
@@ -234,7 +234,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         $deliveryUpserts = [];
         $targetLineItemIds = array_column($lineUpserts, 'id');
 
-        $captureAmount = (float) $createCapture->getMoney()->getValue();
+        $captureAmount = (float) $createCapture->getAmount()->getValue();
         foreach ($deliveryCollection as $delivery) {
             $shippingCosts = $delivery->getShippingCosts();
             $shippingMethod = $delivery->getShippingMethod();
@@ -289,7 +289,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         }
 
         $createCapture->setDescription(implode(', ', $descriptionArray));
-        $createCapture->setMoney(new Money($captureAmount, $createCapture->getMoney()->getCurrency()));
+        $createCapture->setAmount(new Money($captureAmount, $createCapture->getAmount()->getCurrency()));
 
         return $deliveryUpserts;
     }

@@ -112,11 +112,12 @@ final class Pay implements PayInterface
 
         $mollieOrder = $this->mollieGateway->createOrder($createOrderStruct, $salesChannel->getId());
 
-        $payment = new Payment($mollieOrder->getPaymentId());
+        $embeddedPayment = $mollieOrder->getPayment();
+        $payment = new Payment($embeddedPayment->getId());
         $payment->setOrderId($mollieOrder->getId());
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
 
-        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
+        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context, $mollieOrder);
 
         $this->processPaymentStatus($paymentHandler, $transactionId, $orderNumber, $context);
 

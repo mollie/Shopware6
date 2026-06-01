@@ -8,11 +8,9 @@ use Mollie\Shopware\Component\Mollie\Exception\MissingSalutationException;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
-use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
 final class Address implements \JsonSerializable
 {
-    use JsonSerializableTrait;
     public const CUSTOM_FIELDS_KEY = 'mollie_payments_express_address_id';
     private string $title;
     private string $givenName;

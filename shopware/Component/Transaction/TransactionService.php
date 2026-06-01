@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Transaction;
 
+use Mollie\Shopware\Component\Mollie\Order as MollieOrder;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
@@ -11,6 +12,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -132,7 +134,7 @@ final class TransactionService implements TransactionServiceInterface
         );
     }
 
-    public function savePaymentExtension(string $transactionId,OrderEntity $order, Payment $payment, Context $context): EntityWrittenContainerEvent
+    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent
     {
         $salesChannel = $order->getSalesChannelId();
         $orderNumber = $order->getOrderNumber();
@@ -144,13 +146,65 @@ final class TransactionService implements TransactionServiceInterface
             'salesChannelId' => $salesChannel,
         ]);
 
-        return $this->orderTransactionRepository->upsert([
-            [
-                'id' => $transactionId,
-                'customFields' => [
-                    Mollie::EXTENSION => $payment->toArray()
-                ]
-            ]
-        ], $context);
+        $upsertArray = [
+            'id' => $transactionId,
+            'customFields' => [
+                Mollie::EXTENSION => $payment->toArray(),
+            ],
+        ];
+
+        if (!$mollieOrder instanceof MollieOrder) {
+            return $this->orderTransactionRepository->upsert([$upsertArray], $context);
+        }
+
+        $shopwareLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+        $filteredMollieLines = $mollieOrder->getLines()->filterByOrderLineItems($shopwareLineItems);
+
+        $shopwareDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
+        $filteredMollieDeliveryLines = $mollieOrder->getLines()->filterByDeliveries($shopwareDeliveries);
+
+        if ($filteredMollieLines->count() === 0 && $filteredMollieDeliveryLines->count() === 0) {
+            return $this->orderTransactionRepository->upsert([$upsertArray], $context);
+        }
+
+        $orderData = ['id' => $order->getId()];
+
+        if ($filteredMollieLines->count() > 0) {
+            $lineItemsData = [];
+
+            foreach ($filteredMollieLines->getElements() as $mollieLine) {
+                $shopwareLineItem = $shopwareLineItems->get($mollieLine->getShopwareLineItemId());
+                $customFields = $shopwareLineItem->getCustomFields() ?? [];
+                $customFields[Mollie::EXTENSION] = ['order_line_id' => $mollieLine->getId()];
+
+                $lineItemsData[] = [
+                    'id' => $mollieLine->getShopwareLineItemId(),
+                    'customFields' => $customFields,
+                ];
+            }
+
+            $orderData['lineItems'] = $lineItemsData;
+        }
+
+        if ($filteredMollieDeliveryLines->count() > 0) {
+            $deliveriesData = [];
+
+            foreach ($filteredMollieDeliveryLines->getElements() as $mollieLine) {
+                $delivery = $shopwareDeliveries->get($mollieLine->getShopwareLineItemId());
+                $customFields = $delivery->getCustomFields() ?? [];
+                $customFields[Mollie::EXTENSION] = ['order_line_id' => $mollieLine->getId()];
+
+                $deliveriesData[] = [
+                    'id' => $mollieLine->getShopwareLineItemId(),
+                    'customFields' => $customFields,
+                ];
+            }
+
+            $orderData['deliveries'] = $deliveriesData;
+        }
+
+        $upsertArray['order'] = $orderData;
+
+        return $this->orderTransactionRepository->upsert([$upsertArray], $context);
     }
 }

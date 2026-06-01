@@ -3,41 +3,53 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
-final class CreateRefund
+abstract class CreateRefund
 {
-    public function __construct(
-        private readonly string $paymentId,
-        private readonly Money $amount,
-        private readonly string $description,
-    ) {
-    }
+    protected string $description = '';
 
-    public function getPaymentId(): string
-    {
-        return $this->paymentId;
-    }
+    /**
+     * @var array<string, mixed>
+     */
+    protected array $metadata = [];
 
-    public function getAmount(): Money
-    {
-        return $this->amount;
-    }
+    /**
+     * @return array<string, mixed>
+     */
+    abstract public function toArray(): array;
 
     public function getDescription(): string
     {
         return $this->description;
     }
 
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @param array<string, mixed> $metadata
+     */
+    public function setMetadata(array $metadata): void
+    {
+        $this->metadata = $metadata;
+    }
+
     /**
      * @return array<string, mixed>
      */
-    public function toArray(): array
+    public function getMetadata(): array
     {
-        return [
-            'amount' => [
-                'value' => $this->amount->getValue(),
-                'currency' => $this->amount->getCurrency(),
-            ],
-            'description' => $this->description,
-        ];
+        return $this->metadata;
+    }
+
+    public function getLines(): LineItemCollection
+    {
+        return new LineItemCollection();
+    }
+
+    public function getAmount(): ?Money
+    {
+        return null;
     }
 }

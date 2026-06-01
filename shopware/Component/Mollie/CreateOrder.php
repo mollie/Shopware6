@@ -205,7 +205,7 @@ final class CreateOrder implements PaymentParameterInterface
                 'name' => $line->getDescription(),
                 'quantity' => $line->getQuantity(),
                 'unitPrice' => $line->getUnitPrice()->toArray(),
-                'totalAmount' => $line->getTotalAmount()->toArray(),
+                'totalAmount' => $line->getAmount()->toArray(),
             ];
 
             try {
@@ -218,6 +218,11 @@ final class CreateOrder implements PaymentParameterInterface
             $sku = $line->getSku();
             if ($sku !== '') {
                 $lineData['sku'] = $sku;
+            }
+
+            $metadata = $line->getMetadata();
+            if (count($metadata) > 0) {
+                $lineData['metadata'] = $metadata;
             }
 
             $lines[] = $lineData;

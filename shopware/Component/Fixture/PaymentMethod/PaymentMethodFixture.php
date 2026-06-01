@@ -7,14 +7,19 @@ use Mollie\Shopware\Component\Fixture\AbstractFixture;
 use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
+use Kiener\MolliePayments\MolliePayments;
+use Mollie\Shopware\Component\Payment\Method\PayPalOrdersApiPayment;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -24,11 +29,15 @@ final class PaymentMethodFixture extends AbstractFixture
 {
     /**
      * @param EntityRepository<SalesChannelCollection<SalesChannelEntity>> $salesChannelRepository
+     * @param EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $paymentMethodRepository
      */
     public function __construct(
         private readonly PaymentHandlerLocator $paymentHandlerLocator,
         #[Autowire(service: 'sales_channel.repository')]
         private readonly EntityRepository $salesChannelRepository,
+        #[Autowire(service: 'payment_method.repository')]
+        private readonly EntityRepository $paymentMethodRepository,
+        private readonly PluginIdProvider $pluginIdProvider,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
     ) {
@@ -43,6 +52,7 @@ final class PaymentMethodFixture extends AbstractFixture
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', true));
+        $this->installTestOnlyPaymentMethods($context);
         $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
         $upsertData = [];
         $activePaymentMethods = $this->getActivePaymentMethods();
@@ -53,6 +63,37 @@ final class PaymentMethodFixture extends AbstractFixture
             ];
         }
         $this->salesChannelRepository->upsert($upsertData, $context);
+
+
+    }
+
+    private function installTestOnlyPaymentMethods(Context $context): void
+    {
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
+        $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
+        foreach ($paymentHandlers as $paymentHandler) {
+            if (! $paymentHandler instanceof PayPalOrdersApiPayment) {
+                continue;
+            }
+            $this->paymentMethodRepository->upsert([
+                [
+                    'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
+                    'handlerIdentifier' => PayPalOrdersApiPayment::class,
+                    'technicalName' => $paymentHandler->getTechnicalName(),
+                    'pluginId' => $pluginId,
+                    'name' => $paymentHandler->getName(),
+                    'active' => true,
+                    'customFields' => [
+                        'mollie_payment_method_name' => $paymentHandler->getPaymentMethod()->value,
+                    ],
+                    'translations' => [
+                        Defaults::LANGUAGE_SYSTEM => [
+                            'name' => $paymentHandler->getName(),
+                        ],
+                    ],
+                ],
+            ], $context);
+        }
     }
 
     public function uninstall(Context $context): void
@@ -74,6 +115,7 @@ final class PaymentMethodFixture extends AbstractFixture
             }
             $paymentMethodName = $paymentHandler->getName();
             $isDeprecatedMethod = $paymentHandler instanceof DeprecatedMethodAwareInterface;
+            $isTestOnlyActive = $paymentHandler instanceof PayPalOrdersApiPayment;
             $result[] = [
                 'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
                 'name' => $paymentMethodName,
@@ -82,8 +124,9 @@ final class PaymentMethodFixture extends AbstractFixture
                         'name' => $paymentMethodName,
                     ],
                 ],
-                'active' => $isDeprecatedMethod === false
+                'active' => $isDeprecatedMethod === false || $isTestOnlyActive
             ];
+          
         }
 
         return $result;

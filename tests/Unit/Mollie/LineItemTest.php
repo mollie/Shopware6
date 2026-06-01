@@ -41,7 +41,7 @@ final class LineItemTest extends TestCase
         $this->assertSame('test', $lineItem->getDescription());
         $this->assertSame(1, $lineItem->getQuantity());
         $this->assertEquals($price, $lineItem->getUnitPrice());
-        $this->assertEquals($price, $lineItem->getTotalAmount());
+        $this->assertEquals($price, $lineItem->getAmount());
         $this->assertSame('physical', $lineItem->getType()->value);
         $this->assertSame('pc', $lineItem->getQuantityUnit());
         $this->assertEquals($discountAmount, $lineItem->getDiscountAmount());
@@ -77,7 +77,7 @@ final class LineItemTest extends TestCase
             'type' => 'shipping_fee',
             'sku' => 'mol-delivery-fake-shipping-method-id',
             'unitPrice' => new Money(4.99, 'EUR'),
-            'totalAmount' => new Money(4.99, 'EUR'),
+            'amount' => new Money(4.99, 'EUR'),
         ];
 
         $this->assertInstanceOf(LineItem::class, $actual);
@@ -87,7 +87,7 @@ final class LineItemTest extends TestCase
         $this->assertSame($expected['type'], $actual->getType()->value);
         $this->assertSame($expected['sku'], $actual->getSku());
         $this->assertEquals($expected['unitPrice'], $actual->getUnitPrice());
-        $this->assertEquals($expected['totalAmount'], $actual->getTotalAmount());
+        $this->assertEquals($expected['totalAmount'], $actual->getAmount());
     }
 
     public function testExpectExceptionOnEmptyLineItemPrice(): void
@@ -114,7 +114,7 @@ final class LineItemTest extends TestCase
             'type' => 'digital',
             'sku' => 'SW1000',
             'unitPrice' => new Money(10.99, 'EUR'),
-            'totalAmount' => new Money(10.99, 'EUR'),
+            'amount' => new Money(10.99, 'EUR'),
         ];
 
         $this->assertInstanceOf(LineItem::class, $actual);
@@ -123,7 +123,7 @@ final class LineItemTest extends TestCase
         $this->assertSame($expected['type'], $actual->getType()->value);
         $this->assertSame($expected['sku'], $actual->getSku());
         $this->assertEquals($expected['unitPrice'], $actual->getUnitPrice());
-        $this->assertEquals($expected['totalAmount'], $actual->getTotalAmount());
+        $this->assertEquals($expected['totalAmount'], $actual->getAmount());
     }
 
     public function testCanCreateFromOrderLineWithVoucherCategoriesArray(): void

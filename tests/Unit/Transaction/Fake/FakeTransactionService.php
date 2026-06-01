@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Transaction\Fake;
 
 use Mollie\Shopware\Component\Mollie\Mode;
+use Mollie\Shopware\Component\Mollie\Order as MollieOrder;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
@@ -63,7 +64,7 @@ final class FakeTransactionService implements TransactionServiceInterface
         return $this->transaction;
     }
 
-    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context): EntityWrittenContainerEvent
+    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent
     {
         $context = new Context(new SystemSource());
         $nestedEventCollection = new NestedEventCollection();

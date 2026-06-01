@@ -9,22 +9,18 @@ final class CreateCapture implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
-    public function __construct(private Money $money, private string $description)
+    public function __construct(private Money $amount, private string $description)
     {
     }
 
-    public function getMoney(): Money
+    public function getAmount(): Money
     {
-        return $this->money;
+        return $this->amount;
     }
 
-    public function setMoney(Money $money): void
+    public function setAmount(Money $amount): void
     {
-        $this->money = $money;
-    }
-
-    public function add(Money $money): void
-    {
+        $this->amount = $amount;
     }
 
     public function getDescription(): string
@@ -42,9 +38,6 @@ final class CreateCapture implements \JsonSerializable
      */
     public function toArray(): array
     {
-        return $captureArray = [
-            'amount' => $this->money->toArray(),
-            'description' => $this->description,
-        ];
+        return json_decode((string) json_encode($this), true);
     }
 }

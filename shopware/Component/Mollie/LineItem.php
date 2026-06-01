@@ -15,12 +15,10 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
-use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
 final class LineItem implements \JsonSerializable
 {
-    use JsonSerializableTrait;
 
     private LineItemType $type;
 
@@ -38,7 +36,22 @@ final class LineItem implements \JsonSerializable
      */
     private array $categories;
 
-    public function __construct(private readonly string $description, private readonly int $quantity, private readonly Money $unitPrice, private readonly Money $totalAmount)
+    /** @var array<string, mixed> */
+    private array $metadata = [];
+
+    private string $id = '';
+
+    private int $quantityShipped = 0;
+    private ?Money $amountShipped = null;
+    private int $quantityRefunded = 0;
+    private ?Money $amountRefunded = null;
+    private int $quantityCanceled = 0;
+    private ?Money $amountCanceled = null;
+    private int $shippableQuantity = 0;
+    private int $refundableQuantity = 0;
+    private int $cancelableQuantity = 0;
+
+    public function __construct(private readonly string $description, private int $quantity, private Money $unitPrice, private Money $amount)
     {
         $this->type = LineItemType::PHYSICAL;
     }
@@ -54,6 +67,13 @@ final class LineItem implements \JsonSerializable
         $lineItem = self::createBaseLineItem((string) $shippingMethod->getName(), $taxStatus, $shippingCosts, $currency);
         $lineItem->setType(LineItemType::SHIPPING);
         $lineItem->setSku(sprintf('mol-delivery-%s', $shippingMethod->getId()));
+        $lineItem->setShopwareLineItemId($delivery->getId());
+
+        $customFields = $delivery->getCustomFields() ?? [];
+        $mollieLineId = ($customFields[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
+        if ($mollieLineId !== null) {
+            $lineItem->setId((string) $mollieLineId);
+        }
 
         return $lineItem;
     }
@@ -87,7 +107,76 @@ final class LineItem implements \JsonSerializable
             $lineItem->setSku($product->getProductNumber());
         }
 
+        $lineItem->setShopwareLineItemId($orderLineItem->getId());
+
+        $customFields = $orderLineItem->getCustomFields() ?? [];
+        $mollieLineId = ($customFields[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
+        if ($mollieLineId !== null) {
+            $lineItem->setId((string) $mollieLineId);
+        }
+
         return $lineItem;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    public static function createFromClientResponse(array $body): self
+    {
+        $unitPrice = new Money(
+            (float) ($body['unitPrice']['value'] ?? 0),
+            (string) ($body['unitPrice']['currency'] ?? ''),
+        );
+        $amount = new Money(
+            (float) ($body['totalAmount']['value'] ?? 0),
+            (string) ($body['totalAmount']['currency'] ?? ''),
+        );
+
+        $lineItem = new self(
+            (string) ($body['name'] ?? ''),
+            (int) ($body['quantity'] ?? 1),
+            $unitPrice,
+            $amount,
+        );
+
+        $lineItem->setId((string) ($body['id'] ?? ''));
+        $lineItem->setSku((string) ($body['sku'] ?? ''));
+
+        $rawMetadata = $body['metadata'] ?? [];
+        $metadata = is_string($rawMetadata) ? (json_decode($rawMetadata, true) ?? []) : $rawMetadata;
+        $shopwareLineItemId = (string) ($metadata['orderLineItemId'] ?? '');
+        if ($shopwareLineItemId !== '') {
+            $lineItem->setShopwareLineItemId($shopwareLineItemId);
+        }
+
+        $lineItem->setQuantityShipped((int) ($body['quantityShipped'] ?? 0));
+        $lineItem->setQuantityRefunded((int) ($body['quantityRefunded'] ?? 0));
+        $lineItem->setQuantityCanceled((int) ($body['quantityCanceled'] ?? 0));
+        $lineItem->setShippableQuantity((int) ($body['shippableQuantity'] ?? 0));
+        $lineItem->setRefundableQuantity((int) ($body['refundableQuantity'] ?? 0));
+        $lineItem->setCancelableQuantity((int) ($body['cancelableQuantity'] ?? 0));
+
+        if (isset($body['amountShipped']['value'], $body['amountShipped']['currency'])) {
+            $lineItem->setAmountShipped(new Money((float) $body['amountShipped']['value'], (string) $body['amountShipped']['currency']));
+        }
+        if (isset($body['amountRefunded']['value'], $body['amountRefunded']['currency'])) {
+            $lineItem->setAmountRefunded(new Money((float) $body['amountRefunded']['value'], (string) $body['amountRefunded']['currency']));
+        }
+        if (isset($body['amountCanceled']['value'], $body['amountCanceled']['currency'])) {
+            $lineItem->setAmountCanceled(new Money((float) $body['amountCanceled']['value'], (string) $body['amountCanceled']['currency']));
+        }
+
+        return $lineItem;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): void
+    {
+        $this->id = $id;
     }
 
     public function getDescription(): string
@@ -105,9 +194,24 @@ final class LineItem implements \JsonSerializable
         return $this->unitPrice;
     }
 
-    public function getTotalAmount(): Money
+    public function getAmount(): Money
     {
-        return $this->totalAmount;
+        return $this->amount;
+    }
+
+    public function setQuantity(int $quantity): void
+    {
+        $this->quantity = $quantity;
+    }
+
+    public function setUnitPrice(Money $unitPrice): void
+    {
+        $this->unitPrice = $unitPrice;
+    }
+
+    public function setAmount(Money $amount): void
+    {
+        $this->amount = $amount;
     }
 
     public function getType(): LineItemType
@@ -170,6 +274,49 @@ final class LineItem implements \JsonSerializable
         $this->sku = $sku;
     }
 
+    /** @return array<string, mixed> */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $vars = get_object_vars($this);
+        $vars['totalAmount'] = $vars['amount'];
+        unset($vars['amount']);
+
+        if (count($vars['metadata']) > 0) {
+            $vars['metadata'] = json_encode($vars['metadata']);
+        }
+
+        return array_filter($vars, function ($value) {
+            if (is_array($value)) {
+                return count($value) > 0;
+            }
+            return $value !== null;
+        });
+    }
+
+    /** @param array<string, mixed> $metadata */
+    public function setMetadata(array $metadata): void
+    {
+        $this->metadata = $metadata;
+    }
+
+    public function getShopwareLineItemId(): string
+    {
+        return (string) ($this->metadata['orderLineItemId'] ?? '');
+    }
+
+    public function setShopwareLineItemId(string $id): void
+    {
+        $this->metadata['orderLineItemId'] = $id;
+    }
+
     public function getImageUrl(): string
     {
         return $this->imageUrl;
@@ -196,6 +343,96 @@ final class LineItem implements \JsonSerializable
     public function setProductUrl(string $productUrl): void
     {
         $this->productUrl = $productUrl;
+    }
+
+    public function getQuantityShipped(): int
+    {
+        return $this->quantityShipped;
+    }
+
+    public function setQuantityShipped(int $quantityShipped): void
+    {
+        $this->quantityShipped = $quantityShipped;
+    }
+
+    public function getAmountShipped(): ?Money
+    {
+        return $this->amountShipped;
+    }
+
+    public function setAmountShipped(Money $amountShipped): void
+    {
+        $this->amountShipped = $amountShipped;
+    }
+
+    public function getQuantityRefunded(): int
+    {
+        return $this->quantityRefunded;
+    }
+
+    public function setQuantityRefunded(int $quantityRefunded): void
+    {
+        $this->quantityRefunded = $quantityRefunded;
+    }
+
+    public function getAmountRefunded(): ?Money
+    {
+        return $this->amountRefunded;
+    }
+
+    public function setAmountRefunded(Money $amountRefunded): void
+    {
+        $this->amountRefunded = $amountRefunded;
+    }
+
+    public function getQuantityCanceled(): int
+    {
+        return $this->quantityCanceled;
+    }
+
+    public function setQuantityCanceled(int $quantityCanceled): void
+    {
+        $this->quantityCanceled = $quantityCanceled;
+    }
+
+    public function getAmountCanceled(): ?Money
+    {
+        return $this->amountCanceled;
+    }
+
+    public function setAmountCanceled(Money $amountCanceled): void
+    {
+        $this->amountCanceled = $amountCanceled;
+    }
+
+    public function getShippableQuantity(): int
+    {
+        return $this->shippableQuantity;
+    }
+
+    public function setShippableQuantity(int $shippableQuantity): void
+    {
+        $this->shippableQuantity = $shippableQuantity;
+    }
+
+    public function getRefundableQuantity(): int
+    {
+        return $this->refundableQuantity;
+    }
+
+    public function setRefundableQuantity(int $refundableQuantity): void
+    {
+        $this->refundableQuantity = $refundableQuantity;
+    }
+
+    public function getCancelableQuantity(): int
+    {
+        return $this->cancelableQuantity;
+    }
+
+    public function setCancelableQuantity(int $cancelableQuantity): void
+    {
+        $this->cancelableQuantity = $cancelableQuantity;
     }
 
     private static function createBaseLineItem(string $label, string $taxStatus, CalculatedPrice $price, CurrencyEntity $currency): self

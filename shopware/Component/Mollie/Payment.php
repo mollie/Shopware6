@@ -51,12 +51,17 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?Money $amount = null;
 
+    private Money $amountRefunded;
+
+    private RefundCollection $refunds;
+
     private bool $cancelable = false;
 
     private ?string $orderId = null;
 
     public function __construct(private string $id)
     {
+        $this->refunds = new RefundCollection();
     }
 
     public function isCancelable(): bool
@@ -311,6 +316,7 @@ final class Payment extends Struct implements \JsonSerializable
         $capturedAmount = $body['amountCaptured'] ?? null;
         $amountRemaining = $body['amountRemaining'] ?? null;
         $amount = $body['amount'] ?? null;
+        $amountRefunded = $body['amountRefunded'] ?? null;
 
         if ($paymentMethod !== null) {
             $payment->setMethod($paymentMethod);
@@ -354,6 +360,10 @@ final class Payment extends Struct implements \JsonSerializable
         if ($amount !== null) {
             $payment->setAmount(new Money((float) $amount['value'], $amount['currency']));
         }
+        $payment->setAmountRefunded(new Money(
+            (float) ($amountRefunded['value'] ?? 0.0),
+            (string) ($amountRefunded['currency'] ?? $amount['currency'] ?? ''),
+        ));
 
         $payment->setCancelable((bool) ($body['isCancelable'] ?? false));
 
@@ -378,6 +388,10 @@ final class Payment extends Struct implements \JsonSerializable
             $payment->setConsumerName((string) ($body['details']['consumerName'] ?? ''));
             $payment->setConsumerAccount((string) ($body['details']['consumerAccount'] ?? ''));
             $payment->setConsumerBic((string) ($body['details']['consumerBic'] ?? ''));
+        }
+
+        foreach ($body['_embedded']['refunds'] ?? [] as $refundData) {
+            $payment->refunds->add(Refund::createFromClientResponse($refundData));
         }
 
         return $payment;
@@ -512,5 +526,20 @@ final class Payment extends Struct implements \JsonSerializable
     public function setAmount(Money $amount): void
     {
         $this->amount = $amount;
+    }
+
+    public function getAmountRefunded(): Money
+    {
+        return $this->amountRefunded;
+    }
+
+    public function setAmountRefunded(Money $amountRefunded): void
+    {
+        $this->amountRefunded = $amountRefunded;
+    }
+
+    public function getRefunds(): RefundCollection
+    {
+        return $this->refunds;
     }
 }

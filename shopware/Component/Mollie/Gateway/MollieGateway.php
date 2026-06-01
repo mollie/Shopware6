@@ -142,6 +142,21 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
+    public function getOrder(string $mollieOrderId, string $salesChannelId): Order
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $response = $client->get(sprintf('orders/%s', $mollieOrderId), [
+                'query' => ['embed' => 'payments,refunds'],
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            return Order::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
     public function getCurrentProfile(?string $salesChannelId = null): Profile
     {
         try {
@@ -240,7 +255,9 @@ final class MollieGateway implements MollieGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $response = $client->get('payments/' . $molliePaymentId);
+            $response = $client->get('payments/' . $molliePaymentId, [
+                'query' => ['embed' => 'refunds'],
+            ]);
             $body = json_decode($response->getBody()->getContents(), true);
             $this->logger->debug('Additional data from mollie loaded', [
                 'molliePaymentId' => $molliePaymentId,
@@ -390,4 +407,5 @@ final class MollieGateway implements MollieGatewayInterface
 
         return $payment;
     }
+
 }
