@@ -1,5 +1,6 @@
 # unreleased
 - Fixed: When an order has multiple returns, the refund is now always triggered for the correct return instead of always using the first one found.
+- Fixed: Returns created directly via API with status "done" now correctly trigger a refund. Previously, only returns that went through the open → done transition were processed.
 - Fixed: Using the browser back button during a payment no longer causes unexpected redirects on later visits to the account order list.
 
 # 4.24.1
