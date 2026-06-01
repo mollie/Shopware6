@@ -1,4 +1,5 @@
 # unreleased
+- Fixed: When an order has multiple returns, the refund is now always triggered for the correct return instead of always using the first one found.
 - Fixed: Using the browser back button during a payment no longer causes unexpected redirects on later visits to the account order list.
 
 # 4.24.1

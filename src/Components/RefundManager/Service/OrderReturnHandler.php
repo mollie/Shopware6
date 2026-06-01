@@ -16,7 +16,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class OrderReturnHandler
 {
@@ -44,12 +43,12 @@ class OrderReturnHandler
         $this->featureDisabled = $orderReturnRepository === null;
     }
 
-    public function return(OrderEntity $order, Context $context): void
+    public function return(string $returnId, Context $context): void
     {
         if ($this->featureDisabled) {
             return;
         }
-        $orderReturn = $this->findReturnByOrder($order, $context);
+        $orderReturn = $this->findReturnById($returnId, $context);
         if ($orderReturn === null) {
             return;
         }
@@ -57,7 +56,7 @@ class OrderReturnHandler
         $order = $orderReturn->getOrder();
         if (! $order instanceof OrderEntity) {
             $this->logger->error('Order Return has no order associated', [
-                'returnId' => $orderReturn->getId()
+                'returnId' => $returnId
             ]);
 
             return;
@@ -71,9 +70,21 @@ class OrderReturnHandler
         }
     }
 
-    public function cancel(OrderEntity $order, Context $context): void
+    public function cancel(string $returnId, Context $context): void
     {
         if ($this->featureDisabled) {
+            return;
+        }
+        $orderReturn = $this->findReturnById($returnId, $context);
+        if ($orderReturn === null) {
+            return;
+        }
+        $order = $orderReturn->getOrder();
+        if (! $order instanceof OrderEntity) {
+            $this->logger->error('Order Return has no order associated', [
+                'returnId' => $returnId
+            ]);
+
             return;
         }
         $this->refundManager->cancelAllOrderRefunds($order, $context);
@@ -164,14 +175,12 @@ class OrderReturnHandler
         return $request;
     }
 
-    private function findReturnByOrder(OrderEntity $order, Context $context): ?OrderReturnEntity
+    private function findReturnById(string $returnId, Context $context): ?OrderReturnEntity
     {
         if ($this->orderReturnRepository === null) {
             return null;
         }
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('orderId', $order->getId()));
-        $criteria->addFilter(new EqualsFilter('orderVersionId', $order->getVersionId()));
+        $criteria = new Criteria([$returnId]);
         $criteria->addAssociation('lineItems');
         $criteria->addAssociation('order.deliveries');
         $criteria->addAssociation('order.deliveries.shippingCosts');
@@ -182,14 +191,13 @@ class OrderReturnHandler
         $orderReturnSearchResult = $this->orderReturnRepository->search($criteria, $context);
 
         if ($orderReturnSearchResult->getTotal() === 0) {
-            $this->logger->warning('Failed to find order return for order {{orderNumber}}', [
-                'orderNumber' => $order->getOrderNumber(),
+            $this->logger->warning('Failed to find order return {{returnId}}', [
+                'returnId' => $returnId,
             ]);
 
             return null;
         }
 
-        /* @var OrderReturnEntity $orderReturn */
         return $orderReturnSearchResult->first();
     }
 }
