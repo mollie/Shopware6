@@ -88,7 +88,7 @@ class MollieOrderPaymentFlow
 
         // our transaction has no payment method here?
         // but it's also done in the finalize...this should be refactored
-        if (MolliePaymentStatus::isFailedStatus('', $paymentStatus)) {
+        if (MolliePaymentStatus::isFailedStatus((string) $mollieOrder->method, $paymentStatus)) {
             return false;
         }
 
