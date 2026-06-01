@@ -4,11 +4,15 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Subscriber;
 
 use Kiener\MolliePayments\Components\RefundManager\Service\OrderReturnHandler;
-use Shopware\Core\Checkout\Order\Event\OrderStateMachineStateChangeEvent;
+use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderReturnSubscriber implements EventSubscriberInterface
 {
+    private const STATE_MACHINE_EVENT = 'state_machine.order_return.state_changed';
+    private const STATE_DONE = 'done';
+    private const STATE_CANCELLED = 'cancelled';
+
     private OrderReturnHandler $orderReturnHandler;
 
     public function __construct(OrderReturnHandler $orderReturnHandler)
@@ -16,21 +20,29 @@ class OrderReturnSubscriber implements EventSubscriberInterface
         $this->orderReturnHandler = $orderReturnHandler;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            'state_enter.order_return.state.done' => ['onOrderReturnFinished', 10],
-            'state_enter.order_return.state.cancelled' => ['onOrderReturnCancelled', 10],
+            self::STATE_MACHINE_EVENT => ['onOrderReturnStateChanged', 10],
         ];
     }
 
-    public function onOrderReturnCancelled(OrderStateMachineStateChangeEvent $event): void
+    public function onOrderReturnStateChanged(StateMachineStateChangeEvent $event): void
     {
-        $this->orderReturnHandler->cancel($event->getOrder(), $event->getContext());
-    }
+        if ($event->getTransitionSide() !== StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER) {
+            return;
+        }
 
-    public function onOrderReturnFinished(OrderStateMachineStateChangeEvent $event): void
-    {
-        $this->orderReturnHandler->return($event->getOrder(), $event->getContext());
+        $returnId = $event->getTransition()->getEntityId();
+        $context = $event->getContext();
+
+        switch ($event->getStateName()) {
+            case self::STATE_DONE:
+                $this->orderReturnHandler->return($returnId, $context);
+                break;
+            case self::STATE_CANCELLED:
+                $this->orderReturnHandler->cancel($returnId, $context);
+                break;
+        }
     }
 }

@@ -1,4 +1,5 @@
 # unreleased
+- Behoben: Hat eine Bestellung mehrere Retouren, wird die Erstattung nun immer für die korrekte Retoure ausgelöst und nicht mehr immer die erste gefundene verwendet.
 - Behoben: Die Verwendung des Browser-Zurück-Buttons während einer Zahlung führt nicht mehr zu unerwarteten Weiterleitungen beim späteren Besuch der Bestellübersicht.
 
 # 4.24.1
