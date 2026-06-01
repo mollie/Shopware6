@@ -52,22 +52,7 @@ class OrderReturnHandler
         if ($orderReturn === null) {
             return;
         }
-
-        $order = $orderReturn->getOrder();
-        if (! $order instanceof OrderEntity) {
-            $this->logger->error('Order Return has no order associated', [
-                'returnId' => $returnId
-            ]);
-
-            return;
-        }
-        $request = $this->createRequestFromOrder($order, $orderReturn);
-
-        try {
-            $this->refundManager->refund($order, $request, $context);
-        } catch (\Throwable $throwable) {
-            $this->logger->error('Error during refund status change: {{message}}', ['message' => $throwable->getMessage()]);
-        }
+        $this->triggerRefund($returnId, $orderReturn, $context);
     }
 
     public function cancel(string $returnId, Context $context): void
@@ -88,6 +73,41 @@ class OrderReturnHandler
             return;
         }
         $this->refundManager->cancelAllOrderRefunds($order, $context);
+    }
+
+    public function returnOnCreatedAsDone(string $returnId, Context $context): void
+    {
+        if ($this->featureDisabled) {
+            return;
+        }
+        $orderReturn = $this->findReturnById($returnId, $context);
+        if ($orderReturn === null) {
+            return;
+        }
+        $state = $orderReturn->getState();
+        if ($state === null || $state->getTechnicalName() !== 'done') {
+            return;
+        }
+        $this->triggerRefund($returnId, $orderReturn, $context);
+    }
+
+    private function triggerRefund(string $returnId, OrderReturnEntity $orderReturn, Context $context): void
+    {
+        $order = $orderReturn->getOrder();
+        if (! $order instanceof OrderEntity) {
+            $this->logger->error('Order Return has no order associated', [
+                'returnId' => $returnId
+            ]);
+
+            return;
+        }
+        $request = $this->createRequestFromOrder($order, $orderReturn);
+
+        try {
+            $this->refundManager->refund($order, $request, $context);
+        } catch (\Throwable $throwable) {
+            $this->logger->error('Error during refund status change: {{message}}', ['message' => $throwable->getMessage()]);
+        }
     }
 
     private function createRequestFromOrder(OrderEntity $order, OrderReturnEntity $orderReturn): RefundRequest
@@ -181,6 +201,7 @@ class OrderReturnHandler
             return null;
         }
         $criteria = new Criteria([$returnId]);
+        $criteria->addAssociation('state');
         $criteria->addAssociation('lineItems');
         $criteria->addAssociation('order.deliveries');
         $criteria->addAssociation('order.deliveries.shippingCosts');
