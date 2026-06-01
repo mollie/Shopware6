@@ -35,15 +35,25 @@ class PendingOrderRedirectSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $route = $request->attributes->get('_route');
 
-        if ($route !== 'frontend.account.order.page') {
-            return;
-        }
-
         if (! $request->hasSession()) {
             return;
         }
 
         $session = $request->getSession();
+
+        // When the customer returns from Mollie (success or failure), always clear the
+        // pending order session key. Without this, a successful payment leaves the key
+        // set and any later visit to the account order list would wrongly redirect the
+        // customer to the edit-order page.
+        if ($route === 'frontend.mollie.payment') {
+            $session->remove(PayAction::SESSION_KEY_PENDING_ORDER);
+            return;
+        }
+
+        if ($route !== 'frontend.account.order.page') {
+            return;
+        }
+
         $pendingOrderId = $session->get(PayAction::SESSION_KEY_PENDING_ORDER);
 
         if (empty($pendingOrderId)) {
