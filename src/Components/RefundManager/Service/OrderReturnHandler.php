@@ -198,7 +198,6 @@ class OrderReturnHandler
             return null;
         }
 
-        /** @var OrderReturnEntity $orderReturn */
         return $orderReturnSearchResult->first();
     }
 }
