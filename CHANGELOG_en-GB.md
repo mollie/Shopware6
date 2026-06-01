@@ -1,3 +1,6 @@
+# unreleased
+- Fixed: Using the browser back button during a payment no longer causes unexpected redirects on later visits to the account order list.
+
 # 4.24.1
 - Fixed: Installing the plugin no longer fails when a payment method icon is an SVG containing active content (e.g. `data:` URIs), which Shopware now rejects as a security measure. The installer now falls back to the PNG version of the icon in that case.
 

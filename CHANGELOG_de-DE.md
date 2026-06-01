@@ -1,3 +1,6 @@
+# unreleased
+- Behoben: Die Verwendung des Browser-Zurück-Buttons während einer Zahlung führt nicht mehr zu unerwarteten Weiterleitungen beim späteren Besuch der Bestellübersicht.
+
 # 4.24.1
 - Behoben: Die Installation des Plugins schlägt nicht mehr fehl, wenn ein Zahlungsarten-Icon ein SVG mit aktivem Inhalt (z.B. `data:`-URIs) enthält, das Shopware aus Sicherheitsgründen ablehnt. Der Installer fällt in diesem Fall auf die PNG-Version des Icons zurück.
 
