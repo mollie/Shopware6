@@ -47,6 +47,7 @@ class PendingOrderRedirectSubscriber implements EventSubscriberInterface
         // customer to the edit-order page.
         if ($route === 'frontend.mollie.payment') {
             $session->remove(PayAction::SESSION_KEY_PENDING_ORDER);
+
             return;
         }
 
