@@ -147,8 +147,8 @@ class MollieLineItemBuilder
         foreach ($products as $product) {
             $payload = $product->getPayload() ?? [];
             $bundleProducts = $payload['zeobvProductsInBundle'] ?? [];
-
-            if (count($bundleProducts) > 0) {
+            $isNetIBundle = $payload['is-neti-bundle'] ?? false;
+            if (count($bundleProducts) > 0 || $isNetIBundle) {
                 continue;
             }
             $children = $product->getChildren();
