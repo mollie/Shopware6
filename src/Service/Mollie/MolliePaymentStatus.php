@@ -39,6 +39,12 @@ class MolliePaymentStatus
      */
     public static function isFailedStatus($paymentIdentifier, $status)
     {
+        // for these payment methods, an "open" status means the payment did not succeed
+        $openIsFailedMethods = ['bancontact', 'satispay'];
+        if (in_array($paymentIdentifier, $openIsFailedMethods, true) && $status === self::MOLLIE_PAYMENT_OPEN) {
+            return true;
+        }
+
         $list = [
             MolliePaymentStatus::MOLLIE_PAYMENT_CANCELED,
             MolliePaymentStatus::MOLLIE_PAYMENT_FAILED,

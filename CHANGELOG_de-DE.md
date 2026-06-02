@@ -1,4 +1,5 @@
 # unreleased
+- Behoben: Bancontact- und Satispay-Zahlungen mit Status „open" werden nun korrekt als fehlgeschlagen behandelt, statt auf die Erfolgsseite weiterzuleiten.
 - Behoben: Hat eine Bestellung mehrere Retouren, wird die Erstattung nun immer für die korrekte Retoure ausgelöst und nicht mehr immer die erste gefundene verwendet.
 - Behoben: Retouren, die per API direkt mit dem Status „Abgeschlossen" angelegt werden, lösen jetzt korrekt eine Erstattung aus. Bisher wurden nur Retouren verarbeitet, die den Statuswechsel von „Offen" zu „Abgeschlossen" durchlaufen haben.
 - Behoben: Die Verwendung des Browser-Zurück-Buttons während einer Zahlung führt nicht mehr zu unerwarteten Weiterleitungen beim späteren Besuch der Bestellübersicht.
