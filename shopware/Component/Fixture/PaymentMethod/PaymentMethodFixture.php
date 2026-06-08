@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Fixture\PaymentMethod;
 
+use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Fixture\AbstractFixture;
 use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
-use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Payment\Method\PayPalOrdersApiPayment;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -63,8 +63,11 @@ final class PaymentMethodFixture extends AbstractFixture
             ];
         }
         $this->salesChannelRepository->upsert($upsertData, $context);
+    }
 
-
+    public function uninstall(Context $context): void
+    {
+        // We dont want to unassign payment methods
     }
 
     private function installTestOnlyPaymentMethods(Context $context): void
@@ -96,11 +99,6 @@ final class PaymentMethodFixture extends AbstractFixture
         }
     }
 
-    public function uninstall(Context $context): void
-    {
-        // We dont want to unassign payment methods
-    }
-
     /**
      * @return array<mixed>
      */
@@ -126,7 +124,6 @@ final class PaymentMethodFixture extends AbstractFixture
                 ],
                 'active' => $isDeprecatedMethod === false || $isTestOnlyActive
             ];
-          
         }
 
         return $result;

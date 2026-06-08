@@ -44,5 +44,4 @@ interface MollieGatewayInterface
     public function getOrder(string $mollieOrderId, string $salesChannelId): Order;
 
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture;
-
 }

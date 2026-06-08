@@ -407,5 +407,4 @@ final class MollieGateway implements MollieGatewayInterface
 
         return $payment;
     }
-
 }

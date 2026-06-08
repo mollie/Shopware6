@@ -19,7 +19,6 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 final class LineItem implements \JsonSerializable
 {
-
     private LineItemType $type;
 
     private string $quantityUnit;
@@ -287,8 +286,7 @@ final class LineItem implements \JsonSerializable
     {
         $vars = get_object_vars($this);
         $vars['totalAmount'] = $vars['amount'];
-        unset($vars['amount']);
-        unset($vars['metadata']);
+        unset($vars['amount'], $vars['metadata']);
 
         return array_filter($vars, function ($value) {
             if (is_array($value)) {
@@ -300,6 +298,7 @@ final class LineItem implements \JsonSerializable
             if (is_int($value)) {
                 return $value !== 0;
             }
+
             return $value !== null;
         });
     }

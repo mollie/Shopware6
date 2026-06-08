@@ -10,7 +10,6 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
-use Mollie\Shopware\Component\Mollie\LineItemType;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Psr\Log\LoggerInterface;
@@ -49,11 +48,12 @@ final class RefundBuilder implements RefundBuilderInterface
         $orderLineItems = ($order->getLineItems() ?? new OrderLineItemCollection())
             ->filter(function (OrderLineItemEntity $item): bool {
                 return $item->getType() !== ShopwareLineItem::CREDIT_LINE_ITEM_TYPE;
-            });
+            })
+        ;
         $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
 
         $hasRequestedItems = count($requestItems) > 0;
-        $isFullRefund = ($requestAmount === null && !$hasRequestedItems);
+        $isFullRefund = ($requestAmount === null && ! $hasRequestedItems);
 
         $lineItems = new LineItemCollection();
         $mollieLines = null;

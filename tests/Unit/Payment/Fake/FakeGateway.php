@@ -84,7 +84,9 @@ final class FakeGateway implements MollieGatewayInterface
     {
         $this->createOrderPayloads[] = $createOrder;
 
-        return new Order('ord_fake_' . uniqid(), $this->checkoutUrl, 'tr_fake_' . uniqid());
+        $order = new Order('ord_fake_' . uniqid(), $this->checkoutUrl);
+
+        return $order->withPayment($this->payment);
     }
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
@@ -141,5 +143,10 @@ final class FakeGateway implements MollieGatewayInterface
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
     {
         // TODO: Implement createCapture() method.
+    }
+
+    public function getOrder(string $mollieOrderId, string $salesChannelId): Order
+    {
+        // TODO: Implement getOrder() method.
     }
 }
