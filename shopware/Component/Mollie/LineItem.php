@@ -288,14 +288,17 @@ final class LineItem implements \JsonSerializable
         $vars = get_object_vars($this);
         $vars['totalAmount'] = $vars['amount'];
         unset($vars['amount']);
-
-        if (count($vars['metadata']) > 0) {
-            $vars['metadata'] = json_encode($vars['metadata']);
-        }
+        unset($vars['metadata']);
 
         return array_filter($vars, function ($value) {
             if (is_array($value)) {
                 return count($value) > 0;
+            }
+            if (is_string($value)) {
+                return $value !== '';
+            }
+            if (is_int($value)) {
+                return $value !== 0;
             }
             return $value !== null;
         });

@@ -87,7 +87,7 @@ final class LineItemTest extends TestCase
         $this->assertSame($expected['type'], $actual->getType()->value);
         $this->assertSame($expected['sku'], $actual->getSku());
         $this->assertEquals($expected['unitPrice'], $actual->getUnitPrice());
-        $this->assertEquals($expected['totalAmount'], $actual->getAmount());
+        $this->assertEquals($expected['amount'], $actual->getAmount());
     }
 
     public function testExpectExceptionOnEmptyLineItemPrice(): void
@@ -123,7 +123,7 @@ final class LineItemTest extends TestCase
         $this->assertSame($expected['type'], $actual->getType()->value);
         $this->assertSame($expected['sku'], $actual->getSku());
         $this->assertEquals($expected['unitPrice'], $actual->getUnitPrice());
-        $this->assertEquals($expected['totalAmount'], $actual->getAmount());
+        $this->assertEquals($expected['amount'], $actual->getAmount());
     }
 
     public function testCanCreateFromOrderLineWithVoucherCategoriesArray(): void

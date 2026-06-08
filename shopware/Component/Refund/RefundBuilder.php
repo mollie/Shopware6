@@ -88,7 +88,6 @@ final class RefundBuilder implements RefundBuilderInterface
         if ($payment->getOrderId() !== null && $lineItems->count() > 0) {
             $createRefund = new CreateOrderRefund($payment->getOrderId(), $lineItems);
             $createRefund->setDescription($description);
-            $createRefund->setAmount($money);
         } else {
             $createRefund = new CreatePaymentRefund($payment->getId(), $money, $description);
         }
