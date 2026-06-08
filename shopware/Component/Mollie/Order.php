@@ -54,6 +54,14 @@ final class Order
         return $this->payment;
     }
 
+    public function withPayment(Payment $payment): self
+    {
+        $clone = clone $this;
+        $clone->payment = $payment;
+
+        return $clone;
+    }
+
     /**
      * @param array<string, mixed> $body
      */

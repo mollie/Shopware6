@@ -13,6 +13,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -153,7 +154,7 @@ final class TransactionService implements TransactionServiceInterface
             ],
         ];
 
-        if (!$mollieOrder instanceof MollieOrder) {
+        if (! $mollieOrder instanceof MollieOrder) {
             return $this->orderTransactionRepository->upsert([$upsertArray], $context);
         }
 
@@ -174,6 +175,9 @@ final class TransactionService implements TransactionServiceInterface
 
             foreach ($filteredMollieLines->getElements() as $mollieLine) {
                 $shopwareLineItem = $shopwareLineItems->get($mollieLine->getShopwareLineItemId());
+                if (! $shopwareLineItem instanceof OrderLineItemEntity) {
+                    continue;
+                }
                 $customFields = $shopwareLineItem->getCustomFields() ?? [];
                 $customFields[Mollie::EXTENSION] = ['order_line_id' => $mollieLine->getId()];
 
@@ -191,6 +195,9 @@ final class TransactionService implements TransactionServiceInterface
 
             foreach ($filteredMollieDeliveryLines->getElements() as $mollieLine) {
                 $delivery = $shopwareDeliveries->get($mollieLine->getShopwareLineItemId());
+                if (! $delivery instanceof OrderDeliveryEntity) {
+                    continue;
+                }
                 $customFields = $delivery->getCustomFields() ?? [];
                 $customFields[Mollie::EXTENSION] = ['order_line_id' => $mollieLine->getId()];
 

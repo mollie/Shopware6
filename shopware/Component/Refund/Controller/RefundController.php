@@ -9,17 +9,18 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RefundCollection as MollieRefundCollection;
 use Mollie\Shopware\Component\Refund\CreditNoteService;
 use Mollie\Shopware\Component\Refund\DAL\Order\OrderExtension;
-use Mollie\Shopware\Component\Refund\RefundPersister;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundCollection;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
 use Mollie\Shopware\Component\Refund\Event\ModifyCreateRefundPayloadEvent;
 use Mollie\Shopware\Component\Refund\RefundBuilder;
 use Mollie\Shopware\Component\Refund\RefundBuilderInterface;
+use Mollie\Shopware\Component\Refund\RefundPersister;
 use Mollie\Shopware\Component\Refund\Struct\CartStruct;
 use Mollie\Shopware\Component\Refund\Struct\RefundOverviewStruct;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -29,7 +30,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -136,7 +136,7 @@ final class RefundController extends AbstractController
             return (int) ($item['quantity'] ?? 0) > 0 || (float) ($item['amount'] ?? 0.0) > 0.0;
         }));
         $hasRequestedItems = count($items) > 0;
-        $isFullRefund = ($requestAmount === null && !$hasRequestedItems);
+        $isFullRefund = ($requestAmount === null && ! $hasRequestedItems);
         $refundType = $isFullRefund ? self::TYPE_FULL : self::TYPE_PARTIAL;
 
         $this->logger->info('Refund create started', [
