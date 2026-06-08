@@ -76,4 +76,9 @@ final class RefundSettings extends Struct
     {
         return $this->creditNotesSuffix;
     }
+
+    public function getCreditNoteLabel(string $label): string
+    {
+        return trim(sprintf('%s%s%s', $this->creditNotesPrefix, $label, $this->creditNotesSuffix));
+    }
 }

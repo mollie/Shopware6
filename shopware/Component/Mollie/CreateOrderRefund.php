@@ -5,8 +5,6 @@ namespace Mollie\Shopware\Component\Mollie;
 
 final class CreateOrderRefund extends CreateRefund
 {
-    private ?Money $amount = null;
-
     public function __construct(
         private readonly string $orderId,
         private readonly LineItemCollection $lines,
@@ -21,16 +19,6 @@ final class CreateOrderRefund extends CreateRefund
     public function getLines(): LineItemCollection
     {
         return $this->lines;
-    }
-
-    public function getAmount(): ?Money
-    {
-        return $this->amount;
-    }
-
-    public function setAmount(Money $amount): void
-    {
-        $this->amount = $amount;
     }
 
     /**
@@ -50,13 +38,9 @@ final class CreateOrderRefund extends CreateRefund
                 return array_filter([
                     'id' => $line['id'] ?: null,
                     'quantity' => $line['quantity'],
-                    'amount' => $line['amount']??0,
+                    'amount' => $line['amount'] ?? 0,
                 ]);
             }, $lines);
-        }
-
-        if ($this->amount !== null) {
-            $result['amount'] = $this->amount->toArray();
         }
 
         if ($this->metadata !== []) {
