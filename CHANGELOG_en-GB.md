@@ -1,4 +1,4 @@
-# unreleased
+# 4.25.0
 - Fixed: Compatibility with NetInventors Bundle plugin - bundle products are now excluded from child line item expansion, preventing order amount mismatches when creating payments with Mollie.
 - Fixed: Bancontact and Satispay payments with status "open" are now correctly treated as failed instead of redirecting to the success page.
 - Fixed: When an order has multiple returns, the refund is now always triggered for the correct return instead of always using the first one found.
