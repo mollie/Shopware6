@@ -18,6 +18,7 @@ use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\MediaException;
 use Shopware\Core\Content\Media\MediaService;
+use Exception;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -119,15 +120,11 @@ final class PaymentMethodInstaller
 
         if (count($iconMapping) > 0) {
             foreach ($iconMapping as $fileName => $handlerIdentifier) {
-                $currentHandlerIdentifier = $iconMapping[$fileName];
-                $mediaFile = $this->loadMedia($fileName);
-                if ($mediaFile === null) {
-                    unset($iconMapping[$fileName]);
+                $mediaId = $this->installIcon($fileName, $context);
+                if ($mediaId === null) {
                     continue;
                 }
-                $mediaId = $this->mediaService->saveMediaFile($mediaFile, $fileName, $context, 'payment_method', null, false);
-                $mapping[$currentHandlerIdentifier]['mediaId'] = $mediaId;
-                unset($iconMapping[$fileName]);
+                $mapping[$handlerIdentifier]['mediaId'] = $mediaId;
             }
         }
 
@@ -177,31 +174,58 @@ final class PaymentMethodInstaller
         return array_values($mapping);
     }
 
-    private function loadMedia(string $fileName): ?MediaFile
+    private function installIcon(string $fileName, Context $context): ?string
     {
-        $request = new Request();
-        $extensions = ['.svg', '.png'];
-        foreach ($extensions as $extension) {
-            $url = 'https://www.mollie.com/external/icons/payment-methods/' . str_replace('-icon', '', $fileName) . $extension;
-            try {
-                $request->request->set('url', $url);
+        foreach (['.svg', '.png'] as $extension) {
+            $mediaFile = $this->fetchIcon($fileName, $extension);
+            if ($mediaFile === null) {
+                continue;
+            }
 
-                return $this->fileFetcher->fetchFileFromURL($request, $fileName);
-            } catch (MediaException $e) {
-                $message = sprintf('Failed to load icon from url');
-                $this->logger->warning($message, [
+            try {
+                return $this->mediaService->saveMediaFile($mediaFile, $fileName, $context, 'payment_method', null, false);
+            } catch (Exception $e) {
+                $this->logger->warning('Failed to save payment method icon, trying next format', [
                     'exception' => $e->getMessage(),
                     'file' => $fileName,
-                    'url' => $url,
+                    'extension' => $extension,
                 ]);
+            } finally {
+                $this->cleanupTempFile($mediaFile);
             }
         }
 
-        $this->logger->error('Failed to load payment method icon, PNG and SVG', [
+        $this->logger->error('Failed to install payment method icon, all formats exhausted', [
             'file' => $fileName,
-            'url' => $url,
         ]);
 
         return null;
+    }
+
+    private function fetchIcon(string $fileName, string $extension): ?MediaFile
+    {
+        $url = 'https://www.mollie.com/external/icons/payment-methods/' . str_replace('-icon', '', $fileName) . $extension;
+        $request = new Request();
+        $request->request->set('url', $url);
+
+        try {
+            return $this->fileFetcher->fetchFileFromURL($request, $fileName);
+        } catch (MediaException $e) {
+            $this->logger->warning('Failed to fetch payment method icon', [
+                'exception' => $e->getMessage(),
+                'file' => $fileName,
+                'url' => $url,
+            ]);
+
+            return null;
+        }
+    }
+
+    private function cleanupTempFile(MediaFile $mediaFile): void
+    {
+        $tempFilePath = $mediaFile->getFileName();
+        if (file_exists($tempFilePath)) {
+            unlink($tempFilePath);
+        }
     }
 }
