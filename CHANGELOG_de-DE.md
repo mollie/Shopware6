@@ -1,4 +1,4 @@
-# unreleased
+# 4.25.0
 - Behoben: Kompatibilität mit dem NetInventors Bundle Plugin - Bundle-Produkte werden nun von der Erweiterung um Kind-Positionen ausgeschlossen, um Betragsabweichungen beim Erstellen von Zahlungen über Mollie zu verhindern.
 - Behoben: Bancontact- und Satispay-Zahlungen mit Status „open" werden nun korrekt als fehlgeschlagen behandelt, statt auf die Erfolgsseite weiterzuleiten.
 - Behoben: Hat eine Bestellung mehrere Retouren, wird die Erstattung nun immer für die korrekte Retoure ausgelöst und nicht mehr immer die erste gefundene verwendet.
