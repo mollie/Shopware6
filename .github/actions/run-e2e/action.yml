@@ -93,10 +93,10 @@ runs:
         # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
-    - name: Verify Store API Key
+    - name: Fix Store API Key
       shell: bash
       run: |
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"SELECT sc.access_key, sct.name, IF(sc.access_key = '${{ inputs._STORE_API_KEY }}', 'MATCH', 'MISMATCH') AS status FROM sales_channel sc LEFT JOIN sales_channel_translation sct ON sc.id = sct.sales_channel_id;\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel SET access_key='${{ inputs._STORE_API_KEY }}' WHERE HEX(type_id) = '8A243080F92E4C719546314B577CF82B';\""
     - name: Update Shopware Config
       shell: bash
       run: |
