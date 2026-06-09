@@ -25,7 +25,7 @@ final class PayPalOrdersApiPayment extends AbstractMolliePaymentHandler implemen
 
     public function getName(): string
     {
-        return 'PayPal (Orders API - Test only)';
+        return 'PP (Orders API - Test only)';
     }
 
     public function getTechnicalName(): string

@@ -36,19 +36,18 @@ export default class AdminOrdersAction {
     /**
      *
      */
-    openRefundManager() {
+    openMollieTab() {
+        repoOrdersDetails.getMollieTab().click();
         cy.wait(1000);
+    }
 
-        if (shopware.isVersionLower('6.5')) {
-            // forceClick because if a Shopware update exists, that dialog is above our button
-            repoOrdersDetails.getMollieActionsButton().click({force: true, waitForAnimations: false});
-        }
+    /**
+     *
+     */
+    openRefundManager() {
+        this.openMollieTab();
 
-        cy.wait(2000);
-        repoOrdersDetails.getMollieRefundManagerButton().trigger('click'); //the normal click, missed somehow the element randomly
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
+        repoOrdersDetails.getMollieRefundManagerButton().trigger('click');
         repoOrdersDetails.getMollieRefundManagerDialog().should('be.visible');
     }
 
@@ -81,18 +80,11 @@ export default class AdminOrdersAction {
      *
      */
     openShipThroughMollie() {
-
-        cy.wait(2000);
-
-        if (shopware.isVersionLower('6.5')) {
-            repoOrdersDetails.getMollieActionsButton().click(forceOption);
-        }
+        this.openMollieTab();
 
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().trigger('click');
 
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
         cy.wait(4000);
     }
 
@@ -101,18 +93,15 @@ export default class AdminOrdersAction {
      * @param nthItem
      */
     openLineItemShipping(nthItem) {
-
         cy.wait(2000);
         cy.reload();
 
-        repoOrdersDetails.getLineItemActionsButton(nthItem).trigger('click')
+        this.openMollieTab();
 
+        repoOrdersDetails.getLineItemActionsButton(nthItem).trigger('click');
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
-
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click(forceOption);
 
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
         cy.wait(4000);
     }
 

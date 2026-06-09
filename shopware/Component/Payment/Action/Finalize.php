@@ -59,6 +59,10 @@ final class Finalize implements FinalizeInterface
 
         $this->logger->info('Fetched Payment Information from Mollie', $logData);
 
+        // Save again: if Mollie Components are disabled, card details are entered on Mollie's page
+        // and are not available in the initial createPayment response — only here after the customer returns.
+        $this->transactionDataLoader->savePaymentExtension($transactionId, $order, $payment, $context);
+
         $finalizeEvent = new PaymentFinalizeEvent($payment, $context);
         $this->eventDispatcher->dispatch($finalizeEvent);
 

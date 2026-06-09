@@ -94,6 +94,17 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 $transactionExtension->setChangePaymentStateUrl($changePaymentStateUrl);
             }
 
+            $bankAccount = $mollieCustomFields['bankAccount'] ?? null;
+            if ($bankAccount !== null) {
+                $transactionExtension->setBankName((string) ($mollieCustomFields['bankName'] ?? ''));
+                $transactionExtension->setBankAccount((string) $bankAccount);
+                $transactionExtension->setBankBic((string) ($mollieCustomFields['bankBic'] ?? ''));
+                $transactionExtension->setTransferReference((string) ($mollieCustomFields['transferReference'] ?? ''));
+                $transactionExtension->setConsumerName((string) ($mollieCustomFields['consumerName'] ?? ''));
+                $transactionExtension->setConsumerAccount((string) ($mollieCustomFields['consumerAccount'] ?? ''));
+                $transactionExtension->setConsumerBic((string) ($mollieCustomFields['consumerBic'] ?? ''));
+            }
+
             $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
         }
     }

@@ -352,6 +352,7 @@ describe('Administration Tests', () => {
         adminLogin.login();
         adminOrders.openOrders();
         adminOrders.openLastOrder();
+        adminOrders.openMollieTab();
 
         // our Mollie Sandbox data needs to be visible on our page
         // that's the only thing we can verify for now, but speaking of the data

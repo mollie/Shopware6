@@ -18,7 +18,6 @@ use Shopware\Core\Content\Media\MediaCollection;
 use Shopware\Core\Content\Media\MediaEntity;
 use Shopware\Core\Content\Media\MediaException;
 use Shopware\Core\Content\Media\MediaService;
-use Exception;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -184,7 +183,7 @@ final class PaymentMethodInstaller
 
             try {
                 return $this->mediaService->saveMediaFile($mediaFile, $fileName, $context, 'payment_method', null, false);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->warning('Failed to save payment method icon, trying next format', [
                     'exception' => $e->getMessage(),
                     'file' => $fileName,

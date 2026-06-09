@@ -86,9 +86,6 @@ context("Order Shipping", () => {
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
-            if (shopware.isVersionLower('6.5')) {
-                repoOrderDetails.getMollieActionsButton().click({force: true});
-            }
             assertShippingButtonIsDisabled();
 
         })
@@ -115,10 +112,6 @@ context("Order Shipping", () => {
             shippingAction.shipFullOrder();
 
             assertShippingStatus('Shipped', 2);
-
-            if (shopware.isVersionLower('6.5')) {
-                repoOrderDetails.getMollieActionsButton().click({force: true});
-            }
 
             assertShippingButtonIsDisabled();
         })
@@ -189,10 +182,6 @@ context("Order Shipping", () => {
             shippingAction.shipFullOrder();
 
             assertShippingStatus('Shipped', 4);
-
-            if (shopware.isVersionLower('6.5')) {
-                repoOrderDetails.getMollieActionsButton().click({force: true});
-            }
 
             assertShippingButtonIsDisabled();
         })
@@ -303,6 +292,7 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
 }
 
 function assertShippingButtonIsDisabled() {
+    adminOrders.openMollieTab();
 
     repoOrderDetails.getMollieActionButtonShipThroughMollie()
         .should('have.attr', 'class')

@@ -61,6 +61,7 @@ clean: ##1 Cleans all dependencies and files
 
 
 build: ##2 Runs the Shopware theme and asset pipeline (JS assets must be built beforehand via shopware-cli).
+	rm -rf ../../../public/bundles/molliepayments/administration
 	cd ../../.. && php bin/console --no-debug theme:refresh
 	cd ../../.. && php bin/console --no-debug theme:compile
 	cd ../../.. && php bin/console --no-debug theme:refresh
