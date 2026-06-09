@@ -73,7 +73,7 @@ describe('POS Terminals', () => {
                 shopware.prepareDomainChange();
                 checkout.placeOrderOnConfirm();
 
-                cy.url().should('include', '/mollie/pos/checkout?sw=');
+                cy.url().should('include', '/mollie/pos/checkout?transactionId=');
 
                 cy.contains('Follow the instructions on the terminal');
             })
