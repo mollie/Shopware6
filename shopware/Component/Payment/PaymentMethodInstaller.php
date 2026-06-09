@@ -206,6 +206,7 @@ final class PaymentMethodInstaller
         $url = 'https://www.mollie.com/external/icons/payment-methods/' . str_replace('-icon', '', $fileName) . $extension;
         $request = new Request();
         $request->request->set('url', $url);
+        $request->query->set('extension', ltrim($extension, '.'));
 
         try {
             return $this->fileFetcher->fetchFileFromURL($request, $fileName);
