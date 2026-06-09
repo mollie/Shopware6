@@ -77,7 +77,10 @@ final class RefundBuilder implements RefundBuilderInterface
 
         if ($hasRequestedItems) {
             $lineItems = $this->buildFromRequestItems($requestItems, $orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines);
-            $amount = $lineItems->getTotal();
+            // Only override amount if no explicit amount was requested
+            if ($requestAmount === null) {
+                $amount = $lineItems->getTotal();
+            }
         }
 
         $maxRefundable = max(0.0, $order->getAmountTotal() - $alreadyRefunded);
@@ -85,7 +88,9 @@ final class RefundBuilder implements RefundBuilderInterface
 
         $money = new Money($amount, $currency->getIsoCode());
 
-        if ($payment->getOrderId() !== null && $lineItems->count() > 0) {
+        // Use order-based refund with line items only when no custom amount is requested;
+        // a custom amount requires payment-level refund so Mollie honors the amount.
+        if ($payment->getOrderId() !== null && $lineItems->count() > 0 && $requestAmount === null) {
             $createRefund = new CreateOrderRefund($payment->getOrderId(), $lineItems);
             $createRefund->setDescription($description);
         } else {

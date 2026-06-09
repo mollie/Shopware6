@@ -1,10 +1,4 @@
-import Shopware from "Services/shopware/Shopware";
 import RefundManagerRepository from "Repositories/admin/refund-manager/RefundManagerRepository";
-import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
-
-const shopware = new Shopware();
-
-const adminOrders = new AdminOrdersAction();
 
 const repoRefundManager = new RefundManagerRepository();
 
@@ -32,17 +26,6 @@ export default class RefundManagerAction {
 
         repoRefundManager.getVerifyCheckbox().click(forceOption);
         repoRefundManager.getFullRefundButton().click(forceOption);
-
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(5000);
-        // refunds are loaded directly without a page reload,
-        // in some cypress browser this does not work properly
-        // so we reload the page
-        cy.reload();
-        adminOrders.openRefundManager();
-        // this wait is also necessary somehow
-        cy.wait(2000);
     }
 
     /**
@@ -55,17 +38,6 @@ export default class RefundManagerAction {
         repoRefundManager.getDescription().clear(forceOption).type(description, forceOption);
         repoRefundManager.getVerifyCheckbox().click(forceOption);
         repoRefundManager.getRefundButton().click(forceOption);
-
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(5000);
-        // refunds are loaded directly without a page reload,
-        // in some cypress browser this does not work properly
-        // so we reload the page
-        cy.reload();
-        adminOrders.openRefundManager();
-        // this wait is also necessary somehow
-        cy.wait(2000);
     }
 
     /**
@@ -74,10 +46,6 @@ export default class RefundManagerAction {
     cancelPendingRefund() {
         repoRefundManager.getFirstRefundContextButton().click(forceOption);
         repoRefundManager.getFirstRefundCancelButton().click(forceOption);
-
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(5000);
     }
 
     /**

@@ -94,6 +94,7 @@ describe('PayPal', () => {
 
                 adminOrders.openOrders();
                 adminOrders.openLastOrder();
+                adminOrders.openMollieTab();
 
                 repoOrdersDetails.getPaymentReferenceTitle().should('exist');
                 repoOrdersDetails.getPaymentReferenceValue().should('exist');

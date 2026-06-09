@@ -425,10 +425,10 @@ Component.register('mollie-refund-manager', {
                 items: itemData,
             })
                 .then((response) => {
-                    if (response.success) {
+                    if (this._isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors[0]);
+                        this._showNotificationError(response.errors?.[0]);
                     }
                 })
                 .finally(() => {
@@ -453,10 +453,10 @@ Component.register('mollie-refund-manager', {
                 internalDescription: this.refundInternalDescription,
             })
                 .then((response) => {
-                    if (response.success) {
+                    if (this._isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors[0]);
+                        this._showNotificationError(response.errors?.[0]);
                     }
                 })
                 .finally(() => {
@@ -560,7 +560,12 @@ Component.register('mollie-refund-manager', {
                             this.$tc('mollie-payments.refund-manager.notifications.success.refund-canceled'),
                         );
                         this.$emit('refund-cancelled');
-                        this._fetchFormData();
+                        this.mollieRefunds = this.mollieRefunds.map(function (r) {
+                            if (r.id !== item.id) {
+                                return r;
+                            }
+                            return Object.assign({}, r, { status: 'canceled', isPending: false, isQueued: false });
+                        });
                     } else {
                         this._showNotificationError(response.errors[0]);
                     }
@@ -687,15 +692,12 @@ Component.register('mollie-refund-manager', {
             });
         },
 
-        _handleRefundSuccess(response) {
-            this.isRefunding = false;
+        _isRefundSuccess(response) {
+            return typeof response.id === 'string' || response.success === true;
+        },
 
-            if (!response.success) {
-                this._showNotificationError(
-                    this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'),
-                );
-                return;
-            }
+        _handleRefundSuccess(refund) {
+            this.isRefunding = false;
 
             this._showNotificationSuccess(
                 this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'),
@@ -703,10 +705,7 @@ Component.register('mollie-refund-manager', {
 
             this.$emit('refund-success');
 
-            // fetch new data
-            this._fetchFormData();
-
-            // reset existing values
+            this.mollieRefunds = [refund].concat(this.mollieRefunds);
             this.btnResetCartForm_Click();
         },
         // ---------------------------------------------------------------------------------------------------------

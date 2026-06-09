@@ -42,13 +42,11 @@ Component.register('mollie-order-tab', {
 
     computed: {
         order() {
-            // eslint-disable-next-line no-undef
-            return Shopware.State.get('swOrderDetail')?.order ?? null;
+            return this.getSwOrderDetail()?.order ?? null;
         },
 
         context() {
-            // eslint-disable-next-line no-undef
-            return Shopware.State.get('swOrderDetail')?.versionContext ?? null;
+            return this.getSwOrderDetail()?.versionContext ?? null;
         },
 
         isMollieOrder() {
@@ -77,6 +75,14 @@ Component.register('mollie-order-tab', {
 
         creditCardHolder() {
             return this.details?.creditCard?.holder ?? '';
+        },
+
+        hasBankTransferData() {
+            return this.details?.bankTransfer != null;
+        },
+
+        bankTransferReference() {
+            return this.details?.bankTransfer?.transferReference ?? '';
         },
 
         hasPaymentLink() {
@@ -144,6 +150,12 @@ Component.register('mollie-order-tab', {
     },
 
     watch: {
+        orderId: {
+            handler() {
+                this.loadData();
+            },
+            immediate: true,
+        },
         order: function () {
             this.loadData();
         },
@@ -154,6 +166,16 @@ Component.register('mollie-order-tab', {
     },
 
     methods: {
+        getSwOrderDetail() {
+            // eslint-disable-next-line no-undef
+            return (
+                Shopware.Store?.get?.('swOrderDetail') ??
+                // eslint-disable-next-line no-undef
+                Shopware.State.get('swOrderDetail') ??
+                null
+            );
+        },
+
         createdComponent() {
             if (this.$root && this.$root.$on) {
                 this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
@@ -167,18 +189,16 @@ Component.register('mollie-order-tab', {
                     this.loadData();
                 });
             }
-
-            this.loadData();
         },
 
         loadData() {
-            if (!this.order || !this.order.id) {
+            if (!this.orderId) {
                 return;
             }
 
             this.isDetailsLoading = true;
 
-            this.MollieOrderDetailsService.getDetails(this.order.id)
+            this.MollieOrderDetailsService.getDetails(this.orderId)
                 .then((response) => {
                     this.details = response;
 

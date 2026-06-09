@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\LineItemType;
 use Mollie\Shopware\Component\Mollie\Refund as MollieRefund;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundCollection;
+use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -17,6 +18,8 @@ use Shopware\Core\Content\Product\Stock\StockAlteration;
 use Shopware\Core\Content\Product\Stock\StockStorage;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class RefundPersister
@@ -44,8 +47,11 @@ final class RefundPersister
         string $internalDescription,
         array $stockItems,
         Context $context
-    ): void {
+    ): RefundEntity {
+        $entityId = Uuid::randomHex();
+
         $refundData = [
+            'id' => $entityId,
             'orderId' => $order->getId(),
             'orderVersionId' => $order->getVersionId(),
             'mollieRefundId' => $refund->getId(),
@@ -59,13 +65,27 @@ final class RefundPersister
             $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
             $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
             $refundData['refundItems'] = $this->buildRefundItems($lines, $orderLineItems, $orderDeliveries);
+        } elseif (count($stockItems) > 0) {
+            $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+            $refundData['refundItems'] = $this->buildRefundItemsFromRequest($stockItems, $orderLineItems);
+        }
 
-            if (count($stockItems) > 0) {
-                $this->applyStockAlterations($stockItems, $order, $context);
-            }
+        if (count($stockItems) > 0) {
+            $this->applyStockAlterations($stockItems, $order, $context);
         }
 
         $this->refundRepository->upsert([$refundData], $context);
+
+        $criteria = new Criteria([$entityId]);
+        $criteria->addAssociation('refundItems');
+
+        $entity = $this->refundRepository->search($criteria, $context)->first();
+
+        if (! $entity instanceof RefundEntity) {
+            throw new \RuntimeException(sprintf('Refund entity "%s" could not be loaded after upsert.', $entityId));
+        }
+
+        return $entity;
     }
 
     /**
@@ -93,6 +113,37 @@ final class RefundPersister
                 'amount' => (float) $item->getUnitPrice()->getValue(),
                 'orderLineItemId' => $orderLineItemId,
                 'orderLineItemVersionId' => $orderLineItemVersionId,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     *
+     * @return array<array<string, mixed>>
+     */
+    private function buildRefundItemsFromRequest(array $requestItems, OrderLineItemCollection $orderLineItems): array
+    {
+        $result = [];
+
+        foreach ($requestItems as $item) {
+            $qty = max(1, (int) ($item['quantity'] ?? 1));
+            $totalAmount = (float) ($item['amount'] ?? 0.0);
+            $lineItemId = (string) ($item['id'] ?? '');
+
+            // Only set orderLineItemId if the ID actually exists in order_line_item;
+            // delivery IDs are not in that table and would violate the FK constraint.
+            $orderLineItem = $orderLineItems->get($lineItemId);
+
+            $result[] = [
+                'mollieLineId' => '',
+                'label' => (string) ($item['label'] ?? ''),
+                'quantity' => $qty,
+                'amount' => $totalAmount / $qty,
+                'orderLineItemId' => $orderLineItem !== null ? $lineItemId : null,
+                'orderLineItemVersionId' => $orderLineItem?->getVersionId(),
             ];
         }
 

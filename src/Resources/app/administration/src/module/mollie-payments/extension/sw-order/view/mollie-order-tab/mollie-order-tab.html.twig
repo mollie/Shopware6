@@ -42,7 +42,7 @@
                 <div class="mollie-property-column-left">
 
                     {% block mollie_order_tab_creditcard %}
-                        <div v-if="hasCreditCardData" class="mollie-property-section">
+                        <div v-show="hasCreditCardData" class="mollie-property-section">
                             <dt class="mollie-property-title">
                                 {{ $tc('sw-order.detailExtended.titleCreditCardData') }}
                             </dt>
@@ -53,6 +53,15 @@
                             </dd>
                             <dd class="mollie-property-content">{{ creditCardNumber }}</dd>
                             <dd class="mollie-property-content">{{ creditCardHolder }}</dd>
+                        </div>
+                    {% endblock %}
+
+                    {% block mollie_order_tab_banktransfer %}
+                        <div v-show="hasBankTransferData" class="mollie-property-section">
+                            <dt class="mollie-property-title mollie-order-user-card-payment-reference-title">
+                                {{ $tc('sw-order.detailExtended.labelMollieThirdPartyPaymentId') }}
+                            </dt>
+                            <dd class="mollie-property-content mollie-order-user-card-payment-reference-value">{{ bankTransferReference }}</dd>
                         </div>
                     {% endblock %}
 
@@ -136,10 +145,11 @@
         {% endblock %}
 
         {% block mollie_order_tab_line_items %}
-            <sw-card :title="$tc('sw-order.detailBase.cardTitleLineItems')"
+            <sw-card v-if="order"
+                     class="mollie-order-line-items-card"
+                     :title="$tc('sw-order.detailBase.cardTitleLineItems')"
                      position-identifier="mollie-order-tab-line-items">
-                <template #grid>
-                    <sw-container type="row">
+                <sw-container type="row">
                         <mollie-order-line-items-grid :order="order"
                                                       :context="context"
                                                       :editable="false"
@@ -205,7 +215,6 @@
                             </sw-card-section>
                         {% endblock %}
                     </sw-container>
-                </template>
             </sw-card>
         {% endblock %}
 

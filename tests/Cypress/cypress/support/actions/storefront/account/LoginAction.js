@@ -1,6 +1,3 @@
-import LoginRepository from 'Repositories/storefront/account/LoginRepository';
-
-const repo = new LoginRepository();
 export default class LoginAction {
 
     /**
@@ -9,22 +6,20 @@ export default class LoginAction {
      * @param password
      */
     doLogin(email, password) {
+        cy.request('/account/login').then((response) => {
+            const tokenMatch = response.body.match(/name="_csrf_token"\s+value="([^"]+)"/);
+            const csrfToken = tokenMatch ? tokenMatch[1] : '';
 
-        cy.session('login', () => {
-
-            cy.visit('/account');
-
-            repo.getEmail().clear().type(email, {'force': true});
-            repo.getPassword().clear().type(password, {'force': true});
-
-            repo.getSubmitButton().click({force: true});
-            cy.wait(2000);
-        }, {
-            cacheAcrossSpecs: true,
-            validate() {
-                cy.visit('/account');
-                cy.url().should('not.include', '/login');
-            }
+            cy.request({
+                method: 'POST',
+                url: '/account/login',
+                form: true,
+                body: {
+                    email: email,
+                    password: password,
+                    _csrf_token: csrfToken,
+                },
+            });
         });
 
         cy.visit('/');

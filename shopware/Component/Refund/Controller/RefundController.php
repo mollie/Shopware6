@@ -164,7 +164,7 @@ final class RefundController extends AbstractController
         $refund = $this->refundGateway->createRefund($createRefund, $orderNumber, $salesChannelId);
 
         $stockItems = $hasRequestedItems ? $items : [];
-        $this->refundPersister->persist($order, $refund, $createRefund, $refundType, $description, $internalDescription, $stockItems, $context);
+        $dalRefund = $this->refundPersister->persist($order, $refund, $createRefund, $refundType, $description, $internalDescription, $stockItems, $context);
 
         $refundSettings = $this->settingsService->getRefundSettings($salesChannelId);
         if ($refundSettings->isCreateCreditNotes()) {
@@ -178,6 +178,9 @@ final class RefundController extends AbstractController
             'amount' => $createRefund->getAmount()?->getValue(),
             'type' => $refundType,
         ]);
+
+        $refund->setRefundItems($dalRefund->getRefundItems());
+        $refund->setInternalDescription((string) $dalRefund->getInternalDescription());
 
         return $this->json($refund);
     }

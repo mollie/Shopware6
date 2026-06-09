@@ -106,4 +106,5 @@ function createOrderAndOpenAdmin(paymentMethod) {
     adminLogin.login();
     adminOrders.openOrders();
     adminOrders.openLastOrder();
+    adminOrders.openMollieTab();
 }

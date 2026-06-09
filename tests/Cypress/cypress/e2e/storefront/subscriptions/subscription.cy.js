@@ -158,6 +158,7 @@ describe('Subscription', () => {
 
                     cy.contains('Show Shopware order').click();
                     cy.url().should('include', '/order/detail');
+                    adminOrders.openMollieTab();
                     cy.contains('Subscription Order', {matchCase: false}).click();
 
                     cy.url().should('include', '/subscription/detail');
@@ -495,7 +496,8 @@ function assertValidSubscriptionInAdmin() {
     adminOrders.openOrders();
     adminOrders.openLastOrder();
 
-    // our latest order must have a subscription "badge"
+    // our latest order must have a subscription "badge" (located in the Mollie tab)
+    adminOrders.openMollieTab();
     repoOrdersDetails.getSubscriptionBadge().should('exist');
 
     // ------------------------------------------------------------------------------------------------------
