@@ -96,7 +96,7 @@ runs:
     - name: Verify Store API Key
       shell: bash
       run: |
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"SELECT name, access_key, IF(access_key = '${{ inputs._STORE_API_KEY }}', 'MATCH', 'MISMATCH') AS status FROM sales_channel;\""
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"SELECT sc.access_key, sct.name, IF(sc.access_key = '${{ inputs._STORE_API_KEY }}', 'MATCH', 'MISMATCH') AS status FROM sales_channel sc LEFT JOIN sales_channel_translation sct ON sc.id = sct.sales_channel_id;\""
     - name: Update Shopware Config
       shell: bash
       run: |
