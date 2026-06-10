@@ -5,7 +5,13 @@ export default class ExpressOffcanvasService {
      * @param key a unique key to identify the registration type
      */
     register(handler, key) {
-        const offCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
+        const offCanvasCartEntry = window.PluginManager.getPluginList().OffCanvasCart;
+
+        if (!offCanvasCartEntry) {
+            return;
+        }
+
+        const offCanvasInstances = offCanvasCartEntry.get('instances');
 
         if (!offCanvasInstances) {
             return;
