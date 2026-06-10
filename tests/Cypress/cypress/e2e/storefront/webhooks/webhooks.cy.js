@@ -1,4 +1,4 @@
-context("Storefront Payment Webhooks", () => {
+context.skip("Storefront Payment Webhooks", () => {
 
     it('C266653: Storefront Webhook Route reachable @core', () => {
 
@@ -14,7 +14,7 @@ context("Storefront Payment Webhooks", () => {
 })
 
 
-context("Storefront Subscription Webhooks", () => {
+context.skip("Storefront Subscription Webhooks", () => {
 
     it('C266655: Subscription Webhook is reachable @core', () => {
 

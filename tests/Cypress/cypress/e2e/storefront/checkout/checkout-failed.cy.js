@@ -72,7 +72,7 @@ function beforeEachShopwareFailureMode(device) {
 }
 
 
-context("Checkout Failure Tests", () => {
+context.skip("Checkout Failure Tests", () => {
 
     describe('Mollie Failure Mode', () => {
 

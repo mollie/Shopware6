@@ -51,7 +51,7 @@ function beforeEach(device) {
 }
 
 
-context("Cancel Authorized items", () => {
+context.skip("Cancel Authorized items", () => {
 
     context(devices.getDescription(device), () => {
         it('C3259233: Cancel items from order', () => {

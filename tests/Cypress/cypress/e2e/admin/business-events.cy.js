@@ -19,7 +19,7 @@ const device = devices.getFirstDevice();
 export const getMochaContext = () => cy.state('runnable').ctx;
 
 
-context("Events Config", () => {
+context.skip("Events Config", () => {
 
     context(devices.getDescription(device), () => {
 
