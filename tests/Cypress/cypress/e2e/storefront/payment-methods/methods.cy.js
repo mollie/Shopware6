@@ -22,6 +22,25 @@ const testDevices = [devices.getFirstDevice()];
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
+let beforeAllCalled = false;
+
+function beforeEach(device) {
+    cy.wrap(null).then(() => {
+        if (!beforeAllCalled) {
+            const shopConfig = new ShopConfiguration();
+            const pluginConfig = new PluginConfiguration();
+
+            pluginConfig.setMollieFailureMode(true);
+
+            configAction.configureEnvironment(shopConfig, pluginConfig);
+
+            beforeAllCalled = true;
+        }
+        session.resetBrowserSession();
+        devices.setDevice(device);
+    });
+}
+
 
 context('Active Payment Methods', () => {
 
@@ -31,16 +50,7 @@ context('Active Payment Methods', () => {
 
             it('C3996: Mollie Payment Methods show TEST MODE @core', () => {
 
-                devices.setDevice(device);
-
-                const shopConfig = new ShopConfiguration();
-                const pluginConfig = new PluginConfiguration();
-
-                pluginConfig.setMollieFailureMode(true);
-
-                configAction.configureEnvironment(shopConfig, pluginConfig);
-
-                session.resetBrowserSession();
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 
@@ -63,16 +73,7 @@ context('Deprecated Payment Methods', () => {
 
             it('C38332: ING Home Pay must not exist @core', () => {
 
-                devices.setDevice(device);
-
-                const shopConfig = new ShopConfiguration();
-                const pluginConfig = new PluginConfiguration();
-
-                pluginConfig.setMollieFailureMode(true);
-
-                configAction.configureEnvironment(shopConfig, pluginConfig);
-
-                session.resetBrowserSession();
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 
@@ -83,16 +84,7 @@ context('Deprecated Payment Methods', () => {
 
             it('C38333: SEPA Direct Debit must not exist @core', () => {
 
-                devices.setDevice(device);
-
-                const shopConfig = new ShopConfiguration();
-                const pluginConfig = new PluginConfiguration();
-
-                pluginConfig.setMollieFailureMode(true);
-
-                configAction.configureEnvironment(shopConfig, pluginConfig);
-
-                session.resetBrowserSession();
+                beforeEach(device);
 
                 scenarioDummyBasket.execute();
 
