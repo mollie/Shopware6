@@ -7,21 +7,23 @@ export default class LoginAction {
      * @param attempt
      */
     doLogin(email, password, attempt = 1) {
-        // SW 6.7 login form has no _csrf_token. A successful login returns 302 (redirect
-        // to home); a failed login returns 200 (login form re-rendered). followRedirect:false
-        // lets us distinguish the two without an extra cy.visit('/account') verification step.
+        // createActionResponse() returns new Response() — an empty 200 — when no
+        // redirectTo/forwardTo param is present (our case). A failed login forwards to the
+        // login page and returns 200 with the full login form HTML. Body length distinguishes
+        // the two; no followRedirect:false needed.
         cy.request({
             method: 'POST',
             url: '/account/login',
             form: true,
-            followRedirect: false,
             failOnStatusCode: false,
             body: {
                 email: email,
                 password: password,
             },
         }).then(function (response) {
-            if (response.status !== 302) {
+            var loginFailed = typeof response.body === 'string' && response.body.length > 0;
+
+            if (loginFailed) {
                 if (attempt >= 3) {
                     throw new Error('Login failed after 3 attempts for user: ' + email);
                 }
