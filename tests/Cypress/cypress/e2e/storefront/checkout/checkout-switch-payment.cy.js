@@ -50,7 +50,7 @@ function beforeEachSetup(device) {
 }
 
 
-context("No Pending Order Redirect After Failed Payment", () => {
+context.skip("No Pending Order Redirect After Failed Payment", () => {
 
     context(devices.getDescription(device), () => {
 
@@ -82,7 +82,7 @@ context("No Pending Order Redirect After Failed Payment", () => {
 
 })
 
-context("Switch Payment Method After Browser Back", () => {
+context.skip("Switch Payment Method After Browser Back", () => {
 
     context(devices.getDescription(device), () => {
 

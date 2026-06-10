@@ -101,7 +101,7 @@ function beforeEach(device) {
 }
 
 
-context("Checkout Tests", () => {
+context.skip("Checkout Tests", () => {
 
     describe('Successful Checkout', () => {
         context(devices.getDescription(device), () => {

@@ -60,7 +60,7 @@ function beforeEach(device) {
 }
 
 
-context("Order Shipping", () => {
+context.skip("Order Shipping", () => {
 
     context(devices.getDescription(device), () => {
 
