@@ -1,7 +1,6 @@
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
 import ListingAction from "Actions/storefront/products/ListingAction";
 import Devices from "Services/utils/Devices";
-import Session from "Services/utils/Session";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PDPRepository from "Repositories/storefront/products/PDPRepository";
 import PDPAction from "Actions/storefront/products/PDPAction";
@@ -16,7 +15,6 @@ import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
-const session = new Session();
 const configAction = new ShopConfigurationAction();
 const topMenu = new TopMenuAction();
 const listing = new ListingAction();
@@ -44,23 +42,6 @@ function beforeEachNoPrivacy() {
 
     });
 }
-
-function beforeEachPrivacy() {
-    cy.wrap(null).then(() => {
-        devices.setDevice(devices.getFirstDevice());
-
-        const shopConfig = new ShopConfiguration();
-        const pluginConfig = new PluginConfiguration();
-
-        shopConfig.setDataPrivacy(true);
-        pluginConfig.setMollieFailureMode(true);
-
-        configAction.configureEnvironment(shopConfig, pluginConfig);
-
-        session.resetBrowserSession();
-    });
-}
-
 
 describe('Paypal Express - UI Tests', () => {
 
@@ -97,11 +78,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247548: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openRegularProduct();
@@ -148,11 +130,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247547: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openListingRegularProducts();
@@ -200,11 +183,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247546: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openRegularProduct();
@@ -258,11 +242,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247545: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openRegularProduct();
