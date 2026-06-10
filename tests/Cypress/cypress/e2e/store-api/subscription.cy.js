@@ -4,9 +4,6 @@ import Shopware from "Services/shopware/Shopware"
 
 const shopware = new Shopware();
 
-const client = new StoreAPIClient(shopware.getStoreApiToken());
-
-
 // that ones just made up to have a valid URL
 const fakeSubscriptionID = '0d8eefdd6d12456335280e2ff42431b9';
 
@@ -25,9 +22,13 @@ const validAddressPayload = {
 const customerEmail = 'cypress@mollie.com';
 const customerPassword = 'cypress123';
 
+// Fresh client per test — avoids accumulated context-token state across the 14 tests
+// and prevents Shopware's login throttling from triggering on repeated logins
+// for the same customer within the same module-level singleton.
+let client;
 
 function beforeEach() {
-    client.clearContextToken();
+    client = new StoreAPIClient(shopware.getStoreApiToken());
 }
 
 

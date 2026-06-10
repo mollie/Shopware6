@@ -17,14 +17,11 @@ export default class DummyUserScenario {
 
         const user_email = 'cypress@mollie.com';
         const user_pwd = 'cypress123';
-        cy.visit('/');
 
         session.resetBrowserSession();
 
         login.doLogin(user_email, user_pwd);
 
-        // we have to start on the home page
-        // after session restoring, so that we can continue as usual
         cy.visit('/account');
 
     }

@@ -39,8 +39,6 @@ export default class DummyBasketScenario {
         const user_email = 'cypress@mollie.com';
         const user_pwd = 'cypress123';
 
-        cy.visit('/');
-        
         session.resetBrowserSession();
 
         login.doLogin(user_email, user_pwd);
