@@ -21,25 +21,29 @@ export default class LoginAction {
                     password: password,
                     _csrf_token: csrfToken,
                 },
-            }).then((loginResponse) => {
-                const loginFailed = (loginResponse.redirects || []).some((r) => r.includes('/account/login'));
-
-                if (loginFailed) {
-                    if (attempt >= 3) {
-                        throw new Error('Login failed after 3 attempts for user: ' + email);
-                    }
-
-                    cy.log('Login attempt ' + attempt + ' failed, retrying (' + (attempt + 1) + '/3)...');
-                    cy.clearAllCookies();
-                    cy.clearAllLocalStorage();
-                    cy.clearAllSessionStorage();
-                    cy.visit('/');
-
-                    this.doLogin(email, password, attempt + 1);
-                } else {
-                    cy.visit('/');
-                }
             });
+        });
+
+        // Verify login by actually navigating to /account in the browser.
+        // cy.request() alone cannot reliably detect session state in SW 6.7
+        // because failed logins may return 200 (inline error) instead of a redirect.
+        cy.visit('/account');
+        cy.url().then((currentUrl) => {
+            if (currentUrl.includes('/account/login')) {
+                if (attempt >= 3) {
+                    throw new Error('Login failed after 3 attempts for user: ' + email);
+                }
+
+                cy.log('Login attempt ' + attempt + ' failed, retrying (' + (attempt + 1) + '/3)...');
+                cy.clearAllCookies();
+                cy.clearAllLocalStorage();
+                cy.clearAllSessionStorage();
+                cy.visit('/');
+
+                this.doLogin(email, password, attempt + 1);
+            } else {
+                cy.visit('/');
+            }
         });
     }
 
