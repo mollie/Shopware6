@@ -13,13 +13,14 @@ export default class MollieRegistration {
     register() {
         const pluginManager = window.PluginManager;
 
-        // global plugins
+        // global plugins - registered on 'body' so Shopware's PluginManager initializes
+        // them exactly once per page regardless of version
         // -----------------------------------------------------------------------------
         // hide apple pay direct buttons across the whole shop, if not available
-        pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
+        pluginManager.register('MollieApplePayDirect', MollieApplePayDirect, 'body');
 
         // fix quantity select on PDP Page
-        pluginManager.register('PayPalExpressPlugin', PayPalExpressPlugin);
+        pluginManager.register('PayPalExpressPlugin', PayPalExpressPlugin, 'body');
 
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------
