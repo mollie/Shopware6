@@ -1,6 +1,7 @@
 import TopMenuAction from "Actions/storefront/navigation/TopMenuAction";
 import ListingAction from "Actions/storefront/products/ListingAction";
 import Devices from "Services/utils/Devices";
+import Session from "Services/utils/Session";
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import PDPRepository from "Repositories/storefront/products/PDPRepository";
 import PDPAction from "Actions/storefront/products/PDPAction";
@@ -15,6 +16,7 @@ import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
 
 const devices = new Devices();
+const session = new Session();
 const configAction = new ShopConfigurationAction();
 const topMenu = new TopMenuAction();
 const listing = new ListingAction();
@@ -55,6 +57,7 @@ function beforeEachPrivacy() {
 
         configAction.configureEnvironment(shopConfig, pluginConfig);
 
+        session.resetBrowserSession();
     });
 }
 
