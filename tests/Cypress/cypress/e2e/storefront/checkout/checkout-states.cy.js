@@ -54,7 +54,7 @@ function beforeEach(device) {
 }
 
 
-context.skip("Order Status Mapping Tests", () => {
+context("Order Status Mapping Tests", () => {
 
     context(devices.getDescription(device), () => {
 
