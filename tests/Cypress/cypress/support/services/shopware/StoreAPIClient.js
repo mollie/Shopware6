@@ -40,11 +40,14 @@ export default class StoreAPIClient {
      * returned context token on this client, so that subsequent requests
      * are authenticated as this customer.
      *
+     * Retries up to 3 times if no context token is received.
+     *
      * @param email
      * @param password
+     * @param attempt
      * @returns {Promise}
      */
-    login(email, password) {
+    login(email, password, attempt = 1) {
         return this.post('/account/login', {
             email: email,
             password: password,
@@ -59,9 +62,18 @@ export default class StoreAPIClient {
 
             if (token) {
                 this.setContextToken(token);
+                return response;
             }
 
-            return response;
+            if (attempt >= 3) {
+                throw new Error('Store API login failed after 3 attempts for user: ' + email);
+            }
+
+            return new Promise(function (resolve) {
+                return setTimeout(resolve, 500);
+            }).then(() => {
+                return this.login(email, password, attempt + 1);
+            });
         });
     }
 
