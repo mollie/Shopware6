@@ -14,10 +14,13 @@ export default class LoginAction {
             form: true,
             failOnStatusCode: false,
             followRedirect: false,
+            rejectUnauthorized: false,
             body: {
                 email: email,
                 password: password,
             },
+        }).then(function (response) {
+            expect(response.status, 'Login failed (expected 302 redirect) - check that the fixture user exists and credentials are correct. User: ' + email).to.eq(302);
         });
     }
 

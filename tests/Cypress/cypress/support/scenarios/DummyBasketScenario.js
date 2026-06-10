@@ -49,6 +49,9 @@ export default class DummyBasketScenario {
         }
 
         checkout.goToCheckout();
+        cy.url().should('include', '/checkout/confirm').then(function (url) {
+            cy.log('Checkout reached - current URL: ' + url);
+        });
         checkout.changeBillingCountry('Germany');
         checkout.changeToMollieShippingMethod();
     }
