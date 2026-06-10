@@ -25,7 +25,7 @@ function beforeEach(device) {
     });
 }
 
-context.skip("Plugin Config", () => {
+context("Plugin Config", () => {
 
     context(devices.getDescription(device), () => {
 

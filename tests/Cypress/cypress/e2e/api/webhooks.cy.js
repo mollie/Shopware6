@@ -17,7 +17,7 @@ before(() => {
     });
 });
 
-context.skip("API Payment Webhooks", () => {
+context("API Payment Webhooks", () => {
 
     it('C266659: API Webhook is reachable @core', () => {
 
@@ -40,7 +40,7 @@ context.skip("API Payment Webhooks", () => {
 
 })
 
-context.skip("API Subscription Webhooks", () => {
+context("API Subscription Webhooks", () => {
 
     describe('/subscription/mandate/update', function () {
 

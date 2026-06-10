@@ -81,7 +81,7 @@ function beforeEach(device) {
 }
 
 
-describe.skip('Subscription', () => {
+describe('Subscription', () => {
 
     testDevices.forEach(device => {
 

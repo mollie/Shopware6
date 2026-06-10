@@ -1,3 +1,7 @@
+import LoginRepository from "Repositories/storefront/account/LoginRepository";
+
+const repoLogin = new LoginRepository();
+
 export default class LoginAction {
 
     /**
@@ -5,22 +9,14 @@ export default class LoginAction {
      * @param password
      */
     doLogin(email, password) {
-        // followRedirect:false is required: SW 6.6+ returns 302 on success.
-        // Without it cy.request follows the redirect, loads homepage HTML,
-        // and any body-length check would misclassify a successful login as failure.
-        cy.request({
-            method: 'POST',
-            url: '/account/login',
-            form: true,
-            failOnStatusCode: false,
-            followRedirect: false,
-            rejectUnauthorized: false,
-            body: {
-                email: email,
-                password: password,
-            },
-        }).then(function (response) {
-            expect(response.status, 'Login failed (expected 302 redirect) - check that the fixture user exists and credentials are correct. User: ' + email).to.eq(302);
+        cy.visit('/account/login');
+
+        repoLogin.getEmail().clear().type(email);
+        repoLogin.getPassword().clear().type(password);
+        repoLogin.getSubmitButton().click();
+
+        cy.url().should('not.include', '/account/login').then(function (url) {
+            cy.log('Login verified - current URL: ' + url);
         });
     }
 

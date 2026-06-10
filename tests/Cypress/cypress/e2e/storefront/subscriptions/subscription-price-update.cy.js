@@ -53,7 +53,7 @@ function beforeEach(device) {
 }
 
 
-describe.skip('Subscription price update notice', () => {
+describe('Subscription price update notice', () => {
 
     testDevices.forEach(device => {
 
