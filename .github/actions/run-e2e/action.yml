@@ -109,7 +109,7 @@ runs:
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
         # disable CSRF protection so cy.request() can log in without a browser-generated token
-        docker exec shop bash -c "printf 'shopware:\n    storefront:\n        csrf:\n            enabled: false\n            mode: twig\n' > /var/www/html/config/packages/cypress.yaml"
+        docker exec shop bash -c "printf 'storefront:\n    csrf:\n        enabled: false\n        mode: twig\n' > /var/www/html/config/packages/cypress.yaml"
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
