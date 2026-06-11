@@ -122,7 +122,7 @@ export default class CheckoutAction {
     changeBillingCountry(billingCountry) {
 
         if (shopware.isVersionGreaterEqual('6.7.0.0')) {
-            cy.get('.confirm-address .card-actions:eq(0) > button').click();
+            cy.get('.confirm-address .card-actions:eq(0) > button, .confirm-address .card-actions:eq(0) > a').click();
             cy.wait(1000);
             cy.get('.modal-dialog-address #shipping-address-tab-pane .address-manager-select-address button').first().click();
             cy.get('.dropdown-menu .address-manager-modal-address-form[data-address-type="shipping"]').first().click();
