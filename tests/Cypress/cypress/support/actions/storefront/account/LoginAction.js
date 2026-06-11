@@ -5,24 +5,26 @@ const repoLogin = new LoginRepository();
 export default class LoginAction {
 
     /**
-     * Logs the customer in through the real storefront login form (user journey).
-     * The form login is wrapped in cy.session() so it runs ONCE and the
-     * authenticated cookie is cached and replayed for every following spec. That
-     * keeps the form under test while avoiding the SW 6.6/6.7 login rate limiter
-     * that repeated per-spec UI logins of the same account would otherwise trip.
-     *
      * @param email
      * @param password
      */
     doLogin(email, password) {
 
-            cy.visit('/account/login');
+        cy.visit('/account/login');
 
-            repoLogin.getEmail().clear().type(email);
-            repoLogin.getPassword().clear().type(password);
-            repoLogin.getSubmitButton().click();
+        cy.intercept('POST', '/account/login').as('loginSubmit');
 
-            cy.url().should('not.include', '/account/login');
+        repoLogin.getEmail().clear().type(email);
+        repoLogin.getPassword().clear().type(password);
+        repoLogin.getSubmitButton().click();
+
+        // wait until the submit POST (and its redirect) has actually completed
+        // before asserting the URL, instead of relying on the bare retry window.
+        cy.wait('@loginSubmit').then(function (interception) {
+            cy.log('login POST status: ' + interception.response.statusCode);
+        });
+
+        cy.url().should('not.include', '/account/login');
 
         cy.visit('/');
     }
