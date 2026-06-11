@@ -168,6 +168,8 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	docker run --rm \
+		--user "$(shell id -u):$(shell id -g)" \
+		-e HOME=/tmp \
 		-v "$(CURDIR)/..":/plugins \
 		-v "$(CURDIR)/config/.shopware-extension.yml":/plugins/MolliePayments/.shopware-extension.yml \
 		-w /plugins/.build \
