@@ -32,6 +32,15 @@ export default class LoginAction {
             cy.log('cookies after login: ' + JSON.stringify(cookies));
         });
 
+        // hit /account through the cookie jar (no browser cache) to check whether
+        // the session cookie is server-side valid: 302 here => server does not
+        // know this session as logged in (session-id regeneration mismatch);
+        // 200 here => browser/cache issue only.
+        cy.request({ url: '/account', followRedirect: false, failOnStatusCode: false }).then(function (resp) {
+            cy.log('cy.request GET /account status: ' + resp.status);
+            cy.log('cy.request GET /account location: ' + resp.headers['location']);
+        });
+
         // explicit fresh navigation to the post-login page: if the session cookie
         // from the 302 is really set, this lands on /account instead of bouncing
         // back to /account/login.

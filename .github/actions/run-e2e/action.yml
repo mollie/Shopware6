@@ -108,6 +108,10 @@ runs:
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
+        # disable the storefront reverse-proxy HTTP cache: in prod it can serve a
+        # cached anonymous "/account -> login" redirect to an already logged-in
+        # request (SW 6.7), which breaks the storefront login in the e2e suite.
+        docker exec shop bash -c "echo "SHOPWARE_HTTP_CACHE_ENABLED=0" >> /var/www/html/.env" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
