@@ -22,11 +22,14 @@ export default class LoginAction {
         // before asserting the URL, instead of relying on the bare retry window.
         cy.wait('@loginSubmit').then(function (interception) {
             cy.log('login POST status: ' + interception.response.statusCode);
+            cy.log('login POST location: ' + interception.response.headers['location']);
         });
 
+        // explicit fresh navigation to the post-login page: if the session cookie
+        // from the 302 is really set, this lands on /account instead of bouncing
+        // back to /account/login.
+        cy.visit('/account');
         cy.url().should('not.include', '/account/login');
-
-        cy.visit('/');
     }
 
 }
