@@ -1,7 +1,7 @@
 compatibility_date: '2026-02-11'
 
 build:
-  shopwareVersionConstraint: '>=6.5.8.0'
+  shopwareVersionConstraint: '>=6.6.0.0'
   zip:
     assets:
       enable_es_build_for_admin: true
