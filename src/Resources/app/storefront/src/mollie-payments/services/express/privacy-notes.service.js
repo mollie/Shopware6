@@ -25,6 +25,16 @@ export default class PrivacyNotesService {
             currentNote.classList.add('observed');
 
             const buyElement = this._repoBuyBox.findClosestBuyBox(currentNote);
+
+            // if the privacy note has no surrounding buy box, there is no express
+            // button it could belong to. Hide it and continue instead of calling
+            // querySelectorAll() on null, which would throw and abort init() for
+            // every following express button (no click handler => no validation).
+            if (buyElement === null) {
+                currentNote.classList.add(DISPLAY_NONE_CLS);
+                continue;
+            }
+
             const expressButtons = this._repoBuyBox.findAllExpressButtons(buyElement, null);
 
             if (expressButtons.length === 0) {
