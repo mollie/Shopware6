@@ -58,7 +58,7 @@ export default class StoreAPIClient {
             } else if (response && response.headers && response.headers['sw-context-token']) {
                 token = response.headers['sw-context-token'];
             }
-
+            cy.log(response);
             if (token) {
                 this.setContextToken(token);
             }
