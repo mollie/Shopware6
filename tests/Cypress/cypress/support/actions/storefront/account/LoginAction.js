@@ -23,6 +23,13 @@ export default class LoginAction {
         cy.wait('@loginSubmit').then(function (interception) {
             cy.log('login POST status: ' + interception.response.statusCode);
             cy.log('login POST location: ' + interception.response.headers['location']);
+            cy.log('login POST set-cookie: ' + JSON.stringify(interception.response.headers['set-cookie']));
+        });
+
+        // dump the cookie jar after login so we can see whether a session cookie
+        // exists at all and with which attributes (SameSite / Secure / domain).
+        cy.getCookies().then(function (cookies) {
+            cy.log('cookies after login: ' + JSON.stringify(cookies));
         });
 
         // explicit fresh navigation to the post-login page: if the session cookie
