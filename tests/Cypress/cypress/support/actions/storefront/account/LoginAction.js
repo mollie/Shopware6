@@ -15,7 +15,7 @@ export default class LoginAction {
      * @param password
      */
     doLogin(email, password) {
-        cy.session(['storefront', email], function () {
+
             cy.visit('/account/login');
 
             repoLogin.getEmail().clear().type(email);
@@ -23,13 +23,6 @@ export default class LoginAction {
             repoLogin.getSubmitButton().click();
 
             cy.url().should('not.include', '/account/login');
-        }, {
-            validate: function () {
-                // Re-run the form login if the cached session no longer authenticates.
-                cy.request({ url: '/account', followRedirect: false })
-                    .its('status').should('eq', 200);
-            },
-        });
 
         cy.visit('/');
     }
