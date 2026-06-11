@@ -54,10 +54,16 @@ export default class StoreAPIClient {
         }).then((response) => {
             let token;
 
-            if (response && response.data && response.data.contextToken) {
-                token = response.data.contextToken;
-            } else if (response && response.headers && response.headers['sw-context-token']) {
+            // The freshly issued, customer-authenticated context token is returned in
+            // the `sw-context-token` response header. On Shopware 6.6/6.7 the token in
+            // the response body can diverge from it (the body carries the pre-login
+            // token), which leaves follow-up requests unauthenticated ("Customer is not
+            // logged in."). The header is therefore authoritative; the body is only a
+            // fallback for versions that do not expose the header.
+            if (response && response.headers && response.headers['sw-context-token']) {
                 token = response.headers['sw-context-token'];
+            } else if (response && response.data && response.data.contextToken) {
+                token = response.data.contextToken;
             }
 
             if (token) {
