@@ -6,28 +6,16 @@ const shopware = new Shopware();
 const client = new StoreAPIClient(shopware.getStoreApiToken());
 
 
-it('C2040032: Mollie Config can be retrieved using Store-API', () => {
+it('C2040032: Mollie Config can be retrieved using Store-API', async () => {
+    const response = await client.get('/mollie/config');
 
-    const request = new Promise((resolve) => {
-        client.get('/mollie/config').then(response => {
-            resolve({'data': response.data});
-        });
-    })
-
-    cy.wrap(request).its('data').then(response => {
-        cy.wrap(response).its('apiAlias').should('eq', 'mollie_payments_config')
-
-        cy.wrap(response).its('profileId').should('exist');
-        cy.wrap(response).its('profileId').should('not.eql', '');
-
-        cy.wrap(response).its('testMode').should('exist');
-        cy.wrap(response).its('testMode').should('not.eql', '');
-
-        cy.wrap(response).its('locale').should('exist');
-        cy.wrap(response).its('locale').should('not.eql', '');
-
-        cy.wrap(response).its('oneClickPayments').should('exist');
-        cy.wrap(response).its('oneClickPayments').should('not.eql', '');
-    });
-})
-
+    expect(response.data.apiAlias).to.eq('mollie_payments_config');
+    expect(response.data.profileId).to.exist;
+    expect(response.data.profileId).to.not.eq('');
+    expect(response.data.testMode).to.exist;
+    expect(response.data.testMode).to.not.eq('');
+    expect(response.data.locale).to.exist;
+    expect(response.data.locale).to.not.eq('');
+    expect(response.data.oneClickPayments).to.exist;
+    expect(response.data.oneClickPayments).to.not.eq('');
+});
