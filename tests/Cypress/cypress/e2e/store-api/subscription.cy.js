@@ -4,11 +4,8 @@ import Shopware from "Services/shopware/Shopware"
 
 const shopware = new Shopware();
 
-// that ones just made up to have a valid URL
 const fakeSubscriptionID = '0d8eefdd6d12456335280e2ff42431b9';
 
-// dummy ids / strings that satisfy the route's required-field validation;
-// the subscription lookup that follows is what we actually want to trigger.
 const validAddressPayload = {
     salutationId: '00000000000000000000000000000001',
     firstName: 'Cypress',
@@ -22,19 +19,11 @@ const validAddressPayload = {
 const customerEmail = 'cypress@mollie.com';
 const customerPassword = 'cypress123';
 
-// Fresh client per test — avoids accumulated context-token state across the 14 tests
-// and prevents Shopware's login throttling from triggering on repeated logins
-// for the same customer within the same module-level singleton.
 let client;
 
-function beforeEach() {
+beforeEach(() => {
     client = new StoreAPIClient(shopware.getStoreApiToken());
-}
-
-
-function loginAsCustomer() {
-    return cy.wrap(client.login(customerEmail, customerPassword));
-}
+});
 
 
 context("Store API Subscription Routes", () => {
@@ -43,309 +32,182 @@ context("Store API Subscription Routes", () => {
 
         const url = '/mollie/subscription';
 
-        it('C266685: /subscription with unauthorized customer (Store API) @core', () => {
+        it('C266685: /subscription with unauthorized customer (Store API) @core', async () => {
+            const response = await client.get(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.get(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266686: /subscription with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266686: /subscription with authorized customer @core', () => {
+            const response = await client.get(url);
 
-            beforeEach();
+            expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
+            expect(response.data.subscriptions.length).to.be.gte(0);
+        });
 
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.get(url).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('apiAlias').should('eq', 'mollie_payments_subscriptions_list')
-                    cy.wrap(response).its('subscriptions').its('length').should('be.gte', 0)
-                });
-            })
-        })
-
-    })
+    });
 
 
-    describe('POST /billing/update', function () {
+    describe('POST /billing/update', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/billing/update';
 
-        it('C266687: /billing/update with unauthorized customer @core', () => {
+        it('C266687: /billing/update with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266688: /billing/update with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266688: /billing/update with authorized customer @core', () => {
+            const response = await client.post(url, validAddressPayload);
 
-            beforeEach();
-
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, validAddressPayload).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
     });
 
-    describe('POST /shipping/update', function () {
+
+    describe('POST /shipping/update', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/shipping/update';
 
-        it('C266689: /shipping/update with unauthorized customer @core', () => {
+        it('C266689: /shipping/update with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266690: /shipping/update with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266690: /shipping/update with authorized customer @core', () => {
+            const response = await client.post(url, validAddressPayload);
 
-            beforeEach();
-
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, validAddressPayload).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
     });
 
-    describe('POST /payment/update', function () {
+
+    describe('POST /payment/update', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/payment/update';
 
-        it('C266691: /payment/update with unauthorized customer @core', () => {
+        it('C266691: /payment/update with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266692: /payment/update with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266692: /payment/update with authorized customer @core', () => {
+            const response = await client.post(url, {});
 
-            beforeEach();
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
     });
 
-    describe('POST /pause', function () {
+
+    describe('POST /pause', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/pause';
 
-        it('C266693: /pause with unauthorized customer @core', () => {
+        it('C266693: /pause with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266694: /pause with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266694: /pause with authorized customer @core', () => {
+            const response = await client.post(url, {});
 
-            beforeEach();
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
     });
 
-    describe('POST /resume', function () {
+
+    describe('POST /resume', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/resume';
 
-        it('C266695: /resume with unauthorized customer @core', () => {
+        it('C266695: /resume with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266696: /resume with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266696: /resume with authorized customer @core', () => {
+            const response = await client.post(url, {});
 
-            beforeEach();
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
     });
 
-    describe('POST /skip', function () {
+
+    describe('POST /skip', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/skip';
 
-        it('C266697: /skip with unauthorized customer @core', () => {
+        it('C266697: /skip with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C266698: /skip with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C266698: /skip with authorized customer @core', () => {
+            const response = await client.post(url, {});
 
-            beforeEach();
-
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
     });
 
-    describe('POST /cancel', function () {
+
+    describe('POST /cancel', () => {
 
         const url = '/mollie/subscription/' + fakeSubscriptionID + '/cancel';
 
-        it('C330671: /cancel with unauthorized customer @core', () => {
+        it('C330671: /cancel with unauthorized customer @core', async () => {
+            const response = await client.post(url);
 
-            beforeEach();
+            expect(response.data.status).to.be.oneOf([401, 403]);
+        });
 
-            const request = new Promise((resolve) => {
-                client.post(url).then(response => {
-                    resolve({'data': response.data});
-                });
-            })
-            cy.wrap(request).its('data').then(response => {
-                cy.wrap(response).its('status').should('be.oneOf', [401, 403])
-            });
-        })
+        it('C330672: /cancel with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-        it('C330672: /cancel with authorized customer @core', () => {
+            const response = await client.post(url, {});
 
-            beforeEach();
-
-            loginAsCustomer().then(() => {
-
-                const request = new Promise((resolve) => {
-                    client.post(url, {}).then(response => {
-                        resolve({'data': response.data});
-                    });
-                })
-
-                cy.wrap(request).its('data').then(response => {
-                    cy.wrap(response).its('status').should('eq', 500)
-                    expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
-                });
-            });
-        })
+            expect(response.data.status).to.eq(500);
+            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+        });
 
     });
 
