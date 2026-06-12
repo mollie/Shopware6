@@ -104,7 +104,7 @@ runs:
     - name: Update Shopware Config
       shell: bash
       run: |
-        docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
+        #docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "APP_URL=https://${{ inputs._SHOP_DOMAIN }}" >> /var/www/html/.env" || true;
