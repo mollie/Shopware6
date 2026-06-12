@@ -32,34 +32,35 @@ context("Store API Subscription Routes", () => {
 
         const url = '/mollie/subscription';
 
-        it('C266685: /subscription with unauthorized customer (Store API) @core', async () => {
+        it('C266685: /subscription with unauthorized customer (Store API) @core', () => {
             cy.task('log', '[DEBUG] baseUrl: ' + Cypress.config('baseUrl'));
             cy.task('log', '[DEBUG] client baseURL: ' + client.client.defaults.baseURL);
             cy.task('log', '[DEBUG] storeApiToken: ' + shopware.getStoreApiToken());
 
-            const response = await client.get(url);
+            cy.wrap(client.get(url)).then((response) => {
+                cy.task('log', '[DEBUG] unauthorized GET status: ' + JSON.stringify(response.data?.status ?? response.status));
+                cy.task('log', '[DEBUG] unauthorized GET body: ' + JSON.stringify(response.data?.data ?? response.data));
 
-            cy.task('log', '[DEBUG] unauthorized GET status: ' + JSON.stringify(response.data?.status ?? response.status));
-            cy.task('log', '[DEBUG] unauthorized GET body: ' + JSON.stringify(response.data?.data ?? response.data));
-
-            expect(response.data.status).to.be.oneOf([401, 403]);
+                expect(response.data.status).to.be.oneOf([401, 403]);
+            });
         });
 
-        it('C266686: /subscription with authorized customer @core', async () => {
+        it('C266686: /subscription with authorized customer @core', () => {
             cy.task('log', '[DEBUG] baseUrl: ' + Cypress.config('baseUrl'));
             cy.task('log', '[DEBUG] client baseURL: ' + client.client.defaults.baseURL);
             cy.task('log', '[DEBUG] storeApiToken: ' + shopware.getStoreApiToken());
 
-            const loginResponse = await client.login(customerEmail, customerPassword);
-            cy.task('log', '[DEBUG] login status: ' + JSON.stringify(loginResponse?.data?.status ?? loginResponse?.status));
-            cy.task('log', '[DEBUG] login body: ' + JSON.stringify(loginResponse?.data?.data ?? loginResponse?.data));
-            cy.task('log', '[DEBUG] contextToken after login: ' + client.contextToken);
-            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
+            cy.wrap(client.login(customerEmail, customerPassword)).then((loginResponse) => {
+                cy.task('log', '[DEBUG] login status: ' + JSON.stringify(loginResponse?.data?.status ?? loginResponse?.status));
+                cy.task('log', '[DEBUG] login body: ' + JSON.stringify(loginResponse?.data?.data ?? loginResponse?.data));
+                cy.task('log', '[DEBUG] contextToken after login: ' + client.contextToken);
+                expect(client.contextToken, 'login did not return a context token').to.not.be.null;
+            });
 
-            const response = await client.get(url);
-
-            expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
-            expect(response.data.subscriptions.length).to.be.gte(0);
+            cy.wrap(client.get(url)).then((response) => {
+                expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
+                expect(response.data.subscriptions.length).to.be.gte(0);
+            });
         });
 
     });
