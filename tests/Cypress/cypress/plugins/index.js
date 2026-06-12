@@ -20,6 +20,13 @@ const TestRailReporter = require('cypress-testrail');
 
 module.exports = (on, config) => {
 
+    on('task', {
+        log(message) {
+            console.log(message);
+            return null;
+        },
+    });
+
     const customCommand = 'Shopware: ' + config.env.SHOPWARE;
     new TestRailReporter(on, config, customCommand).register();
 
