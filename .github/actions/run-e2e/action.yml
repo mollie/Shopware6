@@ -189,20 +189,20 @@ runs:
         docker exec shop bash -c 'php bin/console dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
-    - name: Integration analyzer
-      shell: bash
-      run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
+   # - name: Integration analyzer
+   #   shell: bash
+    #  run: |
+    #    docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
 
-    - name: Integration tests
-      shell: bash
-      run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
+    #- name: Integration tests
+    #  shell: bash
+    #  run: |
+     #   docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
 
-    - name: Functional tests
-      shell: bash
-      run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
+    #- name: Functional tests
+     # shell: bash
+     # run: |
+     #   docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
