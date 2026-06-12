@@ -41,23 +41,39 @@ export default class StoreAPIClient {
      * @returns {Promise}
      */
     login(email, password) {
-        return this.post('/account/login', {
-            email: email,
-            password: password,
-        }).then((response) => {
-            let token;
+        // Obtain a fresh anonymous context token first. Without this, Shopware's
+        // CartRestorer.restore() may find and reuse an existing customer context
+        // (searched via OR customer_id), which can be stale or expired. The
+        // stale context loses its customer association and subsequent requests
+        // return 403 even though login returned 200.
+        const contextFetch = this.contextToken
+            ? Promise.resolve()
+            : this.get('/context').then((contextResp) => {
+                const freshToken = contextResp && contextResp.headers && contextResp.headers['sw-context-token'];
+                if (freshToken) {
+                    this.setContextToken(freshToken);
+                }
+            });
 
-            if (response && response.data && response.data.contextToken) {
-                token = response.data.contextToken;
-            } else if (response && response.headers && response.headers['sw-context-token']) {
-                token = response.headers['sw-context-token'];
-            }
+        return contextFetch.then(() => {
+            return this.post('/account/login', {
+                email: email,
+                password: password,
+            }).then((response) => {
+                let token;
 
-            if (token) {
-                this.setContextToken(token);
-            }
+                if (response && response.data && response.data.contextToken) {
+                    token = response.data.contextToken;
+                } else if (response && response.headers && response.headers['sw-context-token']) {
+                    token = response.headers['sw-context-token'];
+                }
 
-            return response;
+                if (token) {
+                    this.setContextToken(token);
+                }
+
+                return response;
+            });
         });
     }
 
@@ -190,6 +206,10 @@ export default class StoreAPIClient {
 
         return this.client.request(requestConfig)
             .then((response) => {
+                const newToken = response && response.headers && response.headers['sw-context-token'];
+                if (newToken && newToken !== this.contextToken) {
+                    this.setContextToken(newToken);
+                }
                 return response;
             })
             .catch(function (error) {
