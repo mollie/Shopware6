@@ -36,12 +36,6 @@ export default class StoreAPIClient {
     }
 
     /**
-     * Logs in the given customer against the Store API and stores the
-     * returned context token on this client, so that subsequent requests
-     * are authenticated as this customer.
-     *
-     * Retries up to 3 times if no context token is received.
-     *
      * @param email
      * @param password
      * @returns {Promise}
@@ -58,7 +52,7 @@ export default class StoreAPIClient {
             } else if (response && response.headers && response.headers['sw-context-token']) {
                 token = response.headers['sw-context-token'];
             }
-           
+
             if (token) {
                 this.setContextToken(token);
             }
