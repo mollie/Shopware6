@@ -55,11 +55,11 @@ context("Store API Subscription Routes", () => {
                 cy.task('log', '[DEBUG] login body: ' + JSON.stringify(loginResponse?.data?.data ?? loginResponse?.data));
                 cy.task('log', '[DEBUG] contextToken after login: ' + client.contextToken);
                 expect(client.contextToken, 'login did not return a context token').to.not.be.null;
-            });
 
-            cy.wrap(client.get(url)).then((response) => {
-                expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
-                expect(response.data.subscriptions.length).to.be.gte(0);
+                cy.wrap(client.get(url)).then((response) => {
+                    expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
+                    expect(response.data.subscriptions.length).to.be.gte(0);
+                });
             });
         });
 
