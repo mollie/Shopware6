@@ -93,6 +93,9 @@ runs:
         echo "Waiting for Shopware to be ready..."
         timeout 120 sh -c 'until curl -sk https://${{ inputs._SHOP_DOMAIN }}/api/info > /dev/null 2>&1; do sleep 5; done'
         echo "Shop is ready."
+        echo "Waiting for MySQL to be ready..."
+        timeout 60 sh -c 'until docker exec shop bash -c "mysqladmin -h 127.0.0.1 -u root -proot ping --silent" > /dev/null 2>&1; do sleep 2; done'
+        echo "MySQL is ready."
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
     - name: Fix Store API Key
       shell: bash
@@ -238,8 +241,8 @@ runs:
       run: |
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
-        docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware
-        docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
+        docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware || true
+        docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache || true
 
     - name: Store Cypress Results
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
