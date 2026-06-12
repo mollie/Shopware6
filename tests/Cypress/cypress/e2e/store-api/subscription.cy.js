@@ -32,35 +32,20 @@ context("Store API Subscription Routes", () => {
 
         const url = '/mollie/subscription';
 
-        it('C266685: /subscription with unauthorized customer (Store API) @core', () => {
-            cy.task('log', '[DEBUG] baseUrl: ' + Cypress.config('baseUrl'));
-            cy.task('log', '[DEBUG] client baseURL: ' + client.client.defaults.baseURL);
-            cy.task('log', '[DEBUG] storeApiToken: ' + shopware.getStoreApiToken());
+        it('C266685: /subscription with unauthorized customer (Store API) @core', async () => {
+            const response = await client.get(url);
 
-            cy.wrap(client.get(url)).then((response) => {
-                cy.task('log', '[DEBUG] unauthorized GET status: ' + JSON.stringify(response.data?.status ?? response.status));
-                cy.task('log', '[DEBUG] unauthorized GET body: ' + JSON.stringify(response.data?.data ?? response.data));
-
-                expect(response.data.status).to.be.oneOf([401, 403]);
-            });
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
-        it('C266686: /subscription with authorized customer @core', () => {
-            cy.task('log', '[DEBUG] baseUrl: ' + Cypress.config('baseUrl'));
-            cy.task('log', '[DEBUG] client baseURL: ' + client.client.defaults.baseURL);
-            cy.task('log', '[DEBUG] storeApiToken: ' + shopware.getStoreApiToken());
+        it('C266686: /subscription with authorized customer @core', async () => {
+            await client.login(customerEmail, customerPassword);
+            expect(client.contextToken, 'login did not return a context token').to.not.be.null;
 
-            cy.wrap(client.login(customerEmail, customerPassword)).then((loginResponse) => {
-                cy.task('log', '[DEBUG] login status: ' + JSON.stringify(loginResponse?.data?.status ?? loginResponse?.status));
-                cy.task('log', '[DEBUG] login body: ' + JSON.stringify(loginResponse?.data?.data ?? loginResponse?.data));
-                cy.task('log', '[DEBUG] contextToken after login: ' + client.contextToken);
-                expect(client.contextToken, 'login did not return a context token').to.not.be.null;
+            const response = await client.get(url);
 
-                cy.wrap(client.get(url)).then((response) => {
-                    expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
-                    expect(response.data.subscriptions.length).to.be.gte(0);
-                });
-            });
+            expect(response.data.apiAlias).to.eq('mollie_payments_subscriptions_list');
+            expect(response.data.subscriptions.length).to.be.gte(0);
         });
 
     });
@@ -73,7 +58,7 @@ context("Store API Subscription Routes", () => {
         it('C266687: /billing/update with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C266688: /billing/update with authorized customer @core', async () => {
@@ -82,8 +67,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, validAddressPayload);
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
@@ -96,7 +81,7 @@ context("Store API Subscription Routes", () => {
         it('C266689: /shipping/update with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C266690: /shipping/update with authorized customer @core', async () => {
@@ -105,8 +90,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, validAddressPayload);
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
@@ -119,7 +104,7 @@ context("Store API Subscription Routes", () => {
         it('C266691: /payment/update with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C266692: /payment/update with authorized customer @core', async () => {
@@ -128,8 +113,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, {});
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
@@ -142,7 +127,7 @@ context("Store API Subscription Routes", () => {
         it('C266693: /pause with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C266694: /pause with authorized customer @core', async () => {
@@ -151,8 +136,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, {});
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
@@ -165,7 +150,7 @@ context("Store API Subscription Routes", () => {
         it('C266695: /resume with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C266696: /resume with authorized customer @core', async () => {
@@ -174,8 +159,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, {});
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
@@ -188,7 +173,7 @@ context("Store API Subscription Routes", () => {
         it('C266697: /skip with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C266698: /skip with authorized customer @core', async () => {
@@ -197,8 +182,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, {});
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
@@ -211,7 +196,7 @@ context("Store API Subscription Routes", () => {
         it('C330671: /cancel with unauthorized customer @core', async () => {
             const response = await client.post(url);
 
-            expect(response.data.status).to.be.oneOf([401, 403]);
+            expect(response.status).to.be.oneOf([401, 403]);
         });
 
         it('C330672: /cancel with authorized customer @core', async () => {
@@ -220,8 +205,8 @@ context("Store API Subscription Routes", () => {
 
             const response = await client.post(url, {});
 
-            expect(response.data.status).to.eq(500);
-            expect(response.data.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
+            expect(response.status).to.eq(500);
+            expect(response.data.errors[0].detail).to.contain('Subscription with id ' + fakeSubscriptionID + ' was not found');
         });
 
     });
