@@ -125,7 +125,7 @@ phpintegration: ##3 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
 
 behat:
-	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml
+	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml --format progress --colors
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
