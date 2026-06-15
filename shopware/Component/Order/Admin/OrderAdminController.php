@@ -8,6 +8,12 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Order\Admin\Response\CancelStatusEntry;
+use Mollie\Shopware\Component\Order\Admin\Response\OrderDetailsResponse;
+use Mollie\Shopware\Component\Order\Admin\Response\RefundManagerConfig;
+use Mollie\Shopware\Component\Order\Admin\Response\ShippingData;
+use Mollie\Shopware\Component\Order\Admin\Response\ShippingStatusEntry;
+use Mollie\Shopware\Component\Order\Admin\Response\ShippingTotal;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
@@ -100,24 +106,23 @@ final class OrderAdminController extends AbstractController
 
         $mollieOrder = $this->loadMollieOrder($mollieOrderId, $salesChannelId);
 
-        return new JsonResponse([
-            'isMollieOrder' => true,
-            'mollieId' => $mollieId,
-            'thirdPartyPaymentId' => $payment->getThirdPartyPaymentId() ?: null,
-            'creditCard' => $creditCard,
-            'paypal' => $paypal,
-            'bankTransfer' => $bankTransfer,
-            'checkoutUrl' => $checkoutUrl,
-            'isSubscription' => $isSubscription,
-            'subscriptionId' => $subscriptionId,
-            'subscriptionEnabled' => $this->mollieSettings->getSubscriptionSettings($salesChannelId)->isEnabled(),
-            'refundManager' => $this->buildRefundManagerConfig($salesChannelId),
-            'shipping' => [
-                'total' => $this->buildShippingTotal($mollieOrder),
-                'status' => $this->buildShippingStatus($mollieOrderId, $mollieOrder),
-            ],
-            'cancelItem' => $this->buildCancelStatus($mollieOrderId, $mollieOrder),
-        ]);
+        return new JsonResponse(new OrderDetailsResponse(
+            $mollieId,
+            $payment->getThirdPartyPaymentId() ?: null,
+            $creditCard,
+            $paypal,
+            $bankTransfer,
+            $checkoutUrl,
+            $isSubscription,
+            $subscriptionId,
+            $this->mollieSettings->getSubscriptionSettings($salesChannelId)->isEnabled(),
+            $this->buildRefundManagerConfig($salesChannelId),
+            new ShippingData(
+                $this->buildShippingTotal($mollieOrder),
+                $this->buildShippingStatus($mollieOrderId, $mollieOrder),
+            ),
+            $this->buildCancelStatus($mollieOrderId, $mollieOrder),
+        ));
     }
 
     private function loadMollieOrder(string $mollieOrderId, string $salesChannelId): ?Order
@@ -134,7 +139,7 @@ final class OrderAdminController extends AbstractController
     }
 
     /**
-     * @return array<string, array<string, mixed>>
+     * @return array<string, CancelStatusEntry>
      */
     private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder): array
     {
@@ -148,20 +153,20 @@ final class OrderAdminController extends AbstractController
             if ($shopwareLineItemId === '') {
                 continue;
             }
-            $result[$shopwareLineItemId] = [
-                'mollieOrderId' => $mollieOrderId,
-                'mollieId' => $line->getId(),
-                'isCancelable' => $line->getCancelableQuantity() > 0,
-                'cancelableQuantity' => $line->getCancelableQuantity(),
-                'quantityCanceled' => $line->getQuantityCanceled(),
-            ];
+            $result[$shopwareLineItemId] = new CancelStatusEntry(
+                $mollieOrderId,
+                $line->getId(),
+                $line->getCancelableQuantity() > 0,
+                $line->getCancelableQuantity(),
+                $line->getQuantityCanceled(),
+            );
         }
 
         return $result;
     }
 
     /**
-     * @return array<string, array<string, mixed>>
+     * @return array<string, ShippingStatusEntry>
      */
     private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder): array
     {
@@ -175,25 +180,22 @@ final class OrderAdminController extends AbstractController
             if ($shopwareLineItemId === '') {
                 continue;
             }
-            $result[$shopwareLineItemId] = [
-                'mollieOrderId' => $mollieOrderId,
-                'mollieId' => $line->getId(),
-                'isShippable' => $line->getShippableQuantity() > 0,
-                'shippableQuantity' => $line->getShippableQuantity(),
-                'quantityShipped' => $line->getQuantityShipped(),
-            ];
+            $result[$shopwareLineItemId] = new ShippingStatusEntry(
+                $mollieOrderId,
+                $line->getId(),
+                $line->getShippableQuantity() > 0,
+                $line->getShippableQuantity(),
+                $line->getQuantityShipped(),
+            );
         }
 
         return $result;
     }
 
-    /**
-     * @return array<string, float|int>
-     */
-    private function buildShippingTotal(?Order $mollieOrder): array
+    private function buildShippingTotal(?Order $mollieOrder): ShippingTotal
     {
         if ($mollieOrder === null) {
-            return ['amount' => 0.0, 'quantity' => 0, 'shippable' => 0];
+            return new ShippingTotal('0.00', 0, 0);
         }
 
         $totalAmount = 0.0;
@@ -209,7 +211,11 @@ final class OrderAdminController extends AbstractController
             $totalShippable += $line->getShippableQuantity();
         }
 
-        return ['amount' => number_format(round($totalAmount, 2),2), 'quantity' => $totalQuantity, 'shippable' => $totalShippable];
+        return new ShippingTotal(
+            number_format(round($totalAmount, 2), 2),
+            $totalQuantity,
+            $totalShippable,
+        );
     }
 
     private function restorePaymentFromOrderCustomFields(OrderEntity $order, OrderTransactionEntity $transaction, Context $context): ?Payment
@@ -282,18 +288,15 @@ final class OrderAdminController extends AbstractController
         return $payment;
     }
 
-    /**
-     * @return array<string, bool>
-     */
-    private function buildRefundManagerConfig(string $salesChannelId): array
+    private function buildRefundManagerConfig(string $salesChannelId): RefundManagerConfig
     {
         $settings = $this->mollieSettings->getRefundSettings($salesChannelId);
 
-        return [
-            'enabled' => $settings->isEnabled(),
-            'autoStockReset' => $settings->isAutoStockReset(),
-            'verifyRefund' => $settings->isVerifyRefund(),
-            'showInstructions' => $settings->isShowInstructions(),
-        ];
+        return new RefundManagerConfig(
+            $settings->isEnabled(),
+            $settings->isAutoStockReset(),
+            $settings->isVerifyRefund(),
+            $settings->isShowInstructions(),
+        );
     }
 }
