@@ -250,7 +250,7 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
             if (status === null || status === undefined) {
                 return '~';
             }
-            return status.quantityShippable;
+            return status.shippableQuantity;
         },
 
         shippedQuantity(item) {

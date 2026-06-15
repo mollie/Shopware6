@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Order\Admin;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -97,6 +98,8 @@ final class OrderAdminController extends AbstractController
         $subscriptionId = $subscriptions instanceof SubscriptionCollection ? $subscriptions->first()?->getId() : null;
         $isSubscription = $subscriptionId !== null;
 
+        $mollieOrder = $this->loadMollieOrder($mollieOrderId, $salesChannelId);
+
         return new JsonResponse([
             'isMollieOrder' => true,
             'mollieId' => $mollieId,
@@ -110,25 +113,32 @@ final class OrderAdminController extends AbstractController
             'subscriptionEnabled' => $this->mollieSettings->getSubscriptionSettings($salesChannelId)->isEnabled(),
             'refundManager' => $this->buildRefundManagerConfig($salesChannelId),
             'shipping' => [
-                'total' => $this->stubShippingTotal(),
-                'status' => [],
+                'total' => $this->buildShippingTotal($mollieOrder),
+                'status' => $this->buildShippingStatus($mollieOrderId, $mollieOrder),
             ],
-            'cancelItem' => $this->buildCancelStatus($mollieOrderId, $salesChannelId),
+            'cancelItem' => $this->buildCancelStatus($mollieOrderId, $mollieOrder),
         ]);
+    }
+
+    private function loadMollieOrder(string $mollieOrderId, string $salesChannelId): ?Order
+    {
+        if ($mollieOrderId === '') {
+            return null;
+        }
+
+        try {
+            return $this->mollieGateway->getOrder($mollieOrderId, $salesChannelId);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**
      * @return array<string, array<string, mixed>>
      */
-    private function buildCancelStatus(string $mollieOrderId, string $salesChannelId): array
+    private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder): array
     {
-        if ($mollieOrderId === '') {
-            return [];
-        }
-
-        try {
-            $mollieOrder = $this->mollieGateway->getOrder($mollieOrderId, $salesChannelId);
-        } catch (\Throwable $e) {
+        if ($mollieOrder === null) {
             return [];
         }
 
@@ -148,6 +158,58 @@ final class OrderAdminController extends AbstractController
         }
 
         return $result;
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder): array
+    {
+        if ($mollieOrder === null) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($mollieOrder->getLines() as $line) {
+            $shopwareLineItemId = $line->getShopwareLineItemId();
+            if ($shopwareLineItemId === '') {
+                continue;
+            }
+            $result[$shopwareLineItemId] = [
+                'mollieOrderId' => $mollieOrderId,
+                'mollieId' => $line->getId(),
+                'isShippable' => $line->getShippableQuantity() > 0,
+                'shippableQuantity' => $line->getShippableQuantity(),
+                'quantityShipped' => $line->getQuantityShipped(),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<string, float|int>
+     */
+    private function buildShippingTotal(?Order $mollieOrder): array
+    {
+        if ($mollieOrder === null) {
+            return ['amount' => 0.0, 'quantity' => 0, 'shippable' => 0];
+        }
+
+        $totalAmount = 0.0;
+        $totalQuantity = 0;
+        $totalShippable = 0;
+
+        foreach ($mollieOrder->getLines() as $line) {
+            $amountShipped = $line->getAmountShipped();
+            if ($amountShipped !== null) {
+                $totalAmount += (float) $amountShipped->getValue();
+            }
+            $totalQuantity += $line->getQuantityShipped();
+            $totalShippable += $line->getShippableQuantity();
+        }
+
+        return ['amount' => $totalAmount, 'quantity' => $totalQuantity, 'shippable' => $totalShippable];
     }
 
     private function restorePaymentFromOrderCustomFields(OrderEntity $order, OrderTransactionEntity $transaction, Context $context): ?Payment
@@ -235,13 +297,4 @@ final class OrderAdminController extends AbstractController
         ];
     }
 
-    /**
-     * @return array<string, float|int>
-     *
-     * @todo implement via Shipment component
-     */
-    private function stubShippingTotal(): array
-    {
-        return ['amount' => 0.0, 'quantity' => 0, 'shippable' => 0];
-    }
 }

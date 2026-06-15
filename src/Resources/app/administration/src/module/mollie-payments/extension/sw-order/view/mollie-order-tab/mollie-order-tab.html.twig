@@ -25,7 +25,7 @@
                       :title="$tc('mollie-payments.modals.shipping.title')"
                       variant="large"
                       @modal-close="onCloseShippingManager">
-                <mollie-ship-order :order="order" />
+                <mollie-ship-order :order="order" :shippingStatus="initialShippingStatus" />
                 <template #modal-footer>
                     <sw-button size="small" @click="onCloseShippingManager">
                         {{ $tc('mollie-payments.modals.shipping.cancelButton') }}
