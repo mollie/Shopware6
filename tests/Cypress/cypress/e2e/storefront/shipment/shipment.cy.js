@@ -261,7 +261,7 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
     const scenarioDummyBasket = new DummyBasketScenario(itemQty, itemCount);
     scenarioDummyBasket.execute();
 
-    paymentAction.switchPaymentMethod('Klarna');
+    paymentAction.switchPaymentMethod('Klarna (Orders API - Test only)');
 
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();

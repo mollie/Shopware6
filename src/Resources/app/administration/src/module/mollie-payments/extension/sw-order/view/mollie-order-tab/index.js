@@ -214,7 +214,7 @@ Component.register('mollie-order-tab', {
 
                     const shippingStatus = response.shipping?.status ?? {};
                     this.isShippingPossible = Object.values(shippingStatus).some(function (s) {
-                        return (s.quantityShippable ?? 0) > 0;
+                        return (s.shippableQuantity ?? 0) > 0;
                     });
 
                     const shippingTotal = response.shipping?.total ?? {};

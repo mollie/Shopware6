@@ -90,6 +90,75 @@ final class OrderAdminControllerTest extends TestCase
         $this->assertSame([], $body['cancelItem']);
     }
 
+    public function testShippingStatusIsEmptyForPaymentsApiOrder(): void
+    {
+        $order = $this->buildOrder('pay-xxx', null);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $this->assertSame([], $body['shipping']['status']);
+    }
+
+    public function testShippingStatusContainsShippableLineItems(): void
+    {
+        $order = $this->buildOrder('pay-xxx', 'ord-xxx');
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $mollieOrder = new Order('ord-xxx', '', [
+            $this->buildShippableLineItem('shopware-line-1', 'mollie-line-1', shippable: 2, shipped: 1),
+        ]);
+        $gateway->withOrder($mollieOrder);
+
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $this->assertArrayHasKey('shopware-line-1', $body['shipping']['status']);
+        $lineStatus = $body['shipping']['status']['shopware-line-1'];
+        $this->assertSame('ord-xxx', $lineStatus['mollieOrderId']);
+        $this->assertSame('mollie-line-1', $lineStatus['mollieId']);
+        $this->assertTrue($lineStatus['isShippable']);
+        $this->assertSame(2, $lineStatus['shippableQuantity']);
+        $this->assertSame(1, $lineStatus['quantityShipped']);
+    }
+
+    public function testShippingTotalAggregatesAcrossLines(): void
+    {
+        $order = $this->buildOrder('pay-xxx', 'ord-xxx');
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $line1 = $this->buildShippableLineItem('shopware-line-1', 'mollie-line-1', shippable: 3, shipped: 1);
+        $line1->setAmountShipped(new Money(10.0, 'EUR'));
+        $line2 = $this->buildShippableLineItem('shopware-line-2', 'mollie-line-2', shippable: 2, shipped: 2);
+        $line2->setAmountShipped(new Money(20.0, 'EUR'));
+        $mollieOrder = new Order('ord-xxx', '', [$line1, $line2]);
+        $gateway->withOrder($mollieOrder);
+
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $total = $body['shipping']['total'];
+        $this->assertSame(30.0, $total['amount']);
+        $this->assertSame(3, $total['quantity']);
+        $this->assertSame(5, $total['shippable']);
+    }
+
     private function buildOrder(string $molliePaymentId, ?string $mollieOrderId): OrderEntity
     {
         $payment = new Payment($molliePaymentId);
@@ -115,6 +184,17 @@ final class OrderAdminControllerTest extends TestCase
         $line->setId($mollieId);
         $line->setShopwareLineItemId($shopwareId);
         $line->setCancelableQuantity($cancelableQty);
+
+        return $line;
+    }
+
+    private function buildShippableLineItem(string $shopwareId, string $mollieId, int $shippable, int $shipped): LineItem
+    {
+        $line = new LineItem('product', 1, new Money(10.0, 'EUR'), new Money(10.0, 'EUR'));
+        $line->setId($mollieId);
+        $line->setShopwareLineItemId($shopwareId);
+        $line->setShippableQuantity($shippable);
+        $line->setQuantityShipped($shipped);
 
         return $line;
     }
