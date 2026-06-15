@@ -209,7 +209,7 @@ final class OrderAdminController extends AbstractController
             $totalShippable += $line->getShippableQuantity();
         }
 
-        return ['amount' => round($totalAmount, 2), 'quantity' => $totalQuantity, 'shippable' => $totalShippable];
+        return ['amount' => number_format(round($totalAmount, 2),2), 'quantity' => $totalQuantity, 'shippable' => $totalShippable];
     }
 
     private function restorePaymentFromOrderCustomFields(OrderEntity $order, OrderTransactionEntity $transaction, Context $context): ?Payment
