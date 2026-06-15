@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Capture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Mandate;
@@ -16,6 +17,7 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
@@ -146,6 +148,11 @@ final class FakeGateway implements MollieGatewayInterface
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
     {
         // TODO: Implement createCapture() method.
+    }
+
+    public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment
+    {
+        return new Shipment('shp_fake_' . uniqid());
     }
 
     public function withOrder(Order $order): void

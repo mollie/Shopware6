@@ -6,8 +6,8 @@ namespace Mollie\Shopware\Unit\Order\Admin;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
-use Mollie\Shopware\Component\Order\Admin\OrderAdminController;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Order\Admin\OrderAdminController;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -154,7 +154,7 @@ final class OrderAdminControllerTest extends TestCase
         $body = json_decode((string) $response->getContent(), true);
 
         $total = $body['shipping']['total'];
-        $this->assertSame(30.0, $total['amount']);
+        $this->assertSame('30.00', $total['amount']);
         $this->assertSame(3, $total['quantity']);
         $this->assertSame(5, $total['shippable']);
     }

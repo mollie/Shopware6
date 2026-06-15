@@ -84,8 +84,6 @@ export default class AdminOrdersAction {
 
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().should('not.have.class', 'sw-button--disabled');
         repoOrdersDetails.getMollieActionButtonShipThroughMollie().trigger('click');
-
-        cy.wait(4000);
     }
 
     /**
@@ -93,16 +91,11 @@ export default class AdminOrdersAction {
      * @param nthItem
      */
     openLineItemShipping(nthItem) {
-        cy.wait(2000);
-        cy.reload();
-
         this.openMollieTab();
 
         repoOrdersDetails.getLineItemActionsButton(nthItem).trigger('click');
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().should('not.have.class', 'is--disabled');
         repoOrdersDetails.getLineItemActionsButtonShipThroughMollie().click(forceOption);
-
-        cy.wait(4000);
     }
 
     /**

@@ -5,24 +5,31 @@ namespace Mollie\Shopware\Component\Mollie;
 
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
 final class Money implements \JsonSerializable
 {
-    use JsonSerializableTrait;
     private const MOLLIE_PRICE_PRECISION = 2;
-    private string $currency;
-    private string $value;
 
-    public function __construct(float $value, string $currency)
-    {
-        $this->currency = $currency;
-        $this->value = $this->formatValue($value);
+    public function __construct(
+        private float $value,
+        private string $currency,
+    ) {
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, string>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'value' => number_format(round($this->value, self::MOLLIE_PRICE_PRECISION), self::MOLLIE_PRICE_PRECISION, '.', ''),
+            'currency' => $this->currency,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
      */
     public function toArray(): array
     {
@@ -34,12 +41,12 @@ final class Money implements \JsonSerializable
         return $this->currency;
     }
 
-    public function getValue(): string
+    public function getValue(): float
     {
         return $this->value;
     }
 
-    public static function fromOrder(OrderEntity $order,CurrencyEntity $currency): self
+    public static function fromOrder(OrderEntity $order, CurrencyEntity $currency): self
     {
         $value = $order->getAmountTotal();
         if ((string) $order->getTaxStatus() === CartPrice::TAX_STATE_FREE) {
@@ -47,10 +54,5 @@ final class Money implements \JsonSerializable
         }
 
         return new self($value, $currency->getIsoCode());
-    }
-
-    private function formatValue(float $value): string
-    {
-        return number_format(round($value, self::MOLLIE_PRICE_PRECISION), self::MOLLIE_PRICE_PRECISION, '.', '');
     }
 }

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Shipment\Route;
 
 use Mollie\Shopware\Component\Mollie\CreateCapture;
+use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
-use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\ShippingItem;
+use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
+use Mollie\Shopware\Component\Mollie\Tracking;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -108,62 +111,26 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         }
 
         $orderShippedEvent = new OrderShippedEvent($firstTransaction->getId(), $context);
+        $mollieOrderId = $payment->getOrderId();
 
-        $createCapture = new CreateCapture(new Money(0.0, $currency->getIsoCode()), '');
+        $shippingItems = new ShippingItemCollection();
+        $lineUpserts = $this->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems);
+        $deliveryUpserts = $this->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection);
 
-        $lineUpserts = $this->getLineItems($items, $lineItems, $orderId, $createCapture);
+        if ($mollieOrderId !== null) {
+            $trackingCode = (string) $request->get('trackingCode', '');
+            $lineItemIds = array_column($lineUpserts, 'id');
+            $tracking = $this->resolveTracking($trackingCode, $deliveryCollection, $lineItemIds);
+            $createShipment = new CreateShipment($shippingItems, $tracking);
+            $shipment = $this->mollieGateway->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
 
-        $deliveryUpserts = $this->getDeliveries($lineUpserts, $createCapture, $deliveryCollection);
+            return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $shipment->getId(), 'shipmentId', $orderId, $orderShippedEvent, $context);
+        }
 
+        $createCapture = new CreateCapture($shippingItems, $currency->getIsoCode());
         $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, (string) $orderNumber, $salesChannelId);
 
-        foreach ($lineUpserts as $i => $row) {
-            $lineUpserts[$i]['customFields'][Mollie::EXTENSION]['captureId'] = $capture->getId();
-        }
-
-        $this->orderLineRepository->upsert($lineUpserts, $context);
-
-        $deliveryIds = array_column($deliveryUpserts, 'id');
-        $deliveryId = $deliveryIds[0] ?? null;
-
-        if (\count($deliveryUpserts) > 0) {
-            foreach ($deliveryUpserts as $i => $row) {
-                $deliveryUpserts[$i]['customFields'][Mollie::EXTENSION]['captureId'] = $capture->getId();
-            }
-
-            $this->orderDeliveryRepository->upsert($deliveryUpserts, $context);
-        }
-
-        if ($deliveryId !== null) {
-            $transition = StateMachineTransitionActions::ACTION_SHIP_PARTIALLY;
-
-            $this->orderService->orderDeliveryStateTransition(
-                $deliveryId,
-                $transition,
-                new ParameterBag(),
-                $context
-            );
-        }
-
-        $this->eventDispatcher->dispatch($orderShippedEvent);
-
-        return new ShipOrderResponse($capture->getId(), $orderId, $lineUpserts);
-    }
-
-    /**
-     * Resolve an incoming identifier that can be either a real order line item ID or a product number.
-     */
-    private function findLineItem(OrderLineItemCollection $lineItems, string $idOrProductNumber): ?OrderLineItemEntity
-    {
-        // Try direct ID match first
-        $direct = $lineItems->get(strtolower($idOrProductNumber));
-        if ($direct instanceof OrderLineItemEntity) {
-            return $direct;
-        }
-
-        return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
-            return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
-        });
+        return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $context);
     }
 
     /**
@@ -171,11 +138,10 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    private function getLineItems(array $items, OrderLineItemCollection $lineItems, string $orderId, CreateCapture $createCapture): array
+    private function collectLineItemUpserts(array $items, OrderLineItemCollection $lineItems, string $orderId, ShippingItemCollection $shippingItems): array
     {
-        $captureAmount = (float) $createCapture->getAmount()->getValue();
-        $descriptionArray = [];
         $lineUpserts = [];
+
         foreach ($items as $item) {
             $rawId = (string) $item['id'];
             $requestedQuantity = (int) $item['quantity'];
@@ -186,39 +152,38 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
                 throw ShippingException::lineItemNotFound(strtolower($rawId), $orderId);
             }
 
-            $oldCaptures = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [
-                'quantity' => 0
-            ];
+            $oldState = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? ['quantity' => 0];
+            $shippedQuantity = (int) ($oldState['quantity'] ?? 0);
 
-            $product = $lineItem->getProduct();
-            $name = $product !== null ? (string) $product->getName() : (string) $lineItem->getLabel();
-            $descriptionArray[] = $requestedQuantity . 'x ' . $name;
-
-            $quantity = (int) ($oldCaptures['quantity'] ?? 0);
-
-            if ($lineItem->getQuantity() === $quantity) {
+            if ($lineItem->getQuantity() === $shippedQuantity) {
                 throw ShippingException::lineItemAlreadyShipped($lineItem->getId(), $orderId);
             }
 
-            $newQuantity = $quantity + $requestedQuantity;
+            $newQuantity = $shippedQuantity + $requestedQuantity;
 
             if ($newQuantity > $lineItem->getQuantity()) {
-                throw ShippingException::shippingQuantityTooHigh($lineItem->getId(), $orderId, $newQuantity, $lineItem->getQuantity()); // message anpassen
+                throw ShippingException::shippingQuantityTooHigh($lineItem->getId(), $orderId, $newQuantity, $lineItem->getQuantity());
             }
 
-            $captureAmount += $lineItem->getUnitPrice() * $requestedQuantity;
+            $product = $lineItem->getProduct();
+            $name = $product !== null ? (string) $product->getName() : (string) $lineItem->getLabel();
+            $mollieLineId = ($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
+
+            $shippingItem = new ShippingItem(
+                $requestedQuantity,
+                $requestedQuantity . 'x ' . $name,
+                $lineItem->getUnitPrice() * $requestedQuantity,
+                $mollieLineId !== null ? (string) $mollieLineId : null,
+            );
+            $shippingItems->add($shippingItem);
+
             $lineUpserts[] = [
                 'id' => $lineItem->getId(),
                 'customFields' => [
-                    Mollie::EXTENSION => [
-                        'quantity' => $newQuantity
-                    ],
+                    Mollie::EXTENSION => ['quantity' => $newQuantity],
                 ],
             ];
         }
-
-        $createCapture->setDescription(implode(', ', $descriptionArray));
-        $createCapture->setAmount(new Money($captureAmount, $createCapture->getAmount()->getCurrency()));
 
         return $lineUpserts;
     }
@@ -228,29 +193,21 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    private function getDeliveries(array $lineUpserts, CreateCapture $createCapture, OrderDeliveryCollection $deliveryCollection): array
+    private function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection): array
     {
-        $descriptionArray = [];
         $deliveryUpserts = [];
         $targetLineItemIds = array_column($lineUpserts, 'id');
 
-        $captureAmount = (float) $createCapture->getAmount()->getValue();
         foreach ($deliveryCollection as $delivery) {
             $shippingCosts = $delivery->getShippingCosts();
-            $shippingMethod = $delivery->getShippingMethod();
             $shippingCostsQuantity = $shippingCosts->getQuantity();
             $positions = $delivery->getPositions();
             if ($positions === null) {
                 continue;
             }
 
-            $oldDeliveries = $delivery->getCustomFields()[Mollie::EXTENSION] ?? [
-                'quantity' => 0
-            ];
-
-            $oldShippingCostsQuantity = (int) ($oldDeliveries['quantity'] ?? 0);
-
-            if ($shippingCostsQuantity === $oldShippingCostsQuantity) {
+            $oldState = $delivery->getCustomFields()[Mollie::EXTENSION] ?? ['quantity' => 0];
+            if ($shippingCostsQuantity === (int) ($oldState['quantity'] ?? 0)) {
                 continue;
             }
 
@@ -258,8 +215,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
             // A delivery belongs to our shipment if at least one of its positions references one of the resolved line item IDs
             foreach ($positions as $position) {
-                $posLineItemId = $position->getOrderLineItemId();
-                if (in_array($posLineItemId, $targetLineItemIds, true)) {
+                if (in_array($position->getOrderLineItemId(), $targetLineItemIds, true)) {
                     $deliveryBelongsToItems = true;
                     break;
                 }
@@ -269,28 +225,146 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
                 continue;
             }
 
+            $shippingMethod = $delivery->getShippingMethod();
             if ($shippingMethod === null) {
                 continue;
             }
 
-            $captureAmount += ($shippingCosts->getUnitPrice() * $shippingCosts->getQuantity());
-            $descriptionArray[] = $shippingCosts->getQuantity() . 'x ' . $shippingMethod->getName();
+            $mollieLineId = ($delivery->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
 
-            $deliveryId = $delivery->getId();
+            $shippingItem = new ShippingItem(
+                $shippingCostsQuantity,
+                $shippingCostsQuantity . 'x ' . $shippingMethod->getName(),
+                $shippingCosts->getUnitPrice() * $shippingCostsQuantity,
+                $mollieLineId !== null ? (string) $mollieLineId : null,
+            );
+            $shippingItems->add($shippingItem);
 
             $deliveryUpserts[] = [
-                'id' => $deliveryId,
+                'id' => $delivery->getId(),
                 'customFields' => [
-                    Mollie::EXTENSION => [
-                        'quantity' => $shippingCosts->getQuantity()
-                    ],
+                    Mollie::EXTENSION => ['quantity' => $shippingCostsQuantity],
                 ],
             ];
         }
 
-        $createCapture->setDescription(implode(', ', $descriptionArray));
-        $createCapture->setAmount(new Money($captureAmount, $createCapture->getAmount()->getCurrency()));
-
         return $deliveryUpserts;
+    }
+
+    /**
+     * @param list<array{id: string, customFields: array<string, mixed>}> $lineUpserts
+     * @param list<array{id: string, customFields: array<string, mixed>}> $deliveryUpserts
+     */
+    private function persistAndDispatch(
+        array $lineUpserts,
+        array $deliveryUpserts,
+        string $mollieId,
+        string $mollieIdKey,
+        string $orderId,
+        OrderShippedEvent $orderShippedEvent,
+        Context $context
+    ): ShipOrderResponse {
+        foreach ($lineUpserts as $i => $row) {
+            $lineUpserts[$i]['customFields'][Mollie::EXTENSION][$mollieIdKey] = $mollieId;
+        }
+
+        $this->orderLineRepository->upsert($lineUpserts, $context);
+
+        $deliveryIds = array_column($deliveryUpserts, 'id');
+        $deliveryId = $deliveryIds[0] ?? null;
+
+        if (\count($deliveryUpserts) > 0) {
+            foreach ($deliveryUpserts as $i => $row) {
+                $deliveryUpserts[$i]['customFields'][Mollie::EXTENSION][$mollieIdKey] = $mollieId;
+            }
+
+            $this->orderDeliveryRepository->upsert($deliveryUpserts, $context);
+        }
+
+        if ($deliveryId !== null) {
+            $this->orderService->orderDeliveryStateTransition(
+                $deliveryId,
+                StateMachineTransitionActions::ACTION_SHIP_PARTIALLY,
+                new ParameterBag(),
+                $context
+            );
+        }
+
+        $this->eventDispatcher->dispatch($orderShippedEvent);
+
+        return new ShipOrderResponse($mollieId, $orderId, $lineUpserts);
+    }
+
+    /**
+     * @param list<string> $targetLineItemIds
+     */
+    private function resolveTracking(string $requestCode, OrderDeliveryCollection $deliveries, array $targetLineItemIds): ?Tracking
+    {
+        foreach ($deliveries as $delivery) {
+            $positions = $delivery->getPositions();
+            if ($positions === null) {
+                continue;
+            }
+
+            $belongs = false;
+            foreach ($positions as $position) {
+                if (in_array($position->getOrderLineItemId(), $targetLineItemIds, true)) {
+                    $belongs = true;
+                    break;
+                }
+            }
+
+            if ($belongs === false) {
+                continue;
+            }
+
+            $shippingMethod = $delivery->getShippingMethod();
+            if ($shippingMethod === null) {
+                continue;
+            }
+
+            $carrier = (string) $shippingMethod->getName();
+            if ($carrier === '') {
+                return null;
+            }
+
+            $code = $requestCode;
+            if ($code === '') {
+                $codes = array_values(array_filter($delivery->getTrackingCodes()));
+                if (count($codes) !== 1) {
+                    return null;
+                }
+                $code = $codes[0];
+            }
+
+            if (mb_strlen($code) > 99) {
+                return null;
+            }
+
+            $urlTemplate = (string) $shippingMethod->getTrackingUrl();
+            if (str_contains($urlTemplate, '%s%')) {
+                $urlTemplate = '';
+            }
+            $url = $urlTemplate !== '' ? trim(sprintf($urlTemplate, $code)) : '';
+            if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL) === false) {
+                $url = '';
+            }
+
+            return new Tracking($carrier, $code, $url);
+        }
+
+        return null;
+    }
+
+    private function findLineItem(OrderLineItemCollection $lineItems, string $idOrProductNumber): ?OrderLineItemEntity
+    {
+        $direct = $lineItems->get(strtolower($idOrProductNumber));
+        if ($direct instanceof OrderLineItemEntity) {
+            return $direct;
+        }
+
+        return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
+            return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
+        });
     }
 }

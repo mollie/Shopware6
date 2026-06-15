@@ -151,10 +151,6 @@ context("Order Shipping", () => {
 
             shippingAction.shipLineItem(1);
 
-            // somehow this is required in Shopware 6.5, lets just stick with it, its ok
-            cy.wait(2000);
-            cy.reload();
-
             assertShippingStatus('Shipped (partially)', 1);
 
             // --------------------------------------------------------------------------------------------------------------------
@@ -280,8 +276,10 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  * @param shippedItemsCount
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
+    cy.contains('The order has been successfully shipped.', {timeout: 10000});
+    cy.get('.sw-modal__close').click();
+    repoOrderDetails.getOrderDetailsGeneralTab().click();
     cy.reload();
-    cy.wait(2000);
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
 

@@ -7,6 +7,7 @@ use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Fixture\AbstractFixture;
 use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
+use Mollie\Shopware\Component\Payment\Method\KlarnaOrdersApiPayment;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Payment\Method\PayPalOrdersApiPayment;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
@@ -75,13 +76,13 @@ final class PaymentMethodFixture extends AbstractFixture
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
         $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
         foreach ($paymentHandlers as $paymentHandler) {
-            if (! $paymentHandler instanceof PayPalOrdersApiPayment) {
+            if (! $paymentHandler instanceof PayPalOrdersApiPayment && ! $paymentHandler instanceof KlarnaOrdersApiPayment) {
                 continue;
             }
             $this->paymentMethodRepository->upsert([
                 [
                     'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
-                    'handlerIdentifier' => PayPalOrdersApiPayment::class,
+                    'handlerIdentifier' => get_class($paymentHandler),
                     'technicalName' => $paymentHandler->getTechnicalName(),
                     'pluginId' => $pluginId,
                     'name' => $paymentHandler->getName(),

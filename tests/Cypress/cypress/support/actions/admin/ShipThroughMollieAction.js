@@ -25,10 +25,6 @@ export default class ShipThroughMollieAction {
         repoShippingFull.getSelectAllItemsButton().click();
 
         repoShippingFull.getShippingButton().click(forceOption);
-
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
     }
 
     /**
@@ -42,10 +38,6 @@ export default class ShipThroughMollieAction {
         repoShippingFull.getFirstItemSelectCheckbox().click();
 
         repoShippingFull.getShippingButton().click(forceOption);
-
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
     }
 
     /**
@@ -56,10 +48,6 @@ export default class ShipThroughMollieAction {
         repoShippingItem.getInputQuantity().clear(forceOption).type(qty, forceOption);
         cy.wait(500);
         repoShippingItem.getShippingButton().click(forceOption);
-
-        // here are automatic reloads and things as it seems
-        // I really want to test the real UX, so we just wait like a human
-        cy.wait(4000);
     }
 
 }

@@ -9,6 +9,8 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\ShippingItem;
+use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
@@ -167,7 +169,10 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
 
         // throw new \Exception('stop here');
 
-        $createCapture = new CreateCapture($money, 'automaticShipment');
+        $captureItems = new ShippingItemCollection();
+        $captureItem = new ShippingItem(1, 'automaticShipment', $money->getValue());
+        $captureItems->add($captureItem);
+        $createCapture = new CreateCapture($captureItems, $money->getCurrency());
 
         $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, $orderNumber, $salesChannelId);
 
