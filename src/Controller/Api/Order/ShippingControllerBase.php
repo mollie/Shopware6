@@ -444,49 +444,6 @@ class ShippingControllerBase extends AbstractController
         );
     }
 
-    /**
-     * This is the plain action API route that is used in the Shopware Administration.
-     */
-    public function shipItemAdmin(RequestDataBag $data, Context $context): JsonResponse
-    {
-        $orderId = $data->getAlnum('orderId');
-        $itemId = $data->get('itemId', '');
-        $quantity = $data->get('quantity', 0);
-        $trackingCarrier = $data->get('trackingCarrier', '');
-        $trackingCode = $data->get('trackingCode', '');
-        $trackingUrl = $data->get('trackingUrl', '');
-
-        return $this->processShipItem(
-            $orderId,
-            $itemId,
-            $quantity,
-            $trackingCarrier,
-            $trackingCode,
-            $trackingUrl,
-            $context
-        );
-    }
-
-    public function shipItemAdminLegacy(RequestDataBag $data, Context $context): JsonResponse
-    {
-        $orderId = $data->getAlnum('orderId');
-        $itemId = $data->get('itemId', '');
-        $quantity = $data->get('quantity', 0);
-        $trackingCarrier = $data->get('trackingCarrier', '');
-        $trackingCode = $data->get('trackingCode', '');
-        $trackingUrl = $data->get('trackingUrl', '');
-
-        return $this->processShipItem(
-            $orderId,
-            $itemId,
-            $quantity,
-            $trackingCarrier,
-            $trackingCode,
-            $trackingUrl,
-            $context
-        );
-    }
-
     private function getTotalResponse(string $orderId, Context $context): JsonResponse
     {
         try {
@@ -570,44 +527,6 @@ class ShippingControllerBase extends AbstractController
             return $this->shipmentToJson($shipment);
         } catch (\Exception $e) {
             return $this->buildErrorResponse($e->getMessage());
-        }
-    }
-
-    private function processShipItem(string $orderId, string $itemId, int $quantity, string $trackingCarrier, string $trackingCode, string $trackingUrl, Context $context): JsonResponse
-    {
-        try {
-            if (empty($orderId)) {
-                throw new \InvalidArgumentException('Missing Argument for Order ID!');
-            }
-
-            if (empty($itemId)) {
-                throw new \InvalidArgumentException('Missing Argument for Item ID!');
-            }
-
-            $order = $this->orderService->getOrder($orderId, $context);
-
-            $tracking = new TrackingData($trackingCarrier, $trackingCode, $trackingUrl);
-
-            $shipment = $this->shipment->shipItem(
-                $order,
-                $itemId,
-                $quantity,
-                $tracking,
-                $context
-            );
-
-            return $this->shipmentToJson($shipment);
-        } catch (\Exception $e) {
-            $data = [
-                'orderId' => $orderId,
-                'itemId' => $itemId,
-                'quantity' => $quantity,
-                'trackingCarrier' => $trackingCarrier,
-                'trackingCode' => $trackingCode,
-                'trackingUrl' => $trackingUrl,
-            ];
-
-            return $this->exceptionToJson($e, $data);
         }
     }
 

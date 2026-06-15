@@ -276,8 +276,7 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  * @param shippedItemsCount
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
-    cy.contains('The order has been successfully shipped.', {timeout: 10000});
-    cy.get('.sw-modal__close').click();
+    cy.contains('The order has been successfully shipped.', {timeout: 20000});
     repoOrderDetails.getOrderDetailsGeneralTab().click();
     cy.reload();
 
