@@ -193,8 +193,24 @@ final class WebhookRoute extends AbstractWebhookRoute
 
     private function updateDeliveryStatus(Payment $payment, OrderEntity $shopwareOrder, Context $context): void
     {
+        $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $captured = $payment->getCapturedAmount();
+        $amount = $payment->getAmount();
+
+        $this->logger->info('updateDeliveryStatus: checking capture amounts', [
+            'orderNumber' => $orderNumber,
+            'paymentStatus' => $payment->getStatus()->value,
+            'capturedAmount' => $captured !== null ? $captured->getValue() : null,
+            'totalAmount' => $amount !== null ? $amount->getValue() : null,
+        ]);
+
         if ($captured === null || (float) $captured->getValue() <= 0.0 || $payment->getStatus() !== PaymentStatus::PAID) {
+            return;
+        }
+
+        // Only transition to fully shipped when the captured amount covers the full payment amount.
+        // Partial captures are already handled by ShipOrderRoute (ACTION_SHIP_PARTIALLY).
+        if ($amount === null || $captured->getValue() < $amount->getValue()) {
             return;
         }
 
@@ -208,11 +224,9 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
         $orderDeliveryId = $firstDelivery->getId();
 
-        $transition = StateMachineTransitionActions::ACTION_SHIP;
-
         $this->orderService->orderDeliveryStateTransition(
             $orderDeliveryId,
-            $transition,
+            StateMachineTransitionActions::ACTION_SHIP,
             new ParameterBag(),
             $context
         );

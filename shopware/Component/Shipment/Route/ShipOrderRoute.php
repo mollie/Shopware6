@@ -15,6 +15,7 @@ use Mollie\Shopware\Component\Mollie\Tracking;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
@@ -33,7 +34,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
+#[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true])]
 final class ShipOrderRoute extends AbstractShipOrderRoute
 {
     /**
@@ -53,6 +54,8 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
         private readonly OrderService $orderService,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -68,6 +71,15 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         $orderId = strtolower($orderId);
 
         $items = $request->get('items');
+
+        $logContext = [
+            'orderNumber' => '',
+            'orderId' => $orderId,
+            'requestedItems' => $items,
+        ];
+
+        $this->logger->info('ShipOrderRoute: request received', $logContext);
+
         if (count($items) === 0) {
             throw ShippingException::noLineItems($orderId);
         }
@@ -90,6 +102,22 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         if ($orderNumber === null) {
             throw ShippingException::orderNotFound($orderId);
         }
+
+        $logContext['orderNumber'] = $orderNumber;
+        $logContext['orderLineItems'] = array_map(
+            static function (OrderLineItemEntity $li): array {
+                return [
+                    'id' => $li->getId(),
+                    'label' => $li->getLabel(),
+                    'quantity' => $li->getQuantity(),
+                    'shippedQty' => (int) (($li->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0),
+                ];
+            },
+            ($order->getLineItems() ?? new OrderLineItemCollection())->getElements()
+        );
+
+        $this->logger->info('ShipOrderRoute: order loaded', $logContext);
+
         $transactions = $order->getTransactions();
         if ($transactions === null || $transactions->count() === 0) {
             throw ShippingException::orderNotFound($orderId);
@@ -116,21 +144,48 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         $shippingItems = new ShippingItemCollection();
         $lineUpserts = $this->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems);
         $deliveryUpserts = $this->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection);
+        $fullyShipped = $this->isFullyShipped($lineItems, $lineUpserts);
+
+        $logContext['lineUpserts'] = $lineUpserts;
+        $logContext['deliveryUpsertsCount'] = count($deliveryUpserts);
+        $logContext['fullyShipped'] = $fullyShipped;
+        $logContext['shippingItems'] = json_encode($shippingItems);
+
+        $this->logger->info('ShipOrderRoute: collected shipping data', $logContext);
 
         if ($mollieOrderId !== null) {
             $trackingCode = (string) $request->get('trackingCode', '');
             $lineItemIds = array_column($lineUpserts, 'id');
             $tracking = $this->resolveTracking($trackingCode, $deliveryCollection, $lineItemIds);
             $createShipment = new CreateShipment($shippingItems, $tracking);
+
+            $logContext['mollieOrderId'] = $mollieOrderId;
+            $logContext['tracking'] = $tracking !== null ? ['carrier' => $tracking->getCarrier(), 'code' => $tracking->getCode()] : null;
+
+            $this->logger->info('ShipOrderRoute: calling Mollie createShipment (Orders API)', $logContext);
+
             $shipment = $this->mollieGateway->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
 
-            return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $shipment->getId(), 'shipmentId', $orderId, $orderShippedEvent, $context);
+            $logContext['mollieShipmentId'] = $shipment->getId();
+
+            $this->logger->info('ShipOrderRoute: Mollie createShipment response', $logContext);
+
+            return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $shipment->getId(), 'shipmentId', $orderId, $orderShippedEvent, $fullyShipped, $context);
         }
 
         $createCapture = new CreateCapture($shippingItems, $currency->getIsoCode());
+
+        $logContext['molliePaymentId'] = $paymentId;
+
+        $this->logger->info('ShipOrderRoute: calling Mollie createCapture (Payments API)', $logContext);
+
         $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, (string) $orderNumber, $salesChannelId);
 
-        return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $context);
+        $logContext['mollieCaptureId'] = $capture->getId();
+
+        $this->logger->info('ShipOrderRoute: Mollie createCapture response', $logContext);
+
+        return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $fullyShipped, $context);
     }
 
     /**
@@ -180,7 +235,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             $lineUpserts[] = [
                 'id' => $lineItem->getId(),
                 'customFields' => [
-                    Mollie::EXTENSION => ['quantity' => $newQuantity],
+                    Mollie::EXTENSION => array_merge($oldState, ['quantity' => $newQuantity]),
                 ],
             ];
         }
@@ -262,6 +317,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         string $mollieIdKey,
         string $orderId,
         OrderShippedEvent $orderShippedEvent,
+        bool $fullyShipped,
         Context $context
     ): ShipOrderResponse {
         foreach ($lineUpserts as $i => $row) {
@@ -282,9 +338,13 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         }
 
         if ($deliveryId !== null) {
+            $transition = $fullyShipped
+                ? StateMachineTransitionActions::ACTION_SHIP
+                : StateMachineTransitionActions::ACTION_SHIP_PARTIALLY;
+
             $this->orderService->orderDeliveryStateTransition(
                 $deliveryId,
-                StateMachineTransitionActions::ACTION_SHIP_PARTIALLY,
+                $transition,
                 new ParameterBag(),
                 $context
             );
@@ -366,5 +426,34 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
             return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
         });
+    }
+
+    /**
+     * Checks whether all order line items are fully shipped after the current batch.
+     * Items in $lineUpserts carry the updated shipped quantity; all others are read from custom fields.
+     *
+     * @param list<array{id: string, customFields: array<string, mixed>}> $lineUpserts
+     */
+    private function isFullyShipped(OrderLineItemCollection $lineItems, array $lineUpserts): bool
+    {
+        $upsertQuantities = [];
+        foreach ($lineUpserts as $upsert) {
+            $upsertQuantities[$upsert['id']] = (int) ($upsert['customFields'][Mollie::EXTENSION]['quantity'] ?? 0);
+        }
+
+        foreach ($lineItems as $lineItem) {
+            if ($lineItem->getQuantity() <= 0) {
+                continue;
+            }
+
+            $shipped = $upsertQuantities[$lineItem->getId()]
+                ?? (int) (($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0);
+
+            if ($shipped < $lineItem->getQuantity()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
