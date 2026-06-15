@@ -34,6 +34,9 @@ final class FakeGateway implements MollieGatewayInterface
     /** @var array<string,PaymentCollection> */
     private array $subscriptionPayments = [];
 
+    private ?Order $order = null;
+    private bool $throwOnGetOrder = false;
+
     public function __construct(private string $checkoutUrl = '',private ?Payment $payment = null)
     {
         if ($payment === null) {
@@ -145,8 +148,26 @@ final class FakeGateway implements MollieGatewayInterface
         // TODO: Implement createCapture() method.
     }
 
+    public function withOrder(Order $order): void
+    {
+        $this->order = $order;
+    }
+
+    public function withGetOrderException(): void
+    {
+        $this->throwOnGetOrder = true;
+    }
+
     public function getOrder(string $mollieOrderId, string $salesChannelId): Order
     {
-        // TODO: Implement getOrder() method.
+        if ($this->throwOnGetOrder) {
+            throw new \RuntimeException('Mollie API unavailable');
+        }
+
+        if ($this->order !== null) {
+            return $this->order;
+        }
+
+        return new Order($mollieOrderId, '');
     }
 }
