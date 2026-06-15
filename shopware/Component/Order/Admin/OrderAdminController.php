@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Order\Admin;
 
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -37,6 +39,8 @@ final class OrderAdminController extends AbstractController
         private readonly EntityRepository $orderRepository,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $mollieSettings,
+        #[Autowire(service: MollieGateway::class)]
+        private readonly MollieGatewayInterface $mollieGateway,
     ) {
     }
 
@@ -109,8 +113,41 @@ final class OrderAdminController extends AbstractController
                 'total' => $this->stubShippingTotal(),
                 'status' => [],
             ],
-            'cancelItem' => [],
+            'cancelItem' => $this->buildCancelStatus($mollieOrderId, $salesChannelId),
         ]);
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function buildCancelStatus(string $mollieOrderId, string $salesChannelId): array
+    {
+        if ($mollieOrderId === '') {
+            return [];
+        }
+
+        try {
+            $mollieOrder = $this->mollieGateway->getOrder($mollieOrderId, $salesChannelId);
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($mollieOrder->getLines() as $line) {
+            $shopwareLineItemId = $line->getShopwareLineItemId();
+            if ($shopwareLineItemId === '') {
+                continue;
+            }
+            $result[$shopwareLineItemId] = [
+                'mollieOrderId' => $mollieOrderId,
+                'mollieId' => $line->getId(),
+                'isCancelable' => $line->getCancelableQuantity() > 0,
+                'cancelableQuantity' => $line->getCancelableQuantity(),
+                'quantityCanceled' => $line->getQuantityCanceled(),
+            ];
+        }
+
+        return $result;
     }
 
     private function restorePaymentFromOrderCustomFields(OrderEntity $order, OrderTransactionEntity $transaction, Context $context): ?Payment

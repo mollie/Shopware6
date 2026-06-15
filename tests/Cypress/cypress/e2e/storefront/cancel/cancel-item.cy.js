@@ -58,7 +58,7 @@ context("Cancel Authorized items", () => {
 
             beforeEach(device);
 
-            createOrderAndOpenAdmin('Klarna');
+            createOrderAndOpenAdmin('Klarna (Orders API - Test only)');
 
             orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').trigger('click');
 

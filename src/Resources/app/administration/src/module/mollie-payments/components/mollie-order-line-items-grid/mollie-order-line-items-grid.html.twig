@@ -79,8 +79,7 @@
     </mollie-cancel-item>
 {% endblock %}
 
-{% block sw_order_line_items_grid_grid_actions_show %}
-    {% parent %}
+{% block sw_order_line_items_grid_grid_actions_extension %}
     <sw-context-menu-item :disabled="!isShippable(item)"
                           @click="onOpenShipItemModal(item)">
         {{ $tc('mollie-payments.general.shipThroughMollie') }}
@@ -89,4 +88,5 @@
                           @click="onOpenCancelItemModal(item)">
         {{ $tc('mollie-payments.general.cancelMollieItem') }}
     </sw-context-menu-item>
+    {% parent %}
 {% endblock %}

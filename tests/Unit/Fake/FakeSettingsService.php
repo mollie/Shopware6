@@ -108,6 +108,6 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getRefundSettings(?string $salesChannelId = null): RefundSettings
     {
-        // TODO: Implement getRefundSettings() method.
+        return new RefundSettings();
     }
 }

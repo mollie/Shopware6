@@ -8,8 +8,6 @@ const { Component, Mixin } = Shopware;
 const { string } = Shopware.Utils;
 
 Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
-    template,
-
     mixins: [Mixin.getByName('notification')],
 
     inject: ['MolliePaymentsShippingService', 'MolliePaymentsItemCancelService'],
@@ -80,6 +78,14 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
         },
     },
 
+    watch: {
+        initialCancelStatus(value) {
+            if (value !== null && value !== undefined) {
+                this.cancelStatus = value;
+            }
+        },
+    },
+
     created() {
         if (!this.isMollieOrder) {
             return;
@@ -112,7 +118,6 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
     methods: {
         async reloadData() {
             await this.loadMollieShippingStatus();
-            await this.loadMollieCancelStatus();
         },
 
         async loadMollieShippingStatus() {
@@ -123,12 +128,29 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
             );
         },
 
-        async loadMollieCancelStatus() {
-            await this.MolliePaymentsItemCancelService.status({ mollieOrderId: this.mollieId }).then(
-                function (response) {
-                    this.cancelStatus = response;
-                }.bind(this),
-            );
+        loadMollieCancelStatus(cancelResponse) {
+            if (!cancelResponse || !cancelResponse.success || !cancelResponse.data) {
+                return;
+            }
+            const cancelledMollieId = cancelResponse.data.id;
+            const cancelledQuantity = cancelResponse.data.quantity || 0;
+
+            const updated = {};
+            Object.entries(this.cancelStatus || {}).forEach(function (pair) {
+                const swItemId = pair[0];
+                const status = pair[1];
+                if (status.mollieId === cancelledMollieId) {
+                    const newCancelableQty = Math.max(0, (status.cancelableQuantity || 0) - cancelledQuantity);
+                    updated[swItemId] = Object.assign({}, status, {
+                        quantityCanceled: (status.quantityCanceled || 0) + cancelledQuantity,
+                        cancelableQuantity: newCancelableQty,
+                        isCancelable: newCancelableQty > 0,
+                    });
+                } else {
+                    updated[swItemId] = status;
+                }
+            });
+            this.cancelStatus = updated;
         },
 
         onOpenShipItemModal(item) {
@@ -300,4 +322,11 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
             };
         },
     },
+});
+
+// Template blocks are applied via Component.override so that resolveTokens (same path as
+// Component.override plugins like SwagCommercial) is used instead of resolveExtendTokens,
+// which does not reliably propagate sub-block overrides inside Vue named slots.
+Component.override('mollie-order-line-items-grid', {
+    template,
 });
