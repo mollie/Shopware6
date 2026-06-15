@@ -103,7 +103,7 @@ final class MollieSubscriptionPatchTest extends TestCase
         );
         $this->mollieSubscriptionId = $created->getId();
 
-        $this->assertSame('10.00', $created->getAmount()->getValue());
+        $this->assertSame(10.00, $created->getAmount()->getValue());
 
         $loaded = $this->gateway->getSubscription(
             $this->mollieSubscriptionId,
@@ -111,7 +111,7 @@ final class MollieSubscriptionPatchTest extends TestCase
             'integration-test',
             $this->salesChannelId
         );
-        $this->assertSame('10.00', $loaded->getAmount()->getValue(), 'Initial amount should match the value used at creation.');
+        $this->assertSame(10.00, $loaded->getAmount()->getValue(), 'Initial amount should match the value used at creation.');
 
         $loaded->setAmount(new Money(20.00, $loaded->getAmount()->getCurrency()));
         $patched = $this->gateway->updateSubscription(
@@ -120,7 +120,7 @@ final class MollieSubscriptionPatchTest extends TestCase
             'integration-test',
             $this->salesChannelId
         );
-        $this->assertSame('20.00', $patched->getAmount()->getValue(), 'Mollie should return the patched amount in the PATCH response.');
+        $this->assertSame(20.00, $patched->getAmount()->getValue(), 'Mollie should return the patched amount in the PATCH response.');
 
         $reloaded = $this->gateway->getSubscription(
             $this->mollieSubscriptionId,
@@ -128,7 +128,7 @@ final class MollieSubscriptionPatchTest extends TestCase
             'integration-test',
             $this->salesChannelId
         );
-        $this->assertSame('20.00', $reloaded->getAmount()->getValue(), 'Reloaded subscription should reflect the patched amount.');
+        $this->assertSame(20.00, $reloaded->getAmount()->getValue(), 'Reloaded subscription should reflect the patched amount.');
     }
 
     private function createCustomer(): string
