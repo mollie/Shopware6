@@ -23,10 +23,7 @@ final class RefundItem
         ];
 
         if ($this->amount !== null) {
-            $data['amount'] = [
-                'value' => $this->amount->getValue(),
-                'currency' => $this->amount->getCurrency(),
-            ];
+            $data['amount'] = $this->amount->toArray();
         }
 
         return $data;

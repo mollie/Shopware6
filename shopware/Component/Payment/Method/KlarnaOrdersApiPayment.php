@@ -9,7 +9,7 @@ use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\OrdersApiAwareInterface;
 
-final class KlarnaOrdersApiPayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface,DeprecatedMethodAwareInterface, OrdersApiAwareInterface
+final class KlarnaOrdersApiPayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface, DeprecatedMethodAwareInterface, OrdersApiAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

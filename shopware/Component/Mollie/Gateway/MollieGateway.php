@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Capture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Locale;
@@ -17,6 +18,7 @@ use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\Terminal;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Mollie\Shopware\Component\Transaction\TransactionService;
@@ -342,6 +344,32 @@ final class MollieGateway implements MollieGatewayInterface
             return Capture::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
+        }
+    }
+
+    public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $formParams = $createShipment->toArray();
+
+            $response = $client->post('orders/' . $mollieOrderId . '/shipments', [
+                'form_params' => $formParams,
+            ]);
+
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Shipment created', [
+                'requestParameter' => $formParams,
+                'responseParameter' => $body,
+                'mollieOrderId' => $mollieOrderId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Shipment::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
         }
     }
 
