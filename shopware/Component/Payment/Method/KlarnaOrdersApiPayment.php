@@ -19,7 +19,7 @@ final class KlarnaOrdersApiPayment extends AbstractMolliePaymentHandler implemen
 
     public function getName(): string
     {
-        return 'Klarna (Orders API - Test only)';
+        return 'Kl (Orders API - Test only)';
     }
 
     public function getTechnicalName(): string
