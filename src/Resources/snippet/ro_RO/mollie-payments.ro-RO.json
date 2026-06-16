@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "A apărut o problemă când ați încercat să ștergeți cardul dvs.",
                 "newCard": "Card nou",
                 "remove": "Eliminare",
-                "subscriptionBadge": "Abonament"
+                "subscriptionBadge": "Abonament",
+                "emptyMessage": "Nu există carduri salvate"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Anulați",

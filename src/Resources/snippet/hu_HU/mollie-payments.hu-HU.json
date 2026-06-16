@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Hiba történt a kártya eltávolításakor",
                 "newCard": "Új kártya",
                 "remove": "Eltávolítás",
-                "subscriptionBadge": "Előfizetés"
+                "subscriptionBadge": "Előfizetés",
+                "emptyMessage": "Nincsenek mentett kártyák"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Törlés",

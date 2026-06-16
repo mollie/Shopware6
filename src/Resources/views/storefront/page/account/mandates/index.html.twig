@@ -61,6 +61,16 @@
                         } %}
                     {% endblock %}
 
+                {% else %}
+
+                    {% block mollie_page_account_credit_card_mandate_empty %}
+                        <h2 class="card-title">{{ "molliePayments.components.mandate.sectionTitle"|trans|striptags }}</h2>
+                        {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
+                            type: 'info',
+                            content: "molliePayments.components.mandate.emptyMessage"|trans|striptags,
+                        } %}
+                    {% endblock %}
+
                 {% endif %}
             {% endblock %}
         {% endif %}

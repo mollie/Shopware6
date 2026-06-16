@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Došlo je do problema pri uklanjanju vaše kartice",
                 "newCard": "Nova kartica",
                 "remove": "Ukloni",
-                "subscriptionBadge": "Pretplata"
+                "subscriptionBadge": "Pretplata",
+                "emptyMessage": "Nema spremljenih kartica"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Otkaži",

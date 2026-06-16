@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Възникна проблем при премахване на вашата карта",
                 "newCard": "Нова карта",
                 "remove": "Премахване",
-                "subscriptionBadge": "Абонамент"
+                "subscriptionBadge": "Абонамент",
+                "emptyMessage": "Няма запазени карти"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Отказ",

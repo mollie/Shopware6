@@ -26,7 +26,7 @@
                 "selectBank": "Select bank"
             },
             "pos": {
-              "selectTerminal": "Select terminal"
+                "selectTerminal": "Select terminal"
             },
             "mandate": {
                 "sectionTitle": "Saved cards",
@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "There was a problem when removing your card",
                 "newCard": "New card",
                 "remove": "Remove",
-                "subscriptionBadge" : "Subscription"
+                "subscriptionBadge": "Subscription",
+                "emptyMessage": "No saved cards"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Cancel",
@@ -45,8 +46,8 @@
                 "title": "Delete Confirmation"
             },
             "phoneField": {
-              "headLine": "Phone number",
-              "phoneErrorMessage": "Phone Number is required. For example +31208202070"
+                "headLine": "Phone number",
+                "phoneErrorMessage": "Phone Number is required. For example +31208202070"
             }
         },
         "messages": {

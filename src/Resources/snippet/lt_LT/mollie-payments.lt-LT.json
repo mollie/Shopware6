@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Įvyko problema, kai bandėte pašalinti savo kortelę",
                 "newCard": "Nauja kortelė",
                 "remove": "Pašalinti",
-                "subscriptionBadge": "Prenumerata"
+                "subscriptionBadge": "Prenumerata",
+                "emptyMessage": "Nėra išsaugotų kortelių"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Atšaukti",

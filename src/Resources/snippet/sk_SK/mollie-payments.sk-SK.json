@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Pri odstraňovaní vašej karty nastala chyba",
                 "newCard": "Nová karta",
                 "remove": "Odstrániť",
-                "subscriptionBadge": "Predplatné"
+                "subscriptionBadge": "Predplatné",
+                "emptyMessage": "Žiadne uložené karty"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Zrušiť",

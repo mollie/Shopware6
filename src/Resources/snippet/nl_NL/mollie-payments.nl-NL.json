@@ -25,9 +25,9 @@
             "ideal": {
                 "selectBank": "Selecteer bank"
             },
-          "pos": {
-            "selectTerminal": "Selecteer terminal"
-          },
+            "pos": {
+                "selectTerminal": "Selecteer terminal"
+            },
             "mandate": {
                 "sectionTitle": "Opgeslagen kaarten",
                 "cardTitleLabel": "%name% •••• %number%",
@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Er is een probleem opgetreden bij het verwijderen van uw kaart",
                 "newCard": "Nieuwe kaart",
                 "remove": "Verwijderen",
-                "subscriptionBadge" : "Abonnement"
+                "subscriptionBadge": "Abonnement",
+                "emptyMessage": "Geen opgeslagen kaarten"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Annuleren",
@@ -45,8 +46,8 @@
                 "title": "Bevestiging verwijderen"
             },
             "phoneField": {
-              "headLine": "Telefoonnummer",
-              "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
+                "headLine": "Telefoonnummer",
+                "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
             }
         },
         "messages": {
@@ -64,9 +65,9 @@
                 "captionTaxes": "BTW",
                 "paymentError": "De betaling met Apple Pay is mislukt."
             },
-          "paypalExpress": {
-            "paymentError": "De betaling met Paypal Express is mislukt."
-          }
+            "paypalExpress": {
+                "paymentError": "De betaling met Paypal Express is mislukt."
+            }
         },
         "subscriptions": {
             "account": {

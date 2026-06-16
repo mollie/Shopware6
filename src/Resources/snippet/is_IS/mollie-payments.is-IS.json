@@ -35,7 +35,8 @@
                 "deleteErrorMessage": " Það kom upp vandamál við að fjarlægja kortið þitt.",
                 "newCard": "Nýtt kort",
                 "remove": "Fjarlægja",
-                "subscriptionBadge": "Áskrift"
+                "subscriptionBadge": "Áskrift",
+                "emptyMessage": "Engar vistaðar kort"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Hætta við",

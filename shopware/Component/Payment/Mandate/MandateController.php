@@ -35,7 +35,7 @@ final class MandateController extends StorefrontController
         ]);
     }
 
-    #[Route(name: 'frontend.mollie.components.revokeMandate', path: '/mollie/components/revoke-mandate/{customerId}/{mandateId}', methods: ['GET'], options: ['seo' => false])]
+    #[Route(name: 'frontend.mollie.components.revokeMandate', path: '/mollie/components/revoke-mandate/{customerId}/{mandateId}', methods: ['GET', 'POST'], options: ['seo' => false])]
     public function revoke(string $customerId, string $mandateId, SalesChannelContext $salesChannelContext): Response
     {
         $response = $this->revokeMandateRoute->revoke($customerId, $mandateId, $salesChannelContext);

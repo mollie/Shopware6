@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Der opstod et problem, da dit kort skulle fjernes",
                 "newCard": "Nyt kort",
                 "remove": "Fjern",
-                "subscriptionBadge": "Abonnement"
+                "subscriptionBadge": "Abonnement",
+                "emptyMessage": "Ingen gemte kort"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Annuller",

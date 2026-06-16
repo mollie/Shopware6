@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Prišlo je do težave pri odstranjevanju vaše kartice",
                 "newCard": "Nova kartica",
                 "remove": "Odstrani",
-                "subscriptionBadge": "Naročnina"
+                "subscriptionBadge": "Naročnina",
+                "emptyMessage": "Ni shranjenih kartic"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Prekliči",
