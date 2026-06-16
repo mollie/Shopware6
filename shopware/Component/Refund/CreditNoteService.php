@@ -13,6 +13,8 @@ use Shopware\Core\Checkout\Cart\Rule\LineItemOfTypeRule;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Rule\Rule;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -63,13 +65,28 @@ final class CreditNoteService
 
     public function cancelCreditNote(string $orderId, string $mollieRefundId, Context $context): void
     {
-        $creditNoteId = Uuid::fromStringToHex($orderId . $mollieRefundId);
+        $creditNoteIdentifier = Uuid::fromStringToHex($orderId . $mollieRefundId);
 
-        $result = $this->orderLineItemRepository->delete([['id' => $creditNoteId]], $context);
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('orderId', $orderId));
+        $criteria->addFilter(new EqualsFilter('identifier', $creditNoteIdentifier));
 
-        if (count($result->getDeletedPrimaryKeys('order_line_item')) === 0) {
+        $lineItems = $this->orderLineItemRepository->searchIds($criteria, $context);
+
+        if ($lineItems->getTotal() === 0) {
+            $this->logger->debug('No matching credit note found to cancel', [
+                'orderId' => $orderId,
+                'mollieRefundId' => $mollieRefundId,
+            ]);
+
             return;
         }
+
+        $toDelete = array_map(static function (string $id) {
+            return ['id' => $id];
+        }, $lineItems->getIds());
+
+        $this->orderLineItemRepository->delete($toDelete, $context);
 
         $this->recalculationService->recalculateOrder($orderId, $context);
 
