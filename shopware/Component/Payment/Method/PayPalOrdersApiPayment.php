@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\OrdersApiAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\TestOnlyAwareInterface;
 
 /**
  * Test-only payment method. Uses Mollie Orders API (/v2/orders) so that
@@ -16,7 +17,7 @@ use Mollie\Shopware\Component\Payment\Handler\OrdersApiAwareInterface;
  * Implements DeprecatedMethodAwareInterface so the installer keeps it
  * inactive in production; Behat fixtures activate it explicitly.
  */
-final class PayPalOrdersApiPayment extends AbstractMolliePaymentHandler implements DeprecatedMethodAwareInterface, OrdersApiAwareInterface
+final class PayPalOrdersApiPayment extends AbstractMolliePaymentHandler implements DeprecatedMethodAwareInterface, OrdersApiAwareInterface, TestOnlyAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

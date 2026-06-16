@@ -7,9 +7,8 @@ use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Fixture\AbstractFixture;
 use Mollie\Shopware\Component\Fixture\FixtureGroup;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
-use Mollie\Shopware\Component\Payment\Method\KlarnaOrdersApiPayment;
+use Mollie\Shopware\Component\Payment\Handler\TestOnlyAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
-use Mollie\Shopware\Component\Payment\Method\PayPalOrdersApiPayment;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
@@ -76,7 +75,7 @@ final class PaymentMethodFixture extends AbstractFixture
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
         $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
         foreach ($paymentHandlers as $paymentHandler) {
-            if (! $paymentHandler instanceof PayPalOrdersApiPayment && ! $paymentHandler instanceof KlarnaOrdersApiPayment) {
+            if (! $paymentHandler instanceof TestOnlyAwareInterface) {
                 continue;
             }
             $this->paymentMethodRepository->upsert([
@@ -114,7 +113,7 @@ final class PaymentMethodFixture extends AbstractFixture
             }
             $paymentMethodName = $paymentHandler->getName();
             $isDeprecatedMethod = $paymentHandler instanceof DeprecatedMethodAwareInterface;
-            $isTestOnlyActive = $paymentHandler instanceof PayPalOrdersApiPayment;
+            $isTestOnlyActive = $paymentHandler instanceof TestOnlyAwareInterface;
             $result[] = [
                 'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
                 'name' => $paymentMethodName,
