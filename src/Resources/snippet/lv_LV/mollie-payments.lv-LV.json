@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Radās problēma, izdzēšot jūsu karti",
                 "newCard": "Jauna karte",
                 "remove": "Noņemt",
-                "subscriptionBadge": "Abonements"
+                "subscriptionBadge": "Abonements",
+                "emptyMessage": "Nav saglabātu karšu"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Atcelt",

@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Ha ocurrido un error al eliminar tu tarjeta",
                 "newCard": "Nueva tarjeta",
                 "remove": "Eliminar",
-                "subscriptionBadge": "Suscripción"
+                "subscriptionBadge": "Suscripción",
+                "emptyMessage": "No hay tarjetas guardadas"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Cancelar",

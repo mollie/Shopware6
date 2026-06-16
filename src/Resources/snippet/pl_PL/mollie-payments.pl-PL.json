@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Wystąpił problem podczas usuwania karty",
                 "newCard": "Nowa karta",
                 "remove": "Usuń",
-                "subscriptionBadge": "Subskrypcja"
+                "subscriptionBadge": "Subskrypcja",
+                "emptyMessage": "Brak zapisanych kart"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Anuluj",

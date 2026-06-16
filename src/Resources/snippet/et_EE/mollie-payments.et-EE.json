@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Sinu kaardi eemaldamisel tekkis probleem",
                 "newCard": "Uus kaart",
                 "remove": "Eemalda",
-                "subscriptionBadge": "Telli"
+                "subscriptionBadge": "Telli",
+                "emptyMessage": "Salvestatud kaarte pole"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Tühista",

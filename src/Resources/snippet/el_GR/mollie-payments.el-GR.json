@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Παρουσιάστηκε πρόβλημα κατά την αφαίρεση της κάρτας σας",
                 "newCard": "Νέα κάρτα",
                 "remove": "Αφαίρεση",
-                "subscriptionBadge": "Συνδρομή"
+                "subscriptionBadge": "Συνδρομή",
+                "emptyMessage": "Δεν υπάρχουν αποθηκευμένες κάρτες"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Ακύρωση",

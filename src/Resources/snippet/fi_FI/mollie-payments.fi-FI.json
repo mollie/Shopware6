@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Korttisi poistamisessa ilmeni ongelma",
                 "newCard": "Uusi kortti",
                 "remove": "Poista",
-                "subscriptionBadge": "Tilaus"
+                "subscriptionBadge": "Tilaus",
+                "emptyMessage": "Ei tallennettuja kortteja"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Peruuta",
