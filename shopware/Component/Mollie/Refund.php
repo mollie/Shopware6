@@ -10,6 +10,9 @@ final class Refund implements \JsonSerializable
     private ?RefundItemCollection $refundItems = null;
     private string $internalDescription = '';
 
+    /**
+     * @param array<string, mixed> $metadata
+     */
     public function __construct(
         private string $id,
         private string $paymentId,
@@ -17,6 +20,7 @@ final class Refund implements \JsonSerializable
         private Money $amount,
         private string $description,
         private \DateTimeImmutable $createdAt,
+        private array $metadata = [],
     ) {
     }
 
@@ -54,6 +58,8 @@ final class Refund implements \JsonSerializable
      */
     public static function createFromClientResponse(array $body): self
     {
+        $metadata = is_array($body['metadata'] ?? null) ? $body['metadata'] : [];
+
         return new self(
             $body['id'],
             $body['paymentId'],
@@ -61,7 +67,15 @@ final class Refund implements \JsonSerializable
             new Money((float) $body['amount']['value'], $body['amount']['currency']),
             $body['description'] ?? '',
             new \DateTimeImmutable($body['createdAt']),
+            $metadata,
         );
+    }
+
+    public function getReturnId(): ?string
+    {
+        $value = $this->metadata['swagReturnId'] ?? null;
+
+        return is_string($value) ? $value : null;
     }
 
     public function getId(): string

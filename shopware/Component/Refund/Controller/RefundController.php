@@ -130,6 +130,7 @@ final class RefundController extends AbstractController
         $requestAmount = $request->get('amount');
         $description = (string) $request->get('description', '');
         $internalDescription = (string) $request->get('internalDescription', '');
+        $returnId = (string) $request->get('returnId', '');
         /** @var array<array{id: string, quantity: int, amount: float, resetStock: int}> $items */
         $items = $request->get('items', []);
         $items = array_values(array_filter($items, function ($item) {
@@ -155,6 +156,10 @@ final class RefundController extends AbstractController
             $description,
             $requestAmount !== null ? (float) $requestAmount : null,
         );
+
+        if ($returnId !== '') {
+            $createRefund->setMetadata(['swagReturnId' => $returnId]);
+        }
 
         $refundPayloadEvent = new ModifyCreateRefundPayloadEvent($createRefund, $order, $context);
         /** @var ModifyCreateRefundPayloadEvent $refundPayloadEvent */

@@ -51,6 +51,17 @@ final class RefundCollection implements \JsonSerializable
         return null;
     }
 
+    public function findByReturnId(string $returnId): ?Refund
+    {
+        foreach ($this->refunds as $refund) {
+            if ($refund->getReturnId() === $returnId) {
+                return $refund;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return Refund[]
      */

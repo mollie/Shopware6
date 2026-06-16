@@ -83,7 +83,8 @@ final class RefundBuilder implements RefundBuilderInterface
             }
         }
 
-        $maxRefundable = max(0.0, $order->getAmountTotal() - $alreadyRefunded);
+        $baseTotal = $this->computeBaseTotal($orderLineItems, $orderDeliveries);
+        $maxRefundable = max(0.0, $baseTotal - $alreadyRefunded);
         $amount = min($amount, $maxRefundable);
 
         $money = new Money($amount, $currency->getIsoCode());
@@ -105,6 +106,19 @@ final class RefundBuilder implements RefundBuilderInterface
         ]);
 
         return $createRefund;
+    }
+
+    private function computeBaseTotal(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries): float
+    {
+        $total = 0.0;
+        foreach ($orderLineItems as $lineItem) {
+            $total += $lineItem->getTotalPrice();
+        }
+        foreach ($orderDeliveries as $delivery) {
+            $total += $delivery->getShippingCosts()->getTotalPrice();
+        }
+
+        return $total;
     }
 
     private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines): LineItemCollection

@@ -50,12 +50,7 @@
             <argument type="service" id="Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
-        <service id="Kiener\MolliePayments\Subscriber\OrderReturnSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\Service\OrderReturnHandler"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Subscriber\OrderLinesUpdatedSubscriber">
+<service id="Kiener\MolliePayments\Subscriber\OrderLinesUpdatedSubscriber">
             <argument type="service" id="monolog.logger.mollie"/>
             <tag name="kernel.event_subscriber"/>
         </service>
