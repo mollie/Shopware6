@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Payment;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\TestOnlyAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
@@ -73,6 +74,10 @@ final class PaymentMethodInstaller
         /** @var AbstractMolliePaymentHandler $paymentHandler */
         foreach ($molliePaymentMethods as $paymentHandler) {
             $handlerIdentifier = get_class($paymentHandler);
+
+            if ($paymentHandler instanceof TestOnlyAwareInterface) {
+                continue;
+            }
 
             if ($paymentHandler instanceof PayPalExpressPayment && ! $paypalExpressSettings->isEnabled()) {
                 continue;
