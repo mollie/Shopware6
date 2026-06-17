@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Subscriber;
+namespace Mollie\Shopware\Unit\Payment\Subscriber;
 
-use Kiener\MolliePayments\Subscriber\PendingOrderRedirectSubscriber;
-use Mollie\Shopware\Component\Payment\PayAction;
+use Mollie\Shopware\Component\Payment\Action\Pay;
+use Mollie\Shopware\Component\Payment\Subscriber\PendingOrderRedirectSubscriber;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -18,7 +19,6 @@ class PendingOrderRedirectSubscriberTest extends TestCase
 {
     private const ORDER_ID = 'order-abc123';
     private const EDIT_ORDER_URL = '/account/order/edit/order-abc123';
-
     private PendingOrderRedirectSubscriber $subscriber;
 
     public function setUp(): void
@@ -26,34 +26,14 @@ class PendingOrderRedirectSubscriberTest extends TestCase
         $router = $this->createMock(RouterInterface::class);
         $router->method('generate')->willReturn(self::EDIT_ORDER_URL);
 
-        $this->subscriber = new PendingOrderRedirectSubscriber($router);
+        $this->subscriber = new PendingOrderRedirectSubscriber($router, new NullLogger());
     }
 
     /**
-     * This test verifies that when the customer returns from Mollie
-     * (frontend.mollie.payment), the pending order session key is cleared
-     * and no redirect is triggered. Without this, a successful payment leaves
-     * a stale session key that later causes unexpected redirects.
+     * When Shopware redirects the customer from an empty cart to the order list
+     * (browser-back scenario), the subscriber must redirect to the edit-order page.
      */
-    public function testSessionKeyIsClearedOnMollieReturnRoute(): void
-    {
-        $session = $this->createSessionWithPendingOrder(self::ORDER_ID);
-        $event = $this->createControllerEvent('frontend.mollie.payment', $session);
-
-        $originalController = $event->getController();
-
-        $this->subscriber->onController($event);
-
-        $this->assertNull($session->get(PayAction::SESSION_KEY_PENDING_ORDER));
-        $this->assertSame($originalController, $event->getController());
-    }
-
-    /**
-     * This test verifies that when the customer hits the browser back button
-     * after checkout (landing on the account order list), they are redirected
-     * to the edit-order page for the pending order.
-     */
-    public function testBrowserBackRedirectsToEditOrderPage(): void
+    public function testBrowserBackViaCheckoutRedirectsToEditOrderPage(): void
     {
         $session = $this->createSessionWithPendingOrder(self::ORDER_ID);
         $event = $this->createControllerEvent('frontend.account.order.page', $session);
@@ -67,22 +47,20 @@ class PendingOrderRedirectSubscriberTest extends TestCase
     }
 
     /**
-     * This test verifies that after the browser-back redirect the session key
-     * is removed so that subsequent visits to the account order page are unaffected.
+     * After the redirect the session key must be consumed.
      */
-    public function testSessionKeyIsRemovedAfterBrowserBackRedirect(): void
+    public function testSessionKeyIsRemovedAfterRedirect(): void
     {
         $session = $this->createSessionWithPendingOrder(self::ORDER_ID);
         $event = $this->createControllerEvent('frontend.account.order.page', $session);
 
         $this->subscriber->onController($event);
 
-        $this->assertNull($session->get(PayAction::SESSION_KEY_PENDING_ORDER));
+        $this->assertNull($session->get(Pay::SESSION_KEY_PENDING_ORDER));
     }
 
     /**
-     * This test verifies that visiting the account order list without a pending
-     * order in the session does not trigger any redirect.
+     * Visiting the order list without a pending order must never redirect.
      */
     public function testNoRedirectWhenNoPendingOrderInSession(): void
     {
@@ -97,10 +75,26 @@ class PendingOrderRedirectSubscriberTest extends TestCase
     }
 
     /**
-     * This test verifies that on unrelated routes the subscriber leaves the
-     * controller and the session completely untouched.
+     * When the customer returns from Mollie (success or failure) the session
+     * key must be cleared so no later redirect fires.
      */
-    public function testUnrelatedRoutesAreIgnored(): void
+    public function testSessionKeyIsClearedOnMollieReturn(): void
+    {
+        $session = $this->createSessionWithPendingOrder(self::ORDER_ID);
+        $event = $this->createControllerEvent('frontend.mollie.payment', $session);
+
+        $originalController = $event->getController();
+
+        $this->subscriber->onController($event);
+
+        $this->assertNull($session->get(Pay::SESSION_KEY_PENDING_ORDER));
+        $this->assertSame($originalController, $event->getController());
+    }
+
+    /**
+     * On unrelated routes the session key must remain untouched.
+     */
+    public function testUnrelatedRoutesLeaveSessionKeyIntact(): void
     {
         $session = $this->createSessionWithPendingOrder(self::ORDER_ID);
         $event = $this->createControllerEvent('frontend.home.page', $session);
@@ -110,7 +104,7 @@ class PendingOrderRedirectSubscriberTest extends TestCase
         $this->subscriber->onController($event);
 
         $this->assertSame($originalController, $event->getController());
-        $this->assertSame(self::ORDER_ID, $session->get(PayAction::SESSION_KEY_PENDING_ORDER));
+        $this->assertSame(self::ORDER_ID, $session->get(Pay::SESSION_KEY_PENDING_ORDER));
     }
 
     // ------------------------------------------------------------------
@@ -118,7 +112,7 @@ class PendingOrderRedirectSubscriberTest extends TestCase
     private function createSessionWithPendingOrder(string $orderId): Session
     {
         $session = new Session(new MockArraySessionStorage());
-        $session->set(PayAction::SESSION_KEY_PENDING_ORDER, $orderId);
+        $session->set(Pay::SESSION_KEY_PENDING_ORDER, $orderId);
 
         return $session;
     }
