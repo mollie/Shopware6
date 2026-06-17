@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Controller;
 
 use Mollie\Shopware\Component\FailureMode\PaymentPageFailedEvent;
-use Mollie\Shopware\Component\Payment\PayAction;
 use Mollie\Shopware\Component\Payment\Route\AbstractReturnRoute;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\ReturnRoute;
@@ -21,7 +20,6 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -37,8 +35,6 @@ final class PaymentController extends StorefrontController
         private AbstractSettingsService $settingsService,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
-        #[Autowire(service: 'request_stack')]
-        private RequestStack $requestStack,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -47,13 +43,6 @@ final class PaymentController extends StorefrontController
     #[Route(path: '/mollie/payment/{transactionId}', name: 'frontend.mollie.payment', methods: ['GET', 'POST'], options: ['seo' => false])]
     public function return(string $transactionId, SalesChannelContext $salesChannelContext): Response
     {
-        // clear the session key so that a failed/cancelled payment returning via this route
-        // does not cause an unexpected redirect on the next visit to /account/order
-        $currentRequest = $this->requestStack->getCurrentRequest();
-        if ($currentRequest !== null && $currentRequest->hasSession()) {
-            $currentRequest->getSession()->remove(PayAction::SESSION_KEY_PENDING_ORDER);
-        }
-
         $salesChannelId = $salesChannelContext->getSalesChannelId();
         $logData = [
             'transactionId' => $transactionId,

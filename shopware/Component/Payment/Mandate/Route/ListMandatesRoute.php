@@ -80,7 +80,7 @@ final class ListMandatesRoute extends AbstractListMandatesRoute
         $logData['profileId'] = $mollieProfileId;
         $mollieCustomerId = $customerExtension->getForProfileId($mollieProfileId,$apiSettings->getMode());
         if ($mollieCustomerId === null) {
-            $this->logger->debug('Mollie Customer ID not found for Mollie Profile', $logData);
+            $this->logger->warning('Mollie Customer ID not found for Mollie Profile', $logData);
 
             return new ListMandatesResponse($mandateCollection);
         }
