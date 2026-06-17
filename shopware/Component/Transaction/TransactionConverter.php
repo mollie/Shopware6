@@ -5,7 +5,6 @@ namespace Mollie\Shopware\Component\Transaction;
 
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\TransactionService;
-use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct as ShopwarePaymentTransactionStruct;
 use Shopware\Core\Framework\Context;
 
@@ -18,41 +17,21 @@ final class TransactionConverter implements TransactionConverterInterface
     private OrderService $orderService;
     private TransactionService $transactionService;
 
-    public function __construct(OrderService $orderService, TransactionService $transactionService)
+    public function __construct(
+        OrderService $orderService,
+        TransactionService $transactionService)
     {
         $this->orderService = $orderService;
         $this->transactionService = $transactionService;
     }
 
-    /**
-     * @param AsyncPaymentTransactionStruct|ShopwarePaymentTransactionStruct $transactionStruct
-     */
-    public function convert($transactionStruct, Context $context): PaymentTransactionStruct
+    public function convert(ShopwarePaymentTransactionStruct $transactionStruct, Context $context): PaymentTransactionStruct
     {
-        $orderTransactionId = $this->getTransactionId($transactionStruct);
+        $orderTransactionId = $transactionStruct->getOrderTransactionId();
 
         $transaction = $this->transactionService->getTransactionById($orderTransactionId, $context->getVersionId(), $context);
         $order = $this->orderService->getOrder($transaction->getOrderId(), $context);
 
         return new PaymentTransactionStruct($orderTransactionId, (string) $transactionStruct->getReturnUrl(), $order, $transaction);
-    }
-
-    /**
-     * @param AsyncPaymentTransactionStruct|ShopwarePaymentTransactionStruct $transactionStruct
-     */
-    private function getTransactionId($transactionStruct): string
-    {
-        $orderTransactionId = null;
-        if ($transactionStruct instanceof ShopwarePaymentTransactionStruct) {
-            $orderTransactionId = $transactionStruct->getOrderTransactionId();
-        }
-        if ($transactionStruct instanceof AsyncPaymentTransactionStruct) {
-            $orderTransactionId = $transactionStruct->getOrderTransaction()->getId();
-        }
-        if ($orderTransactionId === null) {
-            throw new \Exception(sprintf('Invalid transaction struct. OrderTransaction Id could not be found in class %s', get_class($transactionStruct)));
-        }
-
-        return $orderTransactionId;
     }
 }

@@ -15,13 +15,12 @@
             {% endblock %}
         {% endif %}
 
-        {% if enable_one_click_payments and MollieCreditCardMandateCollection|length > 0 %}
+        {% if enable_credit_card_components and enable_one_click_payments %}
             <a href="{{ path('frontend.account.mollie.mandates.page') }}"
                title="{{ "molliePayments.components.mandate.sectionTitle"|trans|striptags }}"
                class="list-group-item list-group-item-action account-aside-item{% if activeRoute is same as('frontend.account.mollie.mandates.page') %} is-active{% endif %}">
                 {{ "molliePayments.components.mandate.sectionTitle"|trans|sw_sanitize }}
             </a>
-
         {% endif %}
     {% endif %}
 

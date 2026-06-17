@@ -25,6 +25,8 @@ jobs:
 
       - name: Clone Code
         uses: actions/checkout@v3
+        with:
+          path: MolliePayments
 
       - name: Create Cache Directories
         run: |
@@ -37,7 +39,7 @@ jobs:
           path: ~/.build
 
       - name: Build Plugin
-        uses: ./.github/actions/build-plugin
+        uses: ./MolliePayments/.github/actions/build-plugin
 
   e2e:
     name: E2E Tests | Shopware ${{ github.event.inputs.swVersion }}, PHP ${{ github.event.inputs.phpVersion }}

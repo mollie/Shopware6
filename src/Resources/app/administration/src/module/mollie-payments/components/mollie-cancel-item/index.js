@@ -49,7 +49,7 @@ Component.register('mollie-cancel-item', {
                             message: this.$tc('mollie-payments.modals.cancel.item.failed.' + response.message),
                         });
                     }
-                    this.$emit('update-cancel-status');
+                    this.$emit('update-cancel-status', response);
                     this.$emit('close');
                 })
                 .catch((error) => {

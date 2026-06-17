@@ -131,8 +131,10 @@
                     "pending": "O reembolso será enviado ao banco no próximo dia útil. Ainda é possível cancelar o reembolso.",
                     "processing": "O reembolso foi enviado para o banco. O montante do reembolso será transferido para a conta do consumidor o mais rapidamente possível.",
                     "refunded": "O montante do reembolso foi transferido para o consumidor.",
-                    "failed": "O reembolso falhou após o processamento. Por exemplo, o cliente fechou a sua conta bancária. Os fundos serão devolvidos à sua conta."
-                }
+                    "failed": "O reembolso falhou após o processamento. Por exemplo, o cliente fechou a sua conta bancária. Os fundos serão devolvidos à sua conta.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

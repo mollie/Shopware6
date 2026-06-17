@@ -131,8 +131,10 @@
                     "pending": "Il rimborso sarà inviato alla banca il giorno lavorativo successivo. Puoi comunque annullare il rimborso.",
                     "processing": "Il rimborso è stato inviato alla banca. L'importo del rimborso sarà trasferito sul conto del consumatore il prima possibile.",
                     "refunded": "L'importo del rimborso è stato trasferito al consumatore.",
-                    "failed": "Il rimborso non è riuscito dopo l'elaborazione. Ad esempio, il cliente ha chiuso il proprio conto bancario. I fondi saranno restituiti sul tuo conto."
-                }
+                    "failed": "Il rimborso non è riuscito dopo l'elaborazione. Ad esempio, il cliente ha chiuso il proprio conto bancario. I fondi saranno restituiti sul tuo conto.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

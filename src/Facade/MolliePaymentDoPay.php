@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Facade;
 
-use Kiener\MolliePayments\Components\Subscription\SubscriptionManagerInterface;
 use Kiener\MolliePayments\Exception\CouldNotCreateMollieCustomerException;
 use Kiener\MolliePayments\Exception\CustomerCouldNotBeFoundException;
 use Kiener\MolliePayments\Exception\MollieOrderCancelledException;
@@ -75,11 +74,6 @@ class MolliePaymentDoPay
     private $updaterLineItemCustomFields;
 
     /**
-     * @var SubscriptionManagerInterface
-     */
-    private $subscriptionManager;
-
-    /**
      * @var Environment
      */
     private $twig;
@@ -89,7 +83,7 @@ class MolliePaymentDoPay
      */
     private $logger;
 
-    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, SubscriptionManagerInterface $subscriptionManager, Environment $twig, LoggerInterface $logger)
+    public function __construct(OrderDataExtractor $extractor, MollieOrderBuilder $orderBuilder, Order $orderApiService, CustomerService $customerService, SettingsService $settingsService, UpdateOrderCustomFields $updateOrderCustomFields, UpdateOrderLineItems $updateOrderLineItems, Environment $twig, LoggerInterface $logger)
     {
         $this->extractor = $extractor;
         $this->orderBuilder = $orderBuilder;
@@ -99,7 +93,6 @@ class MolliePaymentDoPay
         $this->settingsService = $settingsService;
         $this->updaterOrderCustomFields = $updateOrderCustomFields;
         $this->updaterLineItemCustomFields = $updateOrderLineItems;
-        $this->subscriptionManager = $subscriptionManager;
         $this->twig = $twig;
         $this->logger = $logger;
     }
@@ -197,12 +190,6 @@ class MolliePaymentDoPay
         // for this payment in Shopware.
         $molliePaymentData = $this->createMollieOrder($order, $paymentMethod, $transactionStruct, $salesChannelContext, $paymentHandler);
 
-        // now create subscriptions from our order for
-        // all products that are configured to be a subscription.
-        // this will prepare the subscriptions in our database.
-        // the confirmation of these, however, will be done in a webhook
-        $subscriptionId = $this->subscriptionManager->createSubscription($order, $salesChannelContext);
-
         // now update our custom struct values
         // and immediately set our Mollie Order ID and more
         if (strpos($molliePaymentData->getId(), 'ord_') !== false) {
@@ -214,12 +201,6 @@ class MolliePaymentDoPay
         }
 
         $orderCustomFields->setMolliePaymentUrl($molliePaymentData->getCheckoutUrl());
-
-        // if we have a subscription, make sure
-        // to remember the ID in our order
-        if (! empty($subscriptionId)) {
-            $orderCustomFields->setSubscriptionData($subscriptionId, '');
-        }
 
         /**
          * @var OrderLineItemCollection $orderLineItems

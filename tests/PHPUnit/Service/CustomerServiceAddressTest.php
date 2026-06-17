@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Service\ConfigService;
 use Kiener\MolliePayments\Service\CustomerService;
@@ -10,8 +10,8 @@ use Kiener\MolliePayments\Service\MollieApi\Customer;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Kiener\MolliePayments\Struct\Address\AddressStruct;
-use MolliePayments\Tests\Fakes\FakeTranslator;
-use MolliePayments\Tests\Fakes\Repositories\FakeCustomerRepository;
+use MolliePayments\Shopware\Tests\Fakes\FakeTranslator;
+use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeCustomerRepository;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;

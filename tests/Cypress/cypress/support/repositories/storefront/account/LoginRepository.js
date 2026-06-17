@@ -21,7 +21,7 @@ export default class LoginRepository {
      * @returns {*}
      */
     getSubmitButton() {
-        return cy.get('.login-submit > .btn')
+        return cy.get('.login-form .login-submit > button[type="submit"]')
     }
 
 }

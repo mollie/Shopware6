@@ -12,12 +12,19 @@ Component.register('mollie-refund-manager', {
 
     mixins: [Mixin.getByName('notification')],
 
-    inject: ['MolliePaymentsConfigService', 'MolliePaymentsRefundService', 'acl'],
+    inject: ['MolliePaymentsRefundService', 'acl'],
 
     props: {
         order: {
             type: Object,
             required: true,
+        },
+        refundManagerConfig: {
+            type: Object,
+            required: false,
+            default: function () {
+                return { verifyRefund: true, autoStockReset: true, showInstructions: true };
+            },
         },
     },
 
@@ -26,11 +33,6 @@ Component.register('mollie-refund-manager', {
             // -------------------------------
             // services
             itemService: null,
-            // ------------------
-            // configs
-            configVerifyRefund: true,
-            configAutoStockReset: true,
-            configShowInstructions: true,
             // -------------------------------
             // basic view stuff
             isRefundDataLoading: false,
@@ -66,12 +68,18 @@ Component.register('mollie-refund-manager', {
     },
 
     computed: {
-        /**
-         * Returns the translated title for the sw-card
-         * of the current Shopware order and its cart overview.
-         * This can have dynamic values, so we use a JS function
-         * @returns {string}
-         */
+        configVerifyRefund() {
+            return this.refundManagerConfig?.verifyRefund ?? true;
+        },
+
+        configAutoStockReset() {
+            return this.refundManagerConfig?.autoStockReset ?? true;
+        },
+
+        configShowInstructions() {
+            return this.refundManagerConfig?.showInstructions ?? true;
+        },
+
         titleCardOrder() {
             let text = this.$tc('mollie-payments.refund-manager.cart.title');
             text = text.replace('##orderNumber##', this.order.orderNumber);
@@ -141,21 +149,7 @@ Component.register('mollie-refund-manager', {
             this.itemService = new RefundItemService();
 
             if (this.order) {
-                // immediately load our Mollie data
-                // as soon as we open the form
                 this._fetchFormData();
-
-                const me = this;
-
-                // also get the config for the refund manager
-                // so that we can show/hide a few things
-                this.MolliePaymentsConfigService.getRefundManagerConfig(this.order.salesChannelId, this.order.id).then(
-                    (response) => {
-                        me.configVerifyRefund = response.verifyRefund;
-                        me.configAutoStockReset = response.autoStockReset;
-                        me.configShowInstructions = response.showInstructions;
-                    },
-                );
             }
         },
 
@@ -431,10 +425,10 @@ Component.register('mollie-refund-manager', {
                 items: itemData,
             })
                 .then((response) => {
-                    if (response.success) {
+                    if (this._isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors[0]);
+                        this._showNotificationError(response.errors?.[0]);
                     }
                 })
                 .finally(() => {
@@ -459,10 +453,10 @@ Component.register('mollie-refund-manager', {
                 internalDescription: this.refundInternalDescription,
             })
                 .then((response) => {
-                    if (response.success) {
+                    if (this._isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors[0]);
+                        this._showNotificationError(response.errors?.[0]);
                     }
                 })
                 .finally(() => {
@@ -566,7 +560,12 @@ Component.register('mollie-refund-manager', {
                             this.$tc('mollie-payments.refund-manager.notifications.success.refund-canceled'),
                         );
                         this.$emit('refund-cancelled');
-                        this._fetchFormData();
+                        this.mollieRefunds = this.mollieRefunds.map(function (r) {
+                            if (r.id !== item.id) {
+                                return r;
+                            }
+                            return Object.assign({}, r, { status: 'canceled', isPending: false, isQueued: false });
+                        });
                     } else {
                         this._showNotificationError(response.errors[0]);
                     }
@@ -594,43 +593,37 @@ Component.register('mollie-refund-manager', {
 
             const me = this;
 
-            this.MolliePaymentsRefundService.getRefundManagerData({
+            this.MolliePaymentsRefundService.getRefundOverview({
                 orderId: this.order.id,
-            }).then((response) => {
-                // we got the response from our plugin API endpoint.
-                // now simply assign the values to our props
-                // so that vue will show it
-                this.mollieRefunds = response.refunds;
-                this.remainingAmount = response.totals.remaining;
-                this.refundedAmount = response.totals.refunded;
-                this.voucherAmount = response.totals.voucherAmount;
-                this.pendingRefunds = response.totals.pendingRefunds;
-                this.roundingDiff = response.totals.roundingDiff;
+            })
+                .then((response) => {
+                    if (!response || response.success === false) {
+                        this.isRefundDataLoading = false;
+                        return;
+                    }
 
-                // build our local items
-                // we have to build it by assigning it to a new local object,
-                // because we are merging the response data with our local structure
-                // that will be used for the request later on.
-                // this is also required to have everything like the focus-color working!
-                this.orderItems = [];
-                response.cart.forEach(function (item) {
-                    // grab what we need from our response
-                    const localItem = {
-                        refunded: item.refunded,
-                        shopware: item.shopware,
-                    };
+                    this.mollieRefunds = response.refunds;
+                    this.remainingAmount = response.totals.remaining;
+                    this.refundedAmount = response.totals.refunded;
+                    this.voucherAmount = response.totals.voucherAmount;
+                    this.pendingRefunds = response.totals.pendingRefunds;
+                    this.roundingDiff = response.totals.roundingDiff;
 
-                    // make sure to reset the refund data
-                    // which implicitly creates our structure for
-                    // the refund request later on
-                    me.itemService.resetRefundData(localItem);
+                    this.orderItems = [];
+                    response.cart.forEach(function (item) {
+                        const localItem = {
+                            refunded: item.refunded,
+                            shopware: item.shopware,
+                        };
+                        me.itemService.resetRefundData(localItem);
+                        me.orderItems.push(localItem);
+                    });
 
-                    me.orderItems.push(localItem);
+                    this.isRefundDataLoading = false;
+                })
+                .catch(() => {
+                    this.isRefundDataLoading = false;
                 });
-
-                // yep, we're done loading ;)
-                this.isRefundDataLoading = false;
-            });
         },
 
         /**
@@ -699,15 +692,12 @@ Component.register('mollie-refund-manager', {
             });
         },
 
-        _handleRefundSuccess(response) {
-            this.isRefunding = false;
+        _isRefundSuccess(response) {
+            return typeof response.id === 'string' || response.success === true;
+        },
 
-            if (!response.success) {
-                this._showNotificationError(
-                    this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'),
-                );
-                return;
-            }
+        _handleRefundSuccess(refund) {
+            this.isRefunding = false;
 
             this._showNotificationSuccess(
                 this.$tc('mollie-payments.refund-manager.notifications.success.refund-created'),
@@ -715,10 +705,7 @@ Component.register('mollie-refund-manager', {
 
             this.$emit('refund-success');
 
-            // fetch new data
-            this._fetchFormData();
-
-            // reset existing values
+            this.mollieRefunds = [refund].concat(this.mollieRefunds);
             this.btnResetCartForm_Click();
         },
         // ---------------------------------------------------------------------------------------------------------

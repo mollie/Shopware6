@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Beim Entfernen Ihrer Karte ist ein Problem aufgetreten",
                 "newCard": "Neue Karte",
                 "remove": "Entfernen",
-                "subscriptionBadge" : "Abonnement"
+                "subscriptionBadge": "Abonnement",
+                "emptyMessage": "Keine gespeicherten Kreditkarten vorhanden"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Stornieren",
@@ -45,8 +46,8 @@
                 "title": "Bestätigung zum Löschen"
             },
             "phoneField": {
-              "headLine": "Telefonnummer",
-              "phoneErrorMessage": "Die Telefonnummer ist erforderlich. Zum Beispiel +31208202070"
+                "headLine": "Telefonnummer",
+                "phoneErrorMessage": "Die Telefonnummer ist erforderlich. Zum Beispiel +31208202070"
             }
         },
         "messages": {
@@ -72,8 +73,8 @@
             "account": {
                 "btnEditBillingAddress": "Rechnungsadresse bearbeiten",
                 "btnEditShippingAddress": "Lieferadresse bearbeiten",
-                "cancelSubscription": "Das Abonnement wurde gekündigt",
-                "errorCancelSubscription": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
+                "successCancel": "Das Abonnement wurde gekündigt",
+                "errorCancel": "Das Abonnement konnte aufgrund eines Fehlers nicht gekündigt werden. Bitte wenden Sie sich an unseren Support.",
                 "errorPause": "Dein Abonnement konnte nicht pausiert werden",
                 "errorResume": "Dein Abonnement konnte nicht fortgesetzt werden",
                 "errorSkip": "Dein Abonnement konnte nicht ausgesetzt werden",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Ihre letzten Abonnements:",
                 "orderActionHide": "Ausblenden",
                 "orderActionView": "Anzeigen",
+                "priceChangeNoticeCancelButton": "Abonnement kündigen",
+                "priceChangeNoticeCurrentLabel": "Aktueller Preis",
+                "priceChangeNoticeEffectiveLabel": "Gültig ab",
+                "priceChangeNoticeHeadline": "Bevorstehende Preisänderung",
+                "priceChangeNoticeMessage": "Der Verlängerungspreis dieses Abonnements wird sich ändern. Sie können das Abonnement bis zum Inkrafttreten des neuen Preises jederzeit kündigen.",
+                "priceChangeNoticeNewLabel": "Neuer Preis",
                 "shippingEqualToBilling": "gleich wie Rechnungsadresse",
                 "successPause": "Dein Abonnement wurde pausiert",
                 "successResume": "Dein Abonnement wird nun wieder fortgesetzt",

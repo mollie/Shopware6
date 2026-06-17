@@ -131,8 +131,10 @@
                     "pending": "Tagasimakse saadetakse panka järgmisel tööpäeval. Sa saad endiselt tagasimakse tühistada.",
                     "processing": "Tagasimakse on saadetud panka. Tagastatav summa kantakse tarbija kontole niipea kui võimalik.",
                     "refunded": "Tagasimakstud summa on kantud tarbijale.",
-                    "failed": "Tagasimakse ebaõnnestus pärast töötlemist. Näiteks on klient sulgenud oma pangakonto. Raha tagastatakse sinu kontole."
-                }
+                    "failed": "Tagasimakse ebaõnnestus pärast töötlemist. Näiteks on klient sulgenud oma pangakonto. Raha tagastatakse sinu kontole.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\Order;
+namespace MolliePayments\Shopware\Tests\Service\Order;
 
 use Kiener\MolliePayments\Service\Order\OrderTimeService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -12,9 +13,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 
 class OrderTimeServiceTest extends TestCase
 {
-    /**
-     * @dataProvider dateComparisonLogicProvider
-     */
+    #[DataProvider('dateComparisonLogicProvider')]
     public function testDateComparisonLogic(\DateTime $now, \DateTime $orderDate, bool $expected, int $compareValueInMinutes = 60): void
     {
         $order = $this->orderMockWithLastTransactionTimestamp($orderDate);
@@ -24,7 +23,7 @@ class OrderTimeServiceTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dateComparisonLogicProvider()
+    public static function dateComparisonLogicProvider()
     {
         return [
             'order is older than 1 hour' => [

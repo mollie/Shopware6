@@ -35,7 +35,6 @@
 
         <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService" >
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
-            <argument type="service" id="Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
@@ -140,23 +139,8 @@
             <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService">
-            <argument type="service" id="product.repository"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Cart\Subscription\SubscriptionCartCollector">
-            <tag name="shopware.cart.collector" priority="1999" />
-            <argument type="service" id="event_dispatcher"/>
-        </service>
 
 
-        <service id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector">
-            <argument type="service" id="Kiener\MolliePayments\Service\Cart\Voucher\VoucherService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
-            <!-- // inject after product collector(5000) -->
-            <tag name="shopware.cart.collector" priority="2000"/>
-        </service>
 
         <service id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator">
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>

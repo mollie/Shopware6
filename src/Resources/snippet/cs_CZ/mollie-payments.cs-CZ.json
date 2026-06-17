@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Došlo k problému při odstraňování vaší karty",
                 "newCard": "Nová karta",
                 "remove": "Odstranit",
-                "subscriptionBadge": "Předplatné"
+                "subscriptionBadge": "Předplatné",
+                "emptyMessage": "Žádné uložené karty"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Zrušit",
@@ -72,8 +73,8 @@
             "account": {
                 "btnEditBillingAddress": "upravit fakturační adresu",
                 "btnEditShippingAddress": "upravit doručovací adresu",
-                "cancelSubscription": "Předplatné bylo zrušeno",
-                "errorCancelSubscription": "Předplatné se nepodařilo zrušit kvůli chybě. Prosim, kontaktujte naši podporu.",
+                "successCancel": "Předplatné bylo zrušeno",
+                "errorCancel": "Předplatné se nepodařilo zrušit kvůli chybě. Prosim, kontaktujte naši podporu.",
                 "errorPause": "Došlo k chybě při pozastavení vašeho předplatného",
                 "errorResume": "Došlo k chybě při obnovování vašeho předplatného",
                 "errorSkip": "Došlo k chybě při přeskočení vašeho předplatného",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Vaše nedávná předplatná:",
                 "orderActionHide": "Skrýt",
                 "orderActionView": "Zobrazit",
+                "priceChangeNoticeCancelButton": "Zrušit předplatné",
+                "priceChangeNoticeCurrentLabel": "Aktuální cena",
+                "priceChangeNoticeEffectiveLabel": "Platí od",
+                "priceChangeNoticeHeadline": "Nadcházející změna ceny",
+                "priceChangeNoticeMessage": "Cena obnovení tohoto předplatného se brzy změní. Můžete zrušit kdykoli před tím, než se nová cena začne uplatňovat.",
+                "priceChangeNoticeNewLabel": "Nová cena",
                 "shippingEqualToBilling": "Shoduje se s fakturační adresou",
                 "successPause": "Vaše předplatné bylo pozastaveno",
                 "successResume": "Vaše předplatné bude nyní obnoveno",

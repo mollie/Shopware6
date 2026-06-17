@@ -45,9 +45,11 @@ export default class PayPalExpressPlugin extends Plugin {
             // on the product buy box, because in that case the button is enabled/disabled and
             // then we have to update our express button visibility
             const buyForm = this._repoBuyBox.findClosestBuyBox(button);
-            buyForm.addEventListener('change', () => {
-                this.updateButtonVisibility(button);
-            });
+            if (buyForm !== null) {
+                buyForm.addEventListener('change', () => {
+                    this.updateButtonVisibility(button);
+                });
+            }
         }
     }
 

@@ -1,4 +1,3 @@
-import MollieCreditCardComponents from './mollie-payments/plugins/creditcard-components.plugin';
 import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard-components-sw64.plugin';
 import MollieApplePayDirect from './mollie-payments/plugins/express/apple-pay-direct.plugin';
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
@@ -14,13 +13,14 @@ export default class MollieRegistration {
     register() {
         const pluginManager = window.PluginManager;
 
-        // global plugins
+        // global plugins - registered on 'body' so Shopware's PluginManager initializes
+        // them exactly once per page regardless of version
         // -----------------------------------------------------------------------------
         // hide apple pay direct buttons across the whole shop, if not available
-        pluginManager.register('MollieApplePayDirect', MollieApplePayDirect);
+        pluginManager.register('MollieApplePayDirect', MollieApplePayDirect, 'body');
 
         // fix quantity select on PDP Page
-        pluginManager.register('PayPalExpressPlugin', PayPalExpressPlugin);
+        pluginManager.register('PayPalExpressPlugin', PayPalExpressPlugin, 'body');
 
         // hiding the standard Apple Pay method in the checkout and account area
         // -----------------------------------------------------------------------------
@@ -36,13 +36,7 @@ export default class MollieRegistration {
         );
 
         // showing credit card components in the checkout
-        // we have 2 versions for < Shopware 6.4 and >= Shopware 6.4
         // -----------------------------------------------------------------------------
-        pluginManager.register(
-            'MollieCreditCardComponents',
-            MollieCreditCardComponents,
-            '[data-mollie-template-creditcard-components]',
-        );
         pluginManager.register(
             'MollieCreditCardComponentsSw64',
             MollieCreditCardComponentsSw64,
@@ -64,5 +58,9 @@ export default class MollieRegistration {
         // UNIVERSAL PHONE VALIDATION
         // -----------------------------------------------------------------------------
         pluginManager.register('MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]');
+
+        // Our bundle loads after Shopware's main initializePlugins() call, so we
+        // must trigger another initialization round for our newly registered plugins.
+        pluginManager.initializePlugins();
     }
 }

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Struct\Product;
 
-use Kiener\MolliePayments\Struct\Voucher\VoucherType;
 use Shopware\Core\Content\Product\ProductEntity;
 
 class ProductAttributes
@@ -41,25 +40,6 @@ class ProductAttributes
         $this->subscriptionInterval = $this->getCustomFieldValue($product, 'subscription_interval');
         $this->subscriptionIntervalUnit = $this->getCustomFieldValue($product, 'subscription_interval_unit');
         $this->subscriptionRepetitionCount = $this->getCustomFieldValue($product, 'subscription_repetition');
-    }
-
-    /**
-     * @return string
-     */
-    public function getVoucherType()
-    {
-        $availableTypes = [
-            VoucherType::TYPE_NONE,
-            VoucherType::TYPE_ECO,
-            VoucherType::TYPE_MEAL,
-            VoucherType::TYPE_GIFT,
-        ];
-
-        if (! in_array($this->voucherType, $availableTypes)) {
-            return VoucherType::TYPE_NOTSET;
-        }
-
-        return (string) $this->voucherType;
     }
 
     public function isSubscriptionProduct(): bool

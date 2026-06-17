@@ -14,7 +14,7 @@
 {% block component_payment_method_description %}
 
 
-    {% if "MolliePayments" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
+    {% if "Mollie" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
         <div class="payment-method-description">
             <strong>{{ payment.translated.name }} ({{ "molliePayments.testMode.label"|trans }})</strong>
             {% if payment.translated.description and payment.id is same as(selectedPaymentMethodId) %}
@@ -38,5 +38,8 @@
         {% sw_include '@MolliePayments/storefront/component/payment/component/pos-fields.html.twig' %}
     {% elseif payment.translated.customFields.mollie_payment_method_name in ['bancomatpay', 'bizum'] %}
         {% sw_include '@MolliePayments/storefront/component/payment/component/phone-fields.html.twig' %}
+    {% elseif payment.technicalName == 'payment_mollie_paypalexpress' %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/ppe-fields.html.twig' %}
     {% endif %}
+
 {% endblock %}

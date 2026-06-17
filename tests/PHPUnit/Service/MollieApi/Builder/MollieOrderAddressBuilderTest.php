@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service\MollieApi\Builder;
+namespace MolliePayments\Shopware\Tests\Service\MollieApi\Builder;
 
 use Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder;
-use MolliePayments\Tests\Traits\OrderTrait;
+use MolliePayments\Shopware\Tests\Traits\OrderTrait;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 

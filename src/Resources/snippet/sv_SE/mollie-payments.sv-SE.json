@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Det uppstod ett problem när ditt kort skulle tas bort",
                 "newCard": "Ny kort",
                 "remove": "Ta bort",
-                "subscriptionBadge": "Prenumeration"
+                "subscriptionBadge": "Prenumeration",
+                "emptyMessage": "Inga sparade kort"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Avbryt",
@@ -72,8 +73,8 @@
             "account": {
                 "btnEditBillingAddress": "redigera faktureringsadress",
                 "btnEditShippingAddress": "redigera fraktadress",
-                "cancelSubscription": "Prenumerationen har avbrutits",
-                "errorCancelSubscription": "Prenumerationen kunde inte avbrytas på grund av ett fel. Vänligen kontakta vår support.",
+                "successCancel": "Prenumerationen har avbrutits",
+                "errorCancel": "Prenumerationen kunde inte avbrytas på grund av ett fel. Vänligen kontakta vår support.",
                 "errorPause": "Det uppstod ett fel när prenumerationen skulle pausas",
                 "errorResume": "Det uppstod ett fel när prenumerationen skulle återupptas",
                 "errorSkip": "Det uppstod ett fel när prenumerationen skulle hoppas över",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Dina senaste prenumerationer:",
                 "orderActionHide": "Dölj",
                 "orderActionView": "Visa",
+                "priceChangeNoticeCancelButton": "Avsluta prenumeration",
+                "priceChangeNoticeCurrentLabel": "Aktuellt pris",
+                "priceChangeNoticeEffectiveLabel": "Gäller från",
+                "priceChangeNoticeHeadline": "Kommande prisändring",
+                "priceChangeNoticeMessage": "Förnyelsepriset för denna prenumeration kommer att ändras. Du kan avsluta när som helst innan det nya priset börjar gälla.",
+                "priceChangeNoticeNewLabel": "Nytt pris",
                 "shippingEqualToBilling": "Samma som faktureringsadress",
                 "successPause": "Din prenumeration har pausats",
                 "successResume": "Din prenumeration kommer nu att återupptas",

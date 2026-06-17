@@ -72,7 +72,7 @@ inputs:
     required: false
   _ZIP_FILE:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
-    default: '~/.build/MolliePayments-e2e.zip'
+    default: '~/.build/MolliePayments.zip'
     required: false
 
 
@@ -89,21 +89,32 @@ runs:
       shell: bash
       run: |
         docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
-        sleep 15
-        # now change the domain of our shop, mollie doesn't work with localhost
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
+        echo "Waiting for Shopware to be ready..."
+        timeout 120 sh -c 'until curl -sk https://${{ inputs._SHOP_DOMAIN }}/api/info > /dev/null 2>&1; do sleep 5; done'
+        echo "Shop is ready."
+        echo "Waiting for MySQL to be ready..."
+        timeout 60 sh -c 'until docker exec shop bash -c "mysqladmin -h 127.0.0.1 -u root -proot ping --silent" > /dev/null 2>&1; do sleep 2; done'
+        echo "MySQL is ready."
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
-
+    - name: Fix Store API Key
+      shell: bash
+      run: |
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel SET access_key='${{ inputs._STORE_API_KEY }}' WHERE id = (SELECT sales_channel_id FROM sales_channel_domain WHERE url = 'https://${{ inputs._SHOP_DOMAIN }}' LIMIT 1);\""
     - name: Update Shopware Config
       shell: bash
       run: |
-        docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
+        #docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "APP_URL=https://${{ inputs._SHOP_DOMAIN }}" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
+        # disable the storefront reverse-proxy HTTP cache: in prod it can serve a
+        # cached anonymous "/account -> login" redirect to an already logged-in
+        # request (SW 6.7), which breaks the storefront login in the e2e suite.
+        docker exec shop bash -c "echo "SHOPWARE_HTTP_CACHE_ENABLED=0" >> /var/www/html/.env" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -113,28 +124,27 @@ runs:
         docker cp ${{ inputs._ZIP_FILE }} shop:/var/www/html/custom/plugins/MolliePayments.zip
         docker exec shop bash -c 'cd /var/www/html/custom/plugins && unzip -qq -o MolliePayments.zip'
 
+    - name: Copy test files into Docker
+      shell: bash
+      run: |
+        docker cp tests/ shop:/var/www/html/custom/plugins/MolliePayments/tests/
+        docker cp config/ shop:/var/www/html/custom/plugins/MolliePayments/config/
+        docker cp makefile shop:/var/www/html/custom/plugins/MolliePayments/makefile
+
     - name: Configure Shopware
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true'
-
-    - name: Legacy fixes
-      if: ${{ startsWith(inputs.SHOPWARE,'6.4') }}
-      shell: bash
-      run: |
-        # latest composer has an issue with php 7.4 where the lock file is not read fully. you see error that shopware/core is not found
-        docker exec -u root shop bash -c 'wget https://getcomposer.org/download/2.2.9/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer'
-        docker exec  shop bash -c 'mkdir -p /var/www/html/var/test/jwt && cp /var/www/html/config/jwt/*.pem /var/www/html/var/test/jwt && chmod 0660 /var/www/html/var/test/jwt/*.pem'
-       
+        docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true' 
+  
 
     - name: Prepare Shop for e2e tests
       shell: bash
       run: |
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:9.* -W' # we need to install phpunit 9 with all dependencies, because of minimum php version 8.0
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
+        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W'
 
     - name: Install Plugin
       shell: bash
@@ -154,12 +164,25 @@ runs:
         docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
         docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsEnabled true'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowPauseResume true'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowSkip true'
+        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowAddressEditing true'
+        # clean settings inheritance
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
+        docker exec shop bash -c 'php bin/console cache:clear'
+
+    - name: Compile Theme
+      shell: bash
+      run: |
+        docker exec shop bash -c 'php bin/console assets:install'
+        docker exec shop bash -c 'php bin/console theme:compile'
         docker exec shop bash -c 'php bin/console cache:clear'
 
     - name: Install Fixtures
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console mollie:fixtures:install --force'
+        docker exec shop bash -c 'php bin/console mollie:fixtures:load'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -172,7 +195,7 @@ runs:
     - name: Integration analyzer
       shell: bash
       run: |
-        docker exec shop bash -c 'php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
 
     - name: Integration tests
       shell: bash
@@ -188,14 +211,6 @@ runs:
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
       run: cd tests/Cypress && make install -B
-
-    - name: Remove deprecated Cypress Tests
-      if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.REMOVE_DEPRECATED_TESTS == 'true' }}
-      shell: bash
-      run: |
-        # SEPA Direct Debit has been completely removed from Mollie. We have to remove that entry from the tests in old Cypress versions
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/e2e/storefront/checkout/checkout-success.cy.js || true
-        sed -i "/key: 'directdebit'/g" $(pwd)/tests/Cypress/cypress/integration/storefront/checkout/checkout-success.spec.js || true
 
     - name: Start Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' && inputs.TESTRAIL == 'false' }}
@@ -226,8 +241,8 @@ runs:
       run: |
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/shopware
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
-        docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware
-        docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache
+        docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware || true
+        docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache || true
 
     - name: Store Cypress Results
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}

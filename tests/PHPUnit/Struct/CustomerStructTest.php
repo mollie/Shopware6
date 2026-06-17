@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Struct;
+namespace MolliePayments\Shopware\Tests\Struct;
 
 use Kiener\MolliePayments\Struct\CustomerStruct;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CustomerStructTest extends TestCase
@@ -23,10 +24,9 @@ class CustomerStructTest extends TestCase
     }
 
     /**
-     * @dataProvider mollieCustomerIdsTestData
-     *
      * @param mixed $testData
      */
+    #[DataProvider('mollieCustomerIdsTestData')]
     public function testGetCustomerId(
         $testData,
         string $profileId,
@@ -40,53 +40,53 @@ class CustomerStructTest extends TestCase
         $this->assertSame($expectedCustomerId, $actualValue);
     }
 
-    public function mollieCustomerIdsTestData()
+    public static function mollieCustomerIdsTestData()
     {
         return [
             'profileId foo, live' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'foo',
                 false,
                 'cst_123',
             ],
             'profileId foo, test' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'foo',
                 true,
                 'cst_321',
             ],
             'profileId bar, live' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'bar',
                 false,
                 'cst_789',
             ],
             'profileId bar, test' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'bar',
                 true,
                 'cst_987',
             ],
             'profileId baz, live' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'baz',
                 false,
                 'cst_456',
             ],
             'profileId baz, test' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'baz',
                 true,
                 'cst_654',
             ],
             'profileId doesn\'t exist, live' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'fizz',
                 false,
                 '',
             ],
             'profileId doesn\'t exist, test' => [
-                $this->customerIds(),
+                self::customerIds(),
                 'fizz',
                 true,
                 '',
@@ -194,7 +194,7 @@ class CustomerStructTest extends TestCase
         $this->assertEquals($expected, $customFields);
     }
 
-    private function customerIds()
+    private static function customerIds()
     {
         return [
             'customer_ids' => [

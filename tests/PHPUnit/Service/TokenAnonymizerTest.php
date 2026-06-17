@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Service;
+namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Service\TokenAnonymizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class TokenAnonymizerTest extends TestCase
@@ -18,9 +19,8 @@ class TokenAnonymizerTest extends TestCase
 
     /**
      * function tests that token is anoymized as expected
-     *
-     * @dataProvider getTestData
      */
+    #[DataProvider('getTestData')]
     public function testAnonymize(string $expected, string $token): void
     {
         $anonymizer = new TokenAnonymizer();
@@ -28,7 +28,7 @@ class TokenAnonymizerTest extends TestCase
         self::assertSame($expected, $anonymizer->anonymize($token));
     }
 
-    public function getTestData(): array
+    public static function getTestData(): array
     {
         return [
             'test that empty string returns empty string' => ['', '   '],

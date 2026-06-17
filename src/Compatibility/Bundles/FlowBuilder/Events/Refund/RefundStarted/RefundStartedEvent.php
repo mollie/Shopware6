@@ -7,17 +7,17 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\OrderDefinition;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Event\BusinessEventInterface;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
 use Shopware\Core\Framework\Event\EventData\ScalarValueType;
+use Shopware\Core\Framework\Event\FlowEventAware;
 use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\OrderAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesChannelAware, BusinessEventInterface
+class RefundStartedEvent extends Event implements OrderAware, MailAware, SalesChannelAware, FlowEventAware
 {
     /**
      * @var OrderEntity

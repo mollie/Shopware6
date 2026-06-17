@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace MolliePayments\Tests\Components\Subscription\DAL\Subscription;
+namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription;
 
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionCollection;
-use Kiener\MolliePayments\Components\Subscription\DAL\Subscription\SubscriptionEntity;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Uuid\Uuid;
 

@@ -93,9 +93,9 @@ context("Order Refunds", () => {
             // -------------------------------------------------------------------------------
 
             // now cancel our pending refund
-            // and make sure that its gone afterwards
+            // status should switch to Canceled, the entry remains visible
             refundManager.cancelPendingRefund();
-            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+            repoRefundManager.getFirstRefundStatusLabel().contains('Canceled');
         })
 
 
@@ -134,9 +134,9 @@ context("Order Refunds", () => {
             // -------------------------------------------------------------------------------
 
             // now cancel our pending refund
-            // and make sure that its gone afterwards
+            // status should switch to Canceled, the entry remains visible
             refundManager.cancelPendingRefund();
-            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+            repoRefundManager.getFirstRefundStatusLabel().contains('Canceled');
         })
 
         it('C139487: Overwrite total amount in full item refund', () => {
@@ -176,57 +176,50 @@ context("Order Refunds", () => {
             // -------------------------------------------------------------------------------
 
             // now cancel our pending refund
-            // and make sure that its gone afterwards
+            // status should switch to Canceled, the entry remains visible
             refundManager.cancelPendingRefund();
-            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+            repoRefundManager.getFirstRefundStatusLabel().contains('Canceled');
         })
 
-        it('C273581: Canceled refunds should not be visible', () => {
+        it('C273581: Canceled refunds remain visible with Canceled status', () => {
 
             beforeEach(device);
 
             createOrderAndOpenAdmin();
 
             const REFUND_DESCRIPTION = 'full refund executed twice with Cypress';
-            const CANCELED_REFUND_STATUS_LABEL = 'mollie-payments.refunds.status.canceled';
+
             // -------------------------------------------------------------------------------
 
-            // open the refund manager
-            // and start a partial refund of 2 EUR
             adminOrders.openRefundManager();
 
-            // check if our button is disabled if
-            // the checkbox for the verification is not enabled
             repoRefundManager.getFullRefundButton().should('be.disabled');
-
-            // check if refund quantity input field is visible
             repoRefundManager.getFirstLineItemQuantityInput().should('be.visible');
 
-            // now start the full refund
+            // first full refund
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
 
-            // verify that our refund now exists
             repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
             repoRefundManager.getFirstRefundPublicDescriptionLabel().contains(REFUND_DESCRIPTION);
 
             // -------------------------------------------------------------------------------
 
-            // now cancel our pending refund
-            // and make sure that its gone afterwards
+            // cancel first refund → entry stays visible with Canceled status
             refundManager.cancelPendingRefund();
+            repoRefundManager.getFirstRefundStatusLabel().contains('Canceled');
 
-
-            // after cancel, the refund input field should be visible again
+            // the refund input fields should still be visible after cancel
             repoRefundManager.getFirstLineItemQuantityInput().scrollIntoView().should('be.visible');
 
-            // now start another full refund
+            // -------------------------------------------------------------------------------
+
+            // second full refund → newest entry should show Pending
             refundManager.fullRefund(REFUND_DESCRIPTION, '');
+            repoRefundManager.getFirstRefundStatusLabel().contains('Pending');
 
-            cy.contains(CANCELED_REFUND_STATUS_LABEL).should('not.exist');
-
-            // second cancel should clear the history
+            // cancel second refund → also becomes Canceled
             refundManager.cancelPendingRefund();
-            cy.contains(REFUND_DESCRIPTION).should('not.exist')
+            repoRefundManager.getFirstRefundStatusLabel().contains('Canceled');
         })
 
     })

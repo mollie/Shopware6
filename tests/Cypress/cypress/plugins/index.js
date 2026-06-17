@@ -20,6 +20,13 @@ const TestRailReporter = require('cypress-testrail');
 
 module.exports = (on, config) => {
 
+    on('task', {
+        log(message) {
+            console.log(message);
+            return null;
+        },
+    });
+
     const customCommand = 'Shopware: ' + config.env.SHOPWARE;
     new TestRailReporter(on, config, customCommand).register();
 
@@ -31,6 +38,7 @@ module.exports = (on, config) => {
     on('before:browser:launch', (browser = {}, launchOptions) => {
         if (browser.name === 'chrome' || browser.name === 'edge') {
             launchOptions.args.push('--disable-features=SameSiteByDefaultCookies')
+            launchOptions.args.push('--ignore-certificate-errors')
             return launchOptions
         }
     })

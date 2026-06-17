@@ -1,6 +1,7 @@
 {% block page_account_mollie_subscriptions_item_overview %}
     <div class="order-wrapper">
         <div class="order-item-header">
+
             <div class="row flex-wrap">
                 {% block page_account_mollie_subscriptions_item_heading %}
                     <h2 class="col-auto order-table-header-heading heading-mollie-subscriptions">
@@ -29,7 +30,7 @@
                         {% block page_account_subscriptions_item_context_menu %}
 
                             {% block page_account_subscriptions_item_context_menu_button %}
-                                <button class="btn dropdown-toggle order-table-header-context-menu"
+                                <button class="btn order-table-header-context-menu btn-light float-end"
                                         type="button"
                                         id="accountOrderDropdown"
                                         data-toggle="dropdown"
@@ -42,8 +43,18 @@
                             {% endblock %}
 
                             {% block page_account_subscriptions_item_context_menu_content %}
-                                <div class="dropdown-menu dropdown-menu-right order-table-header-context-menu-content" aria-labelledby="accountOrderDropdown">
+                                <div class="dropdown-menu dropdown-menu-end order-table-header-context-menu-content" aria-labelledby="accountOrderDropdown">
 
+                                {% set reorderableLineItems = [] %}
+                                {% if subscription.order and subscription.order.lineItems %}
+                                    {% for lineItem in subscription.order.lineItems %}
+                                        {% if lineItem.type and lineItem.referencedId %}
+                                            {% set reorderableLineItems = reorderableLineItems|merge([lineItem]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if page.allowReorder and reorderableLineItems|length > 0 %}
                                 {% block page_account_subscriptions_item_context_menu_reorder %}
                                     {% set action %}
                                         {% block page_account_subscriptions_item_context_menu_reorder_form_action %}
@@ -70,41 +81,44 @@
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_line_items_input %}
-                                                {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][id]"
-                                                           value="{{ subscription.productId }}">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][referencedId]"
-                                                           value="{{ subscription.productId }}">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][type]"
-                                                           value="product">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][stackable]"
-                                                           value="1">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][removable]"
-                                                           value="1">
-                                                    <input type="hidden"
-                                                           name="lineItems[{{ subscription.productId }}][quantity]"
-                                                           value="1">
-                                                {% endblock %}
+                                                {% for lineItem in reorderableLineItems %}
+                                                    {% block page_account_subscriptions_item_context_menu_reorder_form_line_item_input %}
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][id]"
+                                                               value="{{ lineItem.referencedId }}">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][referencedId]"
+                                                               value="{{ lineItem.referencedId }}">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][type]"
+                                                               value="{{ lineItem.type }}">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][stackable]"
+                                                               value="1">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][removable]"
+                                                               value="1">
+                                                        <input type="hidden"
+                                                               name="lineItems[{{ lineItem.referencedId }}][quantity]"
+                                                               value="{{ lineItem.quantity }}">
+                                                    {% endblock %}
+                                                {% endfor %}
                                             {% endblock %}
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_button %}
-                                                <button class="order-table-header-context-menu-content-link" type="submit">
+                                                <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                     {{ "molliePayments.subscriptions.account.mollieSubscriptionContextMenuReorder"|trans|sw_sanitize }}
                                                 </button>
                                             {% endblock %}
                                         </form>
                                     {% endblock %}
                                 {% endblock %}
+                                {% endif %}
 
-                                {% if(subscription.isUpdatePaymentAllowed) %}
+                                {% if page.allowUpdatePayment and subscription.isUpdatePaymentAllowed %}
                                     {% block page_account_subscriptions_item_context_menu_update_payment %}
                                         {% block page_account_subscriptions_item_context_menu_update_payment_form %}
-                                            <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'swSubscriptionId': subscription.id }) }}"
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.payment.update', { 'subscriptionId': subscription.id }) }}"
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
@@ -116,7 +130,7 @@
                                                 {% endif %}
 
                                                 {% block page_account_subscriptions_item_context_menu_update_payment_form_button %}
-                                                    <button class="order-table-header-context-menu-content-link" type="submit">
+                                                    <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                         {{ "molliePayments.subscriptions.account.mollieSubscriptionUpdatePayment"|trans|sw_sanitize }}
                                                     </button>
                                                 {% endblock %}
@@ -129,7 +143,7 @@
                                     {% if(subscription.isPauseAllowed) %}
                                         {% block page_account_subscriptions_item_context_menu_pause %}
                                             {% block page_account_subscriptions_item_context_menu_pause_form %}
-                                                <form action="{{ path('frontend.account.mollie.subscriptions.pause', { 'swSubscriptionId': subscription.id }) }}"
+                                                <form action="{{ path('frontend.account.mollie.subscriptions.pause', { 'subscriptionId': subscription.id }) }}"
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
@@ -141,7 +155,7 @@
                                                     {% endif %}
 
                                                     {% block page_account_subscriptions_item_context_menu_pause_form_button %}
-                                                        <button class="order-table-header-context-menu-content-link" type="submit">
+                                                        <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                             {{ "molliePayments.subscriptions.account.mollieSubscriptionPause"|trans|sw_sanitize }}
                                                         </button>
                                                     {% endblock %}
@@ -152,7 +166,7 @@
                                     {% if(subscription.isResumeAllowed) %}
                                         {% block page_account_subscriptions_item_context_menu_resume %}
                                             {% block page_account_subscriptions_item_context_menu_resume_form %}
-                                                <form action="{{ path('frontend.account.mollie.subscriptions.resume', { 'swSubscriptionId': subscription.id }) }}"
+                                                <form action="{{ path('frontend.account.mollie.subscriptions.resume', { 'subscriptionId': subscription.id }) }}"
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
@@ -164,7 +178,7 @@
                                                     {% endif %}
 
                                                     {% block page_account_subscriptions_item_context_menu_resume_form_button %}
-                                                        <button class="order-table-header-context-menu-content-link" type="submit">
+                                                        <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                             {{ "molliePayments.subscriptions.account.mollieSubscriptionResume"|trans|sw_sanitize }}
                                                         </button>
                                                     {% endblock %}
@@ -177,7 +191,7 @@
                                 {% if page.allowSkip and subscription.isSkipAllowed %}
                                     {% block page_account_subscriptions_item_context_menu_skip %}
                                         {% block page_account_subscriptions_item_context_menu_skip_form %}
-                                            <form action="{{ path('frontend.account.mollie.subscriptions.skip', { 'swSubscriptionId': subscription.id }) }}"
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.skip', { 'subscriptionId': subscription.id }) }}"
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
@@ -189,7 +203,7 @@
                                                 {% endif %}
 
                                                 {% block page_account_subscriptions_item_context_menu_skip_form_button %}
-                                                    <button class="order-table-header-context-menu-content-link" type="submit">
+                                                    <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                         {{ "molliePayments.subscriptions.account.mollieSubscriptionSkip"|trans|sw_sanitize }}
                                                     </button>
                                                 {% endblock %}
@@ -221,19 +235,8 @@
                                                     {% endblock %}
                                                 {% endif %}
 
-                                                {% block page_account_subscriptions_item_context_menu_cancel_form_line_items_input %}
-                                                    {% block page_account_subscriptions_item_context_menu_cancel_form_line_item_input %}
-                                                        <input type="hidden"
-                                                               name="mollie[subscription_id]"
-                                                               value="{{ subscription.subscriptionId }}">
-                                                        <input type="hidden"
-                                                               name="mollie[customer_id]"
-                                                               value="{{ subscription.mollieCustomerId }}">
-                                                    {% endblock %}
-                                                {% endblock %}
-
                                                 {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
-                                                    <button class="order-table-header-context-menu-content-link btn-mollie-subscription-cancel"
+                                                    <button class="dropdown-item order-table-header-context-menu-content-link btn-mollie-subscription-cancel"
                                                             type="submit">{{ "molliePayments.subscriptions.account.mollieSubscriptionCancel"|trans|sw_sanitize }}</button>
                                                 {% endblock %}
                                             </form>
@@ -264,6 +267,63 @@
                                 <span class="order-table-body-value d-block">{{ "molliePayments.subscriptions.account.mollieSubscriptionCancelUntil"|trans|sw_sanitize }} {{ subscription.cancelUntil| format_date('short', locale=app.request.locale) }}</span>
                             {% endblock %}
                         </div>
+                    {% endblock %}
+
+                    {% block page_account_mollie_subscriptions_item_price_update_notice %}
+
+                        {% if subscription.priceUpdateState == 'notified' and subscription.nextNotifiedPrice is not null and subscription.notifiedAt is not null %}
+                            {% set effectiveDate = subscription.notifiedAt|date_modify('+' ~ page.priceUpdateNoticeDays ~ ' day') %}
+                            <div class="col-12 px-0 subscription-price-update-notice"
+                                 data-test="subscription-price-update-notice">
+                                <div class="alert alert-warning" role="alert">
+                                    {% block page_account_mollie_subscriptions_item_price_update_notice_title %}
+                                        <h4 class="alert-heading">
+                                            {{ "molliePayments.subscriptions.account.priceChangeNoticeHeadline"|trans|sw_sanitize }}
+                                        </h4>
+                                    {% endblock %}
+
+                                    {% block page_account_mollie_subscriptions_item_price_update_notice_message %}
+                                        <p class="mb-2">
+                                            {{ "molliePayments.subscriptions.account.priceChangeNoticeMessage"|trans|sw_sanitize }}
+                                        </p>
+                                    {% endblock %}
+
+                                    {% block page_account_mollie_subscriptions_item_price_update_notice_details %}
+                                        <ul class="list-unstyled mb-3">
+                                            <li>
+                                                <strong>{{ "molliePayments.subscriptions.account.priceChangeNoticeCurrentLabel"|trans|sw_sanitize }}:</strong>
+                                                <span data-test="subscription-price-update-current">{{ subscription.amount|currency(currencyIsoCode) }}</span>
+                                            </li>
+                                            <li>
+                                                <strong>{{ "molliePayments.subscriptions.account.priceChangeNoticeNewLabel"|trans|sw_sanitize }}:</strong>
+                                                <span data-test="subscription-price-update-new">{{ subscription.nextNotifiedPrice|currency(currencyIsoCode) }}</span>
+                                            </li>
+                                            <li>
+                                                <strong>{{ "molliePayments.subscriptions.account.priceChangeNoticeEffectiveLabel"|trans|sw_sanitize }}:</strong>
+                                                <span data-test="subscription-price-update-effective">{{ effectiveDate|format_date('short', locale=app.request.locale) }}</span>
+                                            </li>
+                                        </ul>
+                                    {% endblock %}
+
+                                    {% if subscription.isCancellationAllowed %}
+                                        {% block page_account_mollie_subscriptions_item_price_update_notice_cancel %}
+                                            <form action="{{ path('frontend.account.mollie.subscriptions.cancel', { 'subscriptionId': subscription.id }) }}"
+                                                  method="post"
+                                                  data-form-csrf-handler="true">
+                                                {% if mollie_csrf_available %}
+                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
+                                                {% endif %}
+                                                <button class="btn btn-primary btn-mollie-subscription-price-update-cancel"
+                                                        type="submit"
+                                                        data-test="btn-subscription-price-update-cancel">
+                                                    {{ "molliePayments.subscriptions.account.priceChangeNoticeCancelButton"|trans|sw_sanitize }}
+                                                </button>
+                                            </form>
+                                        {% endblock %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endblock %}
 
                     {% block page_account_mollie_subscriptions_order_table_toggle_button %}
