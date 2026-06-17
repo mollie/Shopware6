@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Refund\Controller;
@@ -224,6 +225,7 @@ final class RefundController extends AbstractController
         if (! $dalRefunds instanceof RefundCollection) {
             return $mollieRefunds;
         }
+
         /** @var RefundEntity $dalRefund */
         foreach ($dalRefunds as $dalRefund) {
             $mollieRefundId = (string) $dalRefund->getMollieRefundId();
