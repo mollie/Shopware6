@@ -7,5 +7,7 @@ use GuzzleHttp\Client;
 
 interface ClientFactoryInterface
 {
-    public function create(?string $salesChannelId = null,bool $forceLive = false): Client;
+    public function create(?string $salesChannelId = null, bool $forceLive = false): Client;
+
+    public function createForKey(string $apiKey): Client;
 }

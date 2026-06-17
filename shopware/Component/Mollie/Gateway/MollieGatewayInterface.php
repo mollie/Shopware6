@@ -35,6 +35,8 @@ interface MollieGatewayInterface
 
     public function getCurrentProfile(?string $salesChannelId = null): Profile;
 
+    public function getProfileForApiKey(string $apiKey): Profile;
+
     public function createCustomer(CustomerEntity $customer,string $salesChannelId): Customer;
 
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection;
