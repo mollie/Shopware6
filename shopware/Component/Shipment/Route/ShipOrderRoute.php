@@ -185,6 +185,11 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         $this->logger->info('ShipOrderRoute: Mollie createCapture response', $logContext);
 
+        if ($fullyShipped) {
+            $this->logger->info('ShipOrderRoute: all items shipped, releasing authorization (Payments API)', $logContext);
+            $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
+        }
+
         return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $fullyShipped, $context);
     }
 
@@ -429,7 +434,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
     }
 
     /**
-     * Checks whether all order line items are fully shipped after the current batch.
+     * Checks whether all order line items are fully handled (shipped or cancelled) after the current batch.
      * Items in $lineUpserts carry the updated shipped quantity; all others are read from custom fields.
      *
      * @param list<array{id: string, customFields: array<string, mixed>}> $lineUpserts
@@ -446,10 +451,11 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
                 continue;
             }
 
-            $shipped = $upsertQuantities[$lineItem->getId()]
-                ?? (int) (($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0);
+            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+            $shipped = $upsertQuantities[$lineItem->getId()] ?? (int) ($fields['quantity'] ?? 0);
+            $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
 
-            if ($shipped < $lineItem->getQuantity()) {
+            if (($shipped + $cancelled) < $lineItem->getQuantity()) {
                 return false;
             }
         }

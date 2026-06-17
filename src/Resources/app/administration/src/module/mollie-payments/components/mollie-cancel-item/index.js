@@ -31,10 +31,8 @@ Component.register('mollie-cancel-item', {
             this.isLoading = true;
 
             this.MolliePaymentsItemCancelService.cancel({
-                mollieOrderId: this.item.mollieOrderId,
-                mollieLineId: this.item.mollieId,
                 shopwareLineId: this.item.shopwareItemId,
-                canceledQuantity: this.canceledQuantity,
+                quantity: this.canceledQuantity,
                 resetStock: this.resetStock,
             })
                 .then((response) => {

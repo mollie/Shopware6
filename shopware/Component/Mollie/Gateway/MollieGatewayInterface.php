@@ -50,4 +50,8 @@ interface MollieGatewayInterface
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture;
 
     public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment;
+
+    public function cancelOrderLines(string $mollieOrderId, string $mollieLineId, int $quantity, string $orderNumber, string $salesChannelId): void;
+
+    public function releaseAuthorization(string $paymentId, string $orderNumber, string $salesChannelId): void;
 }

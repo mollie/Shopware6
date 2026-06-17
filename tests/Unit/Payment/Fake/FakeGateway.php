@@ -194,4 +194,12 @@ final class FakeGateway implements MollieGatewayInterface
 
         return new Order($mollieOrderId, '');
     }
+
+    public function cancelOrderLines(string $mollieOrderId, string $mollieLineId, int $quantity, string $orderNumber, string $salesChannelId): void
+    {
+    }
+
+    public function releaseAuthorization(string $paymentId, string $orderNumber, string $salesChannelId): void
+    {
+    }
 }

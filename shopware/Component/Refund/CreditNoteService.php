@@ -82,7 +82,7 @@ final class CreditNoteService
             return;
         }
 
-        $toDelete = array_map(static function (string $id) {
+        $toDelete = array_map(function (string $id) {
             return ['id' => $id];
         }, $lineItems->getIds());
 

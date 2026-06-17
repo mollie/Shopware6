@@ -75,15 +75,8 @@
             <argument type="service" id="Nyholm\Psr7\Factory\Psr17Factory"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Components\CancelManager\CancelItemFacade">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Stock\StockManager"/>
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker">
+<service id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker">
             <argument type="service" id="customer.repository"/>
             <argument type="service" id="customer_address.repository"/>
         </service>

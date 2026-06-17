@@ -386,6 +386,43 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
+    public function cancelOrderLines(string $mollieOrderId, string $mollieLineId, int $quantity, string $orderNumber, string $salesChannelId): void
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $client->delete('orders/' . $mollieOrderId . '/lines', [
+                'json' => [
+                    'lines' => [['id' => $mollieLineId, 'quantity' => $quantity]],
+                ],
+            ]);
+
+            $this->logger->info('Order lines cancelled', [
+                'orderNumber' => $orderNumber,
+                'mollieOrderId' => $mollieOrderId,
+                'mollieLineId' => $mollieLineId,
+                'quantity' => $quantity,
+            ]);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
+    public function releaseAuthorization(string $paymentId, string $orderNumber, string $salesChannelId): void
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $client->post('payments/' . $paymentId . '/release-authorization');
+
+            $this->logger->info('Authorization released', [
+                'paymentId' => $paymentId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
     private function getPaymentByMollieOrderId(string $mollieOrderId, string $orderNumber, string $salesChannelId): Payment
     {
         try {

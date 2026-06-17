@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Shipment\CancelItemEvent;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -36,6 +37,7 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
         return [
             PaymentFinalizeEvent::class => 'handleFinalizeEvent',
             OrderShippedEvent::class => 'onOrderShipped',
+            CancelItemEvent::class => 'onCancelItem',
         ];
     }
 
@@ -60,6 +62,18 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
             return;
         }
         $this->logger->warning('Executing Webhook in Dev mode');
+        sleep(2);
+        $this->webhookRoute->notify($event->getTransactionId(), $event->getContext());
+    }
+
+    public function onCancelItem(CancelItemEvent $event): void
+    {
+        $environmentSettings = $this->settingsService->getEnvironmentSettings();
+
+        if (! $environmentSettings->isDevMode() && ! $environmentSettings->isCypressMode()) {
+            return;
+        }
+        $this->logger->warning('Executing Webhook in Dev mode after cancel');
         sleep(2);
         $this->webhookRoute->notify($event->getTransactionId(), $event->getContext());
     }

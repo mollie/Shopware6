@@ -16,6 +16,13 @@ export default class OrderDetailsRepository {
         return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
     }
 
+    getPaymentStatusTop() {
+        if (shopware.isVersionGreaterEqual('6.5')) {
+            return cy.get('.sw-order-general-info__order-state-payment .sw-block-field__block .sw-single-select__selection-text');
+        }
+        return cy.get(':nth-child(1) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
+    }
+
     /**
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}

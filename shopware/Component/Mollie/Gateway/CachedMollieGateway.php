@@ -150,6 +150,16 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->decorated->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
     }
 
+    public function cancelOrderLines(string $mollieOrderId, string $mollieLineId, int $quantity, string $orderNumber, string $salesChannelId): void
+    {
+        $this->decorated->cancelOrderLines($mollieOrderId, $mollieLineId, $quantity, $orderNumber, $salesChannelId);
+    }
+
+    public function releaseAuthorization(string $paymentId, string $orderNumber, string $salesChannelId): void
+    {
+        $this->decorated->releaseAuthorization($paymentId, $orderNumber, $salesChannelId);
+    }
+
     public function clearCache(): void
     {
         $this->paymentIdPayments = [];

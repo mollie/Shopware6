@@ -18,6 +18,8 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Mollie;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
@@ -64,6 +66,8 @@ final class OrderAdminController extends AbstractController
             ->setLimit(1)
         ;
         $criteria->addAssociation('mollieSubscriptions');
+        $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('deliveries');
 
         /** @var null|OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -119,9 +123,9 @@ final class OrderAdminController extends AbstractController
             $this->buildRefundManagerConfig($salesChannelId),
             new ShippingData(
                 $this->buildShippingTotal($mollieOrder),
-                $this->buildShippingStatus($mollieOrderId, $mollieOrder),
+                $this->buildShippingStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $order->getDeliveries()),
             ),
-            $this->buildCancelStatus($mollieOrderId, $mollieOrder),
+            $this->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems()),
         ));
     }
 
@@ -141,10 +145,29 @@ final class OrderAdminController extends AbstractController
     /**
      * @return array<string, CancelStatusEntry>
      */
-    private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder): array
+    private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems): array
     {
         if ($mollieOrder === null) {
-            return [];
+            if ($lineItems === null) {
+                return [];
+            }
+
+            $result = [];
+            foreach ($lineItems as $lineItem) {
+                $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+                $shipped = (int) ($fields['quantity'] ?? 0);
+                $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
+                $cancelable = max(0, $lineItem->getQuantity() - $shipped - $cancelled);
+                $result[$lineItem->getId()] = new CancelStatusEntry(
+                    '',
+                    $lineItem->getId(),
+                    $cancelable > 0,
+                    $cancelable,
+                    $cancelled,
+                );
+            }
+
+            return $result;
         }
 
         $result = [];
@@ -168,10 +191,43 @@ final class OrderAdminController extends AbstractController
     /**
      * @return array<string, ShippingStatusEntry>
      */
-    private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder): array
+    private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems, ?OrderDeliveryCollection $deliveries = null): array
     {
         if ($mollieOrder === null) {
-            return [];
+            if ($lineItems === null) {
+                return [];
+            }
+
+            $result = [];
+            foreach ($lineItems as $lineItem) {
+                $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+                $shippedQty = (int) ($fields['quantity'] ?? 0);
+                $cancelledQty = (int) ($fields['cancelled_quantity'] ?? 0);
+                $shippableQty = max(0, $lineItem->getQuantity() - $shippedQty - $cancelledQty);
+                $result[$lineItem->getId()] = new ShippingStatusEntry(
+                    '',
+                    '',
+                    $shippableQty > 0,
+                    $shippableQty,
+                    $shippedQty,
+                );
+            }
+
+            foreach ($deliveries ?? [] as $delivery) {
+                $fields = $delivery->getCustomFields()[Mollie::EXTENSION] ?? [];
+                $shippedQty = (int) ($fields['quantity'] ?? 0);
+                $totalQty = $delivery->getShippingCosts()->getQuantity();
+                $shippableQty = max(0, $totalQty - $shippedQty);
+                $result[$delivery->getId()] = new ShippingStatusEntry(
+                    '',
+                    '',
+                    $shippableQty > 0,
+                    $shippableQty,
+                    $shippedQty,
+                );
+            }
+
+            return $result;
         }
 
         $result = [];

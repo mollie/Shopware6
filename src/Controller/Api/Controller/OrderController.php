@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\Controller;
 
-use Kiener\MolliePayments\Controller\Api\Order\CancelLineController;
 use Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase;
 use Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase;
@@ -40,11 +39,6 @@ class OrderController extends AbstractController
     private $orderController;
 
     /**
-     * @var CancelLineController
-     */
-    private $cancelLineController;
-
-    /**
      * @var EntityRepository<EntityCollection<OrderEntity>>
      */
     private $orderRepository;
@@ -57,14 +51,12 @@ class OrderController extends AbstractController
         ConfigControllerBase $baseController,
         ShippingControllerBase $shippingController,
         OrderControllerBase $orderController,
-        CancelLineController $cancelLineController,
         $orderRepository
     ) {
         $this->baseController = $baseController;
         $this->shippingController = $shippingController;
         $this->requestBagFactory = $requestBagFactory;
         $this->orderController = $orderController;
-        $this->cancelLineController = $cancelLineController;
         $this->orderRepository = $orderRepository;
     }
 
@@ -83,13 +75,11 @@ class OrderController extends AbstractController
         $config = $this->baseController->getRefundManagerConfig($request, $context);
         $shipping = $this->shippingController->total($this->requestBagFactory->createForShipping($request), $context);
         $payment = $this->orderController->paymentUrl($request, $context);
-        $cancelStatus = $this->cancelLineController->statusAction($request, $context);
 
         $result = [
             'config' => $config->getContent(),
             'shipping' => $shipping->getContent(),
             'payment' => $payment->getContent(),
-            'cancelStatus' => $cancelStatus->getContent(),
         ];
 
         foreach ($result as &$item) {
