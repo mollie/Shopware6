@@ -173,6 +173,19 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
+    public function getProfileForApiKey(string $apiKey): Profile
+    {
+        try {
+            $client = $this->clientFactory->createForKey($apiKey);
+            $response = $client->get('profiles/me');
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            return Profile::fromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
     public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer
     {
         try {

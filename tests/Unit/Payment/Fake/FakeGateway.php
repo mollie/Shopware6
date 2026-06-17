@@ -39,6 +39,9 @@ final class FakeGateway implements MollieGatewayInterface
     private ?Order $order = null;
     private bool $throwOnGetOrder = false;
 
+    /** @var list<string> */
+    private array $validApiKeys = [];
+
     public function __construct(private string $checkoutUrl = '',private ?Payment $payment = null)
     {
         if ($payment === null) {
@@ -99,9 +102,23 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->payment;
     }
 
+    public function withValidApiKey(string $key): void
+    {
+        $this->validApiKeys[] = $key;
+    }
+
     public function getCurrentProfile(?string $salesChannelId = null): Profile
     {
-        return new Profile('fake_profile', 'fake', 'fake');
+        return new Profile('fake_profile', 'fake', 'fake@mollie.test');
+    }
+
+    public function getProfileForApiKey(string $apiKey): Profile
+    {
+        if (! in_array($apiKey, $this->validApiKeys, true)) {
+            throw new \RuntimeException('Invalid API key');
+        }
+
+        return new Profile('fake_profile', 'fake', 'fake@mollie.test');
     }
 
     public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer

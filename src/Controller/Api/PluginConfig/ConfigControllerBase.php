@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\PluginConfig;
 
-use Exception;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\MollieRefundConfigException;
 use Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService;
-use Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Administration\Snippet\SnippetFinderInterface;
@@ -18,10 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ConfigControllerBase extends AbstractController
 {
-    /**
-     * @var ApiKeyValidator
-     */
-    protected $apiKeyValidator;
     /**
      * @var SettingsService
      */
@@ -40,29 +34,11 @@ class ConfigControllerBase extends AbstractController
     public function __construct(
         SettingsService $settings,
         SnippetFinderInterface $snippetFinder,
-        ApiKeyValidator $apiKeyValidator,
         MollieRefundConfigService $configMollieRefundService
     ) {
         $this->settings = $settings;
         $this->snippetFinder = $snippetFinder;
-        $this->apiKeyValidator = $apiKeyValidator;
         $this->configMollieRefundService = $configMollieRefundService;
-    }
-
-    public function testApiKeys(Request $request): JsonResponse
-    {
-        $liveApiKey = $request->get('liveApiKey');
-        $testApiKey = $request->get('testApiKey');
-
-        return $this->testApiKeysAction($liveApiKey, $testApiKey);
-    }
-
-    public function testApiKeys64(Request $request): JsonResponse
-    {
-        $liveApiKey = $request->get('liveApiKey');
-        $testApiKey = $request->get('testApiKey');
-
-        return $this->testApiKeysAction($liveApiKey, $testApiKey);
     }
 
     /**
@@ -138,42 +114,6 @@ class ConfigControllerBase extends AbstractController
     public function getRefundManagerConfigLegacy(Request $request, Context $context): JsonResponse
     {
         return $this->getRefundManagerConfig($request, $context);
-    }
-
-    private function testApiKeysAction(string $liveApiKey, string $testApiKey): JsonResponse
-    {
-        $keys = [
-            [
-                'key' => $liveApiKey,
-                'mode' => 'live',
-            ],
-            [
-                'key' => $testApiKey,
-                'mode' => 'test',
-            ],
-        ];
-
-        $results = [];
-
-        foreach ($keys as $key) {
-            $result = [
-                'key' => $key['key'],
-                'mode' => $key['mode'],
-                'valid' => false,
-            ];
-
-            try {
-                $result['valid'] = $this->apiKeyValidator->validate($key['key']);
-            } catch (\Exception $e) {
-                // No need to handle this exception
-            }
-
-            $results[] = $result;
-        }
-
-        return new JsonResponse([
-            'results' => $results,
-        ]);
     }
 
     private function getAdminSnippet(string $snippetName, string $locale): string

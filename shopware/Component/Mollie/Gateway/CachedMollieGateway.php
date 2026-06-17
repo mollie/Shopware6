@@ -59,6 +59,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->profiles[$cacheKey];
     }
 
+    public function getProfileForApiKey(string $apiKey): Profile
+    {
+        return $this->decorated->getProfileForApiKey($apiKey);
+    }
+
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
         return $this->decorated->createPayment($molliePayment, $salesChannelId);
