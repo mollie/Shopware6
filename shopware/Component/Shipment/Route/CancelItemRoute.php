@@ -62,7 +62,8 @@ final class CancelItemRoute
         $criteria = new Criteria([$shopwareLineId]);
         $criteria->getAssociation('order.transactions')
             ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->setLimit(1);
+            ->setLimit(1)
+        ;
         $criteria->addAssociation('order.lineItems');
 
         $lineItem = $this->orderLineRepository->search($criteria, $context)->first();
