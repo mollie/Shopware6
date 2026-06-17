@@ -35,9 +35,12 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class Pay implements PayInterface
 {
+    public const SESSION_KEY_PENDING_ORDER = 'mollie_pending_order_id';
+
     public function __construct(
         #[Autowire(service: TransactionService::class)]
         private TransactionServiceInterface $transactionService,
@@ -51,6 +54,8 @@ final class Pay implements PayInterface
         private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: 'request_stack')]
+        private RequestStack $requestStack,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -67,6 +72,9 @@ final class Pay implements PayInterface
         $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
+        $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
+        $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
+
         $transaction = $transactionDataStruct->getTransaction();
         $orderNumber = (string) $order->getOrderNumber();
         $salesChannel = $transactionDataStruct->getSalesChannel();
