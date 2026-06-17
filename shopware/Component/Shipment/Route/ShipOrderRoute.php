@@ -185,8 +185,8 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         $this->logger->info('ShipOrderRoute: Mollie createCapture response', $logContext);
 
-        if ($fullyShipped) {
-            $this->logger->info('ShipOrderRoute: all items shipped, releasing authorization (Payments API)', $logContext);
+        if ($fullyShipped && $this->hasCancelledItems($lineItems)) {
+            $this->logger->info('ShipOrderRoute: all items handled with cancellations, releasing authorization (Payments API)', $logContext);
             $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
         }
 
@@ -431,6 +431,18 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
             return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
         });
+    }
+
+    private function hasCancelledItems(OrderLineItemCollection $lineItems): bool
+    {
+        foreach ($lineItems as $lineItem) {
+            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+            if ((int) ($fields['cancelled_quantity'] ?? 0) > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
