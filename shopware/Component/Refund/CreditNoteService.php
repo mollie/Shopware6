@@ -82,9 +82,12 @@ final class CreditNoteService
             return;
         }
 
-        $toDelete = array_map(function (string $id) {
-            return ['id' => $id];
-        }, $lineItems->getIds());
+        $toDelete = [];
+        $ids = $lineItems->getIds();
+
+        foreach ($ids as $id) {
+            $toDelete[] = ['id' => $id];
+        }
 
         $this->orderLineItemRepository->delete($toDelete, $context);
 
