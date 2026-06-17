@@ -22,25 +22,6 @@ const testDevices = [devices.getFirstDevice()];
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
-let beforeAllCalled = false;
-
-function beforeEach(device) {
-    cy.wrap(null).then(() => {
-        if (!beforeAllCalled) {
-            const shopConfig = new ShopConfiguration();
-            const pluginConfig = new PluginConfiguration();
-
-            pluginConfig.setMollieFailureMode(true);
-
-            configAction.configureEnvironment(shopConfig, pluginConfig);
-
-            beforeAllCalled = true;
-        }
-        session.resetBrowserSession();
-        devices.setDevice(device);
-    });
-}
-
 
 context('Active Payment Methods', () => {
 
@@ -50,16 +31,30 @@ context('Active Payment Methods', () => {
 
             it('C3996: Mollie Payment Methods show TEST MODE @core', () => {
 
-                beforeEach(device);
+                cy.wrap(null).then(() => {
+                    const shopConfig = new ShopConfiguration();
+                    const pluginConfig = new PluginConfiguration();
+
+                    pluginConfig.setMollieFailureMode(true);
+                    configAction.configureEnvironment(shopConfig, pluginConfig);
+
+                    session.resetBrowserSession();
+                    devices.setDevice(device);
+                });
 
                 scenarioDummyBasket.execute();
+
+                // make sure the confirm page is fully rendered before we
+                // probe for the Test-mode label - in CI the confirm template
+                // can take longer than the default command timeout
+                cy.get('#confirmFormSubmit', { timeout: 30000 }).should('be.visible');
 
                 paymentAction.showPaymentMethods();
 
                 // yes we require test mode, but this is
                 // the only chance to see if the plugin is being used, because
                 // every merchant might have different payment methods ;)
-                cy.contains('(Test mode)');
+                cy.contains('(Test mode)', { timeout: 30000 }).should('be.visible');
             })
         })
     })
@@ -73,7 +68,16 @@ context('Deprecated Payment Methods', () => {
 
             it('C38332: ING Home Pay must not exist @core', () => {
 
-                beforeEach(device);
+                devices.setDevice(device);
+
+                const shopConfig = new ShopConfiguration();
+                const pluginConfig = new PluginConfiguration();
+
+                pluginConfig.setMollieFailureMode(true);
+
+                configAction.configureEnvironment(shopConfig, pluginConfig);
+
+                session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();
 
@@ -84,7 +88,16 @@ context('Deprecated Payment Methods', () => {
 
             it('C38333: SEPA Direct Debit must not exist @core', () => {
 
-                beforeEach(device);
+                devices.setDevice(device);
+
+                const shopConfig = new ShopConfiguration();
+                const pluginConfig = new PluginConfiguration();
+
+                pluginConfig.setMollieFailureMode(true);
+
+                configAction.configureEnvironment(shopConfig, pluginConfig);
+
+                session.resetBrowserSession();
 
                 scenarioDummyBasket.execute();
 
