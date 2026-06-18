@@ -12,7 +12,7 @@
         <title lang="nb-NO"> </title>
         <title lang="pl-PL"> </title>
         <title lang="cs-CZ"> </title>
-        <title lang="sl-SL"> </title>
+        <title lang="sl-SI"> </title>
         <title lang="hu-HU"> </title>
         <title lang="fi-FI"> </title>
         <title lang="da-DK"> </title>
@@ -40,7 +40,7 @@
         <title lang="nb-NO">API</title>
         <title lang="pl-PL">API</title>
         <title lang="cs-CZ">API</title>
-        <title lang="sl-SL">API</title>
+        <title lang="sl-SI">API</title>
         <title lang="hu-HU">API</title>
         <title lang="fi-FI">API</title>
         <title lang="da-DK">API</title>
@@ -66,7 +66,7 @@
             <label lang="nb-NO">Aktiv nøkkel</label>
             <label lang="pl-PL">Live Klucz API</label>
             <label lang="cs-CZ">Live klíč</label>
-            <label lang="sl-SL">Live Key</label>
+            <label lang="sl-SI">Live Key</label>
             <label lang="hu-HU">Élő kulcs</label>
             <label lang="fi-FI">Live Avain</label>
             <label lang="da-DK">Live nøgle</label>
@@ -92,7 +92,7 @@
             <label lang="nb-NO">Testnøkkel</label>
             <label lang="pl-PL">Testowy Klucz API</label>
             <label lang="cs-CZ">Testovací Klíč</label>
-            <label lang="sl-SL">Testni ključ</label>
+            <label lang="sl-SI">Testni ključ</label>
             <label lang="hu-HU">Teszt kulcs</label>
             <label lang="fi-FI">Test Avain</label>
             <label lang="da-DK">Testnøgle</label>
@@ -117,7 +117,7 @@
             <label lang="nb-NO">Testmodus</label>
             <label lang="pl-PL">Tryb testowy</label>
             <label lang="cs-CZ">Testovací režim</label>
-            <label lang="sl-SL">Testni način</label>
+            <label lang="sl-SI">Testni način</label>
             <label lang="hu-HU">Teszt üzemmód</label>
             <label lang="fi-FI">Testitila</label>
             <label lang="da-DK">Testtilstand</label>
@@ -140,7 +140,7 @@
             <helpText lang="nb-NO">Aktiverer testmodus med Mollie Sandbox betalingsside. Butikkfronten vil også vise (Testmodus) ved siden av navnene på betalingsmetodene.</helpText>
             <helpText lang="pl-PL">Ta opcja włącza tryb testowy z użyciem strony płatności Mollie Sandbox. W widoku sklepu obok nazw metod płatności będzie wyświetlana informacja "(Tryb testowy)".</helpText>
             <helpText lang="cs-CZ">Aktivuje testovací režim s platební stránkou Mollie Sandbox. V obchodě se vedle názvů platebních metod také zobrazí označení (Testovací režim).</helpText>
-            <helpText lang="sl-SL">Omogoči testni način z Mollie Sandbox stranjo za plačilo. Trgovina bo prav tako prikazala (Testni način) poleg načinov plačila.</helpText>
+            <helpText lang="sl-SI">Omogoči testni način z Mollie Sandbox stranjo za plačilo. Trgovina bo prav tako prikazala (Testni način) poleg načinov plačila.</helpText>
             <helpText lang="hu-HU">Engedélyezi a teszt üzemmódot a Mollie Sandbox fizetési oldalon. Az áruház is megjeleníti a (Teszt üzemmód) feliratot a fizetési módok neve mellett.</helpText>
             <helpText lang="fi-FI">Ottaa käyttöön testitilan Mollie Sandbox -maksusivulla. Kaupanjulkisivu näkyy myös (testitilassa) maksutapojen nimien vieressä.</helpText>
             <helpText lang="da-DK">Aktiverer testtilstanden med Mollie Sandbox betalingsside. Butikken vil også vise (Testtilstand) ved siden af betalingsmetodenavne.</helpText>
@@ -168,7 +168,7 @@
         <title lang="nb-NO">Logger</title>
         <title lang="pl-PL">Logger</title>
         <title lang="cs-CZ">Logger</title>
-        <title lang="sl-SL">Logger</title>
+        <title lang="sl-SI">Logger</title>
         <title lang="hu-HU">Logger</title>
         <title lang="fi-FI">Logger</title>
         <title lang="da-DK">Logger</title>
@@ -192,7 +192,7 @@
             <label lang="nb-NO">Feilsøkingsmodus</label>
             <label lang="pl-PL">Tryb debugowania</label>
             <label lang="cs-CZ">Režim ladění</label>
-            <label lang="sl-SL">Način odpravljanja napak</label>
+            <label lang="sl-SI">Način odpravljanja napak</label>
             <label lang="hu-HU">Hibakeresési üzemmód</label>
             <label lang="fi-FI">Virheenkorjaustila</label>
             <label lang="da-DK">Fejlsøgningsmodus</label>
@@ -215,7 +215,7 @@
             <helpText lang="nb-NO">Mollie har en egendefinert loggfil i Shopware loggmappen. Denne funksjonen aktiverer utvidede logger med mer informasjon som kan hjelpe med å løse problemer.</helpText>
             <helpText lang="pl-PL">Mollie posiada niestandardowy plik logów w katalogu logów Shopware. Ta funkcja umożliwia istnienie rozszerzonych logów z większą ilością informacji, które mogą pomóc w rozwiązywaniu problemów.</helpText>
             <helpText lang="cs-CZ">Mollie má vlastní soubor protokolu v adresáři protokolů Shopware. Tato funkce aktivuje rozšířené protokoly s více informacemi, které mohou pomoci při řešení problémů.</helpText>
-            <helpText lang="sl-SL">Mollie ima datoteko dnevnika po meri v imeniku dnevnikov Shopware. Ta funkcija omogoča obsežnejše dnevnike z več informacijami, ki bi lahko pomagale pri reševanju težav.</helpText>
+            <helpText lang="sl-SI">Mollie ima datoteko dnevnika po meri v imeniku dnevnikov Shopware. Ta funkcija omogoča obsežnejše dnevnike z več informacijami, ki bi lahko pomagale pri reševanju težav.</helpText>
             <helpText lang="hu-HU">Mollie-nak van egy egyéni naplófájlja a Shopware naplók könyvtárában. Ez a funkció lehetővé teszi a kibővített naplókat, amelyek további információkat tartalmaznak a problémák megoldásához.</helpText>
             <helpText lang="fi-FI">Molliella on mukautettu lokitiedosto Shopwaren lokihakemistossa. Tämä ominaisuus mahdollistaa laajennetut lokit, joissa on lisätietoja, jotka voivat auttaa ratkaisemaan ongelmia.</helpText>
             <helpText lang="da-DK">Mollie har en tilpasset logfil i Shopware loggmappen. Denne funktion aktiverer udvidede logs med mere information, der kan hjælpe med at løse problemer.</helpText>
@@ -240,7 +240,7 @@
             <label lang="nb-NO">Behold loggerfiler (dager)</label>
             <label lang="pl-PL">Zachowuj pliki dziennika (dni)</label>
             <label lang="cs-CZ">Udržovat soubory protokolu (dny)</label>
-            <label lang="sl-SL">Obdržite datoteke dnevnika (dni)</label>
+            <label lang="sl-SI">Obdržite datoteke dnevnika (dni)</label>
             <label lang="hu-HU">Naplófájlok megtartása (napok)</label>
             <label lang="fi-FI">Pidä lokitiedostoja (päivinä)</label>
             <label lang="da-DK">Behold logfiler (dage)</label>
@@ -263,7 +263,7 @@
             <helpText lang="nb-NO">Angi hvor mange dager loggfiler holdes før de blir automatisk slettet.</helpText>
             <helpText lang="pl-PL">Ustaw liczbę dni, przez które pliki dziennika będą przechowywane, zanim zostaną automatycznie usunięte.</helpText>
             <helpText lang="cs-CZ">Nastavte počet dnů, po které budou protokolové soubory uchovávány, než budou automaticky smazány.</helpText>
-            <helpText lang="sl-SL">Nastavite število dni, koliko časa naj se ohranjajo datoteke dnevnika, dokler ne bodo samodejno izbrisane.</helpText>
+            <helpText lang="sl-SI">Nastavite število dni, koliko časa naj se ohranjajo datoteke dnevnika, dokler ne bodo samodejno izbrisane.</helpText>
             <helpText lang="hu-HU">Állítsa be a napok számát, hogy meddig tartják meg a (log) naplófájlokat, amíg automatikusan törlésre kerülnek.</helpText>
             <helpText lang="fi-FI">Määritä päivien lukumäärä, kuinka kauan lokitiedostoja säilytetään, ennen kuin ne poistetaan automaattisesti.</helpText>
             <helpText lang="da-DK">Indstil antallet af dage, hvor logfiler opbevares, indtil de automatisk slettes.</helpText>
@@ -288,7 +288,7 @@
         <title lang="nb-NO">Betalinger</title>
         <title lang="pl-PL">Płatności</title>
         <title lang="cs-CZ">Platby</title>
-        <title lang="sl-SL">Plačila</title>
+        <title lang="sl-SI">Plačila</title>
         <title lang="hu-HU">Fizetések</title>
         <title lang="fi-FI">Maksut</title>
         <title lang="da-DK">Betalinger</title>
@@ -312,7 +312,7 @@
             <label lang="nb-NO">Bruk Shopware standard oppførsel for mislykkede betalinger</label>
             <label lang="pl-PL">Użyj domyślnego działania Shopware dla nieudanych płatności</label>
             <label lang="cs-CZ">Použijte standardní chování Shopware pro neúspěšné platby</label>
-            <label lang="sl-SL">Uporabite standardni proces Shopware za neuspešna plačila</label>
+            <label lang="sl-SI">Uporabite standardni proces Shopware za neuspešna plačila</label>
             <label lang="hu-HU">Használja a Shopware standard viselkedését a sikertelen tranzakcióknál</label>
             <label lang="fi-FI">Käytä Shopwaren oletustoimintaa epäonnistuneissa maksuissa</label>
             <label lang="da-DK">Brug Shopware standard adfærd for mislykkedes betalinger</label>
@@ -335,7 +335,7 @@
             <helpText lang="nb-NO">Bruk Shopware standard oppførsel på mislykkede betalinger. Hvis deaktivert, vil Mollie automatisk gi brukeren mulighet for å prøve å betale på nytt ved å omdirigere dem til Mollie betalingsside.</helpText>
             <helpText lang="pl-PL">Użyj domyślnego działania Shopware w przypadku nieudanych płatności. Jeśli ta opcja jest wyłączona, Mollie automatycznie udostępni możliwość ponowienia płatności, przekierowując użytkownika na stronę płatności Mollie.</helpText>
             <helpText lang="cs-CZ">Pro neúspěšné transakce použijte výchozí nastavení Shopware. Pokud tuto možnost deaktivujete, Mollie automaticky nabídne způsob pokusu o vrácení peněz a přesměruje uživatele na platební stránku Mollie.</helpText>
-            <helpText lang="sl-SL">Uporabite privzet proces Shopware za neuspešna plačila. Če je onemogočeno, bo Mollie samodejno zagotavljal način za ponovni poskus plačila, tako da preusmeri uporabnika na plačilno stran Mollie.</helpText>
+            <helpText lang="sl-SI">Uporabite privzet proces Shopware za neuspešna plačila. Če je onemogočeno, bo Mollie samodejno zagotavljal način za ponovni poskus plačila, tako da preusmeri uporabnika na plačilno stran Mollie.</helpText>
             <helpText lang="hu-HU">Használja a Shopware alapértelmezett beállítást a sikertelen tranzakcióknál. Ha letiltja ezt az opciót, Mollie automatikusan biztosít egy módot a visszafizetés megkísérlésére, és felhasználót átirányítva a Mollie fizetési oldalára.</helpText>
             <helpText lang="fi-FI">Käytä oletusarvoista Shopware-toimintaa epäonnistuneissa maksuissa. Jos se on poistettu käytöstä, Mollie tarjoaa automaattisesti tavan yrittää maksua uudelleen ohjaamalla käyttäjän Mollien maksut -sivustolle.</helpText>
             <helpText lang="da-DK">Brug den standard Shopware adfærd ved mislykkede betalinger. Hvis deaktiveret, vil Mollie automatisk give en måde at forsøge at gennemføre betalingen ved at omdirigere brugeren til Mollie betalingsside.</helpText>
@@ -360,7 +360,7 @@
             <label lang="nb-NO">Opprett kunder hos Mollie</label>
             <label lang="pl-PL">Twórz klientów w Mollie</label>
             <label lang="cs-CZ">Vytvořit zákazníky v Mollie</label>
-            <label lang="sl-SL">Ustvari stranke v Mollie</label>
+            <label lang="sl-SI">Ustvari stranke v Mollie</label>
             <label lang="hu-HU">Ügyfelek létrehozása Mollie-nál</label>
             <label lang="fi-FI">Luo asiakkaita Molliessa</label>
             <label lang="da-DK">Opret kunder hos Mollie</label>
@@ -383,7 +383,7 @@
             <helpText lang="nb-NO">Opprett kunder automatisk i ditt Mollie Dashboard for å se alle betalinger fra en spesifikk kunde.</helpText>
             <helpText lang="pl-PL">Ustaw automatyczne tworzenie klientów w Panelu kontrolnym Mollie, aby mieć dostęp do wszystkich płatności konkretnego klienta.</helpText>
             <helpText lang="cs-CZ">Automaticky vytvářejte zákazníky ve svém Mollie Dashboard, abyste viděli všechny platby konkrétního zákazníka.</helpText>
-            <helpText lang="sl-SL">Samodejno ustvarite stranke v Mollie Dashboard, da vidite vsa plačila določene stranke.</helpText>
+            <helpText lang="sl-SI">Samodejno ustvarite stranke v Mollie Dashboard, da vidite vsa plačila določene stranke.</helpText>
             <helpText lang="hu-HU">Automatikusan hozzon létre ügyfeleket a Mollie irányítópultjáról, hogy megtekinthesse az adott ügyfél összes fizetését.</helpText>
             <helpText lang="fi-FI">Luo automaattisesti asiakkaita Mollie-hallintapaneeliin, jotta näet kaikki tietyn asiakkaan maksut.</helpText>
             <helpText lang="da-DK">Automatisk oprettelse af kunder i din Mollie Dashboard for at se alle betalinger fra en specifik kunde.</helpText>
@@ -409,7 +409,7 @@
             <label lang="nb-NO">Bruk Mollies tilgjengelighetsregler for betalingsmetoder</label>
             <label lang="pl-PL">Użyj zasad dostępności Mollie dla metod płatności</label>
             <label lang="cs-CZ">Použít pravidla přístupnosti Mollie pro platební metody</label>
-            <label lang="sl-SL">Uporabite pravila razpoložljivosti Mollie za načine plačila</label>
+            <label lang="sl-SI">Uporabite pravila razpoložljivosti Mollie za načine plačila</label>
             <label lang="hu-HU">Használja a Mollie elérhetőségi szabályait a fizetési módokhoz</label>
             <label lang="fi-FI">Käytä maksutavoissa Mollien saatavuussääntöjä</label>
             <label lang="da-DK">Brug Mollies tilgængelighedsregler for betalingsmetoder</label>
@@ -441,7 +441,7 @@
             <helpText lang="pl-PL">Ta opcja automatycznie ukrywa metody płatności w koszyku na podstawie zasad dostępności metod płatności. Tylko aktywne metody płatności z Twojego panelu Mollie będą wyświetlane. Jeśli metoda płatności ma limit koszyka, ograniczenia waluty lub adresu rozliczeniowego, zostanie ukryta podczas realizacji zamówienia.
             </helpText>
             <helpText lang="cs-CZ">Automaticky skrývá platební metody v košíku na základě pravidel dostupnosti platebních metod. Zobrazí se pouze aktivní platební metody z vašeho Mollie Dashboard. Pokud má platební metoda omezení na hodnotu košíku, měnu nebo fakturační adresu, bude ve fázi pokladny skryta.</helpText>
-            <helpText lang="sl-SL">Samodejno skrije načine plačila na blagajni na podlagi pravil o razpoložljivosti načinov plačila. Prikazani bodo samo aktivni načini plačila iz vaše nadzorne plošče Mollie. Če ima način plačila omejitev košarice, omejitev valute ali omejitev naslova za obračun, bo med blagajno skrit.</helpText>
+            <helpText lang="sl-SI">Samodejno skrije načine plačila na blagajni na podlagi pravil o razpoložljivosti načinov plačila. Prikazani bodo samo aktivni načini plačila iz vaše nadzorne plošče Mollie. Če ima način plačila omejitev košarice, omejitev valute ali omejitev naslova za obračun, bo med blagajno skrit.</helpText>
             <helpText lang="hu-HU">A fizetési módok automatikus elrejtése a fizetési folyamatban a fizetési módok rendelkezésre állási szabályai alapján. Csak az aktív fizetési módok jelennek meg a Mollie Dashboardon. Ha a fizetési mód kosárkorláttal, devizakorlátozással vagy számlázási címre vonatkozó korlátozással rendelkezik, az el lesz rejtve a
                 fizetési folyamat során.
             </helpText>
@@ -475,7 +475,7 @@
             <label lang="nb-NO">Egendefinert format for Mollie ordrenumre (Dashboard, PayPal, ...)</label>
             <label lang="pl-PL">Niestandardowy format numerów zamówień Mollie (Panel, PayPal, ...)</label>
             <label lang="cs-CZ">Vlastní formát pro čísla objednávek Mollie (Přehled, PayPal, ...)</label>
-            <label lang="sl-SL">Prilagojena oblika za številke naročil Mollie (Dashboard, PayPal, ...)</label>
+            <label lang="sl-SI">Prilagojena oblika za številke naročil Mollie (Dashboard, PayPal, ...)</label>
             <label lang="hu-HU">Egyedi formátum a Mollie megrendelési számokhoz (Irányítópult, PayPal, ...)</label>
             <label lang="fi-FI">Räätälöity muoto Mollie-tilausnumeroille (Dashboard, PayPal, ...)</label>
             <label lang="da-DK">Brugerdefineret format for Mollie ordrenumre (Dashboard, PayPal, ...)</label>
@@ -497,7 +497,7 @@
             <helpText lang="nb-NO">Hvis angitt, vil dette formatet bli brukt før ordrenummeret i Mollie Dashbord. Dette vil også bli videreført til PayPal som fakturanummer.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest ustawiona, ten format będzie używany przed numerem zamówienia w panelu Mollie. Zostanie on również przekazany do PayPal jako numer faktury.</helpText>
             <helpText lang="cs-CZ">Pokud je toto nastaveno, tento formát bude použit před číslem objednávky v Mollie Dashboard. Bude také předán PayPalu jako číslo faktury.</helpText>
-            <helpText lang="sl-SL">Če je to nastavljeno, bo ta oblika uporabljena pred številko naročila v Mollie Dashboard. To se bo preneslo tudi na PayPal kot številka računa.</helpText>
+            <helpText lang="sl-SI">Če je to nastavljeno, bo ta oblika uporabljena pred številko naročila v Mollie Dashboard. To se bo preneslo tudi na PayPal kot številka računa.</helpText>
             <helpText lang="hu-HU">Ha be van állítva, ez a formátum a rendelésszám előtt kerül felhasználásra a Mollie Dashboardon. A PayPal-nak is átkerül a számlaszámként.</helpText>
             <helpText lang="fi-FI">Jos tämä on asetettu, tätä muotoa käytetään ennen tilausnumeroa Mollie-hallintapaneelissa. Tämä välitetään myös PayPalille laskun numerona.</helpText>
             <helpText lang="da-DK">Hvis indstillet, vil dette format blive brugt før ordrenummeret i Mollie dashboardet. Dette vil også blive sendt til PayPal som fakturanummer.</helpText>
@@ -528,7 +528,7 @@
         <title lang="nb-NO">Kredittkort</title>
         <title lang="pl-PL">Karta kredytowa</title>
         <title lang="cs-CZ">Kreditní karta</title>
-        <title lang="sl-SL">Kreditna kartica</title>
+        <title lang="sl-SI">Kreditna kartica</title>
         <title lang="hu-HU">Hitelkártya</title>
         <title lang="fi-FI">Luottokortti</title>
         <title lang="da-DK">Kreditkort</title>
@@ -552,7 +552,7 @@
             <label lang="nb-NO">Aktiver Kredittkortkomponenter</label>
             <label lang="pl-PL">Włącz Karty Kredytowe</label>
             <label lang="cs-CZ">Povolit komponenty kreditních karet</label>
-            <label lang="sl-SL">Omogoči komponente kreditnih kartic</label>
+            <label lang="sl-SI">Omogoči komponente kreditnih kartic</label>
             <label lang="hu-HU">Kártya összetevők engedélyezése</label>
             <label lang="fi-FI">Ota luottokorttikomponentit käyttöön</label>
             <label lang="da-DK">Aktiver kreditkortkomponenter</label>
@@ -583,7 +583,7 @@
             <helpText lang="nb-NO">Vis kredittkortinformasjon direkte i din Shopware butikk. Hvis deaktivert, vil Mollie vise skjemaene på Mollie betalingsside.</helpText>
             <helpText lang="pl-PL">Pokaż pola wprowadzania danych karty kredytowej bezpośrednio w Twoim sklepie Shopware. Jeśli ta opcja jest wyłączona, Mollie wyświetli formularze na stronie płatności Mollie.</helpText>
             <helpText lang="cs-CZ">Zobrazit pole pro zadání kreditní karty přímo ve vašem Shopware obchodě. Pokud je tato možnost zakázána, Mollie zobrazí formuláře na platební stránce Mollie.</helpText>
-            <helpText lang="sl-SL">Prikaži polja za kreditne kartic neposredno v vaši trgovini Shopware. Če je onemogočeno, bo Mollie prikazal obrazce na plačilni strani Mollie.</helpText>
+            <helpText lang="sl-SI">Prikaži polja za kreditne kartic neposredno v vaši trgovini Shopware. Če je onemogočeno, bo Mollie prikazal obrazce na plačilni strani Mollie.</helpText>
             <helpText lang="hu-HU">Jelenítse meg a hitelkártya-beviteli mezőket közvetlenül a Shopware üzletében. Ha le van tiltva, Mollie megjeleníti az űrlapokat Mollie fizetési oldalán.</helpText>
             <helpText lang="fi-FI">Näytä luottokortin syöttökentät suoraan Shopware-kaupassasi. Jos poistettu käytöstä, Mollie näyttää lomakkeet Mollien maksusivulla.</helpText>
             <helpText lang="da-DK">Vis kreditkortindtastningsfelter direkte i din Shopware butik. Hvis deaktiveret, vil Mollie vise formularerne på Mollies betalingsside.</helpText>
@@ -608,7 +608,7 @@
             <label lang="nb-NO">Aktiver betalinger med ett klikk</label>
             <label lang="pl-PL">Włącz płatności jednym kliknięciem</label>
             <label lang="cs-CZ">Povolit platby jedním kliknutím</label>
-            <label lang="sl-SL">Omogoči plačila z enim klikom</label>
+            <label lang="sl-SI">Omogoči plačila z enim klikom</label>
             <label lang="hu-HU">Egyszerűsített kifizetések engedélyezése</label>
             <label lang="fi-FI">Ota käyttöön yhden klikkauksen maksut</label>
             <label lang="da-DK">Aktiver betalninger med et klik</label>
@@ -639,7 +639,7 @@
             <helpText lang="nb-NO">Kunder kan velge å lagre kredittkortdataene sine for gjentakende bestillinger. Sensitive data vil kun bli lagret på Mollie-serverne og ikke i Shopware.</helpText>
             <helpText lang="pl-PL">Klienci mogą zdecydować się na zapisanie danych karty kredytowej do przyszłych zamówień. Dane karty kredytowej będą przechowywane jedynie na serwerach Mollie, a nie w Shopware.</helpText>
             <helpText lang="cs-CZ">Zákazníci si mohou zvolit, zda si uloží data své kreditní karty pro opakované objednávky. Citlivá data budou uchovávána pouze na serverech Mollie a ne v Shopware.</helpText>
-            <helpText lang="sl-SL">Stranke lahko izberejo, da shranijo podatke o kreditnih karticah za ponavljajoča plačila. Občutljivi podatki bodo shranjeni samo na strežnikih Mollie in ne v Shopware.</helpText>
+            <helpText lang="sl-SI">Stranke lahko izberejo, da shranijo podatke o kreditnih karticah za ponavljajoča plačila. Občutljivi podatki bodo shranjeni samo na strežnikih Mollie in ne v Shopware.</helpText>
             <helpText lang="hu-HU">Az ügyfelek elmenthetik kártyaadataikat az ismételt megrendelésekhez. A bizalmas információkat csak a Mollie szerverein tároljuk, a Shopware-en nem.</helpText>
             <helpText lang="fi-FI">Asiakkaat voivat valita, haluavatko he tallentaa luottokorttitietonsa uusia tilauksia varten. Arkaluontoisia tietoja säilytetään vain Mollie-palvelimilla, ei Shopwareissa.</helpText>
             <helpText lang="da-DK">Kunder kan vælge at gemme deres kreditkortdata til gentagne ordrer. Følsomme data vil kun blive gemt på Mollies servere og ikke i Shopware.</helpText>
@@ -664,7 +664,7 @@
             <label lang="nb-NO">Aktiver kompakt visning for betalinger med ett klikk</label>
             <label lang="pl-PL">Włącz kompaktowy widok dla płatności jednym kliknięciem</label>
             <label lang="cs-CZ">Povolit kompaktní zobrazení plateb jedním kliknutím</label>
-            <label lang="sl-SL">Omogoči kompakten pregled plačil z enim klikom</label>
+            <label lang="sl-SI">Omogoči kompakten pregled plačil z enim klikom</label>
             <label lang="hu-HU">Engedélyezze az egykattintásos fizetések tömörített nézetét</label>
             <label lang="fi-FI">Ota käyttöön yhden klikkauksen maksujen kompakti näkymä</label>
             <label lang="da-DK">Aktiver kompakt visning for betalinger med et klik</label>
@@ -694,7 +694,7 @@
             <helpText lang="nb-NO">Hvis aktivert, vil de lagrede kredittkortene ikke bli vist som visuelle kort på kassesiden.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, zapisane karty kredytowe nie będą wyświetlane jako wizualne karty na stronie finalizacji zamówienia.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, uložené kreditní karty nebudou zobrazeny jako vizuální karty na stránce pokladny.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, shranjene kreditne kartice ne bodo prikazane kot vizualne kartice na strani blagajne.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, shranjene kreditne kartice ne bodo prikazane kot vizualne kartice na strani blagajne.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, a tárolt hitelkártyák nem jelennek meg grafikusan a fizetési oldalon.</helpText>
             <helpText lang="fi-FI">Jos otettu käyttöön, tallennettuja luottokortteja ei näytetä visuaalisina korteina maksusivulla.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, vises de gemte kreditkort ikke som visuelle kort på kassesiden.</helpText>
@@ -836,7 +836,7 @@
         <title lang="nb-NO">Apple Pay</title>
         <title lang="pl-PL">Apple Pay</title>
         <title lang="cs-CZ">Apple Pay</title>
-        <title lang="sl-SL">Apple Pay</title>
+        <title lang="sl-SI">Apple Pay</title>
         <title lang="hu-HU">Apple Pay</title>
         <title lang="fi-FI">Apple Pay</title>
         <title lang="da-DK">Apple Pay</title>
@@ -860,7 +860,7 @@
             <label lang="nb-NO">Aktiver Apple Pay Direct</label>
             <label lang="pl-PL">Włącz Apple Pay Direct</label>
             <label lang="cs-CZ">Povolit Apple Pay Direct</label>
-            <label lang="sl-SL">Omogoči Apple Pay Direct</label>
+            <label lang="sl-SI">Omogoči Apple Pay Direct</label>
             <label lang="hu-HU">Apple Pay közvetlen engedélyezése</label>
             <label lang="fi-FI">Ota käyttöön Apple Pay Direct</label>
             <label lang="da-DK">Aktiver Apple Pay Direct</label>
@@ -883,7 +883,7 @@
             <helpText lang="nb-NO">Vis Apple Pay-knapper og betalingsalternativer direkte på en produktdetaljside eller produktliste. Denne funksjonen krever at betalingsmetoden Apple Pay er tildelt i salgskanalen din.</helpText>
             <helpText lang="pl-PL">Wyświetl przyciski Apple Pay oraz opcje płatności bezpośrednio na stronie szczegółów produktu lub w widoku listy. Ta funkcja wymaga przypisania metody płatności Apple Pay do Twojego Kanału Sprzedaży.</helpText>
             <helpText lang="cs-CZ">Zobrazit tlačítka Apple Pay a možnosti platby přímo na stránce detailu produktu nebo v seznamu produktů. Tato funkce vyžaduje, aby byla platební metoda Apple Pay přiřazena k vašemu prodejnímu kanálu.</helpText>
-            <helpText lang="sl-SL">Prikažite gumbe in možnosti plačila Apple Pay neposredno na strani o podrobnostih izdelka ali v seznamu. Ta funkcija zahteva, da je način plačila Apple Pay dodeljen vašemu prodajnemu kanalu.</helpText>
+            <helpText lang="sl-SI">Prikažite gumbe in možnosti plačila Apple Pay neposredno na strani o podrobnostih izdelka ali v seznamu. Ta funkcija zahteva, da je način plačila Apple Pay dodeljen vašemu prodajnemu kanalu.</helpText>
             <helpText lang="hu-HU">Mutassa meg az Apple Pay gombokat és fizetési lehetőségeket közvetlenül a termékleírásban vagy a katalógusban. A funkció használatához az Apple Pay fizetési módnak csatlakoznia kell az értékesítési csatornához.</helpText>
             <helpText lang="fi-FI">Näytä Apple Pay -painikkeet ja maksutapavaihtoehdot suoraan tuotetietosivulla tai luettelossa. Tämä ominaisuus vaatii sen, että maksutapa Apple Pay on liitetty myyntikanavaasi.</helpText>
             <helpText lang="da-DK">Vis Apple Pay knapper og betalingsmetoder direkte på en produktside eller i en liste. Denne funktion kræver, at betalingsmetoden Apple Pay er tildelt din salgskanal.</helpText>
@@ -908,7 +908,7 @@
             <label lang="nb-NO">Apple Pay visningsbegrensninger</label>
             <label lang="pl-PL">Ograniczenia wyświetlania Apple Pay</label>
             <label lang="cs-CZ">Omezení zobrazení Apple Pay</label>
-            <label lang="sl-SL">Omejitve prikazovanja Apple Pay</label>
+            <label lang="sl-SI">Omejitve prikazovanja Apple Pay</label>
             <label lang="hu-HU">Apple Pay kijelzési korlátozások</label>
             <label lang="fi-FI">Apple Pay -näyttörajoitukset</label>
             <label lang="da-DK">Apple Pay visningsbegrænsninger</label>
@@ -930,7 +930,7 @@
             <helpText lang="nb-NO">Begrens Apple Pay Direct fra å bli vist på disse sidene.</helpText>
             <helpText lang="pl-PL">Ogranicz wyświetlanie Apple Pay Direct na tych stronach.</helpText>
             <helpText lang="cs-CZ">Omezit zobrazení Apple Pay Direct na těchto stránkách.</helpText>
-            <helpText lang="sl-SL">Omejite, da se Apple Pay Direct ne prikaže na teh straneh.</helpText>
+            <helpText lang="sl-SI">Omejite, da se Apple Pay Direct ne prikaže na teh straneh.</helpText>
             <helpText lang="hu-HU">Korlátozza az Apple Pay közvetlen megjelenítését ezeken az oldalakon.</helpText>
             <helpText lang="fi-FI">Rajoita Apple Pay Directin näyttämistä näillä sivuilla.</helpText>
             <helpText lang="da-DK">Begræns visningen af Apple Pay Direct på disse sider.</helpText>
@@ -955,7 +955,7 @@
                     <name lang="nb-NO">Kategorisider</name>
                     <name lang="pl-PL">Strony kategorii</name>
                     <name lang="cs-CZ">Stránky kategorií</name>
-                    <name lang="sl-SL">Strani kategorij</name>
+                    <name lang="sl-SI">Strani kategorij</name>
                     <name lang="hu-HU">Kategória oldalak</name>
                     <name lang="fi-FI">Kategoriasivut</name>
                     <name lang="da-DK">Kategorisider</name>
@@ -980,7 +980,7 @@
                     <name lang="nb-NO">Produktsider</name>
                     <name lang="pl-PL">Strony produktów</name>
                     <name lang="cs-CZ">Stránky produktu</name>
-                    <name lang="sl-SL">Strani izdelkov</name>
+                    <name lang="sl-SI">Strani izdelkov</name>
                     <name lang="hu-HU">Termék oldalak</name>
                     <name lang="fi-FI">Tuotesivut</name>
                     <name lang="da-DK">Produktsider</name>
@@ -1005,7 +1005,7 @@
                     <name lang="nb-NO">Offcanvas handlekurv</name>
                     <name lang="pl-PL">Koszyk wysuwany z boku</name>
                     <name lang="cs-CZ">Boční vyskakovací košík</name>
-                    <name lang="sl-SL">Odstranitev košarice</name>
+                    <name lang="sl-SI">Odstranitev košarice</name>
                     <name lang="hu-HU">Oldalsávos kosár</name>
                     <name lang="fi-FI">Offcanvas-ostoskori</name>
                     <name lang="da-DK">Offcanvas kurv</name>
@@ -1030,7 +1030,7 @@
                     <name lang="nb-NO">Handlekurvside</name>
                     <name lang="pl-PL">Strona koszyka</name>
                     <name lang="cs-CZ">Stránka košíku</name>
-                    <name lang="sl-SL">Stran košarice</name>
+                    <name lang="sl-SI">Stran košarice</name>
                     <name lang="hu-HU">Kosár oldal</name>
                     <name lang="fi-FI">Ostoskori-sivu</name>
                     <name lang="da-DK">Kurvside</name>
@@ -1057,7 +1057,7 @@
             <label lang="nb-NO">Tillatte domener for Apple Pay Direct</label>
             <label lang="pl-PL">Dozwolone domeny dla Apple Pay Direct</label>
             <label lang="cs-CZ">Povolené domény pro Apple Pay Direct</label>
-            <label lang="sl-SL">Dovoljene domene za Apple Pay Direct</label>
+            <label lang="sl-SI">Dovoljene domene za Apple Pay Direct</label>
             <label lang="hu-HU">Engedélyezett domainek az Apple Pay közvetlenhez</label>
             <label lang="fi-FI">Sallitut verkkotunnukset Apple Pay Directille</label>
             <label lang="da-DK">Tilladte domæner for Apple Pay Direct</label>
@@ -1095,7 +1095,7 @@
             <helpText lang="nb-NO">Skriv inn domenene som er tillatt for Apple Pay Direct, atskilt med komma. Denne innstillingen er valgfri og kreves kun hvis du bruker et headless-oppsett</helpText>
             <helpText lang="pl-PL">Wprowadź domeny, które są dozwolone dla Apple Pay Direct, oddzielone przecinkami. To ustawienie jest opcjonalne i wymagane tylko wtedy, gdy używasz konfiguracji headless</helpText>
             <helpText lang="cs-CZ">Zadejte domény, které jsou povolené pro Apple Pay Direct, oddělené čárkami. Tato nastavení jsou volitelná a vyžadována pouze v případě, že používáte headless setup</helpText>
-            <helpText lang="sl-SL">Vnesite domene, ki so dovoljene za Apple Pay Direct, ločene z vejicami. Ta nastavitev je neobvezna in potrebna le, če uporabljate headless sistem</helpText>
+            <helpText lang="sl-SI">Vnesite domene, ki so dovoljene za Apple Pay Direct, ločene z vejicami. Ta nastavitev je neobvezna in potrebna le, če uporabljate headless sistem</helpText>
             <helpText lang="hu-HU">Adja hozzá az Apple Pay Direct számára engedélyezett domaineket, vesszővel elválasztva. Ez a konfiguráció nem kötelező, és csak akkor szükséges, ha fej nélküli konfigurációt használ</helpText>
             <helpText lang="fi-FI">Anna Apple Pay Directin sallitut verkkotunnukset pilkuilla erotettuina. Tämä asetus on valinnainen ja vaaditaan vain, jos käytät headless-asetusta</helpText>
             <helpText lang="da-DK">Indtast de domæner, der er tilladt for Apple Pay Direct, adskilt af kommaer. Denne indstilling er valgfri og kræves kun, hvis du bruger en headless-opsætning</helpText>
@@ -1122,7 +1122,7 @@
         <title lang="nb-NO">Ordrebehandling</title>
         <title lang="pl-PL">Zarządzanie zamówieniami</title>
         <title lang="cs-CZ">Správa objednávek</title>
-        <title lang="sl-SL">Upravljanje naročil</title>
+        <title lang="sl-SI">Upravljanje naročil</title>
         <title lang="hu-HU">Megrendelés kezelése</title>
         <title lang="fi-FI">Tilauksen hallinta</title>
         <title lang="da-DK">Ordrehåndtering</title>
@@ -1146,7 +1146,7 @@
             <label lang="nb-NO">Forfallsdato for bankoverføring (dager)</label>
             <label lang="pl-PL">Termin płatności przelewem (dni)</label>
             <label lang="cs-CZ">Datum splatnosti pro bankovní převod (dny)</label>
-            <label lang="sl-SL">Rok plačila za bančno nakazilo (dni)</label>
+            <label lang="sl-SI">Rok plačila za bančno nakazilo (dni)</label>
             <label lang="hu-HU">Banki átutalás esedékességi napja (napok)</label>
             <label lang="fi-FI">Tilisiirron eräpäivä (päivät)</label>
             <label lang="da-DK">Forfaldsdato for bankoverførsel (dage)</label>
@@ -1168,7 +1168,7 @@
             <helpText lang="nb-NO">Tildel en egendefinert "forfallsdato" for betalingsmetoden bankoverføring. Dette er tidsfristen kunden har for å betale før betalingen utløper.</helpText>
             <helpText lang="pl-PL">Przypisz niestandardowy "termin płatności" dla metody płatności Przelew bankowy. Jest to czas, w którym klient może dokonać płatności, zanim termin wygaśnie.</helpText>
             <helpText lang="cs-CZ">Přiřaďte vlastní 'datum splatnosti' pro platební metodu Bankovní převod. Toto je doba, dokdy může zákazník zaplatit, než platba vyprší.</helpText>
-            <helpText lang="sl-SL">Dodelite prilagojen "rok" za način plačila z bančnim nakazilom. To je čas, do katerega lahko stranka plača, preden plačilo poteče.</helpText>
+            <helpText lang="sl-SI">Dodelite prilagojen "rok" za način plačila z bančnim nakazilom. To je čas, do katerega lahko stranka plača, preden plačilo poteče.</helpText>
             <helpText lang="hu-HU">Állítson be egyéni "esedékességi dátumot" a banki átutalás fizetési módhoz. Ez az idő, ameddig az ügyfél tud fizetni, amíg a tranzakció lejár.</helpText>
             <helpText lang="fi-FI">Määritä mukautettu eräpäivä tilisiirto maksutavalle. Tämä on aika, jonka kuluessa asiakas voi maksaa, kunnes maksu erääntyy.</helpText>
             <helpText lang="da-DK">Tildel en brugerdefineret "forfaldsdato" for betalingsmetoden bankoverførsel. Dette er den tid, kunden kan betale, indtil betalingen udløber.</helpText>
@@ -1196,7 +1196,7 @@
             <label lang="nb-NO">Ordrelevetid dager</label>
             <label lang="pl-PL">Czas aktywności zamówienia (dni)</label>
             <label lang="cs-CZ">Dny platnosti objednávky</label>
-            <label lang="sl-SL">Število dni trajanja naročila</label>
+            <label lang="sl-SI">Število dni trajanja naročila</label>
             <label lang="hu-HU">Order Lifetime Days</label>
             <label lang="fi-FI">Tilauksen elinikäpäivät</label>
             <label lang="da-DK">Ordrelevetid dage</label>
@@ -1218,7 +1218,7 @@
             <helpText lang="nb-NO">Konfigurer varigheten til en ordre til den utløper når den ikke er betalt. Dette gjelder for alle betalingsmetoder.</helpText>
             <helpText lang="pl-PL">Skonfiguruj czas aktywności zamówienia do momentu jego wygaśnięcia, jeśli nie zostanie opłacone. Dotyczy to wszystkich metod płatności.</helpText>
             <helpText lang="cs-CZ">Nastavte dobu platnosti objednávky, dokud nevyprší, pokud není uhrazena. Toto nastavení platí pro všechny platební metody.</helpText>
-            <helpText lang="sl-SL">Nastavite življenjsko dobo naročila, dokler ne poteče, ko ni plačano. To velja za vse načine plačila.</helpText>
+            <helpText lang="sl-SI">Nastavite življenjsko dobo naročila, dokler ne poteče, ko ni plačano. To velja za vse načine plačila.</helpText>
             <helpText lang="hu-HU">Állítsa be egy rendelés élettartamát, ameddig az lejár, ha nem fizetnek érte. Ez minden fizetési módra vonatkozik.</helpText>
             <helpText lang="fi-FI">Määritä tilauksen kesto, kunnes se vanhenee, kun sitä ei ole maksettu. Tämä koskee kaikkia maksutapoja.</helpText>
             <helpText lang="da-DK">Konfigurer levetiden for en ordre, indtil den udløber, hvis den ikke betales. Dette gælder for alle betalingsmetoder.</helpText>
@@ -1244,7 +1244,7 @@
             <label lang="nb-NO">Automatisk frakt</label>
             <label lang="pl-PL">Automatyczna wysyłka</label>
             <label lang="cs-CZ">Automatické odeslání</label>
-            <label lang="sl-SL">Samodejno pošiljanje</label>
+            <label lang="sl-SI">Samodejno pošiljanje</label>
             <label lang="hu-HU">Automatikus szállítás</label>
             <label lang="fi-FI">Automaattinen toimitus</label>
             <label lang="da-DK">Automatisk forsendelse</label>
@@ -1266,7 +1266,7 @@
             <helpText lang="nb-NO">Hvis aktivert, vil pluginen automatiskt utløse en forsendelse hos Mollie når leveringsstatusen endres til 'fraktet'.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, wtyczka automatycznie wywoła wysyłkę w Mollie, gdy status dostawy zmieni się na 'wysłane'.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin automaticky spustí odeslání u Mollie, když se stav dodávky změní na 'odesláno'.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, bo vtičnik samodejno sprožil pošiljanje pri Mollie, ko se status dostave spremeni v 'odposlano'.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, bo vtičnik samodejno sprožil pošiljanje pri Mollie, ko se status dostave spremeni v 'odposlano'.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, a bővítmény automatikusan aktivál egy szállítást Mollie-nál, amikor a szállítási állapot 'kiszállítva' állapotra vált.</helpText>
             <helpText lang="fi-FI">Jos laajennus on käytössä, se käynnistää automaattisesti lähetyksen Molliessa, kun toimitustila muuttuu lähetetyksi.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, vil pluginet automatisk udløse en forsendelse hos Mollie, når leveringsstatussen skifter til 'afsendt'.</helpText>
@@ -1292,7 +1292,7 @@
             <label lang="nb-NO">Automatisk kansellering</label>
             <label lang="pl-PL">Automatyczne anulowanie</label>
             <label lang="cs-CZ">Automatické zrušení</label>
-            <label lang="sl-SL">Samodejni preklic</label>
+            <label lang="sl-SI">Samodejni preklic</label>
             <label lang="hu-HU">Automatikus törlés</label>
             <label lang="fi-FI">Automaattinen peruutus</label>
             <label lang="da-DK">Automatisk annullering</label>
@@ -1317,7 +1317,7 @@
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, wtyczka automatycznie anuluje zamówienia Mollie, gdy zostaną anulowane w Shopware. Tylko zamówienia o statusie utworzone, autoryzowane lub częściowo wysłane zostaną anulowane. Jeśli zamówienie zostało częściowo wysłane, anulowane zostaną tylko pozycje, które nie zostały wysłane.
             </helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin automaticky zruší objednávky Mollie, když budou zrušeny v Shopware. Zrušeny budou pouze objednávky, které byly vytvořeny, autorizovány nebo částečně odeslány. Při částečném odeslání budou zrušeny pouze položky, které nebyly odeslány.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, bo vtičnik samodejno preklical naročila Mollie, ko bodo preklicana v Shopware. Preklicana bodo samo naročila, ki so bila ustvarjena, avtorizirana ali delno odposlana. Če so bila delno odposlana, se bodo preklicali samo tisti predmeti, ki niso bili odposlani.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, bo vtičnik samodejno preklical naročila Mollie, ko bodo preklicana v Shopware. Preklicana bodo samo naročila, ki so bila ustvarjena, avtorizirana ali delno odposlana. Če so bila delno odposlana, se bodo preklicali samo tisti predmeti, ki niso bili odposlani.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve, a bővítmény automatikusan törli a Mollie megrendeléseket, amikor azokat a Shopware-ban törlik. Csak a létrehozott, engedélyezett vagy részben kiszállított megrendelések kerülnek törlésre. Ha részben ki vannak szállítva, csak a nem kiszállított tételek kerülnek törlésre.</helpText>
             <helpText lang="fi-FI">Jos käytössä, laajennus peruuttaa automaattisesti Mollie-tilaukset, kun ne peruutetaan Shopwaressa. Vain luodut, valtuutetut tai osittain toimitetut tilaukset peruutetaan. Jos tilaus toimitetaan osittain, vain tuotteet, joita ei ole lähetetty, peruutetaan.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, vil plugin'et automatisk annullere Mollie bestillinger, når de annulleres i Shopware. Kun bestillinger, der er oprettet, godkendt eller delvist afsendt, vil blive annulleret. Hvis delvist afsendt, vil kun de varer, der ikke er sendt, blive annulleret.</helpText>
@@ -1343,7 +1343,7 @@
             <label lang="nb-NO">Automatisk utløp</label>
             <label lang="pl-PL">Automatyczne wygaśnięcie</label>
             <label lang="cs-CZ">Automatické vypršení platnosti</label>
-            <label lang="sl-SL">Samodejni potek</label>
+            <label lang="sl-SI">Samodejni potek</label>
             <label lang="hu-HU">Automatikus lejárat</label>
             <label lang="fi-FI">Automaattinen vanheneminen</label>
             <label lang="da-DK">Automatisk udløb</label>
@@ -1365,7 +1365,7 @@
             <helpText lang="nb-NO">Hvis aktivert, vil pluginen automatisk la ordrer med betalingsstatusen "Under behandling" løpe ut.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, wtyczka automatycznie zakończy termin aktywności zamówień ze statusem płatności „W trakcie realizacji”.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin automaticky zneplatní objednávky se stavem platby 'Probíhá'.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, bo vtičnik samodejno potekel naročila s statusom plačila "V obdelavi".</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, bo vtičnik samodejno potekel naročila s statusom plačila "V obdelavi".</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, a bővítmény automatikusan lejárja a "Folyamatban" állapotú megrendeléseket.</helpText>
             <helpText lang="fi-FI">Jos käytössä, laajennus vanhentaa automaattisesti tilaukset, joiden maksutila on "käsittelyssä".</helpText>
             <helpText lang="da-DK">Hvis aktiveret, vil pluginet automatisk udløbe ordrer med betalingsstatus "I gang".</helpText>
@@ -1390,7 +1390,7 @@
         <title lang="nb-NO">Refund Manager</title>
         <title lang="pl-PL">Refund Manager</title>
         <title lang="cs-CZ">Správce vrácení peněz</title>
-        <title lang="sl-SL">Upravljalnik vračil</title>
+        <title lang="sl-SI">Upravljalnik vračil</title>
         <title lang="hu-HU">Visszatérítés kezelő</title>
         <title lang="fi-FI">Hyvityshallinta</title>
         <title lang="da-DK">Refusionsadministrator</title>
@@ -1416,7 +1416,7 @@
             <label lang="nb-NO">Aktiver Refund Manager</label>
             <label lang="pl-PL">Włącz Menedżera zwrotów</label>
             <label lang="cs-CZ">Povolit správce vrácení peněz</label>
-            <label lang="sl-SL">Omogoči upravljalnik vračil</label>
+            <label lang="sl-SI">Omogoči upravljalnik vračil</label>
             <label lang="hu-HU">Visszatérítés kezelő engedélyezése</label>
             <label lang="fi-FI">Ota käyttöön hyvityshallinta</label>
             <label lang="da-DK">Aktiver Refusion Manager</label>
@@ -1438,7 +1438,7 @@
             <helpText lang="nb-NO">Aktiver eller deaktiver refusjonsbehandleren i administrasjonen</helpText>
             <helpText lang="pl-PL">Włączanie i wyłączanie Menedżera zwrotów w Administracji</helpText>
             <helpText lang="cs-CZ">Povolte nebo zakažte správce vrácení peněz v Administraci</helpText>
-            <helpText lang="sl-SL">Omogoči ali onemogoči upravljalnik vračil v upravljanju</helpText>
+            <helpText lang="sl-SI">Omogoči ali onemogoči upravljalnik vračil v upravljanju</helpText>
             <helpText lang="hu-HU">A Visszatérítéskezelőt engedélyezheti vagy letilthatja az Adminisztrációban</helpText>
             <helpText lang="fi-FI">Ota hyvityshallinta käyttöön tai poista käytöstä hallinnoinnissa</helpText>
             <helpText lang="da-DK">Aktiver eller deaktiver Refusion Manager i administrationen</helpText>
@@ -1464,7 +1464,7 @@
             <label lang="nb-NO">Automatisk inkluder tilbakestilling av lagret</label>
             <label lang="pl-PL">Automatycznie uwzględnij reset stanu magazynowego</label>
             <label lang="cs-CZ">Automaticky zahrnout obnovení zásob</label>
-            <label lang="sl-SL">Samodejno vključite ponastavitev zalog</label>
+            <label lang="sl-SI">Samodejno vključite ponastavitev zalog</label>
             <label lang="hu-HU">Automatikusan tartalmazza a készlet-visszaállítást</label>
             <label lang="fi-FI">Sisällytä automaattisesti varaston nollaus</label>
             <label lang="da-DK">Inkluderer automatisk lagernulstilling</label>
@@ -1486,7 +1486,7 @@
             <helpText lang="nb-NO">Automatisk angi den angitte refusjonsmengden også som kvantitet for å øke lageret igjen.</helpText>
             <helpText lang="pl-PL">Automatycznie ustaw wprowadzoną ilość zwrotu również jako ilość dodawaną do stanu magazynowego.</helpText>
             <helpText lang="cs-CZ">Automaticky nastavte zadané množství vrácení jako množství, které se použije k opětovnému navýšení zásob.</helpText>
-            <helpText lang="sl-SL">Samodejno nastavite vnešeno količino vračila tudi kot količino, ki se uporabi za ponovno povečanje zaloge.</helpText>
+            <helpText lang="sl-SI">Samodejno nastavite vnešeno količino vračila tudi kot količino, ki se uporabi za ponovno povečanje zaloge.</helpText>
             <helpText lang="hu-HU">Automatikusan állítsa be az beírt visszatérítési mennyiséget is a készlet növelésére szolgáló mennyiségként.</helpText>
             <helpText lang="fi-FI">Aseta syötetty palautusmäärä automaattisesti myös määräksi, jota käytetään varaston lisäämiseen.</helpText>
             <helpText lang="da-DK">Automatisk indstill den indtastede refusionsmængde også som den mængde, der skal bruges til at øge lageret igen.</helpText>
@@ -1512,7 +1512,7 @@
             <label lang="nb-NO">Verifiser refusjoner</label>
             <label lang="pl-PL">Weryfikuj zwroty</label>
             <label lang="cs-CZ">Ověřit vrácení peněz</label>
-            <label lang="sl-SL">Potrdite vračila</label>
+            <label lang="sl-SI">Potrdite vračila</label>
             <label lang="hu-HU">Visszatérítések ellenőrzése</label>
             <label lang="fi-FI">Vahvista hyvitykset</label>
             <label lang="da-DK">Verificer tilbagebetalinger</label>
@@ -1534,7 +1534,7 @@
             <helpText lang="nb-NO">Hvis aktivert, må en verifiseringsboks bli krysset av for å fortsette med refusjonen. Vi anbefaler dette for å unngå utilsiktede refusjoner og lagerendringer.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, konieczne będzie zaznaczenie pola weryfikacji, aby kontynuować zwrot. Zalecamy tę opcję, aby uniknąć przypadkowych zwrotów i zmian w stanie magazynowym.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, je nutné zaškrtnout ověřovací políčko, aby bylo možné pokračovat ve vrácení. Doporučujeme to, aby se předešlo náhodným vrácením a změnám zásob.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, je treba potrditveno polje označiti, da nadaljujete z vračilom. Priporočamo vam, da to storite, da se izognete naključnim vračilom in spremembam zalog.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, je treba potrditveno polje označiti, da nadaljujete z vračilom. Priporočamo vam, da to storite, da se izognete naključnim vračilom in spremembam zalog.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, egy jelölőnégyzetet be kell jelölni a visszatérítés folytatásához. Ajánlott lehetőség a véletlen visszatérítések és készletváltozások elkerülésére.</helpText>
             <helpText lang="fi-FI">Jos käytössä, vahvistusvalintaruutu on valittava hyvityksen jatkamiseksi. Suosittelemme tätä välttääksesi vahingossa tapahtuvia palautuksia ja varastomuutoksia.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, skal en verifikationsboks krydses af for at fortsætte med refunderingen. Vi anbefaler dette for at undgå utilsigtede refunderinger og lagerændringer.</helpText>
@@ -1560,7 +1560,7 @@
             <label lang="nb-NO">Vis instruksjoner</label>
             <label lang="pl-PL">Pokaż instrukcje</label>
             <label lang="cs-CZ">Zobrazit pokyny</label>
-            <label lang="sl-SL">Prikaži navodila</label>
+            <label lang="sl-SI">Prikaži navodila</label>
             <label lang="hu-HU">Ut instrukciók megjelenítése</label>
             <label lang="fi-FI">Näytä ohjeet</label>
             <label lang="da-DK">Vis instruktioner</label>
@@ -1582,7 +1582,7 @@
             <helpText lang="nb-NO">Viser eller skjuler instruksjonsområdet. Du kan enkelt slå av dette hvis det forstyrrer når du er kjent med Refusjonsbehandleren.</helpText>
             <helpText lang="pl-PL">Pokazuje lub ukrywa obszar instrukcji. Możesz wyłączyć tę opcję, jeśli przeszkadza Ci, gdy już zaznajomiłeś się z Menedżerem Zwrotów.</helpText>
             <helpText lang="cs-CZ">Zobrazuje nebo skrývá pokyny. Můžete ji jednoduše vypnout, pokud vám začne překážet, jakmile se seznámíte se Správcem vrácení peněz.</helpText>
-            <helpText lang="sl-SL">Pokaže ali skrije področje z navodili. To lahko preprosto izklopite, če vas moti, ko poznate uporabo upravljalca vračil.</helpText>
+            <helpText lang="sl-SI">Pokaže ali skrije področje z navodili. To lahko preprosto izklopite, če vas moti, ko poznate uporabo upravljalca vračil.</helpText>
             <helpText lang="hu-HU">Megjeleníti vagy elrejti az útmutató területet. Egyszerűen kikapcsolhatja, ha zavaró, miután megismerte a Visszatérítés Kezelőt.</helpText>
             <helpText lang="fi-FI">Näyttää tai piilottaa ohjealueen. Voit yksinkertaisesti poistaa tämän käytöstä, jos se on häiritsee, kun olet tutustunut hyvityshallintaan.</helpText>
             <helpText lang="da-DK">Viser eller skjuler instruktionsområdet. Du kan nemt deaktivere dette, hvis det forstyrrer, når du er blevet bekendt med Refusion Manager.</helpText>
@@ -1608,7 +1608,7 @@
             <label lang="nb-NO">Opprett kreditnotaer</label>
             <label lang="pl-PL">Utwórz noty kredytowe</label>
             <label lang="cs-CZ">Vytvořte kreditní poznámky</label>
-            <label lang="sl-SL">Ustvarite dobropise</label>
+            <label lang="sl-SI">Ustvarite dobropise</label>
             <label lang="hu-HU">Készítsen jóváírási jegyeket</label>
             <label lang="fi-FI">Luo luottolaskuja</label>
             <label lang="da-DK">Opret kreditnotaer</label>
@@ -1630,7 +1630,7 @@
             <helpText lang="nb-NO">Opprett automatisk en kreditnota i Shopware når en refusjon behandles.</helpText>
             <helpText lang="pl-PL">Automatyczne tworzenie noty kredytowej w Shopware w przypadku przetworzenia zwrotu.</helpText>
             <helpText lang="cs-CZ">Automaticky vytvořit dobropis v Shopware při zpracování refundace.</helpText>
-            <helpText lang="sl-SL">Samodejno ustvarite dobropis v Shopware, ko je vračilo obdelano.</helpText>
+            <helpText lang="sl-SI">Samodejno ustvarite dobropis v Shopware, ko je vračilo obdelano.</helpText>
             <helpText lang="hu-HU">A visszatérítés feldolgozásakor automatikusan jóváírást hoz létre a Shopware-ben.</helpText>
             <helpText lang="fi-FI">Luo automaattisesti hyvityslasku Shopwaressa, kun hyvitys käsitellään.</helpText>
             <helpText lang="da-DK">Opret automatisk en kreditnota i Shopware, når en refusion behandles.</helpText>
@@ -1656,7 +1656,7 @@
             <label lang="nb-NO">Kreditnota-prefiks</label>
             <label lang="pl-PL">Prefiks noty kredytowej</label>
             <label lang="cs-CZ">Předpona dobropisu</label>
-            <label lang="sl-SL">Predpona dobropisa</label>
+            <label lang="sl-SI">Predpona dobropisa</label>
             <label lang="hu-HU">Hiteljegy előtag</label>
             <label lang="fi-FI">Hyvityslaskun etuliite</label>
             <label lang="da-DK">Kreditnote præfix</label>
@@ -1678,7 +1678,7 @@
             <helpText lang="nb-NO">Prefiks for kreditnotanummeret. Kreditnotaen består av prefiks, original linjepostnavn og suffiks</helpText>
             <helpText lang="pl-PL">Prefiks numeru noty kredytowej. Nota kredytowa składa się z prefiksu, nazwy oryginalnej pozycji i sufiksu</helpText>
             <helpText lang="cs-CZ">Předpona pro číslo dobropisu. Dobropis se skládá z předpony, původního názvu položky a přípony</helpText>
-            <helpText lang="sl-SL">Predpona za številko dobropisa. Dobropis je sestavljen iz predpone, izvirnega imena postavke in pripone</helpText>
+            <helpText lang="sl-SI">Predpona za številko dobropisa. Dobropis je sestavljen iz predpone, izvirnega imena postavke in pripone</helpText>
             <helpText lang="hu-HU">Prefix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="fi-FI">Hyvityslaskun etuliite. Hyvityslasku koostuu etuliitteestä, alkuperäisestä rivikohdan nimestä ja jälkiliitteestä</helpText>
             <helpText lang="da-DK">Præfix for kreditnotenummeret. Kreditnoten består af præfix, original linjepostnavn og suffiks</helpText>
@@ -1704,7 +1704,7 @@
             <label lang="nb-NO">Kreditnota-suffiks</label>
             <label lang="pl-PL">Sufiks noty kredytowej</label>
             <label lang="cs-CZ">Přípona dobropisu</label>
-            <label lang="sl-SL">Pripona dobropisa</label>
+            <label lang="sl-SI">Pripona dobropisa</label>
             <label lang="hu-HU">Hiteljegy utótag</label>
             <label lang="fi-FI">Hyvityslaskun jälkiliitte</label>
             <label lang="da-DK">Kreditnote suffiks</label>
@@ -1726,7 +1726,7 @@
             <helpText lang="nb-NO">Suffiks for kreditnotanummeret. En kreditnota består av prefiks, opprinnelig linjepostnavn og suffiks</helpText>
             <helpText lang="pl-PL">Sufiks numeru noty kredytowej. Nota kredytowa składa się z prefiksu, nazwy oryginalnej pozycji i sufiksu</helpText>
             <helpText lang="cs-CZ">Přípona pro číslo dobropisu. Dobropis se skládá z předpony, původního názvu položky a přípony</helpText>
-            <helpText lang="sl-SL">Predpona za številko dobropisa. Dobropis je sestavljen iz predpone, izvirnega imena postavke in pripone</helpText>
+            <helpText lang="sl-SI">Predpona za številko dobropisa. Dobropis je sestavljen iz predpone, izvirnega imena postavke in pripone</helpText>
             <helpText lang="hu-HU">Suffix for the credit note number. Credit note consist of prefix, original line item name and suffix</helpText>
             <helpText lang="fi-FI">Hyvityslaskun jälkiliitte. Hyvityslasku koostuu etuliitteestä, alkuperäisestä rivikohdan nimestä ja jälkiliitteestä.</helpText>
             <helpText lang="da-DK">Suffiks for kreditnotenummer. Kreditnoten består af præfiks, oprindeligt linjepostnavn og suffiks</helpText>
@@ -1751,7 +1751,7 @@
         <title lang="nb-NO">Automatisering av ordrestatus</title>
         <title lang="pl-PL">Automatyzacja stanu zamówienia</title>
         <title lang="cs-CZ">Automatizace stavu objednávky</title>
-        <title lang="sl-SL">Avtomatizacija stanja naročila</title>
+        <title lang="sl-SI">Avtomatizacija stanja naročila</title>
         <title lang="hu-HU">Megrendelés állapot automatizáció</title>
         <title lang="fi-FI">Tilauksen tilaus automaatio</title>
         <title lang="da-DK">Automatisering af ordrestatus</title>
@@ -1776,7 +1776,7 @@
             <label lang="nb-NO">Ordrestatus med en betalt transaksjon</label>
             <label lang="pl-PL">Status zamówienia ze zrealizowaną transakcją</label>
             <label lang="cs-CZ">Stav objednávky s uhrazenou transakcí</label>
-            <label lang="sl-SL">Stanje naročila s plačano transakcijo</label>
+            <label lang="sl-SI">Stanje naročila s plačano transakcijo</label>
             <label lang="hu-HU">Megrendelés állapot fizetett tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on maksettu maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en betalt transaktion</label>
@@ -1801,7 +1801,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento status</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring denne status over</name>
@@ -1826,7 +1826,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřené</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -1851,7 +1851,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -1876,7 +1876,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -1901,7 +1901,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -1928,7 +1928,7 @@
             <label lang="nb-NO">Ordrestatus med en mislykket transaksjon</label>
             <label lang="pl-PL">Status zamówienia z nieudaną transakcją</label>
             <label lang="cs-CZ">Stav objednávky s neúspěšnou transakcí</label>
-            <label lang="sl-SL">Stanje naročila z neuspešno transakcijo</label>
+            <label lang="sl-SI">Stanje naročila z neuspešno transakcijo</label>
             <label lang="hu-HU">Megrendelés állapot sikertelen tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on epäonnistunut maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en mislykket transaktion</label>
@@ -1953,7 +1953,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento stav</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring denne status over</name>
@@ -1978,7 +1978,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřené</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -2003,7 +2003,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -2028,7 +2028,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -2053,7 +2053,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -2080,7 +2080,7 @@
             <label lang="nb-NO">Ordrestatus med en kansellert transaksjon</label>
             <label lang="pl-PL">Status zamówienia z anulowaną transakcją</label>
             <label lang="cs-CZ">Stav objednávky se zrušenou transakcí</label>
-            <label lang="sl-SL">Stanje naročila s preklicano transakcijo</label>
+            <label lang="sl-SI">Stanje naročila s preklicano transakcijo</label>
             <label lang="hu-HU">Megrendelés állapot törölt tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on peruutettu maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en annulleret transaktion</label>
@@ -2105,7 +2105,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento stav</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring denne status over</name>
@@ -2130,7 +2130,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřené</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -2155,7 +2155,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -2180,7 +2180,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -2205,7 +2205,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -2232,7 +2232,7 @@
             <label lang="nb-NO">Ordrestatus med en autorisert transaksjon</label>
             <label lang="pl-PL">Status zamówienia z autoryzowaną transakcją</label>
             <label lang="cs-CZ">Stav objednávky s autorizovanou transakcí</label>
-            <label lang="sl-SL">Stanje naročila z avtorizirano transakcijo</label>
+            <label lang="sl-SI">Stanje naročila z avtorizirano transakcijo</label>
             <label lang="hu-HU">Megrendelés állapot engedélyezett tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on valtuutettu maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en autoriseret transaktion</label>
@@ -2257,7 +2257,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento status</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring status over</name>
@@ -2282,7 +2282,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřené</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -2307,7 +2307,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -2332,7 +2332,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -2357,7 +2357,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -2384,7 +2384,7 @@
             <label lang="nb-NO">Ordrestatus med en chargeback transaksjon</label>
             <label lang="pl-PL">Status zamówienia z obciążeniem zwrotnym</label>
             <label lang="cs-CZ">Stav objednávky s transakcí zaúčtovanou zpětně</label>
-            <label lang="sl-SL">Stanje naročila z vračilom transakcije</label>
+            <label lang="sl-SI">Stanje naročila z vračilom transakcije</label>
             <label lang="hu-HU">Megrendelés állapot visszatérített tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on takaisinveloitettu maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en tilbagebetalingstransaktion</label>
@@ -2409,7 +2409,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento status</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring denne status over</name>
@@ -2434,7 +2434,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřeno</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -2459,7 +2459,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -2484,7 +2484,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -2509,7 +2509,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -2536,7 +2536,7 @@
             <label lang="nb-NO">Ordrestatus med en refusjonstransaksjon</label>
             <label lang="pl-PL">Status zamówienia ze zwrotem</label>
             <label lang="cs-CZ">Stav objednávky s vrácenou transakcí</label>
-            <label lang="sl-SL">Stanje naročila z vračilom transakcije</label>
+            <label lang="sl-SI">Stanje naročila z vračilom transakcije</label>
             <label lang="hu-HU">Megrendelés állapot visszatérített tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on hyvitetty maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en refunderingstransaktion</label>
@@ -2561,7 +2561,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento status</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring denne status over</name>
@@ -2586,7 +2586,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřeno</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -2611,7 +2611,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -2636,7 +2636,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -2661,7 +2661,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -2688,7 +2688,7 @@
             <label lang="nb-NO">Ordrestatus med en delvis refusjonstransaksjon</label>
             <label lang="pl-PL">Status zamówienia z częściowym zwrotem</label>
             <label lang="cs-CZ">Stav objednávky s částečným vrácením peněz</label>
-            <label lang="sl-SL">Stanje naročila z delnim vračilom</label>
+            <label lang="sl-SI">Stanje naročila z delnim vračilom</label>
             <label lang="hu-HU">Megrendelés állapot részleges visszatérítés tranzakcióval</label>
             <label lang="fi-FI">Tilaus, jossa on osittain hyvitetty maksutapahtuma</label>
             <label lang="da-DK">Ordrestatus med en delvis refunderingstransaktion</label>
@@ -2713,7 +2713,7 @@
                     <name lang="nb-NO">Hopp over denne statusen</name>
                     <name lang="pl-PL">Pomiń ten status</name>
                     <name lang="cs-CZ">Přeskočit tento status</name>
-                    <name lang="sl-SL">Preskoči to stanje</name>
+                    <name lang="sl-SI">Preskoči to stanje</name>
                     <name lang="hu-HU">Ugorja át ezt az állapotot</name>
                     <name lang="fi-FI">Ohita tämä tila</name>
                     <name lang="da-DK">Spring denne status over</name>
@@ -2738,7 +2738,7 @@
                     <name lang="nb-NO">Åpen</name>
                     <name lang="pl-PL">Otwarte</name>
                     <name lang="cs-CZ">Otevřené</name>
-                    <name lang="sl-SL">Odprto</name>
+                    <name lang="sl-SI">Odprto</name>
                     <name lang="hu-HU">Nyitott</name>
                     <name lang="fi-FI">Avoin</name>
                     <name lang="da-DK">Åben</name>
@@ -2763,7 +2763,7 @@
                     <name lang="nb-NO">Under behandling</name>
                     <name lang="pl-PL">W trakcie realizacji</name>
                     <name lang="cs-CZ">Probíhá</name>
-                    <name lang="sl-SL">V teku</name>
+                    <name lang="sl-SI">V teku</name>
                     <name lang="hu-HU">Folyamatban</name>
                     <name lang="fi-FI">Käynnissä</name>
                     <name lang="da-DK">I gang</name>
@@ -2788,7 +2788,7 @@
                     <name lang="nb-NO">Fullført</name>
                     <name lang="pl-PL">Zakończone</name>
                     <name lang="cs-CZ">Dokončeno</name>
-                    <name lang="sl-SL">Končano</name>
+                    <name lang="sl-SI">Končano</name>
                     <name lang="hu-HU">Befejezett</name>
                     <name lang="fi-FI">Suoritettu</name>
                     <name lang="da-DK">Færdiggjort</name>
@@ -2813,7 +2813,7 @@
                     <name lang="nb-NO">Kansellert</name>
                     <name lang="pl-PL">Anulowane</name>
                     <name lang="cs-CZ">Zrušeno</name>
-                    <name lang="sl-SL">Preklicano</name>
+                    <name lang="sl-SI">Preklicano</name>
                     <name lang="hu-HU">Törölt</name>
                     <name lang="fi-FI">Peruutettu</name>
                     <name lang="da-DK">Annulleret</name>
@@ -2841,7 +2841,7 @@
             <label lang="nb-NO">Endelig ordrestatus</label>
             <label lang="pl-PL">Końcowy stan zamówienia</label>
             <label lang="cs-CZ">Konečný stav objednávky</label>
-            <label lang="sl-SL">Končno stanje naročila</label>
+            <label lang="sl-SI">Končno stanje naročila</label>
             <label lang="hu-HU">Végső megrendelési állapot</label>
             <label lang="fi-FI">Lopullinen tilauksen tila</label>
             <label lang="da-DK">Endelig ordretilstand</label>
@@ -2863,7 +2863,7 @@
             <helpText lang="nb-NO">Hvis aktivert, vil pluginen ikke gå over til en ny ordrestatus hvis den endelige statusen allerede er angitt i ordren. Bruk denne funksjonen i kombinasjon med plugins og systemer hvis arbeidsflytene deres ikke matcher den fra Mollie.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, wtyczka nie przejdzie do nowego statusu zamówienia, jeśli w zamówieniu został już ustawiony status końcowy. Używaj tej funkcji w połączeniu z wtyczkami i systemami, jeśli ich procesy nie są zgodne procesami Mollie.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin nepřejde do nového stavu objednávky, pokud je konečný stav již nastaven v objednávce. Použijte tuto funkci v kombinaci s pluginy a systémy, pokud jejich pracovní postupy neodpovídají těm, které používá Mollie.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, vtičnik ne bo prešel v novo stanje naročila, če je končno stanje že nastavljeno v naročilu. Uporabite to funkcijo v kombinaciji z vtičniki in sistemi, če njihovi delovni postopki ne ustrezajo tistemu iz Mollie.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, vtičnik ne bo prešel v novo stanje naročila, če je končno stanje že nastavljeno v naročilu. Uporabite to funkcijo v kombinaciji z vtičniki in sistemi, če njihovi delovni postopki ne ustrezajo tistemu iz Mollie.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve, a plugin nem vált új megrendelési állapotra, ha a végső állapot már be van állítva a megrendelésnél. Használja ezt a funkciót együtt pluginokkal és rendszerekkel, ha a munkafolyamataik nem egyeznek meg a Mollie munkafolyamatával.</helpText>
             <helpText lang="fi-FI">Jos käytössä, laajennus ei siirry uuteen tilauksen tilaan, jos lopullinen tila on jo asetettu tilauksessa. Käytä tätä ominaisuutta yhdessä laajennusten ja järjestelmien kanssa, jos niiden työnkulku ei vastaa Mollien työnkulkua.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, vil plugin'et ikke overgå til en ny ordretilstand, hvis den endelige tilstand allerede er indstillet i ordren. Brug denne funktion i kombination med plugins og systemer, hvis deres arbejdsgange ikke matcher den, der er fra Mollie.</helpText>
@@ -2890,7 +2890,7 @@
         <title lang="nb-NO">Abonnementer</title>
         <title lang="pl-PL">Subskrypcje</title>
         <title lang="cs-CZ">Předplatná</title>
-        <title lang="sl-SL">Naročnine</title>
+        <title lang="sl-SI">Naročnine</title>
         <title lang="hu-HU">Előfizetések</title>
         <title lang="fi-FI">Tilaukset</title>
         <title lang="da-DK">Abonnementer</title>
@@ -2915,7 +2915,7 @@
             <label lang="nb-NO">Aktiver Mollie abonnementer</label>
             <label lang="pl-PL">Włącz subskrypcje Mollie</label>
             <label lang="cs-CZ">Povolit předplatná Mollie</label>
-            <label lang="sl-SL">Omogoči Mollie naročnine</label>
+            <label lang="sl-SI">Omogoči Mollie naročnine</label>
             <label lang="hu-HU">Mollie előfizetések engedélyezése</label>
             <label lang="fi-FI">Ota käyttöön Mollie-tilaukset</label>
             <label lang="da-DK">Aktiver Mollie abonnementer</label>
@@ -2937,7 +2937,7 @@
             <helpText lang="nb-NO">Aktiverer eller deaktiverer full abonnementsfunksjonalitet. Vennligst last inn administrasjonen på nytt etter å ha endret denne innstillingen.</helpText>
             <helpText lang="pl-PL">Włącza lub wyłącza pełną funkcjonalność subskrypcji. Po zmianie tego ustawienia odśwież panel administracyjny.</helpText>
             <helpText lang="cs-CZ">Povolí nebo zakáže plnou funkčnost předplatného. Po změně tohoto nastavení prosím znovu načtěte administraci.</helpText>
-            <helpText lang="sl-SL">Omogoča ali onemogoča celotno funkcionalnost naročnin. Po spremembi te nastavitve znova naložite upravljanje.</helpText>
+            <helpText lang="sl-SI">Omogoča ali onemogoča celotno funkcionalnost naročnin. Po spremembi te nastavitve znova naložite upravljanje.</helpText>
             <helpText lang="hu-HU">Engedélyezi vagy letiltja a teljes előfizetési funkciót. Kérjük, töltse újra az adminisztrációt a beállítás megváltoztatása után.</helpText>
             <helpText lang="fi-FI">Otaa käyttöön tai poistaa käytöstä kaikki tilaustoiminnot. Uudelleen lataa hallinta tämän asetuksen muuttamisen jälkeen.</helpText>
             <helpText lang="da-DK">Aktiverer eller deaktiverer den fulde abonnementsfunktionalitet. Venligst genindlæs administrationen efter ændring af denne indstilling.</helpText>
@@ -2963,7 +2963,7 @@
             <label lang="nb-NO">Vis abonnementindikator</label>
             <label lang="pl-PL">Pokaż wskaźnik subskrypcji</label>
             <label lang="cs-CZ">Zobrazit indikátor předplatného</label>
-            <label lang="sl-SL">Prikaži kazalnik naročnine</label>
+            <label lang="sl-SI">Prikaži kazalnik naročnine</label>
             <label lang="hu-HU">Előfizetés jelölő mutatása</label>
             <label lang="fi-FI">Näytä tilausindikaattori</label>
             <label lang="da-DK">Vis abonnementsindikator</label>
@@ -2985,7 +2985,7 @@
             <helpText lang="nb-NO">Viser en abonnementindikator på produktdetaljsiden for et abonnementprodukt.</helpText>
             <helpText lang="pl-PL">Wyświetla wskaźnik subskrypcji na stronie szczegółów produktu subskrypcyjnego.</helpText>
             <helpText lang="cs-CZ">Zobrazí indikátor předplatného na stránce detailu produktu s předplatným.</helpText>
-            <helpText lang="sl-SL">Prikaže kazalnik naročnine na strani podrobnosti izdelka naročnine.</helpText>
+            <helpText lang="sl-SI">Prikaže kazalnik naročnine na strani podrobnosti izdelka naročnine.</helpText>
             <helpText lang="hu-HU">Az előfizetési termék részletező oldalán jelzi az előfizetési lehetőséget.</helpText>
             <helpText lang="fi-FI">Näyttää tilausindikaattorin tilaustuotteen tuotetietosivulla.</helpText>
             <helpText lang="da-DK">Viser en abonnementsindikator på produktdetaljesiden for et abonnementsprodukt.</helpText>
@@ -3011,7 +3011,7 @@
             <label lang="nb-NO">Tillat kunder å redigere fakturerings- og fraktadresser for aktive abonnementer</label>
             <label lang="pl-PL">Pozwól klientom na edytowanie adresów do fakturowania i wysyłki dla aktywnych subskrypcji</label>
             <label lang="cs-CZ">Povolit zákazníkům upravit fakturační a doručovací adresy u aktivních předplatných</label>
-            <label lang="sl-SL">Dovoli strankam, da uredijo naslove za obračun in dostavo za aktivne naročnine</label>
+            <label lang="sl-SI">Dovoli strankam, da uredijo naslove za obračun in dostavo za aktivne naročnine</label>
             <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy szerkeszthessék a |számlázási és szállítási címeket aktív előfizetésekhez</label>
             <label lang="fi-FI">Salli asiakkaiden muokata käynnissä olevien tilausten laskutus- ja toimitusosoitteita</label>
             <label lang="da-DK">Tillad kunder at redigere fakturerings- og leveringsadresser for aktive abonnementer</label>
@@ -3033,7 +3033,7 @@
             <helpText lang="nb-NO">Hvis aktivert, kan kundene redigere sine fakturerings- og fraktadresser i butikken. Vær oppmerksom på at ingen nye fraktkostnader vil bli beregnet for endre adresser. Land kan ikke redigeres.</helpText>
             <helpText lang="pl-PL">Jeżeli ta opcja jest włączona, klienci mogą edytować swoje adresy fakturowania i wysyłki w sklepie. Proszę pamiętać, że nowe koszty wysyłki dla zmodyfikowanych adresów nie będą obliczane. Nie jest dozwolone edytowanie krajów.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci mohou upravit své fakturační a doručovací adresy v obchodě. Vezměte prosím na vědomí, že pro upravené adresy nebudou přepočítány nové náklady na dopravu. Země nelze upravit.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, strankam ni dovoljeno, da urejajo naslove za obračun in dostavo v trgovini. Upoštevajte, da novi stroški dostave ne bodo izračunani za spremenjene naslove. Držav ni dovoljeno urejati.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, strankam ni dovoljeno, da urejajo naslove za obračun in dostavo v trgovini. Upoštevajte, da novi stroški dostave ne bodo izračunani za spremenjene naslove. Držav ni dovoljeno urejati.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, lehetővé teszi az ügyfelek számára, hogy módosítsák számlázási és szállítási címüket az üzletben. Felhívjuk figyelmét, hogy a megváltozott címre nem számolunk új szállítási költséget. Az ország szerkesztése nem lehetséges.</helpText>
             <helpText lang="fi-FI">Jos käytössä, asiakkaat voivat muokata laskutus- ja toimitusosoitteitaan kaupassa. Huomaa, että muutetuille osoitteille ei lasketa uusia toimituskustannuksia. Maata ei voi muuttaa.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, kan kunder redigere deres fakturerings- og leveringsadresser i butikken. Bemærk venligst, at der ikke vil blive beregnet nye forsendelsesomkostninger for ændrede adresser. Lande må ikke redigeres.</helpText>
@@ -3059,7 +3059,7 @@
             <label lang="nb-NO">Tillat kunder å pause og gjenoppta aktive abonnementer</label>
             <label lang="pl-PL">Pozwól klientom na wstrzymywanie i wznawianie aktywnych subskrypcji</label>
             <label lang="cs-CZ">Povolit zákazníkům pozastavit a obnovit aktivní předplatná</label>
-            <label lang="sl-SL">Dovoli strankam, da prekličejo in ponovno aktivirajo aktivne naročnine</label>
+            <label lang="sl-SI">Dovoli strankam, da prekličejo in ponovno aktivirajo aktivne naročnine</label>
             <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy szüneteltessék és folytathassák az aktív előfizetéseket</label>
             <label lang="fi-FI">Salli asiakkaiden keskeyttää ja jatkaa käynnissä olevia tilauksia</label>
             <label lang="da-DK">Tillad kunder at sætte aktive abonnementer på pause og genoptage dem</label>
@@ -3081,7 +3081,7 @@
             <helpText lang="nb-NO">Hvis aktivert, kan kundene pause og gjenoppta abonnementene sine i kontoen sin.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, klienci mogą wstrzymać i wznawiać posiadane subskrypcje.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci mohou pozastavit a také obnovit svá předplatná ve svém účtu.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, strankam ni dovoljeno, da prekličejo in ponovno aktivirajo svoje naročnine v njihovem računu.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, strankam ni dovoljeno, da prekličejo in ponovno aktivirajo svoje naročnine v njihovem računu.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, az ügyfelek szüneteltethetik és újra folytathatják az előfizetéseiket a fiókjukban.</helpText>
             <helpText lang="fi-FI">Jos käytössä, asiakkaat voivat keskeyttää ja myös jatkaa tilauksiaan tilillään.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, kan kunderne sætte deres abonnementer på pause og også genoptage dem i deres konto.</helpText>
@@ -3107,7 +3107,7 @@
             <label lang="nb-NO">Tillat kunder å hoppe over en kommende fornyelse av abonnement</label>
             <label lang="pl-PL">Pozwól klientom pominąć nadchodzące odnowienie subskrypcji</label>
             <label lang="cs-CZ">Povolit zákazníkům přeskočit nadcházející obnovení předplatného</label>
-            <label lang="sl-SL">Dovoli strankam, da preskočijo prihajajoče obnovitve naročnine</label>
+            <label lang="sl-SI">Dovoli strankam, da preskočijo prihajajoče obnovitve naročnine</label>
             <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy kihagyják a közelgő előfizetés megújítását</label>
             <label lang="fi-FI">Salli asiakkaiden ohittaa tuleva tilauksen uusiminen</label>
             <label lang="da-DK">Tillad kunder at springe en kommende fornyelse af abonnementet over</label>
@@ -3129,7 +3129,7 @@
             <helpText lang="nb-NO">Hvis aktivert, kan kundene hoppe over en kommende fornyelse av et aktivt abonnement. Dette tar også hensyn til den siste påminnelseperioden.</helpText>
             <helpText lang="pl-PL">Jeśli ta opcja jest włączona, klienci mogą pominąć nadchodzące odnowienie aktywnej subskrypcji, z uwzględnieniem ostatniego okres wypowiedzenia.</helpText>
             <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci mohou přeskočit nadcházející obnovu aktivního předplatného. Tento proces také zohledňuje poslední výpovědní lhůtu.</helpText>
-            <helpText lang="sl-SL">Če je omogočeno, strankam ni dovoljeno, da preskočijo prihajajoče obnovitve aktivne naročnine. To upošteva tudi zadnji odpovedni rok.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, strankam ni dovoljeno, da preskočijo prihajajoče obnovitve aktivne naročnine. To upošteva tudi zadnji odpovedni rok.</helpText>
             <helpText lang="hu-HU">Ha engedélyezve van, az ügyfelek kihagyhatják a közelgő megújítását egy aktív előfizetésnek. Ez figyelembe veszi az utolsó értesítési időszakot is.</helpText>
             <helpText lang="fi-FI">Jos käytössä, asiakkaat voivat ohittaa käynnissä olevan tilauksen tulevan uusimisen. Tässä otetaan huomioon myös viimeinen irtisanomisaika.</helpText>
             <helpText lang="da-DK">Hvis aktiveret, kan kunderne springe en kommende fornyelse af et aktivt abonnement over. Dette tager også den sidste varslingsperiode i betragtning.</helpText>
@@ -3155,7 +3155,7 @@
             <label lang="nb-NO">Hopp over fornyelse av abonnement hvis betalingen mislykkes</label>
             <label lang="pl-PL">Pomiń odnowienie subskrypcji, jeśli płatność nie powiedzie się</label>
             <label lang="cs-CZ">Přeskočit obnovu předplatného, pokud platba selže</label>
-            <label lang="sl-SL">Preskoči obnovitev naročnine, če plačilo ne uspe</label>
+            <label lang="sl-SI">Preskoči obnovitev naročnine, če plačilo ne uspe</label>
             <label lang="hu-HU">Előfizetés megújítása kihagyása, ha a fizetés nem sikerül</label>
             <label lang="fi-FI">Ohita tilauksen uusiminen, jos maksu epäonnistuu</label>
             <label lang="da-DK">Spring abonnement fornyelse over, hvis betalingen mislykkes</label>
@@ -3177,7 +3177,7 @@
             <helpText lang="nb-NO">Hvis hoppet over, vil ikke pluginen opprette nye ordrer ved fornyelse av abonnementet hvis betalingen ikke var vellykket. Hvis ikke hoppet over, så blir en ny bestilling opprettet og kunden kan betale på nytt gjennom Shopware.</helpText>
             <helpText lang="pl-PL">Jeśli pominięto, wtyczka nie utworzy nowych zamówień przy odnowieniu subskrypcji, jeśli płatność nie zostanie pomyślnie zrealizowana. Jeśli nie pominięto, zostanie utworzone nowe zamówienie, a klient będzie mógł ponownie dokonać płatności w systemie Shopware.</helpText>
             <helpText lang="cs-CZ">Pokud je obnovení přeskočeno, plugin nevytvoří nové objednávky při obnovení předplatného, pokud platba nebyla úspěšná. Pokud obnovení není přeskočeno, vytvoří se nová objednávka a zákazník může znovu zaplatit v systému Shopware.</helpText>
-            <helpText lang="sl-SL">Če je preskočeno, vtičnik ne bo ustvaril novih naročil ob obnovitvah naročnin, če plačilo ni bilo uspešno. Če ni preskočeno, se ustvari novo naročilo in stranka lahko ponovno plača v Shopware.</helpText>
+            <helpText lang="sl-SI">Če je preskočeno, vtičnik ne bo ustvaril novih naročil ob obnovitvah naročnin, če plačilo ni bilo uspešno. Če ni preskočeno, se ustvari novo naročilo in stranka lahko ponovno plača v Shopware.</helpText>
             <helpText lang="hu-HU">Ha kihagyja, a bővítmény nem hoz létre új megrendeléseket az előfizetések megújításakor, ha a fizetés nem volt sikeres. Ha nem hagyja ki, akkor új megrendelés készül és az ügyfél újra tud fizetni a Shopware-ben.</helpText>
             <helpText lang="fi-FI">Jos ohitetaan, laajennus ei luo uusia tilauksia tilauksen uusimisen yhteydessä, jos maksu ei onnistunut. Jos ei ohiteta, niin uusi tilaus luodaan ja asiakas voi maksaa uudelleen Shopwareissa.</helpText>
             <helpText lang="da-DK">Hvis oversprunget, vil plugin'et ikke oprette nye ordrer ved abonnement fornyelser, hvis betalingen ikke var succesfuld. Hvis ikke oversprunget, så oprettes en ny ordre, og kunden kan betale igen inden for Shopware.</helpText>
@@ -3203,7 +3203,7 @@
             <label lang="nb-NO">Påminnelsesperiode før fornyelse (dager)</label>
             <label lang="pl-PL">Okres przypomnienia przed odnowieniem (dni)</label>
             <label lang="cs-CZ">Období připomenutí před obnovením (dny)</label>
-            <label lang="sl-SL">Odpovedni rok pred obnovitvijo (dni)</label>
+            <label lang="sl-SI">Odpovedni rok pred obnovitvijo (dni)</label>
             <label lang="hu-HU">Emlékeztető időszak a megújítás előtt (napok)</label>
             <label lang="fi-FI">Muistutusaika ennen uusimista (päivinä)</label>
             <label lang="da-DK">Påmindelsesperiode før fornyelse (dage)</label>
@@ -3225,7 +3225,7 @@
             <helpText lang="nb-NO">Angi antall dager før fornyelsen for å sende påminnelsesvarsler om fornyelse i systemet (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="pl-PL">Ustaw liczbę dni przed odnowieniem, w których będą wysyłane przypomnienia o odnowieniu w systemie (Flow Builder, Wydarzenia Biznesowe, ...).</helpText>
             <helpText lang="cs-CZ">Nastavte počet dní před obnovou pro odesílání připomínkových událostí obnovy v systému (Flow Builder, Business Events, ...).</helpText>
-            <helpText lang="sl-SL">Nastavite dneve pred obnovitvijo za pošiljanje obvestil o obnovitvi v sistemu (Flow Builder, poslovni dogodki, ...).</helpText>
+            <helpText lang="sl-SI">Nastavite dneve pred obnovitvijo za pošiljanje obvestil o obnovitvi v sistemu (Flow Builder, poslovni dogodki, ...).</helpText>
             <helpText lang="hu-HU">Állítsa be a napokat a megújítás előtt, amikor emlékeztető eseményeket küld a rendszerben (Flow Builder, Üzleti Események, ...).</helpText>
             <helpText lang="fi-FI">Aseta uusimista edeltävät päivät uusimismuistutustapahtumien lähettämiseksi järjestelmässä (Flow Builder, Business Events, ...).</helpText>
             <helpText lang="da-DK">Indstil antal dage før fornyelse for at sende påmindelsesbegivenheder i systemet (Flow Builder, Business Events, ...).</helpText>
@@ -3251,7 +3251,7 @@
             <label lang="nb-NO">Siste varslingsperiode før fornyelse (dager)</label>
             <label lang="pl-PL">Ostatni okres wypowiedzenia przed odnowieniem (dni)</label>
             <label lang="cs-CZ">Poslední výpovědní lhůta před obnovou (dny)</label>
-            <label lang="sl-SL">Zadnji odpovedni rok pred obnovitvijo (dni)</label>
+            <label lang="sl-SI">Zadnji odpovedni rok pred obnovitvijo (dni)</label>
             <label lang="hu-HU">Legkésőbb értesítési időszak a megújítás előtt (napok)</label>
             <label lang="fi-FI">Viimeinen irtisanomisaika ennen uusimista (päiviä)</label>
             <label lang="da-DK">Seneste varslingsperiode før fornyelse (dage)</label>
@@ -3273,7 +3273,7 @@
             <helpText lang="nb-NO">Angi en varslingsperiode for kundene før abonnementet fornyes. Hvis et abonnement fornyes på fredag og du bruker "2", kan det kanselleres eller pauses senest onsdag. Bruk "0" for alltid å tillate kanselleringer.</helpText>
             <helpText lang="pl-PL">Ustaw okres wypowiedzenia dla klientów przed odnowieniem subskrypcji. Jeśli subskrypcja odnawia się w piątek, a ustawisz "2", można ją anulować lub wstrzymać najpóźniej w środę. Użyj "0", aby zawsze zezwalać na anulowanie.</helpText>
             <helpText lang="cs-CZ">Nastavte výpovědní lhůtu pro zákazníky před obnovením předplatného. Pokud se předplatné obnovuje v pátek a nastavíte '2', může být zrušeno nebo pozastaveno nejpozději ve středu. Použijte '0', aby bylo zrušení možné kdykoliv.</helpText>
-            <helpText lang="sl-SL">Nastavite odpovedni rok za stranke pred obnovitvijo naročnine. Če se naročnina obnovi v petek in uporabljate "2", jo lahko prekličete oziroma ustavite najkasneje do srede. Uporabite "0", da vedno omogočite preklic.</helpText>
+            <helpText lang="sl-SI">Nastavite odpovedni rok za stranke pred obnovitvijo naročnine. Če se naročnina obnovi v petek in uporabljate "2", jo lahko prekličete oziroma ustavite najkasneje do srede. Uporabite "0", da vedno omogočite preklic.</helpText>
             <helpText lang="hu-HU">Állítson be egy értesítési időszakot az ügyfél számára az előfizetés megújítása előtt. Ha egy előfizetés pénteken újul meg, és a „2”-t használja, akkor az előfizetés lemondható vagy szünetelhető szerdáig (utolsó nap). A "0" használatával bármikor engedélyezheti a törlést.</helpText>
             <helpText lang="fi-FI">Aseta asiakkaille irtisanomisaika ennen tilauksen uusimista. Jos tilaus uusitaan perjantaina ja käytät "2", se voidaan peruuttaa tai keskeyttää viimeistään keskiviikkona. Käytä "0" salliaksesi peruutukset aina.</helpText>
             <helpText lang="da-DK">Indstil en varslingsperiode for kunderne før fornyelse af abonnementet. Hvis et abonnement fornyes på fredag og du bruger "2", så kan det annulleres eller sættes på pause senest onsdag. Brug "0" for altid at tillade annulleringer.</helpText>
@@ -3299,7 +3299,7 @@
         <title lang="nb-NO">Avrunding</title>
         <title lang="pl-PL">Zaokrąglanie</title>
         <title lang="cs-CZ">Zaokrouhlování</title>
-        <title lang="sl-SL">Zaokroževanje</title>
+        <title lang="sl-SI">Zaokroževanje</title>
         <title lang="hu-HU">Kerekítés</title>
         <title lang="fi-FI">Pyöristys</title>
         <title lang="da-DK">Afrunding</title>
@@ -3323,7 +3323,7 @@
             <label lang="nb-NO">Opprett linjepost i Mollie Dashboard</label>
             <label lang="pl-PL">Utwórz pozycję w Panelu Mollie</label>
             <label lang="cs-CZ">Vytvořit položku v Mollie Dashboard</label>
-            <label lang="sl-SL">Ustvari postavko v Mollie Dashboard</label>
+            <label lang="sl-SI">Ustvari postavko v Mollie Dashboard</label>
             <label lang="hu-HU">Sor létrehozása a Mollie Irányítópultján</label>
             <label lang="fi-FI">Luo rivikohta Mollie-hallintapaneelissa</label>
             <label lang="da-DK">Opret linjepost i Mollie Dashboard</label>
@@ -3349,7 +3349,7 @@
             <label lang="nb-NO">Navn på linjeelement (valgfritt)</label>
             <label lang="pl-PL">Nazwa pozycji (opcjonalnie)</label>
             <label lang="cs-CZ">Název položky (volitelné)</label>
-            <label lang="sl-SL">Ime postavke (neobvezno)</label>
+            <label lang="sl-SI">Ime postavke (neobvezno)</label>
             <label lang="hu-HU">Sor neve (opcionális)</label>
             <label lang="fi-FI">Rivikohdan nimi (valinnainen)</label>
             <label lang="da-DK">Navn på linjepost (valgfrit)</label>
@@ -3371,7 +3371,7 @@
             <helpText lang="nb-NO">Angi et egendefinert navn for din separate linjepost. Dette hjelper deg hvis du trenger å identifisere det i et annet system.</helpText>
             <helpText lang="pl-PL">Ustaw niestandardową nazwę dla oddzielnej pozycji zamówienia. Będzie to pomocne, jeśli będziesz musiał zidentyfikować ją w innym systemie.</helpText>
             <helpText lang="cs-CZ">Nastavte vlastní název pro samostatnou položku. To pomůže, pokud ji potřebujete identifikovat v jiném systému.</helpText>
-            <helpText lang="sl-SL">Nastavite prilagojeno ime za svojo ločeno postavko. To vam pomaga, če jo potrebujete identificirati v drugem sistemu.</helpText>
+            <helpText lang="sl-SI">Nastavite prilagojeno ime za svojo ločeno postavko. To vam pomaga, če jo potrebujete identificirati v drugem sistemu.</helpText>
             <helpText lang="hu-HU">Állítson be egy egyéni nevet a különálló sorhoz. Ez segíthet, ha azonosítania kell egy másik rendszerben.</helpText>
             <helpText lang="fi-FI">Aseta nimet erillisille rivikohdille. Tämä auttaa, tunnistamaan sen toisessa järjestelmässä.</helpText>
             <helpText lang="da-DK">Indstil et tilpasset navn for din separate linjepost. Dette hjælper, hvis du skal identificere den i et andet system.</helpText>
@@ -3396,7 +3396,7 @@
             <label lang="nb-NO">Linjepost SKU (valgfritt)</label>
             <label lang="pl-PL">Numer SKU pozycji (opcjonalnie)</label>
             <label lang="cs-CZ">SKU položky (volitelné)</label>
-            <label lang="sl-SL">SKU postavke (neobvezno)</label>
+            <label lang="sl-SI">SKU postavke (neobvezno)</label>
             <label lang="hu-HU">Sor SKU (opcionális)</label>
             <label lang="fi-FI">Rivikohta SKU (valinnainen)</label>
             <label lang="da-DK">SKU for linjepost (valgfrit)</label>
@@ -3418,7 +3418,7 @@
             <helpText lang="nb-NO">Angi en egendefinert SKU-verdi for din separate linjepost. Dette hjelper deg hvis du trenger å identifisere det i et annet system.</helpText>
             <helpText lang="pl-PL">Ustaw niestandardową wartość numeru SKU dla oddzielnej pozycji zamówienia. Będzie to pomocne, jeśli będziesz musiał zidentyfikować ją w innym systemie.</helpText>
             <helpText lang="cs-CZ">Nastavte vlastní hodnotu SKU pro samostatnou položku. To pomůže, pokud ji potřebujete identifikovat v jiném systému.</helpText>
-            <helpText lang="sl-SL">Nastavite prilagojeno vrednost SKU za svojo ločeno postavko. To pomaga, če jo potrebujete identificirati v drugem sistemu.</helpText>
+            <helpText lang="sl-SI">Nastavite prilagojeno vrednost SKU za svojo ločeno postavko. To pomaga, če jo potrebujete identificirati v drugem sistemu.</helpText>
             <helpText lang="hu-HU">Állítson be egy egyéni SKU értéket a különálló sorhoz. Ez segíthet, ha azonosítania kell egy másik rendszerben.</helpText>
             <helpText lang="fi-FI">Aseta muokattu SKU-arvo erilliselle rivikohdalle. Tämä auttaa sinua tunnistamaan sen toisessa järjestelmässä.</helpText>
             <helpText lang="da-DK">Indstil en tilpasset SKU-værdi for din separate linjepost. Dette hjælper, hvis du skal identificere den i et andet system.</helpText>
@@ -3447,7 +3447,7 @@
         <title lang="nb-NO">Javascript</title>
         <title lang="pl-PL">Javascript</title>
         <title lang="cs-CZ">Javascript</title>
-        <title lang="sl-SL">Javascript</title>
+        <title lang="sl-SI">Javascript</title>
         <title lang="hu-HU">Javascript</title>
         <title lang="fi-FI">Javascript</title>
         <title lang="da-DK">Javascript</title>
@@ -3471,7 +3471,7 @@
             <label lang="nb-NO">Bruk Shopware standard Javascript i butikkfronten (krever manuell kompilering)</label>
             <label lang="pl-PL">Użyj domyślnego JavaScript Shopware w interfejsie użytkownika (wymaga ręcznej kompilacji)</label>
             <label lang="cs-CZ">Použijte výchozí Javascript Shopware v obchodě (vyžaduje ruční kompilaci)</label>
-            <label lang="sl-SL">Uporabite privzeti Javascript Shopware v trgovini (zahteva ročno pripravo)</label>
+            <label lang="sl-SI">Uporabite privzeti Javascript Shopware v trgovini (zahteva ročno pripravo)</label>
             <label lang="hu-HU">Használja a Shopware alapértelmezett Javascript-ját az Árufronton (kézi fordítást igényel)</label>
             <label lang="fi-FI">Käytä Shopwaren oletus-Javascriptia kauppapaikalla (vaatii manuaalista koodausta)</label>
             <label lang="da-DK">Brug Shopware standard Javascript i butiksvinduet (kræver manuel kompilering)</label>
@@ -3494,7 +3494,7 @@
             <helpText lang="nb-NO">Du kan også gjenbruke Mollie inne i "all.js" til temaet direkte. Dette krever at du bygger om butikkfronten på egen hånd.</helpText>
             <helpText lang="pl-PL">Możesz również przywrócić Mollie bezpośrednio w pliku motywu „all.js”. Wymaga to samodzielnej odbudowy interfejsu użytkownika.</helpText>
             <helpText lang="cs-CZ">Mollie můžete také přidat přímo do souboru 'all.js' šablony. K tomu je nutné si vlastními silami znovu sestavit Storefront.</helpText>
-            <helpText lang="sl-SL">Mollie lahko prav tako vrnete v "all.js" teme neposredno. To zahteva, da sami ponovno vzpostavite trgovino.</helpText>
+            <helpText lang="sl-SI">Mollie lahko prav tako vrnete v "all.js" teme neposredno. To zahteva, da sami ponovno vzpostavite trgovino.</helpText>
             <helpText lang="hu-HU">A Mollie-t is visszahelyezheti a téma "all.js"-ban. Ehhez szükséges, hogy saját magának kell újraépítenie az Árufrontot.</helpText>
             <helpText lang="fi-FI">Voit myös palauttaa Mollien suoraan teeman "all.js"-tiedostoon. Tämä edellyttää, että rakennat kaupan uudelleen itse.</helpText>
             <helpText lang="da-DK">Du kan også bringe Mollie tilbage i "all.js" i temaet direkte. Dette kræver, at du genopbygger butiksvinduet selv.</helpText>

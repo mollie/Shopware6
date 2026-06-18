@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Resources\snippet\sl_SL;
+namespace Kiener\MolliePayments\Resources\snippet\sl_SI;
 
 use Shopware\Core\System\Snippet\Files\SnippetFileInterface;
 
-class SnippetFile_sl_SL implements SnippetFileInterface
+class SnippetFile_sl_SI implements SnippetFileInterface
 {
     public function getName(): string
     {
@@ -28,7 +28,7 @@ class SnippetFile_sl_SL implements SnippetFileInterface
 
     public function getIso(): string
     {
-        return 'sl-SL';
+        return 'sl-SI';
     }
 
     public function getAuthor(): string

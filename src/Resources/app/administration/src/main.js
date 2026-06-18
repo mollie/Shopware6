@@ -36,7 +36,7 @@ import svSE from './snippet/sv-SE';
 import nbNO from './snippet/nb-NO';
 import plPL from './snippet/pl-PL';
 import csCZ from './snippet/cs-CZ';
-import slSL from './snippet/sl-SL';
+import slSI from './snippet/sl-SI';
 import huHU from './snippet/hu-HU';
 import fiFI from './snippet/fi-FI';
 import daDK from './snippet/da-DK';
@@ -71,7 +71,7 @@ Shopware.Locale.extend('pl-PL', plPL);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('cs-CZ', csCZ);
 // eslint-disable-next-line no-undef
-Shopware.Locale.extend('sl-SL', slSL);
+Shopware.Locale.extend('sl-SI', slSI);
 // eslint-disable-next-line no-undef
 Shopware.Locale.extend('hu-HU', huHU);
 // eslint-disable-next-line no-undef
