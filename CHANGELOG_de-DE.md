@@ -1,3 +1,6 @@
+# 4.25.1
+- Behoben: Kompatibilität mit Shopware 6.7.11.0 – Tippfehler im ISO-Code der slowenischen Snippet-Sprache korrigiert, der ab dieser Version von Shopware validiert wird.
+
 # 4.25.0
 - Behoben: Kompatibilität mit dem NetInventors Bundle Plugin - Bundle-Produkte werden nun von der Erweiterung um Kind-Positionen ausgeschlossen, um Betragsabweichungen beim Erstellen von Zahlungen über Mollie zu verhindern.
 - Behoben: Bancontact- und Satispay-Zahlungen mit Status „open" werden nun korrekt als fehlgeschlagen behandelt, statt auf die Erfolgsseite weiterzuleiten.
