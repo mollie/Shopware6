@@ -46,7 +46,9 @@ final class FlowBuilderConfigController extends AbstractController
         if ($locale === '') {
             $locale = 'en-GB';
         }
-
+        /**
+         * @var string[] $salesChannelIds
+         */
         $salesChannelIds = $this->salesChannelRepository->searchIds(new Criteria(), $context)->getIds();
 
         $automaticShippingFound = false;
