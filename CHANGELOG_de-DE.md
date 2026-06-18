@@ -1,5 +1,6 @@
 # 4.25.1
 - Behoben: Kompatibilität mit Shopware 6.7.11.0 – Tippfehler im ISO-Code der slowenischen Snippet-Sprache korrigiert, der ab dieser Version von Shopware validiert wird.
+- Entfernt: Kreditkarten-Logos werden in der Bestelldetailansicht der Administration nicht mehr angezeigt.
 
 # 4.25.0
 - Behoben: Kompatibilität mit dem NetInventors Bundle Plugin - Bundle-Produkte werden nun von der Erweiterung um Kind-Positionen ausgeschlossen, um Betragsabweichungen beim Erstellen von Zahlungen über Mollie zu verhindern.

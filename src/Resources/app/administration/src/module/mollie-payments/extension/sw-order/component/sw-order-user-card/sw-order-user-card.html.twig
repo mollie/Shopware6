@@ -16,9 +16,7 @@ SHOPWARE 6.4
         <div v-if="hasCreditCardData">
             <dt>Credit Card Data</dt>
             <dd>
-                <mollie-credit-card-logo :creditCardCompany="creditCardLabel">
-                    {{ creditCardLabel }}
-                </mollie-credit-card-logo>
+                {{ creditCardLabel }}
             </dd>
             <dd>
                 {{ creditCardNumber }}
