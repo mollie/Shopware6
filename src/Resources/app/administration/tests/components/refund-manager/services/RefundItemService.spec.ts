@@ -1,29 +1,27 @@
-import { beforeEach, expect, test } from 'vitest'
-import RefundItemService from '../../../../src/module/mollie-payments/components/mollie-refund-manager/services/RefundItemService';
+import { beforeEach, expect, test } from 'vitest';
+import RefundItemService, {
+    type RefundItem,
+} from '../../../../src/module/mollie-payments/components/mollie-refund-manager/services/RefundItemService';
 
 const service = new RefundItemService();
 
-
-let item = {};
-
+let item: RefundItem;
 
 beforeEach(() => {
-
     item = {
-        'refunded': 0,
-        'refundQuantity': 0,
-        'shopware': {
-            'quantity': 5,
-            'unitPrice': 14.99,
-            'isPromotion': false,
-            'isDelivery': false,
-            'promotion': {
-                'discount': 0,
+        refunded: 0,
+        refundQuantity: 0,
+        shopware: {
+            quantity: 5,
+            unitPrice: 14.99,
+            isPromotion: false,
+            isDelivery: false,
+            promotion: {
+                discount: 0,
             },
         },
     };
 });
-
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -152,7 +150,6 @@ test('Item values can be reset correctly', () => {
 // ---------------------------------------------------------------------------------------------------
 
 test('Item with deducted promotion leads to reduced refund amount', () => {
-
     // we sold 3 items with 10 EUR per item
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
@@ -175,7 +172,6 @@ test('Item with deducted promotion leads to reduced refund amount', () => {
 });
 
 test('Item without deducted promotion leads to original refund amount', () => {
-
     // we sold 3 items with 10 EUR per item
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
@@ -198,7 +194,6 @@ test('Item without deducted promotion leads to original refund amount', () => {
 });
 
 test('Item does not deduct promotion if a custom amount is already set', () => {
-
     // we sold 3 items with 10 EUR per item
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
@@ -221,7 +216,6 @@ test('Item does not deduct promotion if a custom amount is already set', () => {
 // ---------------------------------------------------------------------------------------------------
 
 test('Item refund quantity can be set correctly', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -232,7 +226,6 @@ test('Item refund quantity can be set correctly', () => {
 });
 
 test('Item refund amount automatically calculated when quantity is set', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -244,7 +237,6 @@ test('Item refund amount automatically calculated when quantity is set', () => {
 });
 
 test('Item quantity is not recalculated if we already entered an amount', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -259,7 +251,6 @@ test('Item quantity is not recalculated if we already entered an amount', () => 
 });
 
 test('Item automatically calculates maximum refundable quantity', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -274,7 +265,6 @@ test('Item automatically calculates maximum refundable quantity', () => {
 // ---------------------------------------------------------------------------------------------------
 
 test('Item refund amount can be set correctly', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -285,7 +275,6 @@ test('Item refund amount can be set correctly', () => {
 });
 
 test('Item calculates matching quantity on amount input', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -296,7 +285,6 @@ test('Item calculates matching quantity on amount input', () => {
 });
 
 test('Item does not calculate matching quantity on amount input if quantity already set', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -309,7 +297,6 @@ test('Item does not calculate matching quantity on amount input if quantity alre
 });
 
 test('Item with custom refund even if quantity is already set', () => {
-
     item.shopware.unitPrice = 10;
     item.shopware.quantity = 3;
 
@@ -325,4 +312,3 @@ test('Item with custom refund even if quantity is already set', () => {
 
     expect(item.refundAmount).toBe(8);
 });
-
