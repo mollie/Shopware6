@@ -146,20 +146,7 @@
         </service>
 
 
-        <!-- Subscribers -->
-        <service id="Kiener\MolliePayments\Subscriber\CheckoutConfirmPageSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MandateService"/>
-            <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\TestModeNotificationSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
 
         <service id="Kiener\MolliePayments\Service\Router\RoutingDetector">
@@ -181,10 +168,6 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Subscriber\KernelSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\VersionCompare"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
 
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
