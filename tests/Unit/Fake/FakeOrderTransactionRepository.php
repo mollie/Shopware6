@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
+use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
+use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -10,7 +12,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Event\NestedEventCollection;
 
-final class FakeOrderTransactionRepository extends EntityRepository
+final class FakeOrderTransactionRepository extends EntityRepository implements OrderTransactionRepositoryInterface
 {
     /** @var list<string> */
     private array $matchingIds = [];
@@ -35,14 +37,14 @@ final class FakeOrderTransactionRepository extends EntityRepository
         return $this->upsertedPayloads;
     }
 
+    public function findOpenTransactions(?Context $context = null): IdSearchResult
+    {
+        return $this->buildIdSearchResult($context ?? new Context(new SystemSource()));
+    }
+
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        $data = [];
-        foreach ($this->matchingIds as $id) {
-            $data[] = ['data' => ['id' => $id], 'primaryKey' => $id];
-        }
-
-        return new IdSearchResult(count($data), $data, $criteria, $context);
+        return $this->buildIdSearchResult($context);
     }
 
     /**
@@ -55,5 +57,15 @@ final class FakeOrderTransactionRepository extends EntityRepository
         }
 
         return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
+    }
+
+    private function buildIdSearchResult(Context $context): IdSearchResult
+    {
+        $data = [];
+        foreach ($this->matchingIds as $id) {
+            $data[] = ['data' => ['id' => $id], 'primaryKey' => $id];
+        }
+
+        return new IdSearchResult(count($data), $data, new Criteria(), $context);
     }
 }

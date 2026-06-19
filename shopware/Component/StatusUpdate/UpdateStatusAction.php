@@ -3,20 +3,23 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\StatusUpdate;
 
-use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
+use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
+use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class UpdateStatusAction
 {
-    private OrderTransactionRepositoryInterface $transactionRepository;
-    private NotificationFacade $notification;
-
-    public function __construct(OrderTransactionRepositoryInterface $transactionRepository, NotificationFacade $notification)
-    {
-        $this->transactionRepository = $transactionRepository;
-        $this->notification = $notification;
+    public function __construct(
+        private OrderTransactionRepositoryInterface $transactionRepository,
+        #[Autowire(service: WebhookRoute::class)]
+        private AbstractWebhookRoute $webhookRoute,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private LoggerInterface $logger
+    ) {
     }
 
     public function execute(): UpdateStatusResult
@@ -29,11 +32,18 @@ final class UpdateStatusAction
         if ($transactions->getTotal() === 0) {
             return $result;
         }
-        $transactionIds = $transactions->getIds();
+
         /** @var string $transactionId */
-        foreach ($transactionIds as $transactionId) {
-            $result->addUpdateId($transactionId);
-            $this->notification->onNotify($transactionId, $context);
+        foreach ($transactions->getIds() as $transactionId) {
+            try {
+                $this->webhookRoute->notify($transactionId, $context);
+                $result->addUpdateId($transactionId);
+            } catch (\Throwable $e) {
+                $this->logger->error('Failed to update status for transaction', [
+                    'transactionId' => $transactionId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         return $result;

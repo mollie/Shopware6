@@ -13,10 +13,6 @@
 
 
 
-        <service id="Kiener\MolliePayments\Subscriber\OrderEditSubscriber">
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
-            <tag name="kernel.event_subscriber" />
-        </service>
 
 
 

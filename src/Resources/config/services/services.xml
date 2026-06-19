@@ -119,10 +119,6 @@
             <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Order\OrderTimeService">
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
             <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
             <argument type="service" id="order.repository"/>
@@ -157,14 +153,6 @@
 
         <service id="Kiener\MolliePayments\Service\MollieLocaleService">
             <argument type="service" id="language.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Components\OrderExpiration\ExpireAction">
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderExpireService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
         <service id="Kiener\MolliePayments\Service\OrderCreateService" public="true">
