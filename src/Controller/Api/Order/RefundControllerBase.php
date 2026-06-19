@@ -7,7 +7,6 @@ use Kiener\MolliePayments\Components\RefundManager\RefundManagerInterface;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequest;
 use Kiener\MolliePayments\Components\RefundManager\Request\RefundRequestItem;
 use Kiener\MolliePayments\Exception\PaymentNotFoundException;
-use Kiener\MolliePayments\Service\MolliePaymentExtractor;
 use Kiener\MolliePayments\Service\OrderService;
 use Kiener\MolliePayments\Service\Refund\RefundService;
 use Kiener\MolliePayments\Traits\Api\ApiTrait;
@@ -42,23 +41,16 @@ class RefundControllerBase extends AbstractController
      */
     private $logger;
 
-    /**
-     * @var MolliePaymentExtractor
-     */
-    private $molliePaymentExtractor;
-
     public function __construct(
         OrderService $orderService,
         RefundManagerInterface $refundManager,
         RefundService $refundService,
-        LoggerInterface $logger,
-        MolliePaymentExtractor $molliePaymentExtractor
+        LoggerInterface $logger
     ) {
         $this->orderService = $orderService;
         $this->refundManager = $refundManager;
         $this->refundService = $refundService;
         $this->logger = $logger;
-        $this->molliePaymentExtractor = $molliePaymentExtractor;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -97,32 +89,6 @@ class RefundControllerBase extends AbstractController
     // ----------------------------------------------------------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------------------------------------------------------
     // TECHNICAL ADMIN APIs
-
-    public function refundManagerData(RequestDataBag $data, Context $context): JsonResponse
-    {
-        try {
-            $orderId = $data->getAlnum('orderId');
-
-            $order = $this->orderService->getOrder($orderId, $context);
-
-            if (! $this->molliePaymentExtractor->isLastTransactionMollie($order)) {
-                return $this->json($this->emptyRefundManagerData((string) $order->getTaxStatus()));
-            }
-
-            $refundData = $this->refundManager->getData($order, $context);
-
-            return $this->json($refundData->toArray());
-        } catch (\Throwable $e) {
-            $this->logger->error(
-                $e->getMessage(),
-                [
-                    'error' => $e,
-                ]
-            );
-
-            return $this->buildErrorResponse($e->getMessage());
-        }
-    }
 
     public function list(RequestDataBag $data, Context $context): JsonResponse
     {
@@ -167,11 +133,6 @@ class RefundControllerBase extends AbstractController
         return $this->cancelRefundAction($orderId, $refundId, $context);
     }
 
-    public function refundManagerDataLegacy(RequestDataBag $data, Context $context): JsonResponse
-    {
-        return $this->refundManagerData($data, $context);
-    }
-
     public function listLegacy(RequestDataBag $data, Context $context): JsonResponse
     {
         return $this->listRefundsAction($data->getAlnum('orderId'), $context);
@@ -191,29 +152,6 @@ class RefundControllerBase extends AbstractController
     {
         return $this->cancelRefundAction($data->getAlnum('orderId'), $data->get('refundId'), $context);
     }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function emptyRefundManagerData(string $taxStatus): array
-    {
-        return [
-            'totals' => [
-                'remaining' => 0.0,
-                'voucherAmount' => 0.0,
-                'pendingRefunds' => 0.0,
-                'refunded' => 0.0,
-                'roundingDiff' => 0.0,
-            ],
-            'cart' => [],
-            'refunds' => [],
-            'taxStatus' => $taxStatus,
-        ];
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------------------------------
-    // ----------------------------------------------------------------------------------------------------------------------------------------
-    // ----------------------------------------------------------------------------------------------------------------------------------------
 
     private function listRefundsAction(string $orderId, Context $context): JsonResponse
     {

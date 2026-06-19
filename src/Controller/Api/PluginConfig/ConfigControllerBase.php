@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Controller\Api\PluginConfig;
 
-use Kiener\MolliePayments\Controller\Api\PluginConfig\Exceptions\MollieRefundConfigException;
-use Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Setting\MollieSettingStruct;
 use Shopware\Administration\Snippet\SnippetFinderInterface;
@@ -26,19 +24,12 @@ class ConfigControllerBase extends AbstractController
      */
     private $snippetFinder;
 
-    /**
-     * @var MollieRefundConfigService
-     */
-    private $configMollieRefundService;
-
     public function __construct(
         SettingsService $settings,
-        SnippetFinderInterface $snippetFinder,
-        MollieRefundConfigService $configMollieRefundService
+        SnippetFinderInterface $snippetFinder
     ) {
         $this->settings = $settings;
         $this->snippetFinder = $snippetFinder;
-        $this->configMollieRefundService = $configMollieRefundService;
     }
 
     /**
@@ -82,38 +73,6 @@ class ConfigControllerBase extends AbstractController
                 ],
             ],
         ]);
-    }
-
-    /**
-     * This route can be used to get the configuration for the refund manager from the plugin configuration.
-     * Depending on these settings, the merchant might have configured a different behaviour
-     * for fields, flows and actions.
-     */
-    public function getRefundManagerConfig(Request $request, Context $context): JsonResponse
-    {
-        // it's important to get the sales channel.
-        // because different sales channels might have different configured behaviours for the
-        // employees of the merchant.
-        // so depending on the order, we grab the matching sales channel configuration.
-        $salesChannelID = (string) $request->get('salesChannelId');
-        $orderId = (string) $request->get('orderId');
-
-        if (empty($salesChannelID)) {
-            $config = $this->settings->getSettings('');
-        } else {
-            $config = $this->settings->getSettings($salesChannelID);
-        }
-
-        try {
-            return $this->configMollieRefundService->createConfigControllerResponse($orderId, $config, $salesChannelID, $context);
-        } catch (MollieRefundConfigException $exception) {
-            return ConfigControllerResponse::createFromMollieSettingStruct($config);
-        }
-    }
-
-    public function getRefundManagerConfigLegacy(Request $request, Context $context): JsonResponse
-    {
-        return $this->getRefundManagerConfig($request, $context);
     }
 
     private function getAdminSnippet(string $snippetName, string $locale): string

@@ -17,15 +17,6 @@ export default class MolliePaymentsRefundService extends ApiService {
      * @param data
      * @returns {*}
      */
-    getRefundManagerData(data = { orderId: null }) {
-        return this.__post('/refund-manager/data', data);
-    }
-
-    /**
-     *
-     * @param data
-     * @returns {*}
-     */
     getRefundOverview(data = { orderId: null }) {
         return this.__post('/order/refund-overview', data);
     }

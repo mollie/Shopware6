@@ -11,32 +11,9 @@
         <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- Admin API Controller -->
 
-        <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService">
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Controller\Api\Controller\RequestBagFactory"/>
-
-        <service id="Kiener\MolliePayments\Controller\Api\Controller\OrderController">
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Controller\RequestBagFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase"/>
-            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase"/>
-            <argument type="service" id="Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase"/>
-            <argument type="service" id="order.repository"/>
-        </service>
-
-
         <service id="Kiener\MolliePayments\Controller\Api\PluginConfig\ConfigControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="Shopware\Administration\Snippet\CachedSnippetFinder"/>
-            <argument type="service"
-                      id="Kiener\MolliePayments\Controller\Api\PluginConfig\Services\MollieRefundConfigService"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -59,7 +36,6 @@
             <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundService"/>
             <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MolliePaymentExtractor"/>
 
             <call method="setContainer">
                 <argument type="service" id="service_container"/>

@@ -207,8 +207,12 @@ Component.register('mollie-order-tab', {
                     }
 
                     const refundManager = response.refundManager ?? {};
-                    const isAuthorized =
-                        this.order?.transactions?.[0]?.stateMachineState?.technicalName === 'authorized';
+                    const transactions = Array.from(this.order?.transactions ?? []);
+                    const latestTransaction =
+                        transactions.sort(function (a, b) {
+                            return new Date(b.createdAt) - new Date(a.createdAt);
+                        })[0] ?? null;
+                    const isAuthorized = latestTransaction?.stateMachineState?.technicalName === 'authorized';
                     const aclAllowed = this.acl.can('mollie_refund_manager:read');
                     this.isRefundManagerPossible = !isAuthorized && aclAllowed && (refundManager.enabled ?? false);
 
