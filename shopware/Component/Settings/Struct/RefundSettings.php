@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class RefundSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_ENABLED = 'refundManagerEnabled';
     public const KEY_VERIFY_REFUND = 'refundManagerVerifyRefund';
     public const KEY_AUTO_STOCK_RESET = 'refundManagerAutoStockReset';

@@ -4,17 +4,19 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Settings\Struct;
 
 use Mollie\Shopware\Component\Mollie\Mode;
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class ApiSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_TEST_API_KEY = 'testApiKey';
     public const KEY_LIVE_API_KEY = 'liveApiKey';
     public const KEY_TEST_MODE = 'testMode';
 
     public const KEY_PROFILE_ID = 'profileId';
 
-    public function __construct(private string $testApiKey, private string $liveApiKey, private Mode $mode,private string $profileId)
+    public function __construct(private string $testApiKey, private string $liveApiKey, private Mode $mode, private string $profileId)
     {
     }
 

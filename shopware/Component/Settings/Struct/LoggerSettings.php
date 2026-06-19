@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class LoggerSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_LOG_FILE_DAYS = 'logFileDays';
     public const KEY_DEBUG_MODE = 'debugMode';
 

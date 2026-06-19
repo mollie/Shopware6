@@ -5,10 +5,12 @@ namespace Mollie\Shopware\Component\Settings\Struct;
 
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestriction;
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class ApplePaySettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_APPLE_PAY_DIRECT_ENABLED = 'enableApplePayDirect';
     public const KEY_RESTRICTIONS = 'applePayDirectRestrictions';
 

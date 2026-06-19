@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class AccountSettings extends Struct
 {
+    use JsonSerializableTrait;
+
     public function __construct(private bool $phoneFieldShown,
         private bool $phoneFieldRequired,
         private bool $birthdayFieldShown,

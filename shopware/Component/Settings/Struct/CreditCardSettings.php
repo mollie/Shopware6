@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class CreditCardSettings extends Struct
 {
+    use JsonSerializableTrait;
     private const KEY_CREDIT_CARD_COMPONENTS = 'enableCreditCardComponents';
 
     public function __construct(private bool $creditCardComponentsEnabled = false)

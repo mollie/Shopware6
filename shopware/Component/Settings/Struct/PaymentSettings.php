@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class PaymentSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_ORDER_NUMBER_FORMAT = 'formatOrderNumber';
     public const KEY_DUE_DATE_DAYS = 'paymentMethodBankTransferDueDateDays';
     public const KEY_SHOPWARE_FAILED_PAYMENT = 'shopwareFailedPayment';

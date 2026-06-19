@@ -57,7 +57,7 @@ final class JsonConfigGenerator implements AttachmentGeneratorInterface
     {
         try {
             $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
-            $apiVars = $apiSettings->getVars();
+            $apiVars = $apiSettings->jsonSerialize();
             foreach (self::SENSITIVE_KEYS as $key) {
                 $apiVars[$key] = '(hidden)';
             }
@@ -66,15 +66,15 @@ final class JsonConfigGenerator implements AttachmentGeneratorInterface
                 'label' => $label,
                 'config' => [
                     'api' => $apiVars,
-                    'payment' => $this->settingsService->getPaymentSettings($salesChannelId)->getVars(),
-                    'logger' => $this->settingsService->getLoggerSettings($salesChannelId)->getVars(),
-                    'creditCard' => $this->settingsService->getCreditCardSettings($salesChannelId)->getVars(),
-                    'applePay' => $this->settingsService->getApplePaySettings($salesChannelId)->getVars(),
-                    'payPalExpress' => $this->settingsService->getPaypalExpressSettings($salesChannelId)->getVars(),
-                    'account' => $this->settingsService->getAccountSettings($salesChannelId)->getVars(),
-                    'orderState' => $this->settingsService->getOrderStateSettings($salesChannelId)->getVars(),
-                    'refund' => $this->settingsService->getRefundSettings($salesChannelId)->getVars(),
-                    'subscription' => $this->settingsService->getSubscriptionSettings($salesChannelId)->getVars(),
+                    'payment' => $this->settingsService->getPaymentSettings($salesChannelId)->jsonSerialize(),
+                    'logger' => $this->settingsService->getLoggerSettings($salesChannelId)->jsonSerialize(),
+                    'creditCard' => $this->settingsService->getCreditCardSettings($salesChannelId)->jsonSerialize(),
+                    'applePay' => $this->settingsService->getApplePaySettings($salesChannelId)->jsonSerialize(),
+                    'payPalExpress' => $this->settingsService->getPaypalExpressSettings($salesChannelId)->jsonSerialize(),
+                    'account' => $this->settingsService->getAccountSettings($salesChannelId)->jsonSerialize(),
+                    'orderState' => $this->settingsService->getOrderStateSettings($salesChannelId)->jsonSerialize(),
+                    'refund' => $this->settingsService->getRefundSettings($salesChannelId)->jsonSerialize(),
+                    'subscription' => $this->settingsService->getSubscriptionSettings($salesChannelId)->jsonSerialize(),
                 ],
             ];
         } catch (\Throwable $e) {

@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Settings\Struct;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class OrderStateSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_STATE_PAID = 'orderStateWithAPaidTransaction';
     public const KEY_STATE_FAILED = 'orderStateWithAFailedTransaction';
     public const KEY_STATE_CANCELLED = 'orderStateWithACancelledTransaction';

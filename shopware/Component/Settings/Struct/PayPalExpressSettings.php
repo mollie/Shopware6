@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class PayPalExpressSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_BUTTON_STYLE = 'paypalExpressButtonStyle';
     public const KEY_BUTTON_SHAPE = 'paypalExpressButtonShape';
     public const KEY_RESTRICTIONS = 'paypalExpressRestrictions';

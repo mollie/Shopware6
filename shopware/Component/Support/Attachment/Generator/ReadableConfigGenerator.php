@@ -70,7 +70,8 @@ final class ReadableConfigGenerator implements AttachmentGeneratorInterface
             $lines[] = 'Profile ID: ' . ($apiSettings->getProfileId() ?: 'Empty');
             $lines[] = '';
 
-            foreach ($this->settingsService->getPaymentSettings($salesChannelId)->getVars() as $key => $value) {
+            $paymentVars = $this->settingsService->getPaymentSettings($salesChannelId)->jsonSerialize();
+            foreach ($paymentVars as $key => $value) {
                 $lines[] = $key . ': ' . $this->formatValue($value);
             }
 
@@ -108,6 +109,18 @@ final class ReadableConfigGenerator implements AttachmentGeneratorInterface
 
         if ($value === null || $value === '') {
             return 'Empty';
+        }
+
+        if (is_array($value)) {
+            return empty($value) ? 'Empty' : implode(', ', array_map('strval', $value));
+        }
+
+        if ($value instanceof \UnitEnum) {
+            return $value instanceof \BackedEnum ? (string) $value->value : $value->name;
+        }
+
+        if (is_object($value)) {
+            return get_class($value);
         }
 
         return (string) $value;

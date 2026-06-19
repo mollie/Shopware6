@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
 final class SubscriptionSettings extends Struct
 {
+    use JsonSerializableTrait;
     public const KEY_ENABLED = 'subscriptionsEnabled';
     public const KEY_SHOW_INDICATOR = 'subscriptionsShowIndicator';
     public const KEY_ALLOW_EDIT_ADDRESS = 'subscriptionsAllowAddressEditing';

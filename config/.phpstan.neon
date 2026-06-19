@@ -9,8 +9,6 @@ parameters:
         - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
         - ./../src/Components/RefundManager/Elasticsearch/RefundAdminSearchIndexer.php
         - ./../shopware/Component/Subscription/Search/SubscriptionAdminSearchIndexer.php
-        # legacy code that is not working with abstract/interface changes
-        - ./../src/Service/Mail/MailService63.php
         # AbstractPaymentHandler only exists in Shopware 6.6+; the if/else feature-flag
         # pattern used here cannot be statically analysed against the 6.5 vendor.
         - ./../shopware/Component/Payment/Handler/AbstractMolliePaymentHandler.php
