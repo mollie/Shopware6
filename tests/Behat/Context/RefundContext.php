@@ -17,8 +17,6 @@ use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
-use Shopware\Core\Checkout\Order\OrderCollection;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -216,16 +214,7 @@ final class RefundContext extends ShopwareContext
         $request = new Request();
         $request->request->replace(['orderId' => $orderId, 'refundId' => $refundId]);
 
-        /** @var EntityRepository<OrderCollection> $orderRepository */
-        $orderRepository = $this->getContainer()->get('order.repository');
-        $versionId = $orderRepository->createVersion($orderId, $context);
-        $versionContext = $context->createWithVersionId($versionId);
-
-        $controller->cancel($request, $versionContext);
-
-        $context->scope(Context::SYSTEM_SCOPE, function (Context $systemContext) use ($orderRepository, $versionId): void {
-            $orderRepository->merge($versionId, $systemContext);
-        });
+        $controller->cancel($request, $context);
     }
 
     private function findDalRefundByMollieId(string $mollieRefundId): RefundEntity
@@ -309,18 +298,8 @@ final class RefundContext extends ShopwareContext
         Storage::set(self::STORAGE_LAST_REFUND_RESPONSE, null);
         Storage::set(self::STORAGE_REFUND_EXCEPTION, null);
 
-        $orderId = (string) ($params['orderId'] ?? '');
-
-        /** @var EntityRepository<OrderCollection> $orderRepository */
-        $orderRepository = $this->getContainer()->get('order.repository');
-        $versionId = $orderRepository->createVersion($orderId, $context);
-        $versionContext = $context->createWithVersionId($versionId);
-
         try {
-            $response = $controller->create($request, $versionContext);
-            $context->scope(Context::SYSTEM_SCOPE, function (Context $systemContext) use ($orderRepository, $versionId): void {
-                $orderRepository->merge($versionId, $systemContext);
-            });
+            $response = $controller->create($request, $context);
             $data = json_decode((string) $response->getContent(), true);
             Storage::set(self::STORAGE_LAST_REFUND_RESPONSE, $data);
             if (isset($data['id'])) {

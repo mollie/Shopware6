@@ -174,7 +174,7 @@ final class RefundController extends AbstractController
 
         $refundSettings = $this->settingsService->getRefundSettings($salesChannelId);
         if ($refundSettings->isCreateCreditNotes()) {
-            $this->creditNoteService->addCreditNote($order->getId(), $refund, $refundSettings, $context);
+            $this->creditNoteService->addCreditNote($order, $refund, $refundSettings, $context);
         }
 
         $this->logger->info('Refund created successfully', [
