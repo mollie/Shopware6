@@ -8,7 +8,10 @@ use Mollie\Shopware\Component\Support\Attachment\AttachmentCollection;
 use Mollie\Shopware\Component\Support\Attachment\Generator\AttachmentGeneratorInterface;
 use Shopware\Core\Content\Mail\Service\AbstractMailFactory;
 use Shopware\Core\Content\Mail\Service\AbstractMailSender;
+use Shopware\Core\Content\Mail\Service\MailFactory;
+use Shopware\Core\Content\Mail\Service\MailSender;
 use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class SupportMailer implements SupportMailerInterface
@@ -23,7 +26,9 @@ final class SupportMailer implements SupportMailerInterface
      * @param iterable<AttachmentGeneratorInterface> $attachmentGenerators
      */
     public function __construct(
+        #[Autowire(service: MailFactory::class)]
         private readonly AbstractMailFactory $mailFactory,
+        #[Autowire(service: MailSender::class)]
         private readonly AbstractMailSender $mailSender,
         #[AutowireIterator('mollie.support.attachment_generator')]
         private readonly iterable $attachmentGenerators,
