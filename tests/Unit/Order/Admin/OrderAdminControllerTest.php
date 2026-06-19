@@ -54,7 +54,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $mollieOrder = new Order('ord-xxx', '', [
+        $mollieOrder = new Order('ord-xxx', '', null, [
             $this->buildCancelableLineItem('shopware-line-1', 'mollie-line-1', 2),
         ]);
         $gateway->withOrder($mollieOrder);
@@ -114,7 +114,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $mollieOrder = new Order('ord-xxx', '', [
+        $mollieOrder = new Order('ord-xxx', '', null, [
             $this->buildShippableLineItem('shopware-line-1', 'mollie-line-1', shippable: 2, shipped: 1),
         ]);
         $gateway->withOrder($mollieOrder);
@@ -145,7 +145,7 @@ final class OrderAdminControllerTest extends TestCase
         $line1->setAmountShipped(new Money(10.0, 'EUR'));
         $line2 = $this->buildShippableLineItem('shopware-line-2', 'mollie-line-2', shippable: 2, shipped: 2);
         $line2->setAmountShipped(new Money(20.0, 'EUR'));
-        $mollieOrder = new Order('ord-xxx', '', [$line1, $line2]);
+        $mollieOrder = new Order('ord-xxx', '', null, [$line1, $line2]);
         $gateway->withOrder($mollieOrder);
 
         $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
