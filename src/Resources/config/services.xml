@@ -180,9 +180,6 @@
             <argument>%kernel.shopware_version%</argument>
         </service>
 
-        <service id="Kiener\MolliePayments\Subscriber\CartConvertedSubscriber">
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
 
 

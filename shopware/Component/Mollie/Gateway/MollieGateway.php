@@ -306,6 +306,25 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
+    public function cancelOrder(string $mollieOrderId, string $orderNumber, string $salesChannelId): Order
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $response = $client->delete('orders/' . $mollieOrderId);
+            $body = json_decode($response->getBody()->getContents(), true);
+            $this->logger->info('Order cancelled over mollie api', [
+                'mollieOrderId' => $mollieOrderId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+                'responseParameter' => $body,
+            ]);
+
+            return Order::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
     public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection
     {
         try {

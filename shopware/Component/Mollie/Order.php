@@ -14,6 +14,7 @@ final class Order
     public function __construct(
         private readonly string $id,
         private readonly string $checkoutUrl,
+        private readonly ?PaymentStatus $status = null,
         array $lines = [],
     ) {
         $this->lines = new LineItemCollection($lines);
@@ -28,6 +29,11 @@ final class Order
     public function getCheckoutUrl(): string
     {
         return $this->checkoutUrl;
+    }
+
+    public function getStatus(): ?PaymentStatus
+    {
+        return $this->status;
     }
 
     public function getLines(): LineItemCollection
@@ -79,7 +85,7 @@ final class Order
             $lines[] = LineItem::createFromClientResponse($line);
         }
 
-        $order = new self($body['id'] ?? '', $checkoutUrl, $lines);
+        $order = new self($body['id'] ?? '', $checkoutUrl, PaymentStatus::tryFrom((string) ($body['status'] ?? '')), $lines);
         $order->payment = Payment::createFromClientResponse($embeddedPaymentBody);
 
         foreach ($body['_embedded']['refunds'] ?? [] as $refundData) {

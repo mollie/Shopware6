@@ -21,6 +21,7 @@ final class PaymentSettings extends Struct
     private const KEY_CREATE_CUSTOMERS_AT_MOLLIE = 'createCustomersAtMollie';
 
     private const KEY_USE_MOLLIE_LIMITS = 'useMolliePaymentMethodLimits';
+    private const KEY_AUTOMATIC_CANCELLATION = 'automaticCancellation';
 
     public function __construct(private string $orderNumberFormat,
         private int $dueDateDays,
@@ -30,6 +31,7 @@ final class PaymentSettings extends Struct
         private bool $createCustomersAtMollie = false,
         private bool $useMollieLimits = false,
         private bool $automaticShipment = false,
+        private bool $automaticCancellation = false,
     ) {
     }
 
@@ -46,8 +48,9 @@ final class PaymentSettings extends Struct
         $createCustomersAtMollie = $settings[self::KEY_CREATE_CUSTOMERS_AT_MOLLIE] ?? false;
         $useMollieLimits = $settings[self::KEY_USE_MOLLIE_LIMITS] ?? false;
         $automaticShipment = $settings[self::KEY_AUTOMATIC_SHIPMENT] ?? false;
+        $automaticCancellation = $settings[self::KEY_AUTOMATIC_CANCELLATION] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment);
+        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation);
     }
 
     public function getOrderNumberFormat(): string
@@ -92,5 +95,10 @@ final class PaymentSettings extends Struct
     public function isAutomaticShipment(): bool
     {
         return $this->automaticShipment;
+    }
+
+    public function isAutomaticCancellation(): bool
+    {
+        return $this->automaticCancellation;
     }
 }

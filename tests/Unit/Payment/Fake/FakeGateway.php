@@ -33,6 +33,9 @@ final class FakeGateway implements MollieGatewayInterface
     /** @var list<string> */
     private array $cancelledPaymentIds = [];
 
+    /** @var list<string> */
+    private array $cancelledOrderIds = [];
+
     /** @var array<string,PaymentCollection> */
     private array $subscriptionPayments = [];
 
@@ -79,6 +82,14 @@ final class FakeGateway implements MollieGatewayInterface
     public function getCancelledPaymentIds(): array
     {
         return $this->cancelledPaymentIds;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getCancelledOrderIds(): array
+    {
+        return $this->cancelledOrderIds;
     }
 
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
@@ -155,6 +166,13 @@ final class FakeGateway implements MollieGatewayInterface
         $this->cancelledPaymentIds[] = $molliePaymentId;
 
         return $this->payment;
+    }
+
+    public function cancelOrder(string $mollieOrderId, string $orderNumber, string $salesChannelId): Order
+    {
+        $this->cancelledOrderIds[] = $mollieOrderId;
+
+        return $this->order ?? new Order($mollieOrderId, '');
     }
 
     public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection

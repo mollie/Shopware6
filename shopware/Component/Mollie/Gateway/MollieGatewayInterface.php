@@ -31,6 +31,8 @@ interface MollieGatewayInterface
 
     public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment;
 
+    public function cancelOrder(string $mollieOrderId, string $orderNumber, string $salesChannelId): Order;
+
     public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection;
 
     public function getCurrentProfile(?string $salesChannelId = null): Profile;
