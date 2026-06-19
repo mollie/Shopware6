@@ -4,18 +4,6 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api.action.mollie.support.request" path="/api/_action/mollie/support/request" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Support\SupportControllerBase::requestSupport</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
-
-    <route id="api.action.mollie.support.request.legacy" path="/api/v{version}/_action/mollie/support/request" methods="POST">
-        <default key="_controller">Kiener\MolliePayments\Controller\Api\Support\SupportControllerBase::requestSupportLegacy</default>
-        <default key="_routeScope"><list><string>api</string></list></default>
-        <default key="auth_required"><bool>true</bool></default>
-        <default key="auth_enabled"><bool>true</bool></default>
-    </route>
+    <!-- migrated to shopware/Component/Support/Controller/SupportController.php -->
 
 </routes>

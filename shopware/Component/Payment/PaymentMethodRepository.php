@@ -9,6 +9,7 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -40,6 +41,15 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
         $searchResult = $this->paymentMethodRepository->searchIds($criteria, $context);
 
         return $searchResult->firstId();
+    }
+
+    public function findAllMollieMethods(Context $context): PaymentMethodCollection
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new ContainsFilter('handlerIdentifier', 'MolliePayments'));
+
+        /** @var PaymentMethodCollection<PaymentMethodEntity> */
+        return $this->paymentMethodRepository->search($criteria, $context)->getEntities();
     }
 
     private function getCriteria(string $salesChannelId): Criteria

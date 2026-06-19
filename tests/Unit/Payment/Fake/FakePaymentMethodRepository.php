@@ -5,6 +5,8 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
+use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 
 final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
@@ -21,5 +23,10 @@ final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterf
     public function getIdByPaymentMethod(PaymentMethod $paymentMethod, string $salesChannelId, Context $context): ?string
     {
         return $this->fakeId;
+    }
+
+    public function findAllMollieMethods(Context $context): PaymentMethodCollection
+    {
+        return new PaymentMethodCollection();
     }
 }

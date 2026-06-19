@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
-final class CreditCardSettings
+use Shopware\Core\Framework\Struct\Struct;
+
+final class CreditCardSettings extends Struct
 {
     private const KEY_CREDIT_CARD_COMPONENTS = 'enableCreditCardComponents';
 

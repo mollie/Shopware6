@@ -159,45 +159,6 @@
             <argument type="service" id="language.repository"/>
         </service>
 
-        <!-- Mail -->
-
-
-        <service id="Kiener\MolliePayments\Service\Mail\AttachmentCollector">
-            <argument type="tagged" tag="mollie_payments.mail.attachment_generator"/>
-        </service>
-
-        <service id="mollie_payments.mail.mollie_log_archive_generator" class="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\LogFileArchiveGenerator">
-            <argument>%kernel.logs_dir%</argument>
-            <argument>mollie_</argument>
-            <tag name="mollie_payments.mail.attachment_generator"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\ReadablePluginConfigurationGenerator">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\Service\ConfigurationService"/>
-            <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\ApiKeyValidator"/>
-
-            <tag name="mollie_payments.mail.attachment_generator"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\JsonPluginConfigurationGenerator">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\Service\ConfigurationService"/>
-            <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-
-            <tag name="mollie_payments.mail.attachment_generator"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Mail\AttachmentGenerator\PaymentMethodGenerator">
-            <argument type="service" id="sales_channel.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor"/>
-
-            <tag name="mollie_payments.mail.attachment_generator"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Components\OrderExpiration\ExpireAction">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="sales_channel.repository"/>

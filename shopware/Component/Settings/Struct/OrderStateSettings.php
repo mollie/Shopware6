@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Settings\Struct;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Framework\Struct\Struct;
 
-final class OrderStateSettings
+final class OrderStateSettings extends Struct
 {
     public const KEY_STATE_PAID = 'orderStateWithAPaidTransaction';
     public const KEY_STATE_FAILED = 'orderStateWithAFailedTransaction';

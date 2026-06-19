@@ -55,16 +55,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Controller\Api\Support\SupportControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieSupportFacade"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Controller\Api\Payment\ReturnControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade"/>
             <call method="setContainer">
