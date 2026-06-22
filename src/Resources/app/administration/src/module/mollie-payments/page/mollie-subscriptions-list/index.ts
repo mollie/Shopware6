@@ -3,13 +3,23 @@ import './mollie-subscriptions-list.scss';
 import MollieSubscriptionGrid from './grids/MollieSubscriptionGrid';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
-// eslint-disable-next-line no-undef
 const { Component, Mixin, Application, Filter } = Shopware;
-
-// eslint-disable-next-line no-undef
 const { Criteria } = Shopware.Data;
 
-Component.register('mollie-subscriptions-list', {
+interface SubscriptionsListPage {
+    isLoading: boolean;
+    systemConfig: any;
+    subscriptions: any;
+    sortBy: string;
+    sortDirection: string;
+    naturalSorting: boolean;
+    showHelp: boolean;
+    searchConfigEntity: string;
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<SubscriptionsListPage> = {
     template,
 
     inject: ['systemConfigApiService', 'MolliePaymentsSubscriptionService', 'repositoryFactory', 'acl'],
@@ -19,11 +29,8 @@ Component.register('mollie-subscriptions-list', {
     data() {
         return {
             isLoading: true,
-            // -------------------------------------
             systemConfig: null,
-            // -------------------------------------
             subscriptions: null,
-            // -------------------------------------
             sortBy: 'createdAt',
             sortDirection: 'DESC',
             naturalSorting: true,
@@ -39,27 +46,14 @@ Component.register('mollie-subscriptions-list', {
     },
 
     computed: {
-        /**
-         *
-         * @returns {mollie_subscription}
-         */
         repoSubscriptions() {
             return this.repositoryFactory.create('mollie_subscription');
         },
 
-        /**
-         *
-         * @returns {SubscriptionService}
-         */
         subscriptionService() {
-            // eslint-disable-next-line no-undef
             return new SubscriptionService(Application.getApplicationRoot());
         },
 
-        /**
-         *
-         * @returns {null|*}
-         */
         prePaymentReminderEmail() {
             if (!this.systemConfig) {
                 return null;
@@ -72,10 +66,6 @@ Component.register('mollie-subscriptions-list', {
             return null;
         },
 
-        /**
-         *
-         * @returns {*}
-         */
         totalSubscriptions() {
             return this.subscriptions.length;
         },
@@ -83,14 +73,15 @@ Component.register('mollie-subscriptions-list', {
         /**
          * Provide icon compatibility for 6.4. Shopware's compatibility mapping will be removed in 6.5
          * @see vendor/shopware/administration/Resources/app/administration/src/app/component/base/sw-icon/legacy-icon-mapping.js
-         * @returns {object}
          */
         compatibilityIcons() {
             const map = Component.getComponentRegistry();
+
             return {
                 refresh: map.has('icons-regular-undo') ? 'regular-undo' : 'default-arrow-360-left',
             };
         },
+
         currencyFilter() {
             return Filter.getByName('currency');
         },
@@ -101,18 +92,12 @@ Component.register('mollie-subscriptions-list', {
     },
 
     methods: {
-        /**
-         *
-         * @returns {[{allowResize: boolean, dataIndex: string, property: string, label},{allowResize: boolean, dataIndex: string, property: string, label},{allowResize: boolean, property: string, label},{allowResize: boolean, property: string, label},{allowResize: boolean, property: string, label},null,null,null]|*}
-         */
         gridColumns() {
             const grid = new MollieSubscriptionGrid();
+
             return grid.buildColumns();
         },
 
-        /**
-         *
-         */
         async getList() {
             this.isLoading = true;
             this.naturalSorting = this.sortBy === 'createdAt';
@@ -130,37 +115,20 @@ Component.register('mollie-subscriptions-list', {
             criteria.addAssociation('customer');
             criteria.addAssociation('currency');
 
-            // eslint-disable-next-line no-undef
-            this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result) => {
+            this.repoSubscriptions.search(criteria, Shopware.Context.api).then((result: any) => {
                 this.subscriptions = result;
                 this.isLoading = false;
             });
         },
 
-        // ---------------------------------------------------------------------------------------------------------
-        // <editor-fold desc="GRID">
-        // ---------------------------------------------------------------------------------------------------------
-
-        /**
-         *
-         * @param status
-         * @returns {*}
-         */
-        statusTranslation(status) {
+        statusTranslation(status: string) {
             return this.subscriptionService.getStatusTranslation(status);
         },
 
-        /**
-         *
-         * @param status
-         * @returns {string}
-         */
-        statusColor(status) {
+        statusColor(status: string) {
             return this.subscriptionService.getStatusColor(status);
         },
-
-        // ---------------------------------------------------------------------------------------------------------
-        // </editor-fold>
-        // ---------------------------------------------------------------------------------------------------------
     },
-});
+};
+
+Component.register('mollie-subscriptions-list', componentConfig);
