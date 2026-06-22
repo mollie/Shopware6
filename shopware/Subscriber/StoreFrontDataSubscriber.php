@@ -70,7 +70,6 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
             );
             $this->addMollieLocale($page, $localeCode);
 
-            $this->addTestMode($page, $apiSettings);
             $this->addProfileId($page, $apiSettings);
             $this->addCreditCardSettings($page, $mollieExtension, $salesChannelContext);
             $this->addPosTerminals($page, $mollieExtension, $salesChannelContext);
@@ -119,13 +118,6 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
     {
         $page->assign([
             'mollie_profile_id' => $apiSettings->getProfileId()
-        ]);
-    }
-
-    private function addTestMode(Page $page, ApiSettings $apiSettings): void
-    {
-        $page->assign([
-            'mollie_test_mode' => $apiSettings->isTestMode() ? 'true' : 'false',
         ]);
     }
 

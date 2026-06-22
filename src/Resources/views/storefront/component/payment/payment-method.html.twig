@@ -2,22 +2,7 @@
 {% sw_extends '@Storefront/storefront/component/payment/payment-method.html.twig' %}
 
 {% block component_payment_method_description %}
-
-
-    {% if "Mollie" in payment.handlerIdentifier and page.extensions.MollieTestModePageExtension.testMode == true %}
-        <div class="payment-method-description">
-            <strong>{{ payment.translated.name }} ({{ "molliePayments.testMode.label"|trans }})</strong>
-            {% if payment.translated.description and payment.id is same as(selectedPaymentMethodId) %}
-                {% set paymentDescription = payment.translated.description|raw %}
-                {% set paymentDescriptionTitle = payment.translated.description|striptags|raw %}
-                {% set paymentDescription = (paymentDescription|length > 75 ? paymentDescription[:75] ~ ' ...' : paymentDescription) %}
-
-                <p title="{{ paymentDescriptionTitle }}">{{ paymentDescription }}</p>
-            {% endif %}
-        </div>
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+    {{ parent() }}
 
     {# load mollie creditcard components #}
     {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}

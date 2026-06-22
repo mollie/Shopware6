@@ -62,7 +62,7 @@
                     "locale": "{{ page.mollie_locale }}",
                     "profileId": "{{ page.mollie_profile_id }}",
                     "shopUrl": "{{ seoUrl('frontend.home.page') }}",
-                    "testMode": {{ page.mollie_test_mode }},
+                    "testMode": {{ page.mollie_test_mode ? 'true' : 'false' }},
                     "paymentId": "{{ payment.id }}",
                     "newCardMandateOption": "{{ NEW_CARD_MANDATE_OPTION }}"
                 }'
