@@ -2,10 +2,15 @@ import template from './mollie-pluginconfig-section-info.html.twig';
 import './mollie-pluginconfig-section-info.scss';
 import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
-// eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
 
-Component.register('mollie-pluginconfig-section-info', {
+interface SectionInfoComponent {
+    versionCompare: any;
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<SectionInfoComponent> = {
     template,
 
     mixins: [Mixin.getByName('notification')],
@@ -20,23 +25,20 @@ Component.register('mollie-pluginconfig-section-info', {
     shortcuts: {
         'SYSTEMKEY+i': 'openConfigImport',
     },
+
     created() {
         this.versionCompare = new VersionCompare();
     },
+
     computed: {
-        /**
-         * @returns {string|*}
-         */
         userName() {
             const user = this.getCurrentUser();
             if (!user) {
                 return '';
             }
-
             if (user.firstName === '') {
                 return user.username;
             }
-
             return user.firstName;
         },
 
@@ -49,14 +51,14 @@ Component.register('mollie-pluginconfig-section-info', {
         openConfigImport() {
             // TODO create and open a configuration import modal
         },
+
         getCurrentUser() {
-            // eslint-disable-next-line no-undef
-            let session = Shopware.State.get('session');
-            if (session === undefined) {
-                session = Shopware.Store.get('session');
-            }
-            return session.currentUser;
+            // Pinia store (Shopware >= 6.6/6.7) first, Vuex state as fallback for older versions.
+            return (
+                Shopware.Store?.get?.('session')?.currentUser ?? Shopware.State?.get?.('session')?.currentUser ?? null
+            );
         },
+
         openSupport() {
             this.isSupportOpen = true;
         },
@@ -65,4 +67,6 @@ Component.register('mollie-pluginconfig-section-info', {
             this.isSupportOpen = false;
         },
     },
-});
+};
+
+Component.register('mollie-pluginconfig-section-info', componentConfig);
