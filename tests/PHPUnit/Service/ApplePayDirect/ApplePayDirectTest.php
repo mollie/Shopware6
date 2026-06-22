@@ -13,7 +13,6 @@ use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDirectDomai
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayFormatter;
 use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingBuilder;
-use Kiener\MolliePayments\Facade\MolliePaymentDoPay;
 use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
@@ -78,9 +77,6 @@ class ApplePayDirectTest extends TestCase
 
         /** @var ApplePayPayment $payment */
         $payment = $this->createDummyMock(ApplePayPayment::class, $this);
-
-        /** @var MolliePaymentDoPay $doPay */
-        $doPay = $this->createDummyMock(MolliePaymentDoPay::class, $this);
 
         /** @var ApplePayFormatter $formatter */
         $formatter = $this->createDummyMock(ApplePayFormatter::class, $this);

@@ -22,26 +22,12 @@
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Transition\OrderTransitionService">
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Transition\DeliveryTransitionService">
+<service id="Kiener\MolliePayments\Service\Transition\DeliveryTransitionService">
             <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService" >
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransitionService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Order\OrderStateService" >
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\OrderService">
+<service id="Kiener\MolliePayments\Service\OrderService">
             <argument type="service" id="order.repository"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
             <argument type="service" id="Kiener\MolliePayments\Service\UpdateOrderCustomFields"/>
@@ -83,12 +69,7 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor">
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor">
+<service id="Kiener\MolliePayments\Service\MollieApi\OrderDeliveryExtractor">
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
@@ -103,29 +84,7 @@
             <argument type="service" id="order_transaction.repository"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\Order\UpdateOrderLineItems">
-            <argument type="service" id="order_line_item.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher">
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor">
-            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Order\OrderStatusUpdater">
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
-            <argument type="service" id="state_machine_state.repository"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\CartService" public="true">
+<service id="Kiener\MolliePayments\Service\CartService" public="true">
             <argument type="service" id="Shopware\Core\Checkout\Cart\SalesChannel\CartService"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory"/>
@@ -136,21 +95,13 @@
 
 
 
-        <service id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator">
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider">
+<service id="Kiener\MolliePayments\Service\Payment\Provider\ActivePaymentMethodsProvider">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\MollieLocaleService">
-            <argument type="service" id="language.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\OrderCreateService" public="true">
+<service id="Kiener\MolliePayments\Service\OrderCreateService" public="true">
             <argument type="service" id="Shopware\Core\Framework\Validation\DataValidator"/>
             <argument type="service" id="Shopware\Core\Checkout\Order\Validation\OrderValidationFactory"/>
             <argument type="service" id="event_dispatcher"/>

@@ -44,12 +44,7 @@
 
 
         <!-- Helpers -->
-        <service id="Kiener\MolliePayments\Service\Order\OrderStateService">
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\OrderTransitionService"/>
-        </service>
-
-        <service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
+<service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
 
         <service id="kiener.mollie_payments.http.client" class="Kiener\MolliePayments\Service\HttpClient\HttpClientInterface">
             <factory service="kiener.mollie_payments.http.client.factory" method="buildClient"/>
@@ -104,16 +99,7 @@
             <argument type="service" id="router"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Service\TransactionService" >
-            <argument type="service" id="order_transaction.repository"/>
-        </service>
-
-
-        <service id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter" public="false">
-        </service>
-
-
-        <service id="Kiener\MolliePayments\Service\Router\RoutingDetector">
+<service id="Kiener\MolliePayments\Service\Router\RoutingDetector">
             <argument type="service" id="request_stack"/>
         </service>
 

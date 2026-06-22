@@ -6,35 +6,7 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderBuilder">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\OrderDataExtractor"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\MollieOrderCustomerEnricher"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder">
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieLineItemBuilder">
-            <argument type="service" id="Kiener\MolliePayments\Validator\IsOrderLineItemValid"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\PriceCalculator"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\LineItemDataExtractor"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer"/>
-            <argument type="service" id="Kiener\MolliePayments\Hydrator\MollieLineItemHydrator"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieShippingLineItemBuilder"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderAddressBuilder"/>
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer">
         </service>
