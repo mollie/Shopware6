@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Nollaa oppat",
                 "btnToggleTutorial": "Näytä/piilota opas",
+                "btnShowTutorial": "Näytä opas",
+                "btnHideTutorial": "Piilota opas",
                 "titleFullRefund": "Kokonaishyvitys",
                 "textFullRefund": "Käytä vain painiketta tehdäksesi täyden hyvityksen. Tämä varmistaa, että kaikki tuotteet merkitään hyvitetyiksi ja koko summa palautetaan asiakkaalle.",
                 "titleStockReset": "Varaston nollaus",

@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Útmutatók visszaállítása",
                 "btnToggleTutorial": "Útmutató megjelenítése/elrejtése",
+                "btnShowTutorial": "Útmutató megjelenítése",
+                "btnHideTutorial": "Útmutató elrejtése",
                 "titleFullRefund": "Teljes visszatérítés",
                 "textFullRefund": "Csak használja a teljes visszatérítés gombot. Ez biztosítja, hogy az összes elemét visszatérítettnek jelöljön meg, és a teljes összeg visszatérítést nyújtsa a vásárlónak.",
                 "titleStockReset": "Készlet visszaállítás",

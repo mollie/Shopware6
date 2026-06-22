@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Handleidingen resetten",
                 "btnToggleTutorial": "Handleidingen tonen/verbergen",
+                "btnShowTutorial": "Handleidingen tonen",
+                "btnHideTutorial": "Handleidingen verbergen",
                 "titleFullRefund": "Volledige terugbetaling",
                 "textFullRefund": "Gebruik gewoon de knop voor de volledige terugbetaling. Dit zorgt ervoor dat alle artikelen worden gemarkeerd als terugbetaald en het volledige bedrag wordt vergoed aan de klant.",
                 "titleStockReset": "Voorraad resetten",

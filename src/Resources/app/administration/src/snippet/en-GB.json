@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Reset Tutorials",
                 "btnToggleTutorial": "Show/Hide Tutorial",
+                "btnShowTutorial": "Show Tutorial",
+                "btnHideTutorial": "Hide Tutorial",
                 "titleFullRefund": "Full Refund",
                 "textFullRefund": "Just use the button for the full refund. This makes sure that all your items are marked as refunded and the full amount is returned to the customer.",
                 "titleStockReset": "Stock Reset",

@@ -1,0 +1,69 @@
+<sw-container
+    columns="1fr 1fr"
+    gap="0px"
+>
+    <sw-card-section
+        v-if="showInstructions"
+        position-identifier="instructions-container-content"
+        class="instructions-container-content"
+        divider="right"
+    >
+        <sw-container
+            v-for="(block, index) in blocksPrimary"
+            :key="index"
+            columns="1fr 20fr"
+            class="instructions-block"
+        >
+            <div></div>
+            <div>
+                <strong>{{ block.title }}</strong>
+                <br />
+                {{ block.text }}
+                <br />
+                <br />
+                <sw-button
+                    variant="ghost"
+                    :ghost="true"
+                    size="small"
+                    @click="block.toggle()"
+                >
+                    {{ block.label }}
+                </sw-button>
+            </div>
+        </sw-container>
+    </sw-card-section>
+    <sw-card-section v-else></sw-card-section>
+    <sw-card-section
+        v-if="showInstructions"
+        class="instructions-container-content"
+        divider="right"
+    >
+        <sw-container
+            v-for="(block, index) in blocksSecondary"
+            :key="index"
+            columns="1fr 20fr"
+            class="instructions-block"
+        >
+            <div></div>
+            <div>
+                <strong>{{ block.title }}</strong>
+                <br />
+                {{ block.text }}
+                <br />
+                <br />
+                <sw-button
+                    variant="ghost"
+                    :ghost="true"
+                    size="small"
+                    @click="block.toggle()"
+                >
+                    {{ block.label }}
+                </sw-button>
+            </div>
+        </sw-container>
+    </sw-card-section>
+    <sw-card-section
+        v-else
+        divider="right"
+    ></sw-card-section>
+</sw-container>

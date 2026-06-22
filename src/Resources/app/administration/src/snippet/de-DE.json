@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Tutorials zurücksetzen",
                 "btnToggleTutorial": "Tutorial anzeigen/verstecken",
+                "btnShowTutorial": "Tutorial anzeigen",
+                "btnHideTutorial": "Tutorial verstecken",
                 "titleFullRefund": "Vollständige Rückerstattung",
                 "textFullRefund": "Verwenden Sie einfach die Schaltfläche für die vollständige Rückerstattung. Dadurch wird sichergestellt, dass alle Ihre Artikel als erstattet markiert werden und der volle Betrag an den Kunden zurückerstattet wird.",
                 "titleStockReset": "Lagerbestand zurücksetzen",

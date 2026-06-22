@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Nulstil Vejledninger",
                 "btnToggleTutorial": "Vis/Skjul Vejledning",
+                "btnShowTutorial": "Vis Vejledning",
+                "btnHideTutorial": "Skjul Vejledning",
                 "titleFullRefund": "Fuld Refusion",
                 "textFullRefund": "Brug knappen til fuld refusion. Dette sikrer, at alle dine elementer markeres som refunderet, og det fulde beløb returneres til kunden.",
                 "titleStockReset": "Nulstilling af lager",

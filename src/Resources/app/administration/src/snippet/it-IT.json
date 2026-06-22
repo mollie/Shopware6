@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Reimposta tutorial",
                 "btnToggleTutorial": "Mostra/Nascondi Tutorial",
+                "btnShowTutorial": "Mostra Tutorial",
+                "btnHideTutorial": "Nascondi Tutorial",
                 "titleFullRefund": "Rimborso totale",
                 "textFullRefund": "Utilizza semplicemente il pulsante per il rimborso totale. In questo modo, tutti i tuoi articoli saranno contrassegnati come rimborsati e l'intero importo sarà restituito al cliente.",
                 "titleStockReset": "Reimpostazione stock",

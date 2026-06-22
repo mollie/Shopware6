@@ -1,6 +1,6 @@
 import template from './mollie-refund-manager-refunds.html.twig';
-import MollieRefundsGrid from '../mollie-refund-manager/grids/MollieRefundsGrid';
-import RefundCompositionFormatter from '../mollie-refund-manager/services/RefundCompositionFormatter';
+import MollieRefundsGrid from '../../grids/MollieRefundsGrid';
+import RefundCompositionFormatter from '../../services/RefundCompositionFormatter';
 
 const { Component, Filter } = Shopware;
 

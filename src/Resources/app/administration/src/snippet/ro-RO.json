@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Resetați tutorialele",
                 "btnToggleTutorial": "Arată/Ascunde tutorialul",
+                "btnShowTutorial": "Arată tutorialul",
+                "btnHideTutorial": "Ascunde tutorialul",
                 "titleFullRefund": "Rambursare totală",
                 "textFullRefund": "Trebuie doar să folosiți butonul pentru rambursarea totală. Acest lucru asigură că toate articolele dvs. sunt marcate ca fiind rambursate și întreaga sumă este returnată clientului.",
                 "titleStockReset": "Resetare stoc",
