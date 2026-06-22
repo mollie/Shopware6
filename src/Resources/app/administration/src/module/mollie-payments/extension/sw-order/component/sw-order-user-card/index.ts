@@ -2,10 +2,17 @@ import template from './sw-order-user-card.html.twig';
 import './sw-order-user-card.scss';
 import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
-// eslint-disable-next-line no-undef
 const { Component } = Shopware;
 
-Component.override('sw-order-user-card', {
+interface SwOrderUserCardOverride {
+    isMolliePaymentUrlLoading: boolean;
+    molliePaymentUrl: string | null;
+    molliePaymentUrlCopied: boolean;
+
+    [key: string]: any;
+}
+
+const overrideConfig: ThisType<SwOrderUserCardOverride> = {
     template,
 
     inject: ['MolliePaymentsOrderService'],
@@ -19,90 +26,51 @@ Component.override('sw-order-user-card', {
     },
 
     computed: {
-        /**
-         *
-         * @returns {boolean}
-         */
         isMollieOrder() {
-            const attr = new OrderAttributes(this.currentOrder);
-            return attr.isMollieOrder();
+            return new OrderAttributes(this.currentOrder).isMollieOrder();
         },
 
-        /**
-         *
-         * @returns {*}
-         */
         hasCreditCardData() {
             return this._creditCardData().hasCreditCardData();
         },
 
-        /**
-         *
-         * @returns {string|*}
-         */
         creditCardLabel() {
             return this._creditCardData().getLabel();
         },
 
-        /**
-         *
-         * @returns {string|*}
-         */
         creditCardNumber() {
             return '**** **** **** ' + this._creditCardData().getNumber();
         },
 
-        /**
-         *
-         * @returns {string|*}
-         */
         creditCardHolder() {
             return this._creditCardData().getHolder();
         },
 
-        /**
-         *
-         * @returns {null|string|*}
-         */
         mollieOrderId() {
-            const orderAttributes = new OrderAttributes(this.currentOrder);
-            return orderAttributes.getMollieID();
+            return new OrderAttributes(this.currentOrder).getMollieID();
         },
 
-        /**
-         *
-         * @returns {string}
-         */
         mollieThirdPartyPaymentId() {
-            const orderAttributes = new OrderAttributes(this.currentOrder);
-            return orderAttributes.getPaymentRef();
+            return new OrderAttributes(this.currentOrder).getPaymentRef();
         },
 
         /**
-         * Subscription either via legacy customField (older orders) or via
-         * the mollieSubscriptions extension association (loaded by the
+         * Subscription either via legacy customField (older orders) or via the
+         * mollieSubscriptions extension association (loaded by the
          * sw-order-detail override).
-         *
-         * @returns {boolean}
          */
         isSubscription() {
             const orderAttributes = new OrderAttributes(this.currentOrder);
+
             return orderAttributes.isSubscription() || this._extensionSubscription() !== null;
         },
 
-        /**
-         *
-         * @returns {string}
-         */
         subscriptionId() {
             const orderAttributes = new OrderAttributes(this.currentOrder);
+
             return orderAttributes.getSwSubscriptionId() || this._extensionSubscription()?.id || '';
         },
 
-        /**
-         *
-         * @returns {boolean}
-         */
         hasPaymentLink() {
             return this.molliePaymentUrl !== '';
         },
@@ -113,9 +81,6 @@ Component.override('sw-order-user-card', {
     },
 
     methods: {
-        /**
-         *
-         */
         createdComponent() {
             this.$super('createdComponent');
 
@@ -128,7 +93,7 @@ Component.override('sw-order-user-card', {
             this.isMolliePaymentUrlLoading = true;
 
             this.MolliePaymentsOrderService.getPaymentUrl({ orderId: this.currentOrder.id })
-                .then((response) => {
+                .then((response: any) => {
                     this.molliePaymentUrl = response.url !== null ? response.url : '';
                 })
                 .finally(() => {
@@ -136,24 +101,17 @@ Component.override('sw-order-user-card', {
                 });
         },
 
-        /**
-         *
-         * @returns {CreditcardAttributes|*}
-         */
         _creditCardData() {
-            const orderAttributes = new OrderAttributes(this.currentOrder);
-            return orderAttributes.getCreditCardAttributes();
+            return new OrderAttributes(this.currentOrder).getCreditCardAttributes();
         },
 
         /**
          * Reads mollieSubscriptions from either the entity extension bag
-         * (Shopware default for EntityExtension associations) or directly
-         * from the order — depending on the Shopware version the DAL
-         * sometimes hoists the association onto the entity itself.
-         *
-         * @returns {object|null}
+         * (Shopware default for EntityExtension associations) or directly from
+         * the order — depending on the Shopware version the DAL sometimes hoists
+         * the association onto the entity itself.
          */
-        _extensionSubscription() {
+        _extensionSubscription(): any {
             const order = this.currentOrder;
             const subscriptions = order?.extensions?.mollieSubscriptions ?? order?.mollieSubscriptions ?? null;
 
@@ -168,21 +126,15 @@ Component.override('sw-order-user-card', {
             return subscriptions.length > 0 ? subscriptions[0] : null;
         },
 
-        /**
-         *
-         */
         copyPaymentUrlToClipboard() {
-            // eslint-disable-next-line no-undef
             Shopware.Utils.dom.copyToClipboard(this.molliePaymentUrl);
             this.molliePaymentUrlCopied = true;
         },
 
-        /**
-         *
-         * @param value
-         */
-        onMolliePaymentUrlProcessFinished(value) {
+        onMolliePaymentUrlProcessFinished(value: boolean) {
             this.molliePaymentUrlCopied = value;
         },
     },
-});
+};
+
+Component.override('sw-order-user-card', overrideConfig);
