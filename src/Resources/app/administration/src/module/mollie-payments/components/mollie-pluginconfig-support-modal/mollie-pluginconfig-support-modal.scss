@@ -41,6 +41,18 @@
     .input-recepient .sw-select__selection {
         display: flex;
         align-items: center;
+
+        // The selection box is a flex row, so let the selection wrapper grow and let
+        // its input fill the full width — otherwise the selected value is clipped when
+        // the dropdown is open (e.g. "International Support (inf").
+        .sw-single-select__selection {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .sw-single-select__selection-input {
+            width: 100%;
+        }
     }
 
     // The email field renders as the newer grid-based mt-email-field while the name
