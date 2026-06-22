@@ -5,5 +5,12 @@ node_modules
 tests
 vendor
 modules
+src_vendor
 package-lock.json
 dist
+
+# Top-level {% block %} override template: Prettier's HTML parser flattens the
+# block structure and there is no wrapping element to scope an inline
+# prettier-ignore to (the blocks must stay at the top level for the override to
+# work), so this file is kept hand-formatted.
+src/Resources/app/administration/src/module/mollie-payments/components/mollie-order-line-items-grid/mollie-order-line-items-grid.html.twig
