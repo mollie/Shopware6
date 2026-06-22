@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Restablecer tutoriales",
                 "btnToggleTutorial": "Mostrar/Ocultar tutorial",
+                "btnShowTutorial": "Mostrar tutorial",
+                "btnHideTutorial": "Ocultar tutorial",
                 "titleFullRefund": "Reembolso completo",
                 "textFullRefund": "Usa este botón para el reembolso completo. Esto garantiza que todos tus artículos están marcados como reembolsados y la cantidad total se reembolsa al cliente.",
                 "titleStockReset": "Restablecer el stock",

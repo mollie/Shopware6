@@ -15,7 +15,8 @@
             @qty-changed="onItemQtyChanged"
             @amount-changed="onItemAmountChanged"
             @refund-tax-changed="onItemRefundTaxChanged"
-            @promotion-changed="onItemPromotionDeductionChanged">
+            @promotion-changed="onItemPromotionDeductionChanged"
+        >
         </mollie-refund-manager-cart>
 
         <mollie-refund-manager-refunds
@@ -23,23 +24,41 @@
             :refunds="mollieRefunds"
             :is-loading="isRefundDataLoading"
             :is-acl-cancel-allowed="isAclCancelAllowed"
-            @cancel="btnCancelRefund_Click">
+            @cancel="btnCancelRefund_Click"
+        >
         </mollie-refund-manager-refunds>
 
-        <sw-card :hero="false" class="mollie-refund-manager-instructions-container" position-identifier="mollie-refund-manager-instructions-container" :large="true">
-            <sw-container v-if="configShowInstructions" columns="1fr" gap="0px">
+        <sw-card
+            :hero="false"
+            class="mollie-refund-manager-instructions-container"
+            position-identifier="mollie-refund-manager-instructions-container"
+            :large="true"
+        >
+            <sw-container
+                v-if="configShowInstructions"
+                columns="1fr"
+                gap="0px"
+            >
                 <div class="instructions-container-top">
-                    <sw-button variant="context" size="small" icon="default-basic-x-block"
-                               @click="btnResetTutorials_Click()">
+                    <sw-button
+                        variant="context"
+                        size="small"
+                        icon="default-basic-x-block"
+                        @click="btnResetTutorials_Click()"
+                    >
                         {{ $tc('mollie-payments.refund-manager.instructions.linkResetTutorials') }}
                     </sw-button>
                 </div>
             </sw-container>
-            <sw-container columns="8fr 3fr" gap="0px">
+            <sw-container
+                columns="8fr 3fr"
+                gap="0px"
+            >
                 <mollie-refund-manager-instructions
                     :show-instructions="configShowInstructions"
                     :blocks-primary="instructionBlocksPrimary"
-                    :blocks-secondary="instructionBlocksSecondary">
+                    :blocks-secondary="instructionBlocksSecondary"
+                >
                 </mollie-refund-manager-instructions>
                 <mollie-refund-manager-summary
                     :order="order"
@@ -57,6 +76,7 @@
                     :refund-internal-description="refundInternalDescription"
                     :check-verify-refund="checkVerifyRefund"
                     :tutorial-full-refund-visible="tutorialFullRefundVisible"
+                    :tutorial-rounding-diff-visible="tutorialRoundingDiffVisible"
                     :tutorial-partial-amount-refund-visible="tutorialPartialAmountRefundVisible"
                     :tutorial-partial-quantity-visible="tutorialPartialQuantityVisible"
                     :tutorial-partial-promotions-visible="tutorialPartialPromotionsVisible"
@@ -68,7 +88,8 @@
                     @verify-changed="checkVerifyRefund = $event"
                     @fix-diff="btnFixDiff_Click"
                     @refund="btnRefund_Click"
-                    @refund-full="btnRefundFull_Click">
+                    @refund-full="btnRefundFull_Click"
+                >
                 </mollie-refund-manager-summary>
             </sw-container>
         </sw-card>

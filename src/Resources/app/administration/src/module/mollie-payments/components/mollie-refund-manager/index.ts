@@ -3,6 +3,10 @@ import './mollie-refund-manager.scss';
 import RefundItemService from './services/RefundItemService';
 import RefundCalculator from './services/RefundCalculator';
 import RefundPayloadBuilder, { type RefundResponse } from './services/RefundPayloadBuilder';
+import './components/mollie-refund-manager-cart';
+import './components/mollie-refund-manager-refunds';
+import './components/mollie-refund-manager-instructions';
+import './components/mollie-refund-manager-summary';
 
 const { Component, Mixin } = Shopware;
 
@@ -73,6 +77,7 @@ const componentConfig: ThisType<RefundManagerComponent> = {
             roundingDiff: 0,
             // tutorials
             tutorialFullRefundVisible: false,
+            tutorialRoundingDiffVisible: false,
             tutorialPartialAmountRefundVisible: false,
             tutorialPartialQuantityVisible: false,
             tutorialPartialPromotionsVisible: false,
@@ -104,31 +109,20 @@ const componentConfig: ThisType<RefundManagerComponent> = {
 
         /**
          * Instruction blocks rendered in the first instructions column.
-         * Each block links a title/text snippet to the tutorial it highlights.
+         * Each block links a title/text snippet to the tutorial it highlights and
+         * the section that should be scrolled into view when it is activated.
          */
         instructionBlocksPrimary() {
-            const prefix = 'mollie-payments.refund-manager.instructions';
+            const p = 'mollie-payments.refund-manager.instructions';
             return [
-                {
-                    title: `${prefix}.titleFullRefund`,
-                    text: `${prefix}.textFullRefund`,
-                    toggle: this.btnToggleTutorialFull_Click,
-                },
-                {
-                    title: `${prefix}.titleRoundingDiff`,
-                    text: `${prefix}.textRoundingDiff`,
-                    toggle: this.btnToggleTutorialFull_Click,
-                },
-                {
-                    title: `${prefix}.titleStockReset`,
-                    text: `${prefix}.textStockReset`,
-                    toggle: this.btnToggleTutorialStock_Click,
-                },
-                {
-                    title: `${prefix}.titleShipping`,
-                    text: `${prefix}.textShipping`,
-                    toggle: this.btnToggleTutorialShipping_Click,
-                },
+                this.buildInstructionBlock(`${p}.titleFullRefund`, `${p}.textFullRefund`, 'tutorialFullRefundVisible'),
+                this.buildInstructionBlock(
+                    `${p}.titleRoundingDiff`,
+                    `${p}.textRoundingDiff`,
+                    'tutorialRoundingDiffVisible',
+                ),
+                this.buildInstructionBlock(`${p}.titleStockReset`, `${p}.textStockReset`, 'tutorialResetStock'),
+                this.buildInstructionBlock(`${p}.titleShipping`, `${p}.textShipping`, 'tutorialRefundShipping'),
             ];
         },
 
@@ -136,23 +130,23 @@ const componentConfig: ThisType<RefundManagerComponent> = {
          * Instruction blocks rendered in the second instructions column.
          */
         instructionBlocksSecondary() {
-            const prefix = 'mollie-payments.refund-manager.instructions';
+            const p = 'mollie-payments.refund-manager.instructions';
             return [
-                {
-                    title: `${prefix}.titlePartialAmount`,
-                    text: `${prefix}.textPartialAmount`,
-                    toggle: this.btnToggleTutorialPartialAmount_Click,
-                },
-                {
-                    title: `${prefix}.titlePartialItems`,
-                    text: `${prefix}.textPartialItems`,
-                    toggle: this.btnToggleTutorialPartialQuantities_Click,
-                },
-                {
-                    title: `${prefix}.titlePartialPromotions`,
-                    text: `${prefix}.textPartialPromotions`,
-                    toggle: this.btnToggleTutorialPartialPromotions_Click,
-                },
+                this.buildInstructionBlock(
+                    `${p}.titlePartialAmount`,
+                    `${p}.textPartialAmount`,
+                    'tutorialPartialAmountRefundVisible',
+                ),
+                this.buildInstructionBlock(
+                    `${p}.titlePartialItems`,
+                    `${p}.textPartialItems`,
+                    'tutorialPartialQuantityVisible',
+                ),
+                this.buildInstructionBlock(
+                    `${p}.titlePartialPromotions`,
+                    `${p}.textPartialPromotions`,
+                    'tutorialPartialPromotionsVisible',
+                ),
             ];
         },
     },
@@ -231,32 +225,43 @@ const componentConfig: ThisType<RefundManagerComponent> = {
         // INSTRUCTIONS
         // -------------------------------------------------------------------------------------------------
 
-        btnToggleTutorialFull_Click() {
-            this.tutorialFullRefundVisible = !this.tutorialFullRefundVisible;
+        /**
+         * Builds a single instruction block: resolved title/text, a state-aware
+         * label ("Show Tutorial" / "Hide Tutorial") and a toggle handler.
+         */
+        buildInstructionBlock(titleKey: string, textKey: string, flagKey: string) {
+            const prefix = 'mollie-payments.refund-manager.instructions';
+            return {
+                title: this.$tc(titleKey),
+                text: this.$tc(textKey),
+                label: this.$tc(this[flagKey] ? `${prefix}.btnHideTutorial` : `${prefix}.btnShowTutorial`),
+                toggle: () => this.toggleTutorial(flagKey),
+            };
         },
 
-        btnToggleTutorialPartialAmount_Click() {
-            this.tutorialPartialAmountRefundVisible = !this.tutorialPartialAmountRefundVisible;
-        },
+        /**
+         * Toggles the given tutorial flag. When it becomes active, the first
+         * highlighted element is scrolled into view so the user sees what the
+         * tutorial points at.
+         */
+        toggleTutorial(flagKey: string) {
+            this[flagKey] = !this[flagKey];
 
-        btnToggleTutorialPartialQuantities_Click() {
-            this.tutorialPartialQuantityVisible = !this.tutorialPartialQuantityVisible;
-        },
+            if (!this[flagKey]) {
+                return;
+            }
 
-        btnToggleTutorialPartialPromotions_Click() {
-            this.tutorialPartialPromotionsVisible = !this.tutorialPartialPromotionsVisible;
-        },
-
-        btnToggleTutorialStock_Click() {
-            this.tutorialResetStock = !this.tutorialResetStock;
-        },
-
-        btnToggleTutorialShipping_Click() {
-            this.tutorialRefundShipping = !this.tutorialRefundShipping;
+            this.$nextTick(() => {
+                const target = this.$el.querySelector('.tutorial-active');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
         },
 
         btnResetTutorials_Click() {
             this.tutorialFullRefundVisible = false;
+            this.tutorialRoundingDiffVisible = false;
             this.tutorialPartialAmountRefundVisible = false;
             this.tutorialPartialQuantityVisible = false;
             this.tutorialPartialPromotionsVisible = false;

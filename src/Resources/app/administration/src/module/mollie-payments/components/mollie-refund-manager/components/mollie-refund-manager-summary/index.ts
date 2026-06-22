@@ -1,5 +1,5 @@
 import template from './mollie-refund-manager-summary.html.twig';
-import RefundCalculator from '../mollie-refund-manager/services/RefundCalculator';
+import RefundCalculator from '../../services/RefundCalculator';
 
 const { Component, Filter } = Shopware;
 
@@ -83,6 +83,11 @@ const componentConfig: ThisType<RefundManagerSummaryComponent> = {
             default: false,
         },
         tutorialFullRefundVisible: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        tutorialRoundingDiffVisible: {
             type: Boolean,
             required: false,
             default: false,

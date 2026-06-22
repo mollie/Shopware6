@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Juhendite lähtestamine",
                 "btnToggleTutorial": "Näita/Peida juhendid",
+                "btnShowTutorial": "Näita juhendid",
+                "btnHideTutorial": "Peida juhendid",
                 "titleFullRefund": "Täielik tagasimakse",
                 "textFullRefund": "Kasuta lihtsalt nuppu täieliku tagasimakse saamiseks. See tagab, et kõik sinu kaubad märgitakse tagastatuks ja kogu summa tagastatakse kliendile.",
                 "titleStockReset": "Varude lähtestamine",

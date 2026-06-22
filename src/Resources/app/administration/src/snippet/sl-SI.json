@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Ponastavi navodila",
                 "btnToggleTutorial": "Prikaži/skrij navodilo",
+                "btnShowTutorial": "Prikaži navodilo",
+                "btnHideTutorial": "Skrij navodilo",
                 "titleFullRefund": "Polno vračilo",
                 "textFullRefund": "Preprosto uporabite gumb za celotno vračilo. Tako zagotovite, da so vsi vaši predmeti označeni kot vrnjeni in da je celoten znesek vrnjen stranki.",
                 "titleStockReset": "Ponastavitev zaloge",

@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Resetiraj vodiče",
                 "btnToggleTutorial": "Prikaži/Sakrij Vodič",
+                "btnShowTutorial": "Prikaži Vodič",
+                "btnHideTutorial": "Sakrij Vodič",
                 "titleFullRefund": "Puni povrat",
                 "textFullRefund": "Jednostavno upotrijebite gumb za puni povrat. Time se osigurava da su sve stavke označene kao refundirane i da se kupcu vraća puni iznos.",
                 "titleStockReset": "Resetiranje zaliha",

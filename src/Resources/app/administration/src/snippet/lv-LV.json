@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Atjaunot apmācības",
                 "btnToggleTutorial": "Rādīt/Slēpt apmācību",
+                "btnShowTutorial": "Rādīt apmācību",
+                "btnHideTutorial": "Slēpt apmācību",
                 "titleFullRefund": "Pilna atmaksa",
                 "textFullRefund": "Vienkārši izmantojiet pogu pilnīgai atmaksai. Tas nodrošina, ka visas jūsu preces tiek atzītas par atgrieztām un pilna summa tiek atgriezta klientam.",
                 "titleStockReset": "Krājuma atiestatīšana",
