@@ -21,28 +21,6 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-
-        <service id="Kiener\MolliePayments\Controller\Api\Order\OrderControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Controller\Api\Order\RefundControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\RefundManager\RefundManager"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Refund\RefundService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Controller\Api\Order\ShippingControllerBase">
             <argument type="service" id="Kiener\MolliePayments\Components\ShipmentManager\ShipmentManager"/>
             <argument type="service" id="Kiener\MolliePayments\Service\OrderService"/>
@@ -54,70 +32,6 @@
             </call>
             <tag name="controller.service_arguments"/>
         </service>
-
-        <service id="Kiener\MolliePayments\Controller\Api\Payment\ReturnControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-
-        <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <!-- Storefront Controller -->
-
-        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\ReturnControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Controller\Storefront\Payment\MollieFailureControllerBase">
-            <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Order\OrderStateService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Transition\TransactionTransitionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Controller\Storefront\Account\AccountControllerBase">
-            <argument type="service" id="Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoader"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-
-
-
-        <!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <!-- Store API Controller -->
-
-        <service id="Kiener\MolliePayments\Controller\StoreApi\Config\ConfigControllerBase">
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieLocaleService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="controller.service_arguments"/>
-        </service>
-
-
-
-
 
     </services>
 

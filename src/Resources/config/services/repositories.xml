@@ -5,22 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Kiener\MolliePayments\Repository\OrderTransactionRepository">
-            <argument type="service" id="order_transaction.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Repository\OrderRepository">
-            <argument type="service" id="order.repository"/>
-        </service>
         <service id="Kiener\MolliePayments\Repository\PaymentMethodRepository">
             <argument type="service" id="payment_method.repository"/>
         </service>
-
-        <service id="Kiener\MolliePayments\Repository\MediaRepository">
-            <argument type="service" id="media.repository"/>
-        </service>
-
-
-
     </services>
 </container>

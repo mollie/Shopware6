@@ -7,7 +7,6 @@ parameters:
         - ./../src/Resources/*
         - ./../src/Migration/*
         - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
-        - ./../src/Components/RefundManager/Elasticsearch/RefundAdminSearchIndexer.php
         - ./../shopware/Component/Subscription/Search/SubscriptionAdminSearchIndexer.php
         # AbstractPaymentHandler only exists in Shopware 6.6+; the if/else feature-flag
         # pattern used here cannot be statically analysed against the 6.5 vendor.

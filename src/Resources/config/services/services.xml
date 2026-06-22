@@ -18,8 +18,6 @@
         </service>
 
 
-        <service id="Kiener\MolliePayments\Service\TokenAnonymizer"/>
-
         <service id="Kiener\MolliePayments\Service\Transition\TransitionService">
             <argument type="service" id="Shopware\Core\System\StateMachine\StateMachineRegistry"/>
         </service>
@@ -146,9 +144,6 @@
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
             <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
             <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\SalesChannel\SalesChannelDataExtractor">
         </service>
 
         <service id="Kiener\MolliePayments\Service\MollieLocaleService">

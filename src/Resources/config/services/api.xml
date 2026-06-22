@@ -38,9 +38,5 @@
         <service id="Kiener\MolliePayments\Service\MollieApi\Payment">
             <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
         </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Mandate">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-        </service>
     </services>
 </container>

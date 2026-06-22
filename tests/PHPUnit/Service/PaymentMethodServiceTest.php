@@ -4,11 +4,9 @@ declare(strict_types=1);
 namespace MolliePayments\Shopware\Tests\Service;
 
 use Kiener\MolliePayments\Service\PaymentMethodService;
-use MolliePayments\Shopware\Tests\Fakes\Repositories\FakeMediaRepository;
 use MolliePayments\Shopware\Tests\Fakes\Repositories\FakePaymentMethodRepository;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
-use Shopware\Core\Content\Media\MediaDefinition;
 use Shopware\Core\Framework\Context;
 
 class PaymentMethodServiceTest extends TestCase
@@ -17,11 +15,6 @@ class PaymentMethodServiceTest extends TestCase
      * @var Context
      */
     private $context;
-
-    /**
-     * @var MediaRepositoryInterface
-     */
-    private $mediaRepository;
 
     /**
      * @var PaymentMethodRepositoryInterface
@@ -43,7 +36,6 @@ class PaymentMethodServiceTest extends TestCase
 
         $this->context = $this->createMock(Context::class);
 
-        $this->mediaRepository = new FakeMediaRepository(new MediaDefinition());
         $this->paymentMethodRepository = new FakePaymentMethodRepository($paymentMethod);
 
         $this->paymentMethodService = new PaymentMethodService(

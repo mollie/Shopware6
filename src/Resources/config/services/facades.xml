@@ -40,23 +40,5 @@
             <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderEventFactory"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Facade\Controller\PaymentReturnFacade">
-            <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Compatibility\Bundles\FlowBuilder\FlowBuilderFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\TransactionService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Order"/>
-            <argument type="service" id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Facade\MollieOrderPaymentFlow">
-            <argument type="service" id="Kiener\MolliePayments\Service\Mollie\OrderStatusConverter"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
-            <argument type="service" id="order_transaction.repository"/>
-        </service>
-
     </services>
 </container>
