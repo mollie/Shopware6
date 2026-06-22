@@ -10,10 +10,19 @@ final class LoggerSettings extends Struct
 {
     use JsonSerializableTrait;
     public const KEY_LOG_FILE_DAYS = 'logFileDays';
+    public const KEY_LOG_SUCCESS_DAYS = 'logSuccessDays';
+    public const KEY_LOG_FAILED_DAYS = 'logFailedDays';
     public const KEY_DEBUG_MODE = 'debugMode';
 
-    public function __construct(private bool $isDebugMode, private int $logFileDays)
-    {
+    public const DEFAULT_LOG_SUCCESS_DAYS = 7;
+    public const DEFAULT_LOG_FAILED_DAYS = 30;
+
+    public function __construct(
+        private bool $isDebugMode,
+        private int $logFileDays,
+        private int $logSuccessDays = self::DEFAULT_LOG_SUCCESS_DAYS,
+        private int $logFailedDays = self::DEFAULT_LOG_FAILED_DAYS
+    ) {
     }
 
     /**
@@ -22,9 +31,11 @@ final class LoggerSettings extends Struct
     public static function createFromShopwareArray(array $settings): self
     {
         $logFileDays = $settings[self::KEY_LOG_FILE_DAYS] ?? 0;
+        $logSuccessDays = $settings[self::KEY_LOG_SUCCESS_DAYS] ?? self::DEFAULT_LOG_SUCCESS_DAYS;
+        $logFailedDays = $settings[self::KEY_LOG_FAILED_DAYS] ?? self::DEFAULT_LOG_FAILED_DAYS;
         $debugMode = $settings[self::KEY_DEBUG_MODE] ?? false;
 
-        return new self((bool) $debugMode, (int) $logFileDays);
+        return new self((bool) $debugMode, (int) $logFileDays, (int) $logSuccessDays, (int) $logFailedDays);
     }
 
     public function isDebugMode(): bool
@@ -35,5 +46,15 @@ final class LoggerSettings extends Struct
     public function getLogFileDays(): int
     {
         return $this->logFileDays;
+    }
+
+    public function getLogSuccessDays(): int
+    {
+        return $this->logSuccessDays;
+    }
+
+    public function getLogFailedDays(): int
+    {
+        return $this->logFailedDays;
     }
 }

@@ -8,19 +8,14 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class OrderFileHandler extends AbstractHandler
 {
-    private string $logDir;
-
     public function __construct(
-        #[Autowire(value: '%kernel.logs_dir%')]
-        string $logDir,
+        private OrderLogStorage $storage,
         bool $bubble = false
     ) {
         parent::__construct(LogLevel::DEBUG, $bubble);
-        $this->logDir = $logDir;
     }
 
     public function handle(LogRecord $record): bool
@@ -33,12 +28,11 @@ final class OrderFileHandler extends AbstractHandler
 
         $orderNumber = (string) $orderNumber;
 
-        $mollieLogDir = $this->logDir . '/mollie';
-        if (! is_dir($mollieLogDir)) {
-            mkdir($mollieLogDir, 0755, true);
+        if (strlen($orderNumber) === 0) {
+            return false;
         }
 
-        $orderLogPath = $mollieLogDir . '/order-' . $orderNumber . '.log';
+        $orderLogPath = $this->storage->resolveLogFile($orderNumber);
 
         try {
             $handler = new StreamHandler($orderLogPath, LogLevel::DEBUG);

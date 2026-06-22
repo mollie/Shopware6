@@ -15,10 +15,22 @@ final class LoggerSettingsTest extends TestCase
         $data = [
             LoggerSettings::KEY_DEBUG_MODE => false,
             LoggerSettings::KEY_LOG_FILE_DAYS => 5,
+            LoggerSettings::KEY_LOG_SUCCESS_DAYS => 14,
+            LoggerSettings::KEY_LOG_FAILED_DAYS => 60,
         ];
         $settings = LoggerSettings::createFromShopwareArray($data);
 
         $this->assertFalse($settings->isDebugMode());
         $this->assertSame(5, $settings->getLogFileDays());
+        $this->assertSame(14, $settings->getLogSuccessDays());
+        $this->assertSame(60, $settings->getLogFailedDays());
+    }
+
+    public function testRetentionDaysFallBackToDefaults(): void
+    {
+        $settings = LoggerSettings::createFromShopwareArray([]);
+
+        $this->assertSame(LoggerSettings::DEFAULT_LOG_SUCCESS_DAYS, $settings->getLogSuccessDays());
+        $this->assertSame(LoggerSettings::DEFAULT_LOG_FAILED_DAYS, $settings->getLogFailedDays());
     }
 }

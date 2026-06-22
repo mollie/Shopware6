@@ -20,9 +20,9 @@ Legend: `[x]` = test exists & covers ≥ 80 %, `[/]` = test exists but < 80 %, `
 | | File | Stmts | Cov % | Test file | PR |
 |---|---|---:|---:|---|---|
 | [x] | `Component/Logger/RecordAnonymizer.php` | 43 | 100 % | – | – |
-| [ ] | `Component/Logger/CleanUpLoggerScheduledTaskHandler.php` | 39 | 0 % | – | – |
+| [x] | `Component/Logger/CleanUpLoggerScheduledTaskHandler.php` | 39 | – | `tests/Unit/Logger/CleanUpLoggerScheduledTaskHandlerTest.php` | – |
 | [x] | `Component/Logger/PluginSettingsHandler.php` | 21 | 95 % | – | – |
-| [ ] | `Component/Logger/WebhookStatusPaidEventSubscriber.php` | 19 | 0 % | – | – |
+| [x] | `Component/Logger/OrderLogStorage.php` | – | – | `tests/Unit/Logger/OrderLogStorageTest.php` | – |
 | [ ] | `Component/Logger/OrderFileHandler.php` | 15 | 0 % | – | – |
 | [ ] | `Component/Logger/Processor/MolliePluginVersionProcessor.php` | 3 | 0 % | – | – |
 | [ ] | `Component/Logger/CleanUpLoggerScheduledTask.php` | 2 | 0 % | – | – |
@@ -48,4 +48,24 @@ Unit only: every other file in this package.
 
 ## Notes
 
-_(Space for package-specific decisions, fake requirements, special setups.)_
+- `WebhookStatusPaidEventSubscriber` was removed (pre-release task 2). Logs are
+  no longer deleted immediately on the `paid`/`authorized` webhook. Retention is
+  now handled entirely by `CleanUpLoggerScheduledTaskHandler`, based on the
+  per-order transaction status:
+  - successful orders (`paid`/`authorized`) → `logSuccessDays` (config, default 7)
+  - failed/cancelled/expired or unknown orders → `logFailedDays` (config, default 30)
+- The handler is file-based (reads `var/log/mollie/order-{orderNumber}.log`), not
+  DB-row based. It batches a single DAL `order.repository` query per run
+  (`EqualsAnyFilter` on `orderNumber`) and deletes at most `MAX_DELETE_PER_RUN`
+  (100) files per run.
+- `OrderLogStorage` is the **single access point** for the per-order log files.
+  Both the writer (`OrderFileHandler`) and the cleanup go through it, so the
+  `order-{orderNumber}.log` naming convention and the storage location live in
+  exactly one class. If logs ever move off the local filesystem (e.g. a
+  Flysystem/`FilesystemInterface` backend), `OrderLogStorage` is the only class
+  that changes — writer and cleanup stay automatically symmetric.
+- Order logging is routed by **context**, not by channel: there is a single
+  `mollie` Monolog channel/logger. General logs go to the rotating
+  `var/log/mollie_<env>.log` (PluginSettingsHandler); a log call additionally
+  lands in a per-order file `var/log/mollie/order-{orderNumber}.log` only when it
+  carries an `orderNumber` context (set manually at the call sites).

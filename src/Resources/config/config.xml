@@ -276,6 +276,102 @@
             <helpText lang="ro-RO">Setați numărul de zile pentru care fișierele jurnal sunt păstrate înainte de a fi șterse automat.</helpText>
             <helpText lang="sk-SK">Nastavte počet dní, počas ktorých sa budú súbory protokolu uchovávať, kým nebudú automaticky odstránené.</helpText><helpText lang="bg-BG">Задайте броя дни, за които лог файловете се съхраняват, преди да бъдат автоматично изтрити.</helpText>
         </input-field>
+        <input-field type="int">
+            <name>logSuccessDays</name>
+            <label>Keep logs of successful orders (days)</label>
+            <label lang="de-DE">Logs erfolgreicher Bestellungen aufbewahren (Tage)</label>
+            <label lang="nl-NL">Logs van succesvolle bestellingen bijhouden (dagen)</label>
+            <label lang="it-IT">Conserva i log degli ordini riusciti (giorni)</label>
+            <label lang="pt-PT">Manter logs de encomendas bem-sucedidas (dias)</label>
+            <label lang="es-ES">Mantener registros de pedidos exitosos (días)</label>
+            <label lang="sv-SE">Behåll loggar för lyckade beställningar (dagar)</label>
+            <label lang="nb-NO">Behold logger for vellykkede bestillinger (dager)</label>
+            <label lang="pl-PL">Zachowuj logi udanych zamówień (dni)</label>
+            <label lang="cs-CZ">Uchovávat protokoly úspěšných objednávek (dny)</label>
+            <label lang="sl-SI">Obdržite dnevnike uspešnih naročil (dni)</label>
+            <label lang="hu-HU">Sikeres rendelések naplóinak megtartása (napok)</label>
+            <label lang="fi-FI">Säilytä onnistuneiden tilausten lokit (päivinä)</label>
+            <label lang="da-DK">Behold logs for gennemførte ordrer (dage)</label>
+            <label lang="el-GR">Διατηρήστε τα αρχεία καταγραφής επιτυχημένων παραγγελιών (ημέρες)</label>
+            <label lang="hr-HR">Zadrži zapisnike uspješnih narudžbi (dana)</label>
+            <label lang="et-EE">Hoia õnnestunud tellimuste logisid (päevad)</label>
+            <label lang="is-IS">Halda annálum árangursríkra pantana (dagar)</label>
+            <label lang="lt-LT">Išlaikyti sėkmingų užsakymų žurnalus (dienos)</label>
+            <label lang="lv-LV">Saglabāt veiksmīgo pasūtījumu žurnālus (dienas)</label>
+            <label lang="ro-RO">Păstrați jurnalele comenzilor reușite (zile)</label>
+            <label lang="sk-SK">Uchovávať protokoly úspešných objednávok (dni)</label><label lang="bg-BG">Задържане на логовете на успешни поръчки (дни)</label>
+            <defaultValue>7</defaultValue>
+            <helpText>Set the number of days how long log files of successful orders (paid or authorized) are kept until they will be automatically deleted.</helpText>
+            <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien erfolgreicher Bestellungen (bezahlt oder autorisiert) aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
+            <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden van succesvolle bestellingen (betaald of geautoriseerd) worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+            <helpText lang="it-IT">Imposta il numero di giorni per quanto tempo i file di log degli ordini riusciti (pagati o autorizzati) devono essere conservati prima di essere automaticamente eliminati.</helpText>
+            <helpText lang="pt-PT">Defina por quantos dias os ficheiros de log de encomendas bem-sucedidas (pagas ou autorizadas) são mantidos até serem automaticamente eliminados.</helpText>
+            <helpText lang="es-ES">Establece el número de días que se conservarán los archivos de registro de pedidos exitosos (pagados o autorizados) hasta eliminarse automáticamente.</helpText>
+            <helpText lang="sv-SE">Ange antalet dagar hur länge loggfiler för lyckade beställningar (betalda eller auktoriserade) behålls innan de automatiskt tas bort.</helpText>
+            <helpText lang="nb-NO">Angi hvor mange dager loggfiler for vellykkede bestillinger (betalt eller autorisert) holdes før de blir automatisk slettet.</helpText>
+            <helpText lang="pl-PL">Ustaw liczbę dni, przez które pliki dziennika udanych zamówień (opłaconych lub autoryzowanych) będą przechowywane, zanim zostaną automatycznie usunięte.</helpText>
+            <helpText lang="cs-CZ">Nastavte počet dnů, po které budou protokolové soubory úspěšných objednávek (zaplacených nebo autorizovaných) uchovávány, než budou automaticky smazány.</helpText>
+            <helpText lang="sl-SI">Nastavite število dni, koliko časa naj se ohranjajo datoteke dnevnika uspešnih naročil (plačanih ali avtoriziranih), dokler ne bodo samodejno izbrisane.</helpText>
+            <helpText lang="hu-HU">Állítsa be a napok számát, hogy meddig tartják meg a sikeres rendelések (fizetett vagy engedélyezett) naplófájljait, amíg automatikusan törlésre kerülnek.</helpText>
+            <helpText lang="fi-FI">Määritä päivien lukumäärä, kuinka kauan onnistuneiden tilausten (maksettujen tai valtuutettujen) lokitiedostoja säilytetään, ennen kuin ne poistetaan automaattisesti.</helpText>
+            <helpText lang="da-DK">Indstil antallet af dage, hvor logfiler for gennemførte ordrer (betalt eller autoriseret) opbevares, indtil de automatisk slettes.</helpText>
+            <helpText lang="el-GR">Ορίστε τον αριθμό των ημερών για το πόσο θα διατηρούνται τα αρχεία καταγραφής επιτυχημένων παραγγελιών (πληρωμένων ή εγκεκριμένων) πριν διαγραφούν αυτόματα.</helpText>
+            <helpText lang="hr-HR">Postavite broj dana koliko dugo će se zapisnici uspješnih narudžbi (plaćenih ili odobrenih) čuvati prije nego što budu automatski izbrisani.</helpText>
+            <helpText lang="et-EE">Määra päevade arv, kui kaua õnnestunud tellimuste (makstud või autoriseeritud) logifaile säilitatakse, enne kui need automaatselt kustutatakse.</helpText>
+            <helpText lang="is-IS">Sláðu inn fjölda daga sem annálaskrár árangursríkra pantana (greiddra eða heimilaðra) eru varðveittar áður en þeim verður sjálfkrafa eytt.</helpText>
+            <helpText lang="lt-LT">Nustatykite dienų skaičių, kiek ilgai sėkmingų užsakymų (apmokėtų arba autorizuotų) žurnalo failai bus saugomi, kol jie bus automatiškai ištrinti.</helpText>
+            <helpText lang="lv-LV">Iestatiet dienu skaitu, cik ilgi veiksmīgo pasūtījumu (apmaksāto vai autorizēto) žurnāla faili tiks glabāti līdz to automātiskai dzēšanai.</helpText>
+            <helpText lang="ro-RO">Setați numărul de zile pentru care fișierele jurnal ale comenzilor reușite (plătite sau autorizate) sunt păstrate înainte de a fi șterse automat.</helpText>
+            <helpText lang="sk-SK">Nastavte počet dní, počas ktorých sa budú súbory protokolu úspešných objednávok (zaplatených alebo autorizovaných) uchovávať, kým nebudú automaticky odstránené.</helpText><helpText lang="bg-BG">Задайте броя дни, за които лог файловете на успешни поръчки (платени или оторизирани) се съхраняват, преди да бъдат автоматично изтрити.</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>logFailedDays</name>
+            <label>Keep logs of failed orders (days)</label>
+            <label lang="de-DE">Logs fehlgeschlagener Bestellungen aufbewahren (Tage)</label>
+            <label lang="nl-NL">Logs van mislukte bestellingen bijhouden (dagen)</label>
+            <label lang="it-IT">Conserva i log degli ordini falliti (giorni)</label>
+            <label lang="pt-PT">Manter logs de encomendas falhadas (dias)</label>
+            <label lang="es-ES">Mantener registros de pedidos fallidos (días)</label>
+            <label lang="sv-SE">Behåll loggar för misslyckade beställningar (dagar)</label>
+            <label lang="nb-NO">Behold logger for mislykkede bestillinger (dager)</label>
+            <label lang="pl-PL">Zachowuj logi nieudanych zamówień (dni)</label>
+            <label lang="cs-CZ">Uchovávat protokoly neúspěšných objednávek (dny)</label>
+            <label lang="sl-SI">Obdržite dnevnike neuspešnih naročil (dni)</label>
+            <label lang="hu-HU">Sikertelen rendelések naplóinak megtartása (napok)</label>
+            <label lang="fi-FI">Säilytä epäonnistuneiden tilausten lokit (päivinä)</label>
+            <label lang="da-DK">Behold logs for mislykkede ordrer (dage)</label>
+            <label lang="el-GR">Διατηρήστε τα αρχεία καταγραφής αποτυχημένων παραγγελιών (ημέρες)</label>
+            <label lang="hr-HR">Zadrži zapisnike neuspješnih narudžbi (dana)</label>
+            <label lang="et-EE">Hoia ebaõnnestunud tellimuste logisid (päevad)</label>
+            <label lang="is-IS">Halda annálum misheppnaðra pantana (dagar)</label>
+            <label lang="lt-LT">Išlaikyti nesėkmingų užsakymų žurnalus (dienos)</label>
+            <label lang="lv-LV">Saglabāt neveiksmīgo pasūtījumu žurnālus (dienas)</label>
+            <label lang="ro-RO">Păstrați jurnalele comenzilor eșuate (zile)</label>
+            <label lang="sk-SK">Uchovávať protokoly neúspešných objednávok (dni)</label><label lang="bg-BG">Задържане на логовете на неуспешни поръчки (дни)</label>
+            <defaultValue>30</defaultValue>
+            <helpText>Set the number of days how long log files of failed, cancelled or expired orders are kept until they will be automatically deleted.</helpText>
+            <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien fehlgeschlagener, stornierter oder abgelaufener Bestellungen aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
+            <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden van mislukte, geannuleerde of verlopen bestellingen worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+            <helpText lang="it-IT">Imposta il numero di giorni per quanto tempo i file di log degli ordini falliti, annullati o scaduti devono essere conservati prima di essere automaticamente eliminati.</helpText>
+            <helpText lang="pt-PT">Defina por quantos dias os ficheiros de log de encomendas falhadas, canceladas ou expiradas são mantidos até serem automaticamente eliminados.</helpText>
+            <helpText lang="es-ES">Establece el número de días que se conservarán los archivos de registro de pedidos fallidos, cancelados o caducados hasta eliminarse automáticamente.</helpText>
+            <helpText lang="sv-SE">Ange antalet dagar hur länge loggfiler för misslyckade, avbrutna eller utgångna beställningar behålls innan de automatiskt tas bort.</helpText>
+            <helpText lang="nb-NO">Angi hvor mange dager loggfiler for mislykkede, kansellerte eller utløpte bestillinger holdes før de blir automatisk slettet.</helpText>
+            <helpText lang="pl-PL">Ustaw liczbę dni, przez które pliki dziennika nieudanych, anulowanych lub wygasłych zamówień będą przechowywane, zanim zostaną automatycznie usunięte.</helpText>
+            <helpText lang="cs-CZ">Nastavte počet dnů, po které budou protokolové soubory neúspěšných, zrušených nebo vypršených objednávek uchovávány, než budou automaticky smazány.</helpText>
+            <helpText lang="sl-SI">Nastavite število dni, koliko časa naj se ohranjajo datoteke dnevnika neuspešnih, preklicanih ali poteklih naročil, dokler ne bodo samodejno izbrisane.</helpText>
+            <helpText lang="hu-HU">Állítsa be a napok számát, hogy meddig tartják meg a sikertelen, törölt vagy lejárt rendelések naplófájljait, amíg automatikusan törlésre kerülnek.</helpText>
+            <helpText lang="fi-FI">Määritä päivien lukumäärä, kuinka kauan epäonnistuneiden, peruutettujen tai vanhentuneiden tilausten lokitiedostoja säilytetään, ennen kuin ne poistetaan automaattisesti.</helpText>
+            <helpText lang="da-DK">Indstil antallet af dage, hvor logfiler for mislykkede, annullerede eller udløbne ordrer opbevares, indtil de automatisk slettes.</helpText>
+            <helpText lang="el-GR">Ορίστε τον αριθμό των ημερών για το πόσο θα διατηρούνται τα αρχεία καταγραφής αποτυχημένων, ακυρωμένων ή ληγμένων παραγγελιών πριν διαγραφούν αυτόματα.</helpText>
+            <helpText lang="hr-HR">Postavite broj dana koliko dugo će se zapisnici neuspješnih, otkazanih ili isteklih narudžbi čuvati prije nego što budu automatski izbrisani.</helpText>
+            <helpText lang="et-EE">Määra päevade arv, kui kaua ebaõnnestunud, tühistatud või aegunud tellimuste logifaile säilitatakse, enne kui need automaatselt kustutatakse.</helpText>
+            <helpText lang="is-IS">Sláðu inn fjölda daga sem annálaskrár misheppnaðra, afturkallaðra eða útrunninna pantana eru varðveittar áður en þeim verður sjálfkrafa eytt.</helpText>
+            <helpText lang="lt-LT">Nustatykite dienų skaičių, kiek ilgai nesėkmingų, atšauktų arba pasibaigusių užsakymų žurnalo failai bus saugomi, kol jie bus automatiškai ištrinti.</helpText>
+            <helpText lang="lv-LV">Iestatiet dienu skaitu, cik ilgi neveiksmīgo, atcelto vai beigušos pasūtījumu žurnāla faili tiks glabāti līdz to automātiskai dzēšanai.</helpText>
+            <helpText lang="ro-RO">Setați numărul de zile pentru care fișierele jurnal ale comenzilor eșuate, anulate sau expirate sunt păstrate înainte de a fi șterse automat.</helpText>
+            <helpText lang="sk-SK">Nastavte počet dní, počas ktorých sa budú súbory protokolu neúspešných, zrušených alebo expirovaných objednávok uchovávať, kým nebudú automaticky odstránené.</helpText><helpText lang="bg-BG">Задайте броя дни, за които лог файловете на неуспешни, отказани или изтекли поръчки се съхраняват, преди да бъдат автоматично изтрити.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Payments</title>
