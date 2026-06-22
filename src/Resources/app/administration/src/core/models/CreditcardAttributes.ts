@@ -1,9 +1,13 @@
 export default class CreditcardAttributes {
-    /**
-     *
-     * @param mollieData
-     */
-    constructor(mollieData) {
+    private readonly _audience: string;
+    private readonly _countryCode: string;
+    private readonly _feeRegion: string;
+    private readonly _holder: string;
+    private readonly _label: string;
+    private readonly _number: string;
+    private readonly _security: string;
+
+    constructor(mollieData: Record<string, any> | null) {
         this._audience = '';
         this._countryCode = '';
         this._feeRegion = '';
@@ -23,15 +27,12 @@ export default class CreditcardAttributes {
         this._label = this._convertString(mollieData['creditCardLabel']);
         this._number = this._convertString(mollieData['creditCardNumber']);
         this._security = this._convertString(mollieData['creditCardSecurity']);
-
-        return null;
     }
 
     /**
      * Helper method to decide if an object has credit card data.
-     * @returns {boolean}
      */
-    hasCreditCardData() {
+    hasCreditCardData(): boolean {
         return (
             !!this._audience &&
             !!this._countryCode &&
@@ -42,69 +43,35 @@ export default class CreditcardAttributes {
         );
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getAudience() {
+    getAudience(): string {
         return this._audience;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getCountryCode() {
+    getCountryCode(): string {
         return this._countryCode;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getFeeRegion() {
+    getFeeRegion(): string {
         return this._feeRegion;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getHolder() {
+    getHolder(): string {
         return this._holder;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getLabel() {
+    getLabel(): string {
         return this._label;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getNumber() {
+    getNumber(): string {
         return this._number;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getSecurity() {
+    getSecurity(): string {
         return this._security;
     }
 
-    /**
-     *
-     * @param value
-     * @returns {string}
-     * @private
-     */
-    _convertString(value) {
+    private _convertString(value: any): string {
         if (value === undefined || value === null) {
             return '';
         }

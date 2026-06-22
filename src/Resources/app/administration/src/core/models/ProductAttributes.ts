@@ -1,9 +1,11 @@
 export default class ProductAttributes {
-    /**
-     *
-     * @param productEntity
-     */
-    constructor(productEntity) {
+    private readonly _voucherType: any;
+    private readonly _subscriptionProduct: any;
+    private readonly _subscriptionInterval: any;
+    private readonly _subscriptionIntervalUnit: any;
+    private readonly _subscriptionRepetition: any;
+
+    constructor(productEntity: any) {
         this._voucherType = '';
         this._subscriptionProduct = '';
         this._subscriptionInterval = '';
@@ -28,11 +30,7 @@ export default class ProductAttributes {
         this._subscriptionRepetition = customFields['mollie_payments_product_subscription_repetition'];
     }
 
-    /**
-     *
-     * @returns {*}
-     */
-    getVoucherType() {
+    getVoucherType(): string {
         const stringType = this._voucherType + '';
 
         // we only allow values 1, 2, and 3
@@ -44,10 +42,7 @@ export default class ProductAttributes {
         return stringType;
     }
 
-    /**
-     * @returns {*}
-     */
-    isSubscriptionProduct() {
+    isSubscriptionProduct(): boolean {
         const boolType = this._subscriptionProduct;
 
         if (!boolType) {
@@ -57,17 +52,11 @@ export default class ProductAttributes {
         return boolType;
     }
 
-    /**
-     * @returns {*}
-     */
-    getSubscriptionInterval() {
+    getSubscriptionInterval(): any {
         return this._subscriptionInterval;
     }
 
-    /**
-     * @returns {*}
-     */
-    getSubscriptionIntervalUnit() {
+    getSubscriptionIntervalUnit(): string {
         const stringType = this._subscriptionIntervalUnit + '';
 
         if (stringType !== 'days' && stringType !== 'weeks' && stringType !== 'months') {
@@ -77,35 +66,15 @@ export default class ProductAttributes {
         return stringType;
     }
 
-    /**
-     * @returns {*}
-     */
-    getSubscriptionRepetition() {
+    getSubscriptionRepetition(): any {
         return this._subscriptionRepetition;
     }
 
-    /**
-     *
-     * @param originalFields
-     * @returns {*}
-     */
-    toArray(originalFields) {
+    toArray(originalFields: any): any {
         return originalFields;
     }
 
-    /**
-     *
-     * @returns {boolean}
-     */
-    hasData() {
-        if (this._voucherType !== '') {
-            return true;
-        }
-
-        if (this._subscriptionProduct) {
-            return true;
-        }
-
-        return false;
+    hasData(): boolean {
+        return this._voucherType !== '' || !!this._subscriptionProduct;
     }
 }

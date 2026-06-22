@@ -1,17 +1,22 @@
 import CreditcardAttributes from './CreditcardAttributes';
 
 export default class OrderAttributes {
-    /**
-     *
-     * @param orderEntity
-     */
-    constructor(orderEntity) {
+    private readonly _orderId: string;
+    private readonly _paymentId: string;
+    private readonly _swSubscriptionId: string;
+    private readonly _creditCardAttributes: CreditcardAttributes | null;
+    private readonly _paymentRef: string | null;
+    private readonly _isMolliePayments: boolean;
+    customFields: Record<string, any> | null | undefined;
+
+    constructor(orderEntity: any) {
         this._orderId = '';
         this._paymentId = '';
         this._swSubscriptionId = '';
         this._creditCardAttributes = null;
         this._paymentRef = null;
         this._isMolliePayments = false;
+
         if (orderEntity === null) {
             return;
         }
@@ -20,7 +25,7 @@ export default class OrderAttributes {
         let latestTransaction = transactions?.first();
 
         if (transactions.length > 1) {
-            transactions.forEach(function (transaction) {
+            transactions.forEach((transaction: any) => {
                 if (transaction.createdAt > latestTransaction.createdAt) {
                     latestTransaction = transaction;
                 }
@@ -59,43 +64,23 @@ export default class OrderAttributes {
         this._creditCardAttributes = new CreditcardAttributes(mollieData);
     }
 
-    /**
-     *
-     * @returns {boolean}
-     */
-    isMollieOrder() {
+    isMollieOrder(): boolean {
         return this._isMolliePayments;
     }
 
-    /**
-     *
-     * @returns {null|CreditcardAttributes|*}
-     */
-    getCreditCardAttributes() {
+    getCreditCardAttributes(): CreditcardAttributes | null {
         return this._creditCardAttributes;
     }
 
-    /**
-     *
-     * @returns {*}
-     */
-    getOrderId() {
+    getOrderId(): string {
         return this._orderId;
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getPaymentId() {
+    getPaymentId(): string {
         return this._paymentId;
     }
 
-    /**
-     *
-     * @returns {string|*|null}
-     */
-    getMollieID() {
+    getMollieID(): string | null {
         if (this.getOrderId() !== '') {
             return this.getOrderId();
         }
@@ -107,37 +92,19 @@ export default class OrderAttributes {
         return null;
     }
 
-    /**
-     *
-     * @returns {boolean}
-     */
-    isSubscription() {
+    isSubscription(): boolean {
         return this.getSwSubscriptionId() !== '';
     }
 
-    /**
-     *
-     * @returns {string|*}
-     */
-    getSwSubscriptionId() {
+    getSwSubscriptionId(): string {
         return this._swSubscriptionId;
     }
 
-    /**
-     *
-     * @returns {string}
-     */
-    getPaymentRef() {
+    getPaymentRef(): string | null {
         return this._paymentRef;
     }
 
-    /**
-     *
-     * @param value
-     * @returns {string}
-     * @private
-     */
-    _convertString(value) {
+    private _convertString(value: any): string {
         if (value === undefined || value === null) {
             return '';
         }
