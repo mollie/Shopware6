@@ -1,18 +1,11 @@
 export default class SubscriptionService {
-    /**
-     *
-     * @param shopwareApp
-     */
-    constructor(shopwareApp) {
+    private readonly _app: any;
+
+    constructor(shopwareApp: any) {
         this._app = shopwareApp;
     }
 
-    /**
-     *
-     * @param status
-     * @returns {string|*}
-     */
-    getStatusTranslation(status) {
+    getStatusTranslation(status: string | null): string {
         if (status === '' || status === null) {
             status = '';
         }
@@ -26,12 +19,7 @@ export default class SubscriptionService {
         return status;
     }
 
-    /**
-     *
-     * @param status
-     * @returns {string}
-     */
-    getStatusColor(status) {
+    getStatusColor(status: string | null): string {
         if (status === '' || status === null) {
             return 'neutral';
         }
@@ -55,39 +43,19 @@ export default class SubscriptionService {
         return 'danger';
     }
 
-    /**
-     *
-     * @param status
-     * @returns {boolean}
-     */
-    isCancellationAllowed(status) {
+    isCancellationAllowed(status: string): boolean {
         return status !== 'canceled' && status !== 'pending';
     }
 
-    /**
-     *
-     * @param status
-     * @returns {boolean}
-     */
-    isSkipAllowed(status) {
+    isSkipAllowed(status: string): boolean {
         return status === 'active' || status === 'resumed';
     }
 
-    /**
-     *
-     * @param status
-     * @returns {boolean}
-     */
-    isPauseAllowed(status) {
+    isPauseAllowed(status: string): boolean {
         return status === 'active' || status === 'resumed';
     }
 
-    /**
-     *
-     * @param status
-     * @returns {boolean}
-     */
-    isResumeAllowed(status) {
+    isResumeAllowed(status: string): boolean {
         return status === 'paused' || status === 'canceled';
     }
 }
