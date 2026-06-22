@@ -55,14 +55,10 @@
                 </template>
                 <dt>{{ $tc('mollie-payments.config.support.data.other') }}</dt>
                 <dd v-if="molliePlugin">
-                    {{ $tc('mollie-payments.config.support.data.pluginLogs', 0, {
-                        plugin: molliePlugin.label
-                    }) }}
+                    {{ $t('mollie-payments.config.support.data.pluginLogs', { plugin: molliePlugin.label }) }}
                 </dd>
                 <dd v-if="molliePlugin">
-                    {{ $tc('mollie-payments.config.support.data.pluginConfiguration', 0, {
-                        plugin: molliePlugin.label
-                    }) }}
+                    {{ $t('mollie-payments.config.support.data.pluginConfiguration', { plugin: molliePlugin.label }) }}
                     <sw-help-text :text="$tc('mollie-payments.config.support.data.pluginConfigurationHelpText')"></sw-help-text>
                 </dd>
                 <dd v-if="molliePlugin">
