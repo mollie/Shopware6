@@ -1,10 +1,7 @@
+import ProductAttributes from '../../models/ProductAttributes';
+
 export default class ProductService {
-    /**
-     *
-     * @param product
-     * @param {ProductAttributes} mollieAttributes
-     */
-    updateCustomFields(product, mollieAttributes) {
+    updateCustomFields(product: any, mollieAttributes: ProductAttributes): void {
         // products inherit from parent products (variants).
         // as soon as something is in the custom fields, then the inheritance does not work anymore.
         // so we need to make sure to not do anything if not appropriate, or simply
