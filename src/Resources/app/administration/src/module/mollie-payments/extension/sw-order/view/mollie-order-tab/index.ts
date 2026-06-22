@@ -1,11 +1,27 @@
 import template from './mollie-order-tab.html.twig';
 import './mollie-order-tab.scss';
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
+import getLatestTransaction from '../../getLatestTransaction';
 
-// eslint-disable-next-line no-undef
 const { Component, Mixin, Filter } = Shopware;
 
-Component.register('mollie-order-tab', {
+interface MollieOrderTab {
+    details: any;
+    isDetailsLoading: boolean;
+    isRefundManagerPossible: boolean;
+    isShippingPossible: boolean;
+    showRefundModal: boolean;
+    showShippingModal: boolean;
+    shippedAmount: number;
+    shippedQuantity: number;
+    molliePaymentUrlCopied: boolean;
+    initialShippingStatus: any;
+    initialCancelStatus: any;
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<MollieOrderTab> = {
     template,
 
     mixins: [Mixin.getByName('notification')],
@@ -114,7 +130,10 @@ Component.register('mollie-order-tab', {
         },
 
         deliveryDiscounts() {
-            if (!this.order?.deliveries) return [];
+            if (!this.order?.deliveries) {
+                return [];
+            }
+
             return Array.from(this.order.deliveries).slice(1);
         },
 
@@ -123,20 +142,21 @@ Component.register('mollie-order-tab', {
         },
 
         sortedCalculatedTaxes() {
-            if (!this.order?.price?.calculatedTaxes) return [];
+            if (!this.order?.price?.calculatedTaxes) {
+                return [];
+            }
+
             const raw = this.order.price.calculatedTaxes;
             const taxes = Array.isArray(raw) ? raw : Object.values(raw);
-            return taxes
-                .filter(function (t) {
-                    return t.tax !== 0;
-                })
-                .sort(function (a, b) {
-                    return b.taxRate - a.taxRate;
-                });
+
+            return taxes.filter((tax: any) => tax.tax !== 0).sort((a: any, b: any) => b.taxRate - a.taxRate);
         },
 
         displayRounded() {
-            if (!this.order) return false;
+            if (!this.order) {
+                return false;
+            }
+
             return (
                 this.order.totalRounding.interval !== 0.01 ||
                 this.order.totalRounding.decimals !== this.order.itemRounding.decimals
@@ -144,7 +164,10 @@ Component.register('mollie-order-tab', {
         },
 
         orderTotal() {
-            if (!this.order) return 0;
+            if (!this.order) {
+                return 0;
+            }
+
             return this.displayRounded ? this.order.price.rawTotal : this.order.price.totalPrice;
         },
     },
@@ -156,7 +179,7 @@ Component.register('mollie-order-tab', {
             },
             immediate: true,
         },
-        order: function () {
+        order() {
             this.loadData();
         },
     },
@@ -167,27 +190,19 @@ Component.register('mollie-order-tab', {
 
     methods: {
         getSwOrderDetail() {
-            // eslint-disable-next-line no-undef
-            return (
-                Shopware.Store?.get?.('swOrderDetail') ??
-                // eslint-disable-next-line no-undef
-                Shopware.State.get('swOrderDetail') ??
-                null
-            );
+            return Shopware.Store?.get?.('swOrderDetail') ?? Shopware.State?.get?.('swOrderDetail') ?? null;
         },
 
         createdComponent() {
+            const onShipped = () => {
+                this.onCloseShippingManager();
+                this.loadData();
+            };
+
             if (this.$root && this.$root.$on) {
-                this.$root.$on(MollieShippingEvents.EventShippedOrder, () => {
-                    this.onCloseShippingManager();
-                    this.loadData();
-                });
+                this.$root.$on(MollieShippingEvents.EventShippedOrder, onShipped);
             } else {
-                // eslint-disable-next-line no-undef
-                Shopware.Utils.EventBus.on(MollieShippingEvents.EventShippedOrder, () => {
-                    this.onCloseShippingManager();
-                    this.loadData();
-                });
+                Shopware.Utils.EventBus.on(MollieShippingEvents.EventShippedOrder, onShipped);
             }
         },
 
@@ -199,7 +214,7 @@ Component.register('mollie-order-tab', {
             this.isDetailsLoading = true;
 
             this.MollieOrderDetailsService.getDetails(this.orderId)
-                .then((response) => {
+                .then((response: any) => {
                     this.details = response;
 
                     if (!response.isMollieOrder) {
@@ -207,19 +222,15 @@ Component.register('mollie-order-tab', {
                     }
 
                     const refundManager = response.refundManager ?? {};
-                    const transactions = Array.from(this.order?.transactions ?? []);
-                    const latestTransaction =
-                        transactions.sort(function (a, b) {
-                            return new Date(b.createdAt) - new Date(a.createdAt);
-                        })[0] ?? null;
+                    const latestTransaction = getLatestTransaction(this.order?.transactions);
                     const isAuthorized = latestTransaction?.stateMachineState?.technicalName === 'authorized';
                     const aclAllowed = this.acl.can('mollie_refund_manager:read');
                     this.isRefundManagerPossible = !isAuthorized && aclAllowed && (refundManager.enabled ?? false);
 
                     const shippingStatus = response.shipping?.status ?? {};
-                    this.isShippingPossible = Object.values(shippingStatus).some(function (s) {
-                        return (s.shippableQuantity ?? 0) > 0;
-                    });
+                    this.isShippingPossible = Object.values(shippingStatus).some(
+                        (status: any) => (status.shippableQuantity ?? 0) > 0,
+                    );
 
                     const shippingTotal = response.shipping?.total ?? {};
                     this.shippedAmount = Math.round((shippingTotal.amount ?? 0) * 100) / 100;
@@ -228,16 +239,12 @@ Component.register('mollie-order-tab', {
                     this.initialShippingStatus = shippingStatus;
                     this.initialCancelStatus = response.cancelItem ?? {};
                 })
-                .catch(
-                    function (response) {
-                        this.createNotificationError({ message: response.message });
-                    }.bind(this),
-                )
-                .finally(
-                    function () {
-                        this.isDetailsLoading = false;
-                    }.bind(this),
-                );
+                .catch((response: any) => {
+                    this.createNotificationError({ message: response.message });
+                })
+                .finally(() => {
+                    this.isDetailsLoading = false;
+                });
         },
 
         onOpenRefundManager() {
@@ -258,11 +265,10 @@ Component.register('mollie-order-tab', {
         },
 
         copyPaymentUrlToClipboard() {
-            const fallback = async function (e) {
-                await navigator.clipboard.writeText(e);
+            const fallback = async (url: string) => {
+                await navigator.clipboard.writeText(url);
             };
 
-            // eslint-disable-next-line no-undef
             const clipboard =
                 typeof Shopware.Utils.dom.copyToClipboard === 'function'
                     ? Shopware.Utils.dom.copyToClipboard
@@ -272,8 +278,10 @@ Component.register('mollie-order-tab', {
             this.molliePaymentUrlCopied = true;
         },
 
-        onMolliePaymentUrlProcessFinished(value) {
+        onMolliePaymentUrlProcessFinished(value: boolean) {
             this.molliePaymentUrlCopied = value;
         },
     },
-});
+};
+
+Component.register('mollie-order-tab', componentConfig);
