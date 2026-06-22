@@ -115,6 +115,7 @@ runs:
         # cached anonymous "/account -> login" redirect to an already logged-in
         # request (SW 6.7), which breaks the storefront login in the e2e suite.
         docker exec shop bash -c "echo "SHOPWARE_HTTP_CACHE_ENABLED=0" >> /var/www/html/.env" || true;
+        docker exec -u root bash shop -c "chown -R www-data:www-data /var/www/html" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 

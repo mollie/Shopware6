@@ -7,11 +7,13 @@ use GuzzleHttp\Psr7\Uri;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\Exception\ApiKeyException;
 use Mollie\Shopware\Component\Mollie\Gateway\ClientFactory;
+use Mollie\Shopware\Component\Mollie\Gateway\RetryMiddleware;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Shopware\Core\Test\TestDefaults;
 
 #[CoversClass(ClientFactory::class)]
@@ -23,7 +25,8 @@ final class ClientFactoryTest extends TestCase
         $key = 'test_key';
         $apiSettings = new ApiSettings($key, '', Mode::TEST,'');
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
-        $factory = new ClientFactory($fakeSettings, $shopwareVersion);
+        $retryMiddleware = new RetryMiddleware(new NullLogger());
+        $factory = new ClientFactory($fakeSettings, $shopwareVersion, $retryMiddleware);
 
         $client = $factory->create(TestDefaults::SALES_CHANNEL);
         $headers = $client->getConfig('headers');
@@ -44,7 +47,8 @@ final class ClientFactoryTest extends TestCase
         $key = 'live_key';
         $apiSettings = new ApiSettings('test_key', $key, Mode::LIVE,'');
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
-        $factory = new ClientFactory($fakeSettings, $shopwareVersion);
+        $retryMiddleware = new RetryMiddleware(new NullLogger());
+        $factory = new ClientFactory($fakeSettings, $shopwareVersion, $retryMiddleware);
 
         $client = $factory->create(TestDefaults::SALES_CHANNEL);
         $headers = $client->getConfig('headers');
@@ -66,7 +70,8 @@ final class ClientFactoryTest extends TestCase
 
         $apiSettings = new ApiSettings('test_key', '', Mode::LIVE,'');
         $fakeSettings = new FakeSettingsService(apiSettings: $apiSettings);
-        $factory = new ClientFactory($fakeSettings, $shopwareVersion);
+        $retryMiddleware = new RetryMiddleware(new NullLogger());
+        $factory = new ClientFactory($fakeSettings, $shopwareVersion, $retryMiddleware);
 
         $client = $factory->create(TestDefaults::SALES_CHANNEL);
     }

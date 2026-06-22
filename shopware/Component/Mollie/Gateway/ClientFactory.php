@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\Exception\ApiKeyException;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -19,6 +20,7 @@ final class ClientFactory implements ClientFactoryInterface
         private AbstractSettingsService $settings,
         #[Autowire(value: '%kernel.shopware_version%')]
         private string $shopwareVersion,
+        private RetryMiddlewareInterface $retryMiddleware,
     ) {
     }
 
@@ -47,7 +49,12 @@ final class ClientFactory implements ClientFactoryInterface
 
     private function buildClient(string $apiKey): Client
     {
+        $retryMiddleware = $this->retryMiddleware->createMiddleware();
+        $handlerStack = HandlerStack::create();
+        $handlerStack->push($retryMiddleware);
+
         return new Client([
+            'handler' => $handlerStack,
             'base_uri' => self::MOLLIE_BASE_URL,
             'headers' => [
                 'Authorization' => sprintf('Bearer %s', $apiKey),
