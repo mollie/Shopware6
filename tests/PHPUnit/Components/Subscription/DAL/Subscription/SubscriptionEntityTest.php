@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription;
 
 use Mollie\Shopware\Component\Mollie\IntervalUnit;
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\IntervalType;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\MollieStatus;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
@@ -260,7 +259,7 @@ class SubscriptionEntityTest extends TestCase
         $expected = [
             'start_date' => '2022-05-01',
             'interval_value' => 1,
-            'interval_unit' => IntervalType::MONTHS,
+            'interval_unit' => IntervalUnit::MONTHS->value,
             'times' => 0,
             'nextPossiblePaymentDate' => '',
         ];

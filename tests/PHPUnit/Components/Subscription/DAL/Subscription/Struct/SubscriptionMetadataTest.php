@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace MolliePayments\Shopware\Tests\Components\Subscription\DAL\Subscription\Struct;
 
 use Mollie\Shopware\Component\Mollie\IntervalUnit;
-use Mollie\Shopware\Component\Subscription\DAL\Subscription\Struct\IntervalType;
 use Mollie\Shopware\Component\Subscription\SubscriptionMetadata;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +19,7 @@ class SubscriptionMetadataTest extends TestCase
 
         static::assertSame('2022-05-01', $meta->getStartDate());
         static::assertSame(1, $meta->getIntervalValue());
-        static::assertSame(IntervalType::MONTHS, $meta->getIntervalUnit()->value);
+        static::assertSame(IntervalUnit::MONTHS->value, $meta->getIntervalUnit()->value);
         static::assertSame(5, $meta->getTimes());
         static::assertSame('tr_123', $meta->getTmpTransaction());
     }
@@ -36,7 +35,7 @@ class SubscriptionMetadataTest extends TestCase
         $expected = [
             'start_date' => '2022-05-01',
             'interval_value' => 1,
-            'interval_unit' => IntervalType::MONTHS,
+            'interval_unit' => IntervalUnit::MONTHS->value,
             'times' => 5,
             'nextPossiblePaymentDate' => '',
             'tmp_transaction' => 'tr_123',

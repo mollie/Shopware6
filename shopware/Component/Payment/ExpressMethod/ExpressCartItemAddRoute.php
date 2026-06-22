@@ -56,18 +56,6 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
 
         $this->cartService->recalculate($cart, $context);
 
-        /*
-        $mollieCart = new MollieShopwareCart($cart);
-
-        // we mark the cart as single product express checkout
-        // because this helps us to decide whether express checkout is done or
-        // a checkout of an existing cart is started (off canvas, cart...)
-        $mollieCart->setSingleProductExpressCheckout(true);
-
-        $cart = $mollieCart->getCart();
-
-        $cartService->updateCart($cart);*/
-
         return $this->getDecorated()->add($request, $cart, $context, $items);
     }
 }
