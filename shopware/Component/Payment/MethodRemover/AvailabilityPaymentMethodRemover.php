@@ -51,7 +51,7 @@ final class AvailabilityPaymentMethodRemover extends AbstractPaymentRemover
             $billingCountry = $this->resolveCartBillingCountry($salesChannelContext);
         }
 
-        if ($amount === null || $amount->getValue() <= 0.0) {
+        if ($amount->getValue() <= 0.0) {
             return $paymentMethods;
         }
 
@@ -73,7 +73,7 @@ final class AvailabilityPaymentMethodRemover extends AbstractPaymentRemover
         return $paymentMethods;
     }
 
-    private function resolveCartAmount(SalesChannelContext $salesChannelContext): ?Money
+    private function resolveCartAmount(SalesChannelContext $salesChannelContext): Money
     {
         $cart = $this->cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
 
@@ -100,11 +100,11 @@ final class AvailabilityPaymentMethodRemover extends AbstractPaymentRemover
         return (string) $country->getIso();
     }
 
-    private function resolveOrderAmount(string $orderId, SalesChannelContext $salesChannelContext): ?Money
+    private function resolveOrderAmount(string $orderId, SalesChannelContext $salesChannelContext): Money
     {
         $order = $this->loadOrder($orderId, $salesChannelContext);
         if ($order === null) {
-            return null;
+            return new Money(0.0, $salesChannelContext->getCurrency()->getIsoCode());
         }
 
         return new Money($order->getAmountTotal(), $salesChannelContext->getCurrency()->getIsoCode());
