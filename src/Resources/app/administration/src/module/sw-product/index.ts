@@ -1,7 +1,6 @@
 import './page/sw-product-detail';
 import './view/sw-product-detail-mollie';
 
-// eslint-disable-next-line no-undef
 const { Module } = Shopware;
 
 Module.register('mollie-sw-product-detail', {
@@ -14,7 +13,7 @@ Module.register('mollie-sw-product-detail', {
     color: '#333',
     icon: 'default-action-settings',
 
-    routeMiddleware(next, currentRoute) {
+    routeMiddleware(next: any, currentRoute: any) {
         if (currentRoute.name === 'sw.product.detail') {
             currentRoute.children.push({
                 name: 'sw.product.detail.mollie',
