@@ -174,7 +174,7 @@ const componentConfig: ThisType<RefundManagerComponent> = {
          * Selects all items by assigning their maximum refundable quantity.
          */
         btnSelectAllItems_Click() {
-            this.orderItems.forEach((item) => this.itemService.setFullRefund(item));
+            this.orderItems.forEach((item: any) => this.itemService.setFullRefund(item));
             this._calculateFinalAmount();
         },
 
@@ -182,7 +182,7 @@ const componentConfig: ThisType<RefundManagerComponent> = {
          * Resets all line items as well as the verification checkbox and descriptions.
          */
         btnResetCartForm_Click() {
-            this.orderItems.forEach((item) => this.itemService.resetRefundData(item));
+            this.orderItems.forEach((item: any) => this.itemService.resetRefundData(item));
             this._calculateFinalAmount();
 
             this.checkVerifyRefund = false;
@@ -361,7 +361,7 @@ const componentConfig: ThisType<RefundManagerComponent> = {
                             this.$tc('mollie-payments.refund-manager.notifications.success.refund-canceled'),
                         );
                         this.$emit('refund-cancelled');
-                        this.mollieRefunds = this.mollieRefunds.map((refund) => {
+                        this.mollieRefunds = this.mollieRefunds.map((refund: any) => {
                             if (refund.id !== item.id) {
                                 return refund;
                             }
