@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments;
 
-use Kiener\MolliePayments\Compatibility\DependencyLoader;
-use Kiener\MolliePayments\Compatibility\VersionCompare;
 use Mollie\Shopware\Component\Installer\PluginInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Migration\MigrationCollection;
@@ -12,31 +10,10 @@ use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
-use Shopware\Core\Kernel;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
     public const PLUGIN_VERSION = '5.0.0-beta4';
-
-    /**
-     * @throws \Exception
-     */
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-
-        $this->container = $container;
-        $shopwareVersion = $this->container->getParameter('kernel.shopware_version');
-        if (! is_string($shopwareVersion)) {
-            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
-        }
-        // load the dependencies that are compatible
-        // with our current shopware version
-        $loader = new DependencyLoader($this->container, new VersionCompare($shopwareVersion));
-        $loader->loadServices();
-        $loader->prepareStorefrontBuild();
-    }
 
     public function install(InstallContext $context): void
     {

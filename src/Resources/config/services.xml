@@ -95,13 +95,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Compatibility\VersionCompare">
-            <argument>%kernel.shopware_version%</argument>
-        </service>
-
-
-
-
 
 
     </services>
