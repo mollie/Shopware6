@@ -12,7 +12,12 @@
         "skipLibCheck": true,
         "resolveJsonModule": true,
         "forceConsistentCasingInFileNames": true,
-        "types": []
+        "types": [],
+        "baseUrl": ".",
+        "paths": {
+            "vitest": ["../../../../dev/node_modules/vitest"],
+            "vitest/*": ["../../../../dev/node_modules/vitest/*"]
+        }
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "tests/**/*.ts"],
     "exclude": ["node_modules", ".tmp", "build"]
