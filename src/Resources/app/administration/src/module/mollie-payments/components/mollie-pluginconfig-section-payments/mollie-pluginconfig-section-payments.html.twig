@@ -1,15 +1,18 @@
-<sw-container gap="16px" columns="1fr 2fr">
-
+<sw-container
+    gap="16px"
+    columns="1fr 2fr"
+>
     <sw-button
-            @click="onUpdatePaymentMethodsButtonClicked"
-            :isLoading="updatePaymentMethodsIsLoading">
+        @click="onUpdatePaymentMethodsButtonClicked"
+        :isLoading="updatePaymentMethodsIsLoading"
+    >
         {{ $tc('mollie-payments.config.payments.updatePaymentMethods.button') }}
     </sw-button>
 
     <sw-external-link
-            class="mollie-pluginconfig-payments-link-limits"
-            href="https://help.mollie.com/hc/en-us/articles/115000667365-What-is-the-minimum-and-maximum-amount-per-payment-method-">
+        class="mollie-pluginconfig-payments-link-limits"
+        href="https://help.mollie.com/hc/en-us/articles/115000667365-What-is-the-minimum-and-maximum-amount-per-payment-method-"
+    >
         {{ $tc('mollie-payments.config.payments.mollieLimits.link') }}
     </sw-external-link>
-
 </sw-container>
