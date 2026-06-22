@@ -1,12 +1,17 @@
 import template from './mollie-tracking-info.html.twig';
 import './mollie-tracking-info.scss';
 
-// eslint-disable-next-line no-undef
 const { Component } = Shopware;
-// eslint-disable-next-line no-undef
 const { string } = Shopware.Utils;
 
-Component.register('mollie-tracking-info', {
+interface TrackingInfoComponent {
+    delivery: any;
+    tracking: { carrier: string; code: string; url: string };
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<TrackingInfoComponent> = {
     template,
 
     props: {
@@ -42,7 +47,7 @@ Component.register('mollie-tracking-info', {
             }
         },
 
-        prefillTrackingInfo(trackingCode, shippingMethod) {
+        prefillTrackingInfo(trackingCode: string, shippingMethod: any) {
             this.tracking.carrier = shippingMethod.name;
             this.tracking.code = trackingCode;
 
@@ -54,10 +59,12 @@ Component.register('mollie-tracking-info', {
         /**
          * Copied from src/Administration/Resources/app/administration/src/module/sw-order/component/sw-order-user-card/index.js
          */
-        renderTrackingUrl(trackingCode, shippingMethod) {
+        renderTrackingUrl(trackingCode: string, shippingMethod: any): string {
             const urlTemplate = shippingMethod ? shippingMethod.trackingUrl : null;
 
             return urlTemplate ? urlTemplate.replace('%s', encodeURIComponent(trackingCode)) : '';
         },
     },
-});
+};
+
+Component.register('mollie-tracking-info', componentConfig);
