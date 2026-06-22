@@ -6,10 +6,8 @@
 
     <imports>
         <import resource="services/api.xml"/>
-        <import resource="services/components.xml"/>
         <import resource="services/commands.xml"/>
         <import resource="services/gateways.xml"/>
-        <import resource="services/hydrators.xml"/>
         <import resource="services/services.xml"/>
         <import resource="services/builder.xml"/>
         <import resource="services/snippets.xml"/>
