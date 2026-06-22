@@ -8,7 +8,6 @@
         <import resource="services/api.xml"/>
         <import resource="services/components.xml"/>
         <import resource="services/commands.xml"/>
-        <import resource="services/facades.xml"/>
         <import resource="services/gateways.xml"/>
         <import resource="services/hydrators.xml"/>
         <import resource="services/payment.xml"/>
@@ -89,14 +88,6 @@
         </service>
 
         <service id="Kiener\MolliePayments\Service\UrlParsingService"/>
-
-        <service id="Kiener\MolliePayments\Service\TrackingInfoStructFactory">
-            <argument type="service" id="Kiener\MolliePayments\Service\UrlParsingService"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-        </service>
-
-
-
 
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

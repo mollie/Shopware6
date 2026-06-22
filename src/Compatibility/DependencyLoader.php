@@ -42,10 +42,6 @@ class DependencyLoader
 
         // load Flow Builder
         $loader->load('compatibility/flowbuilder/all_versions.xml');
-
-        if ($this->versionCompare->gte('6.4.6.0')) {
-            $loader->load('compatibility/flowbuilder/6.4.6.0.xml');
-        }
     }
 
     public function prepareStorefrontBuild(): void

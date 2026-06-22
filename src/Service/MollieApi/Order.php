@@ -15,14 +15,12 @@ use Kiener\MolliePayments\Service\MollieApi\Payment as PaymentApiService;
 use Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer;
 use Kiener\MolliePayments\Service\Router\RoutingBuilder;
 use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Struct\MollieApi\ShipmentTrackingInfoStruct;
 use Kiener\MolliePayments\Struct\OrderLineItemEntity\OrderLineItemEntityAttributes;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\OrderLine;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
-use Mollie\Api\Types\OrderLineType;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
 use Psr\Log\LoggerInterface;
@@ -282,48 +280,6 @@ class Order
         }
 
         return $mollieOrder->status === 'created' ? $mollieOrder->getCheckoutUrl() : null;
-    }
-
-    public function setShipment(string $mollieOrderId, ?ShipmentTrackingInfoStruct $trackingInfoStruct, string $salesChannelId): bool
-    {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
-        $shipment = [];
-        if ($trackingInfoStruct instanceof ShipmentTrackingInfoStruct) {
-            $shipment['tracking'] = $trackingInfoStruct->toArray();
-        }
-        /** @var OrderLine $orderLine */
-        foreach ($mollieOrder->lines() as $orderLine) {
-            if ($orderLine->shippableQuantity > 0) {
-                $mollieOrder->shipAll($shipment);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws CouldNotFetchMollieOrderException
-     */
-    public function isCompletelyShipped(string $mollieOrderId, string $salesChannelId): bool
-    {
-        $mollieOrder = $this->getMollieOrder($mollieOrderId, $salesChannelId);
-
-        /** @var OrderLine $mollieOrderLine */
-        foreach ($mollieOrder->lines() as $mollieOrderLine) {
-            if ($mollieOrderLine->shippableQuantity > 0
-                && in_array($mollieOrderLine->type, [
-                    OrderLineType::TYPE_PHYSICAL,
-                    OrderLineType::TYPE_DIGITAL,
-                    OrderLineType::TYPE_DISCOUNT,
-                    OrderLineType::TYPE_STORE_CREDIT,
-                ])) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public function getCompletedPayment(string $mollieOrderId, string $molliePaymentId, ?string $salesChannelId): Payment

@@ -14,11 +14,7 @@ use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
-use Mollie\Api\Resources\OrderLine;
-use Mollie\Api\Resources\OrderLineCollection;
-use Mollie\Api\Types\OrderLineType;
 use MolliePayments\Shopware\Tests\Traits\BuilderTestTrait;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Routing\RouterInterface;
@@ -107,61 +103,5 @@ class OrderTest extends TestCase
         $this->expectException(CouldNotFetchMollieOrderException::class);
 
         $this->orderApiService->getMollieOrder('foo', 'bar');
-    }
-
-    #[DataProvider('getIsCompletelyShippedData')]
-    public function testIsCompletelyShipped(string $type, int $shippableQuantity, bool $expectedValue)
-    {
-        $mollieOrderLine = $this->createMock(OrderLine::class);
-        $mollieOrderLine->type = $type;
-        $mollieOrderLine->shippableQuantity = $shippableQuantity;
-
-        $mollieOrderLineCollection = new OrderLineCollection(1, []);
-        $mollieOrderLineCollection->append($mollieOrderLine);
-
-        $mollieOrder = $this->createConfiguredMock(Order::class, [
-            'lines' => $mollieOrderLineCollection,
-        ]);
-
-        $orderEndpoint = $this->createConfiguredMock(OrderEndpoint::class, [
-            'get' => $mollieOrder,
-        ]);
-
-        $orderEndpoint->expects($this->once())->method('get');
-
-        $this->clientMock->orders = $orderEndpoint;
-
-        $actualValue = $this->orderApiService->isCompletelyShipped('foo', 'bar');
-
-        $this->assertIsBool($actualValue);
-        $this->assertEquals($expectedValue, $actualValue);
-    }
-
-    public static function getIsCompletelyShippedData()
-    {
-        return [
-            // These types are available as line items in Shopware, so test whether they need to be shipped.
-            [OrderLineType::TYPE_PHYSICAL, 0, true],
-            [OrderLineType::TYPE_PHYSICAL, 1, false],
-            [OrderLineType::TYPE_DIGITAL, 0, true],
-            [OrderLineType::TYPE_DIGITAL, 1, false],
-            [OrderLineType::TYPE_DISCOUNT, 0, true],
-            [OrderLineType::TYPE_DISCOUNT, 1, false],
-            [OrderLineType::TYPE_STORE_CREDIT, 0, true],
-            [OrderLineType::TYPE_STORE_CREDIT, 1, false],
-
-            // These two types are not (yet) being used by the Mollie plugin, so there should not be any order lines
-            // with these types in the Mollie order, and we cannot ship them using Facade/ShipmentManager::shipItem.
-            // Therefore we mark the (Shopware) order completely shipped.
-            [OrderLineType::TYPE_GIFT_CARD, 0, true],
-            [OrderLineType::TYPE_GIFT_CARD, 1, true],
-            [OrderLineType::TYPE_SURCHARGE, 0, true],
-            [OrderLineType::TYPE_SURCHARGE, 1, true],
-
-            // Shipping Fee is not a line item in Shopware, so it cannot be shipped using Facade/MollieShipmen::shipItem.
-            // Therefore we mark the (Shopware) order completely shipped.
-            [OrderLineType::TYPE_SHIPPING_FEE, 0, true],
-            [OrderLineType::TYPE_SHIPPING_FEE, 1, true],
-        ];
     }
 }
