@@ -57,6 +57,7 @@
 - Reworked: Subscriptions now support mixed carts. Customers can combine subscription products, regular products, and vouchers in a single order. Previously only one subscription product per order was allowed.
 - Changed: Storefront JavaScript has been migrated to native Shopware JavaScript.
 - Fixed: Adding credit notes to net orders no longer inflates the total with an extra VAT layer.
+- Fixed: Compatibility with the Klarna Payment plugin
 
 # 4.23.0
 - New: Added Vipps as a payment method.

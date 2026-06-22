@@ -56,6 +56,7 @@
 - Überarbeitet: Abonnements unterstützen nun gemischte Warenkörbe. Kunden können Abo-Produkte, reguläre Produkte und Gutscheine in einer einzigen Bestellung kombinieren. Bisher war nur ein Abo-Produkt pro Bestellung möglich.
 - Geändert: Das Storefront-JavaScript wurde auf natives Shopware-JavaScript umgestellt.
 - Behoben: Gutschriften bei Netto-Bestellungen werden nicht mehr mit einer zusätzlichen MwSt.-Schicht versehen.
+- Behoben: Kompatibilität mit dem Klarna Payment Plugin
 
 # 4.23.0
 - Neu: Vipps als Zahlungsmethode hinzugefügt.

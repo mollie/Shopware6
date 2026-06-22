@@ -1,6 +1,7 @@
 <div class="mollie-pos-terminals d-none"
      data-mollie-template-pos-terminal
      data-customer-id="{{ context.customer.id }}"
+     data-pos-payment-id="{{ payment.id }}"
      data-shop-url="{{ seoUrl('frontend.home.page') }}">
 
     {% if page.mollie_terminals %}
