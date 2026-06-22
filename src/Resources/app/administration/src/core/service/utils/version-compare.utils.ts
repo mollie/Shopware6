@@ -1,31 +1,29 @@
+type VersionParts = Record<string, any>;
+
 export default class VersionCompare {
-    equals(versionA, versionB) {
+    equals(versionA: string, versionB: string): boolean {
         return this.compare(versionA, versionB, '=');
     }
-    notEquals(versionA, versionB) {
+    notEquals(versionA: string, versionB: string): boolean {
         return this.compare(versionA, versionB, '!=');
     }
-    greater(versionA, versionB) {
+    greater(versionA: string, versionB: string): boolean {
         return this.compare(versionA, versionB, '>');
     }
-    greaterOrEqual(versionA, versionB) {
+    greaterOrEqual(versionA: string, versionB: string): boolean {
         return this.compare(versionA, versionB, '>=');
     }
-    lesser(versionA, versionB) {
+    lesser(versionA: string, versionB: string): boolean {
         return this.compare(versionA, versionB, '<');
     }
-    lesserOrEqual(versionA, versionB) {
+    lesserOrEqual(versionA: string, versionB: string): boolean {
         return this.compare(versionA, versionB, '<=');
     }
 
     /**
      * Compare functions do not take into account prerelease versions
-     * @param versionA
-     * @param versionB
-     * @param comparator
-     * @returns {boolean}
      */
-    compare(versionA, versionB, comparator = '=') {
+    compare(versionA: string, versionB: string, comparator: string = '='): boolean {
         const partsA = this.matchVersion(versionA);
         const partsB = this.matchVersion(versionB);
 
@@ -106,7 +104,7 @@ export default class VersionCompare {
         return false;
     }
 
-    matchVersion(version) {
+    matchVersion(version: string): VersionParts | null {
         const match = version.match(
             /(?<version>(?<major>\d+)\.?(?<minor>\d+)\.?(?<patch>\d+)\.?(?<build>\d*))-?(?<prerelease>[a-z]+)?\.?(?<prereleaseDigits>\d+(?:.\d+)*)?/i,
         );
@@ -116,16 +114,16 @@ export default class VersionCompare {
             return null;
         }
 
-        const groups = match.groups;
+        const groups = match.groups as VersionParts;
 
         ['major', 'minor', 'patch', 'build'].forEach((part) => {
-            groups[part] = parseInt(groups[part]) || 0;
+            groups[part] = parseInt(groups[part], 10) || 0;
         });
 
         return groups;
     }
 
-    getHumanReadableVersion(version) {
+    getHumanReadableVersion(version: string): string {
         const match = this.matchVersion(version);
 
         if (match === null) {
@@ -147,7 +145,7 @@ export default class VersionCompare {
         return output;
     }
 
-    getHumanReadablePrereleaseText(text) {
+    getHumanReadablePrereleaseText(text: string): string {
         switch (text) {
             case 'dp':
                 return 'Developer Preview';
