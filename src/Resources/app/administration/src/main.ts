@@ -49,49 +49,32 @@ import roRO from './snippet/ro-RO';
 import skSK from './snippet/sk-SK';
 import bgBG from './snippet/bg-BG';
 
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('de-DE', deDE);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('en-GB', enGB);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('nl-NL', nlNL);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('it-IT', itIT);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('pt-PT', ptPT);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('es-ES', esES);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('sv-SE', svSE);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('nb-NO', nbNO);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('pl-PL', plPL);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('cs-CZ', csCZ);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('sl-SI', slSI);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('hu-HU', huHU);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('fi-FI', fiFI);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('da-DK', daDK);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('el-GR', elGR);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('hr-HR', hrHR);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('et-EE', etEE);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('is-IS', isIS);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('lt-LT', ltLT);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('lv-LV', lvLV);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('ro-RO', roRO);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('sk-SK', skSK);
-// eslint-disable-next-line no-undef
-Shopware.Locale.extend('bg-BG', bgBG);
+const locales: Record<string, any> = {
+    'de-DE': deDE,
+    'en-GB': enGB,
+    'nl-NL': nlNL,
+    'it-IT': itIT,
+    'pt-PT': ptPT,
+    'es-ES': esES,
+    'sv-SE': svSE,
+    'nb-NO': nbNO,
+    'pl-PL': plPL,
+    'cs-CZ': csCZ,
+    'sl-SI': slSI,
+    'hu-HU': huHU,
+    'fi-FI': fiFI,
+    'da-DK': daDK,
+    'el-GR': elGR,
+    'hr-HR': hrHR,
+    'et-EE': etEE,
+    'is-IS': isIS,
+    'lt-LT': ltLT,
+    'lv-LV': lvLV,
+    'ro-RO': roRO,
+    'sk-SK': skSK,
+    'bg-BG': bgBG,
+};
+
+Object.entries(locales).forEach(([code, messages]) => {
+    Shopware.Locale.extend(code, messages);
+});
