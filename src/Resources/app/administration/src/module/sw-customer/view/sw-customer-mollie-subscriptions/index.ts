@@ -1,15 +1,27 @@
 import template from './sw-customer-mollie-subscriptions.html.twig';
+import SubscriptionService from '../../../../core/service/subscription/subscription.service';
 
-// eslint-disable-next-line no-undef
-Shopware.Component.register('sw-customer-mollie-subscriptions', {
+const { Component, Application } = Shopware;
+
+interface CustomerSubscriptionsView {
+    isLoading: boolean;
+    subscriptions: any[];
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<CustomerSubscriptionsView> = {
     template,
+
     props: {
         customer: {
             type: Object,
             required: true,
         },
     },
+
     inject: ['MolliePaymentsSubscriptionService'],
+
     data() {
         return {
             isLoading: false,
@@ -20,6 +32,7 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
     created() {
         this.createdComponent();
     },
+
     computed: {
         columns() {
             return [
@@ -57,14 +70,20 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
         assetFilter() {
             return Shopware.Filter.getByName('asset');
         },
+
+        subscriptionService() {
+            return new SubscriptionService(Application.getApplicationRoot());
+        },
     },
+
     watch: {
         async customer() {
             await this.createdComponent();
         },
     },
+
     methods: {
-        async cancelSubscription(item) {
+        async cancelSubscription(item: any) {
             this.isLoading = true;
             const response = await this.MolliePaymentsSubscriptionService.cancelByMollieId({
                 mollieCustomerId: item.customerId,
@@ -76,7 +95,7 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
             const updatedSubscription = response.subscription;
 
             if (updatedSubscription !== undefined) {
-                this.subscriptions.forEach((subscription, index) => {
+                this.subscriptions.forEach((subscription: any, index: number) => {
                     if (subscription.id === updatedSubscription.id) {
                         this.subscriptions[index].status = updatedSubscription.status;
                     }
@@ -95,28 +114,10 @@ Shopware.Component.register('sw-customer-mollie-subscriptions', {
             this.isLoading = false;
         },
 
-        statusColor(status) {
-            if (status === '' || status === null) {
-                return 'neutral';
-            }
-
-            if (status === 'active' || status === 'resumed') {
-                return 'success';
-            }
-
-            if (status === 'canceled' || status === 'suspended' || status === 'completed') {
-                return 'neutral';
-            }
-
-            if (status === 'skipped') {
-                return 'info';
-            }
-
-            if (status === 'pending' || status === 'paused') {
-                return 'warning';
-            }
-
-            return 'danger';
+        statusColor(status: string) {
+            return this.subscriptionService.getStatusColor(status);
         },
     },
-});
+};
+
+Component.register('sw-customer-mollie-subscriptions', componentConfig);

@@ -1,7 +1,6 @@
 import './page/sw-customer-detail';
 import './view/sw-customer-mollie-subscriptions';
 
-// eslint-disable-next-line no-undef
 const { Module } = Shopware;
 
 Module.register('mollie-sw-customer-detail', {
@@ -14,7 +13,7 @@ Module.register('mollie-sw-customer-detail', {
     color: '#333',
     icon: 'default-action-settings',
 
-    routeMiddleware(next, currentRoute) {
+    routeMiddleware(next: any, currentRoute: any) {
         if (currentRoute.name === 'sw.customer.detail') {
             currentRoute.children.push({
                 name: 'sw.customer.detail.mollie-subscriptions',

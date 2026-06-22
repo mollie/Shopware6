@@ -1,8 +1,14 @@
 import template from './sw-customer-detail.html.twig';
 
-// eslint-disable-next-line no-undef
-Shopware.Component.override('sw-customer-detail', {
+const { Component } = Shopware;
+
+interface SwCustomerDetailOverride {
+    [key: string]: any;
+}
+
+const overrideConfig: ThisType<SwCustomerDetailOverride> = {
     template,
+
     computed: {
         subscriptionRoute() {
             return {
@@ -11,6 +17,7 @@ Shopware.Component.override('sw-customer-detail', {
                 query: { edit: this.editMode },
             };
         },
+
         hasMollieData() {
             if (this.customer === null) {
                 return false;
@@ -19,4 +26,6 @@ Shopware.Component.override('sw-customer-detail', {
             return this.customer.customFields?.mollie_payments?.customer_ids !== undefined;
         },
     },
-});
+};
+
+Component.override('sw-customer-detail', overrideConfig);
