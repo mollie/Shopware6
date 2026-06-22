@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Handler\Method\ApplePayPayment;
 use Kiener\MolliePayments\Handler\Method\IngHomePayPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayLaterPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaPayNowPayment;
 use Kiener\MolliePayments\Handler\Method\KlarnaSliceItPayment;
 use Kiener\MolliePayments\Handler\Method\SofortPayment;
 use Kiener\MolliePayments\Repository\PaymentMethodRepository;
-use Mollie\Api\Resources\Order;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -66,20 +63,6 @@ class PaymentMethodService
             ],
             $context
         );
-    }
-
-    public function isPaidApplePayTransaction(OrderTransactionEntity $transaction, Order $mollieOrder): bool
-    {
-        $paymentMethodId = $transaction->getPaymentMethodId();
-        $paymentMethod = $transaction->getPaymentMethod();
-
-        if (! $paymentMethod instanceof PaymentMethodEntity) {
-            $criteria = new Criteria([$paymentMethodId]);
-            /** @var PaymentMethodEntity $paymentMethod */
-            $paymentMethod = $this->paymentRepository->getRepository()->search($criteria, Context::createDefaultContext())->first();
-        }
-
-        return $paymentMethod->getHandlerIdentifier() === ApplePayPayment::class && $mollieOrder->isPaid() === true;
     }
 
     /**

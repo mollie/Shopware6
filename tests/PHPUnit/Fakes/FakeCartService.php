@@ -50,11 +50,6 @@ class FakeCartService implements CartServiceInterface
         return '';
     }
 
-    public function updateCountry(SalesChannelContext $context, string $countryID): SalesChannelContext
-    {
-        return $this->salesChannelContext;
-    }
-
     public function updateShippingMethod(SalesChannelContext $context, string $shippingMethodID): SalesChannelContext
     {
         return $this->salesChannelContext;

@@ -16,8 +16,6 @@ interface CartServiceInterface
 
     public function getShippingCosts(Cart $cart): float;
 
-    public function updateCountry(SalesChannelContext $context, string $countryID): SalesChannelContext;
-
     public function updateShippingMethod(SalesChannelContext $context, string $shippingMethodID): SalesChannelContext;
 
     public function updatePaymentMethod(SalesChannelContext $context, string $paymentMethodID): SalesChannelContext;

@@ -89,7 +89,6 @@
             <argument type="service" id="Shopware\Core\System\SalesChannel\SalesChannel\SalesChannelContextSwitcher"/>
             <argument type="service" id="Shopware\Core\Checkout\Cart\LineItemFactoryHandler\ProductLineItemFactory"/>
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker"/>
         </service>
 
 

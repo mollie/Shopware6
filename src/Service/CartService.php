@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Service;
 
-use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayShippingAddressFaker;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\LineItemFactoryHandler\LineItemFactoryInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartService;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\DataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
@@ -32,19 +30,13 @@ class CartService implements CartServiceInterface
      */
     private $productItemFactory;
 
-    /**
-     * @var ApplePayShippingAddressFaker
-     */
-    private $shippingAddressFaker;
-
     private SalesChannelContextServiceInterface $contextService;
 
-    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, LineItemFactoryInterface $productItemFactory, SalesChannelContextServiceInterface $contextService, ApplePayShippingAddressFaker $shippingAddressFaker)
+    public function __construct(SalesChannelCartService $swCartService, SalesChannelContextSwitcher $contextSwitcher, LineItemFactoryInterface $productItemFactory, SalesChannelContextServiceInterface $contextService)
     {
         $this->swCartService = $swCartService;
         $this->contextSwitcher = $contextSwitcher;
         $this->productItemFactory = $productItemFactory;
-        $this->shippingAddressFaker = $shippingAddressFaker;
         $this->contextService = $contextService;
     }
 
@@ -78,26 +70,6 @@ class CartService implements CartServiceInterface
         return $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
     }
 
-    public function updateCountry(SalesChannelContext $context, string $countryID): SalesChannelContext
-    {
-        $dataBag = new DataBag();
-        $dataBagData = [
-            SalesChannelContextService::COUNTRY_ID => $countryID,
-        ];
-        $customer = $context->getCustomer();
-
-        if ($customer instanceof CustomerEntity) {
-            $applePayAddressId = $this->shippingAddressFaker->createFakeShippingAddress($countryID, $customer, $context->getContext());
-            $dataBagData[SalesChannelContextService::SHIPPING_ADDRESS_ID] = $applePayAddressId;
-        }
-
-        $dataBag->add($dataBagData);
-
-        $this->contextSwitcher->update($dataBag, $context);
-
-        return $this->getNewSalesChannelContext($context);
-    }
-
     public function updateShippingMethod(SalesChannelContext $context, string $shippingMethodID): SalesChannelContext
     {
         $dataBag = new DataBag();
@@ -122,16 +94,6 @@ class CartService implements CartServiceInterface
         $this->contextSwitcher->update($dataBag, $context);
 
         return $this->getNewSalesChannelContext($context);
-    }
-
-    public function clearFakeAddressIfExists(SalesChannelContext $context): void
-    {
-        $customer = $context->getCustomer();
-        if ($customer === null) {
-            return;
-        }
-
-        $this->shippingAddressFaker->deleteFakeShippingAddress($customer, $context->getContext());
     }
 
     public function persistCart(Cart $cart, SalesChannelContext $context): Cart
