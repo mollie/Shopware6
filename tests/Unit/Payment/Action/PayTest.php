@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Payment\Action;
 
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
@@ -124,7 +125,8 @@ final class PayTest extends TestCase
         $logger = new NullLogger();
         $gateway = $gateway ?? new FakeGateway($checkoutUrl);
         $lineItemAnalyzer = new LineItemAnalyzer();
-        $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,$logger);
+        $lineItemFilter = new LineItemFilter();
+        $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,$lineItemFilter,$logger);
 
         $request = new \Symfony\Component\HttpFoundation\Request();
         $request->setSession(new \Symfony\Component\HttpFoundation\Session\Session(

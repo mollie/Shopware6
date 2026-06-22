@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayAmount;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayCart;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayLineItem;
@@ -36,6 +38,8 @@ final class GetCartRoute extends AbstractGetCartRoute
         #[Autowire(service: Translator::class)]
         private AbstractTranslator $translator,
         private LocaleProvider $localeProvider,
+        #[Autowire(service: LineItemFilter::class)]
+        private LineItemFilterInterface $lineItemFilter,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -100,7 +104,9 @@ final class GetCartRoute extends AbstractGetCartRoute
         $taxAmount = 0.0;
         $subTotal = 0.0;
 
-        foreach ($cart->getLineItems() as $lineItem) {
+        $filteredCartItems = $cart->getLineItems()->filter($this->lineItemFilter->isItemAllowed(...));
+
+        foreach ($filteredCartItems as $lineItem) {
             $totalPrice = 0.0;
 
             $price = $lineItem->getPrice();

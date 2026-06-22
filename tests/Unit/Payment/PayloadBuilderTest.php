@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
@@ -545,7 +546,8 @@ final class PayloadBuilderTest extends TestCase
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         }
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId);
+        $lineItemFilter = new LineItemFilter();
 
-        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new NullLogger());
+        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, new NullLogger());
     }
 }

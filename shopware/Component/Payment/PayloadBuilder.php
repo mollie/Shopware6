@@ -12,6 +12,8 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\Mode;
@@ -56,6 +58,8 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
         private LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: 'customer.repository')]
         private EntityRepository $customerRepository,
+        #[Autowire(service: LineItemFilter::class)]
+        private LineItemFilterInterface $lineItemFilter,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -113,7 +117,8 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
         $oderLineItems = $order->getLineItems();
         $hasSubscriptionLineItem = false;
         if ($oderLineItems !== null) {
-            foreach ($oderLineItems as $lineItem) {
+            $filteredLineItems = $oderLineItems->filter($this->lineItemFilter->isItemAllowed(...));
+            foreach ($filteredLineItems as $lineItem) {
                 $lineItem = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
                 $lineItemCollection->add($lineItem);
             }
