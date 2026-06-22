@@ -2,23 +2,18 @@ import defaultSearchConfiguration from './default-search-configuration';
 import './page/mollie-subscriptions-list';
 import './page/mollie-subscriptions-detail';
 
-// eslint-disable-next-line no-undef
 const { Module, Plugin, Service } = Shopware;
 
 // Tell Shopware to wait loading until we call resolve.
 const resolve = Plugin.addBootPromise();
 
-/**
- *
- * @type {MolliePaymentsConfigService}
- */
 const configService = Service('MolliePaymentsConfigService');
 
 // Because we first have to check if subscription is enabled or not
 configService
     .getSubscriptionConfig()
-    .then((result) => {
-        const navigation = [];
+    .then((result: any) => {
+        const navigation: any[] = [];
 
         if (result.enabled === true) {
             navigation.push({
@@ -41,7 +36,7 @@ configService
             icon: 'regular-shopping-bag',
             entity: 'mollie_subscription',
 
-            routeMiddleware(next, currentRoute) {
+            routeMiddleware(next: any, currentRoute: any) {
                 if (currentRoute.name === 'sw.order.detail') {
                     currentRoute.children.push({
                         name: 'sw.order.detail.mollie',
@@ -68,7 +63,7 @@ configService
                     component: 'mollie-subscriptions-detail',
                     path: 'subscription/detail/:id',
                     props: {
-                        default: ($route) => {
+                        default: ($route: any) => {
                             return {
                                 subscriptionId: $route.params.id,
                             };
