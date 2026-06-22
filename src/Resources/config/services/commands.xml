@@ -19,11 +19,5 @@
             <tag name="console.command"/>
         </service>
 
-        <service id="Kiener\MolliePayments\Command\ApplePay\ApplePayDownloadCommand">
-            <argument type="service" id="Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="console.command"/>
-        </service>
-
     </services>
 </container>

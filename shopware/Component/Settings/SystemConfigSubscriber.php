@@ -5,7 +5,9 @@ namespace Mollie\Shopware\Component\Settings;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Service\ApplePayDomainVerificationService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SystemConfig\Event\SystemConfigChangedEvent;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
@@ -16,10 +18,13 @@ final class SystemConfigSubscriber implements EventSubscriberInterface
 {
     private const KEY_PROFILE_ID = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_PROFILE_ID;
 
+    private const KEY_APPLE_PAY_DIRECT_ENABLED = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApplePaySettings::KEY_APPLE_PAY_DIRECT_ENABLED;
+
     public function __construct(
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
         private SystemConfigService $systemConfigService,
+        private ApplePayDomainVerificationService $domainVerification,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -28,7 +33,10 @@ final class SystemConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            SystemConfigChangedEvent::class => 'updateProfileId',
+            SystemConfigChangedEvent::class => [
+                ['updateProfileId'],
+                ['downloadApplePayDomainAssociationFile'],
+            ],
         ];
     }
 
@@ -53,6 +61,32 @@ final class SystemConfigSubscriber implements EventSubscriberInterface
                 'message' => $exception->getMessage(),
             ]);
             $this->systemConfigService->set(self::KEY_PROFILE_ID, null, $salesChannelId);
+        }
+    }
+
+    public function downloadApplePayDomainAssociationFile(SystemConfigChangedEvent $event): void
+    {
+        if ($event->getKey() !== self::KEY_APPLE_PAY_DIRECT_ENABLED) {
+            return;
+        }
+
+        if (! $event->getValue()) {
+            return;
+        }
+
+        try {
+            $downloaded = $this->domainVerification->downloadDomainAssociationFile();
+
+            if (! $downloaded) {
+                $this->logger->warning('Apple Pay was enabled but the domain verification file could not be downloaded from Mollie', [
+                    'salesChannelId' => $event->getSalesChannelId(),
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to download Apple Pay domain verification file after enabling Apple Pay', [
+                'salesChannelId' => $event->getSalesChannelId(),
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
 

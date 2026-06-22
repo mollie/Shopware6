@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Components\Installer;
 
-use Kiener\MolliePayments\Components\ApplePayDirect\Services\ApplePayDomainVerificationService;
 use Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller;
 use Kiener\MolliePayments\Service\PaymentMethodService;
 use Mollie\Shopware\Component\Payment\PaymentMethodInstaller;
@@ -21,17 +20,14 @@ class PluginInstaller
      */
     private $paymentMethodService;
 
-    private ApplePayDomainVerificationService $domainFileDownloader;
     private PaymentMethodInstaller $paymentMethodInstaller;
 
     public function __construct(CustomFieldsInstaller $customFieldsInstaller,
         PaymentMethodService $paymentMethodService,
-        PaymentMethodInstaller $paymentMethodInstaller,
-        ApplePayDomainVerificationService $domainFileDownloader)
+        PaymentMethodInstaller $paymentMethodInstaller)
     {
         $this->customFieldsInstaller = $customFieldsInstaller;
         $this->paymentMethodService = $paymentMethodService;
-        $this->domainFileDownloader = $domainFileDownloader;
         $this->paymentMethodInstaller = $paymentMethodInstaller;
     }
 
@@ -44,6 +40,5 @@ class PluginInstaller
 
         $this->paymentMethodService->installAndActivatePaymentMethods($context);
         $this->paymentMethodInstaller->install($context);
-        $this->domainFileDownloader->downloadDomainAssociationFile();
     }
 }
