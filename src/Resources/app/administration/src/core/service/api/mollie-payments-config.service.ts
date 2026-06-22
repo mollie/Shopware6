@@ -1,41 +1,25 @@
-// eslint-disable-next-line no-undef
 const ApiService = Shopware.Classes.ApiService;
 
 export default class MolliePaymentsConfigService extends ApiService {
-    /**
-     *
-     * @param httpClient
-     * @param loginService
-     * @param currentLocale
-     */
-    constructor(httpClient, loginService, currentLocale) {
+    private readonly currentLocale: any;
+
+    constructor(httpClient: any, loginService: any, currentLocale: any) {
         super(httpClient, loginService, 'mollie');
 
         this.currentLocale = currentLocale;
     }
 
-    /**
-     *
-     * @param data
-     * @returns {*}
-     */
-    testApiKeys(data = { liveApiKey: null, testApiKey: null }) {
+    testApiKeys(data: Record<string, any> = { liveApiKey: null, testApiKey: null }): Promise<any> {
         const headers = this.getBasicHeaders();
 
         return this.httpClient
             .post(`_action/${this.getApiBasePath()}/config/test-api-keys`, JSON.stringify(data), {
                 headers: headers,
             })
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
+            .then((response: any) => ApiService.handleResponse(response));
     }
 
-    /**
-     *
-     * @returns {*}
-     */
-    validateFlowBuilder() {
+    validateFlowBuilder(): Promise<any> {
         return this.httpClient
             .post(
                 `_action/${this.getApiBasePath()}/config/validate/flowbuilder`,
@@ -46,12 +30,10 @@ export default class MolliePaymentsConfigService extends ApiService {
                     headers: this.getBasicHeaders(),
                 },
             )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
+            .then((response: any) => ApiService.handleResponse(response));
     }
 
-    getSubscriptionConfig() {
+    getSubscriptionConfig(): Promise<any> {
         return this.httpClient
             .post(
                 `_action/${this.getApiBasePath()}/config/subscription`,
@@ -62,8 +44,6 @@ export default class MolliePaymentsConfigService extends ApiService {
                     headers: this.getBasicHeaders(),
                 },
             )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
+            .then((response: any) => ApiService.handleResponse(response));
     }
 }
