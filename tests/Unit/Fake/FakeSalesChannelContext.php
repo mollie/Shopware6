@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Fake;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
@@ -16,6 +17,7 @@ final class FakeSalesChannelContext extends SalesChannelContext
     private Context $fakeContext;
     private ?CustomerEntity $fakeCustomer = null;
     private ?PaymentMethodEntity $fakePaymentMethod = null;
+    private ?CurrencyEntity $fakeCurrency = null;
 
     public function __construct(
         string $salesChannelId = 'sales-channel-id',
@@ -30,6 +32,24 @@ final class FakeSalesChannelContext extends SalesChannelContext
     public function setCustomer(?CustomerEntity $customer): void
     {
         $this->fakeCustomer = $customer;
+    }
+
+    public function setCurrency(CurrencyEntity $currency): void
+    {
+        $this->fakeCurrency = $currency;
+    }
+
+    public function getCurrency(): CurrencyEntity
+    {
+        if ($this->fakeCurrency === null) {
+            $currency = new CurrencyEntity();
+            $currency->setId('currency-id');
+            $currency->setIsoCode('EUR');
+
+            return $currency;
+        }
+
+        return $this->fakeCurrency;
     }
 
     public function setPaymentMethod(PaymentMethodEntity $paymentMethod): void

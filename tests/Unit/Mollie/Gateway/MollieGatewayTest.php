@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie\Gateway;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
@@ -166,5 +170,44 @@ final class MollieGatewayTest extends TestCase
         $createPayment = new CreatePayment('test','test',new Money(10.00,'EUR'));
         $createPayment->setShopwareOrderNumber('10000');
         $gateway->createPayment($createPayment,Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
+    }
+
+    public function testGetActivePaymentMethodsReturnsMethodIds(): void
+    {
+        $body = json_encode([
+            '_embedded' => [
+                'methods' => [
+                    ['id' => 'ideal'],
+                    ['id' => 'creditcard'],
+                ],
+            ],
+        ]);
+        $client = new Client(['handler' => HandlerStack::create(new MockHandler([new Response(200, [], (string) $body)]))]);
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+
+        $result = $gateway->getActivePaymentMethods(new Money(100.0, 'EUR'), 'DE', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
+
+        $this->assertSame(['ideal', 'creditcard'], $result);
+    }
+
+    public function testGetActivePaymentMethodsReturnsEmptyArrayWhenNoMethods(): void
+    {
+        $body = json_encode(['_embedded' => ['methods' => []]]);
+        $client = new Client(['handler' => HandlerStack::create(new MockHandler([new Response(200, [], (string) $body)]))]);
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+
+        $result = $gateway->getActivePaymentMethods(new Money(100.0, 'EUR'), '', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
+
+        $this->assertSame([], $result);
+    }
+
+    public function testGetActivePaymentMethodsHandlesApiException(): void
+    {
+        $this->expectException(ApiException::class);
+
+        $client = new Client(['handler' => HandlerStack::create(new MockHandler([new Response(422, [], (string) json_encode(['detail' => 'failed']))]))]);
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+
+        $gateway->getActivePaymentMethods(new Money(100.0, 'EUR'), 'DE', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
     }
 }

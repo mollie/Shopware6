@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
@@ -44,6 +45,13 @@ interface MollieGatewayInterface
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection;
 
     public function listTerminals(string $salesChannelId): TerminalCollection;
+
+    /**
+     * Returns the ids of the Mollie payment methods that are active for the given amount and billing country.
+     *
+     * @return string[]
+     */
+    public function getActivePaymentMethods(Money $amount, string $billingCountry, string $salesChannelId): array;
 
     public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool;
 

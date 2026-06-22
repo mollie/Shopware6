@@ -14,6 +14,7 @@ use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataExcep
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
@@ -249,6 +250,37 @@ final class MollieGateway implements MollieGatewayInterface
             }
 
             return $collection;
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
+    public function getActivePaymentMethods(Money $amount, string $billingCountry, string $salesChannelId): array
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $query = [
+                'amount' => $amount->toArray(),
+                'resource' => 'orders',
+                'includeWallets' => 'applepay',
+            ];
+
+            if ($billingCountry !== '') {
+                $query['billingCountry'] = $billingCountry;
+            }
+
+            $response = $client->get('methods', ['query' => $query]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $methodIds = [];
+            foreach ($body['_embedded']['methods'] ?? [] as $methodData) {
+                if (isset($methodData['id'])) {
+                    $methodIds[] = (string) $methodData['id'];
+                }
+            }
+
+            return $methodIds;
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }

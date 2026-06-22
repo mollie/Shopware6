@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
@@ -42,6 +43,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
      * @var array<string, Order>
      */
     private array $orders = [];
+
+    /**
+     * @var array<string, string[]>
+     */
+    private array $activePaymentMethods = [];
 
     public function __construct(
         private MollieGatewayInterface $decorated
@@ -136,6 +142,17 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->decorated->listTerminals($salesChannelId);
     }
 
+    public function getActivePaymentMethods(Money $amount, string $billingCountry, string $salesChannelId): array
+    {
+        $cacheKey = sprintf('%s-%s-%s-%s', $salesChannelId, $amount->getValue(), $amount->getCurrency(), $billingCountry);
+        if (isset($this->activePaymentMethods[$cacheKey])) {
+            return $this->activePaymentMethods[$cacheKey];
+        }
+        $this->activePaymentMethods[$cacheKey] = $this->decorated->getActivePaymentMethods($amount, $billingCountry, $salesChannelId);
+
+        return $this->activePaymentMethods[$cacheKey];
+    }
+
     public function getOrder(string $mollieOrderId, string $salesChannelId): Order
     {
         $key = sprintf('%s', $mollieOrderId);
@@ -172,5 +189,6 @@ final class CachedMollieGateway implements MollieGatewayInterface
         $this->paymentIdPayments = [];
         $this->transactionPayments = [];
         $this->orders = [];
+        $this->activePaymentMethods = [];
     }
 }

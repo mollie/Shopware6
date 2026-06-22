@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
@@ -44,6 +45,9 @@ final class FakeGateway implements MollieGatewayInterface
 
     /** @var list<string> */
     private array $validApiKeys = [];
+
+    /** @var string[] */
+    private array $activePaymentMethods = [];
 
     public function __construct(private string $checkoutUrl = '',private ?Payment $payment = null)
     {
@@ -154,6 +158,19 @@ final class FakeGateway implements MollieGatewayInterface
     public function listTerminals(string $salesChannelId): TerminalCollection
     {
         return new TerminalCollection();
+    }
+
+    /**
+     * @param string[] $activePaymentMethods
+     */
+    public function withActivePaymentMethods(array $activePaymentMethods): void
+    {
+        $this->activePaymentMethods = $activePaymentMethods;
+    }
+
+    public function getActivePaymentMethods(Money $amount, string $billingCountry, string $salesChannelId): array
+    {
+        return $this->activePaymentMethods;
     }
 
     public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
