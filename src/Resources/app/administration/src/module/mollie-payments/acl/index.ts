@@ -1,4 +1,6 @@
-// eslint-disable-next-line no-undef
+// No import is needed here, so mark the file as a module explicitly.
+export {};
+
 Shopware.Service('privileges').addPrivilegeMappingEntry({
     category: 'permissions',
     parent: 'mollie',
@@ -19,7 +21,6 @@ Shopware.Service('privileges').addPrivilegeMappingEntry({
     },
 });
 
-// eslint-disable-next-line no-undef
 Shopware.Service('privileges').addPrivilegeMappingEntry({
     category: 'permissions',
     parent: 'mollie',
