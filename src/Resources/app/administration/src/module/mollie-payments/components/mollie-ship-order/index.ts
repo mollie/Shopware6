@@ -1,11 +1,20 @@
 import template from './mollie-ship-order.html.twig';
 import './mollie-ship-order.scss';
 import MollieShippingEvents from './MollieShippingEvents';
+import ShippableItemsService from './services/ShippableItemsService';
 
-// eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
 
-Component.register('mollie-ship-order', {
+interface ShipOrderComponent {
+    shippableItemsService: ShippableItemsService;
+    shippableLineItems: any[];
+    showTrackingInfo: boolean;
+    tracking: { carrier: string; code: string; url: string };
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<ShipOrderComponent> = {
     template,
 
     mixins: [Mixin.getByName('notification')],
@@ -25,6 +34,7 @@ Component.register('mollie-ship-order', {
 
     data() {
         return {
+            shippableItemsService: null,
             shippableLineItems: [],
             showTrackingInfo: false,
             tracking: {
@@ -33,10 +43,6 @@ Component.register('mollie-ship-order', {
                 url: '',
             },
         };
-    },
-
-    created() {
-        this.createdComponent();
     },
 
     computed: {
@@ -64,27 +70,21 @@ Component.register('mollie-ship-order', {
         },
     },
 
+    created() {
+        this.createdComponent();
+    },
+
     methods: {
         createdComponent() {
+            this.shippableItemsService = new ShippableItemsService();
+
             this.showTrackingInfo = false;
             this.tracking = { carrier: '', code: '', url: '' };
 
-            const items = [];
-            for (let i = 0; i < this.order.lineItems.length; i++) {
-                const lineItem = this.order.lineItems[i];
-                const status = this.shippingStatus[lineItem.id];
-                const shippableQty = status ? (status.shippableQuantity ?? 0) : 0;
-
-                items.push({
-                    id: lineItem.id,
-                    mollieId: status ? status.mollieId : null,
-                    label: lineItem.label,
-                    quantity: shippableQty,
-                    originalQuantity: shippableQty,
-                    selected: false,
-                });
-            }
-            this.shippableLineItems = items;
+            this.shippableLineItems = this.shippableItemsService.buildShippableLineItems(
+                this.order.lineItems,
+                this.shippingStatus,
+            );
 
             if (this.order.deliveries.length) {
                 const delivery = this.order.deliveries.first();
@@ -93,34 +93,22 @@ Component.register('mollie-ship-order', {
         },
 
         btnSelectAllItems_Click() {
-            for (let i = 0; i < this.shippableLineItems.length; i++) {
-                const item = this.shippableLineItems[i];
+            this.shippableLineItems.forEach((item: any) => {
                 if (item.originalQuantity > 0) {
                     item.selected = true;
                 }
-            }
+            });
         },
 
         btnResetItems_Click() {
-            for (let i = 0; i < this.shippableLineItems.length; i++) {
-                const item = this.shippableLineItems[i];
+            this.shippableLineItems.forEach((item: any) => {
                 item.selected = false;
                 item.quantity = item.originalQuantity;
-            }
+            });
         },
 
         onShipOrder() {
-            var shippingItems = [];
-
-            for (let i = 0; i < this.shippableLineItems.length; i++) {
-                const item = this.shippableLineItems[i];
-                if (item.selected) {
-                    shippingItems.push({
-                        id: item.id,
-                        quantity: item.quantity,
-                    });
-                }
-            }
+            const shippingItems = this.shippableItemsService.collectSelectedItems(this.shippableLineItems);
 
             this.MolliePaymentsShippingService.shipOrder(
                 this.order.id,
@@ -130,9 +118,7 @@ Component.register('mollie-ship-order', {
                 shippingItems,
             )
                 .then(() => {
-                    // eslint-disable-next-line no-undef
                     if (Shopware.Utils && Shopware.Utils.EventBus) {
-                        // eslint-disable-next-line no-undef
                         Shopware.Utils.EventBus.emit(MollieShippingEvents.EventShippedOrder);
                     } else {
                         this.$root.$emit(MollieShippingEvents.EventShippedOrder);
@@ -142,7 +128,7 @@ Component.register('mollie-ship-order', {
                         message: this.$tc('mollie-payments.modals.shipping.item.success'),
                     });
                 })
-                .catch((response) => {
+                .catch((response: any) => {
                     const msg = response.response.data.message
                         ? response.response.data.message
                         : response.response.data.errors[0];
@@ -152,4 +138,6 @@ Component.register('mollie-ship-order', {
                 });
         },
     },
-});
+};
+
+Component.register('mollie-ship-order', componentConfig);

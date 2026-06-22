@@ -1,9 +1,5 @@
 export default class MollieShippingEvents {
-    /**
-     *
-     * @returns {string}
-     */
-    static get EventShippedOrder() {
+    static get EventShippedOrder(): string {
         return 'mollie-shipped-order';
     }
 }

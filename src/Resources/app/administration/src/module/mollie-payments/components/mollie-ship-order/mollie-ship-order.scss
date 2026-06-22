@@ -1,6 +1,11 @@
 .mollie-ship-order {
     .mollie-ship-order-grid {
         .mollie-ship-order-grid-quantity {
+            // The text field carries the default mt-field bottom margin, which pushes
+            // the input off-center inside the table-cell; remove it so it lines up
+            // vertically with the rest of the row.
+            margin-bottom: 0;
+
             input:not([disabled]) {
                 background-color: #fff5e0;
             }
