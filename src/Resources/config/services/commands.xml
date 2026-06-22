@@ -6,12 +6,6 @@
 
     <services>
 
-        <service id="Kiener\MolliePayments\Command\Install\SetupCommand">
-            <argument type="service" id="Kiener\MolliePayments\Components\Installer\PluginInstaller"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <tag name="console.command"/>
-        </service>
-
         <service id="Kiener\MolliePayments\Command\DAL\DALCleanupCommand">
             <argument type="service" id="product.repository"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>

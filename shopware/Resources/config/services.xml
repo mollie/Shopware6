@@ -9,5 +9,8 @@
 
         <prototype namespace="Mollie\Shopware\" resource="./../../" exclude="../../{Resources,Migration,*.php}"/>
 
+        <!-- fetched via container->get() in the plugin lifecycle, therefore public -->
+        <service id="Mollie\Shopware\Component\Installer\PluginInstaller" public="true"/>
+
     </services>
 </container>

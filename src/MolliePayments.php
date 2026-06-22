@@ -5,7 +5,7 @@ namespace Kiener\MolliePayments;
 
 use Kiener\MolliePayments\Compatibility\DependencyLoader;
 use Kiener\MolliePayments\Compatibility\VersionCompare;
-use Kiener\MolliePayments\Components\Installer\PluginInstaller;
+use Mollie\Shopware\Component\Installer\PluginInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;

@@ -15,7 +15,6 @@
         <import resource="services/services.xml"/>
         <import resource="services/builder.xml"/>
         <import resource="services/snippets.xml"/>
-        <import resource="services/repositories.xml"/>
         <import resource="packages/**/*.xml"/>
         <import resource="../../../shopware/Resources/config/services.xml"/>
     </imports>
@@ -27,13 +26,6 @@
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="Kiener\MolliePayments\Gateway\Mollie\MollieGateway"/>
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-        </service>
-
-
-        <service id="Kiener\MolliePayments\Components\Installer\PluginInstaller" public="true" >
-            <argument type="service" id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\PaymentMethodService"/>
-            <argument type="service" id="Mollie\Shopware\Component\Payment\PaymentMethodInstaller"/>
         </service>
 
 
@@ -61,14 +53,6 @@
             <argument type="service" id="service_container"/>
             <argument type="service" id="request_stack"/>
             <argument type="service" id="translator"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Installer\CustomFieldsInstaller" >
-            <argument type="service" id="custom_field_set.repository"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\PaymentMethodService">
-            <argument type="service" id="Kiener\MolliePayments\Repository\PaymentMethodRepository"/>
         </service>
 
 

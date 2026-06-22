@@ -1,18 +1,17 @@
 <?php
-
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Service\Installer;
+namespace Mollie\Shopware\Component\Installer;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity;
 use Shopware\Core\System\CustomField\CustomFieldTypes;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class CustomFieldsInstaller
+final class CustomFieldsInstaller
 {
     // --------------------------------------------------------------------------------
     private const ID_CUSTOM_FIELDSET = 'f2acb41af0be41638540b31917007fa3';
@@ -29,16 +28,12 @@ class CustomFieldsInstaller
     private const ID_EXPRESS_ADDRESS_ID = 'c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6';
 
     /**
-     * @var EntityRepository<EntityCollection<CustomFieldSetEntity>>
+     * @param EntityRepository<EntityCollection<\Shopware\Core\System\CustomField\Aggregate\CustomFieldSet\CustomFieldSetEntity>> $repoCustomFields
      */
-    private $repoCustomFields;
-
-    /**
-     * @param EntityRepository<EntityCollection<CustomFieldSetEntity>> $repoCustomFields
-     */
-    public function __construct($repoCustomFields)
-    {
-        $this->repoCustomFields = $repoCustomFields;
+    public function __construct(
+        #[Autowire(service: 'custom_field_set.repository')]
+        private readonly EntityRepository $repoCustomFields
+    ) {
     }
 
     public function install(Context $context): void
