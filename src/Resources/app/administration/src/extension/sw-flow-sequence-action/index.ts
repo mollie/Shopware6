@@ -1,14 +1,13 @@
 import { ACTION } from '../../constant/mollie-payments.constant';
 
-// eslint-disable-next-line no-undef
 const { Component } = Shopware;
 
-Component.override('sw-flow-sequence-action', {
+interface FlowSequenceActionOverride {
+    [key: string]: any;
+}
+
+const overrideConfig: ThisType<FlowSequenceActionOverride> = {
     computed: {
-        /**
-         *
-         * @returns {string|*}
-         */
         modalName() {
             if (this.selectedAction === ACTION.MOLLIE_SHIP_ORDER) {
                 return 'mollie-payments-flowsequence-action-order-ship-modal';
@@ -21,32 +20,21 @@ Component.override('sw-flow-sequence-action', {
             return this.$super('modalName');
         },
 
-        /**
-         *
-         * @returns {{[p: string]: *}}
-         */
         actionDescription() {
             const actionDescriptionList = this.$super('actionDescription');
 
             return {
                 ...actionDescriptionList,
-                // eslint-disable-next-line no-unused-vars
-                [ACTION.MOLLIE_SHIP_ORDER]: (config) =>
+                [ACTION.MOLLIE_SHIP_ORDER]: () =>
                     this.$tc('mollie-payments.sw-flow.actions.shipOrder.editor.description'),
-                // eslint-disable-next-line no-unused-vars
-                [ACTION.MOLLIE_REFUND_ORDER]: (config) =>
+                [ACTION.MOLLIE_REFUND_ORDER]: () =>
                     this.$tc('mollie-payments.sw-flow.actions.refundOrder.editor.description'),
             };
         },
     },
 
     methods: {
-        /**
-         *
-         * @param actionName
-         * @returns {*|{icon: string, label: string, value}}
-         */
-        getActionTitle(actionName) {
+        getActionTitle(actionName: string) {
             if (actionName === ACTION.MOLLIE_SHIP_ORDER) {
                 return {
                     value: actionName,
@@ -66,4 +54,6 @@ Component.override('sw-flow-sequence-action', {
             return this.$super('getActionTitle', actionName);
         },
     },
-});
+};
+
+Component.override('sw-flow-sequence-action', overrideConfig);
