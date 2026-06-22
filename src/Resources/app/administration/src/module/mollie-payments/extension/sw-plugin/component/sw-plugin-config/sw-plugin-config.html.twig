@@ -4,8 +4,11 @@
     {% parent %}
 
     {% block sw_plugin_config_actions_test %}
-    <sw-button @click="onTestButtonClicked" v-if="domain === 'MolliePayments.config'">
-        {{ $tc('sw-payment.testButton') }}
-    </sw-button>
+        <sw-button
+            v-if="domain === 'MolliePayments.config'"
+            @click="onTestButtonClicked"
+        >
+            {{ $tc('sw-payment.testButton') }}
+        </sw-button>
     {% endblock %}
 {% endblock %}

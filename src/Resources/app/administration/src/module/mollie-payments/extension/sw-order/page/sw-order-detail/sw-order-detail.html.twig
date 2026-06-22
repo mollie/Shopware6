@@ -1,8 +1,10 @@
 {% block sw_order_detail_content_tabs_extension %}
-    <sw-tabs-item v-if="isMollieOrder"
-                  class="sw-order-detail__tabs-tab-mollie"
-                  :route="{ name: 'sw.order.detail.mollie', params: { id: $route.params.id } }"
-                  :title="$tc('mollie-payments.pluginTitle')">
+    <sw-tabs-item
+        v-if="isMollieOrder"
+        class="sw-order-detail__tabs-tab-mollie"
+        :route="{ name: 'sw.order.detail.mollie', params: { id: $route.params.id } }"
+        :title="$tc('mollie-payments.pluginTitle')"
+    >
         {{ $tc('mollie-payments.pluginTitle') }}
     </sw-tabs-item>
 {% endblock %}
