@@ -18,6 +18,8 @@ use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
+use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixerInterface;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
@@ -60,6 +62,8 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
         private EntityRepository $customerRepository,
         #[Autowire(service: LineItemFilter::class)]
         private LineItemFilterInterface $lineItemFilter,
+        #[Autowire(service: RoundingDifferenceFixer::class)]
+        private RoundingDifferenceFixerInterface $roundingDifferenceFixer,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -147,7 +151,18 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
 
         $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
 
-        $createPaymentStruct = new CreatePayment($description, $returnUrl, Money::fromOrder($order, $currency));
+        $orderAmount = Money::fromOrder($order, $currency);
+
+        if ($paymentSettings->isFixRoundingDiffEnabled()) {
+            $lineItemCollection = $this->roundingDifferenceFixer->fixAmountDiff(
+                $orderAmount,
+                $lineItemCollection,
+                $paymentSettings->getFixRoundingDiffName(),
+                $paymentSettings->getFixRoundingDiffSku()
+            );
+        }
+
+        $createPaymentStruct = new CreatePayment($description, $returnUrl, $orderAmount);
 
         $createPaymentStruct->setBillingAddress($billingAddress);
         $createPaymentStruct->setShippingAddress($shippingAddress);

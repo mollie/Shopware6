@@ -13,6 +13,9 @@ final class PaymentSettings extends Struct
     public const KEY_DUE_DATE_DAYS = 'paymentMethodBankTransferDueDateDays';
     public const KEY_SHOPWARE_FAILED_PAYMENT = 'shopwareFailedPayment';
     public const KEY_AUTOMATIC_SHIPMENT = 'automaticShipping';
+    public const KEY_FIX_ROUNDING_DIFF_ENABLED = 'fixRoundingDiffEnabled';
+    public const KEY_FIX_ROUNDING_DIFF_NAME = 'fixRoundingDiffName';
+    public const KEY_FIX_ROUNDING_DIFF_SKU = 'fixRoundingDiffSKU';
     private const MIN_DUE_DAYS = 1;
     private const MAX_DUE_DAYS = 100;
 
@@ -32,6 +35,9 @@ final class PaymentSettings extends Struct
         private bool $useMollieLimits = false,
         private bool $automaticShipment = false,
         private bool $automaticCancellation = false,
+        private bool $fixRoundingDiffEnabled = false,
+        private string $fixRoundingDiffName = '',
+        private string $fixRoundingDiffSku = '',
     ) {
     }
 
@@ -49,8 +55,11 @@ final class PaymentSettings extends Struct
         $useMollieLimits = $settings[self::KEY_USE_MOLLIE_LIMITS] ?? false;
         $automaticShipment = $settings[self::KEY_AUTOMATIC_SHIPMENT] ?? false;
         $automaticCancellation = $settings[self::KEY_AUTOMATIC_CANCELLATION] ?? false;
+        $fixRoundingDiffEnabled = $settings[self::KEY_FIX_ROUNDING_DIFF_ENABLED] ?? false;
+        $fixRoundingDiffName = $settings[self::KEY_FIX_ROUNDING_DIFF_NAME] ?? '';
+        $fixRoundingDiffSku = $settings[self::KEY_FIX_ROUNDING_DIFF_SKU] ?? '';
 
-        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation);
+        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation, (bool) $fixRoundingDiffEnabled, (string) $fixRoundingDiffName, (string) $fixRoundingDiffSku);
     }
 
     public function getOrderNumberFormat(): string
@@ -100,5 +109,20 @@ final class PaymentSettings extends Struct
     public function isAutomaticCancellation(): bool
     {
         return $this->automaticCancellation;
+    }
+
+    public function isFixRoundingDiffEnabled(): bool
+    {
+        return $this->fixRoundingDiffEnabled;
+    }
+
+    public function getFixRoundingDiffName(): string
+    {
+        return $this->fixRoundingDiffName;
+    }
+
+    public function getFixRoundingDiffSku(): string
+    {
+        return $this->fixRoundingDiffSku;
     }
 }

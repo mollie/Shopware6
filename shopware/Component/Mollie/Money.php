@@ -11,6 +11,13 @@ final class Money implements \JsonSerializable
 {
     private const MOLLIE_PRICE_PRECISION = 2;
 
+    /**
+     * ISO 4217 currencies without minor units. Mollie expects these amounts
+     * without decimals (e.g. "5000" for JPY); sending "5000.00" results in an API error.
+     * Extend this list if further zero-decimal currencies need to be supported.
+     */
+    private const ZERO_DECIMAL_CURRENCIES = ['JPY'];
+
     public function __construct(
         private float $value,
         private string $currency,
@@ -22,10 +29,21 @@ final class Money implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
+        $decimals = $this->getDecimals();
+
         return [
-            'value' => number_format(round($this->value, self::MOLLIE_PRICE_PRECISION), self::MOLLIE_PRICE_PRECISION, '.', ''),
+            'value' => number_format(round($this->value, $decimals), $decimals, '.', ''),
             'currency' => $this->currency,
         ];
+    }
+
+    public function getDecimals(): int
+    {
+        if (in_array(strtoupper($this->currency), self::ZERO_DECIMAL_CURRENCIES, true)) {
+            return 0;
+        }
+
+        return self::MOLLIE_PRICE_PRECISION;
     }
 
     /**

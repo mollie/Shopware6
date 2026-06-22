@@ -8,8 +8,5 @@
 
         <service id="Kiener\MolliePayments\Service\MollieApi\Builder\MollieOrderPriceBuilder"/>
 
-        <service id="Kiener\MolliePayments\Service\MollieApi\Fixer\RoundingDifferenceFixer">
-        </service>
-
     </services>
 </container>

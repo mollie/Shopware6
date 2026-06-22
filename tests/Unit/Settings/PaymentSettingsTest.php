@@ -19,4 +19,27 @@ final class PaymentSettingsTest extends TestCase
 
         $this->assertSame('test-{orderNumber}', $settings->getOrderNumberFormat());
     }
+
+    public function testRoundingDiffDefaults(): void
+    {
+        $settings = PaymentSettings::createFromShopwareArray([]);
+
+        $this->assertFalse($settings->isFixRoundingDiffEnabled());
+        $this->assertSame('', $settings->getFixRoundingDiffName());
+        $this->assertSame('', $settings->getFixRoundingDiffSku());
+    }
+
+    public function testRoundingDiffFromArray(): void
+    {
+        $data = [
+            PaymentSettings::KEY_FIX_ROUNDING_DIFF_ENABLED => true,
+            PaymentSettings::KEY_FIX_ROUNDING_DIFF_NAME => 'Rounding',
+            PaymentSettings::KEY_FIX_ROUNDING_DIFF_SKU => 'ROUND-1',
+        ];
+        $settings = PaymentSettings::createFromShopwareArray($data);
+
+        $this->assertTrue($settings->isFixRoundingDiffEnabled());
+        $this->assertSame('Rounding', $settings->getFixRoundingDiffName());
+        $this->assertSame('ROUND-1', $settings->getFixRoundingDiffSku());
+    }
 }

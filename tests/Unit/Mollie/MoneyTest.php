@@ -27,4 +27,20 @@ final class MoneyTest extends TestCase
         $this->assertSame(19.99, $money->getValue());
         $this->assertSame('EUR', $money->getCurrency());
     }
+
+    public function testDefaultCurrencyUsesTwoDecimals(): void
+    {
+        $money = new Money(10.5, 'EUR');
+
+        $this->assertSame(2, $money->getDecimals());
+        $this->assertSame(['value' => '10.50', 'currency' => 'EUR'], $money->jsonSerialize());
+    }
+
+    public function testZeroDecimalCurrencyHasNoDecimals(): void
+    {
+        $money = new Money(5000.0, 'JPY');
+
+        $this->assertSame(0, $money->getDecimals());
+        $this->assertSame(['value' => '5000', 'currency' => 'JPY'], $money->jsonSerialize());
+    }
 }
