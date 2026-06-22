@@ -2,14 +2,24 @@ import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
-// eslint-disable-next-line no-undef
 const { Application, Component, Context, Mixin, State } = Shopware;
-// eslint-disable-next-line no-undef
 const { Criteria } = Shopware.Data;
-// eslint-disable-next-line no-undef
-const { string } = Shopware.Utils;
+const { string: stringUtils } = Shopware.Utils;
 
-Component.register('mollie-pluginconfig-support-modal', {
+interface SupportModalComponent {
+    versionCompare: any;
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+    recipientLocale: string | null;
+    mailSent: boolean;
+    isSubmitting: boolean;
+
+    [key: string]: any;
+}
+
+const componentConfig: ThisType<SupportModalComponent> = {
     template,
 
     inject: {
@@ -24,12 +34,10 @@ Component.register('mollie-pluginconfig-support-modal', {
         return {
             mailSent: false,
             isSubmitting: false,
-            // ------------------------------------------------------------------
             name: '',
             email: '',
             subject: '',
             message: '',
-            // ------------------------------------------------------------------
             recipientLocale: '',
             recipientOptions: [
                 {
@@ -56,27 +64,27 @@ Component.register('mollie-pluginconfig-support-modal', {
 
         canSubmit() {
             return (
-                !string.isEmptyOrSpaces(this.contactName) &&
-                !string.isEmptyOrSpaces(this.contactEmail) &&
-                !string.isEmptyOrSpaces(this.subject) &&
-                !string.isEmptyOrSpaces(this.message)
+                !stringUtils.isEmptyOrSpaces(this.contactName) &&
+                !stringUtils.isEmptyOrSpaces(this.contactEmail) &&
+                !stringUtils.isEmptyOrSpaces(this.subject) &&
+                !stringUtils.isEmptyOrSpaces(this.message)
             );
         },
 
         contactName: {
             get() {
-                return !string.isEmptyOrSpaces(name) ? this.name : this.userName;
+                return !stringUtils.isEmptyOrSpaces(this.name) ? this.name : this.userName;
             },
-            set(value) {
+            set(value: string) {
                 this.name = value;
             },
         },
 
         contactEmail: {
             get() {
-                return !string.isEmptyOrSpaces(this.email) ? this.email : this.user.email;
+                return !stringUtils.isEmptyOrSpaces(this.email) ? this.email : this.user.email;
             },
-            set(value) {
+            set(value: string) {
                 this.email = value;
             },
         },
@@ -86,7 +94,6 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         user() {
-            // eslint-disable-next-line no-undef
             let session = Shopware.State.get('session');
             if (session === undefined) {
                 session = Shopware.Store.get('session');
@@ -101,7 +108,7 @@ Component.register('mollie-pluginconfig-support-modal', {
 
             const fullName = `${this.user.firstName} ${this.user.lastName}`.trim();
 
-            if (!string.isEmptyOrSpaces(fullName)) {
+            if (!stringUtils.isEmptyOrSpaces(fullName)) {
                 return fullName;
             }
 
@@ -121,7 +128,7 @@ Component.register('mollie-pluginconfig-support-modal', {
         },
 
         molliePlugin() {
-            return this.plugins.find((plugin) => plugin.name === 'MolliePayments');
+            return this.plugins.find((plugin: any) => plugin.name === 'MolliePayments');
         },
 
         mollieVersion() {
@@ -132,9 +139,11 @@ Component.register('mollie-pluginconfig-support-modal', {
             return this.versionCompare.getHumanReadableVersion(Context.app.config.version);
         },
     },
+
     created() {
         this.versionCompare = new VersionCompare();
     },
+
     mounted() {
         this.mountedComponent();
     },
@@ -151,6 +160,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                 }
             }
         },
+
         getShopwareExtensions() {
             let myExtensions = Shopware.State.get('shopwareExtensions');
             if (myExtensions === undefined) {
@@ -158,8 +168,9 @@ Component.register('mollie-pluginconfig-support-modal', {
             }
             return myExtensions.myExtensions;
         },
+
         determineDefaultSupportDesk() {
-            this.recipientLocale = this.recipientOptions.some((option) => option.value === this.locale)
+            this.recipientLocale = this.recipientOptions.some((option: any) => option.value === this.locale)
                 ? this.locale
                 : null;
         },
@@ -191,7 +202,7 @@ Component.register('mollie-pluginconfig-support-modal', {
                 this.subject,
                 this.message,
             )
-                .then((response) => {
+                .then((response: any) => {
                     if (!response.success) {
                         this._showNotificationError(this.$tc('mollie-payments.config.support.error'));
                         this.mailSent = false;
@@ -201,32 +212,22 @@ Component.register('mollie-pluginconfig-support-modal', {
                     this.mailSent = true;
                     this._showNotificationSuccess(this.$tc('mollie-payments.config.support.success'));
                 })
-                .catch((response) => {
+                .catch((response: any) => {
                     this._showNotificationError(response);
                 })
-                .finally(() => (this.isSubmitting = false));
+                .finally(() => {
+                    this.isSubmitting = false;
+                });
         },
 
-        /**
-         *
-         * @param text
-         * @private
-         */
-        _showNotificationSuccess(text) {
-            this.createNotificationSuccess({
-                message: text,
-            });
+        _showNotificationSuccess(message: string) {
+            this.createNotificationSuccess({ message });
         },
 
-        /**
-         *
-         * @param text
-         * @private
-         */
-        _showNotificationError(text) {
-            this.createNotificationError({
-                message: text,
-            });
+        _showNotificationError(message: any) {
+            this.createNotificationError({ message });
         },
     },
-});
+};
+
+Component.register('mollie-pluginconfig-support-modal', componentConfig);
