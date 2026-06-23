@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment;
 
+use Kiener\MolliePayments\MolliePayments;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
@@ -20,7 +21,8 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
      */
     public function __construct(
         #[Autowire(service: 'payment_method.repository')]
-        private EntityRepository $paymentMethodRepository
+        private EntityRepository $paymentMethodRepository,
+        private PluginIdProvider $pluginIdProvider
     ) {
     }
 
@@ -45,8 +47,11 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
 
     public function findAllMollieMethods(Context $context): PaymentMethodCollection
     {
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
+
         $criteria = new Criteria();
-        $criteria->addFilter(new ContainsFilter('handlerIdentifier', 'MolliePayments'));
+        $pluginFilter = new EqualsFilter('pluginId', $pluginId);
+        $criteria->addFilter($pluginFilter);
 
         /** @var PaymentMethodCollection<PaymentMethodEntity> */
         return $this->paymentMethodRepository->search($criteria, $context)->getEntities();

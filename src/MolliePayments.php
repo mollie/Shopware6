@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments;
 
+use Mollie\Shopware\Component\Installer\MollieDataRemover;
 use Mollie\Shopware\Component\Installer\PluginInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
+use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 
 class MolliePayments extends Plugin
@@ -51,6 +53,27 @@ class MolliePayments extends Plugin
         $this->runDbMigrations($context->getMigrationCollection());
 
         $this->preparePlugin($context->getContext());
+    }
+
+    public function uninstall(UninstallContext $context): void
+    {
+        parent::uninstall($context);
+
+        // the merchant chose to keep the data - never touch anything
+        if ($context->keepUserData()) {
+            return;
+        }
+
+        // The data remover and its tagged steps are only available in the container when the
+        // plugin's services are loaded (i.e. it is active). If it is uninstalled while inactive
+        // there is nothing wired up to remove, so we skip safely.
+        if ($this->container === null || $this->container->has(MollieDataRemover::class) === false) {
+            return;
+        }
+
+        /** @var MollieDataRemover $dataRemover */
+        $dataRemover = $this->container->get(MollieDataRemover::class);
+        $dataRemover->removeAllData($context->getContext());
     }
 
     /**

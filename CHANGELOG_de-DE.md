@@ -32,6 +32,8 @@
 - Behoben: Keine Fehler-Logs mehr für nicht-Mollie-Bestellungen in der Bestellübersicht.
 
 # 5.0.0
+- Hinzugefügt: Beim Deinstallieren des Plugins mit der Option „Alle Daten löschen" werden nun alle Mollie-Daten gelöscht.
+- Entfernt: Das alte Kommando `mollie:dal:cleanup`.
 - Zahlungsarten verwenden jetzt die Mollie Payments API.
 - Die minimale PHP-Version ist 8.2.
 - Die minimale Shopware-Version ist 6.6.10.x.

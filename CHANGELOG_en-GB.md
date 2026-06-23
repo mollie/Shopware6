@@ -32,6 +32,8 @@
 - Fixed: No more error logs for non-Mollie orders in the order admin.
 
 # 5.0.0
+- Added: Uninstalling the plugin with the "Remove all data" option now deletes all Mollie data.
+- Removed: The old `mollie:dal:cleanup` command.
 - Payment methods now use the Mollie Payments API.
 - Minimum PHP version is 8.2.
 - Minimum Shopware version is 6.6.10.x.
