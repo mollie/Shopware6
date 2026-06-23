@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Subscription\DAL;
 
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionStatus;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SubscriptionStatus::class)]
