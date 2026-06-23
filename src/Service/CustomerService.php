@@ -435,19 +435,6 @@ class CustomerService implements CustomerServiceInterface
         $settings = $this->settingsService->getSettings($salesChannelId);
         $struct = $this->getCustomerStruct($customerId, $context);
 
-        if (empty($settings->getProfileId())) {
-            $this->logger->warning('No profile ID available, fetch new Profile Id', [
-                'saleschannel' => $salesChannelId,
-                'customerId' => $customerId,
-            ]);
-
-            // auto-fix missing profile IDs
-            $this->configService->fetchProfileId($salesChannelId);
-
-            // refresh settings with new fetched profile id
-            $settings = $this->settingsService->getSettings($salesChannelId);
-        }
-
         if ($this->customerApiService->isLegacyCustomerValid($struct->getLegacyCustomerId(), $salesChannelId)) {
             $this->setMollieCustomerId(
                 $customerId,
