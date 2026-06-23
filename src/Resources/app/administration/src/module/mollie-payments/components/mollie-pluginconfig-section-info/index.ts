@@ -1,6 +1,7 @@
 import template from './mollie-pluginconfig-section-info.html.twig';
 import './mollie-pluginconfig-section-info.scss';
 import VersionCompare from './../../../../core/service/utils/version-compare.utils';
+import { getStore } from './../../../../core/service/utils/store.utils';
 
 const { Component, Mixin } = Shopware;
 
@@ -53,10 +54,7 @@ const componentConfig: ThisType<SectionInfoComponent> = {
         },
 
         getCurrentUser() {
-            // Pinia store (Shopware >= 6.6/6.7) first, Vuex state as fallback for older versions.
-            return (
-                Shopware.Store?.get?.('session')?.currentUser ?? Shopware.State?.get?.('session')?.currentUser ?? null
-            );
+            return getStore('session')?.currentUser ?? null;
         },
 
         openSupport() {

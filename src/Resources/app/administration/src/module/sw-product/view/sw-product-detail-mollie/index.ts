@@ -1,5 +1,6 @@
 import template from './sw-product-detail-mollie.html.twig';
 import './sw-product-detail-mollie.scss';
+import { getStore } from '../../../../core/service/utils/store.utils';
 
 const { Component } = Shopware;
 
@@ -94,13 +95,8 @@ const componentConfig: ThisType<ProductDetailMollieView> = {
     },
 
     methods: {
-        /**
-         * Resolves a Shopware store module across versions: Vuex State (<6.7)
-         * with a fallback to the Pinia Store (>=6.7). Optional chaining keeps it
-         * safe when State has been removed.
-         */
         _resolveStore(name: string) {
-            return Shopware.State?.get?.(name) ?? Shopware.Store?.get?.(name);
+            return getStore(name);
         },
 
         initFields() {

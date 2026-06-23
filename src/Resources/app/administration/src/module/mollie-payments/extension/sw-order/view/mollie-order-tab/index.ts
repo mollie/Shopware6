@@ -2,6 +2,7 @@ import template from './mollie-order-tab.html.twig';
 import './mollie-order-tab.scss';
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 import getLatestTransaction from '../../getLatestTransaction';
+import { getStore } from '../../../../../../core/service/utils/store.utils';
 
 const { Component, Mixin, Filter } = Shopware;
 
@@ -190,7 +191,7 @@ const componentConfig: ThisType<MollieOrderTab> = {
 
     methods: {
         getSwOrderDetail() {
-            return Shopware.Store?.get?.('swOrderDetail') ?? Shopware.State?.get?.('swOrderDetail') ?? null;
+            return getStore('swOrderDetail');
         },
 
         createdComponent() {
