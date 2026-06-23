@@ -131,6 +131,19 @@ final class OrderEntityBuilder
         return $orderLineItem;
     }
 
+    public function createOrderLineItemWithType(string $id, string $type, float $unitPrice = 0.0): OrderLineItemEntity
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId($id);
+        $orderLineItem->setType($type);
+        $orderLineItem->setLabel('Fake line item');
+        $orderLineItem->setQuantity(1);
+        $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0));
+        $orderLineItem->setPayload([]);
+
+        return $orderLineItem;
+    }
+
     public function getLineItems(): OrderLineItemCollection
     {
         $collection = new OrderLineItemCollection();

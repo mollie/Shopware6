@@ -7,8 +7,8 @@ use Mollie\Shopware\Component\Installer\DataRemoval\DataRemoverInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Orchestrates the removal of all Mollie-owned data. It only collects the tagged

@@ -102,17 +102,6 @@ Tests should always reflect the structure of `/shopware`.
 
 ---
 
-### `/vendor_manual`
-
-Contains the Mollie PHP SDK dependency.
-
-Background:
-Older Shopware versions require dependencies to be shipped directly within the plugin source code.
-
-This folder exists to ensure compatibility with those versions.
-
----
-
 ## Architectural Principles
 
 - Clear separation between legacy and new code

@@ -48,8 +48,7 @@
     "autoload": {
         "psr-4": {
             "Mollie\\Shopware\\": "shopware/",
-            "Kiener\\MolliePayments\\": "src/",
-            "Mollie\\Api\\": "vendor_manual/mollie-api-php/src"
+            "Kiener\\MolliePayments\\": "src/"
         }
     },
     "autoload-dev": {
@@ -57,7 +56,6 @@
             "Mollie\\Shopware\\Unit\\": "tests/Unit/",
             "Mollie\\Shopware\\Integration\\": "tests/Integration/",
             "Mollie\\Shopware\\Behat\\": "tests/Behat/",
-            "MolliePayments\\Shopware\\Tests\\": "tests/PHPUnit/",
             "MolliePayments\\Shopware\\PHPStan\\": "tests/PHPStan/"
         }
     },
