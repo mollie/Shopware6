@@ -39,6 +39,44 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "subscription": {
+                      "type": "object",
+                      "description": "The updated Mollie subscription.",
+                      "properties": {
+                        "amount": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "interval": {
+                          "type": "string"
+                        },
+                        "mandateId": {
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "type": "object"
+                        },
+                        "startDate": {
+                          "type": "string"
+                        },
+                        "webhookUrl": {
+                          "type": "string"
+                        },
+                        "times": {
+                          "type": "integer"
+                        }
+                      }
+                    },
                     "success": {
                       "type": "boolean",
                       "example": true
@@ -47,6 +85,15 @@
                   "required": ["success"]
                 },
                 "example": {
+                  "subscription": {
+                    "amount": {
+                      "value": "10.00",
+                      "currency": "EUR"
+                    },
+                    "description": "Monthly subscription",
+                    "interval": "1 month",
+                    "startDate": "2024-01-01"
+                  },
                   "success": true
                 }
               }
@@ -59,22 +106,19 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "error": {
+                      "type": "string"
+                    },
                     "success": {
                       "type": "boolean",
                       "example": false
-                    },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
                     }
                   },
-                  "required": ["success", "errors"]
+                  "required": ["success", "error"]
                 },
                 "example": {
-                  "success": false,
-                  "errors": ["Internal server error occurred."]
+                  "error": "Internal server error occurred.",
+                  "success": false
                 }
               }
             }

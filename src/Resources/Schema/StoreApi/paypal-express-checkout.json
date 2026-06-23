@@ -11,26 +11,6 @@
         "tags": ["Mollie", "Paypal Express"],
         "summary": "Starts the checkout for paypal express. The Cart should be prefilled before this request. When using shopware add to cart request, you can add  `isExpressCheckout=1` to save the current user cart and add just this one product in the request",
         "operationId": "paypalExpressCheckoutStart",
-        "parameters": [
-          {
-            "name": "redirectUrl",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Optional custom redirect target after the PayPal flow. If omitted or empty, the plugin keeps the default redirect URL behavior."
-          },
-          {
-            "name": "cancelUrl",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Optional custom cancel target after the PayPal flow. If omitted or empty, the plugin keeps the default cancel URL behavior."
-          }
-        ],
         "responses": {
           "200": {
             "description": "Response indicating success or failure.",
@@ -46,8 +26,9 @@
                     },
                     "redirectUrl": {
                       "type": "string",
+                      "nullable": true,
                       "example": "https://www.paypal.com/checkoutnow?token=xxxx",
-                      "description": "The redirect URL to paypal with the token"
+                      "description": "The redirect URL to paypal with the token. May be null."
                     }
                   },
                   "required": ["sessionId"]

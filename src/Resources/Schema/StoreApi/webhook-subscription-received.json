@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Mollie Subscription Webhook Endpoint",
-    "description": "Endpoint to handle Mollie subscription webhooks.",
+    "description": "Endpoint Mollie calls to notify the shop about subscription payment events. Either updates the matching order transaction or renews the subscription.",
     "version": "1.0.0"
   },
   "paths": {
@@ -22,7 +22,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The Shopware subscription ID."
+            "description": "The Mollie subscription ID."
           }
         ],
         "responses": {
@@ -33,19 +33,28 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true,
-                      "description": "Indicates if the webhook was successfully processed."
+                    "status": {
+                      "type": "string",
+                      "example": "success",
+                      "description": "Indicates the webhook was processed successfully."
+                    },
+                    "payment": {
+                      "type": "object",
+                      "description": "The processed Mollie payment.",
+                      "additionalProperties": true
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "webhook.route.success"
                     }
                   },
-                  "required": ["success"]
+                  "required": ["status"]
                 }
               }
             }
           },
           "422": {
-            "description": "Failed to handle Mollie subscription webhook.",
+            "description": "Failed to handle Mollie subscription webhook. The status code mirrors the thrown ShopwareHttpException, defaulting to 422 for unexpected errors.",
             "content": {
               "application/json": {
                 "schema": {
@@ -54,7 +63,7 @@
                     "success": {
                       "type": "boolean",
                       "example": false,
-                      "description": "Indicates if the webhook processing failed."
+                      "description": "Indicates the webhook processing failed."
                     },
                     "error": {
                       "type": "string",
@@ -84,7 +93,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The Shopware subscription ID."
+            "description": "The Mollie subscription ID."
           }
         ],
         "responses": {
@@ -95,19 +104,28 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true,
-                      "description": "Indicates if the webhook was successfully processed."
+                    "status": {
+                      "type": "string",
+                      "example": "success",
+                      "description": "Indicates the webhook was processed successfully."
+                    },
+                    "payment": {
+                      "type": "object",
+                      "description": "The processed Mollie payment.",
+                      "additionalProperties": true
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "webhook.route.success"
                     }
                   },
-                  "required": ["success"]
+                  "required": ["status"]
                 }
               }
             }
           },
           "422": {
-            "description": "Failed to handle Mollie subscription webhook.",
+            "description": "Failed to handle Mollie subscription webhook. The status code mirrors the thrown ShopwareHttpException, defaulting to 422 for unexpected errors.",
             "content": {
               "application/json": {
                 "schema": {
@@ -116,7 +134,7 @@
                     "success": {
                       "type": "boolean",
                       "example": false,
-                      "description": "Indicates if the webhook processing failed."
+                      "description": "Indicates the webhook processing failed."
                     },
                     "error": {
                       "type": "string",

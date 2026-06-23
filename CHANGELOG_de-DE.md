@@ -43,6 +43,7 @@
 - Das Event ModifyCreatePaymentPayloadEvent wurde eingeführt, um die Anfrage vor der Erstellung einer Mollie-Zahlung anzupassen.
 - Alle zahlungsbezogenen Logs enthalten nun die Shopware-orderNumber.
 - Die URL zum Speichern des Kreditkarten-Tokens wird nicht mehr verwendet; übergebe stattdessen creditCardToken in der Checkout-Anfrage.
+- Verändert: Mehrere Store-API- und Admin-API-Routen haben sich geändert (Pfade, Parameter und Response-Strukturen), veraltete Endpunkte wurden entfernt. Die aktuellen Details finden Entwickler in der Swagger-/OpenAPI-Dokumentation.
 - Die URL zum Speichern der Mandats-ID ist veraltet; übergebe mandateId als Body-Parameter in der Checkout-Anfrage.
 - Die URL zum Speichern der POS-Terminal-ID ist veraltet; übergebe terminalId als Body-Parameter in der Checkout-Anfrage.
 - Ein Produkt kann nun mehreren Gutschein-Kategorien zugeordnet werden.

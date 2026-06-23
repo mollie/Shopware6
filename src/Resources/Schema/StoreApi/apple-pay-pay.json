@@ -21,6 +21,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "paymentToken": {
+                    "type": "string",
+                    "description": "The Apple Pay payment token. This is the only required field."
+                  },
                   "email": {
                     "type": "string",
                     "description": "The email of the customer."
@@ -49,21 +53,19 @@
                     "type": "string",
                     "description": "The country code of the customer."
                   },
-                  "paymentToken": {
+                  "phone": {
                     "type": "string",
-                    "description": "The payment token for Apple Pay."
+                    "description": "The phone number of the customer (optional)."
                   },
-                  "finishUrl": {
-                    "type": "string",
-                    "description": "The URL to redirect after successful payment."
-                  },
-                  "errorUrl": {
-                    "type": "string",
-                    "description": "The URL to redirect after payment error."
+                  "acceptedDataProtection": {
+                    "type": "integer",
+                    "description": "Whether the customer accepted the data protection terms (0 or 1).",
+                    "example": 1
                   }
                 },
-                "required": ["email", "firstname", "lastname", "street", "city", "postalCode", "countryCode", "paymentToken", "finishUrl", "errorUrl"],
+                "required": ["paymentToken"],
                 "example": {
+                  "paymentToken": "applepay_payment_token_123",
                   "email": "john.doe@example.com",
                   "firstname": "John",
                   "lastname": "Doe",
@@ -71,9 +73,8 @@
                   "city": "Apple City",
                   "postalCode": "12345",
                   "countryCode": "US",
-                  "paymentToken": "applepay_payment_token_123",
-                  "finishUrl": "https://example.com/success",
-                  "errorUrl": "https://example.com/error"
+                  "phone": "+1 555 0100",
+                  "acceptedDataProtection": 1
                 }
               }
             }
@@ -90,55 +91,33 @@
                     "success": {
                       "type": "boolean",
                       "example": true,
-                      "description": "Indicates if the operation was successful."
+                      "description": "Always true on success."
                     },
                     "url": {
                       "type": "string",
-                      "description": "The URL to redirect to."
+                      "description": "The redirect URL returned by the payment handler. May be an empty string when no redirect is required."
                     },
                     "message": {
                       "type": "string",
-                      "description": "Additional message (optional)."
+                      "description": "Additional message. Always an empty string on success."
                     },
-                    "token": {
+                    "orderId": {
                       "type": "string",
-                      "nullable": true,
-                      "description": "Context token that should be used after the Apple Pay flow completes."
+                      "description": "The ID of the created Shopware order."
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "mollie_payments_applepay_direct_payment"
                     }
                   },
-                  "required": ["success", "url"]
+                  "required": ["success", "url", "message", "orderId", "apiAlias"]
                 },
                 "example": {
                   "success": true,
                   "url": "https://applepay.mollie.com/redirect",
-                  "message": "Payment initiated successfully.",
-                  "token": "sw-context-token-123"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error response indicating payment initiation failure.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false,
-                      "description": "Indicates if the operation was successful."
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Error message."
-                    }
-                  },
-                  "required": ["success", "message"]
-                },
-                "example": {
-                  "success": false,
-                  "message": "Failed to initiate payment."
+                  "message": "",
+                  "orderId": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                  "apiAlias": "mollie_payments_applepay_direct_payment"
                 }
               }
             }

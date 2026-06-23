@@ -43,6 +43,7 @@
 - Added the ModifyCreateRefundPayloadEvent to modify the CreateRefund request before sending a refund to Mollie.
 - All payment-related logs now include the Shopware orderNumber.
 - The URL for saving the credit card token is no longer used; provide creditCardToken in the checkout request.
+- Changed: Several Store API and Admin API routes have changed (paths, parameters and response structures), and obsolete endpoints were removed. Developers can find the up-to-date details in the Swagger/OpenAPI documentation.
 - The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.
 - The URL for saving the POS terminal ID is deprecated; provide terminalId as a body parameter in the checkout request.
 - A product can now have multiple voucher categories.

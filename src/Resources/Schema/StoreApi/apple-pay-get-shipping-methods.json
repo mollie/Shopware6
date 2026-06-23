@@ -36,49 +36,62 @@
         },
         "responses": {
           "200": {
-            "description": "Array of shipping methods.",
+            "description": "Apple Pay shipping methods response. The selected shipping method is always the first element.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "The ID of the shipping method."
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "The name of the shipping method."
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "The description of the shipping method."
-                      },
-                      "price": {
-                        "type": "number",
-                        "format": "float",
-                        "description": "The price of the shipping method."
+                  "type": "object",
+                  "properties": {
+                    "shippingMethods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "identifier": {
+                            "type": "string",
+                            "description": "The shipping method ID."
+                          },
+                          "label": {
+                            "type": "string",
+                            "description": "The shipping method name."
+                          },
+                          "detail": {
+                            "type": "string",
+                            "description": "The delivery time name, or an empty string."
+                          },
+                          "amount": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "The shipping cost for this method."
+                          }
+                        },
+                        "required": ["identifier", "label", "detail", "amount"]
                       }
                     },
-                    "required": ["id", "name", "price"]
-                  }
-                },
-                "example": [
-                  {
-                    "id": "shipping_method_1",
-                    "name": "Standard Shipping",
-                    "description": "Delivers within 3-5 business days",
-                    "price": 5.99
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "mollie_payments_applepay_direct_shipping_methods"
+                    }
                   },
-                  {
-                    "id": "shipping_method_2",
-                    "name": "Express Shipping",
-                    "description": "Delivers within 1-2 business days",
-                    "price": 12.99
-                  }
-                ]
+                  "required": ["shippingMethods", "apiAlias"]
+                },
+                "example": {
+                  "shippingMethods": [
+                    {
+                      "identifier": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                      "label": "Standard Shipping",
+                      "detail": "Delivers within 3-5 business days",
+                      "amount": 5.99
+                    },
+                    {
+                      "identifier": "f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3",
+                      "label": "Express Shipping",
+                      "detail": "Delivers within 1-2 business days",
+                      "amount": 12.99
+                    }
+                  ],
+                  "apiAlias": "mollie_payments_applepay_direct_shipping_methods"
+                }
               }
             }
           }

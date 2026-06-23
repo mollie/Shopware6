@@ -25,19 +25,25 @@
                     "success": {
                       "type": "boolean",
                       "example": true,
-                      "description": "Indicates if the operation was successful."
+                      "description": "True when an Apple Pay payment method ID was found."
                     },
                     "id": {
                       "type": "string",
-                      "example": "applepay_12345",
-                      "description": "The Apple Pay ID."
+                      "nullable": true,
+                      "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                      "description": "The Apple Pay payment method ID, or null if not found."
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "mollie_payments_applepay_direct_id"
                     }
                   },
-                  "required": ["success", "id"]
+                  "required": ["success", "id", "apiAlias"]
                 },
                 "example": {
                   "success": true,
-                  "id": "applepay_12345"
+                  "id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                  "apiAlias": "mollie_payments_applepay_direct_id"
                 }
               }
             }

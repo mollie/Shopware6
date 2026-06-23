@@ -54,45 +54,39 @@
         },
         "responses": {
           "200": {
-            "description": "Support request submitted successfully.",
+            "description": "Support request processed. Returns success=true when the mail was sent, or success=false with an error message when sending failed (the controller always responds with HTTP 200).",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      },
+                      "required": ["success"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": false
+                        },
+                        "error": {
+                          "type": "string",
+                          "description": "Error message describing why sending the support request failed."
+                        }
+                      },
+                      "required": ["success", "error"]
                     }
-                  },
-                  "required": ["success"]
+                  ]
                 },
                 "example": {
                   "success": true
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["success", "error"]
-                },
-                "example": {
-                  "success": false,
-                  "error": "Internal server error occurred."
                 }
               }
             }
