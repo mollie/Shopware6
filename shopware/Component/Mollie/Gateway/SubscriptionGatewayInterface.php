@@ -25,4 +25,10 @@ interface SubscriptionGatewayInterface
      * Maximum `limit` accepted by Mollie is 250.
      */
     public function listSubscriptions(?string $from, int $limit, string $salesChannelId): SubscriptionCollection;
+
+    /**
+     * Lists every subscription that belongs to a single Mollie customer. Test/live mode is
+     * resolved from the sales channel settings.
+     */
+    public function listSubscriptionsForCustomer(string $mollieCustomerId, string $salesChannelId): SubscriptionCollection;
 }

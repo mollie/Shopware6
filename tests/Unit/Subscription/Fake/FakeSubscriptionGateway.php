@@ -58,6 +58,35 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
         $this->exceptionsByMethod['listSubscriptions'] = $exception;
     }
 
+    public function throwOnListForCustomer(\Throwable $exception): void
+    {
+        $this->exceptionsByMethod['listSubscriptionsForCustomer'] = $exception;
+    }
+
+    public function listSubscriptionsForCustomer(string $mollieCustomerId, string $salesChannelId): SubscriptionCollection
+    {
+        $this->calls[] = [
+            'method' => 'listSubscriptionsForCustomer',
+            'subscriptionId' => '',
+            'customerId' => $mollieCustomerId,
+            'orderNumber' => '',
+            'salesChannelId' => $salesChannelId,
+        ];
+
+        if (isset($this->exceptionsByMethod['listSubscriptionsForCustomer'])) {
+            throw $this->exceptionsByMethod['listSubscriptionsForCustomer'];
+        }
+
+        $collection = new SubscriptionCollection();
+        foreach ($this->subscriptions as $id => $subscription) {
+            if ($subscription->getCustomerId() === $mollieCustomerId) {
+                $collection->set($id, $subscription);
+            }
+        }
+
+        return $collection;
+    }
+
     public function listSubscriptions(?string $from, int $limit, string $salesChannelId): SubscriptionCollection
     {
         $this->calls[] = [

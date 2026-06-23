@@ -147,6 +147,32 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
         }
     }
 
+    public function listSubscriptionsForCustomer(string $mollieCustomerId, string $salesChannelId): SubscriptionCollection
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $response = $client->get('customers/' . $mollieCustomerId . '/subscriptions');
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $collection = new SubscriptionCollection();
+            foreach ($body['_embedded']['subscriptions'] ?? [] as $subscriptionData) {
+                $subscription = Subscription::createFromClientResponse($subscriptionData);
+                $collection->set($subscription->getId(), $subscription);
+            }
+
+            $this->logger->info('Customer subscriptions listed from mollie api', [
+                'count' => $collection->count(),
+                'customerId' => $mollieCustomerId,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return $collection;
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
     public function updateSubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
     {
         try {

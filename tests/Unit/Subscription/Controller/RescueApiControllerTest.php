@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Subscription\Controller;
 
-use Kiener\MolliePayments\Factory\MollieApiFactory;
 use Mollie\Shopware\Component\Subscription\Controller\RescueApiController;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
+use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionGateway;
 use Mollie\Shopware\Unit\Subscription\Fake\FakeSubscriptionRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +24,8 @@ final class RescueApiControllerTest extends TestCase
     public function testListReturnsErrorWhenCustomerIsMissing(): void
     {
         $controller = new RescueApiController(
-            $this->createMock(MollieApiFactory::class),
+            new FakeSubscriptionGateway(),
+            new FakeGateway(),
             $this->buildCustomerRepository(null),
             new FakeSubscriptionRepository(),
             new FakeSettingsService(),
@@ -46,7 +48,8 @@ final class RescueApiControllerTest extends TestCase
         $customer->setCustomFields([]);
 
         $controller = new RescueApiController(
-            $this->createMock(MollieApiFactory::class),
+            new FakeSubscriptionGateway(),
+            new FakeGateway(),
             $this->buildCustomerRepository($customer),
             new FakeSubscriptionRepository(),
             new FakeSettingsService(),

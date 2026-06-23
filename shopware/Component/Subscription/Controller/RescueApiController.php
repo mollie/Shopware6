@@ -3,7 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription\Controller;
 
-use Kiener\MolliePayments\Factory\MollieApiFactory;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Subscription;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
@@ -49,7 +53,10 @@ final class RescueApiController extends AbstractController
      * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
      */
     public function __construct(
-        private readonly MollieApiFactory $mollieApiFactory,
+        #[Autowire(service: SubscriptionGateway::class)]
+        private readonly SubscriptionGatewayInterface $subscriptionGateway,
+        #[Autowire(service: MollieGateway::class)]
+        private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: 'customer.repository')]
         private readonly EntityRepository $customerRepository,
         #[Autowire(service: 'mollie_subscription.repository')]
@@ -88,11 +95,12 @@ final class RescueApiController extends AbstractController
                 return new JsonResponse(['success' => true, 'subscriptions' => []]);
             }
 
-            $client = $this->mollieApiFactory->getClient($salesChannelId);
             $subscriptions = [];
             foreach ($mollieCustomerIds as $mollieCustomerId) {
-                $apiSubscriptions = $client->subscriptions->listForId($mollieCustomerId);
-                $subscriptions = array_merge($subscriptions, $apiSubscriptions->getArrayCopy());
+                $apiSubscriptions = $this->subscriptionGateway->listSubscriptionsForCustomer($mollieCustomerId, $salesChannelId);
+                foreach ($apiSubscriptions as $apiSubscription) {
+                    $subscriptions[] = $this->mapSubscription($apiSubscription);
+                }
             }
 
             return new JsonResponse(['success' => true, 'subscriptions' => $subscriptions]);
@@ -114,11 +122,9 @@ final class RescueApiController extends AbstractController
         Context $context
     ): JsonResponse {
         try {
-            $client = $this->mollieApiFactory->getClient($salesChannelId);
-
             try {
-                $subscription = $client->subscriptions->getForId($mollieCustomerId, $mollieSubscriptionId);
-                $subscription = $subscription->cancel();
+                $mollieSubscription = $this->subscriptionGateway->cancelSubscription($mollieSubscriptionId, $mollieCustomerId, '', $salesChannelId);
+                $subscription = $this->mapSubscription($mollieSubscription);
             } catch (\Throwable $cancelFailure) {
                 // Subscription cancel itself blew up - revoke the mandate so Mollie can no
                 // longer charge the customer with it. Pretend the subscription is canceled
@@ -129,8 +135,7 @@ final class RescueApiController extends AbstractController
                     'mandateId' => $mandateId,
                     'message' => $cancelFailure->getMessage(),
                 ]);
-                $mandate = $client->mandates->getForId($mollieCustomerId, $mandateId);
-                $mandate->revoke();
+                $this->mollieGateway->revokeMandate($mollieCustomerId, $mandateId, $salesChannelId);
                 $subscription = [
                     'id' => $mollieSubscriptionId,
                     'status' => SubscriptionStatus::CANCELED,
@@ -167,6 +172,30 @@ final class RescueApiController extends AbstractController
         } catch (\Throwable $exception) {
             return $this->buildErrorResponse($exception->getMessage());
         }
+    }
+
+    /**
+     * Maps the gateway subscription struct onto the JSON shape the admin UI expects
+     * (Mollie field names: id, status, amount.{value,currency}, startDate, nextPaymentDate, ...).
+     *
+     * @return array<string,mixed>
+     */
+    private function mapSubscription(Subscription $subscription): array
+    {
+        return [
+            'id' => $subscription->getId(),
+            'customerId' => $subscription->getCustomerId(),
+            'mandateId' => $subscription->getMandateId(),
+            'status' => $subscription->getStatus()->value,
+            'description' => $subscription->getDescription(),
+            'interval' => (string) $subscription->getInterval(),
+            'amount' => $subscription->getAmount()->jsonSerialize(),
+            'startDate' => $subscription->getStartDate()->format('Y-m-d'),
+            'nextPaymentDate' => $subscription->getNextPaymentDate()?->format('Y-m-d'),
+            'canceledAt' => $subscription->getCancelledAt()?->format('Y-m-d'),
+            'timesRemaining' => $subscription->getTimesRemaining(),
+            'metadata' => $subscription->getMetadata(),
+        ];
     }
 
     private function buildErrorResponse(string $error): JsonResponse
