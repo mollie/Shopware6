@@ -89,6 +89,11 @@ const componentConfig: ThisType<LineItemsGridComponent> = {
     },
 
     watch: {
+        initialShippingStatus(value: Record<string, any> | null) {
+            if (value !== null && value !== undefined) {
+                this.shippingStatus = value;
+            }
+        },
         initialCancelStatus(value: Record<string, any> | null) {
             if (value !== null && value !== undefined) {
                 this.cancelStatus = value;
@@ -145,7 +150,11 @@ const componentConfig: ThisType<LineItemsGridComponent> = {
             this.showShipItemModal = false;
             this.shipQuantity = 0;
             this.resetTracking();
-            this.reloadData();
+            // No reload here: cancelling changes nothing, and after a successful ship the
+            // parent (mollie-order-tab) reloads the order details on EventShippedOrder and
+            // re-passes initialShippingStatus, which the watcher above applies. The legacy
+            // reloadData() endpoint returns a different shape (quantityShippable + different
+            // keying) that would blank out the shippable/shipped columns.
         },
 
         onOpenCancelItemModal(item: any) {

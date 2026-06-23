@@ -1,6 +1,8 @@
 export interface ShippingItemStatus {
-    shippableQuantity: number;
-    quantityShipped: number;
+    shippableQuantity?: number;
+    // The legacy /ship/status endpoint names this field "quantityShippable".
+    quantityShippable?: number;
+    quantityShipped?: number;
 }
 
 export interface CancelItemStatus {
@@ -38,7 +40,9 @@ const UNKNOWN = '~';
  */
 export default class LineItemStatusService {
     shippableQuantity(shippingStatus: ShippingStatusMap, itemId: string): number | string {
-        return shippingStatus?.[itemId]?.shippableQuantity ?? UNKNOWN;
+        const entry = shippingStatus?.[itemId];
+
+        return entry?.shippableQuantity ?? entry?.quantityShippable ?? UNKNOWN;
     }
 
     shippedQuantity(shippingStatus: ShippingStatusMap, itemId: string): number | string {
