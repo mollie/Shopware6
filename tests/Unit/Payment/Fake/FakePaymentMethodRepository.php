@@ -6,7 +6,6 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
-use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Context;
 
 final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface

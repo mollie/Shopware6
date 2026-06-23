@@ -48,7 +48,7 @@ final class FakeSupportMailer implements SupportMailerInterface
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return null|array<string, mixed>
      */
     public function getLastCall(): ?array
     {
