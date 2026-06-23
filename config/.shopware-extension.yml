@@ -4,7 +4,7 @@ build:
   shopwareVersionConstraint: '>=6.6.0.0'
   zip:
     assets:
-      enable_es_build_for_admin: true
+      enable_es_build_for_admin: false
       enable_es_build_for_storefront: true
     pack:
       excludes:
