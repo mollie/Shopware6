@@ -1,133 +1,120 @@
 {% block mollie_payments_subscription_list %}
-    <sw-page class="mollie-subscriptions">
-        {% block mollie_payments_subscription_list_search_bar %}
-            <template #search-bar>
-                <sw-search-bar initialSearchType="mollie_subscription"
-                               :initialSearch="term"
-                               @search="onSearch">
-                </sw-search-bar>
-            </template>
+<sw-page class="mollie-subscriptions">
+    {% block mollie_payments_subscription_list_search_bar %}
+    <template #search-bar>
+        <sw-search-bar
+            initialSearchType="mollie_subscription"
+            :initialSearch="term"
+            @search="onSearch"
+        >
+        </sw-search-bar>
+    </template>
+    {% endblock %} {% block mollie_payments_subscription_list_smart_bar_header %}
+    <template slot="smart-bar-header">
+        {% block mollie_payments_subscription_list_smart_bar_header_title %}
+        <h2>
+            {% block mollie_payments_subscription_list_smart_bar_header_title_text %} {{
+            $tc('mollie-payments.subscriptions.list.title') }} {% endblock %} {% block
+            mollie_payments_subscription_list_smart_bar_header_amount %}
+            <span
+                v-if="!isLoading"
+                class="sw-page__smart-bar-amount"
+            >
+                ({{ totalSubscriptions }})
+            </span>
+            {% endblock %}
+        </h2>
         {% endblock %}
-
-        {% block mollie_payments_subscription_list_smart_bar_header %}
-            <template slot="smart-bar-header">
-                {% block mollie_payments_subscription_list_smart_bar_header_title %}
-                    <h2>
-                        {% block mollie_payments_subscription_list_smart_bar_header_title_text %}
-                            {{ $tc('mollie-payments.subscriptions.list.title') }}
-                        {% endblock %}
-                        {% block mollie_payments_subscription_list_smart_bar_header_amount %}
-                            <span v-if="!isLoading" class="sw-page__smart-bar-amount">
-                                  ({{ totalSubscriptions }})
-                            </span>
-                        {% endblock %}
-                    </h2>
+    </template>
+    {% endblock %}
+    <template #content>
+        {% block mollie_payments_subscription_list_content %}
+        <sw-entity-listing
+            class="mollie-subscriptions-grid"
+            v-if="subscriptions"
+            :items="subscriptions"
+            :repository="repoSubscriptions"
+            :columns="gridColumns()"
+            :sort-by="sortBy"
+            :sort-direction="sortDirection"
+            :showSelection="false"
+            :allowDelete="false"
+            :showDelete="false"
+            :isLoading="isLoading"
+        >
+            {% block mollie_payments_subscription_list_content_description %}
+            <template #column-description="{ item }">
+                <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
+                    {{ item.description }}
+                </router-link>
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_customer %}
+            <template #column-customerId="{ item }">
+                <div v-if="item.customer">{{ item.customer.firstName }} {{ item.customer.lastName }}</div>
+                <div v-else>{{ $tc('mollie-payments.subscriptions.list.deletedCustomer') }}</div>
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_amount %}
+            <template #column-amount="{ item }">
+                {{ currencyFilter( item.amount , item.currency.isoCode, item.totalRounding.decimals) }}
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_status %}
+            <template #column-status="{ item }">
+                <sw-label
+                    :variant="statusColor(item.status)"
+                    size="medium"
+                    appearance="pill"
+                    :ghost="false"
+                    :caps="true"
+                    :dismissable="false"
+                >
+                    {{ statusTranslation(item.status) }}
+                </sw-label>
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_next_payment_date %}
+            <template #column-nextPaymentAt="{ item }">
+                {{ dateFilter(item.nextPaymentAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month:
+                '2-digit',year: 'numeric' }) }}
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_pre_payment_reminder %}
+            <template #column-lastRemindedAt="{ item }">
+                {{ dateFilter(item.lastRemindedAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month:
+                '2-digit',year: 'numeric' }) }}
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_created_at %}
+            <template #column-createdAt="{ item }">
+                <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
+                    {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month:
+                    '2-digit',year: 'numeric' }) }}
+                </router-link>
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_canceled_at %}
+            <template #column-canceledAt="{ item }">
+                {{ dateFilter(item.canceledAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month:
+                '2-digit',year: 'numeric' }) }}
+            </template>
+            {% endblock %} {% block mollie_payments_subscription_list_content_actions %}
+            <template #actions="{ item }">
+                {% block mollie_payments_subscription_list_content_actions_edit %}
+                <sw-context-menu-item class="mollie-subscriptions-grid-btn-edit">
+                    <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
+                        {{ $tc('mollie-payments.subscriptions.list.action.edit') }}
+                    </router-link>
+                </sw-context-menu-item>
                 {% endblock %}
             </template>
-        {% endblock %}
-        <template #content>
-            {% block mollie_payments_subscription_list_content %}
-                <sw-entity-listing
-                        class="mollie-subscriptions-grid"
-                        v-if="subscriptions"
-                        :items="subscriptions"
-                        :repository="repoSubscriptions"
-                        :columns="gridColumns()"
-                        :sort-by="sortBy"
-                        :sort-direction="sortDirection"
-                        :showSelection="false"
-                        :allowDelete="false"
-                        :showDelete="false"
-                        :isLoading="isLoading">
-
-
-                    {% block mollie_payments_subscription_list_content_description %}
-                        <template #column-description="{ item }">
-                            <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
-                                {{ item.description }}
-                            </router-link>
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_customer %}
-                        <template #column-customerId="{ item }" >
-                            <div v-if="item.customer">
-                                {{ item.customer.firstName }} {{ item.customer.lastName }}
-                            </div>
-                            <div v-else>
-                                {{ $tc('mollie-payments.subscriptions.list.deletedCustomer') }}
-                            </div>
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_amount %}
-                        <template #column-amount="{ item }">
-                            {{ currencyFilter( item.amount , item.currency.isoCode, item.totalRounding.decimals) }}
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_status %}
-                        <template #column-status="{ item }">
-                            <sw-label :variant="statusColor(item.status)"
-                                      size="medium"
-                                      appearance="pill"
-                                      :ghost="false"
-                                      :caps="true"
-                                      :dismissable="false">
-                                {{ statusTranslation(item.status) }}
-                            </sw-label>
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_next_payment_date %}
-                        <template #column-nextPaymentAt="{ item }">
-                            {{ dateFilter(item.nextPaymentAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_pre_payment_reminder %}
-                        <template #column-lastRemindedAt="{ item }">
-                            {{ dateFilter(item.lastRemindedAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_created_at %}
-                        <template #column-createdAt="{ item }">
-                            <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
-                                {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
-                            </router-link>
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_canceled_at %}
-                        <template #column-canceledAt="{ item }">
-                            {{ dateFilter(item.canceledAt, { hour: '2-digit', minute: '2-digit', day: '2-digit',month: '2-digit',year: 'numeric' }) }}
-                        </template>
-                    {% endblock %}
-
-                    {% block mollie_payments_subscription_list_content_actions %}
-                        <template #actions="{ item }">
-                            {% block mollie_payments_subscription_list_content_actions_edit %}
-                                <sw-context-menu-item class="mollie-subscriptions-grid-btn-edit">
-                                    <router-link :to="{ name: 'mollie.payments.subscription_detail', params: { id: item.id } }">
-                                        {{ $tc('mollie-payments.subscriptions.list.action.edit') }}
-                                    </router-link>
-                                </sw-context-menu-item>
-                            {% endblock %}
-                        </template>
-                    {% endblock %}
-                </sw-entity-listing>
             {% endblock %}
-        </template>
+        </sw-entity-listing>
+        {% endblock %}
+    </template>
 
-        <template #sidebar>
-            <sw-sidebar>
-                <sw-sidebar-item
-                    :icon="compatibilityIcons.refresh"
-                    :title="$tc('sw-product.list.titleSidebarItemRefresh')"
-                    @click="onRefresh"
-                />
-            </sw-sidebar>
-        </template>
-    </sw-page>
+    <template #sidebar>
+        <sw-sidebar>
+            <sw-sidebar-item
+                :icon="compatibilityIcons.refresh"
+                :title="$tc('sw-product.list.titleSidebarItemRefresh')"
+                @click="onRefresh"
+            />
+        </sw-sidebar>
+    </template>
+</sw-page>
 {% endblock %}
