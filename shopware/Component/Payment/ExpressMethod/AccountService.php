@@ -133,7 +133,12 @@ final class AccountService extends AbstractAccountService
         $countryIsoMapping = [];
         /** @var CountryEntity $country */
         foreach ($countrySearchResult->getElements() as $country) {
-            $countryIsoMapping[$country->getIso()] = $country->getId();
+            $iso = $country->getIso();
+            if ($iso === null) {
+                continue;
+            }
+
+            $countryIsoMapping[$iso] = $country->getId();
         }
 
         return $countryIsoMapping;
