@@ -9,5 +9,13 @@
 
         <prototype namespace="Mollie\Shopware\" resource="./../../" exclude="../../{Resources,Migration,*.php}"/>
 
+        <service id="Monolog\Processor\WebProcessor">
+            <tag name="monolog.processor" channel="mollie"/>
+        </service>
+
+        <service id="Monolog\Processor\IntrospectionProcessor">
+            <tag name="monolog.processor" channel="mollie"/>
+        </service>
+
     </services>
 </container>
