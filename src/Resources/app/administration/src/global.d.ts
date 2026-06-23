@@ -9,6 +9,10 @@
 // It is intentionally untyped as the plugin does not ship the official Shopware types.
 declare const Shopware: any;
 
+// Untyped runtime polyfills, imported in main.ts for their side effects only.
+declare module 'regenerator-runtime/runtime';
+declare module 'core-js/stable';
+
 declare module '*.twig' {
     const content: string;
     export default content;
