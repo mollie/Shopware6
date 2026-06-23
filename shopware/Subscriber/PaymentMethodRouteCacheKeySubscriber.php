@@ -1,36 +1,42 @@
 <?php
 declare(strict_types=1);
 
-namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache;
+namespace Mollie\Shopware\Subscriber;
 
-use Kiener\MolliePayments\Service\SettingsService;
-use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Payment\Event\PaymentMethodRouteCacheKeyEvent;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CachedPaymentMethodRoute64 implements EventSubscriberInterface
+/**
+ * Mollie payment methods are shown/hidden dynamically by the payment-method removers - the
+ * availability remover hides methods depending on delivery/billing country, cart amount,
+ * currency and whether the cart contains a subscription product. Shopware caches the
+ * payment-method route, so unless those same factors are folded into the cache key the
+ * cached response keeps returning methods that should already have been removed.
+ *
+ * This subscriber adds the relevant parts so the cache varies along the exact dimensions
+ * the removers depend on.
+ */
+final class PaymentMethodRouteCacheKeySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CartService
-     */
-    private $cartService;
-
-    /**
-     * @var SettingsService
-     */
-    private $pluginSettings;
-
-    public function __construct(SettingsService $pluginSettings, CartService $cartService)
-    {
-        $this->pluginSettings = $pluginSettings;
-        $this->cartService = $cartService;
+    public function __construct(
+        #[Autowire(service: SettingsService::class)]
+        private readonly AbstractSettingsService $settingsService,
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private readonly LineItemAnalyzerInterface $lineItemAnalyzer,
+        private readonly CartService $cartService
+    ) {
     }
 
     /**
-     * @return string[]
+     * @return array<string, string>
      */
     public static function getSubscribedEvents(): array
     {
@@ -39,34 +45,29 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * This function will make sure that we have a working cache key for all dynamic payment method
-     * situations that could occur.
-     * So we need to determine if we have a voucher product in it, or not...otherwise the dynamic display
-     * of these payment methods (in other route handlers) would not work.
-     */
     public function onGenerateCacheKey(PaymentMethodRouteCacheKeyEvent $event): void
     {
-        $originalRuleIds = $event->getContext()->getRuleIds();
+        $context = $event->getContext();
+        $originalRuleIds = $context->getRuleIds();
 
         /**
          * the cart service changes the rule ids based on cart.
          * after failed payment we are not in cart anymore but instead on edit order
          * in this case the cart is empty so the rules will be reset
          */
-        $cart = $this->cartService->getCart($event->getContext()->getToken(), $event->getContext());
+        $cart = $this->cartService->getCart($context->getToken(), $context);
 
         /* we have to collect the original rules before cart service is called and set them again */
-        $event->getContext()->setRuleIds($originalRuleIds);
+        $context->setRuleIds($originalRuleIds);
 
-        $parts = $event->getParts();
         $cacheParts = [];
-        $cacheParts = $this->addMollieLimitsKey($cacheParts);
+        $cacheParts = $this->addMollieLimitsKey($context, $cacheParts);
         $cacheParts = $this->addSubscriptionKey($cart, $cacheParts);
         $cacheParts = $this->addCartAmountKey($cart, $cacheParts);
-        $cacheParts = $this->addCurrencyCodeKey($event->getContext(), $cacheParts);
-        $cacheParts = $this->addBillingAddressKey($event->getContext(), $cacheParts);
+        $cacheParts = $this->addCurrencyCodeKey($context, $cacheParts);
+        $cacheParts = $this->addBillingAddressKey($context, $cacheParts);
 
+        $parts = $event->getParts();
         $parts[] = md5(implode('-', $cacheParts));
         $event->setParts($parts);
     }
@@ -76,11 +77,11 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      *
      * @return array<mixed>
      */
-    private function addMollieLimitsKey(array $parts): array
+    private function addMollieLimitsKey(SalesChannelContext $context, array $parts): array
     {
-        $settings = $this->pluginSettings->getSettings();
+        $paymentSettings = $this->settingsService->getPaymentSettings($context->getSalesChannelId());
 
-        if ($settings->getUseMolliePaymentMethodLimits()) {
+        if ($paymentSettings->useMollieLimits()) {
             $parts[] = 'with-limits';
         } else {
             $parts[] = 'without-limits';
@@ -96,28 +97,13 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
      */
     private function addSubscriptionKey(Cart $cart, array $parts): array
     {
-        $hasSubscriptionItems = $this->isSubscriptionCart($cart);
-
-        if ($hasSubscriptionItems) {
+        if ($this->lineItemAnalyzer->hasSubscriptionProduct($cart->getLineItems())) {
             $parts[] = 'with-subscription';
         } else {
             $parts[] = 'without-subscription';
         }
 
         return $parts;
-    }
-
-    private function isSubscriptionCart(Cart $cart): bool
-    {
-        foreach ($cart->getLineItems() as $lineItem) {
-            $attribute = new LineItemAttributes($lineItem);
-
-            if ($attribute->isSubscriptionProduct()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
