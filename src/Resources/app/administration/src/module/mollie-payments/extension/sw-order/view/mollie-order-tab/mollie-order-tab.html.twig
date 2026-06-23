@@ -1,6 +1,8 @@
 {% block mollie_order_tab %}
     <div class="mollie-order-tab">
-        <sw-skeleton v-if="isDetailsLoading" />
+        {# Only show the skeleton on the initial load; on later reloads (e.g. after closing the
+           refund manager) keep the existing content visible instead of blanking the tab. #}
+        <sw-skeleton v-if="isDetailsLoading && !details" />
 
         <template v-else-if="isMollieOrder">
             {% block mollie_order_tab_refund_modal %}
