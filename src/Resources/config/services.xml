@@ -13,16 +13,6 @@
 
 
     <services>
-        <!-- Helpers -->
-<service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
-
-        <service id="kiener.mollie_payments.http.client" class="Kiener\MolliePayments\Service\HttpClient\HttpClientInterface">
-            <factory service="kiener.mollie_payments.http.client.factory" method="buildClient"/>
-        </service>
-
-        <!-- Services -->
-
-
         <service id="Kiener\MolliePayments\Service\SettingsService">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <argument type="service" id="sales_channel.repository"/>
@@ -31,17 +21,6 @@
             <argument key="$envDevMode">%env(default::MOLLIE_DEV_MODE)%</argument>
             <argument key="$envCypressMode">%env(default::MOLLIE_CYPRESS_MODE)%</argument>
         </service>
-
-        <service id="Kiener\MolliePayments\Service\ShippingMethodService" >
-            <argument type="service" id="shipping_method.repository"/>
-            <argument type="service" id="Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\ShopService">
-            <argument type="service" id="router"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\UrlParsingService"/>
 
         <service id="Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache\CachedPaymentMethodRoute64">
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>

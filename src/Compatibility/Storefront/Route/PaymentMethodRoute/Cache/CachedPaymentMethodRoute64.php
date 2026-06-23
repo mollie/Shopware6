@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments\Compatibility\Storefront\Route\PaymentMethodRoute\Cache;
 
-use Kiener\MolliePayments\Service\Cart\Voucher\VoucherCartCollector;
 use Kiener\MolliePayments\Service\SettingsService;
 use Kiener\MolliePayments\Struct\LineItem\LineItemAttributes;
 use Shopware\Core\Checkout\Cart\Cart;
@@ -62,7 +61,6 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 
         $parts = $event->getParts();
         $cacheParts = [];
-        // s  $cacheParts = $this->addVoucherKey($cart, $cacheParts);
         $cacheParts = $this->addMollieLimitsKey($cacheParts);
         $cacheParts = $this->addSubscriptionKey($cart, $cacheParts);
         $cacheParts = $this->addCartAmountKey($cart, $cacheParts);
@@ -71,27 +69,6 @@ class CachedPaymentMethodRoute64 implements EventSubscriberInterface
 
         $parts[] = md5(implode('-', $cacheParts));
         $event->setParts($parts);
-    }
-
-    /**
-     * @param array<mixed> $parts
-     *
-     * @return array<mixed>
-     *
-     * @phpstan-ignore method.unused
-     */
-    private function addVoucherKey(Cart $cart, array $parts): array
-    {
-        // TODO: check cache key for cart!!
-        $voucherPermitted = (bool) $cart->getData()->get(VoucherCartCollector::VOUCHER_PERMITTED);
-
-        if ($voucherPermitted) {
-            $parts[] = 'with-voucher';
-        } else {
-            $parts[] = 'without-voucher';
-        }
-
-        return $parts;
     }
 
     /**
