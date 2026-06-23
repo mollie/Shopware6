@@ -42,6 +42,16 @@ const componentConfig: ThisType<SectionInfoComponent> = {
             return user.firstName;
         },
 
+        title() {
+            const userName = this.userName;
+            const translated = this.$tc('mollie-payments.config.info.title', 0, { userName });
+
+            // Interpolate {userName} ourselves: vue-i18n 9 (Shopware >= 6.6) does not
+            // interpolate named values via $tc, while $t is not reliably available on the
+            // Vue 2 components of Shopware 6.5. Using $tc + manual replace works on both.
+            return translated.includes('{userName}') ? translated.replace('{userName}', userName) : translated;
+        },
+
         hasSalesChannelList() {
             return this.versionCompare.greaterOrEqual(Shopware.Context.app.config.version, '6.4.2');
         },
