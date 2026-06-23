@@ -15,14 +15,14 @@ final class AttachmentCollection
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return list<array{content: string, fileName: string, mimeType: string}>
      */
     public function toArray(): array
     {
         $result = [];
 
         foreach ($this->attachments as $attachment) {
-            $result[] = json_decode((string) json_encode($attachment), true);
+            $result[] = $attachment->toArray();
         }
 
         return $result;

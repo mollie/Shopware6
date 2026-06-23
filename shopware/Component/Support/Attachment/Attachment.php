@@ -16,4 +16,16 @@ final readonly class Attachment implements \JsonSerializable
         public string $mimeType,
     ) {
     }
+
+    /**
+     * @return array{content: string, fileName: string, mimeType: string}
+     */
+    public function toArray(): array
+    {
+        return [
+            'content' => $this->content,
+            'fileName' => $this->fileName,
+            'mimeType' => $this->mimeType,
+        ];
+    }
 }
