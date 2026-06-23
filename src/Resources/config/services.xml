@@ -7,7 +7,6 @@
     <imports>
         <import resource="services/api.xml"/>
         <import resource="services/commands.xml"/>
-        <import resource="services/services.xml"/>
         <import resource="services/snippets.xml"/>
         <import resource="packages/**/*.xml"/>
         <import resource="../../../shopware/Resources/config/services.xml"/>
@@ -15,12 +14,6 @@
 
 
     <services>
-        <!-- Configuration -->
-        <service id="Kiener\MolliePayments\Service\ConfigService">
-            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
-        </service>
-
-
         <!-- Helpers -->
 <service id="kiener.mollie_payments.http.client.factory" class="Kiener\MolliePayments\Service\HttpClient\PluginHttpClientFactory"/>
 
@@ -29,26 +22,6 @@
         </service>
 
         <!-- Services -->
-
-        <service id="Kiener\MolliePayments\Service\CustomerService">
-            <argument type="service" id="country.repository"/>
-            <argument type="service" id="customer.repository"/>
-            <argument type="service" id="customer_address.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Customer"/>
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister"/>
-            <argument type="service" id="salutation.repository"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument>%kernel.shopware_version%</argument>
-            <argument type="service" id="Kiener\MolliePayments\Service\ConfigService"/>
-            <argument type="service" id="service_container"/>
-            <argument type="service" id="request_stack"/>
-            <argument type="service" id="translator"/>
-        </service>
-
-
-
 
 
         <service id="Kiener\MolliePayments\Service\SettingsService">
@@ -67,17 +40,6 @@
 
         <service id="Kiener\MolliePayments\Service\ShopService">
             <argument type="service" id="router"/>
-        </service>
-
-<service id="Kiener\MolliePayments\Service\Router\RoutingDetector">
-            <argument type="service" id="request_stack"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\Router\RoutingBuilder">
-            <argument type="service" id="router"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingDetector"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument key="$envAppUrl">%env(default::APP_URL)%</argument>
         </service>
 
         <service id="Kiener\MolliePayments\Service\UrlParsingService"/>

@@ -14,23 +14,5 @@
             <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
             <argument type="service" id="monolog.logger.mollie"/>
         </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Customer">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Order">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\Payment"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\Router\RoutingBuilder"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\MollieApi\RequestAnonymizer\MollieRequestAnonymizer"/>
-            <argument type="service" id="monolog.logger.mollie"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\SettingsService"/>
-            <argument type="service" id="Kiener\MolliePayments\Service\CustomerService"/>
-        </service>
-
-        <service id="Kiener\MolliePayments\Service\MollieApi\Payment">
-            <argument type="service" id="Kiener\MolliePayments\Factory\MollieApiFactory"/>
-        </service>
     </services>
 </container>
