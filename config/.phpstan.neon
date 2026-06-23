@@ -7,6 +7,12 @@ parameters:
         - ./../src/Resources/*
         - ./../src/Migration/*
         - ./../shopware/Component/Subscription/Search/SubscriptionAdminSearchIndexer.php
+        # extends AbstractPaymentHandler (6.6+), guarded by Feature::isActive('v6.7.0.0');
+        # the class does not exist on 6.5, so PHPStan reports a non-ignorable class.notFound.
+        - ./../shopware/Component/Payment/Handler/AbstractMolliePaymentHandler.php
+        # globalData() narrows EntityCollection<Entity> to EntityCollection<RefundEntity>,
+        # same covariant-return case as the excluded SubscriptionAdminSearchIndexer.
+        - ./../shopware/Component/Refund/Search/RefundAdminSearchIndexer.php
     disallowedFunctionCalls:
         - function: 'var_dump()'
           message: 'use some logger instead'
