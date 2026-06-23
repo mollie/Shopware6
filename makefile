@@ -88,6 +88,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpintegration -B
 	@make behat -B
 	@make vitest -B
+	@make typecheck -B
 	@make configcheck -B
 	@make phpunuhi -B
 
@@ -135,10 +136,10 @@ vitest: ##3 Starts all Vitest tests
 
 eslint: ##3 Starts the ESLinter
 ifndef mode
-	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/eslint.config.cjs ./src/Resources/app/administration
 endif
 ifeq ($(mode), fix)
-	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/eslint.config.cjs ./src/Resources/app/administration --fix
 endif
 
 stylelint: ##3 Starts the Stylelinter
@@ -191,3 +192,6 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	@echo ""
 	@echo "CONGRATULATIONS"
 	@echo "ZIP file available at plugins/.build/"
+
+typecheck: ##3 Starts the TypeScript type check (administration)
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/tsc --noEmit -p ./src/Resources/app/administration/tsconfig.json

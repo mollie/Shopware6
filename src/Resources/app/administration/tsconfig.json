@@ -3,6 +3,7 @@
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "node",
+        "ignoreDeprecations": "6.0",
         "lib": ["ESNext", "DOM"],
         "allowJs": true,
         "checkJs": false,
@@ -13,12 +14,11 @@
         "resolveJsonModule": true,
         "forceConsistentCasingInFileNames": true,
         "types": [],
-        "baseUrl": ".",
         "paths": {
             "vitest": ["../../../../dev/node_modules/vitest"],
             "vitest/*": ["../../../../dev/node_modules/vitest/*"]
         }
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "tests/**/*.ts"],
-    "exclude": ["node_modules", ".tmp", "build"]
+    "exclude": ["node_modules", ".tmp", "build", "src/module/mollie-payments/extension/sw-plugin"]
 }
