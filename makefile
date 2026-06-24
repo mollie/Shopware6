@@ -54,8 +54,8 @@ clean: ##1 Cleans all dependencies and files
 	# ------------------------------------------------------
 	rm -rf ./dev/node_modules/*
 	rm -rf config-*
-	rm -rf ./src/Resources/app/administration/node_modules/*
-	rm -rf ./src/Resources/app/storefront/node_modules/*
+	rm -rf ./src/Resources/app/administration/node_modules
+	rm -rf ./src/Resources/app/storefront/node_modules
 	# ------------------------------------------------------
 	rm -rf ./src/Resources/app/storefront/dist/storefront
 
@@ -167,6 +167,11 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
+	# An empty node_modules makes shopware-cli skip npm install, producing a ZIP
+	# without admin assets (broken backend on customer update). Remove it so the
+	# asset build always installs fresh.
+	rm -rf ./src/Resources/app/administration/node_modules
+	rm -rf ./src/Resources/app/storefront/node_modules
 	docker run --rm \
 		--user "$(shell id -u):$(shell id -g)" \
 		-e HOME=/tmp \

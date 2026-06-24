@@ -1,5 +1,3 @@
-import 'regenerator-runtime/runtime';
-import 'core-js/stable';
 import './module/mollie-payments/components/mollie-pluginconfig-section-info';
 import './module/mollie-payments/components/mollie-pluginconfig-section-api';
 import './module/mollie-payments/components/mollie-pluginconfig-section-payments';
