@@ -1,0 +1,11 @@
+{
+  "main.js": {
+    "file": "js/mollie-payments.js",
+    "name": "mollie-payments",
+    "src": "main.js",
+    "isEntry": true,
+    "css": [
+      "css/mollie-payments.css"
+    ]
+  }
+}

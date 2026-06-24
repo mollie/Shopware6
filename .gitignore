@@ -6,7 +6,6 @@
 
 src/Resources/app/administration/node_modules
 
-src/Resources/app/storefront/dist/storefront
 src/Resources/app/storefront/node_modules
 *.js.LICENSE.txt
 config-*
@@ -15,7 +14,6 @@ config-*
 /src/Resources/app/administration/.stryker-tmp
 /.phpunuhi/
 /dev/node_modules/
-/src/Resources/public/administration/.vite
 /src/Resources/public/administration/assets/
 composer.lock
 package-lock.json
