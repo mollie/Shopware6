@@ -70,6 +70,16 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
     describe('Functional', () => {
 
+        before(() => {
+            // enabling Apple Pay Direct via config must trigger the
+            // SystemConfigSubscriber which downloads the domain verification file.
+            // this mirrors the real user journey (activate -> file gets downloaded).
+            const pluginConfig = new PluginConfiguration();
+            pluginConfig.setApplePayDirectEnabled(true);
+
+            configAction.configureEnvironment(new ShopConfiguration(), pluginConfig);
+        });
+
         it('C4084: Domain Verification file has been downloaded @core', () => {
             cy.request('/.well-known/apple-developer-merchantid-domain-association');
         })
