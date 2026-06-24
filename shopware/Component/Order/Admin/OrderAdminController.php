@@ -21,6 +21,7 @@ use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -63,6 +64,7 @@ final class OrderAdminController extends AbstractController
         $criteria = new Criteria([$orderId]);
         $criteria->getAssociation('transactions')
             ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
+            ->addAssociation('stateMachineState')
             ->setLimit(1)
         ;
         $criteria->addAssociation('mollieSubscriptions');
@@ -110,6 +112,15 @@ final class OrderAdminController extends AbstractController
 
         $mollieOrder = $this->loadMollieOrder($mollieOrderId, $salesChannelId);
 
+        // The Mollie payment status on the loaded extension is not reliable here (no API call, status not
+        // hydrated), so for the Payments API we rely on the Shopware transaction state machine: shipping/
+        // cancelling is only possible while the transaction is still open or authorized, not once it is paid.
+        $transactionState = $latestTransaction->getStateMachineState()?->getTechnicalName() ?? '';
+        $shippingAllowed = in_array($transactionState, [
+            OrderTransactionStates::STATE_OPEN,
+            OrderTransactionStates::STATE_AUTHORIZED,
+        ], true);
+
         return new JsonResponse(new OrderDetailsResponse(
             $mollieId,
             $payment->getThirdPartyPaymentId() ?: null,
@@ -123,9 +134,9 @@ final class OrderAdminController extends AbstractController
             $this->buildRefundManagerConfig($salesChannelId),
             new ShippingData(
                 $this->buildShippingTotal($mollieOrder),
-                $this->buildShippingStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $order->getDeliveries()),
+                $this->buildShippingStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $shippingAllowed, $order->getDeliveries()),
             ),
-            $this->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems()),
+            $this->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $shippingAllowed),
         ));
     }
 
@@ -145,7 +156,7 @@ final class OrderAdminController extends AbstractController
     /**
      * @return array<string, CancelStatusEntry>
      */
-    private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems): array
+    private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems, bool $shippingAllowed): array
     {
         if ($mollieOrder === null) {
             if ($lineItems === null) {
@@ -157,7 +168,7 @@ final class OrderAdminController extends AbstractController
                 $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
                 $shipped = (int) ($fields['quantity'] ?? 0);
                 $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
-                $cancelable = max(0, $lineItem->getQuantity() - $shipped - $cancelled);
+                $cancelable = $shippingAllowed ? max(0, $lineItem->getQuantity() - $shipped - $cancelled) : 0;
                 $result[$lineItem->getId()] = new CancelStatusEntry(
                     '',
                     $lineItem->getId(),
@@ -191,7 +202,7 @@ final class OrderAdminController extends AbstractController
     /**
      * @return array<string, ShippingStatusEntry>
      */
-    private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems, ?OrderDeliveryCollection $deliveries = null): array
+    private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems, bool $shippingAllowed, ?OrderDeliveryCollection $deliveries = null): array
     {
         if ($mollieOrder === null) {
             if ($lineItems === null) {
@@ -203,7 +214,7 @@ final class OrderAdminController extends AbstractController
                 $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
                 $shippedQty = (int) ($fields['quantity'] ?? 0);
                 $cancelledQty = (int) ($fields['cancelled_quantity'] ?? 0);
-                $shippableQty = max(0, $lineItem->getQuantity() - $shippedQty - $cancelledQty);
+                $shippableQty = $shippingAllowed ? max(0, $lineItem->getQuantity() - $shippedQty - $cancelledQty) : 0;
                 $result[$lineItem->getId()] = new ShippingStatusEntry(
                     '',
                     '',
@@ -217,7 +228,7 @@ final class OrderAdminController extends AbstractController
                 $fields = $delivery->getCustomFields()[Mollie::EXTENSION] ?? [];
                 $shippedQty = (int) ($fields['quantity'] ?? 0);
                 $totalQty = $delivery->getShippingCosts()->getQuantity();
-                $shippableQty = max(0, $totalQty - $shippedQty);
+                $shippableQty = $shippingAllowed ? max(0, $totalQty - $shippedQty) : 0;
                 $result[$delivery->getId()] = new ShippingStatusEntry(
                     '',
                     '',

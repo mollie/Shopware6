@@ -14,11 +14,15 @@ use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 #[CoversClass(OrderAdminController::class)]
 final class OrderAdminControllerTest extends TestCase
@@ -159,7 +163,53 @@ final class OrderAdminControllerTest extends TestCase
         $this->assertSame(5, $total['shippable']);
     }
 
-    private function buildOrder(string $molliePaymentId, ?string $mollieOrderId): OrderEntity
+    public function testPaymentsApiLineItemsAreNotShippableOrCancelableForPaidTransaction(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_PAID, $lineItems);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $shipping = $body['shipping']['status']['shopware-line-1'];
+        $this->assertFalse($shipping['isShippable']);
+        $this->assertSame(0, $shipping['shippableQuantity']);
+
+        $cancel = $body['cancelItem']['shopware-line-1'];
+        $this->assertFalse($cancel['isCancelable']);
+        $this->assertSame(0, $cancel['cancelableQuantity']);
+    }
+
+    public function testPaymentsApiLineItemsAreShippableAndCancelableForAuthorizedTransaction(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_AUTHORIZED, $lineItems);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $shipping = $body['shipping']['status']['shopware-line-1'];
+        $this->assertTrue($shipping['isShippable']);
+        $this->assertSame(2, $shipping['shippableQuantity']);
+
+        $cancel = $body['cancelItem']['shopware-line-1'];
+        $this->assertTrue($cancel['isCancelable']);
+        $this->assertSame(2, $cancel['cancelableQuantity']);
+    }
+
+    private function buildOrder(string $molliePaymentId, ?string $mollieOrderId, ?string $transactionState = null, ?OrderLineItemCollection $lineItems = null): OrderEntity
     {
         $payment = new Payment($molliePaymentId);
         if ($mollieOrderId !== null) {
@@ -169,13 +219,32 @@ final class OrderAdminControllerTest extends TestCase
         $transaction = new OrderTransactionEntity();
         $transaction->setId('transaction-1');
         $transaction->addExtension(Mollie::EXTENSION, $payment);
+        if ($transactionState !== null) {
+            $state = new StateMachineStateEntity();
+            $state->setId('state-1');
+            $state->setTechnicalName($transactionState);
+            $transaction->setStateMachineState($state);
+        }
 
         $order = new OrderEntity();
         $order->setId('order-1');
         $order->setSalesChannelId('sales-channel-1');
         $order->setTransactions(new OrderTransactionCollection([$transaction]));
+        if ($lineItems !== null) {
+            $order->setLineItems($lineItems);
+        }
 
         return $order;
+    }
+
+    private function buildShopwareLineItem(string $id, int $quantity): OrderLineItemEntity
+    {
+        $lineItem = new OrderLineItemEntity();
+        $lineItem->setId($id);
+        $lineItem->setQuantity($quantity);
+        $lineItem->setCustomFields([]);
+
+        return $lineItem;
     }
 
     private function buildCancelableLineItem(string $shopwareId, string $mollieId, int $cancelableQty): LineItem
