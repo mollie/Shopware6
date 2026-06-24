@@ -200,7 +200,7 @@ final class MollieGateway implements MollieGatewayInterface
             ];
             $customerLanguage = $customer->getLanguage();
             if ($customerLanguage instanceof LanguageEntity) {
-                $formParams['locale'] = Locale::fromLanguage($customerLanguage);
+                $formParams['locale'] = Locale::fromLanguage($customerLanguage)->value;
             }
             $response = $client->post('customers', [
                 'form_params' => $formParams

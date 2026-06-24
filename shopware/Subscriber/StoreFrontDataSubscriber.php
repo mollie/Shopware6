@@ -124,7 +124,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
     private function addMollieLocale(Page $page, string $localeCode): void
     {
         $page->assign([
-            'mollie_locale' => Locale::fromLocaleCode($localeCode)
+            'mollie_locale' => Locale::fromLocaleCode($localeCode)->value
         ]);
     }
 }
