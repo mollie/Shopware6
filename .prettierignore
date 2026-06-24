@@ -6,3 +6,4 @@ tests
 vendor
 modules
 package-lock.json
+dist
