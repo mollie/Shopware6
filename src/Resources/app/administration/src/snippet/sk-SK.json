@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Obnoviť návody",
                 "btnToggleTutorial": "Zobraziť/Skryť návod",
+                "btnShowTutorial": "Zobraziť návod",
+                "btnHideTutorial": "Skryť návod",
                 "titleFullRefund": "Úplné vrátenie peňazí",
                 "textFullRefund": "Jednoducho použite tlačidlo na úplné vrátenie peňazí. Tým sa zabezpečí, že všetky položky budú označené ako vrátené a zákazníkovi bude vrátená celá suma.",
                 "titleStockReset": "Resetovanie zásob",

@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Endurstilla leiðbeiningar",
                 "btnToggleTutorial": "Sýna/Fela leiðbeiningar",
+                "btnShowTutorial": "Sýna leiðbeiningar",
+                "btnHideTutorial": "Fela leiðbeiningar",
                 "titleFullRefund": "Full endurgreiðsla",
                 "textFullRefund": "Notaðu einungis hnappinn til þess að fá fulla endurgreiðslu. Þetta tryggir að allar þínar vörur séu merktar sem endurgreiddar og að heildarfjárhæðinni sé skilað til viðskiptavinarins.",
                 "titleStockReset": "Endurstilling birgða",

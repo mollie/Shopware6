@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Nullstill veiledninger",
                 "btnToggleTutorial": "Vis/Skjul veiledning",
+                "btnShowTutorial": "Vis veiledning",
+                "btnHideTutorial": "Skjul veiledning",
                 "titleFullRefund": "Full refusjon",
                 "textFullRefund": "Bare bruk knappen for full refusjon. Dette sikrer at alle varene blir merket som refusert og at hele beløpet blir betakebetalt til kunden.",
                 "titleStockReset": "Lager nullstilling",

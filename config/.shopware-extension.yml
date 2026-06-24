@@ -1,10 +1,16 @@
 compatibility_date: '2026-02-11'
 
+# shopwareVersionConstraint pins which Shopware admin toolchain shopware-cli builds against.
+# Pinned to ~6.6.0 so the release/zip build is DETERMINISTIC and produces the broadly
+# compatible layout: a flat js/mollie-payments.js plus a .vite/entrypoints.json that points to
+# it. That single bundle is loaded by both the webpack admin (6.5 / early 6.6) and the Vite
+# admin (6.6.10+ / 6.7). A 6.7 target would instead emit hashed assets/ with no flat js (Vite
+# only). The installer's run.sh overrides this per provisioned dev-shop version.
 build:
-  shopwareVersionConstraint: '>=6.6.0.0'
+  shopwareVersionConstraint: '~6.6.0'
   zip:
     assets:
-      enable_es_build_for_admin: true
+      enable_es_build_for_admin: false
       enable_es_build_for_storefront: true
       npm_strict: true
     pack:

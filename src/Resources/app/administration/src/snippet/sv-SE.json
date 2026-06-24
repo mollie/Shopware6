@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Återställ handledningar",
                 "btnToggleTutorial": "Visa/Dölj handledning",
+                "btnShowTutorial": "Visa handledning",
+                "btnHideTutorial": "Dölj handledning",
                 "titleFullRefund": "Full återbetalning",
                 "textFullRefund": "Använd bara knappen för full återbetalning. Detta säkerställer att alla dina objekt markeras som återbetalda och hela beloppet återgår till kunden.",
                 "titleStockReset": "Lageråterställning",

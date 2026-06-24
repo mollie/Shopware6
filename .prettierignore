@@ -5,5 +5,21 @@ node_modules
 tests
 vendor
 modules
+src_vendor
 package-lock.json
 dist
+
+# Top-level {% block %} override template: Prettier's HTML parser flattens the
+# block structure and there is no wrapping element to scope an inline
+# prettier-ignore to (the blocks must stay at the top level for the override to
+# work), so these files are kept hand-formatted.
+src/Resources/app/administration/src/module/mollie-payments/components/mollie-order-line-items-grid/mollie-order-line-items-grid.html.twig
+src/Resources/app/administration/src/module/mollie-payments/components/mollie-tracking-info/mollie-tracking-info.html.twig
+
+# Extension override templates: these extend Shopware core via {% block ... %} /
+# {% parent %} at the top level, which Prettier's HTML parser would flatten, so
+# they are hand-formatted too.
+src/Resources/app/administration/src/module/mollie-payments/extension/sw-order/page/sw-order-detail/sw-order-detail.html.twig
+src/Resources/app/administration/src/module/mollie-payments/extension/sw-order/page/sw-order-list/sw-order-list.html.twig
+src/Resources/app/administration/src/module/mollie-payments/extension/sw-order/view/mollie-order-tab/mollie-order-tab.html.twig
+src/Resources/app/administration/src/module/mollie-payments/extension/sw-plugin/component/sw-plugin-config/sw-plugin-config.html.twig

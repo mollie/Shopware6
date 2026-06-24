@@ -88,6 +88,7 @@ pr: ##2 Prepares everything for a Pull Request
 	@make phpintegration -B
 	@make behat -B
 	@make vitest -B
+	@make typecheck -B
 	@make configcheck -B
 	@make phpunuhi -B
 
@@ -135,10 +136,10 @@ vitest: ##3 Starts all Vitest tests
 
 eslint: ##3 Starts the ESLinter
 ifndef mode
-	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/eslint.config.cjs ./src/Resources/app/administration
 endif
 ifeq ($(mode), fix)
-	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/.eslintrc.json ./src/Resources/app --fix
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/eslint --config ./config/eslint.config.cjs ./src/Resources/app/administration --fix
 endif
 
 stylelint: ##3 Starts the Stylelinter
@@ -166,6 +167,9 @@ phpunuhi: ##3 Tests and verifies all plugin snippets
 # -------------------------------------------------------------------------------------------------
 
 release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
+	# Drop any leftover admin/asset build output so stale local builds (e.g. from `make run`)
+	# don't leak into the distribution ZIP — shopware-cli does not clean it before zipping.
+	rm -rf ./src/Resources/public/administration ./src/Resources/public/static/css ./src/Resources/public/static/js
 	cd .. && rm -rf ./.build/MolliePayments* && mkdir -p ./.build
 	# An empty node_modules makes shopware-cli skip npm install, producing a ZIP
 	# without admin assets (broken backend on customer update). Remove it so the
@@ -180,12 +184,14 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 		-w /plugins/.build \
 		ghcr.io/shopware/shopware-cli:latest \
 		extension zip /plugins/MolliePayments --disable-git
-	# Make the same ZIP work on Shopware 6.5.x as well:
-	#   - 6.6/6.7 load the nested  js/<name>/<name>.js  (built above via constraint >=6.6.0.0)
+	# STOREFRONT only: make the same ZIP work on Shopware 6.5.x as well.
+	#   - 6.6/6.7 load the nested  js/<name>/<name>.js
 	#   - 6.5     loads  the flat  js/<name>.js
-	# The shopware-cli esbuild bundle is byte-identical in both layouts (only the
-	# output path differs), so we copy the freshly built nested file to the flat
-	# 6.5 path inside the ZIP instead of running a second build.
+	# The storefront is still built with esbuild (enable_es_build_for_storefront: true), so the
+	# bundle is byte-identical in both layouts (only the output path differs); we copy the nested
+	# file to the flat 6.5 path instead of running a second build.
+	# (The admin needs no such copy: the ~6.6.0 build emits a flat js/ plus a .vite manifest
+	# pointing to it, which both the webpack and the Vite admin load.)
 	cd ../.build && \
 		ZIP=$$(ls MolliePayments*.zip | head -1) && \
 		JS=MolliePayments/src/Resources/app/storefront/dist/storefront/js && \
@@ -196,3 +202,6 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	@echo ""
 	@echo "CONGRATULATIONS"
 	@echo "ZIP file available at plugins/.build/"
+
+typecheck: ##3 Starts the TypeScript type check (administration)
+	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/tsc --noEmit -p ./src/Resources/app/administration/tsconfig.json

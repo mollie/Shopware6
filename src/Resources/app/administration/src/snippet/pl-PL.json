@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Zresetuj samouczki",
                 "btnToggleTutorial": "Pokaż/Ukryj samouczek",
+                "btnShowTutorial": "Pokaż samouczek",
+                "btnHideTutorial": "Ukryj samouczek",
                 "titleFullRefund": "Pełny zwrot",
                 "textFullRefund": "Po prostu użyj przycisku do pełnego zwrotu. Dzięki temu wszystkie przedmioty zostaną oznaczone jako zwrócone, a pełna kwota zostanie zwrócona klientowi.",
                 "titleStockReset": "Reset stanu magazynowego",

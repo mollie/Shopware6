@@ -171,6 +171,8 @@
             "instructions": {
                 "linkResetTutorials": "Iš naujo nustatyti mokymus",
                 "btnToggleTutorial": "Rodyti/Slėpti mokymą",
+                "btnShowTutorial": "Rodyti mokymą",
+                "btnHideTutorial": "Slėpti mokymą",
                 "titleFullRefund": "Pilnas grąžinimas",
                 "textFullRefund": "Tiesiog naudokite mygtuką visam grąžinimui. Taip užtikrinama, kad visos jūsų prekės bus pažymėtos kaip grąžintos ir visa suma bus grąžinta klientui.",
                 "titleStockReset": "Atsargų atnaujinimas",
