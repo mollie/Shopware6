@@ -93,7 +93,7 @@ final class PayTest extends TestCase
         $this->assertCount(1, $gateway->getCreatePayloads());
     }
 
-    public function testOrdersApiHandlerPassesAuthenticationIdInPaymentSubArray(): void
+    public function testOrdersApiHandlerPassesAuthenticationIdAtRootLevel(): void
     {
         $transactionService = new FakeTransactionService();
         $transactionService->createTransaction();
@@ -110,8 +110,9 @@ final class PayTest extends TestCase
         $this->assertCount(1, $orderPayloads);
 
         $orderArray = $orderPayloads[0]->toArray();
-        $this->assertArrayHasKey('payment', $orderArray);
-        $this->assertSame('auth_express_token', $orderArray['payment']['authenticationId']);
+        $this->assertArrayHasKey('authenticationId', $orderArray);
+        $this->assertSame('auth_express_token', $orderArray['authenticationId']);
+        $this->assertArrayNotHasKey('payment', $orderArray);
     }
 
     private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl, ?FakeGateway $gateway = null): Pay

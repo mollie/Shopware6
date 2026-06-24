@@ -6,9 +6,10 @@ namespace Mollie\Shopware\Component\Mollie;
 /**
  * Payload DTO for POST /v2/orders.
  *
- * Payment-specific parameters (authenticationId, cardToken, …) are collected
- * in $paymentParams and serialised into the `payment` sub-array, which is
- * where the Orders API expects them.
+ * Payment-specific parameters (cardToken, …) are collected in $paymentParams
+ * and serialised into the `payment` sub-array, which is where the Orders API
+ * expects them. The authenticationId is the exception: it must sit at the root
+ * of the orders payload, not inside `payment`.
  *
  * @see https://docs.mollie.com/reference/create-order
  */
@@ -17,6 +18,7 @@ final class CreateOrder implements PaymentParameterInterface
     private ?Address $shippingAddress = null;
     private string $webhookUrl = '';
     private ?PaymentMethod $method = null;
+    private ?string $authenticationId = null;
     /**
      * @var array<string, mixed>
      */
@@ -42,7 +44,7 @@ final class CreateOrder implements PaymentParameterInterface
 
     public function setAuthenticationId(string $id): void
     {
-        $this->paymentParams['authenticationId'] = $id;
+        $this->authenticationId = $id;
     }
 
     public function setCardToken(string $cardToken): void
@@ -182,6 +184,9 @@ final class CreateOrder implements PaymentParameterInterface
         }
         if (count($this->metadata) > 0) {
             $data['metadata'] = $this->metadata;
+        }
+        if ($this->authenticationId !== null) {
+            $data['authenticationId'] = $this->authenticationId;
         }
         $paymentParams = array_filter($this->paymentParams, function ($value) {
             return $value !== null;
