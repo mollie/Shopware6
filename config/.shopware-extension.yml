@@ -26,3 +26,5 @@ build:
           - .github
           - .git
           - .gitignore
+          - src/Resources/app/storefront/tests
+          - src/Resources/app/administrator/tests

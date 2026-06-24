@@ -5,5 +5,4 @@ node_modules
 tests
 vendor
 modules
-src_vendor
 package-lock.json
