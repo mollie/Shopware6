@@ -58,6 +58,7 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             $creditCardLabel = $mollieCustomFields['creditCardLabel'] ?? null;
             $creditCardNumber = $mollieCustomFields['creditCardNumber'] ?? null;
             $creditCardHolder = $mollieCustomFields['creditCardHolder'] ?? null;
+            $paypalPayerId = $mollieCustomFields['paypalPayerId'] ?? null;
             $checkoutUrl = $mollieCustomFields['checkoutUrl'] ?? null;
             $changePaymentStateUrl = $mollieCustomFields['changePaymentStateUrl'] ?? null;
 
@@ -86,6 +87,9 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
             if ($creditCardHolder !== null) {
                 $transactionExtension->setCreditCardHolder($creditCardHolder);
+            }
+            if ($paypalPayerId !== null) {
+                $transactionExtension->setPaypalPayerId($paypalPayerId);
             }
             if ($checkoutUrl !== null) {
                 $transactionExtension->setCheckoutUrl($checkoutUrl);
