@@ -470,7 +470,7 @@ final class PayloadBuilderTest extends TestCase
         $this->assertInstanceOf(CreateOrder::class, $actual);
     }
 
-    public function testBuildOrderContainsAuthenticationIdInPaymentSubArray(): void
+    public function testBuildOrderContainsAuthenticationIdAtRootLevel(): void
     {
         $builder = $this->createBuilder();
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
@@ -482,8 +482,9 @@ final class PayloadBuilderTest extends TestCase
 
         $array = $actual->toArray();
 
-        $this->assertArrayHasKey('payment', $array);
-        $this->assertSame('auth_test_123', $array['payment']['authenticationId']);
+        $this->assertArrayHasKey('authenticationId', $array);
+        $this->assertSame('auth_test_123', $array['authenticationId']);
+        $this->assertArrayNotHasKey('payment', $array);
     }
 
     public function testBuildOrderWithoutAuthenticationIdHasNoPaymentSubArray(): void
