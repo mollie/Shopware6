@@ -15,7 +15,7 @@ final class Migration1778100100SubscriptionPriceChangeMailTemplate extends Migra
 {
     private const TECHNICAL_NAME = 'mollie_subscription_price_change';
 
-    private const TEMPLATE_DIR = __DIR__ . '/../../shopware/Resources/views/mail/SubscriptionPriceChange';
+    private const TEMPLATE_DIR = __DIR__ . '/../Resources/views/mail/SubscriptionPriceChange';
 
     public function getCreationTimestamp(): int
     {

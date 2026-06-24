@@ -15,7 +15,7 @@ final class Migration1777881160RenewalReminderMailTemplate extends MigrationStep
 {
     private const TECHNICAL_NAME = 'mollie_subscriptions_renewal_reminder';
 
-    private const TEMPLATE_DIR = __DIR__ . '/../../shopware/Resources/views/mail/RenewalReminder';
+    private const TEMPLATE_DIR = __DIR__ . '/../Resources/views/mail/RenewalReminder';
 
     public function getCreationTimestamp(): int
     {
