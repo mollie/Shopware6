@@ -18,6 +18,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Util\PluginIdProvider;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -50,12 +51,13 @@ final class PaymentMethodFixture extends AbstractFixture
 
     public function install(Context $context): void
     {
+        $existingPaymentMethodIds = $this->getExistingPaymentMethodIds($context);
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', true));
-        $this->installTestOnlyPaymentMethods($context);
+        $this->installTestOnlyPaymentMethods($context, $existingPaymentMethodIds);
         $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
         $upsertData = [];
-        $activePaymentMethods = $this->getActivePaymentMethods();
+        $activePaymentMethods = $this->getActivePaymentMethods($existingPaymentMethodIds);
         foreach ($salesChannels as $salesChannel) {
             $upsertData[] = [
                 'id' => $salesChannel->getId(),
@@ -70,7 +72,10 @@ final class PaymentMethodFixture extends AbstractFixture
         // We dont want to unassign payment methods
     }
 
-    private function installTestOnlyPaymentMethods(Context $context): void
+    /**
+     * @param array<string, string> $existingPaymentMethodIds
+     */
+    private function installTestOnlyPaymentMethods(Context $context, array $existingPaymentMethodIds): void
     {
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
         $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
@@ -78,11 +83,12 @@ final class PaymentMethodFixture extends AbstractFixture
             if (! $paymentHandler instanceof TestOnlyAwareInterface) {
                 continue;
             }
+            $technicalName = $paymentHandler->getTechnicalName();
             $this->paymentMethodRepository->upsert([
                 [
-                    'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
+                    'id' => $existingPaymentMethodIds[$technicalName] ?? Uuid::fromStringToHex('mollie-payment-' . $technicalName),
                     'handlerIdentifier' => get_class($paymentHandler),
-                    'technicalName' => $paymentHandler->getTechnicalName(),
+                    'technicalName' => $technicalName,
                     'pluginId' => $pluginId,
                     'name' => $paymentHandler->getName(),
                     'active' => true,
@@ -100,9 +106,11 @@ final class PaymentMethodFixture extends AbstractFixture
     }
 
     /**
+     * @param array<string, string> $existingPaymentMethodIds
+     *
      * @return array<mixed>
      */
-    private function getActivePaymentMethods(): array
+    private function getActivePaymentMethods(array $existingPaymentMethodIds): array
     {
         $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
         $paypalExpressSettings = $this->settingsService->getPaypalExpressSettings();
@@ -111,12 +119,13 @@ final class PaymentMethodFixture extends AbstractFixture
             if ($paymentHandler instanceof PayPalExpressPayment && ! $paypalExpressSettings->isEnabled()) {
                 continue;
             }
+            $technicalName = $paymentHandler->getTechnicalName();
             $paymentMethodName = $paymentHandler->getName();
             $isDeprecatedMethod = $paymentHandler instanceof DeprecatedMethodAwareInterface;
             $isTestOnlyActive = $paymentHandler instanceof TestOnlyAwareInterface;
             $result[] = [
-                'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
-                'technicalName' => $paymentHandler->getTechnicalName(),
+                'id' => $existingPaymentMethodIds[$technicalName] ?? Uuid::fromStringToHex('mollie-payment-' . $technicalName),
+                'technicalName' => $technicalName,
                 'name' => $paymentMethodName,
                 'translations' => [
                     Defaults::LANGUAGE_SYSTEM => [
@@ -125,6 +134,34 @@ final class PaymentMethodFixture extends AbstractFixture
                 ],
                 'active' => $isDeprecatedMethod === false || $isTestOnlyActive
             ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<string, string> map of technicalName => existing payment method id
+     */
+    private function getExistingPaymentMethodIds(Context $context): array
+    {
+        $technicalNames = [];
+        foreach ($this->paymentHandlerLocator->getPaymentMethods() as $paymentHandler) {
+            $technicalNames[] = $paymentHandler->getTechnicalName();
+        }
+
+        $criteria = new Criteria();
+        $technicalNameFilter = new EqualsAnyFilter('technicalName', $technicalNames);
+        $criteria->addFilter($technicalNameFilter);
+
+        $paymentMethods = $this->paymentMethodRepository->search($criteria, $context)->getEntities();
+
+        $result = [];
+        foreach ($paymentMethods as $paymentMethod) {
+            $technicalName = $paymentMethod->getTechnicalName();
+            if ($technicalName === null) {
+                continue;
+            }
+            $result[$technicalName] = $paymentMethod->getId();
         }
 
         return $result;
