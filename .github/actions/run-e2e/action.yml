@@ -247,7 +247,7 @@ runs:
 
     - name: Store Cypress Results
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: cypress_results_v${{ inputs.SHOPWARE }}${{ inputs.CYPRESS_RESULTS_SUFFIX }}
         retention-days: 1
