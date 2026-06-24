@@ -31,10 +31,8 @@ Component.register('mollie-cancel-item', {
             this.isLoading = true;
 
             this.MolliePaymentsItemCancelService.cancel({
-                mollieOrderId: this.item.mollieOrderId,
-                mollieLineId: this.item.mollieId,
                 shopwareLineId: this.item.shopwareItemId,
-                canceledQuantity: this.canceledQuantity,
+                quantity: this.canceledQuantity,
                 resetStock: this.resetStock,
             })
                 .then((response) => {
@@ -49,7 +47,7 @@ Component.register('mollie-cancel-item', {
                             message: this.$tc('mollie-payments.modals.cancel.item.failed.' + response.message),
                         });
                     }
-                    this.$emit('update-cancel-status');
+                    this.$emit('update-cancel-status', response);
                     this.$emit('close');
                 })
                 .catch((error) => {

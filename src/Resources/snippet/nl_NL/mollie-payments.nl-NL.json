@@ -25,9 +25,9 @@
             "ideal": {
                 "selectBank": "Selecteer bank"
             },
-          "pos": {
-            "selectTerminal": "Selecteer terminal"
-          },
+            "pos": {
+                "selectTerminal": "Selecteer terminal"
+            },
             "mandate": {
                 "sectionTitle": "Opgeslagen kaarten",
                 "cardTitleLabel": "%name% •••• %number%",
@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Er is een probleem opgetreden bij het verwijderen van uw kaart",
                 "newCard": "Nieuwe kaart",
                 "remove": "Verwijderen",
-                "subscriptionBadge" : "Abonnement"
+                "subscriptionBadge": "Abonnement",
+                "emptyMessage": "Geen opgeslagen kaarten"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Annuleren",
@@ -45,8 +46,8 @@
                 "title": "Bevestiging verwijderen"
             },
             "phoneField": {
-              "headLine": "Telefoonnummer",
-              "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
+                "headLine": "Telefoonnummer",
+                "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
             }
         },
         "messages": {
@@ -64,16 +65,16 @@
                 "captionTaxes": "BTW",
                 "paymentError": "De betaling met Apple Pay is mislukt."
             },
-          "paypalExpress": {
-            "paymentError": "De betaling met Paypal Express is mislukt."
-          }
+            "paypalExpress": {
+                "paymentError": "De betaling met Paypal Express is mislukt."
+            }
         },
         "subscriptions": {
             "account": {
                 "btnEditBillingAddress": "factuuradres bewerken",
                 "btnEditShippingAddress": "verzendadres bewerken",
-                "cancelSubscription": "Abonnement is geannuleerd",
-                "errorCancelSubscription": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
+                "successCancel": "Abonnement is geannuleerd",
+                "errorCancel": "Door een fout kon het abonnement niet worden opgezegd. Neem dan contact op met onze ondersteuning.",
                 "errorPause": "There was an error when pausing your subscription",
                 "errorResume": "There was an error when resuming your subscription",
                 "errorSkip": "There was an error when skipping your subscription",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Uw recente abonnementen:",
                 "orderActionHide": "Verbergen",
                 "orderActionView": "Kijkje",
+                "priceChangeNoticeCancelButton": "Abonnement opzeggen",
+                "priceChangeNoticeCurrentLabel": "Huidige prijs",
+                "priceChangeNoticeEffectiveLabel": "Geldig vanaf",
+                "priceChangeNoticeHeadline": "Aankomende prijswijziging",
+                "priceChangeNoticeMessage": "De verlengingsprijs van dit abonnement gaat wijzigen. U kunt op elk moment opzeggen voordat de nieuwe prijs van kracht wordt.",
+                "priceChangeNoticeNewLabel": "Nieuwe prijs",
                 "shippingEqualToBilling": "Gelijk aan factuuradres",
                 "successPause": "Your subscription has been paused",
                 "successResume": "Your subscription will now be resumed",

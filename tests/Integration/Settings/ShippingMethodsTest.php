@@ -1,172 +1,133 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Integration\Settings;
+namespace Mollie\Shopware\Integration\Settings;
 
-use Kiener\MolliePayments\Components\ApplePayDirect\ApplePayDirect;
-use Mollie\Integration\Data\SalesChannelTestBehaviour;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetShippingMethodsRoute;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayAmount;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMethod;
+use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
+use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @infection-ignore-all
  */
+#[CoversClass(GetShippingMethodsRoute::class)]
 final class ShippingMethodsTest extends TestCase
 {
+    use ShopwareTestBehaviour;
     use IntegrationTestBehaviour;
     use SalesChannelTestBehaviour;
 
     /**
-     * Test that getShippingMethods returns shipping methods for a valid country
+     * Test that the route returns shipping methods for a valid country
      */
     public function testGetShippingMethodsReturnsShippingMethodsForValidCountry(): void
     {
         $salesChannelContext = $this->getDefaultSalesChannelContext();
-        $context = $salesChannelContext->getContext();
+        $this->upsertCountry($salesChannelContext, true, true);
 
-        /** @var ApplePayDirect $applePayDirect */
-        $applePayDirect = $this->getContainer()->get(ApplePayDirect::class);
-
-        /**
-         * @var EntityRepository $countryRepository
-         */
-        $countryRepository = $this->getContainer()->get('country.repository');
-
-        $countryId = Uuid::fromStringToHex('country-xxx');
-
-        $countryRepository->upsert([[
-            'id' => $countryId,
-            'iso' => 'XXX',
-            'active' => true,
-            'name' => 'Testland',
-            'shippingAvailable' => true,
-            'salesChannels' => [
-                ['id' => $salesChannelContext->getSalesChannelId()]
-            ]
-        ]], $context);
-
-        $shippingMethods = $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
+        $shippingMethods = $this->getShippingMethods('XXX', $salesChannelContext);
 
         $this->assertNotEmpty($shippingMethods);
     }
 
     /**
-     * Test that getShippingMethods throws exception for invalid country code
+     * Test that the route throws an exception for an invalid country code
      */
     public function testGetShippingMethodsThrowsExceptionForInvalidCountry(): void
     {
         $salesChannelContext = $this->getDefaultSalesChannelContext();
 
-        /** @var ApplePayDirect $applePayDirect */
-        $applePayDirect = $this->getContainer()->get(ApplePayDirect::class);
+        $this->expectException(ApplePayDirectException::class);
+        $this->expectExceptionMessage('Invalid country code');
 
-        $this->expectException(\Exception::class);
-
-        $applePayDirect->getShippingMethods('ZZZZ', $salesChannelContext);
+        $this->getShippingMethods('ZZZZ', $salesChannelContext);
     }
 
     /**
-     * Test that getShippingMethods returns array with expected structure
+     * Test that the returned shipping methods have the expected structure
      */
     public function testGetShippingMethodsReturnsCorrectStructure(): void
     {
         $salesChannelContext = $this->getDefaultSalesChannelContext();
-        $context = $salesChannelContext->getContext();
+        $this->upsertCountry($salesChannelContext, true, true);
 
-        /** @var ApplePayDirect $applePayDirect */
-        $applePayDirect = $this->getContainer()->get(ApplePayDirect::class);
+        $shippingMethods = $this->getShippingMethods('XXX', $salesChannelContext);
 
-        /**
-         * @var EntityRepository $countryRepository
-         */
-        $countryRepository = $this->getContainer()->get('country.repository');
-
-        $countryId = Uuid::fromStringToHex('country-xxx');
-        $countryRepository->upsert([[
-            'id' => $countryId,
-            'iso' => 'XXX',
-            'active' => true,
-            'name' => 'Testland',
-            'shippingAvailable' => true,
-            'salesChannels' => [
-                ['id' => $salesChannelContext->getSalesChannelId()]
-            ]
-        ]], $context);
-
-        $shippingMethods = $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
-
-        $this->assertIsArray($shippingMethods);
+        $this->assertNotEmpty($shippingMethods);
 
         foreach ($shippingMethods as $method) {
-            $this->assertIsArray($method);
-            $this->assertArrayHasKey('identifier', $method);
-            $this->assertArrayHasKey('label', $method);
-            $this->assertArrayHasKey('amount', $method);
+            $this->assertInstanceOf(ApplePayShippingMethod::class, $method);
+            $this->assertNotEmpty($method->getIdentifier());
+            $this->assertNotEmpty($method->getLabel());
+            $this->assertInstanceOf(ApplePayAmount::class, $method->getAmount());
         }
     }
 
     /**
-     * Test that getShippingMethods returns Exception when shipping_available is disabled for country
+     * Test that the route throws an exception when shipping is not available for the country
      */
     public function testGetShippingMethodsReturnsExceptionWhenShippingNotAvailableForCountry(): void
     {
         $salesChannelContext = $this->getDefaultSalesChannelContext();
-        $context = $salesChannelContext->getContext();
+        $this->upsertCountry($salesChannelContext, true, false);
 
-        /** @var ApplePayDirect $applePayDirect */
-        $applePayDirect = $this->getContainer()->get(ApplePayDirect::class);
+        $this->expectException(ApplePayDirectException::class);
+        $this->expectExceptionMessage('Invalid country code');
 
-        /** @var EntityRepository $countryRepository */
-        $countryRepository = $this->getContainer()->get('country.repository');
-
-        $countryId = Uuid::fromStringToHex('country-xxx');
-
-        $countryRepository->upsert([[
-            'id' => $countryId,
-            'iso' => 'XXX',
-            'active' => true,
-            'name' => 'Testland',
-            'shippingAvailable' => false,
-            'salesChannels' => [
-                ['id' => $salesChannelContext->getSalesChannelId()]
-            ]
-        ]], $context);
-
-        $this->expectException(\Exception::class);
-
-        $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
+        $this->getShippingMethods('XXX', $salesChannelContext);
     }
 
     /**
-     * Test that getShippingMethods returns Exception when country is inactive
+     * Test that the route throws an exception when the country is inactive
      */
     public function testGetShippingMethodsReturnsExceptionWhenCountryIsInactive(): void
     {
         $salesChannelContext = $this->getDefaultSalesChannelContext();
-        $context = $salesChannelContext->getContext();
+        $this->upsertCountry($salesChannelContext, false, true);
 
-        /** @var ApplePayDirect $applePayDirect */
-        $applePayDirect = $this->getContainer()->get(ApplePayDirect::class);
+        $this->expectException(ApplePayDirectException::class);
+        $this->expectExceptionMessage('Invalid country code');
 
+        $this->getShippingMethods('XXX', $salesChannelContext);
+    }
+
+    /**
+     * @return ApplePayShippingMethod[]
+     */
+    private function getShippingMethods(string $countryCode, SalesChannelContext $salesChannelContext): array
+    {
+        /** @var GetShippingMethodsRoute $route */
+        $route = $this->getContainer()->get(GetShippingMethodsRoute::class);
+
+        $request = new Request([], ['countryCode' => $countryCode]);
+
+        return $route->methods($request, $salesChannelContext)->getShippingMethods();
+    }
+
+    private function upsertCountry(SalesChannelContext $salesChannelContext, bool $active, bool $shippingAvailable): void
+    {
         /** @var EntityRepository $countryRepository */
         $countryRepository = $this->getContainer()->get('country.repository');
 
-        $countryId = Uuid::fromStringToHex('country-xxx');
         $countryRepository->upsert([[
-            'id' => $countryId,
+            'id' => Uuid::fromStringToHex('country-xxx'),
             'iso' => 'XXX',
-            'active' => false,
+            'active' => $active,
             'name' => 'Testland',
-            'shippingAvailable' => true,
+            'shippingAvailable' => $shippingAvailable,
             'salesChannels' => [
-                ['id' => $salesChannelContext->getSalesChannelId()]
-            ]
-        ]], $context);
-
-        $this->expectException(\Exception::class);
-
-        $applePayDirect->getShippingMethods('XXX', $salesChannelContext);
+                ['id' => $salesChannelContext->getSalesChannelId()],
+            ],
+        ]], $salesChannelContext->getContext());
     }
 }

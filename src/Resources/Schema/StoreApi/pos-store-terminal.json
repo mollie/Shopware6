@@ -6,15 +6,25 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/pos/store-terminal/{terminalId}": {
+    "/mollie/pos/store-terminal/{customerId}/{terminalId}": {
       "post": {
         "tags": [
           "Mollie",
           "POS"
         ],
-        "summary": "Store POS Terminal",
+        "summary": "Store POS Terminal (deprecated)",
+        "description": "Deprecated route. Terminal IDs are no longer stored; provide \"terminalId\" in the checkout request instead. The route always returns a success response with a deprecation message and does not persist anything.",
         "operationId": "storePosTerminal",
         "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the customer."
+          },
           {
             "name": "terminalId",
             "in": "path",
@@ -27,7 +37,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success response indicating the POS terminal was stored.",
+            "description": "Success response indicating the request was handled.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38,24 +48,16 @@
                       "example": true,
                       "description": "Indicates if the operation was successful."
                     },
-                    "customerId": {
+                    "message": {
                       "type": "string",
-                      "description": "The ID of the customer."
-                    },
-                    "result": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "A list of serialized exceptions, if any."
+                      "description": "Informational/deprecation message."
                     }
                   },
-                  "required": ["success", "customerId", "result"]
+                  "required": ["success", "message"]
                 },
                 "example": {
                   "success": true,
-                  "customerId": "customer123",
-                  "result": ["Exception1", "Exception2"]
+                  "message": "Using deprecated route, please provide \"terminalId\" in request body for payment"
                 }
               }
             }

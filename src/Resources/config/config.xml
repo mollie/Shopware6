@@ -276,6 +276,102 @@
             <helpText lang="ro-RO">Setați numărul de zile pentru care fișierele jurnal sunt păstrate înainte de a fi șterse automat.</helpText>
             <helpText lang="sk-SK">Nastavte počet dní, počas ktorých sa budú súbory protokolu uchovávať, kým nebudú automaticky odstránené.</helpText><helpText lang="bg-BG">Задайте броя дни, за които лог файловете се съхраняват, преди да бъдат автоматично изтрити.</helpText>
         </input-field>
+        <input-field type="int">
+            <name>logSuccessDays</name>
+            <label>Keep logs of successful orders (days)</label>
+            <label lang="de-DE">Logs erfolgreicher Bestellungen aufbewahren (Tage)</label>
+            <label lang="nl-NL">Logs van succesvolle bestellingen bijhouden (dagen)</label>
+            <label lang="it-IT">Conserva i log degli ordini riusciti (giorni)</label>
+            <label lang="pt-PT">Manter logs de encomendas bem-sucedidas (dias)</label>
+            <label lang="es-ES">Mantener registros de pedidos exitosos (días)</label>
+            <label lang="sv-SE">Behåll loggar för lyckade beställningar (dagar)</label>
+            <label lang="nb-NO">Behold logger for vellykkede bestillinger (dager)</label>
+            <label lang="pl-PL">Zachowuj logi udanych zamówień (dni)</label>
+            <label lang="cs-CZ">Uchovávat protokoly úspěšných objednávek (dny)</label>
+            <label lang="sl-SI">Obdržite dnevnike uspešnih naročil (dni)</label>
+            <label lang="hu-HU">Sikeres rendelések naplóinak megtartása (napok)</label>
+            <label lang="fi-FI">Säilytä onnistuneiden tilausten lokit (päivinä)</label>
+            <label lang="da-DK">Behold logs for gennemførte ordrer (dage)</label>
+            <label lang="el-GR">Διατηρήστε τα αρχεία καταγραφής επιτυχημένων παραγγελιών (ημέρες)</label>
+            <label lang="hr-HR">Zadrži zapisnike uspješnih narudžbi (dana)</label>
+            <label lang="et-EE">Hoia õnnestunud tellimuste logisid (päevad)</label>
+            <label lang="is-IS">Halda annálum árangursríkra pantana (dagar)</label>
+            <label lang="lt-LT">Išlaikyti sėkmingų užsakymų žurnalus (dienos)</label>
+            <label lang="lv-LV">Saglabāt veiksmīgo pasūtījumu žurnālus (dienas)</label>
+            <label lang="ro-RO">Păstrați jurnalele comenzilor reușite (zile)</label>
+            <label lang="sk-SK">Uchovávať protokoly úspešných objednávok (dni)</label><label lang="bg-BG">Задържане на логовете на успешни поръчки (дни)</label>
+            <defaultValue>7</defaultValue>
+            <helpText>Set the number of days how long log files of successful orders (paid or authorized) are kept until they will be automatically deleted.</helpText>
+            <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien erfolgreicher Bestellungen (bezahlt oder autorisiert) aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
+            <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden van succesvolle bestellingen (betaald of geautoriseerd) worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+            <helpText lang="it-IT">Imposta il numero di giorni per quanto tempo i file di log degli ordini riusciti (pagati o autorizzati) devono essere conservati prima di essere automaticamente eliminati.</helpText>
+            <helpText lang="pt-PT">Defina por quantos dias os ficheiros de log de encomendas bem-sucedidas (pagas ou autorizadas) são mantidos até serem automaticamente eliminados.</helpText>
+            <helpText lang="es-ES">Establece el número de días que se conservarán los archivos de registro de pedidos exitosos (pagados o autorizados) hasta eliminarse automáticamente.</helpText>
+            <helpText lang="sv-SE">Ange antalet dagar hur länge loggfiler för lyckade beställningar (betalda eller auktoriserade) behålls innan de automatiskt tas bort.</helpText>
+            <helpText lang="nb-NO">Angi hvor mange dager loggfiler for vellykkede bestillinger (betalt eller autorisert) holdes før de blir automatisk slettet.</helpText>
+            <helpText lang="pl-PL">Ustaw liczbę dni, przez które pliki dziennika udanych zamówień (opłaconych lub autoryzowanych) będą przechowywane, zanim zostaną automatycznie usunięte.</helpText>
+            <helpText lang="cs-CZ">Nastavte počet dnů, po které budou protokolové soubory úspěšných objednávek (zaplacených nebo autorizovaných) uchovávány, než budou automaticky smazány.</helpText>
+            <helpText lang="sl-SI">Nastavite število dni, koliko časa naj se ohranjajo datoteke dnevnika uspešnih naročil (plačanih ali avtoriziranih), dokler ne bodo samodejno izbrisane.</helpText>
+            <helpText lang="hu-HU">Állítsa be a napok számát, hogy meddig tartják meg a sikeres rendelések (fizetett vagy engedélyezett) naplófájljait, amíg automatikusan törlésre kerülnek.</helpText>
+            <helpText lang="fi-FI">Määritä päivien lukumäärä, kuinka kauan onnistuneiden tilausten (maksettujen tai valtuutettujen) lokitiedostoja säilytetään, ennen kuin ne poistetaan automaattisesti.</helpText>
+            <helpText lang="da-DK">Indstil antallet af dage, hvor logfiler for gennemførte ordrer (betalt eller autoriseret) opbevares, indtil de automatisk slettes.</helpText>
+            <helpText lang="el-GR">Ορίστε τον αριθμό των ημερών για το πόσο θα διατηρούνται τα αρχεία καταγραφής επιτυχημένων παραγγελιών (πληρωμένων ή εγκεκριμένων) πριν διαγραφούν αυτόματα.</helpText>
+            <helpText lang="hr-HR">Postavite broj dana koliko dugo će se zapisnici uspješnih narudžbi (plaćenih ili odobrenih) čuvati prije nego što budu automatski izbrisani.</helpText>
+            <helpText lang="et-EE">Määra päevade arv, kui kaua õnnestunud tellimuste (makstud või autoriseeritud) logifaile säilitatakse, enne kui need automaatselt kustutatakse.</helpText>
+            <helpText lang="is-IS">Sláðu inn fjölda daga sem annálaskrár árangursríkra pantana (greiddra eða heimilaðra) eru varðveittar áður en þeim verður sjálfkrafa eytt.</helpText>
+            <helpText lang="lt-LT">Nustatykite dienų skaičių, kiek ilgai sėkmingų užsakymų (apmokėtų arba autorizuotų) žurnalo failai bus saugomi, kol jie bus automatiškai ištrinti.</helpText>
+            <helpText lang="lv-LV">Iestatiet dienu skaitu, cik ilgi veiksmīgo pasūtījumu (apmaksāto vai autorizēto) žurnāla faili tiks glabāti līdz to automātiskai dzēšanai.</helpText>
+            <helpText lang="ro-RO">Setați numărul de zile pentru care fișierele jurnal ale comenzilor reușite (plătite sau autorizate) sunt păstrate înainte de a fi șterse automat.</helpText>
+            <helpText lang="sk-SK">Nastavte počet dní, počas ktorých sa budú súbory protokolu úspešných objednávok (zaplatených alebo autorizovaných) uchovávať, kým nebudú automaticky odstránené.</helpText><helpText lang="bg-BG">Задайте броя дни, за които лог файловете на успешни поръчки (платени или оторизирани) се съхраняват, преди да бъдат автоматично изтрити.</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>logFailedDays</name>
+            <label>Keep logs of failed orders (days)</label>
+            <label lang="de-DE">Logs fehlgeschlagener Bestellungen aufbewahren (Tage)</label>
+            <label lang="nl-NL">Logs van mislukte bestellingen bijhouden (dagen)</label>
+            <label lang="it-IT">Conserva i log degli ordini falliti (giorni)</label>
+            <label lang="pt-PT">Manter logs de encomendas falhadas (dias)</label>
+            <label lang="es-ES">Mantener registros de pedidos fallidos (días)</label>
+            <label lang="sv-SE">Behåll loggar för misslyckade beställningar (dagar)</label>
+            <label lang="nb-NO">Behold logger for mislykkede bestillinger (dager)</label>
+            <label lang="pl-PL">Zachowuj logi nieudanych zamówień (dni)</label>
+            <label lang="cs-CZ">Uchovávat protokoly neúspěšných objednávek (dny)</label>
+            <label lang="sl-SI">Obdržite dnevnike neuspešnih naročil (dni)</label>
+            <label lang="hu-HU">Sikertelen rendelések naplóinak megtartása (napok)</label>
+            <label lang="fi-FI">Säilytä epäonnistuneiden tilausten lokit (päivinä)</label>
+            <label lang="da-DK">Behold logs for mislykkede ordrer (dage)</label>
+            <label lang="el-GR">Διατηρήστε τα αρχεία καταγραφής αποτυχημένων παραγγελιών (ημέρες)</label>
+            <label lang="hr-HR">Zadrži zapisnike neuspješnih narudžbi (dana)</label>
+            <label lang="et-EE">Hoia ebaõnnestunud tellimuste logisid (päevad)</label>
+            <label lang="is-IS">Halda annálum misheppnaðra pantana (dagar)</label>
+            <label lang="lt-LT">Išlaikyti nesėkmingų užsakymų žurnalus (dienos)</label>
+            <label lang="lv-LV">Saglabāt neveiksmīgo pasūtījumu žurnālus (dienas)</label>
+            <label lang="ro-RO">Păstrați jurnalele comenzilor eșuate (zile)</label>
+            <label lang="sk-SK">Uchovávať protokoly neúspešných objednávok (dni)</label><label lang="bg-BG">Задържане на логовете на неуспешни поръчки (дни)</label>
+            <defaultValue>30</defaultValue>
+            <helpText>Set the number of days how long log files of failed, cancelled or expired orders are kept until they will be automatically deleted.</helpText>
+            <helpText lang="de-DE">Legen Sie die Anzahl der Tage fest, wie lange Protokolldateien fehlgeschlagener, stornierter oder abgelaufener Bestellungen aufbewahrt werden, bis sie automatisch gelöscht werden.</helpText>
+            <helpText lang="nl-NL">Stel het aantal dagen in hoe lang logbestanden van mislukte, geannuleerde of verlopen bestellingen worden bewaard totdat ze automatisch worden verwijderd.</helpText>
+            <helpText lang="it-IT">Imposta il numero di giorni per quanto tempo i file di log degli ordini falliti, annullati o scaduti devono essere conservati prima di essere automaticamente eliminati.</helpText>
+            <helpText lang="pt-PT">Defina por quantos dias os ficheiros de log de encomendas falhadas, canceladas ou expiradas são mantidos até serem automaticamente eliminados.</helpText>
+            <helpText lang="es-ES">Establece el número de días que se conservarán los archivos de registro de pedidos fallidos, cancelados o caducados hasta eliminarse automáticamente.</helpText>
+            <helpText lang="sv-SE">Ange antalet dagar hur länge loggfiler för misslyckade, avbrutna eller utgångna beställningar behålls innan de automatiskt tas bort.</helpText>
+            <helpText lang="nb-NO">Angi hvor mange dager loggfiler for mislykkede, kansellerte eller utløpte bestillinger holdes før de blir automatisk slettet.</helpText>
+            <helpText lang="pl-PL">Ustaw liczbę dni, przez które pliki dziennika nieudanych, anulowanych lub wygasłych zamówień będą przechowywane, zanim zostaną automatycznie usunięte.</helpText>
+            <helpText lang="cs-CZ">Nastavte počet dnů, po které budou protokolové soubory neúspěšných, zrušených nebo vypršených objednávek uchovávány, než budou automaticky smazány.</helpText>
+            <helpText lang="sl-SI">Nastavite število dni, koliko časa naj se ohranjajo datoteke dnevnika neuspešnih, preklicanih ali poteklih naročil, dokler ne bodo samodejno izbrisane.</helpText>
+            <helpText lang="hu-HU">Állítsa be a napok számát, hogy meddig tartják meg a sikertelen, törölt vagy lejárt rendelések naplófájljait, amíg automatikusan törlésre kerülnek.</helpText>
+            <helpText lang="fi-FI">Määritä päivien lukumäärä, kuinka kauan epäonnistuneiden, peruutettujen tai vanhentuneiden tilausten lokitiedostoja säilytetään, ennen kuin ne poistetaan automaattisesti.</helpText>
+            <helpText lang="da-DK">Indstil antallet af dage, hvor logfiler for mislykkede, annullerede eller udløbne ordrer opbevares, indtil de automatisk slettes.</helpText>
+            <helpText lang="el-GR">Ορίστε τον αριθμό των ημερών για το πόσο θα διατηρούνται τα αρχεία καταγραφής αποτυχημένων, ακυρωμένων ή ληγμένων παραγγελιών πριν διαγραφούν αυτόματα.</helpText>
+            <helpText lang="hr-HR">Postavite broj dana koliko dugo će se zapisnici neuspješnih, otkazanih ili isteklih narudžbi čuvati prije nego što budu automatski izbrisani.</helpText>
+            <helpText lang="et-EE">Määra päevade arv, kui kaua ebaõnnestunud, tühistatud või aegunud tellimuste logifaile säilitatakse, enne kui need automaatselt kustutatakse.</helpText>
+            <helpText lang="is-IS">Sláðu inn fjölda daga sem annálaskrár misheppnaðra, afturkallaðra eða útrunninna pantana eru varðveittar áður en þeim verður sjálfkrafa eytt.</helpText>
+            <helpText lang="lt-LT">Nustatykite dienų skaičių, kiek ilgai nesėkmingų, atšauktų arba pasibaigusių užsakymų žurnalo failai bus saugomi, kol jie bus automatiškai ištrinti.</helpText>
+            <helpText lang="lv-LV">Iestatiet dienu skaitu, cik ilgi neveiksmīgo, atcelto vai beigušos pasūtījumu žurnāla faili tiks glabāti līdz to automātiskai dzēšanai.</helpText>
+            <helpText lang="ro-RO">Setați numărul de zile pentru care fișierele jurnal ale comenzilor eșuate, anulate sau expirate sunt păstrate înainte de a fi șterse automat.</helpText>
+            <helpText lang="sk-SK">Nastavte počet dní, počas ktorých sa budú súbory protokolu neúspešných, zrušených alebo expirovaných objednávok uchovávať, kým nebudú automaticky odstránené.</helpText><helpText lang="bg-BG">Задайте броя дни, за които лог файловете на неуспешни, отказани или изтекли поръчки се съхраняват, преди да бъдат автоматично изтрити.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Payments</title>
@@ -422,7 +518,7 @@
             <label lang="ro-RO">Folosește regulile de disponibilitate Mollie pentru metodele de plată</label>
             <label lang="sk-SK">Použite pravidlá dostupnosti Mollie pre spôsoby platby</label><label lang="bg-BG">Използвайте правилата за наличност на Mollie за методите на плащане</label>
             <helpText>Automatically hides payment methods in the checkout based on the availability rules for payment methods. Only active payment methods from your mollie dashboard will be shown. If the payment method has a cart limit, currency restriction or billing address restriction, it will be hidden during checkout.</helpText>
-            <helpText lang="de-DE">Blendet automatisch Zahlungsart im Checkout basierend auf Verfügbarkeitsregeln von Mollie. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
+            <helpText lang="de-DE">Blendet Zahlungsarten im Checkout automatisch anhand der Verfügbarkeitsregeln von Mollie aus. Es werden nur die aktiven Zahlungsarten aus dem Mollie Dashboard angezeigt. Wenn die Zahlungsart eine Einschränkung auf den Warenkorbwert, Währung oder Rechnungsadresse hat, wird diese auch ausgeblendet.</helpText>
             <helpText lang="nl-NL">Automatische betalingsmethode wordt verborgen tijdens het afrekenen op basis van beschikbaarheidsregels van Mollie. Alleen actieve betalingsmethoden uit het Mollie-dashboard worden weergegeven. Als de betalingsmethode beperkingen heeft op de winkelwagenwaarde, valuta of factuuradres, wordt deze ook verborgen.
             </helpText>
             <helpText lang="it-IT">Nasconde automaticamente i metodi di pagamento nel checkout in base alle regole di disponibilità per i metodi di pagamento. Verranno mostrati solo i metodi di pagamento attivi dalla tua Mollie Dashboard. Se il metodo di pagamento ha un limite di carrello, una restrizione di valuta o una restrizione all'indirizzo
@@ -1329,54 +1425,6 @@
             <helpText lang="lv-LV">Ja iespējojat, spraudnis automātiski atcels Mollie pasūtījumus, kad tie tiek atcelti Shopware. Tikai pasūtījumi, kas ir izveidoti, autorizēti vai daļēji nosūtīti, tiks atcelti. Ja ir daļēji nosūtīti, tiks atcelti tikai tie vienumi, kas netika nosūtīti.</helpText>
             <helpText lang="ro-RO">Dacă este activat, pluginul va anula automat comenzile Mollie atunci când sunt anulate în Shopware. Numai comenzile care sunt create, autorizate sau parțial expediate vor fi anulate. Dacă sunt expediate parțial, vor fi anulate doar articolele care nu au fost expediate.</helpText>
             <helpText lang="sk-SK">Ak je táto možnosť povolená, doplnok automaticky zruší objednávky v Mollie, keď budú zrušené v Shopware. Zrušené budú iba objednávky, ktoré sú vytvorené, autorizované alebo čiastočne odoslané. V prípade čiastočného odoslania budú zrušené iba tie položky, ktoré neboli odoslané.</helpText><helpText lang="bg-BG">Ако е активирано, плъгинът автоматично ще отмени Mollie поръчките, когато те са отказани в Shopware. Само поръчки, които са създадени, авторизирани или частично изпратени, ще бъдат отказани. Ако са частично изпратени, само артикулите, които не са изпратени, ще бъдат отказани.</helpText>
-        </input-field>
-        <input-field type="bool">
-            <name>automaticOrderExpire</name>
-            <defaultValue>false</defaultValue>
-            <label>Automatic Expiration</label>
-            <label lang="de-DE">Automatische Ablauf</label>
-            <label lang="nl-NL">Automatische vervaldatum</label>
-            <label lang="it-IT">Scadenza automatica</label>
-            <label lang="pt-PT">Expiração Automática</label>
-            <label lang="es-ES">Vencimiento automático</label>
-            <label lang="sv-SE">Automatisk utgång</label>
-            <label lang="nb-NO">Automatisk utløp</label>
-            <label lang="pl-PL">Automatyczne wygaśnięcie</label>
-            <label lang="cs-CZ">Automatické vypršení platnosti</label>
-            <label lang="sl-SI">Samodejni potek</label>
-            <label lang="hu-HU">Automatikus lejárat</label>
-            <label lang="fi-FI">Automaattinen vanheneminen</label>
-            <label lang="da-DK">Automatisk udløb</label>
-            <label lang="el-GR">Αυτόματη Λήξη</label>
-            <label lang="hr-HR">Automatsko isticanje narudžbi</label>
-            <label lang="et-EE">Automaatne aegumine</label>
-            <label lang="is-IS">Sjálfvirk fyrning</label>
-            <label lang="lt-LT">Automatinis pasibaigimas</label>
-            <label lang="lv-LV">Automātiskā termiņa beigšanās</label>
-            <label lang="ro-RO">Expirare automată</label>
-            <label lang="sk-SK">Automatické vypršanie</label><label lang="bg-BG">Автоматично изтичане</label>
-            <helpText>If enabled, the plugin will automatically expire orders with the payment status "In Progress".</helpText>
-            <helpText lang="de-DE">Wenn aktiviert, lässt das Plugin Bestellungen mit dem Status „In Bearbeitung“ und dem Zahlungsstatus „Offen“ oder „Autorisiert“ automatisch ablaufen.</helpText>
-            <helpText lang="nl-NL">Als deze optie is ingeschakeld, verlopen bestellingen met de status 'In uitvoering' en de betalingsstatus 'Open' of 'Geautoriseerd' automatisch.</helpText>
-            <helpText lang="it-IT">Se abilitato, il plugin scadrà automaticamente gli ordini con lo stato di pagamento "In corso".</helpText>
-            <helpText lang="pt-PT">Se ativado, o plugin expirará automaticamente as encomendas com o estado de pagamento "Em curso".</helpText>
-            <helpText lang="es-ES">Si se habilita, el plugin marcará automáticamente como vencidos los pedidos con el estado de pago "En curso".</helpText>
-            <helpText lang="sv-SE">Om aktiverad kommer pluginet automatiskt att utlösa utgång av beställningar med betalningsstatus "Pågår".</helpText>
-            <helpText lang="nb-NO">Hvis aktivert, vil pluginen automatisk la ordrer med betalingsstatusen "Under behandling" løpe ut.</helpText>
-            <helpText lang="pl-PL">Jeśli ta opcja jest włączona, wtyczka automatycznie zakończy termin aktywności zamówień ze statusem płatności „W trakcie realizacji”.</helpText>
-            <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin automaticky zneplatní objednávky se stavem platby 'Probíhá'.</helpText>
-            <helpText lang="sl-SI">Če je omogočeno, bo vtičnik samodejno potekel naročila s statusom plačila "V obdelavi".</helpText>
-            <helpText lang="hu-HU">Ha engedélyezve van, a bővítmény automatikusan lejárja a "Folyamatban" állapotú megrendeléseket.</helpText>
-            <helpText lang="fi-FI">Jos käytössä, laajennus vanhentaa automaattisesti tilaukset, joiden maksutila on "käsittelyssä".</helpText>
-            <helpText lang="da-DK">Hvis aktiveret, vil pluginet automatisk udløbe ordrer med betalingsstatus "I gang".</helpText>
-            <helpText lang="el-GR">Εάν ενεργοποιηθεί, το πρόσθετο θα λήξει αυτόματα τις παραγγελίες με κατάσταση πληρωμής "Σε Εξέλιξη".</helpText>
-            <helpText lang="hr-HR">Ako je omogućeno, dodatak će automatski označiti narudžbe sa statusom plaćanja „U tijeku” kao istekle.</helpText>
-            <helpText lang="et-EE">Kui see on lubatud, tühistab plugin automaatselt tellimused, mille makse staatus on „Töös“.</helpText>
-            <helpText lang="is-IS">Ef virkjað, mun viðbótin sjálfvirkt fyrna pantanir þegar greiðslustaðan er "Í vinnslu".</helpText>
-            <helpText lang="lt-LT">Jei įjungta, įskiepis automatiškai pažymės užsakymus su mokėjimo būsena „Vykdoma“ kaip nebegaliojančius.</helpText>
-            <helpText lang="lv-LV">Ja šī opcija ir aktivizēta, spraudnis automātiski anulēs pasūtījumus, kuru maksājuma statuss ir 'Procesā</helpText>
-            <helpText lang="ro-RO">Dacă este activat, pluginul va expira automat comenzile cu starea plății "În curs de desfășurare".</helpText>
-            <helpText lang="sk-SK">Ak je táto možnosť povolená, doplnok automaticky nastaví objednávky so stavom platby "Prebieha" ako expirované.</helpText><helpText lang="bg-BG">Ако е активирано, плъгинът автоматично ще изтече поръчки с плащания със статус "В процес".</helpText>
         </input-field>
     </card>
     <card>
@@ -3143,6 +3191,106 @@
             <helpText lang="sk-SK">Ak je povolené, zákazníci môžu preskočiť nadchádzajúce obnovenie aktívneho predplatného. To tiež zohľadňuje posledné obdobie oznámenia.</helpText><helpText lang="bg-BG">Ако е активиране, клиентите могат да пропуснат предстоящо подновяване на текущ абонамент. Това също взема предвид последния уведомителен период.</helpText>
         </input-field>
         <input-field type="bool">
+            <name>subscriptionsAllowReorder</name>
+            <defaultValue>true</defaultValue>
+            <label>Allow customers to reorder the subscription product</label>
+            <label lang="de-DE">Kunden erlauben, das Abo-Produkt erneut zu bestellen</label>
+            <label lang="nl-NL">Sta klanten toe het abonnementsproduct opnieuw te bestellen</label>
+            <label lang="it-IT">Consenti ai clienti di riordinare il prodotto in abbonamento</label>
+            <label lang="pt-PT">Permitir que os clientes voltem a encomendar o produto da subscrição</label>
+            <label lang="es-ES">Permite que los clientes vuelvan a pedir el producto de la suscripción</label>
+            <label lang="sv-SE">Tillåt kunder att beställa prenumerationsprodukten på nytt</label>
+            <label lang="nb-NO">Tillat kunder å bestille abonnementsproduktet på nytt</label>
+            <label lang="pl-PL">Pozwól klientom ponownie zamówić produkt subskrypcji</label>
+            <label lang="cs-CZ">Povolit zákazníkům znovu objednat předplatný produkt</label>
+            <label lang="sl-SI">Dovoli strankam, da znova naročijo izdelek naročnine</label>
+            <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy újra megrendeljék az előfizetési terméket</label>
+            <label lang="fi-FI">Salli asiakkaiden tilata tilaustuote uudelleen</label>
+            <label lang="da-DK">Tillad kunder at genbestille abonnementsproduktet</label>
+            <label lang="el-GR">Επιτρέψτε στους πελάτες να παραγγείλουν ξανά το προϊόν της συνδρομής</label>
+            <label lang="hr-HR">Dopusti korisnicima ponovno naručivanje proizvoda pretplate</label>
+            <label lang="et-EE">Luba klientidel tellimuse toode uuesti tellida</label>
+            <label lang="is-IS">Leyfa viðskiptavinum að panta áskriftarvöruna aftur</label>
+            <label lang="lt-LT">Leisti klientams iš naujo užsisakyti prenumeratos produktą</label>
+            <label lang="lv-LV">Atļaut klientiem atkārtoti pasūtīt abonementa produktu</label>
+            <label lang="ro-RO">Permiteți clienților să recomande produsul de abonament</label>
+            <label lang="sk-SK">Povoliť zákazníkom znovu objednať predplatený produkt</label>
+            <label lang="bg-BG">Позволете на клиентите да поръчат отново продукта на абонамента</label>
+            <helpText>If enabled, customers see a reorder action on each subscription that adds the original product to the cart again.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, sehen Kunden in jeder Subscription eine Aktion, die das ursprüngliche Produkt erneut in den Warenkorb legt.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, zien klanten bij elk abonnement een actie waarmee het oorspronkelijke product opnieuw aan de winkelwagen wordt toegevoegd.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti vedono un'azione di riordino su ogni abbonamento che aggiunge nuovamente il prodotto originale al carrello.</helpText>
+            <helpText lang="pt-PT">Se ativado, os clientes veem uma ação de nova encomenda em cada subscrição que adiciona novamente o produto original ao carrinho.</helpText>
+            <helpText lang="es-ES">Si se habilita, los clientes ven una acción para volver a pedir en cada suscripción que añade el producto original al carrito de nuevo.</helpText>
+            <helpText lang="sv-SE">Om aktiverad ser kunder en åtgärd på varje prenumeration som lägger originalprodukten i varukorgen igen.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, ser kundene en handling på hvert abonnement som legger det opprinnelige produktet i handlekurven igjen.</helpText>
+            <helpText lang="pl-PL">Jeśli ta opcja jest włączona, klienci widzą akcję ponownego zamówienia w każdej subskrypcji, która ponownie dodaje pierwotny produkt do koszyka.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci vidí u každého předplatného akci, která znovu přidá původní produkt do košíku.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, stranke vidijo dejanje za ponovno naročilo pri vsaki naročnini, ki znova doda izvirni izdelek v košarico.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, az ügyfelek minden előfizetésnél láthatnak egy újrarendelési műveletet, amely visszahelyezi az eredeti terméket a kosárba.</helpText>
+            <helpText lang="fi-FI">Jos käytössä, asiakkaat näkevät jokaisen tilauksen kohdalla toiminnon, joka lisää alkuperäisen tuotteen takaisin ostoskoriin.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, ser kunderne en handling på hvert abonnement, der tilføjer det originale produkt til kurven igen.</helpText>
+            <helpText lang="el-GR">Αν είναι ενεργοποιημένο, οι πελάτες βλέπουν μια ενέργεια επαναληπτικής παραγγελίας σε κάθε συνδρομή που προσθέτει ξανά το αρχικό προϊόν στο καλάθι.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, korisnici vide akciju ponovne narudžbe na svakoj pretplati koja ponovno dodaje izvorni proizvod u košaricu.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, näevad kliendid igal tellimusel uuesti tellimise tegevust, mis lisab algse toote uuesti ostukorvi.</helpText>
+            <helpText lang="is-IS">Ef virkjað, sjá viðskiptavinir aðgerð á hverri áskrift sem bætir upprunalegu vörunni aftur í körfuna.</helpText>
+            <helpText lang="lt-LT">Jei aktyvuota, klientai mato veiksmą kiekvienoje prenumeratoje, kuris vėl prideda pradinį produktą į krepšelį.</helpText>
+            <helpText lang="lv-LV">Ja ir ieslēgts, klienti redz darbību katrā abonementā, kas atkal pievieno sākotnējo produktu grozam.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, clienții văd o acțiune de recomandare la fiecare abonament care adaugă din nou produsul original în coș.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, zákazníci vidia akciu opätovného objednania pri každom predplatnom, ktorá znovu pridá pôvodný produkt do košíka.</helpText>
+            <helpText lang="bg-BG">Ако е активирано, клиентите виждат действие за повторна поръчка при всеки абонамент, което добавя оригиналния продукт обратно в количката.</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>subscriptionsAllowUpdatePayment</name>
+            <defaultValue>true</defaultValue>
+            <label>Allow customers to change the payment method of a running subscription</label>
+            <label lang="de-DE">Kunden erlauben, die Zahlungsart einer laufenden Subscription zu ändern</label>
+            <label lang="nl-NL">Sta klanten toe de betaalmethode van een lopend abonnement te wijzigen</label>
+            <label lang="it-IT">Consenti ai clienti di modificare il metodo di pagamento di un abbonamento in corso</label>
+            <label lang="pt-PT">Permitir que os clientes alterem o método de pagamento de uma subscrição em curso</label>
+            <label lang="es-ES">Permite que los clientes cambien el método de pago de una suscripción en curso</label>
+            <label lang="sv-SE">Tillåt kunder att ändra betalningsmetoden för en pågående prenumeration</label>
+            <label lang="nb-NO">Tillat kunder å endre betalingsmetoden for et aktivt abonnement</label>
+            <label lang="pl-PL">Pozwól klientom zmienić metodę płatności aktywnej subskrypcji</label>
+            <label lang="cs-CZ">Povolit zákazníkům změnit platební metodu aktivního předplatného</label>
+            <label lang="sl-SI">Dovoli strankam, da spremenijo način plačila aktivne naročnine</label>
+            <label lang="hu-HU">Engedje meg az ügyfeleknek, hogy módosítsák az aktív előfizetés fizetési módját</label>
+            <label lang="fi-FI">Salli asiakkaiden vaihtaa käynnissä olevan tilauksen maksutapa</label>
+            <label lang="da-DK">Tillad kunder at ændre betalingsmetoden for et aktivt abonnement</label>
+            <label lang="el-GR">Επιτρέψτε στους πελάτες να αλλάξουν τη μέθοδο πληρωμής μιας ενεργής συνδρομής</label>
+            <label lang="hr-HR">Dopusti korisnicima promjenu načina plaćanja aktivne pretplate</label>
+            <label lang="et-EE">Luba klientidel muuta käimasoleva tellimuse makseviisi</label>
+            <label lang="is-IS">Leyfa viðskiptavinum að breyta greiðslumáta virkrar áskriftar</label>
+            <label lang="lt-LT">Leisti klientams pakeisti vykdomos prenumeratos mokėjimo būdą</label>
+            <label lang="lv-LV">Atļaut klientiem mainīt aktīva abonementa maksājuma veidu</label>
+            <label lang="ro-RO">Permiteți clienților să schimbe metoda de plată a unui abonament activ</label>
+            <label lang="sk-SK">Povoliť zákazníkom zmeniť spôsob platby aktívneho predplatného</label>
+            <label lang="bg-BG">Позволете на клиентите да променят начина на плащане на активен абонамент</label>
+            <helpText>If enabled, customers can update the payment method (mandate) for an active subscription. The action is still hidden if the subscription is not active.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, können Kunden die Zahlungsart (Mandat) eines aktiven Abos ändern. Die Aktion bleibt verborgen, solange die Subscription nicht aktiv ist.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, kunnen klanten de betaalmethode (mandaat) van een actief abonnement bijwerken. De actie blijft verborgen zolang het abonnement niet actief is.</helpText>
+            <helpText lang="it-IT">Se abilitato, i clienti possono aggiornare il metodo di pagamento (mandato) di un abbonamento attivo. L'azione rimane nascosta se l'abbonamento non è attivo.</helpText>
+            <helpText lang="pt-PT">Se ativado, os clientes podem atualizar o método de pagamento (mandato) de uma subscrição ativa. A ação permanece oculta enquanto a subscrição não estiver ativa.</helpText>
+            <helpText lang="es-ES">Si se habilita, los clientes pueden actualizar el método de pago (mandato) de una suscripción activa. La acción permanece oculta mientras la suscripción no esté activa.</helpText>
+            <helpText lang="sv-SE">Om aktiverad kan kunder uppdatera betalningsmetoden (mandatet) för en aktiv prenumeration. Åtgärden förblir dold om prenumerationen inte är aktiv.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, kan kunder oppdatere betalingsmetoden (mandatet) for et aktivt abonnement. Handlingen er fortsatt skjult hvis abonnementet ikke er aktivt.</helpText>
+            <helpText lang="pl-PL">Jeśli ta opcja jest włączona, klienci mogą zaktualizować metodę płatności (mandat) aktywnej subskrypcji. Akcja pozostaje ukryta, dopóki subskrypcja nie jest aktywna.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, zákazníci mohou aktualizovat platební metodu (mandát) aktivního předplatného. Akce zůstává skrytá, pokud předplatné není aktivní.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, lahko stranke posodobijo način plačila (pooblastilo) aktivne naročnine. Dejanje ostane skrito, dokler naročnina ni aktivna.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, az ügyfelek frissíthetik az aktív előfizetés fizetési módját (megbízását). A művelet rejtve marad, amíg az előfizetés nem aktív.</helpText>
+            <helpText lang="fi-FI">Jos käytössä, asiakkaat voivat päivittää aktiivisen tilauksen maksutavan (valtuutuksen). Toiminto pysyy piilossa, jos tilaus ei ole aktiivinen.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, kan kunderne opdatere betalingsmetoden (mandatet) for et aktivt abonnement. Handlingen forbliver skjult, hvis abonnementet ikke er aktivt.</helpText>
+            <helpText lang="el-GR">Αν είναι ενεργοποιημένο, οι πελάτες μπορούν να ενημερώσουν τη μέθοδο πληρωμής (εντολή) μιας ενεργής συνδρομής. Η ενέργεια παραμένει κρυφή όσο η συνδρομή δεν είναι ενεργή.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, korisnici mogu ažurirati način plaćanja (ovlaštenje) aktivne pretplate. Akcija ostaje skrivena dok pretplata nije aktivna.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, saavad kliendid värskendada aktiivse tellimuse makseviisi (volitust). Toiming jääb peidetuks, kui tellimus pole aktiivne.</helpText>
+            <helpText lang="is-IS">Ef virkjað, geta viðskiptavinir uppfært greiðslumáta (umboð) virkrar áskriftar. Aðgerðin er falin svo lengi sem áskriftin er ekki virk.</helpText>
+            <helpText lang="lt-LT">Jei aktyvuota, klientai gali atnaujinti aktyvios prenumeratos mokėjimo būdą (įgaliojimą). Veiksmas lieka paslėptas, kol prenumerata nėra aktyvi.</helpText>
+            <helpText lang="lv-LV">Ja ir ieslēgts, klienti var atjaunināt aktīva abonementa maksājuma veidu (pilnvarojumu). Darbība paliek slēpta, kamēr abonements nav aktīvs.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, clienții pot actualiza metoda de plată (mandatul) unui abonament activ. Acțiunea rămâne ascunsă dacă abonamentul nu este activ.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, zákazníci môžu aktualizovať spôsob platby (mandát) aktívneho predplatného. Akcia zostáva skrytá, pokiaľ predplatné nie je aktívne.</helpText>
+            <helpText lang="bg-BG">Ако е активирано, клиентите могат да актуализират начина на плащане (мандата) на активен абонамент. Действието остава скрито, докато абонаментът не е активен.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>subscriptionSkipRenewalsOnFailedPayments</name>
             <defaultValue>false</defaultValue>
             <label>Skip subscription renewal if payment fails</label>
@@ -3285,6 +3433,160 @@
             <helpText lang="lv-LV">Iestatiet paziņošanas periodu klientiem pirms abonēšanas atjaunošanas. Ja abonēšana tiek atjaunota piektdienā un jūs izmantojat "2", tad to var atcelt vai apturēt līdz pēdējai trešdienai. Izmantojiet "0", lai vienmēr atļautu atcelšanas.</helpText>
             <helpText lang="ro-RO">Setați o perioadă de notificare pentru clienți înainte de a reînnoi abonamentul. Dacă un abonament se reînnoiește vineri și folosiți "2", atunci acesta poate fi anulat sau suspendat cel târziu miercuri. Folosiți "0" pentru a permite întotdeauna anulările.</helpText>
             <helpText lang="sk-SK">Nastavte výpovednú lehotu pre zákazníkov pred obnovením predplatného. Ak sa predplatné obnovuje v piatok a nastavíte „2“, je ho možné zrušiť alebo pozastaviť najneskôr v stredu. Použite „0“, aby bolo zrušenie vždy povolené.</helpText><helpText lang="bg-BG">Задайте период на предизвестие за клиентите преди подновяване на абонамента. Ако абонаментът се подновява в петък и използвате "2", тогава може да бъде прекратен или поставен на пауза най-късно в сряда. Използвайте "0", за да винаги позволите откази.</helpText>
+        </input-field>
+        <input-field type="single-select">
+            <name>subscriptionsPriceUpdateMode</name>
+            <defaultValue>keep</defaultValue>
+            <label>Behaviour when a subscription product price changes</label>
+            <label lang="de-DE">Verhalten bei Preisänderung eines Abonnement-Produkts</label>
+            <label lang="nl-NL">Gedrag bij een prijswijziging van een abonnementsproduct</label>
+            <label lang="it-IT">Comportamento al cambio prezzo di un prodotto in abbonamento</label>
+            <label lang="pt-PT">Comportamento quando o preço de um produto de subscrição muda</label>
+            <label lang="es-ES">Comportamiento al cambiar el precio de un producto de suscripción</label>
+            <label lang="sv-SE">Beteende när priset på en prenumerationsprodukt ändras</label>
+            <label lang="nb-NO">Atferd når prisen på et abonnementsprodukt endres</label>
+            <label lang="pl-PL">Zachowanie przy zmianie ceny produktu subskrypcyjnego</label>
+            <label lang="cs-CZ">Chování při změně ceny předplaceného produktu</label>
+            <label lang="sl-SI">Vedenje ob spremembi cene naročniškega izdelka</label>
+            <label lang="hu-HU">Viselkedés az előfizetéses termék árának változásakor</label>
+            <label lang="fi-FI">Toiminta tilaustuotteen hinnan muuttuessa</label>
+            <label lang="da-DK">Adfærd når prisen på et abonnementsprodukt ændres</label>
+            <label lang="el-GR">Συμπεριφορά όταν αλλάζει η τιμή ενός προϊόντος συνδρομής</label>
+            <label lang="hr-HR">Ponašanje kada se promijeni cijena pretplatničkog proizvoda</label>
+            <label lang="et-EE">Käitumine, kui tellimuse toote hind muutub</label>
+            <label lang="is-IS">Hegðun þegar verð á áskriftarvöru breytist</label>
+            <label lang="lt-LT">Veikimas, kai pasikeičia prenumeratos produkto kaina</label>
+            <label lang="lv-LV">Darbība, mainot abonēšanas produkta cenu</label>
+            <label lang="ro-RO">Comportament la schimbarea prețului unui produs de abonament</label>
+            <label lang="sk-SK">Správanie pri zmene ceny predplatného produktu</label>
+            <label lang="bg-BG">Поведение при промяна на цената на абонаментен продукт</label>
+            <helpText>Choose how running subscriptions react when the price of a subscription product changes. "Keep current price" leaves running subscriptions untouched. "Notify and migrate" notifies the customer, gives them a cancel window and then updates the subscription amount automatically.</helpText>
+            <helpText lang="de-DE">Legen Sie fest, wie laufende Abonnements auf eine Preisänderung des Abonnement-Produkts reagieren sollen. "Preis beibehalten" lässt laufende Abonnements unberührt. "Benachrichtigen und migrieren" informiert den Kunden, gewährt eine Kündigungsfrist und passt anschließend den Abonnementbetrag automatisch an.</helpText>
+            <helpText lang="nl-NL">Bepaal hoe lopende abonnementen reageren op een prijswijziging van een abonnementsproduct. "Prijs behouden" laat lopende abonnementen ongewijzigd. "Klant informeren en migreren" stelt de klant op de hoogte, biedt een opzegtermijn en past daarna het abonnementsbedrag automatisch aan.</helpText>
+            <helpText lang="it-IT">Scegli come reagiscono gli abbonamenti attivi al cambio prezzo di un prodotto in abbonamento. "Mantieni il prezzo attuale" lascia invariati gli abbonamenti attivi. "Notifica e migra" avvisa il cliente, concede un periodo di disdetta e aggiorna automaticamente l'importo dell'abbonamento.</helpText>
+            <helpText lang="pt-PT">Escolha como as subscrições ativas reagem à alteração do preço de um produto de subscrição. "Manter o preço atual" deixa as subscrições inalteradas. "Notificar e migrar" informa o cliente, concede um período de cancelamento e atualiza automaticamente o valor da subscrição.</helpText>
+            <helpText lang="es-ES">Elige cómo reaccionan las suscripciones activas ante un cambio de precio del producto de suscripción. "Mantener precio actual" deja las suscripciones sin cambios. "Notificar y migrar" avisa al cliente, ofrece un periodo de cancelación y actualiza el importe de la suscripción automáticamente.</helpText>
+            <helpText lang="sv-SE">Välj hur aktiva prenumerationer reagerar när priset på en prenumerationsprodukt ändras. "Behåll nuvarande pris" lämnar prenumerationerna orörda. "Meddela och migrera" informerar kunden, ger en uppsägningsperiod och uppdaterar sedan prenumerationsbeloppet automatiskt.</helpText>
+            <helpText lang="nb-NO">Velg hvordan aktive abonnementer reagerer når prisen på et abonnementsprodukt endres. "Behold nåværende pris" lar abonnementene være uendret. "Varsle og migrere" informerer kunden, gir en oppsigelsesperiode og oppdaterer så abonnementsbeløpet automatisk.</helpText>
+            <helpText lang="pl-PL">Wybierz, jak aktywne subskrypcje mają reagować na zmianę ceny produktu subskrypcyjnego. "Zachowaj obecną cenę" pozostawia subskrypcje bez zmian. "Powiadom i migruj" informuje klienta, daje okres na anulowanie i automatycznie aktualizuje kwotę subskrypcji.</helpText>
+            <helpText lang="cs-CZ">Zvolte, jak se mají aktivní předplatná chovat při změně ceny předplaceného produktu. „Ponechat aktuální cenu" nechá předplatná beze změny. „Upozornit a migrovat" informuje zákazníka, poskytne lhůtu na zrušení a poté automaticky upraví částku předplatného.</helpText>
+            <helpText lang="sl-SI">Izberite, kako se bodo aktivne naročnine odzvale na spremembo cene naročniškega izdelka. "Ohrani trenutno ceno" pusti naročnine nespremenjene. "Obvesti in preseli" obvesti stranko, omogoči odpovedni rok in nato samodejno posodobi znesek naročnine.</helpText>
+            <helpText lang="hu-HU">Válassza ki, hogyan reagáljanak az aktív előfizetések, ha az előfizetéses termék ára megváltozik. „Jelenlegi ár megtartása" érintetlenül hagyja az előfizetéseket. „Értesítés és migrálás" értesíti az ügyfelet, lemondási időszakot biztosít, majd automatikusan frissíti az előfizetés összegét.</helpText>
+            <helpText lang="fi-FI">Valitse, miten aktiiviset tilaukset reagoivat tilaustuotteen hinnanmuutokseen. "Säilytä nykyinen hinta" jättää tilaukset ennalleen. "Ilmoita ja migroi" ilmoittaa asiakkaalle, antaa peruutusajan ja päivittää sitten tilauksen summan automaattisesti.</helpText>
+            <helpText lang="da-DK">Vælg hvordan aktive abonnementer skal reagere, når prisen på et abonnementsprodukt ændres. "Behold nuværende pris" lader abonnementerne være uændrede. "Underret og migrer" informerer kunden, giver en opsigelsesperiode og opdaterer derefter abonnementsbeløbet automatisk.</helpText>
+            <helpText lang="el-GR">Επιλέξτε πώς θα αντιδρούν οι ενεργές συνδρομές όταν αλλάζει η τιμή ενός προϊόντος συνδρομής. "Διατήρηση τρέχουσας τιμής" αφήνει τις συνδρομές ανέπαφες. "Ειδοποίηση και μετάπτωση" ειδοποιεί τον πελάτη, παρέχει περίοδο ακύρωσης και ενημερώνει αυτόματα το ποσό συνδρομής.</helpText>
+            <helpText lang="hr-HR">Odaberite kako će aktivne pretplate reagirati na promjenu cijene pretplatničkog proizvoda. "Zadrži trenutnu cijenu" ostavlja pretplate netaknutima. "Obavijesti i migriraj" obavještava kupca, daje rok za otkazivanje i potom automatski ažurira iznos pretplate.</helpText>
+            <helpText lang="et-EE">Valige, kuidas aktiivsed tellimused reageerivad tellimuse toote hinna muutusele. „Säilita praegune hind" jätab tellimused puutumata. „Teavita ja migreeri" teavitab klienti, annab tühistamise tähtaja ja seejärel uuendab tellimuse summa automaatselt.</helpText>
+            <helpText lang="is-IS">Veldu hvernig virkar áskriftir bregðast við þegar verð á áskriftarvöru breytist. "Halda núverandi verði" lætur áskriftirnar óbreyttar. "Tilkynna og flytja" tilkynnir viðskiptavininum, gefur uppsagnarfrest og uppfærir svo upphæð áskriftarinnar sjálfvirkt.</helpText>
+            <helpText lang="lt-LT">Pasirinkite, kaip aktyvios prenumeratos reaguos į prenumeratos produkto kainos pokytį. „Išlaikyti dabartinę kainą" palieka prenumeratas nepakitusias. „Informuoti ir migruoti" praneša klientui, suteikia atšaukimo laikotarpį ir tada automatiškai atnaujina prenumeratos sumą.</helpText>
+            <helpText lang="lv-LV">Izvēlieties, kā aktīvajiem abonementiem jāreaģē, ja mainās abonēšanas produkta cena. "Saglabāt pašreizējo cenu" atstāj abonementus neskartus. "Paziņot un migrēt" informē klientu, dod atcelšanas periodu un pēc tam automātiski atjaunina abonementa summu.</helpText>
+            <helpText lang="ro-RO">Alegeți cum reacționează abonamentele active când se schimbă prețul unui produs de abonament. „Păstrează prețul curent" lasă abonamentele neatinse. „Notifică și migrează" anunță clientul, oferă o perioadă de anulare și apoi actualizează automat valoarea abonamentului.</helpText>
+            <helpText lang="sk-SK">Vyberte, ako sa majú aktívne predplatné správať pri zmene ceny predplateného produktu. „Ponechať aktuálnu cenu" nechá predplatné nezmenené. „Upozorniť a migrovať" informuje zákazníka, poskytne lehotu na zrušenie a potom automaticky upraví sumu predplatného.</helpText>
+            <helpText lang="bg-BG">Изберете как активните абонаменти да реагират при промяна на цената на абонаментен продукт. „Запази текущата цена" оставя абонаментите непроменени. „Уведоми и мигрирай" уведомява клиента, предоставя срок за отказ и след това автоматично обновява сумата на абонамента.</helpText>
+            <options>
+                <option>
+                    <id>keep</id>
+                    <name>Keep current price</name>
+                    <name lang="de-DE">Preis beibehalten</name>
+                    <name lang="nl-NL">Huidige prijs behouden</name>
+                    <name lang="it-IT">Mantieni il prezzo attuale</name>
+                    <name lang="pt-PT">Manter o preço atual</name>
+                    <name lang="es-ES">Mantener el precio actual</name>
+                    <name lang="sv-SE">Behåll nuvarande pris</name>
+                    <name lang="nb-NO">Behold nåværende pris</name>
+                    <name lang="pl-PL">Zachowaj obecną cenę</name>
+                    <name lang="cs-CZ">Ponechat aktuální cenu</name>
+                    <name lang="sl-SI">Ohrani trenutno ceno</name>
+                    <name lang="hu-HU">Jelenlegi ár megtartása</name>
+                    <name lang="fi-FI">Säilytä nykyinen hinta</name>
+                    <name lang="da-DK">Behold nuværende pris</name>
+                    <name lang="el-GR">Διατήρηση τρέχουσας τιμής</name>
+                    <name lang="hr-HR">Zadrži trenutnu cijenu</name>
+                    <name lang="et-EE">Säilita praegune hind</name>
+                    <name lang="is-IS">Halda núverandi verði</name>
+                    <name lang="lt-LT">Išlaikyti dabartinę kainą</name>
+                    <name lang="lv-LV">Saglabāt pašreizējo cenu</name>
+                    <name lang="ro-RO">Păstrează prețul curent</name>
+                    <name lang="sk-SK">Ponechať aktuálnu cenu</name>
+                    <name lang="bg-BG">Запази текущата цена</name>
+                </option>
+                <option>
+                    <id>auto</id>
+                    <name>Notify customer and migrate after notice period</name>
+                    <name lang="de-DE">Kunden benachrichtigen und nach Frist migrieren</name>
+                    <name lang="nl-NL">Klant informeren en na opzegtermijn migreren</name>
+                    <name lang="it-IT">Notifica il cliente e migra dopo il periodo di preavviso</name>
+                    <name lang="pt-PT">Notificar o cliente e migrar após o período de aviso</name>
+                    <name lang="es-ES">Notificar al cliente y migrar tras el período de aviso</name>
+                    <name lang="sv-SE">Meddela kunden och migrera efter uppsägningstiden</name>
+                    <name lang="nb-NO">Varsle kunden og migrere etter oppsigelsesperioden</name>
+                    <name lang="pl-PL">Powiadom klienta i migruj po okresie wypowiedzenia</name>
+                    <name lang="cs-CZ">Upozornit zákazníka a migrovat po lhůtě</name>
+                    <name lang="sl-SI">Obvesti stranko in preseli po odpovednem roku</name>
+                    <name lang="hu-HU">Ügyfél értesítése és migrálás a határidő után</name>
+                    <name lang="fi-FI">Ilmoita asiakkaalle ja migroi peruutusajan jälkeen</name>
+                    <name lang="da-DK">Underret kunden og migrer efter opsigelsesperioden</name>
+                    <name lang="el-GR">Ειδοποίηση πελάτη και μετάπτωση μετά την περίοδο ειδοποίησης</name>
+                    <name lang="hr-HR">Obavijesti kupca i migriraj nakon roka</name>
+                    <name lang="et-EE">Teavita klienti ja migreeri pärast etteteatamistähtaega</name>
+                    <name lang="is-IS">Tilkynna viðskiptavini og flytja eftir uppsagnarfrest</name>
+                    <name lang="lt-LT">Pranešti klientui ir migruoti po įspėjimo laikotarpio</name>
+                    <name lang="lv-LV">Paziņot klientam un migrēt pēc paziņošanas perioda</name>
+                    <name lang="ro-RO">Notifică clientul și migrează după perioada de notificare</name>
+                    <name lang="sk-SK">Upozorniť zákazníka a migrovať po lehote</name>
+                    <name lang="bg-BG">Уведоми клиента и мигрирай след срока</name>
+                </option>
+            </options>
+        </input-field>
+        <input-field type="int">
+            <name>subscriptionsPriceUpdateNoticeDays</name>
+            <defaultValue>0</defaultValue>
+            <label>Notice period before price update takes effect (days)</label>
+            <label lang="de-DE">Frist vor Wirksamwerden der Preisänderung (Tagen)</label>
+            <label lang="nl-NL">Opzegtermijn voordat de prijswijziging in werking treedt (dagen)</label>
+            <label lang="it-IT">Periodo di preavviso prima che la modifica del prezzo abbia effetto (giorni)</label>
+            <label lang="pt-PT">Período de pré-aviso antes da alteração do preço entrar em vigor (dias)</label>
+            <label lang="es-ES">Período de aviso antes de aplicar la nueva tarifa (días)</label>
+            <label lang="sv-SE">Uppsägningstid innan prisändringen träder i kraft (dagar)</label>
+            <label lang="nb-NO">Varslingsperiode før prisendringen trer i kraft (dager)</label>
+            <label lang="pl-PL">Okres wypowiedzenia przed wejściem w życie zmiany ceny (dni)</label>
+            <label lang="cs-CZ">Výpovědní lhůta před účinností změny ceny (dny)</label>
+            <label lang="sl-SI">Odpovedni rok pred uveljavitvijo spremembe cene (dni)</label>
+            <label lang="hu-HU">Értesítési időszak az árváltoztatás hatálybalépése előtt (napok)</label>
+            <label lang="fi-FI">Ilmoitusaika ennen hinnanmuutoksen voimaantuloa (päivinä)</label>
+            <label lang="da-DK">Varslingsperiode før prisændringen træder i kraft (dage)</label>
+            <label lang="el-GR">Περίοδος ειδοποίησης πριν τεθεί σε ισχύ η αλλαγή τιμής (ημέρες)</label>
+            <label lang="hr-HR">Rok obavijesti prije nego što promjena cijene stupi na snagu (u danima)</label>
+            <label lang="et-EE">Etteteatamistähtaeg enne hinnamuudatuse jõustumist (päevades)</label>
+            <label lang="is-IS">Tilkynningartímabilið áður en verðbreytingin tekur gildi (dagar)</label>
+            <label lang="lt-LT">Įspėjimo laikotarpis prieš įsigaliojant kainos pakeitimui (dienomis)</label>
+            <label lang="lv-LV">Paziņošanas periods pirms cenas izmaiņu spēkā stāšanās (dienas)</label>
+            <label lang="ro-RO">Perioada de notificare înainte ca modificarea prețului să intre în vigoare (zile)</label>
+            <label lang="sk-SK">Výpovedná lehota pred nadobudnutím účinnosti zmeny ceny (dni)</label>
+            <label lang="bg-BG">Срок за известяване преди влизане в сила на промяната на цената (дни)</label>
+            <helpText>Days between notifying the customer of an upcoming subscription price change and applying the new amount. Customers can cancel within this window. Used only when the mode is set to "Notify and migrate".</helpText>
+            <helpText lang="de-DE">Tage zwischen der Kundenbenachrichtigung über eine bevorstehende Preisänderung und der Übernahme des neuen Betrags. Kunden können innerhalb dieser Frist kündigen. Wird nur verwendet, wenn der Modus auf "Benachrichtigen und migrieren" steht.</helpText>
+            <helpText lang="nl-NL">Aantal dagen tussen de melding aan de klant over een aanstaande prijswijziging en het toepassen van het nieuwe bedrag. Klanten kunnen binnen deze termijn opzeggen. Wordt alleen gebruikt als de modus op "Klant informeren en migreren" staat.</helpText>
+            <helpText lang="it-IT">Giorni tra la notifica al cliente di un imminente cambio prezzo dell'abbonamento e l'applicazione del nuovo importo. Il cliente può disdire entro questo periodo. Usato solo quando la modalità è "Notifica e migra".</helpText>
+            <helpText lang="pt-PT">Dias entre a notificação ao cliente sobre uma alteração de preço da subscrição e a aplicação do novo valor. Os clientes podem cancelar dentro deste período. Utilizado apenas quando o modo está definido como "Notificar e migrar".</helpText>
+            <helpText lang="es-ES">Días entre la notificación al cliente sobre un próximo cambio de precio y la aplicación del nuevo importe. Los clientes pueden cancelar dentro de este periodo. Solo se utiliza cuando el modo está en "Notificar y migrar".</helpText>
+            <helpText lang="sv-SE">Dagar mellan att meddela kunden om en kommande prisändring och att tillämpa det nya beloppet. Kunder kan säga upp inom denna period. Används endast när läget är "Meddela och migrera".</helpText>
+            <helpText lang="nb-NO">Dager mellom varsling av kunden om en kommende prisendring og bruk av det nye beløpet. Kunder kan si opp innenfor dette tidsrommet. Brukes kun når modusen er "Varsle og migrere".</helpText>
+            <helpText lang="pl-PL">Liczba dni między powiadomieniem klienta o zbliżającej się zmianie ceny a zastosowaniem nowej kwoty. Klienci mogą anulować w tym okresie. Używane tylko, gdy tryb jest ustawiony na "Powiadom i migruj".</helpText>
+            <helpText lang="cs-CZ">Počet dní mezi upozorněním zákazníka na nadcházející změnu ceny předplatného a uplatněním nové částky. Zákazníci mohou v této lhůtě zrušit předplatné. Používá se pouze v režimu „Upozornit a migrovat".</helpText>
+            <helpText lang="sl-SI">Dnevi med obvestilom stranki o prihajajoči spremembi cene naročnine in uporabo novega zneska. Stranke lahko v tem obdobju odpovedo. Uporablja se samo v načinu "Obvesti in preseli".</helpText>
+            <helpText lang="hu-HU">Napok száma az ügyfél értesítése és az új összeg alkalmazása között a közelgő előfizetés-árváltozásnál. Az ügyfelek ebben az időszakban mondhatnak le. Csak az „Értesítés és migrálás" módban használt.</helpText>
+            <helpText lang="fi-FI">Päivien lukumäärä tulevasta tilaushinnan muutoksesta ilmoittamisen ja uuden summan käyttöönoton välillä. Asiakkaat voivat peruuttaa tänä aikana. Käytetään vain, kun tila on "Ilmoita ja migroi".</helpText>
+            <helpText lang="da-DK">Dage mellem at underrette kunden om en kommende prisændring og at anvende det nye beløb. Kunder kan opsige inden for dette tidsrum. Bruges kun, når tilstanden er sat til "Underret og migrer".</helpText>
+            <helpText lang="el-GR">Ημέρες μεταξύ της ειδοποίησης του πελάτη για επικείμενη αλλαγή τιμής συνδρομής και της εφαρμογής του νέου ποσού. Οι πελάτες μπορούν να ακυρώσουν εντός αυτού του διαστήματος. Χρησιμοποιείται μόνο όταν η λειτουργία είναι "Ειδοποίηση και μετάπτωση".</helpText>
+            <helpText lang="hr-HR">Broj dana između obavijesti kupcu o nadolazećoj promjeni cijene pretplate i primjene novog iznosa. Kupci mogu otkazati u ovom razdoblju. Koristi se samo kada je način postavljen na "Obavijesti i migriraj".</helpText>
+            <helpText lang="et-EE">Päevade arv kliendi teavitamise ja uue summa rakendamise vahel eeloleva tellimuse hinnamuudatuse korral. Kliendid saavad selle aja jooksul tühistada. Kasutatakse ainult režiimis „Teavita ja migreeri".</helpText>
+            <helpText lang="is-IS">Dagar á milli þess að tilkynna viðskiptavininum um væntanlega verðbreytingu á áskrift og að beita nýju upphæðinni. Viðskiptavinir geta sagt upp innan þessa tímabils. Aðeins notað þegar stillingin er „Tilkynna og flytja".</helpText>
+            <helpText lang="lt-LT">Dienų skaičius tarp pranešimo klientui apie būsimą prenumeratos kainos pakeitimą ir naujos sumos pritaikymo. Per šį laikotarpį klientai gali atšaukti. Naudojama tik tada, kai režimas „Informuoti ir migruoti".</helpText>
+            <helpText lang="lv-LV">Dienu skaits starp klienta informēšanu par gaidāmo abonementa cenas izmaiņu un jaunās summas piemērošanu. Šajā laikā klienti var atcelt. Tiek izmantots tikai tad, kad režīms ir iestatīts uz "Paziņot un migrēt".</helpText>
+            <helpText lang="ro-RO">Numărul de zile între notificarea clientului despre o viitoare modificare a prețului abonamentului și aplicarea noii sume. Clienții pot anula în acest interval. Utilizat doar când modul este setat la „Notifică și migrează".</helpText>
+            <helpText lang="sk-SK">Počet dní medzi upozornením zákazníka na nadchádzajúcu zmenu ceny predplatného a uplatnením novej sumy. Zákazníci môžu v tejto lehote zrušiť. Používa sa iba v režime „Upozorniť a migrovať".</helpText>
+            <helpText lang="bg-BG">Брой дни между уведомяването на клиента за предстояща промяна на цената на абонамента и прилагането на новата сума. Клиентите могат да откажат в този период. Използва се само когато режимът е „Уведоми и мигрирай".</helpText>
         </input-field>
     </card>
 
@@ -3436,77 +3738,5 @@
         </component>
     </card>
 
-    <card>
-        <title>Javascript</title>
-        <title lang="de-DE">Storefront Javascript</title>
-        <title lang="nl-NL">Storefront Javascript</title>
-        <title lang="it-IT">Storefront Javascript</title>
-        <title lang="pt-PT">Javascript</title>
-        <title lang="es-ES">Javascript</title>
-        <title lang="sv-SE">Javascript</title>
-        <title lang="nb-NO">Javascript</title>
-        <title lang="pl-PL">Javascript</title>
-        <title lang="cs-CZ">Javascript</title>
-        <title lang="sl-SI">Javascript</title>
-        <title lang="hu-HU">Javascript</title>
-        <title lang="fi-FI">Javascript</title>
-        <title lang="da-DK">Javascript</title>
-        <title lang="el-GR">Javascript</title>
-        <title lang="hr-HR">Javascript</title>
-        <title lang="et-EE">Javascript</title>
-        <title lang="is-IS">Javascript</title>
-        <title lang="lt-LT">Javascript</title>
-        <title lang="lv-LV">Javascript</title>
-        <title lang="ro-RO">Javascript</title>
-        <title lang="sk-SK">Javascript</title><title lang="bg-BG">Javascript</title>
-        <input-field type="bool">
-            <name>useShopwareJavascript</name>
-            <label>Use Shopware default Javascript in Storefront (requires manual compilation)</label>
-            <label lang="de-DE">Verwenden Sie Shopware-Standard-Javascript in Storefront (erfordert manuelle Kompilierung)</label>
-            <label lang="nl-NL">Gebruik Shopware standaard Javascript in Storefront (vereist handmatig bouwen)</label>
-            <label lang="it-IT">Usa il Javascript predefinito di Shopware nella vetrina (richiede la compilazione manuale)</label>
-            <label lang="pt-PT">Utilizar o Javascript predefinido do Shopware no interface da loja (requer compilação manual)</label>
-            <label lang="es-ES">Usar Javascript predeterminado de Shopware para la interfaz de la tienda (requiere compilación manual)</label>
-            <label lang="sv-SE">Använd Shopwares standard-Javascript i skyltfönstret (kräver manuell kompilering)</label>
-            <label lang="nb-NO">Bruk Shopware standard Javascript i butikkfronten (krever manuell kompilering)</label>
-            <label lang="pl-PL">Użyj domyślnego JavaScript Shopware w interfejsie użytkownika (wymaga ręcznej kompilacji)</label>
-            <label lang="cs-CZ">Použijte výchozí Javascript Shopware v obchodě (vyžaduje ruční kompilaci)</label>
-            <label lang="sl-SI">Uporabite privzeti Javascript Shopware v trgovini (zahteva ročno pripravo)</label>
-            <label lang="hu-HU">Használja a Shopware alapértelmezett Javascript-ját az Árufronton (kézi fordítást igényel)</label>
-            <label lang="fi-FI">Käytä Shopwaren oletus-Javascriptia kauppapaikalla (vaatii manuaalista koodausta)</label>
-            <label lang="da-DK">Brug Shopware standard Javascript i butiksvinduet (kræver manuel kompilering)</label>
-            <label lang="el-GR">Χρησιμοποιήστε το προεπιλεγμένο Javascript του Shopware στο ηλεκτρονικό κατάστημα (απαιτεί χειροκίνητη μεταγλώττιση)</label>
-            <label lang="hr-HR">Koristi zadani Shopware JavaScript u Storefrontu (zahtijeva ručnu kompilaciju)</label>
-            <label lang="et-EE">Kasutage Shopware'i vaikimisi Javascript'i kaupluses (vajalik käsitsi kompilatsioon)</label>
-            <label lang="is-IS">Í Shopware skaltu nota Javascript sjálfgefið í Storefront (kefst handvirkrar samsetningar)</label>
-            <label lang="lt-LT">Naudokite Shopware standartinį Javascript Storefront'e (reikalingas rankinis kompiliavimas)</label>
-            <label lang="lv-LV">Izmantot Shopware noklusējuma Javascript veikalā (prasa manuālu kompilāciju)</label>
-            <label lang="ro-RO">Utilizați Javascript-ul standard Shopware în vitrină (necesită compilare manuală)</label>
-            <label lang="sk-SK">Použiť predvolený Javascript Shopware v obchode (vyžaduje ručnú kompiláciu)</label><label lang="bg-BG">Използвайте Shopware стандартен Javascript в предната част на магазина (изисква ръчно компилиране)</label>
-            <defaultValue>false</defaultValue>
-            <helpText>You can also bring back Mollie inside the "all.js" of the theme directly. This requires that you rebuild the Storefront on your own.</helpText>
-            <helpText lang="de-DE">Sie können Mollie auch direkt in die "all.js" des Themes zurückbringen. Dies erfordert, dass Sie die Storefront selbst neu erstellen.</helpText>
-            <helpText lang="nl-NL">Je kunt Mollie ook rechtstreeks terugbrengen in de "all.js" van het thema. Dit vereist dat je de Storefront zelf herbouwt.</helpText>
-            <helpText lang="it-IT">Puoi anche reintegrare Mollie direttamente all'interno del file "all.js" del tema. Questo richiede che tu ricompili la vetrina autonomamente.</helpText>
-            <helpText lang="pt-PT">Também é possível recuperar a Mollie diretamente no "all.js" do tema. Para isso, é necessário reconstruir o interface da loja por conta própria.</helpText>
-            <helpText lang="es-ES">También puedes incluir Mollie dentro de "all.js" del tema. Esto ermite reconstruir la interfaz de la tienda por tu cuenta.</helpText>
-            <helpText lang="sv-SE">Du kan också återföra Mollie direkt i "all.js" av temat. Detta kräver att du bygger om butiken på egen hand.</helpText>
-            <helpText lang="nb-NO">Du kan også gjenbruke Mollie inne i "all.js" til temaet direkte. Dette krever at du bygger om butikkfronten på egen hånd.</helpText>
-            <helpText lang="pl-PL">Możesz również przywrócić Mollie bezpośrednio w pliku motywu „all.js”. Wymaga to samodzielnej odbudowy interfejsu użytkownika.</helpText>
-            <helpText lang="cs-CZ">Mollie můžete také přidat přímo do souboru 'all.js' šablony. K tomu je nutné si vlastními silami znovu sestavit Storefront.</helpText>
-            <helpText lang="sl-SI">Mollie lahko prav tako vrnete v "all.js" teme neposredno. To zahteva, da sami ponovno vzpostavite trgovino.</helpText>
-            <helpText lang="hu-HU">A Mollie-t is visszahelyezheti a téma "all.js"-ban. Ehhez szükséges, hogy saját magának kell újraépítenie az Árufrontot.</helpText>
-            <helpText lang="fi-FI">Voit myös palauttaa Mollien suoraan teeman "all.js"-tiedostoon. Tämä edellyttää, että rakennat kaupan uudelleen itse.</helpText>
-            <helpText lang="da-DK">Du kan også bringe Mollie tilbage i "all.js" i temaet direkte. Dette kræver, at du genopbygger butiksvinduet selv.</helpText>
-            <helpText lang="el-GR">Μπορείτε επίσης να επαναφέρετε τη Mollie απευθείας μέσα στο "all.js" του θέματος. Αυτό απαιτεί να ξαναχτίσετε το ηλεκτρονικό κατάστημα μόνοι σας.</helpText>
-            <helpText lang="hr-HR">Mollie možete dodati i izravno u “all.js” datoteku teme. To zahtijeva da sami ponovno izgradite storefront.</helpText>
-            <helpText lang="et-EE">Samuti saate tagasi tuua Mollie teema "all.js"-s otse. See eeldab, et koostad Shopware'i ise ümber.</helpText>
-            <helpText lang="is-IS">Þú getur einnig bætt Mollie inn beint í „all.js“ skránna í þemanu. Þetta krefst þess að þú endurbyggir vefverslunina sjálfur.</helpText>
-            <helpText lang="lt-LT">Taip pat galite atkurti Mollie tiesiai "all.js" temoje. Tam reikia, kad jūs patys atstatytumėte Storefront.</helpText>
-            <helpText lang="lv-LV">Jūs varat arī atvest Mollie atpakaļ tēmas "all.js" iekšienē tieši. Tas prasa, lai jūs patstāvīgi pārveidotu veikala priekšpusi.</helpText>
-            <helpText lang="ro-RO">Puteți de asemenea să aduceți înapoi Mollie în "all.js" al temei direct. Acest lucru necesită să reconstruiți vitrina pe cont propriu.</helpText>
-            <helpText lang="sk-SK">Mollie môžete tiež pridať priamo do súboru `all.js` témy. Na to je potrebné vlastnoručne znovu zostaviť Storefront.</helpText><helpText lang="bg-BG">Можете също така да върнете Mollie в "all.js" на темата директно. Това изисква да възстановите предната част на магазина сами.</helpText>
-        </input-field>
-    </card>
 
 </config>

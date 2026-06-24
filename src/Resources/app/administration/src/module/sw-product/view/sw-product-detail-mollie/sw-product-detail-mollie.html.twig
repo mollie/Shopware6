@@ -36,7 +36,7 @@
                             :has-parent="!!parentProduct.id"
                             :inherited-value="parentProduct.customFields.mollie_payments_product_voucher_type">
                         <template #content="props">
-                            <sw-single-select
+                            <sw-multi-select
                                     class="mollie-voucher-type"
                                     :disabled="props.isInherited"
                                     :value="props.currentValue"
@@ -45,7 +45,7 @@
                                     @change="props.updateCurrentValue"
                                     @update:value="props.updateCurrentValue"
                             >
-                            </sw-single-select>
+                            </sw-multi-select>
                         </template>
                     </sw-inherit-wrapper>
 

@@ -50,6 +50,38 @@ function beforeEachSetup(device) {
 }
 
 
+context("No Pending Order Redirect After Failed Payment", () => {
+
+    context(devices.getDescription(device), () => {
+
+        it('Account orders page is not redirected after a failed payment return', () => {
+
+            beforeEachSetup(device);
+
+            scenarioDummyBasket.execute();
+            paymentAction.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnConfirm();
+
+            cy.url().should('include', 'https://www.mollie.com/checkout/');
+
+            // fail the payment — Mollie redirects back via /mollie/payment/{transactionId}
+            // which must clear the pending-order session key (regression for #1258)
+            mollieSandbox.initSandboxCookie();
+            molliePayment.selectFailed();
+
+            // after a failed payment Shopware lands on /account/order/edit
+            // navigate away and then back to /account/order to verify no unwanted redirect occurs
+            cy.visit('/account/order');
+            cy.url().should('not.include', '/account/order/edit/');
+            cy.url().should('include', '/account/order');
+        })
+
+    })
+
+})
+
 context("Switch Payment Method After Browser Back", () => {
 
     context(devices.getDescription(device), () => {

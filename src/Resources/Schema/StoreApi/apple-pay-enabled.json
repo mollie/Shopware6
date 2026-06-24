@@ -25,13 +25,24 @@
                     "enabled": {
                       "type": "boolean",
                       "example": true,
-                      "description": "Indicates if Apple Pay integration is enabled."
+                      "description": "Indicates if Apple Pay Direct is enabled."
+                    },
+                    "paymentMethodId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "The Apple Pay payment method ID, or null if the payment method does not exist."
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "mollie_payments_applepay_direct_enabled"
                     }
                   },
-                  "required": ["enabled"]
+                  "required": ["enabled", "paymentMethodId", "apiAlias"]
                 },
                 "example": {
-                  "enabled": true
+                  "enabled": true,
+                  "paymentMethodId": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                  "apiAlias": "mollie_payments_applepay_direct_enabled"
                 }
               }
             }

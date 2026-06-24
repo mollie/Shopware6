@@ -43,22 +43,6 @@ function beforeEachNoPrivacy() {
     });
 }
 
-function beforeEachPrivacy() {
-    cy.wrap(null).then(() => {
-        devices.setDevice(devices.getFirstDevice());
-
-        const shopConfig = new ShopConfiguration();
-        const pluginConfig = new PluginConfiguration();
-
-        shopConfig.setDataPrivacy(true);
-        pluginConfig.setMollieFailureMode(true);
-
-        configAction.configureEnvironment(shopConfig, pluginConfig);
-
-    });
-}
-
-
 describe('Paypal Express - UI Tests', () => {
 
     describe('PDP', () => {
@@ -94,11 +78,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247548: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openRegularProduct();
@@ -145,11 +130,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247547: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openListingRegularProducts();
@@ -197,11 +183,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247546: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openRegularProduct();
@@ -255,11 +242,12 @@ describe('Paypal Express - UI Tests', () => {
 
         it('C4247545: PayPal Express requires data protection to be accepted if enabled @core', () => {
 
-            beforeEachPrivacy();
-
             cy.wrap(null).then(() => {
+                devices.setDevice(devices.getFirstDevice());
+                const shopConfig = new ShopConfiguration();
+                shopConfig.setDataPrivacy(true);
                 const pluginConfig = new PluginConfiguration();
-                configAction.configurePlugin(pluginConfig);
+                configAction.configureEnvironment(shopConfig, pluginConfig);
             });
 
             mollieProductsAction.openRegularProduct();

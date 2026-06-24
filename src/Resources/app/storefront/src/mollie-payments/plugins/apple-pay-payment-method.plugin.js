@@ -1,7 +1,6 @@
 import Plugin from '../plugin';
 
-const APPLE_PAY_INPUT_SELECTOR_OLD = '.payment-method-input.applepay';
-const APPLE_PAY_INPUT_SELECTOR_NEW = '#paymentMethod';
+const APPLE_PAY_INPUT_SELECTOR = '#paymentMethod';
 const PAYMENT_METHOD_SELECTOR = '.payment-method';
 
 export default class MollieApplePayPaymentMethod extends Plugin {
@@ -25,11 +24,7 @@ export default class MollieApplePayPaymentMethod extends Plugin {
             return;
         }
 
-        // support for < Shopware 6.4
-        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR_OLD);
-
-        // support for >= Shopware 6.4
-        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR_NEW + this.options.applePayId);
+        this.hideApplePay(APPLE_PAY_INPUT_SELECTOR + this.options.applePayId);
 
         // hide cart apple pay select option
         if (this.options.hideApplePayOption) {

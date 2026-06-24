@@ -3,10 +3,6 @@
     "version": "1.0.0",
     "description": "",
     "author": "Mollie B.V.",
-    "dependencies": {
-        "core-js": "^3.40.0",
-        "raw-loader": "^4.0.2",
-        "regenerator-runtime": "^0.14.1"
-    },
+    "dependencies": {},
     "devDependencies": {}
 }

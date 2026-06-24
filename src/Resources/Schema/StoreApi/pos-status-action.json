@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/pos/{orderId}/{molliePaymentId}/status": {
+    "/mollie/pos/{transactionId}/{paymentId}/status": {
       "get": {
         "tags": [
           "Mollie",
@@ -16,16 +16,16 @@
         "operationId": "checkPosPaymentStatus",
         "parameters": [
           {
-            "name": "orderId",
+            "name": "transactionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The ID of the order."
+            "description": "The ID of the order transaction."
           },
           {
-            "name": "molliePaymentId",
+            "name": "paymentId",
             "in": "path",
             "required": true,
             "schema": {

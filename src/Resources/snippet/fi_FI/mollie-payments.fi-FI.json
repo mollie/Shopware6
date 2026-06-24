@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Korttisi poistamisessa ilmeni ongelma",
                 "newCard": "Uusi kortti",
                 "remove": "Poista",
-                "subscriptionBadge": "Tilaus"
+                "subscriptionBadge": "Tilaus",
+                "emptyMessage": "Ei tallennettuja kortteja"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Peruuta",
@@ -72,8 +73,8 @@
             "account": {
                 "btnEditBillingAddress": "muokkaa laskutusosoitetta",
                 "btnEditShippingAddress": "muokkaa toimitusosoitetta",
-                "cancelSubscription": "Tilaus on peruutettu",
-                "errorCancelSubscription": "Tilauksen peruuttaminen epäonnistui virheen vuoksi. Ota yhteyttä tukeemme.",
+                "successCancel": "Tilaus on peruutettu",
+                "errorCancel": "Tilauksen peruuttaminen epäonnistui virheen vuoksi. Ota yhteyttä tukeemme.",
                 "errorPause": "Tilauksen keskeyttämisessä ilmeni virhe",
                 "errorResume": "Tilauksen jatkamisessa ilmeni virhe",
                 "errorSkip": "Tilauksen ohittamisessa ilmeni virhe",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Viimeisimmät tilauksesi:",
                 "orderActionHide": "Piilota",
                 "orderActionView": "Näytä",
+                "priceChangeNoticeCancelButton": "Peruuta tilaus",
+                "priceChangeNoticeCurrentLabel": "Nykyinen hinta",
+                "priceChangeNoticeEffectiveLabel": "Voimassa alkaen",
+                "priceChangeNoticeHeadline": "Tuleva hinnanmuutos",
+                "priceChangeNoticeMessage": "Tämän tilauksen uusimishinta muuttuu. Voit peruuttaa milloin tahansa ennen uuden hinnan voimaantuloa.",
+                "priceChangeNoticeNewLabel": "Uusi hinta",
                 "shippingEqualToBilling": "Sama kuin laskutusosoite",
                 "successPause": "Tilauksesi on keskeytetty",
                 "successResume": "Tilaustasi jatketaan nyt",

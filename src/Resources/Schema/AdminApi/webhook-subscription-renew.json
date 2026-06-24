@@ -6,19 +6,28 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/webhook/subscription/{swSubscriptionId}/renew": {
+    "/mollie/webhook/subscription/{subscriptionId}/renew": {
       "get": {
         "summary": "Handle Mollie Subscription Renewal Webhook Notification (GET)",
         "operationId": "handleMollieSubscriptionRenewalWebhookGet",
         "parameters": [
           {
-            "name": "swSubscriptionId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The ID of the subscription associated with the renewal webhook."
+            "description": "The Shopware ID of the subscription associated with the renewal webhook."
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the Mollie payment that triggered the renewal webhook."
           }
         ],
         "responses": {
@@ -27,45 +36,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Optional success message."
-                    }
-                  },
-                  "required": ["success"]
+                  "$ref": "#/components/schemas/WebhookResponse"
                 },
                 "example": {
-                  "success": true
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable entity.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string"
-                    }
+                  "payment": {
+                    "id": "tr_123456789"
                   },
-                  "required": ["success", "error"]
-                },
-                "example": {
-                  "success": false,
-                  "error": "Unprocessable entity error message."
+                  "status": "success"
                 }
               }
             }
@@ -77,35 +54,30 @@
         "operationId": "handleMollieSubscriptionRenewalWebhookPost",
         "parameters": [
           {
-            "name": "swSubscriptionId",
+            "name": "subscriptionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The ID of the subscription associated with the renewal webhook."
+            "description": "The Shopware ID of the subscription associated with the renewal webhook."
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "id": {
                     "type": "string",
-                    "description": "The ID of the Mollie payment associated with the renewal webhook."
-                  },
-                  "subscriptionId": {
-                    "type": "string",
-                    "description": "The ID of the Mollie subscription associated with the renewal webhook."
+                    "description": "The ID of the Mollie payment that triggered the renewal webhook."
                   }
                 },
-                "required": ["id", "subscriptionId"],
+                "required": ["id"],
                 "example": {
-                  "id": "tr_123456789",
-                  "subscriptionId": "sub_987654321"
+                  "id": "tr_123456789"
                 }
               }
             }
@@ -117,50 +89,36 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Optional success message."
-                    }
-                  },
-                  "required": ["success"]
+                  "$ref": "#/components/schemas/WebhookResponse"
                 },
                 "example": {
-                  "success": true
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable entity.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string"
-                    }
+                  "payment": {
+                    "id": "tr_123456789"
                   },
-                  "required": ["success", "error"]
-                },
-                "example": {
-                  "success": false,
-                  "error": "Unprocessable entity error message."
+                  "status": "success"
                 }
               }
             }
           }
         }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WebhookResponse": {
+        "type": "object",
+        "properties": {
+          "payment": {
+            "type": "object",
+            "description": "The Mollie payment associated with the transaction."
+          },
+          "status": {
+            "type": "string",
+            "example": "success"
+          }
+        },
+        "required": ["payment", "status"]
       }
     }
   }

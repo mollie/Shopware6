@@ -131,8 +131,10 @@
                     "pending": "Återbetalningen kommer att skickas till banken nästa arbetsdag. Du kan fortfarande avbryta återbetalningen.",
                     "processing": "Återbetalningen har skickats till banken. Återbetalt belopp kommer att överföras till konsumentens konto så snart som möjligt.",
                     "refunded": "Återbetalat belopp har överförts till konsumenten.",
-                    "failed": "Återbetalningen har misslyckats efter bearbetningen. Till exempel har kunden stängt sitt bankkonto. Medlen kommer att återföras till ditt konto."
-                }
+                    "failed": "Återbetalningen har misslyckats efter bearbetningen. Till exempel har kunden stängt sitt bankkonto. Medlen kommer att återföras till ditt konto.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

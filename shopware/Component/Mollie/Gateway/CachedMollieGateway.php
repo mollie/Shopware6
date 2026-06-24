@@ -1,0 +1,194 @@
+<?php
+declare(strict_types=1);
+
+namespace Mollie\Shopware\Component\Mollie\Gateway;
+
+use Mollie\Shopware\Component\Mollie\Capture;
+use Mollie\Shopware\Component\Mollie\CreateCapture;
+use Mollie\Shopware\Component\Mollie\CreateOrder;
+use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\CreateShipment;
+use Mollie\Shopware\Component\Mollie\Customer;
+use Mollie\Shopware\Component\Mollie\MandateCollection;
+use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\Order;
+use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentCollection;
+use Mollie\Shopware\Component\Mollie\Profile;
+use Mollie\Shopware\Component\Mollie\Shipment;
+use Mollie\Shopware\Component\Mollie\TerminalCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Framework\Context;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+
+#[AsDecorator(decorates: MollieGateway::class)]
+final class CachedMollieGateway implements MollieGatewayInterface
+{
+    /**
+     * @var array<string, Payment>
+     */
+    private array $transactionPayments = [];
+
+    /**
+     * @var array<string, Profile>
+     */
+    private array $profiles = [];
+
+    /**
+     * @var array<string, Payment>
+     */
+    private array $paymentIdPayments = [];
+
+    /**
+     * @var array<string, Order>
+     */
+    private array $orders = [];
+
+    /**
+     * @var array<string, string[]>
+     */
+    private array $activePaymentMethods = [];
+
+    public function __construct(
+        private MollieGatewayInterface $decorated
+    ) {
+    }
+
+    public function getCurrentProfile(?string $salesChannelId = null): Profile
+    {
+        $cacheKey = $salesChannelId ?? 'all';
+        if (isset($this->profiles[$cacheKey])) {
+            return $this->profiles[$cacheKey];
+        }
+        $this->profiles[$cacheKey] = $this->decorated->getCurrentProfile($salesChannelId);
+
+        return $this->profiles[$cacheKey];
+    }
+
+    public function getProfileForApiKey(string $apiKey): Profile
+    {
+        return $this->decorated->getProfileForApiKey($apiKey);
+    }
+
+    public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
+    {
+        return $this->decorated->createPayment($molliePayment, $salesChannelId);
+    }
+
+    public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
+    {
+        return $this->decorated->createOrder($createOrder, $salesChannelId);
+    }
+
+    public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
+    {
+        $key = sprintf('%s', $transactionId);
+        if (isset($this->transactionPayments[$key])) {
+            return $this->transactionPayments[$key];
+        }
+        $this->transactionPayments[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
+
+        return $this->transactionPayments[$key];
+    }
+
+    public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
+    {
+        $key = sprintf('%s', $molliePaymentId);
+        if (isset($this->paymentIdPayments[$key])) {
+            return $this->paymentIdPayments[$key];
+        }
+        $this->paymentIdPayments[$key] = $this->decorated->getPayment($molliePaymentId, $orderNumber, $salesChannelId);
+
+        return $this->paymentIdPayments[$key];
+    }
+
+    public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
+    {
+        unset($this->paymentIdPayments[$molliePaymentId]);
+
+        return $this->decorated->cancelPayment($molliePaymentId, $orderNumber, $salesChannelId);
+    }
+
+    public function cancelOrder(string $mollieOrderId, string $orderNumber, string $salesChannelId): Order
+    {
+        unset($this->orders[$mollieOrderId]);
+
+        return $this->decorated->cancelOrder($mollieOrderId, $orderNumber, $salesChannelId);
+    }
+
+    public function listSubscriptionPayments(string $mollieCustomerId, string $mollieSubscriptionId, string $orderNumber, string $salesChannelId): PaymentCollection
+    {
+        return $this->decorated->listSubscriptionPayments($mollieCustomerId, $mollieSubscriptionId, $orderNumber, $salesChannelId);
+    }
+
+    public function createCustomer(CustomerEntity $customer, string $salesChannelId): Customer
+    {
+        return $this->decorated->createCustomer($customer, $salesChannelId);
+    }
+
+    public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection
+    {
+        // TODO save in array
+        return $this->decorated->listMandates($mollieCustomerId, $salesChannelId);
+    }
+
+    public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool
+    {
+        return $this->decorated->revokeMandate($mollieCustomerId, $mandateId, $salesChannelId);
+    }
+
+    public function listTerminals(string $salesChannelId): TerminalCollection
+    {
+        return $this->decorated->listTerminals($salesChannelId);
+    }
+
+    public function getActivePaymentMethods(Money $amount, string $billingCountry, string $salesChannelId): array
+    {
+        $cacheKey = sprintf('%s-%s-%s-%s', $salesChannelId, $amount->getValue(), $amount->getCurrency(), $billingCountry);
+        if (isset($this->activePaymentMethods[$cacheKey])) {
+            return $this->activePaymentMethods[$cacheKey];
+        }
+        $this->activePaymentMethods[$cacheKey] = $this->decorated->getActivePaymentMethods($amount, $billingCountry, $salesChannelId);
+
+        return $this->activePaymentMethods[$cacheKey];
+    }
+
+    public function getOrder(string $mollieOrderId, string $salesChannelId): Order
+    {
+        $key = sprintf('%s', $mollieOrderId);
+        if (isset($this->orders[$key])) {
+            return $this->orders[$key];
+        }
+        $this->orders[$key] = $this->decorated->getOrder($mollieOrderId, $salesChannelId);
+
+        return $this->orders[$key];
+    }
+
+    public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
+    {
+        return $this->decorated->createCapture($createCapture, $paymentId, $orderNumber, $salesChannelId);
+    }
+
+    public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment
+    {
+        return $this->decorated->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
+    }
+
+    public function cancelOrderLines(string $mollieOrderId, string $mollieLineId, int $quantity, string $orderNumber, string $salesChannelId): void
+    {
+        $this->decorated->cancelOrderLines($mollieOrderId, $mollieLineId, $quantity, $orderNumber, $salesChannelId);
+    }
+
+    public function releaseAuthorization(string $paymentId, string $orderNumber, string $salesChannelId): void
+    {
+        $this->decorated->releaseAuthorization($paymentId, $orderNumber, $salesChannelId);
+    }
+
+    public function clearCache(): void
+    {
+        $this->paymentIdPayments = [];
+        $this->transactionPayments = [];
+        $this->orders = [];
+        $this->activePaymentMethods = [];
+    }
+}

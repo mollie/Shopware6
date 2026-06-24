@@ -1,5 +1,6 @@
 import MolliePaymentsConfigService from '../core/service/api/mollie-payments-config.service';
 import MolliePaymentsOrderService from '../core/service/api/mollie-payments-order.service';
+import MollieOrderDetailsService from '../core/service/api/mollie-order-details.service';
 import MolliePaymentsPaymentMethodService from '../core/service/api/mollie-payments-payment-method.service';
 import MolliePaymentsRefundService from '../core/service/api/mollie-payments-refund.service';
 import MolliePaymentsShippingService from '../core/service/api/mollie-payments-shipping.service';
@@ -27,6 +28,12 @@ Application.addServiceProvider('MolliePaymentsOrderService', (container) => {
     const initContainer = Application.getContainer('init');
 
     return new MolliePaymentsOrderService(initContainer.httpClient, container.loginService);
+});
+
+Application.addServiceProvider('MollieOrderDetailsService', (container) => {
+    const initContainer = Application.getContainer('init');
+
+    return new MollieOrderDetailsService(initContainer.httpClient, container.loginService);
 });
 
 Application.addServiceProvider('MolliePaymentsPaymentMethodService', (container) => {

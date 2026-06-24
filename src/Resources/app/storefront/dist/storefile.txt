@@ -1,1 +1,0 @@
-we leave the file here so that the dist folder is also included into the plugin build

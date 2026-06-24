@@ -131,8 +131,10 @@
                     "pending": "Grąžinimas bus išsiųstas į banką kitą darbo dieną. Vis dar galite atšaukti šį grąžinimą.",
                     "processing": "Grąžinimas buvo išsiųstas į banką. Grąžinama suma bus pervesta į vartotojo sąskaitą kuo greičiau.",
                     "refunded": "Grąžinimo suma buvo pervesta vartotojui.",
-                    "failed": "Grąžinimas nepavyko po apdorojimo. Pavyzdžiui, klientas uždarė savo banko sąskaitą. Lėšos bus grąžintos į jūsų sąskaitą."
-                }
+                    "failed": "Grąžinimas nepavyko po apdorojimo. Pavyzdžiui, klientas uždarė savo banko sąskaitą. Lėšos bus grąžintos į jūsų sąskaitą.",
+                    "canceled": "The refund has been cancelled."
+                },
+                "canceled": "Canceled"
             }
         },
         "refund-manager": {

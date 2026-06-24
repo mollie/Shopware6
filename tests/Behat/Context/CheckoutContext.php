@@ -1,30 +1,42 @@
 <?php
 
-namespace Mollie\Behat;
+declare(strict_types=1);
 
+namespace Mollie\Shopware\Behat\Context;
 
-
+use Behat\Hook\BeforeScenario;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
-use Mollie\Integration\Data\CheckoutTestBehaviour;
-use Mollie\Integration\Data\MolliePageTestBehaviour;
-use Mollie\Integration\Data\PaymentMethodTestBehaviour;
+use Mollie\Shopware\Behat\Storage;
+use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
+use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
+use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
+use Mollie\Shopware\Integration\MolliePage\MolliePage;
+use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Api\OrderActionController;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CheckoutContext extends ShopwareContext
 {
     use CheckoutTestBehaviour;
     use PaymentMethodTestBehaviour;
-    use MolliePageTestBehaviour;
+    public const STORAGE_MOLLIE_URL = 'mollieUrl';
+    public const STORAGE_ORDER_ID = 'orderId';
+    public const STORAGE_RETURN_URL = 'shopwareReturnUrl';
+    public const STORAGE_REMEMBERED_PAYMENT_ID = 'rememberedMolliePaymentId';
 
-
-    private string $mollieSandboxPage = '';
-    private string $shopwareReturnPage = '';
-    private string $shopwareOderId = '';
+    #[BeforeScenario]
+    public function setUp(): void
+    {
+    }
 
     #[Given('product :arg1 with quantity :arg2 is in cart')]
     public function productWithQuantityIsInCart(string $productNumber, int $quantity): void
@@ -33,62 +45,208 @@ final class CheckoutContext extends ShopwareContext
         $this->addItemToCart($productNumber, $salesChannelContext, $quantity);
     }
 
+    #[Given('i apply promotion code :arg1')]
+    public function iApplyPromotionCode(string $code): void
+    {
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $this->addPromotionToCart($code, $salesChannelContext);
+    }
 
     #[When('i start checkout with payment method :arg1')]
     public function iStartCheckoutWithPaymentMethod(string $paymentMethodTechnicalName): void
     {
+        $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodTechnicalName, $this->getCurrentSalesChannelContext()->getContext());
 
-            $salesChannelContext = $this->getCurrentSalesChannelContext();
-            $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodTechnicalName, $salesChannelContext->getContext());
-            $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
+        $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
 
-            /** @var RedirectResponse $response */
-            $response = $this->startCheckout($this->getCurrentSalesChannelContext());
+        /** @var RedirectResponse $response */
+        $response = $this->startCheckout($this->getCurrentSalesChannelContext());
 
-            $this->mollieSandboxPage = $response->getTargetUrl();
+        $mollieSandboxPage = $response->getTargetUrl();
 
-            Assert::assertStringContainsString('mollie.com', $this->mollieSandboxPage);
-
+        Storage::set(self::STORAGE_MOLLIE_URL, $mollieSandboxPage);
+        Assert::assertStringContainsString('mollie.com', $mollieSandboxPage);
     }
-
-
 
     #[When('select payment status :arg1')]
     public function selectPaymentStatus(string $selectedStatus): void
     {
-        $response = $this->selectMolliePaymentStatus($selectedStatus, $this->mollieSandboxPage);
+        $mollieUrl = Storage::get(self::STORAGE_MOLLIE_URL);
+        $molliePage = new MolliePage($mollieUrl);
+        $response = $molliePage->selectPaymentStatus($selectedStatus);
         Assert::assertSame($response->getStatusCode(), 302);
-        $this->shopwareReturnPage = $response->getHeaderLine('location');
-        Assert::assertStringContainsString('mollie/payment', $this->shopwareReturnPage);
+        $redirect = $response->getHeaderLine('location');
+
+        if (str_contains($redirect, 'mollie.com')) {
+            Storage::set(self::STORAGE_MOLLIE_URL, $redirect);
+
+            return;
+        }
+        Storage::set(self::STORAGE_RETURN_URL, $redirect);
+    }
+
+    #[When('i select issuer :arg1')]
+    public function iSelectIssuer(string $issuer): void
+    {
+        $mollieUrl = Storage::get(self::STORAGE_MOLLIE_URL);
+        $molliePage = new MolliePage($mollieUrl);
+        $response = $molliePage->selectIssuer($issuer);
+
+        Assert::assertSame($response->getStatusCode(), 302);
+        $mollieUrl = $response->getHeaderLine('location');
+        Storage::set(self::STORAGE_MOLLIE_URL, $mollieUrl);
+        Assert::assertStringContainsString('mollie.com', $mollieUrl);
     }
 
     #[Given('i select :art1 as currency')]
     public function iSelectAsCurrency(string $currency): void
     {
-        $currency = $this->findCurrencyByIso($currency,$this->getCurrentSalesChannelContext());
+        $currency = $this->findCurrencyByIso($currency, $this->getCurrentSalesChannelContext());
         $this->setOptions(SalesChannelContextService::CURRENCY_ID, $currency->getId());
     }
 
     #[Then('i see success page')]
     public function iSeeSuccessPage(): void
     {
-        $this->shopwareOderId = '';
+        $returnPage = Storage::get(self::STORAGE_RETURN_URL, '');
+        if (strlen($returnPage) === 0) {
+            $mollieUrl = Storage::get(self::STORAGE_MOLLIE_URL);
+            $molliePage = new MolliePage($mollieUrl);
+            $returnPage = $molliePage->getShopwareReturnPage();
+            Storage::set(self::STORAGE_RETURN_URL, $returnPage);
+        }
+        Assert::assertStringContainsString('mollie/', $returnPage);
         /** @var RedirectResponse $response */
-        $response = $this->finishCheckout($this->shopwareReturnPage, $this->getCurrentSalesChannelContext());
-        $this->shopwareOderId = str_replace('/checkout/finish?orderId=','',$response->getTargetUrl());
+        $response = $this->finishCheckout($returnPage, $this->getCurrentSalesChannelContext());
+        $shopwareOderId = str_replace('/checkout/finish?orderId=', '', $response->getTargetUrl());
 
         Assert::assertSame($response->getStatusCode(), 302);
-        Assert::assertStringContainsString('/checkout/finish', $response->getTargetUrl());
-        Assert::assertNotEmpty($this->shopwareOderId);
+        Assert::assertNotEmpty($shopwareOderId);
+        Storage::set(self::STORAGE_ORDER_ID,$shopwareOderId);
+    }
+
+    #[When('select mollie payment method :arg1')]
+    public function selectMolliePaymentMethod(string $molliePaymentMethod): void
+    {
+        $mollieUrl = Storage::get(self::STORAGE_MOLLIE_URL);
+        $molliePage = new MolliePage($mollieUrl);
+        $response = $molliePage->selectPaymentMethod($molliePaymentMethod);
+
+        Assert::assertSame($response->getStatusCode(), 302);
+        $mollieUrl = $response->getHeaderLine('location');
+        Assert::assertStringContainsString('mollie.com', $mollieUrl);
+        Storage::set(self::STORAGE_MOLLIE_URL, $mollieUrl);
     }
 
     #[Then('order payment status is :arg1')]
     public function orderPaymentStatusIs(string $expectedPaymentStatus): void
     {
-        $order = $this->getOrderById($this->shopwareOderId,$this->getCurrentSalesChannelContext());
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
         /** @var OrderTransactionEntity $oderTransaction */
         $oderTransaction = $order->getTransactions()->first();
         $actualOrderState = $oderTransaction->getStateMachineState()->getTechnicalName();
+
         Assert::assertSame($expectedPaymentStatus, $actualOrderState);
+    }
+
+    #[Then('order total is :arg1')]
+    public function orderTotalIs(string $expectedTotal): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        Assert::assertSame((float) $expectedTotal, $order->getAmountTotal(), sprintf('Order %s total mismatch', $orderId));
+    }
+
+    #[Then('the order shipping country is :arg1')]
+    public function theOrderShippingCountryIs(string $expectedIsoCode): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        /** @var ?OrderDeliveryEntity $delivery */
+        $delivery = $order->getDeliveries()?->first();
+        Assert::assertNotNull($delivery, sprintf('Order %s has no delivery', $orderId));
+
+        $shippingAddress = $delivery->getShippingOrderAddress();
+        Assert::assertNotNull($shippingAddress, sprintf('Order %s delivery has no shipping address', $orderId));
+
+        $country = $shippingAddress->getCountry();
+        Assert::assertNotNull($country, sprintf('Order %s shipping address has no country', $orderId));
+
+        Assert::assertSame($expectedIsoCode, $country->getIso(), sprintf('Order %s shipping country mismatch', $orderId));
+    }
+
+    #[Then('i remember the mollie payment id')]
+    public function iRememberTheMolliePaymentId(): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        /** @var ?OrderTransactionEntity $transaction */
+        $transaction = $order->getTransactions()->first();
+        Assert::assertNotNull($transaction, sprintf('No transaction found for order %s', $orderId));
+
+        $customFields = $transaction->getCustomFields() ?? [];
+        $mollieData = $customFields[Mollie::EXTENSION] ?? [];
+        $paymentId = $mollieData['id'] ?? null;
+
+        Assert::assertNotEmpty($paymentId, sprintf('No Mollie payment id on transaction of order %s', $orderId));
+
+        Storage::set(self::STORAGE_REMEMBERED_PAYMENT_ID, $paymentId);
+    }
+
+    #[When('i select delivery status action :arg1')]
+    public function iSelectDeliveryStatusAction(string $targetStatus): void
+    {
+        /** @var OrderActionController $orderActionController */
+        $orderActionController = $this->getContainer()->get(OrderActionController::class);
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+        $mollieGateway->clearCache();
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+        $firstDelivery = $order->getDeliveries()->first();
+        $orderDeliveryId = $firstDelivery->getId();
+        $request = new Request();
+        $request->request->set('sendMail', false);
+
+        $response = $orderActionController->orderDeliveryStateTransition($orderDeliveryId, $targetStatus, $request, $this->getCurrentSalesChannelContext()->getContext());
+    }
+
+    #[When('i ship line item :arg1 with quantity :arg2')]
+    public function iShipLineItemWithQuantity(string $productNumber, int $quantity): void
+    {
+        /** @var ShipOrderRoute $shipOrderRoute */
+        $shipOrderRoute = $this->getContainer()->get(ShipOrderRoute::class);
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+        $mollieGateway->clearCache();
+
+        $items = [
+            [
+                'id' => $productNumber,
+                'quantity' => $quantity,
+            ],
+        ];
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $request = new Request();
+        $request->request->set('orderId', $orderId);
+        $request->request->set('items', $items);
+
+        $shipOrderRoute->ship($request, $this->getCurrentSalesChannelContext()->getContext());
+    }
+
+    #[Then('delivery status is :arg1')]
+    public function deliveryStatusIs(string $expectedDeliveryStatus): void
+    {
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+        /** @var OrderDeliveryEntity $orderDelivery */
+        $orderDelivery = $order->getDeliveries()->first();
+        $actualDeliveryStatus = $orderDelivery->getStateMachineState()->getTechnicalName();
+
+        Assert::assertSame($expectedDeliveryStatus, $actualDeliveryStatus);
     }
 }

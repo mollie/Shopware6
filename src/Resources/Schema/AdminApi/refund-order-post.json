@@ -21,23 +21,54 @@
                   "orderId": {
                     "type": "string",
                     "format": "uuid",
-                    "description": "The UUID of the order."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "The refund description."
-                  },
-                  "internalDescription": {
-                    "type": "string",
-                    "description": "Internal description for the refund."
+                    "description": "The UUID of the Shopware order to refund."
                   },
                   "amount": {
                     "type": "number",
                     "format": "float",
-                    "description": "The refund amount."
+                    "nullable": true,
+                    "description": "The refund amount. Omit (or send null) together with an empty items array to trigger a full refund; otherwise a partial refund is created."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The refund description sent to Mollie. Defaults to an empty string."
+                  },
+                  "internalDescription": {
+                    "type": "string",
+                    "description": "Internal description stored on the Shopware refund entity. Defaults to an empty string."
+                  },
+                  "returnId": {
+                    "type": "string",
+                    "description": "Optional Shopware return id. When provided it is stored as the swagReturnId in the Mollie refund metadata."
+                  },
+                  "items": {
+                    "type": "array",
+                    "description": "Line items to refund for a partial item-based refund. Items with quantity 0 and amount 0 are ignored.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The line item id."
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "The quantity to refund."
+                        },
+                        "amount": {
+                          "type": "number",
+                          "format": "float",
+                          "description": "The amount to refund for this item."
+                        },
+                        "resetStock": {
+                          "type": "integer",
+                          "description": "Quantity to add back to stock."
+                        }
+                      }
+                    }
                   }
                 },
-                "required": ["orderId", "description", "internalDescription", "amount"]
+                "required": ["orderId"]
               },
               "example": {
                 "orderId": "123e4567-e89b-12d3-a456-426614174000",
@@ -50,56 +81,93 @@
         },
         "responses": {
           "200": {
-            "description": "Refund successfully processed.",
+            "description": "Refund successfully created. Returns the created Mollie refund.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
+                    "id": {
+                      "type": "string",
+                      "description": "The Mollie refund id.",
+                      "example": "re_4qqhO89gsT"
+                    },
+                    "paymentId": {
+                      "type": "string",
+                      "description": "The Mollie payment id the refund belongs to.",
+                      "example": "tr_WDqYK6vllg"
+                    },
+                    "amount": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "100.00"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "EUR"
+                        }
+                      },
+                      "required": ["value", "currency"]
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Refund for order 123456"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["queued", "pending", "processing", "refunded", "failed", "canceled"],
+                      "example": "pending"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-01-01T12:00:00+00:00"
+                    },
+                    "isPending": {
                       "type": "boolean",
                       "example": true
                     },
-                    "refundId": {
-                      "type": "string",
-                      "example": "refund_123456"
-                    }
-                  }
-                },
-                "example": {
-                  "success": true,
-                  "refundId": "refund_123456"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
+                    "isQueued": {
                       "type": "boolean",
                       "example": false
                     },
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "example": [
-                        "Error message"
-                      ]
+                    "internalDescription": {
+                      "type": "string",
+                      "example": "Customer requested refund"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "composition": {
+                          "type": "array",
+                          "description": "The persisted refund items, or an empty array when none.",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
                     }
-                  }
+                  },
+                  "required": ["id", "paymentId", "amount", "description", "status", "createdAt", "isPending", "isQueued", "internalDescription", "metadata"]
                 },
                 "example": {
-                  "success": false,
-                  "errors": [
-                    "Error message"
-                  ]
+                  "id": "re_4qqhO89gsT",
+                  "paymentId": "tr_WDqYK6vllg",
+                  "amount": {
+                    "value": "100.00",
+                    "currency": "EUR"
+                  },
+                  "description": "Refund for order 123456",
+                  "status": "pending",
+                  "createdAt": "2024-01-01T12:00:00+00:00",
+                  "isPending": true,
+                  "isQueued": false,
+                  "internalDescription": "Customer requested refund",
+                  "metadata": {
+                    "composition": []
+                  }
                 }
               }
             }

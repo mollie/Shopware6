@@ -1,3 +1,34 @@
+# 5.0.0
+- Hinweis: Durch Autoloader-Caching kann beim Hochladen/Update des Plugins ein Fehler erscheinen. Dieser kann ignoriert werden.
+- Hinzugefügt: Beim Deinstallieren des Plugins mit der Option „Alle Daten löschen" werden nun alle Mollie-Daten gelöscht.
+- Entfernt: Das alte Kommando `mollie:dal:cleanup`.
+- Zahlungsarten verwenden jetzt die Mollie Payments API.
+- Die minimale PHP-Version ist 8.2.
+- Die minimale Shopware-Version ist 6.5.8.x.
+- Order Events und Flows werden nicht mehr ausgelöst.
+- Neue Payment Flows wurden hinzugefügt.
+- Das ModifyCreateRefundPayloadEvent wurde hinzugefügt, um den CreateRefund-Request vor dem Senden einer Rückerstattung an Mollie zu modifizieren.
+- Das Event ModifyCreatePaymentPayloadEvent wurde eingeführt, um die Anfrage vor der Erstellung einer Mollie-Zahlung anzupassen.
+- Alle zahlungsbezogenen Logs enthalten nun die Shopware-orderNumber.
+- Die URL zum Speichern des Kreditkarten-Tokens wird nicht mehr verwendet; übergebe stattdessen creditCardToken in der Checkout-Anfrage.
+- Verändert: Mehrere Store-API- und Admin-API-Routen haben sich geändert (Pfade, Parameter und Response-Strukturen), veraltete Endpunkte wurden entfernt. Die aktuellen Details finden Entwickler in der Swagger-/OpenAPI-Dokumentation.
+- Die URL zum Speichern der Mandats-ID ist veraltet; übergebe mandateId als Body-Parameter in der Checkout-Anfrage.
+- Die URL zum Speichern der POS-Terminal-ID ist veraltet; übergebe terminalId als Body-Parameter in der Checkout-Anfrage.
+- Ein Produkt kann nun mehreren Gutschein-Kategorien zugeordnet werden.
+- Hinzugefügt: Order-bezogene Logeinträge werden nun in einem eigenen mollie-Verzeichnis abgelegt. Die Logdateien tragen ein Namensschema im Format order-<orderNumber>, z. B. order-12345.
+- Hinzugefügt: Order-bezogene Logeinträge werden nun automatisch gelöscht, sobald sich der Zahlungsstatus auf "paid" ändert. Zudem werden alle übrigen Einträge entfernt, sobald sie die in den Einstellungen definierte Aufbewahrungsfrist überschreiten.
+- Im Mollie Failure Mode werden auf der Mollie-Seite ausschließlich Zahlungsarten angezeigt, die auch im Warenkorb verfügbar sind.
+- Das Order-State-Mapping wurde optimiert. Beim Statuswechsel wird nun ein präziser Übergangspfad ermittelt; kann der Wechsel nicht durchgeführt werden, werden detaillierte Log-Einträge erstellt.
+- Payconiq ist eingestellt und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
+- Das Event PaymentCreatedEvent wurde eingeführt, damit ist es möglich vor der Weiterleitung zum Zahlungsanbieter noch eigene Logik einzubauen
+- Neues Event ModifyCreateSubscriptionPayloadEvent hinzugefügt. Damit können Entwickler den Payload für die Mollie Subscription API vor dem Erstellen einer Subscription anpassen und erweitern.
+- Trustly ist veraltet und wird nach dem Update nicht aktiviert. Bitte deaktivieren Sie die Zahlungsmethode und entfernen Sie die Zuordnung zum Verkaufskanal.
+- Hinzugefügt: Preisanpassungen bei Abo-Produkten können nun berücksichtigt werden.
+- Überarbeitet: Abonnements unterstützen nun gemischte Warenkörbe. Kunden können Abo-Produkte, reguläre Produkte und Gutscheine in einer einzigen Bestellung kombinieren. Bisher war nur ein Abo-Produkt pro Bestellung möglich.
+- Geändert: Das Storefront-JavaScript wurde auf natives Shopware-JavaScript umgestellt.
+- Behoben: Gutschriften bei Netto-Bestellungen werden nicht mehr mit einer zusätzlichen MwSt.-Schicht versehen.
+- Behoben: Kompatibilität mit dem Klarna Payment Plugin
+
 # 4.25.1
 - Behoben: Kompatibilität mit Shopware 6.7.11.0 – Tippfehler im ISO-Code der slowenischen Snippet-Sprache korrigiert, der ab dieser Version von Shopware validiert wird.
 - Entfernt: Kreditkarten-Logos werden in der Bestelldetailansicht der Administration nicht mehr angezeigt.
@@ -676,7 +707,7 @@ Diese Version bietet Unterstützung für die Massenbearbeitung von Produkten in 
 - Neues `MollieOrderBuilder` Event, um eigene Metadaten zu einer Bestellung hinzufügen zu können (Feature für Entwickler).
 
 ### Verbesserungen
-- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch fehlschlug, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
+- Wichtige Änderung und Fehlerbehebungen für Order Transaktionen in Shopware. Wenn ein Kunde zusätzliche Zahlungsversuche durchführt, nachdem der erste Versuch scheiterte, kam es manchmal dazu, dass die Anzeige der Statuseinträge in Administration und API nicht mehr passten. Mollie benutzt nun stets die aktuellste Transaktion in Shopware und fügt sämtliche Aktualisierungen dieser hinzu, um alle Daten konsistent zu halten.
 - SEPA Zahlungen bleiben nun auf "In Progress", wenn diese gestartet wurden, und springen nicht mehr zurück auf "Open".
 - Zahlungen mit Status "Created" werden nun als "fehlerhaft" erkannt.
 - Kreditkartenzahlungen mit Status "Open" werden nun als "fehlerhaft" erkannt.
@@ -841,7 +872,7 @@ Aber keine Sorge, es gibt eine neue Funktion **"Automatischer Versand"**, die st
 
 ## [1.4.3] - 2021-07-07
 ### Fehlerbehebungen
-- Fix for Backwards-Compatibility
+- Fix für Backwards-Compatibility
 
 ## [1.4.2] - 2021-07-06
 ### Fehlerbehebungen

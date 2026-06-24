@@ -1,33 +1,22 @@
-import LoginRepository from 'Repositories/storefront/account/LoginRepository';
+import LoginRepository from "Repositories/storefront/account/LoginRepository";
 
-const repo = new LoginRepository();
+const repoLogin = new LoginRepository();
 
 export default class LoginAction {
 
     /**
-     *
      * @param email
      * @param password
      */
     doLogin(email, password) {
 
-        cy.session('login', () => {
+        cy.visit('/account/login');
 
-            cy.visit('/account');
-
-            repo.getEmail().clear().type(email, {'force': true});
-            repo.getPassword().clear().type(password, {'force': true});
-
-            repo.getSubmitButton().click();
-
-        }, {
-            cacheAcrossSpecs: false,
-            validate() {
-            }
-        });
-
-        cy.visit('/account');
+        repoLogin.getEmail().clear().type(email);
+        repoLogin.getPassword().clear().type(password);
+        repoLogin.getSubmitButton().click();
+        cy.wait(200);
+        cy.url().should('not.include', '/account/login');
     }
 
 }
-

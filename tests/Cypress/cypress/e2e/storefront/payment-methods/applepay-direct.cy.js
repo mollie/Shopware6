@@ -70,6 +70,16 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
     describe('Functional', () => {
 
+        before(() => {
+            // enabling Apple Pay Direct via config must trigger the
+            // SystemConfigSubscriber which downloads the domain verification file.
+            // this mirrors the real user journey (activate -> file gets downloaded).
+            const pluginConfig = new PluginConfiguration();
+            pluginConfig.setApplePayDirectEnabled(true);
+
+            configAction.configureEnvironment(new ShopConfiguration(), pluginConfig);
+        });
+
         it('C4084: Domain Verification file has been downloaded @core', () => {
             cy.request('/.well-known/apple-developer-merchantid-domain-association');
         })
@@ -103,25 +113,11 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('C266701: /mollie/apple-pay/add-product without product ID @core', () => {
-
-            const request = new Promise((resolve) => {
-                storefrontClient.post('/mollie/apple-pay/add-product', {}).then(response => {
-                    resolve({'data': response.data.data});
-                });
-            })
-
-            cy.wrap(request).its('data').then(data => {
-                cy.wrap(data).its('success').should('eq', false)
-                cy.wrap(data).its('error').should('contain', 'Please provide a product ID');
-            });
-        })
-
         it('C266702: /mollie/apple-pay/validate without data @core', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/validate').then(response => {
-                    resolve({'data': response.data.data});
+                    resolve({'data': response.data});
                 });
             })
 
@@ -150,7 +146,7 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/shipping-methods', {}).then(response => {
-                    resolve({'data': response.data.data});
+                    resolve({'data': response.data});
                 });
             })
 
@@ -164,13 +160,13 @@ describe('Apple Pay Direct - Storefront Routes', () => {
 
             const request = new Promise((resolve) => {
                 storefrontClient.post('/mollie/apple-pay/set-shipping').then(response => {
-                    resolve({'data': response.data.data});
+                    resolve({'data': response.data});
                 });
             })
 
             cy.wrap(request).its('data').then(data => {
                 cy.wrap(data).its('success').should('eq', false)
-                cy.wrap(data).its('error').should('contain', 'Please provide a Shipping Method identifier');
+                cy.wrap(data).its('error').should('contain', 'Missing shipping method identifier');
             });
         })
 
@@ -187,18 +183,6 @@ describe('Apple Pay Direct - Storefront Routes', () => {
             });
         })
 
-        it('C266707: /mollie/apple-pay/finish-payment redirects to cart with invalid data @core', () => {
-
-            const request = new Promise((resolve) => {
-                storefrontClient.get('/mollie/apple-pay/finish-payment').then(response => {
-                    resolve({'data': response});
-                });
-            })
-
-            cy.wrap(request).its('data').then(data => {
-                cy.wrap(data).its('request.responseURL').should('contain', '/checkout/cart');
-            });
-        })
 
         it('C266708: /mollie/apple-pay/restore-cart @core', () => {
 

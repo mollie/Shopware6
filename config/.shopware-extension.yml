@@ -1,2 +1,30 @@
+compatibility_date: '2026-02-11'
+
 build:
-  shopwareVersionConstraint: '6.4.5.0'
+  shopwareVersionConstraint: '>=6.6.0.0'
+  zip:
+    assets:
+      enable_es_build_for_admin: true
+      enable_es_build_for_storefront: true
+      npm_strict: true
+    pack:
+      excludes:
+        paths:
+          - .ai
+          - .phpunuhi
+          - .prettierignore
+          - .reports
+          - .shopware-extension.yml
+          - AGENTS.md
+          - config
+          - docs
+          - makefile
+          - tests
+          - dev
+          - node_modules
+          - vendor
+          - .github
+          - .git
+          - .gitignore
+          - src/Resources/app/storefront/tests
+          - src/Resources/app/administrator/tests

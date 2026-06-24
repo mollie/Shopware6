@@ -3,7 +3,6 @@
 }
 
 .subscription-hide-btn {
-    margin-bottom: 25px;
     float: right;
 
     .subscription-hide-btn-text {
@@ -27,6 +26,14 @@
 
 .subscription-item-detail {
     padding: 0 !important;
+}
+
+.subscription-detail-content {
+    margin-top: 1rem;
+}
+
+.order-table .subscription-detail-content {
+    padding-top: 1rem;
 }
 
 .subscription-edit-shipping-address-modal,

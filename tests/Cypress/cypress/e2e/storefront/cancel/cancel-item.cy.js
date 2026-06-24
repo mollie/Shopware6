@@ -58,7 +58,7 @@ context("Cancel Authorized items", () => {
 
             beforeEach(device);
 
-            createOrderAndOpenAdmin('Klarna');
+            createOrderAndOpenAdmin('Kl (Orders API - Test only)');
 
             orderDetailsRepository.getLineItemActionsButton(1).should('be.visible').trigger('click');
 
@@ -106,4 +106,5 @@ function createOrderAndOpenAdmin(paymentMethod) {
     adminLogin.login();
     adminOrders.openOrders();
     adminOrders.openLastOrder();
+    adminOrders.openMollieTab();
 }

@@ -53,6 +53,10 @@ export default class MollieCreditCardMandateManage extends Plugin {
         }
 
         removeButtons.forEach((removeButton) => {
+            if (removeButton._mollieManageInit) {
+                return;
+            }
+            removeButton._mollieManageInit = true;
             removeButton.addEventListener('click', (e) => {
                 e.preventDefault();
 
@@ -61,6 +65,10 @@ export default class MollieCreditCardMandateManage extends Plugin {
         });
 
         modalRemoveButtons.forEach((modalRemoveButton) => {
+            if (modalRemoveButton._mollieManageInit) {
+                return;
+            }
+            modalRemoveButton._mollieManageInit = true;
             modalRemoveButton.addEventListener('click', (e) => {
                 e.preventDefault();
 
@@ -79,11 +87,15 @@ export default class MollieCreditCardMandateManage extends Plugin {
     }
 
     onConfirmRemoveButtonClick() {
-        const { currentContainerEl, currentMandateId } = this;
+        const currentContainerEl = this.currentContainerEl;
+        const currentMandateId = this.currentMandateId;
 
         if (!currentContainerEl || !currentMandateId) {
             return;
         }
+
+        this.currentMandateId = null;
+        this.currentContainerEl = null;
 
         this.deleteMandate(currentMandateId).then(({ success }) => {
             if (success) {

@@ -36,22 +36,26 @@
         },
         "responses": {
           "200": {
-            "description": "Success response indicating the shipping method was selected.",
+            "description": "Success response containing the updated sales channel context token.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true,
-                      "description": "Indicates if the operation was successful."
+                    "salesChannelContextToken": {
+                      "type": "string",
+                      "description": "The sales channel context token of the context with the selected shipping method applied."
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "mollie_payments_applepay_direct_shipping_updated"
                     }
                   },
-                  "required": ["success"]
+                  "required": ["salesChannelContextToken", "apiAlias"]
                 },
                 "example": {
-                  "success": true
+                  "salesChannelContextToken": "sw-context-token-123",
+                  "apiAlias": "mollie_payments_applepay_direct_shipping_updated"
                 }
               }
             }

@@ -3,41 +3,19 @@ declare(strict_types=1);
 
 namespace Kiener\MolliePayments;
 
-use Kiener\MolliePayments\Compatibility\DependencyLoader;
-use Kiener\MolliePayments\Compatibility\VersionCompare;
-use Kiener\MolliePayments\Components\Installer\PluginInstaller;
+use Mollie\Shopware\Component\Installer\MollieDataRemover;
+use Mollie\Shopware\Component\Installer\PluginInstaller;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Migration\MigrationCollection;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
+use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
-use Shopware\Core\Kernel;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MolliePayments extends Plugin
 {
-    public const PLUGIN_VERSION = '4.25.1';
-
-    /**
-     * @throws \Exception
-     */
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-
-        $this->container = $container;
-        $shopwareVersion = $this->container->getParameter('kernel.shopware_version');
-        if (! is_string($shopwareVersion)) {
-            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
-        }
-        // load the dependencies that are compatible
-        // with our current shopware version
-        $loader = new DependencyLoader($this->container, new VersionCompare($shopwareVersion));
-        $loader->loadServices();
-        $loader->prepareStorefrontBuild();
-    }
+    public const PLUGIN_VERSION = '5.0.0';
 
     public function install(InstallContext $context): void
     {
@@ -57,12 +35,11 @@ class MolliePayments extends Plugin
         parent::update($context);
 
         if ($context->getPlugin()->isActive() === true) {
+            $this->runDbMigrations($context->getMigrationCollection());
             // only prepare our whole plugin
             // if it is indeed active at the moment.
             // otherwise service would not be found of course
             $this->preparePlugin($context->getContext());
-
-            $this->runDbMigrations($context->getMigrationCollection());
         }
     }
 
@@ -78,25 +55,25 @@ class MolliePayments extends Plugin
         $this->preparePlugin($context->getContext());
     }
 
-    public function boot(): void
+    public function uninstall(UninstallContext $context): void
     {
-        parent::boot();
+        parent::uninstall($context);
 
-        if ($this->container === null) {
+        // the merchant chose to keep the data - never touch anything
+        if ($context->keepUserData()) {
             return;
         }
-        /** @var Container $container */
-        $container = $this->container;
 
-        $shopwareVersion = $container->getParameter('kernel.shopware_version');
-        if (! is_string($shopwareVersion)) {
-            $shopwareVersion = Kernel::SHOPWARE_FALLBACK_VERSION;
+        // The data remover and its tagged steps are only available in the container when the
+        // plugin's services are loaded (i.e. it is active). If it is uninstalled while inactive
+        // there is nothing wired up to remove, so we skip safely.
+        if ($this->container === null || $this->container->has(MollieDataRemover::class) === false) {
+            return;
         }
-        // load the dependencies that are compatible
-        // with our current shopware version
 
-        $loader = new DependencyLoader($container, new VersionCompare($shopwareVersion));
-        $loader->registerDependencies();
+        /** @var MollieDataRemover $dataRemover */
+        $dataRemover = $this->container->get(MollieDataRemover::class);
+        $dataRemover->removeAllData($context->getContext());
     }
 
     /**

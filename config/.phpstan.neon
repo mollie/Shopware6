@@ -2,14 +2,17 @@ parameters:
     level: 8
     paths:
         - ./../src
+        - ./../shopware
     excludePaths:
         - ./../src/Resources/*
         - ./../src/Migration/*
-        - ./../src/Compatibility/Bundles/FlowBuilder/Events/*
-        - ./../src/Components/RefundManager/Elasticsearch/RefundAdminSearchIndexer.php
-        - ./../src/Components/Subscription/Elasticsearch/SubscriptionAdminSearchIndexer.php
-        # legacy code that is not working with abstract/interface changes
-        - ./../src/Service/Mail/MailService63.php
+        - ./../shopware/Component/Subscription/Search/SubscriptionAdminSearchIndexer.php
+        # extends AbstractPaymentHandler (6.6+), guarded by Feature::isActive('v6.7.0.0');
+        # the class does not exist on 6.5, so PHPStan reports a non-ignorable class.notFound.
+        - ./../shopware/Component/Payment/Handler/AbstractMolliePaymentHandler.php
+        # globalData() narrows EntityCollection<Entity> to EntityCollection<RefundEntity>,
+        # same covariant-return case as the excluded SubscriptionAdminSearchIndexer.
+        - ./../shopware/Component/Refund/Search/RefundAdminSearchIndexer.php
     disallowedFunctionCalls:
         - function: 'var_dump()'
           message: 'use some logger instead'
@@ -21,8 +24,6 @@ parameters:
           message: 'use some logger instead'
         - function: 'putenv()'
           message: 'might overwrite existing variables'
-    scanDirectories:
-      - ../polyfill/Shopware
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
@@ -36,9 +37,16 @@ parameters:
     		- identifier: parameter.unresolvableType
     		- identifier: varTag.unresolvableType
     		- identifier: attribute.notFound
+    		- identifier: function.alreadyNarrowedType
+    		# Traits used only in AbstractMolliePaymentHandler.php which is excluded from analysis
+    		# because it uses the Feature::isActive() if/else pattern for 6.5/6.7 compatibility.
+    		- identifier: trait.unused
+    		# ArrayStruct changed from <TKey, TValue> in 6.5 to <TData extends array> in 6.7.
+    		# <array<string, mixed>> is correct for 6.7; on 6.5 the second type param is missing.
+    		- identifier: missingType.generics
 
 services:
-    - class: MolliePayments\PHPStan\Rules\NoManufacturerRule
+    - class: MolliePayments\Shopware\PHPStan\Rules\NoManufacturerRule
       tags:
         - phpstan.rules.rule
 

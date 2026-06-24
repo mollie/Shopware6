@@ -1,3 +1,35 @@
+# 5.0.0
+- Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.
+- Added: Uninstalling the plugin with the "Remove all data" option now deletes all Mollie data.
+- Removed: The old `mollie:dal:cleanup` command.
+- Payment methods now use the Mollie Payments API.
+- Minimum PHP version is 8.2.
+- Minimum Shopware version is 6.5.8.x.
+- Order Events and Flows are no longer triggered.
+- New payment flows have been added.
+- Added the ModifyCreatePaymentPayloadEvent to modify the request before creating a payment in Mollie.
+- Added the ModifyCreateRefundPayloadEvent to modify the CreateRefund request before sending a refund to Mollie.
+- All payment-related logs now include the Shopware orderNumber.
+- The URL for saving the credit card token is no longer used; provide creditCardToken in the checkout request.
+- Changed: Several Store API and Admin API routes have changed (paths, parameters and response structures), and obsolete endpoints were removed. Developers can find the up-to-date details in the Swagger/OpenAPI documentation.
+- The URL for saving the mandate ID is deprecated; provide mandateId as a body parameter in the checkout request.
+- The URL for saving the POS terminal ID is deprecated; provide terminalId as a body parameter in the checkout request.
+- A product can now have multiple voucher categories.
+- Added: order-related log entries are now stored in a dedicated mollie directory. Log files follow the naming pattern order-<orderNumber>, for example order-12345.
+- Added: order-related log entries are now automatically removed when the payment status changes to "paid". Additionally, any remaining entries are deleted once they exceed the retention period defined in the settings.
+- In Mollie Failure Mode, only payment methods that are also available in the cart are displayed on the Mollie page.
+- The order state mapping has been optimized. During a status change, a precise transition path is now determined; if the transition cannot be performed, detailed log entries are generated.
+- Payconiq is discontinued and will not be activated after update. Please deactivate the payment method and remove it from saleschannel
+- Added new event PaymentCreatedEvent, now you can execute custom logic before redirecting to the payment provider
+- Added new event ModifyCreateSubscriptionPayloadEvent. This allows developers to modify and extend the payload for the Mollie Subscription API before a subscription is created.
+- Trustly is deprecated and will not be activated after the update. Please deactivate the payment method and remove it from the sales channel.
+- Removed: The Apple Pay Direct route `POST /mollie/apple-pay/add-product` (storefront) and `POST /store-api/mollie/applepay/add-product` (Store API) have been removed. Use Shopware's native add-to-cart route (`POST /store-api/checkout/cart/line-item`) with `isExpressCheckout: true` in the request body instead.
+- Added: price changes on subscription products can now be applied to running subscriptions.
+- Reworked: Subscriptions now support mixed carts. Customers can combine subscription products, regular products, and vouchers in a single order. Previously only one subscription product per order was allowed.
+- Changed: Storefront JavaScript has been migrated to native Shopware JavaScript.
+- Fixed: Adding credit notes to net orders no longer inflates the total with an extra VAT layer.
+- Fixed: Compatibility with the Klarna Payment plugin
+
 # 4.25.1
 - Fixed: Compatibility with Shopware 6.7.11.0 – corrected a typo in the Slovenian snippet ISO code, which is now validated by Shopware.
 - Removed: Credit card brand logos are no longer displayed in the administration order detail view.
@@ -74,6 +106,7 @@
 
 # 4.20.1
 - Fixed: Order overview in Shopware 6.5 does not crash anymore
+
 # 4.20.0
 - Changed order builder to use order addresses instead of customer default addresses to make sure the address in mollie matches the order information in shopware.
 - Fixed an issue where Apple Pay Direct did not work when the phone number was configured as a required field in the shop.

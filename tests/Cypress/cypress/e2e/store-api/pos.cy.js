@@ -4,44 +4,28 @@ import Shopware from "Services/shopware/Shopware"
 
 const shopware = new Shopware();
 
-
 const client = new StoreAPIClient(shopware.getStoreApiToken());
 
 const storeApiPrefix = '/store-api';
 
 
-context(storeApiPrefix +"/mollie/ideal/issuers", () => {
+context(storeApiPrefix + "/mollie/ideal/issuers", () => {
 
-    it('C1341122: POS fetch terminals (Store API)', () => {
+    it('C1341122: POS fetch terminals (Store API)', async () => {
+        const response = await client.get('/mollie/pos/terminals');
 
-        const request = new Promise((resolve) => {
-            client.get('/mollie/pos/terminals').then(response => {
-                resolve({'data': response.data});
-            });
-        })
-
-        cy.wrap(request).its('data').then(response => {
-            cy.wrap(response).its('apiAlias').should('eq', 'mollie_payments_pos_terminals')
-            cy.wrap(response).its('terminals').its('length').should('be.gte', 1)
-        });
-    })
+        expect(response.data.apiAlias).to.eq('mollie_payments_pos_terminals');
+        expect(response.data.terminals.length).to.be.gte(1);
+    });
 
 })
 
-context(storeApiPrefix +"/mollie/ideal/store-issuer", () => {
+context(storeApiPrefix + "/mollie/ideal/store-issuer", () => {
 
-    it('C1341123: POS store terminal with invalid customer id (Store API) @core', () => {
+    it('C1341123: POS store terminal with invalid customer id (Store API) @core', async () => {
+        const response = await client.post('/mollie/pos/store-terminal/cust-123/ideal_ABNANL2A');
 
-        const request = new Promise((resolve) => {
-            client.post('/mollie/pos/store-terminal/cust-123/ideal_ABNANL2A').then(response => {
-                resolve({'data': response.data});
-            });
-        })
-
-        cy.wrap(request).its('data').then(response => {
-            cy.wrap(response).its('status').should('eq', 500)
-            expect(response.data.errors[0].detail).to.contain('Customer with ID  not found in Shopware');
-        });
-    })
+        expect(response.data.message).to.contain('Using deprecated route, please provide "terminalId" in request body for payment');
+    });
 
 })

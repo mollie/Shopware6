@@ -1,7 +1,6 @@
 import template from './mollie-ship-order.html.twig';
 import './mollie-ship-order.scss';
 import MollieShippingEvents from './MollieShippingEvents';
-import MollieShipping from './MollieShipping';
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
@@ -11,10 +10,14 @@ Component.register('mollie-ship-order', {
 
     mixins: [Mixin.getByName('notification')],
 
-    inject: ['MolliePaymentsShippingService', 'MolliePaymentsConfigService', 'acl'],
+    inject: ['MolliePaymentsShippingService', 'acl'],
 
     props: {
         order: {
+            type: Object,
+            required: true,
+        },
+        shippingStatus: {
             type: Object,
             required: true,
         },
@@ -23,7 +26,6 @@ Component.register('mollie-ship-order', {
     data() {
         return {
             shippableLineItems: [],
-            shippedLineItems: [],
             showTrackingInfo: false,
             tracking: {
                 carrier: '',
@@ -33,9 +35,6 @@ Component.register('mollie-ship-order', {
         };
     },
 
-    /**
-     *
-     */
     created() {
         this.createdComponent();
     },
@@ -66,52 +65,33 @@ Component.register('mollie-ship-order', {
     },
 
     methods: {
-        /**
-         *
-         */
-        async createdComponent() {
+        createdComponent() {
             this.showTrackingInfo = false;
+            this.tracking = { carrier: '', code: '', url: '' };
 
-            this.tracking = {
-                carrier: '',
-                code: '',
-                url: '',
-            };
+            const items = [];
+            for (let i = 0; i < this.order.lineItems.length; i++) {
+                const lineItem = this.order.lineItems[i];
+                const status = this.shippingStatus[lineItem.id];
+                const shippableQty = status ? (status.shippableQuantity ?? 0) : 0;
 
-            // load the already shipped items
-            // so that we can calculate what is left to be shipped
-            await this.MolliePaymentsShippingService.status({
-                orderId: this.order.id,
-            }).then((response) => {
-                this.shippedLineItems = response;
-            });
+                items.push({
+                    id: lineItem.id,
+                    mollieId: status ? status.mollieId : null,
+                    label: lineItem.label,
+                    quantity: shippableQty,
+                    originalQuantity: shippableQty,
+                    selected: false,
+                });
+            }
+            this.shippableLineItems = items;
 
-            const shipping = new MollieShipping(this.MolliePaymentsShippingService);
-
-            shipping.getShippableItems(this.order).then((items) => {
-                // this is required to make sure the "select all" works
-                // because we need to have a default value
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    item.selected = false;
-                    item.originalQuantity = item.quantity;
-                }
-
-                this.shippableLineItems = items;
-            });
-
-            // if we have at least 1 tracking code in the order
-            // then try to prefill our tracking information
-            // also automatically enable the tracking data (it can be turned off again by the merchant)
             if (this.order.deliveries.length) {
                 const delivery = this.order.deliveries.first();
                 this.showTrackingInfo = delivery.trackingCodes.length >= 1;
             }
         },
 
-        /**
-         *
-         */
         btnSelectAllItems_Click() {
             for (let i = 0; i < this.shippableLineItems.length; i++) {
                 const item = this.shippableLineItems[i];
@@ -121,9 +101,6 @@ Component.register('mollie-ship-order', {
             }
         },
 
-        /**
-         *
-         */
         btnResetItems_Click() {
             for (let i = 0; i < this.shippableLineItems.length; i++) {
                 const item = this.shippableLineItems[i];
@@ -132,15 +109,11 @@ Component.register('mollie-ship-order', {
             }
         },
 
-        /**
-         *
-         */
         onShipOrder() {
             var shippingItems = [];
 
             for (let i = 0; i < this.shippableLineItems.length; i++) {
                 const item = this.shippableLineItems[i];
-
                 if (item.selected) {
                     shippingItems.push({
                         id: item.id,
@@ -157,8 +130,13 @@ Component.register('mollie-ship-order', {
                 shippingItems,
             )
                 .then(() => {
-                    // send global event
-                    this.$root.$emit(MollieShippingEvents.EventShippedOrder);
+                    // eslint-disable-next-line no-undef
+                    if (Shopware.Utils && Shopware.Utils.EventBus) {
+                        // eslint-disable-next-line no-undef
+                        Shopware.Utils.EventBus.emit(MollieShippingEvents.EventShippedOrder);
+                    } else {
+                        this.$root.$emit(MollieShippingEvents.EventShippedOrder);
+                    }
 
                     this.createNotificationSuccess({
                         message: this.$tc('mollie-payments.modals.shipping.item.success'),

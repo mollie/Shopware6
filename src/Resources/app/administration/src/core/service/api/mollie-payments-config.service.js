@@ -66,27 +66,4 @@ export default class MolliePaymentsConfigService extends ApiService {
                 return ApiService.handleResponse(response);
             });
     }
-
-    /**
-     *
-     * @param salesChannelId
-     * @param orderId
-     * @returns {*}
-     */
-    getRefundManagerConfig(salesChannelId, orderId) {
-        return this.httpClient
-            .post(
-                `_action/${this.getApiBasePath()}/config/refund-manager`,
-                {
-                    salesChannelId: salesChannelId,
-                    orderId: orderId,
-                },
-                {
-                    headers: this.getBasicHeaders(),
-                },
-            )
-            .then((response) => {
-                return ApiService.handleResponse(response);
-            });
-    }
 }

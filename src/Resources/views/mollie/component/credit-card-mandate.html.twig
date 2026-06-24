@@ -8,7 +8,8 @@
                         {% block mollie_credit_card_mandate_block_input %}
                             {% if not modifiable %}
                                 <input type="radio"
-                                       name="mollieCreditCardMandate"
+                                       form="confirmOrderForm"
+                                       name="mandateId"
                                        class="{{ formCheckInputClass ?? 'custom-control-input form-check-input' }}"
                                        id="mandate{{ mandate.id }}"
                                        value="{{ mandate.id }}"

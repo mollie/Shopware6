@@ -5,10 +5,10 @@ const MOLLIE_POS_TERMINALS_SELECTOR = 'div.mollie-pos-terminals';
 const DROPDOWN_TERMINALS_SELECTOR = '#posTerminals';
 const PAYMENT_FORM_SELECTOR = '#changePaymentForm';
 const RADIO_INPUTS_SELECTOR = 'input[type="radio"]';
-const POS_RADIO_INPUT_SELECTOR = 'input[type="radio"].pointofsale';
 
 const DATA_SHOP_URL_ATTR = 'data-shop-url';
 const DATA_CUSTOMER_ID_ATTR = 'data-customer-id';
+const DATA_POS_PAYMENT_ID_ATTR = 'data-pos-payment-id';
 
 const DISPLAY_NONE_CLS = 'd-none';
 
@@ -81,7 +81,11 @@ export default class MolliePosTerminalPlugin extends Plugin {
         }
 
         this._radioInputs = this._paymentForm.querySelectorAll(RADIO_INPUTS_SELECTOR);
-        this._posRadioInput = this._paymentForm.querySelector(POS_RADIO_INPUT_SELECTOR);
+
+        // the POS payment method id is provided by the template so we can target the
+        // radio input directly via its id instead of relying on a css class on the input
+        const posPaymentId = this._container.getAttribute(DATA_POS_PAYMENT_ID_ATTR);
+        this._posRadioInput = posPaymentId ? this._paymentForm.querySelector('#paymentMethod' + posPaymentId) : null;
     }
 
     /**

@@ -6,20 +6,20 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/webhook/{swTransactionId}": {
-      "post": {
-        "summary": "Handle Mollie Webhook Notification",
-        "description": "Handles incoming webhook notifications from Mollie.",
-        "operationId": "handleMollieWebhook",
+    "/mollie/webhook/{transactionId}": {
+      "get": {
+        "summary": "Handle Mollie Webhook Notification (GET)",
+        "description": "Handles incoming webhook notifications from Mollie for an order transaction.",
+        "operationId": "handleMollieWebhookGet",
         "parameters": [
           {
-            "name": "swTransactionId",
+            "name": "transactionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The transaction ID associated with the webhook."
+            "description": "The Shopware order transaction ID associated with the webhook."
           }
         ],
         "responses": {
@@ -28,46 +28,70 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  },
-                  "required": ["success"]
+                  "$ref": "#/components/schemas/WebhookResponse"
                 },
                 "example": {
-                  "success": true
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string"
-                    }
+                  "payment": {
+                    "id": "tr_123456789"
                   },
-                  "required": ["success", "error"]
-                },
-                "example": {
-                  "success": false,
-                  "error": "Bad request error message."
+                  "status": "success"
                 }
               }
             }
           }
         }
+      },
+      "post": {
+        "summary": "Handle Mollie Webhook Notification (POST)",
+        "description": "Handles incoming webhook notifications from Mollie for an order transaction.",
+        "operationId": "handleMollieWebhookPost",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Shopware order transaction ID associated with the webhook."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook handled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponse"
+                },
+                "example": {
+                  "payment": {
+                    "id": "tr_123456789"
+                  },
+                  "status": "success"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WebhookResponse": {
+        "type": "object",
+        "properties": {
+          "payment": {
+            "type": "object",
+            "description": "The Mollie payment associated with the transaction."
+          },
+          "status": {
+            "type": "string",
+            "example": "success"
+          }
+        },
+        "required": ["payment", "status"]
       }
     }
   }

@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "Det oppstod et problem ved fjerning av kortet ditt",
                 "newCard": "Nytt kort",
                 "remove": "Fjern",
-                "subscriptionBadge": "Abonnement"
+                "subscriptionBadge": "Abonnement",
+                "emptyMessage": "Ingen lagrede kort"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Kanseller",
@@ -72,8 +73,8 @@
             "account": {
                 "btnEditBillingAddress": "rediger faktureringsadresse",
                 "btnEditShippingAddress": "rediger fraktadresse",
-                "cancelSubscription": "Abonnementet be kansellert",
-                "errorCancelSubscription": "Abonnementet kunne ikke kanselleres på grunn av en feil. Vennligst kontakt vår support.",
+                "successCancel": "Abonnementet be kansellert",
+                "errorCancel": "Abonnementet kunne ikke kanselleres på grunn av en feil. Vennligst kontakt vår support.",
                 "errorPause": "Det oppstod en feil ved pausing av abonnementet ditt",
                 "errorResume": "Det oppstod en feil ved gjenopptakelse av abonnementet ditt",
                 "errorSkip": "Det oppstod en feil ved overhopping av abonnementet ditt",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Dine nyeste abonnementer:",
                 "orderActionHide": "Skjul",
                 "orderActionView": "Vis",
+                "priceChangeNoticeCancelButton": "Si opp abonnement",
+                "priceChangeNoticeCurrentLabel": "Nåværende pris",
+                "priceChangeNoticeEffectiveLabel": "Gjelder fra",
+                "priceChangeNoticeHeadline": "Kommende prisendring",
+                "priceChangeNoticeMessage": "Fornyelsesprisen for dette abonnementet vil endres. Du kan si opp når som helst før den nye prisen trer i kraft.",
+                "priceChangeNoticeNewLabel": "Ny pris",
                 "shippingEqualToBilling": "Lik faktureringsadresse",
                 "successPause": "Abonnementet ditt har blitt pauset",
                 "successResume": "Abonnementet ditt vil nå bli gjenopptatt",

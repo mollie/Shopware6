@@ -2,33 +2,47 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Mollie Payment Endpoint",
-    "description": "Endpoint to handle Mollie payments.",
+    "description": "Endpoint the customer returns to from the Mollie payment provider. Loads the payment status and forwards to Shopware's finalize transaction handler, which redirects to the storefront finish/error page.",
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/payment/{swTransactionId}": {
+    "/mollie/payment/{transactionId}": {
       "get": {
         "tags": [
           "Mollie",
           "Payment"
         ],
-        "summary": "Handle Mollie Payment (GET)",
+        "summary": "Handle Mollie Payment Return (GET)",
         "operationId": "handleMolliePaymentGet",
         "parameters": [
           {
-            "name": "swTransactionId",
+            "name": "transactionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The Shopware transaction ID."
+            "description": "The Shopware order transaction ID."
           }
         ],
         "responses": {
-          "200": {
-            "description": "Mollie payment handled successfully.",
-            "content": {}
+          "302": {
+            "description": "Forwards to Shopware's finalize transaction handler, which renders/redirects to the storefront checkout finish or error page.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "The storefront URL the customer is redirected to after finalizing the transaction."
+              }
+            },
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -37,23 +51,37 @@
           "Mollie",
           "Payment"
         ],
-        "summary": "Handle Mollie Payment (POST)",
+        "summary": "Handle Mollie Payment Return (POST)",
         "operationId": "handleMolliePaymentPost",
         "parameters": [
           {
-            "name": "swTransactionId",
+            "name": "transactionId",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The Shopware transaction ID."
+            "description": "The Shopware order transaction ID."
           }
         ],
         "responses": {
-          "200": {
-            "description": "Mollie payment handled successfully.",
-            "content": {}
+          "302": {
+            "description": "Forwards to Shopware's finalize transaction handler, which renders/redirects to the storefront checkout finish or error page.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "The storefront URL the customer is redirected to after finalizing the transaction."
+              }
+            },
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }

@@ -1,47 +1,65 @@
 <?php
+declare(strict_types=1);
 
-namespace Mollie\Unit\StatsUpdate;
+namespace Mollie\Shopware\Unit\StatsUpdate;
 
-use Kiener\MolliePayments\Controller\Storefront\Webhook\NotificationFacade;
 use Mollie\Shopware\Component\StatusUpdate\UpdateStatusAction;
-use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
+use Mollie\Shopware\Unit\Fake\FakeOrderTransactionRepository;
+use Mollie\Shopware\Unit\Fake\FakeWebhookRoute;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Framework\Api\Context\SystemSource;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
+use Psr\Log\NullLogger;
 
-
+#[CoversClass(UpdateStatusAction::class)]
 class UpdateStatusActionTest extends TestCase
 {
+    /**
+     * This test verifies that no updates are reported when no open transactions exist.
+     */
     public function testNothingToUpdate(): void
     {
-        $fakeRepository = $this->createMock(OrderTransactionRepositoryInterface::class);
-        $fakeNotification = $this->createMock(NotificationFacade::class);
-        $action = new UpdateStatusAction($fakeRepository, $fakeNotification);
+        $repository = new FakeOrderTransactionRepository();
+        $webhookRoute = new FakeWebhookRoute();
+
+        $action = new UpdateStatusAction($repository, $webhookRoute, new NullLogger());
         $result = $action->execute();
 
         $this->assertEquals(0, $result->getUpdated());
+        $this->assertEmpty($webhookRoute->getNotifiedTransactionIds());
     }
 
+    /**
+     * This test verifies that one transaction is notified and counted when it is open.
+     */
     public function testOneTransactionUpdated(): void
     {
-        $idResult = new IdSearchResult(1, [
-            [
-                'data' => [
-                    'id' => 'test123'
-                ],
-                'primaryKey' => 'test123'
-            ]
-        ], new Criteria(), new Context(new SystemSource()));
+        $repository = new FakeOrderTransactionRepository();
+        $repository->setMatchingIds('test123');
 
-        $fakeRepository = $this->createMock(OrderTransactionRepositoryInterface::class);
-        $fakeRepository->method('findOpenTransactions')->willReturn($idResult);
-        $fakeNotification = $this->createMock(NotificationFacade::class);
-        $action = new UpdateStatusAction($fakeRepository, $fakeNotification);
+        $webhookRoute = new FakeWebhookRoute();
 
+        $action = new UpdateStatusAction($repository, $webhookRoute, new NullLogger());
         $result = $action->execute();
 
         $this->assertEquals(1, $result->getUpdated());
+        $this->assertEquals(['test123'], $webhookRoute->getNotifiedTransactionIds());
+    }
+
+    /**
+     * This test verifies that a failing webhook notification is caught and the transaction
+     * is not counted as updated.
+     */
+    public function testFailedNotificationIsSkipped(): void
+    {
+        $repository = new FakeOrderTransactionRepository();
+        $repository->setMatchingIds('tx-ok', 'tx-fail', 'tx-ok-2');
+
+        $webhookRoute = new FakeWebhookRoute();
+        $webhookRoute->addFailingTransactionId('tx-fail');
+
+        $action = new UpdateStatusAction($repository, $webhookRoute, new NullLogger());
+        $result = $action->execute();
+
+        $this->assertEquals(2, $result->getUpdated());
     }
 }

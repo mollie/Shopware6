@@ -1,0 +1,24 @@
+Sehr geehrte(r) {{ customer.firstName }} {{ customer.lastName }},<br/>
+<br/>
+wir möchten Sie darüber informieren, dass sich der Preis Ihres Abonnements bei {{ salesChannel.name }} ändert.<br/>
+<br/>
+<strong>Abonnement</strong>: {{ subscription.description }}<br/>
+<strong>Aktueller Betrag</strong>: {{ subscription.amount }} {{ subscription.currency.symbol }}<br/>
+<strong>Neuer Betrag</strong>: {{ subscription.nextNotifiedPrice }} {{ subscription.currency.symbol }}<br/>
+<strong>Gültig ab der nächsten Verlängerung am</strong>: {{ subscription.nextPaymentAt | date("d.m.Y", false) }}<br/>
+<br/>
+{% if subscription.order and subscription.order.lineItems %}
+<strong>Bestandteile dieses Abonnements:</strong><br/>
+<ul>
+{% for lineItem in subscription.order.lineItems %}
+    <li>{{ lineItem.label }} &mdash; {{ lineItem.quantity }} &times; {{ lineItem.unitPrice }} {{ subscription.currency.symbol }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+<br/>
+Falls Sie mit dem neuen Preis nicht einverstanden sind, können Sie Ihr Abonnement vor der nächsten Verlängerung in Ihrem Konto bei {{ salesChannel.name }} kündigen.<br/>
+<br/>
+Sollten wir nichts von Ihnen hören, gilt der neue Preis automatisch ab der nächsten Verlängerung.<br/>
+<br/>
+Vielen Dank,<br/>
+{{ salesChannel.name }}

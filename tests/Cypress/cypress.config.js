@@ -40,8 +40,6 @@ module.exports = defineConfig({
         taskTimeout: 60000,
 
         testIsolation: true,
-        experimentalSessionAndOrigin: true,
-        experimentalWebKitSupport: true,
 
         // We've imported your old cypress plugins here.
         // You may want to clean this up later by importing these.

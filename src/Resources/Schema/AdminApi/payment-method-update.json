@@ -23,7 +23,8 @@
                       "type": "boolean",
                       "example": true
                     }
-                  }
+                  },
+                  "required": ["success"]
                 },
                 "example": {
                   "success": true
@@ -32,25 +33,26 @@
             }
           },
           "500": {
-            "description": "Internal server error.",
+            "description": "Failed to update the payment methods. The HTTP status code matches the underlying exception's status code (defaults to 500).",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
                     "message": {
                       "type": "string",
                       "example": "Error message"
-                    },
-                    "success": {
-                      "type": "string",
-                      "example": "false"
                     }
-                  }
+                  },
+                  "required": ["success", "message"]
                 },
                 "example": {
-                  "message": "Error message",
-                  "success": "false"
+                  "success": false,
+                  "message": "Error message"
                 }
               }
             }

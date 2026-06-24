@@ -6,15 +6,26 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/creditcard/store-mandate-id/{mandateId}": {
+    "/mollie/creditcard/store-mandate-id/{customerId}/{mandateId}": {
       "post": {
         "tags": [
           "Mollie",
           "Credit Card"
         ],
         "summary": "Store Mollie Credit Card Mandate ID",
+        "description": "Deprecated route. Mandate IDs are no longer stored; provide \"mandateId\" in the request body for payment instead.",
+        "deprecated": true,
         "operationId": "storeMollieCreditCardMandateId",
         "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The customer ID."
+          },
           {
             "name": "mandateId",
             "in": "path",
@@ -37,9 +48,14 @@
                       "type": "boolean",
                       "example": true,
                       "description": "Indicates if storing the mandate ID was successful."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Informational message about the deprecated route.",
+                      "example": "Using deprecated route, please provide \"mandateId\" in request body for payment"
                     }
                   },
-                  "required": ["success"]
+                  "required": ["success", "message"]
                 }
               }
             }

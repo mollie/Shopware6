@@ -25,13 +25,18 @@
                     "success": {
                       "type": "boolean",
                       "example": true,
-                      "description": "Indicates if the cart was restored successfully."
+                      "description": "Indicates if the cart was restored successfully. False if restoring failed."
+                    },
+                    "apiAlias": {
+                      "type": "string",
+                      "example": "mollie_payments_applepay_direct_cart_restored"
                     }
                   },
-                  "required": ["success"]
+                  "required": ["success", "apiAlias"]
                 },
                 "example": {
-                  "success": true
+                  "success": true,
+                  "apiAlias": "mollie_payments_applepay_direct_cart_restored"
                 }
               }
             }

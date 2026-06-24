@@ -26,7 +26,7 @@
                 "selectBank": "Select bank"
             },
             "pos": {
-              "selectTerminal": "Select terminal"
+                "selectTerminal": "Select terminal"
             },
             "mandate": {
                 "sectionTitle": "Saved cards",
@@ -35,7 +35,8 @@
                 "deleteErrorMessage": "There was a problem when removing your card",
                 "newCard": "New card",
                 "remove": "Remove",
-                "subscriptionBadge" : "Subscription"
+                "subscriptionBadge": "Subscription",
+                "emptyMessage": "No saved cards"
             },
             "mandateRemoveModal": {
                 "cancelButton": "Cancel",
@@ -45,8 +46,8 @@
                 "title": "Delete Confirmation"
             },
             "phoneField": {
-              "headLine": "Phone number",
-              "phoneErrorMessage": "Phone Number is required. For example +31208202070"
+                "headLine": "Phone number",
+                "phoneErrorMessage": "Phone Number is required. For example +31208202070"
             }
         },
         "messages": {
@@ -72,8 +73,8 @@
             "account": {
                 "btnEditBillingAddress": "edit billing address",
                 "btnEditShippingAddress": "edit shipping address",
-                "cancelSubscription": "Subscription has been canceled",
-                "errorCancelSubscription": "The subscription could not be canceled due to an error. Please contact our support.",
+                "successCancel": "Subscription has been canceled",
+                "errorCancel": "The subscription could not be canceled due to an error. Please contact our support.",
                 "errorPause": "There was an error when pausing your subscription",
                 "errorResume": "There was an error when resuming your subscription",
                 "errorSkip": "There was an error when skipping your subscription",
@@ -98,6 +99,12 @@
                 "mollieSubscriptionsWelcome": "Your recent subscriptions:",
                 "orderActionHide": "Hide",
                 "orderActionView": "View",
+                "priceChangeNoticeCancelButton": "Cancel subscription",
+                "priceChangeNoticeCurrentLabel": "Current price",
+                "priceChangeNoticeEffectiveLabel": "Effective from",
+                "priceChangeNoticeHeadline": "Upcoming price change",
+                "priceChangeNoticeMessage": "The renewal price of this subscription is about to change. You can cancel any time before the new price applies.",
+                "priceChangeNoticeNewLabel": "New price",
                 "shippingEqualToBilling": "Equal to billing address",
                 "successPause": "Your subscription has been paused",
                 "successResume": "Your subscription will now be resumed",

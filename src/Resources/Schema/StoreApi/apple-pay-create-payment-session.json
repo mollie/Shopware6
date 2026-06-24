@@ -24,11 +24,16 @@
                   "validationUrl": {
                     "type": "string",
                     "description": "The validation URL for Apple Pay session creation."
+                  },
+                  "domain": {
+                    "type": "string",
+                    "description": "Optional custom domain to validate the session for. Must be in the configured allow list. Defaults to the sales channel storefront domain."
                   }
                 },
                 "required": ["validationUrl"],
                 "example": {
-                  "validationUrl": "https://example.com/applepay/validation"
+                  "validationUrl": "https://example.com/applepay/validation",
+                  "domain": "example.com"
                 }
               }
             }
@@ -36,20 +41,30 @@
         },
         "responses": {
           "200": {
-            "description": "Apple Pay payment session ID response.",
+            "description": "Apple Pay payment session response.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "value": {
+                    "session": {
+                      "type": "object",
+                      "description": "The raw Apple Pay payment session object returned by Mollie.",
+                      "additionalProperties": true
+                    },
+                    "apiAlias": {
                       "type": "string",
-                      "description": "The session ID for Apple Pay payment session."
+                      "example": "mollie_payments_applepay_direct_session"
                     }
                   },
-                  "required": ["value"],
+                  "required": ["session", "apiAlias"],
                   "example": {
-                    "value": "applepay_session_12345"
+                    "session": {
+                      "epochTimestamp": 1234567890,
+                      "merchantSessionIdentifier": "SSH12345",
+                      "displayName": "My Shop"
+                    },
+                    "apiAlias": "mollie_payments_applepay_direct_session"
                   }
                 }
               }

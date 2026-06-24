@@ -86,9 +86,6 @@ context("Order Shipping", () => {
             // verify delivery status and item shipped count
             assertShippingStatus('Shipped', 2);
 
-            if (shopware.isVersionLower('6.5')) {
-                repoOrderDetails.getMollieActionsButton().click({force: true});
-            }
             assertShippingButtonIsDisabled();
 
         })
@@ -115,10 +112,6 @@ context("Order Shipping", () => {
             shippingAction.shipFullOrder();
 
             assertShippingStatus('Shipped', 2);
-
-            if (shopware.isVersionLower('6.5')) {
-                repoOrderDetails.getMollieActionsButton().click({force: true});
-            }
 
             assertShippingButtonIsDisabled();
         })
@@ -158,10 +151,6 @@ context("Order Shipping", () => {
 
             shippingAction.shipLineItem(1);
 
-            // somehow this is required in Shopware 6.5, lets just stick with it, its ok
-            cy.wait(2000);
-            cy.reload();
-
             assertShippingStatus('Shipped (partially)', 1);
 
             // --------------------------------------------------------------------------------------------------------------------
@@ -189,10 +178,6 @@ context("Order Shipping", () => {
             shippingAction.shipFullOrder();
 
             assertShippingStatus('Shipped', 4);
-
-            if (shopware.isVersionLower('6.5')) {
-                repoOrderDetails.getMollieActionsButton().click({force: true});
-            }
 
             assertShippingButtonIsDisabled();
         })
@@ -272,7 +257,7 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
     const scenarioDummyBasket = new DummyBasketScenario(itemQty, itemCount);
     scenarioDummyBasket.execute();
 
-    paymentAction.switchPaymentMethod('Klarna');
+    paymentAction.switchPaymentMethod('Kl (Orders API - Test only)');
 
     shopware.prepareDomainChange();
     checkout.placeOrderOnConfirm();
@@ -291,8 +276,9 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  * @param shippedItemsCount
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
+    cy.contains('The order has been successfully shipped.', {timeout: 20000});
+    repoOrderDetails.getOrderDetailsGeneralTab().click();
     cy.reload();
-    cy.wait(2000);
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
 
@@ -303,6 +289,7 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
 }
 
 function assertShippingButtonIsDisabled() {
+    adminOrders.openMollieTab();
 
     repoOrderDetails.getMollieActionButtonShipThroughMollie()
         .should('have.attr', 'class')

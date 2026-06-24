@@ -11,18 +11,10 @@ const storeApiPrefix = '/store-api';
 
 context(storeApiPrefix + "/mollie/creditcard/store-token", () => {
 
-    it('C266682: Store Credit Card Token with invalid customer ID (Store API) @core', () => {
+    it('C266682: Store Credit Card Token with invalid customer ID (Store API) @core', async () => {
+        const response = await client.post('/mollie/creditcard/store-token/cust-123/tk_123');
 
-        const request = new Promise((resolve) => {
-            client.post('/mollie/creditcard/store-token/cust-123/tk_123').then(response => {
-                resolve({'data': response.data});
-            });
-        })
-
-        cy.wrap(request).its('data').then(response => {
-            cy.wrap(response).its('status').should('eq', 500)
-            expect(response.data.errors[0].detail).to.contain('Customer with ID  not found in Shopware');
-        });
-    })
+        expect(response.data.message).to.contain('Using deprecated route, please provide "creditCardToken" in request body for payment');
+    });
 
 })

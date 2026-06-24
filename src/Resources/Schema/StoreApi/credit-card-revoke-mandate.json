@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/mollie/mandate/revoke/{mandateId}": {
+    "/mollie/mandate/revoke/{customerId}/{mandateId}": {
       "post": {
         "tags": [
           "Mollie",
@@ -15,6 +15,15 @@
         "summary": "Revoke Mollie Mandate",
         "operationId": "revokeMollieMandate",
         "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The customer ID."
+          },
           {
             "name": "mandateId",
             "in": "path",
