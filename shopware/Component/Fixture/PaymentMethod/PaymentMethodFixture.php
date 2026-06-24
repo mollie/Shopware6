@@ -116,6 +116,7 @@ final class PaymentMethodFixture extends AbstractFixture
             $isTestOnlyActive = $paymentHandler instanceof TestOnlyAwareInterface;
             $result[] = [
                 'id' => Uuid::fromStringToHex('mollie-payment-' . $paymentHandler->getTechnicalName()),
+                'technicalName' => $paymentHandler->getTechnicalName(),
                 'name' => $paymentMethodName,
                 'translations' => [
                     Defaults::LANGUAGE_SYSTEM => [
