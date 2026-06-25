@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Abonnement | Mollie Abonnementer"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Bestilling gennemført",
-            "mollie_checkout_order_failed": " Bestilling mislykkedes",
-            "mollie_checkout_order_canceled": " Bestilling annulleret",
+            "mollie_payment_success": " Bestilling gennemført",
+            "mollie_payment_failed": " Bestilling mislykkedes",
+            "mollie_payment_cancelled": " Bestilling annulleret",
             "mollie_webhook_received_All": " Mollie Webhook Modtaget (Alle)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Modtaget (Åben)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Modtaget (Autoriseret)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Modtaget (Mislykkedes)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Modtaget (Annulleret)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie abonnement genoptaget",
             "mollie_subscription_skipped": " Mollie abonnement sprunget over",
             "mollie_subscription_renewed": " Mollie abonnement fornyet",
-            "mollie_subscription_renewal_reminder": " Mollie påmindelse om fornyelse af abonnement"
+            "mollie_subscription_renewal_reminder": " Mollie påmindelse om fornyelse af abonnement",
+            "mollie_subscription_priceChangeNotice": " Mollie abonnement prisændring"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Annulleret",
             "expired": "Udløbet",
             "partiallyRefunded": "Refunderet (delvist)",
-            "orderSuccess": "Ordren var vellykket",
-            "orderFailed": "Ordren mislykkedes",
-            "orderCanceled": "Ordren blev annulleret"
+            "payment": "Betaling",
+            "success": "Succes",
+            "priceChangeNotice": "Prisændring"
         }
     }
 }

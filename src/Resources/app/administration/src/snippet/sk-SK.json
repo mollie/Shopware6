@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Predplatné | Mollie Predplatné"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Objednávka bola úspešná",
-            "mollie_checkout_order_failed": "Objednávka zlyhala",
-            "mollie_checkout_order_canceled": "Objednávka bola zrušená",
+            "mollie_payment_success": "Objednávka bola úspešná",
+            "mollie_payment_failed": "Objednávka zlyhala",
+            "mollie_payment_cancelled": "Objednávka bola zrušená",
             "mollie_webhook_received_All": "Prijatý Webhook Mollie (všetky)",
+            "mollie_webhook_received_status_open": "Prijatý Webhook Mollie (Otvorené)",
             "mollie_webhook_received_status_authorized": "Mollie Webhook prijatý (Autorizovaný)",
             "mollie_webhook_received_status_failed": "Mollie Webhook prijatý (Zlyhalo)",
             "mollie_webhook_received_status_canceled": "Mollie Webhook prijatý (Zrušený)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": "Predplatné Mollie bolo znovu aktivované",
             "mollie_subscription_skipped": "Mollie predplatné preskočené",
             "mollie_subscription_renewed": "Mollie predplatné bolo obnovené",
-            "mollie_subscription_renewal_reminder": "Mollie pripomienka na obnovenie predplatného"
+            "mollie_subscription_renewal_reminder": "Mollie pripomienka na obnovenie predplatného",
+            "mollie_subscription_priceChangeNotice": "Mollie predplatné zmena ceny"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Zrušené",
             "expired": "Expirované",
             "partiallyRefunded": "Vrátené (čiastočne)",
-            "orderSuccess": "Objednávka úspešná",
-            "orderFailed": "Objednávka zlyhala",
-            "orderCanceled": "Objednávka zrušená"
+            "payment": "Platba",
+            "success": "Úspech",
+            "priceChangeNotice": "Zmena ceny"
         }
     }
 }

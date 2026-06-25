@@ -33,6 +33,8 @@ final class SubscriptionPage extends Page
 
     protected int $priceUpdateNoticeDays = 0;
 
+    protected bool $autoPriceUpdate = false;
+
     /**
      * @return EntitySearchResult<SubscriptionCollection<SubscriptionEntity>>
      */
@@ -127,5 +129,15 @@ final class SubscriptionPage extends Page
     public function setPriceUpdateNoticeDays(int $priceUpdateNoticeDays): void
     {
         $this->priceUpdateNoticeDays = $priceUpdateNoticeDays;
+    }
+
+    public function isAutoPriceUpdate(): bool
+    {
+        return $this->autoPriceUpdate;
+    }
+
+    public function setAutoPriceUpdate(bool $autoPriceUpdate): void
+    {
+        $this->autoPriceUpdate = $autoPriceUpdate;
     }
 }

@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie naročnina | Mollie naročnine"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Naročilo uspešno",
-            "mollie_checkout_order_failed": " Naročilo neuspešno",
-            "mollie_checkout_order_canceled": " Naročilo preklicano",
+            "mollie_payment_success": " Naročilo uspešno",
+            "mollie_payment_failed": " Naročilo neuspešno",
+            "mollie_payment_cancelled": " Naročilo preklicano",
             "mollie_webhook_received_All": " Prejeto avtomatizirano obvestilo Mollie (vsa)",
+            "mollie_webhook_received_status_open": " Prejeto avtomatizirano obvestilo Mollie (Odprto)",
             "mollie_webhook_received_status_authorized": " Prejeto avtomatizirano obvestilo Mollie (avtorizirano)",
             "mollie_webhook_received_status_failed": " Mollie avtomatizirano obvestilo prejeto (neuspešno)",
             "mollie_webhook_received_status_canceled": " Mollie avtomatizirano obvestilo prejeto (preklicano)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie naročnina se nadaljuje",
             "mollie_subscription_skipped": " Mollie naročnina ni bila izvedena",
             "mollie_subscription_renewed": " Mollie naročnina je obnovljena",
-            "mollie_subscription_renewal_reminder": " Mollie opomnik za obnovitev naročnine"
+            "mollie_subscription_renewal_reminder": " Mollie opomnik za obnovitev naročnine",
+            "mollie_subscription_priceChangeNotice": " Mollie naročnina sprememba cene"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Preklicano",
             "expired": "Potekel",
             "partiallyRefunded": "Povrnjeno (delno)",
-            "orderSuccess": "Naročilo uspešno",
-            "orderFailed": "Naročilo neuspešno",
-            "orderCanceled": "Naročilo preklicano"
+            "payment": "Plačilo",
+            "success": "Uspešno",
+            "priceChangeNotice": "Sprememba cene"
         }
     }
 }

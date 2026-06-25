@@ -66,6 +66,7 @@ class SubscriptionPageLoader
         $page->setAllowReorder($settings->isAllowReorder());
         $page->setAllowUpdatePayment($settings->isAllowUpdatePayment());
         $page->setPriceUpdateNoticeDays($settings->getPriceUpdateNoticeDays());
+        $page->setAutoPriceUpdate($settings->isAutoPriceUpdate());
 
         return $page;
     }

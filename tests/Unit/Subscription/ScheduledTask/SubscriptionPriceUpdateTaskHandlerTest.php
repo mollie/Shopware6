@@ -15,7 +15,7 @@ final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
     public function testTaskNameAndIntervalMatchExpectedDefaults(): void
     {
         $this->assertSame('mollie.subscriptions.price_update', SubscriptionPriceUpdateTask::getTaskName());
-        $this->assertSame(86400, SubscriptionPriceUpdateTask::getDefaultInterval());
+        $this->assertSame(300, SubscriptionPriceUpdateTask::getDefaultInterval());
     }
 
     public function testGetHandledMessagesReturnsTaskClass(): void

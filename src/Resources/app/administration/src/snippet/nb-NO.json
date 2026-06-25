@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie-abonnement | Mollie-abonnementer"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Bestilling vellykket",
-            "mollie_checkout_order_failed": "Bestilling mislyktes",
-            "mollie_checkout_order_canceled": "Bestilling kansellert",
+            "mollie_payment_success": "Bestilling vellykket",
+            "mollie_payment_failed": "Bestilling mislyktes",
+            "mollie_payment_cancelled": "Bestilling kansellert",
             "mollie_webhook_received_All": "Mollie Webhook Mottatt (Alle)",
+            "mollie_webhook_received_status_open": "Mollie Webhook Mottatt (Åpen)",
             "mollie_webhook_received_status_authorized": "Mollie Webhook Mottatt (Autorisert)",
             "mollie_webhook_received_status_failed": "Mollie Webhook Mottatt (Mislyktes)",
             "mollie_webhook_received_status_canceled": "Mollie Webhook Mottatt (Kansellert)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": "Mollie abonnement gjenopptatt",
             "mollie_subscription_skipped": "Mollie abonnement hoppet over",
             "mollie_subscription_renewed": "Mollie abonnement fornyet",
-            "mollie_subscription_renewal_reminder": "Mollie påminnelse om fornyelse av abonnement"
+            "mollie_subscription_renewal_reminder": "Mollie påminnelse om fornyelse av abonnement",
+            "mollie_subscription_priceChangeNotice": "Mollie abonnement prisendring"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Kansellert",
             "expired": "Utløpt",
             "partiallyRefunded": "Refundert (delvis)",
-            "orderSuccess": "Bestilling vellykket",
-            "orderFailed": "Bestilling mislyktes",
-            "orderCanceled": "Bestilling kansellert"
+            "payment": "Betaling",
+            "success": "Vellykket",
+            "priceChangeNotice": "Prisendring"
         }
     }
 }

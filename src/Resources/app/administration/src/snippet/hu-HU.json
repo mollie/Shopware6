@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie előfizetés | Mollie előfizetések"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " A rendelés sikeres",
-            "mollie_checkout_order_failed": " A rendelés sikertelen",
-            "mollie_checkout_order_canceled": " A rendelés törölve",
+            "mollie_payment_success": " A rendelés sikeres",
+            "mollie_payment_failed": " A rendelés sikertelen",
+            "mollie_payment_cancelled": " A rendelés törölve",
             "mollie_webhook_received_All": " Mollie Webhook beérkezett (Minden)",
+            "mollie_webhook_received_status_open": " Mollie Webhook beérkezett (Nyitott)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook beérkezett (Engedélyezett)",
             "mollie_webhook_received_status_failed": " Mollie Webhook beérkezett (Sikertelen)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook beérkezett (Törölve)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie előfizetés folytatva",
             "mollie_subscription_skipped": " Mollie előfizetés átugorva",
             "mollie_subscription_renewed": " Mollie előfizetés megújítva",
-            "mollie_subscription_renewal_reminder": " Mollie emlékeztető az előfizetés megújításához"
+            "mollie_subscription_renewal_reminder": " Mollie emlékeztető az előfizetés megújításához",
+            "mollie_subscription_priceChangeNotice": " Mollie előfizetés árváltozás"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Törölve",
             "expired": "Lejárt",
             "partiallyRefunded": "Refunded (partially)",
-            "orderSuccess": "A megrendelés sikeres",
-            "orderFailed": "A megrendelés sikertelen",
-            "orderCanceled": "A megrendelés törölve"
+            "payment": "Fizetés",
+            "success": "Sikeres",
+            "priceChangeNotice": "Árváltozás"
         }
     }
 }

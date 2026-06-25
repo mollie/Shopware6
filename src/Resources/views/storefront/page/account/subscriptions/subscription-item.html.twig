@@ -271,7 +271,7 @@
 
                     {% block page_account_mollie_subscriptions_item_price_update_notice %}
 
-                        {% if subscription.priceUpdateState == 'notified' and subscription.nextNotifiedPrice is not null and subscription.notifiedAt is not null %}
+                        {% if page.autoPriceUpdate and subscription.priceUpdateState == 'notified' and subscription.nextNotifiedPrice is not null and subscription.notifiedAt is not null %}
                             {% set effectiveDate = subscription.notifiedAt|date_modify('+' ~ page.priceUpdateNoticeDays ~ ' day') %}
                             <div class="col-12 px-0 subscription-price-update-notice"
                                  data-test="subscription-price-update-notice">
