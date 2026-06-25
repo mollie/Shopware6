@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie prenumerata | Mollie prenumeratos"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Užsakymas sėkmingas",
-            "mollie_checkout_order_failed": "Užsakymas nepavyko",
-            "mollie_checkout_order_canceled": "Užsakymas atšauktas",
+            "mollie_payment_success": "Užsakymas sėkmingas",
+            "mollie_payment_failed": "Užsakymas nepavyko",
+            "mollie_payment_cancelled": "Užsakymas atšauktas",
             "mollie_webhook_received_All": " Gautas Mollie „webhook“ (Visi)",
             "mollie_webhook_received_status_authorized": "Gautas Mollie „webhook“ (Autorizuoti)",
             "mollie_webhook_received_status_failed": "Gautas Mollie „webhook“ (Nepavykę)",

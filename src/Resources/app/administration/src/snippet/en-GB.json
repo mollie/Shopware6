@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Order successful",
-            "mollie_checkout_order_failed": " Order failed",
-            "mollie_checkout_order_canceled": " Order canceled",
+            "mollie_payment_success": " Order successful",
+            "mollie_payment_failed": " Order failed",
+            "mollie_payment_cancelled": " Order canceled",
             "mollie_webhook_received_All": " Mollie Webhook Received (All)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Received (Open)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Received (Authorized)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Received (Failed)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Received (Canceled)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie subscription resumed",
             "mollie_subscription_skipped": " Mollie subscription skipped",
             "mollie_subscription_renewed": " Mollie subscription renewed",
-            "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal"
+            "mollie_subscription_renewal_reminder": " Mollie reminder for subscription renewal",
+            "mollie_subscription_priceChangeNotice": " Mollie subscription price change"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Canceled",
             "expired": "Expired",
             "partiallyRefunded": "Refunded (partially)",
-            "orderSuccess": "Order successful",
-            "orderFailed": "Order failed",
-            "orderCanceled": "Order canceled"
+            "payment": "Payment",
+            "success": "Success",
+            "priceChangeNotice": "Price change notice"
         }
     }
 }

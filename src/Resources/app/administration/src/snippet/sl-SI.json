@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie naročnina | Mollie naročnine"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Naročilo uspešno",
-            "mollie_checkout_order_failed": " Naročilo neuspešno",
-            "mollie_checkout_order_canceled": " Naročilo preklicano",
+            "mollie_payment_success": " Naročilo uspešno",
+            "mollie_payment_failed": " Naročilo neuspešno",
+            "mollie_payment_cancelled": " Naročilo preklicano",
             "mollie_webhook_received_All": " Prejeto avtomatizirano obvestilo Mollie (vsa)",
             "mollie_webhook_received_status_authorized": " Prejeto avtomatizirano obvestilo Mollie (avtorizirano)",
             "mollie_webhook_received_status_failed": " Mollie avtomatizirano obvestilo prejeto (neuspešno)",

@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie-abonnement | Mollie-abonnementer"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Bestilling vellykket",
-            "mollie_checkout_order_failed": "Bestilling mislyktes",
-            "mollie_checkout_order_canceled": "Bestilling kansellert",
+            "mollie_payment_success": "Bestilling vellykket",
+            "mollie_payment_failed": "Bestilling mislyktes",
+            "mollie_payment_cancelled": "Bestilling kansellert",
             "mollie_webhook_received_All": "Mollie Webhook Mottatt (Alle)",
             "mollie_webhook_received_status_authorized": "Mollie Webhook Mottatt (Autorisert)",
             "mollie_webhook_received_status_failed": "Mollie Webhook Mottatt (Mislyktes)",

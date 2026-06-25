@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie Predplatné | Mollie Predplatné"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Objednávka bola úspešná",
-            "mollie_checkout_order_failed": "Objednávka zlyhala",
-            "mollie_checkout_order_canceled": "Objednávka bola zrušená",
+            "mollie_payment_success": "Objednávka bola úspešná",
+            "mollie_payment_failed": "Objednávka zlyhala",
+            "mollie_payment_cancelled": "Objednávka bola zrušená",
             "mollie_webhook_received_All": "Prijatý Webhook Mollie (všetky)",
             "mollie_webhook_received_status_authorized": "Mollie Webhook prijatý (Autorizovaný)",
             "mollie_webhook_received_status_failed": "Mollie Webhook prijatý (Zlyhalo)",

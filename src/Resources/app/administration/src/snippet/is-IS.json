@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie áskrift | Mollie áskriftir"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Pöntun árángursrík",
-            "mollie_checkout_order_failed": "Pöntun misheppnaðist",
-            "mollie_checkout_order_canceled": "Pöntun aflýst",
+            "mollie_payment_success": " Pöntun árángursrík",
+            "mollie_payment_failed": "Pöntun misheppnaðist",
+            "mollie_payment_cancelled": "Pöntun aflýst",
             "mollie_webhook_received_All": " Mollie Webhook Móttekin (Allt)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Móttekin (Viðurkennd)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Móttekin (Mistókst)",

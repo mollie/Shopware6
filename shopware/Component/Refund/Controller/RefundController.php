@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Refund\Controller;
 
+use Mollie\Shopware\Component\FlowBuilder\Event\Refund\RefundStartedEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -184,6 +185,9 @@ final class RefundController extends AbstractController
             'amount' => $createRefund->getAmount()?->getValue(),
             'type' => $refundType,
         ]);
+
+        $refundStartedEvent = new RefundStartedEvent($order, $dalRefund, $refund->getAmount()->getValue(), $context);
+        $this->eventDispatcher->dispatch($refundStartedEvent);
 
         $refund->setRefundItems($dalRefund->getRefundItems());
         $refund->setInternalDescription((string) $dalRefund->getInternalDescription());

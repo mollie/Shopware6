@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie tellimus | Mollie tellimused"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Tellimus edukas",
-            "mollie_checkout_order_failed": "Tellimus ebaõnnestus",
-            "mollie_checkout_order_canceled": "Tellimus tühistatud",
+            "mollie_payment_success": "Tellimus edukas",
+            "mollie_payment_failed": "Tellimus ebaõnnestus",
+            "mollie_payment_cancelled": "Tellimus tühistatud",
             "mollie_webhook_received_All": " Mollie Veebikonks Saadud (Kõik)",
             "mollie_webhook_received_status_authorized": " Mollie Veebikonks Saadud (Volitatud)",
             "mollie_webhook_received_status_failed": " Mollie Veebikonks Saadud (Ebaõnnestunud)",

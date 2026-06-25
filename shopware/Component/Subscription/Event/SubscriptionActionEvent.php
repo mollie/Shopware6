@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Shopware\Core\Checkout\Customer\CustomerDefinition;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Event\CustomerAware;
 use Shopware\Core\Framework\Event\EventData\EntityType;
 use Shopware\Core\Framework\Event\EventData\EventDataCollection;
 use Shopware\Core\Framework\Event\EventData\MailRecipientStruct;
@@ -16,7 +17,7 @@ use Shopware\Core\Framework\Event\MailAware;
 use Shopware\Core\Framework\Event\SalesChannelAware;
 use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class SubscriptionActionEvent extends Event implements SubscriptionAware, MailAware, SalesChannelAware, FlowEventAware
+abstract class SubscriptionActionEvent extends Event implements SubscriptionAware, CustomerAware, MailAware, SalesChannelAware, FlowEventAware
 {
     public function __construct(private readonly SubscriptionEntity $subscription,
         private readonly CustomerEntity $customer,
@@ -62,6 +63,11 @@ abstract class SubscriptionActionEvent extends Event implements SubscriptionAwar
     public function getCustomer(): CustomerEntity
     {
         return $this->customer;
+    }
+
+    public function getCustomerId(): string
+    {
+        return $this->customer->getId();
     }
 
     public function getContext(): Context

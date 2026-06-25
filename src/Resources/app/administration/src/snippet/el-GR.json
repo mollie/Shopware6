@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie Συνδρομή | Mollie Συνδρομές"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Η παραγγελία ήταν επιτυχής",
-            "mollie_checkout_order_failed": " Η παραγγελία απέτυχε",
-            "mollie_checkout_order_canceled": " Η παραγγελία ακυρώθηκε",
+            "mollie_payment_success": " Η παραγγελία ήταν επιτυχής",
+            "mollie_payment_failed": " Η παραγγελία απέτυχε",
+            "mollie_payment_cancelled": " Η παραγγελία ακυρώθηκε",
             "mollie_webhook_received_All": " Λήφθηκε Webhook Mollie (Όλα)",
             "mollie_webhook_received_status_authorized": " Λήφθηκε Webhook Mollie (Εγκεκριμένο)",
             "mollie_webhook_received_status_failed": " Λήφθηκε Webhook Mollie (Απέτυχε)",

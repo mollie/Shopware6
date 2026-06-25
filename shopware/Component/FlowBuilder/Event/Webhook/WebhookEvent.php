@@ -34,7 +34,7 @@ class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, Mail
 
     public function getName(): string
     {
-        return 'mollie.webhook_received.' . self::getStatus();
+        return 'mollie.webhook_received.' . static::getStatus();
     }
 
     public function getMailStruct(): MailRecipientStruct
@@ -81,8 +81,13 @@ class WebhookEvent extends Event implements MolliePaymentAware, OrderAware, Mail
         return $this->order;
     }
 
+    /**
+     * Segment appended to "mollie.webhook_received." to build the flow event
+     * name. Kept as the legacy "All" / "status.<status>" scheme so flows
+     * configured before the refactor keep matching.
+     */
     protected static function getStatus(): string
     {
-        return 'all';
+        return 'All';
     }
 }

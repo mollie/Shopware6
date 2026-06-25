@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie előfizetés | Mollie előfizetések"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " A rendelés sikeres",
-            "mollie_checkout_order_failed": " A rendelés sikertelen",
-            "mollie_checkout_order_canceled": " A rendelés törölve",
+            "mollie_payment_success": " A rendelés sikeres",
+            "mollie_payment_failed": " A rendelés sikertelen",
+            "mollie_payment_cancelled": " A rendelés törölve",
             "mollie_webhook_received_All": " Mollie Webhook beérkezett (Minden)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook beérkezett (Engedélyezett)",
             "mollie_webhook_received_status_failed": " Mollie Webhook beérkezett (Sikertelen)",

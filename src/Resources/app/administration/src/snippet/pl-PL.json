@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Zamówienie zrealizowane",
-            "mollie_checkout_order_failed": " Zamówienie nieudane",
-            "mollie_checkout_order_canceled": " Zamówienie anulowane",
+            "mollie_payment_success": " Zamówienie zrealizowane",
+            "mollie_payment_failed": " Zamówienie nieudane",
+            "mollie_payment_cancelled": " Zamówienie anulowane",
             "mollie_webhook_received_All": " Otrzymano webhooki Mollie (wszystkie)",
             "mollie_webhook_received_status_authorized": " Otrzymano webhook Mollie (Autoryzowany)",
             "mollie_webhook_received_status_failed": " Otrzymano webhook Mollie (Nieudany)",

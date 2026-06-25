@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie Prenumeration | Mollie Prenumerationer"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Lyckad beställning",
-            "mollie_checkout_order_failed": " Misslyckad beställning",
-            "mollie_checkout_order_canceled": " Avbruten beställningen",
+            "mollie_payment_success": " Lyckad beställning",
+            "mollie_payment_failed": " Misslyckad beställning",
+            "mollie_payment_cancelled": " Avbruten beställningen",
             "mollie_webhook_received_All": " Mollie Webhook Mottagen (Alla)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Mottagen (Auktoriserad)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Mottagen (Misslyckad)",

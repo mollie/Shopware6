@@ -64,6 +64,35 @@ final class PriceDriftDetectorTest extends TestCase
         $this->assertStringStartsWith('price_notified', (string) $upsert['historyEntries'][0]['comment']);
     }
 
+    public function testDriftDetectedForLowerPriceDispatchesEvent(): void
+    {
+        $subscription = $this->buildSubscription('subscription-id');
+        $subscription->setAmount(50.00);
+
+        $repository = new FakeSubscriptionRepository();
+        $repository->add($subscription);
+
+        // New product price is LOWER than the stored subscription amount.
+        $cartBuilder = new FakeSubscriptionGroupCartBuilder($this->buildGroupCart(25.00));
+        $eventSpy = new EventSpy();
+        $detector = $this->buildDetector(
+            settings: $this->autoSettings(),
+            subscriptionRepository: $repository,
+            cartBuilder: $cartBuilder,
+            eventDispatcher: $eventSpy
+        );
+
+        $count = $detector->detect(Context::createDefaultContext());
+
+        $this->assertSame(1, $count);
+        $this->assertSame(1, $eventSpy->getEventCount());
+        $this->assertInstanceOf(SubscriptionPriceChangeNoticeEvent::class, $eventSpy->getEvent());
+
+        $upsert = $repository->getLastUpsert();
+        $this->assertSame(PriceDriftDetector::STATE_NOTIFIED, $upsert['priceUpdateState']);
+        $this->assertSame(25.00, $upsert['nextNotifiedPrice']);
+    }
+
     public function testEqualAmountDoesNotNotify(): void
     {
         $subscription = $this->buildSubscription('subscription-id');

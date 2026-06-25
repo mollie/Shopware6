@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Abonnement | Mollie Abonnements"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Bestellung erfolgreich",
-            "mollie_checkout_order_failed": " Bestellung fehlgeschlagen",
-            "mollie_checkout_order_canceled": " Bestellung abgebrochen",
+            "mollie_payment_success": " Bestellung erfolgreich",
+            "mollie_payment_failed": " Bestellung fehlgeschlagen",
+            "mollie_payment_cancelled": " Bestellung abgebrochen",
             "mollie_webhook_received_All": " Mollie Webhook empfangen (Alle)",
+            "mollie_webhook_received_status_open": " Mollie Webhook empfangen (Offen)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook empfangen (Authorisiert)",
             "mollie_webhook_received_status_failed": " Mollie Webhook empfangen (Fehler)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook empfangen (Abgebrochen)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie Abonnement fortgesetzt",
             "mollie_subscription_skipped": " Mollie Abonnement ausgesetzt",
             "mollie_subscription_renewed": " Mollie Abonnement erneuert",
-            "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung"
+            "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung",
+            "mollie_subscription_priceChangeNotice": " Mollie Abonnement Preisänderung"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Abgebrochen",
             "expired": "Abgelaufen",
             "partiallyRefunded": "Rückerstattet (teilweise)",
-            "orderSuccess": "Bestellung erfolgreich",
-            "orderFailed": "Bestellung fehlgeschlagen",
-            "orderCanceled": "Bestellung abgebrochen"
+            "payment": "Zahlung",
+            "success": "Erfolgreich",
+            "priceChangeNotice": "Preisänderung"
         }
     }
 }

@@ -4,9 +4,9 @@
             "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Pasūtījums veiksmīgs ",
-            "mollie_checkout_order_failed": " Pasūtījums neizdevās",
-            "mollie_checkout_order_canceled": " Pasūtījums atcelts",
+            "mollie_payment_success": "Pasūtījums veiksmīgs ",
+            "mollie_payment_failed": " Pasūtījums neizdevās",
+            "mollie_payment_cancelled": " Pasūtījums atcelts",
             "mollie_webhook_received_All": " Mollie Webhook Saņemts (Visi)",
             "mollie_webhook_received_status_authorized": "Mollie tīmekļa āķi saņemti (Autorizēti)",
             "mollie_webhook_received_status_failed": "Mollie tīmekļa āķi saņemti (Neizdevušies)",

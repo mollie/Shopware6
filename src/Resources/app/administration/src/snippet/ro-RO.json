@@ -4,9 +4,9 @@
             "mollie_subscription": "Abonament Mollie | Abonamente Mollie"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Comandă reușită",
-            "mollie_checkout_order_failed": " Comandă eșuată",
-            "mollie_checkout_order_canceled": " Comandă anulată",
+            "mollie_payment_success": " Comandă reușită",
+            "mollie_payment_failed": " Comandă eșuată",
+            "mollie_payment_cancelled": " Comandă anulată",
             "mollie_webhook_received_All": " Webhook Mollie primit (Toate)",
             "mollie_webhook_received_status_authorized": " Webhook Mollie primit (Autorizat)",
             "mollie_webhook_received_status_failed": " Webhook Mollie primit (Eșuat)",
