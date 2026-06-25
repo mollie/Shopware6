@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Tilaus epäonnistui",
             "mollie_payment_cancelled": " Tilaus peruutettu",
             "mollie_webhook_received_All": " Mollie Webhook vastaanotettu (Kaikki)",
+            "mollie_webhook_received_status_open": " Mollie Webhook vastaanotettu (Avoin)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook vastaanotettu (Valtuutettu)",
             "mollie_webhook_received_status_failed": " Mollie Webhook vastaanotettu (Epäonnistunut)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook vastaanotettu (Peruutettu)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie-tilaus jatkettu",
             "mollie_subscription_skipped": " Mollie-tilaus ohitettu",
             "mollie_subscription_renewed": " Mollie-tilaus uusittu",
-            "mollie_subscription_renewal_reminder": " Mollie muistutus tilauksen uusimisesta"
+            "mollie_subscription_renewal_reminder": " Mollie muistutus tilauksen uusimisesta",
+            "mollie_subscription_priceChangeNotice": " Mollie-tilaus hinnanmuutos"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Peruutettu",
             "expired": "Vanhentunut",
             "partiallyRefunded": "Hyvitetty (osittain)",
-            "orderSuccess": "Tilaus onnistui",
-            "orderFailed": "Tilaus epäonnistui",
-            "orderCanceled": "Tilaus peruutettu"
+            "payment": "Maksu",
+            "success": "Onnistui",
+            "priceChangeNotice": "Hinnanmuutos"
         }
     }
 }

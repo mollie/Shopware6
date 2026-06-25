@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Narudžba neuspjela",
             "mollie_payment_cancelled": " Narudžba otkazana",
             "mollie_webhook_received_All": " Mollie Webhook Primljen (Svi)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Primljen (Otvoreno)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Primljen (Autorizirano)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Primljen (Neuspjelo)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Primljen (Otkazano)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie pretplata nastavljena",
             "mollie_subscription_skipped": " Mollie pretplata preskočena",
             "mollie_subscription_renewed": " Mollie pretplata obnovljena",
-            "mollie_subscription_renewal_reminder": " Mollie podsjetnik za obnovu pretplate"
+            "mollie_subscription_renewal_reminder": " Mollie podsjetnik za obnovu pretplate",
+            "mollie_subscription_priceChangeNotice": " Mollie pretplata promjena cijene"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Otkazano",
             "expired": "Isteklo",
             "partiallyRefunded": "Vraćeno (djelomično)",
-            "orderSuccess": "Narudžba uspješna",
-            "orderFailed": "Narudžba nije uspjela",
-            "orderCanceled": "Narudžba otkazana"
+            "payment": "Plaćanje",
+            "success": "Uspjeh",
+            "priceChangeNotice": "Promjena cijene"
         }
     }
 }

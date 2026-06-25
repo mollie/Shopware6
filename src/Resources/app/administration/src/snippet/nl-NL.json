@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Bestelling mislukt",
             "mollie_payment_cancelled": " Bestelling geannuleerd",
             "mollie_webhook_received_All": " Mollie Webhook Ontvangen (Alle)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Ontvangen (Open)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Ontvangen (Geautoriseerd)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Ontvangen (Mislukt)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Ontvangen (Geannuleerd)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie abonnement hervat",
             "mollie_subscription_skipped": " Mollie abonnement overgeslagen",
             "mollie_subscription_renewed": " Mollie abonnement verlengd",
-            "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
+            "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging",
+            "mollie_subscription_priceChangeNotice": " Mollie abonnement prijswijziging"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Geannuleerd",
             "expired": "Verlopen",
             "partiallyRefunded": "Terugbetaald (gedeeltelijk)",
-            "orderSuccess": "Bestelling succesvol",
-            "orderFailed": "Bestelling mislukt",
-            "orderCanceled": "Bestelling geannuleerd"
+            "payment": "Betaling",
+            "success": "Succesvol",
+            "priceChangeNotice": "Prijswijziging"
         }
     }
 }

@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Поръчката не е успешна",
             "mollie_payment_cancelled": " Поръчката е отказана",
             "mollie_webhook_received_All": " Получен е Mollie уебхук (Всички)",
+            "mollie_webhook_received_status_open": " Получен е Mollie уебхук (Отворен)",
             "mollie_webhook_received_status_authorized": " Получен е уебхук на Mollie (Разрешен)",
             "mollie_webhook_received_status_failed": " Получен е Mollie уебхук (Неуспешно)",
             "mollie_webhook_received_status_canceled": " Получен е Mollie уебхук (Отказан)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie абонамент е възобновен",
             "mollie_subscription_skipped": " Mollie абонамент е пропуснат",
             "mollie_subscription_renewed": " Mollie абонамент е подновен",
-            "mollie_subscription_renewal_reminder": " Mollie напомняне за подновяване на абонамент"
+            "mollie_subscription_renewal_reminder": " Mollie напомняне за подновяване на абонамент",
+            "mollie_subscription_priceChangeNotice": " Mollie абонамент промяна на цената"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Отказан",
             "expired": "Изтекъл",
             "partiallyRefunded": "Възстановена сума (частично)",
-            "orderSuccess": "Поръчка успешна",
-            "orderFailed": "Поръчка неуспешна",
-            "orderCanceled": "Поръчката е отказана"
+            "payment": "Плащане",
+            "success": "Успех",
+            "priceChangeNotice": "Промяна на цената"
         }
     }
 }

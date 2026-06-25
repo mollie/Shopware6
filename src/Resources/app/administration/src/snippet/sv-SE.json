@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Misslyckad beställning",
             "mollie_payment_cancelled": " Avbruten beställningen",
             "mollie_webhook_received_All": " Mollie Webhook Mottagen (Alla)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Mottagen (Öppen)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Mottagen (Auktoriserad)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Mottagen (Misslyckad)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Mottagen (Avbruten)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie-prenumerationen har återupptagits",
             "mollie_subscription_skipped": " Mollie-prenumerationen har hoppats över",
             "mollie_subscription_renewed": " Mollie prenumeration förnyad",
-            "mollie_subscription_renewal_reminder": " Mollie påminnelse för prenumerationsförnyelse"
+            "mollie_subscription_renewal_reminder": " Mollie påminnelse för prenumerationsförnyelse",
+            "mollie_subscription_priceChangeNotice": " Mollie prenumeration prisändring"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Avbruten",
             "expired": "Utgått",
             "partiallyRefunded": "Återbetald (delvis)",
-            "orderSuccess": "Beställning lyckad",
-            "orderFailed": "Beställning misslyckades",
-            "orderCanceled": "Beställning avbruten"
+            "payment": "Betalning",
+            "success": "Lyckades",
+            "priceChangeNotice": "Prisändring"
         }
     }
 }

@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Pasūtījums neizdevās",
             "mollie_payment_cancelled": " Pasūtījums atcelts",
             "mollie_webhook_received_All": " Mollie Webhook Saņemts (Visi)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Saņemts (Atvērts)",
             "mollie_webhook_received_status_authorized": "Mollie tīmekļa āķi saņemti (Autorizēti)",
             "mollie_webhook_received_status_failed": "Mollie tīmekļa āķi saņemti (Neizdevušies)",
             "mollie_webhook_received_status_canceled": "Mollie tīmekļa āķi saņemti (Atcelti)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": "Mollie abonements atsākts",
             "mollie_subscription_skipped": "Mollie abonements izlaists",
             "mollie_subscription_renewed": "Mollie abonements atjaunots",
-            "mollie_subscription_renewal_reminder": "Mollie atgādinājums par abonementa atjaunošanu"
+            "mollie_subscription_renewal_reminder": "Mollie atgādinājums par abonementa atjaunošanu",
+            "mollie_subscription_priceChangeNotice": "Mollie abonements cenas izmaiņas"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Atcelts",
             "expired": "Beidzies",
             "partiallyRefunded": "Atmaksāts (daļēji)",
-            "orderSuccess": "Pasūtījums veiksmīgs",
-            "orderFailed": "Pasūtījums neizdevās",
-            "orderCanceled": "Pasūtījums atcelts"
+            "payment": "Maksājums",
+            "success": "Veiksmīgi",
+            "priceChangeNotice": "Cenas izmaiņas"
         }
     }
 }

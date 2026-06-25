@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Zamówienie nieudane",
             "mollie_payment_cancelled": " Zamówienie anulowane",
             "mollie_webhook_received_All": " Otrzymano webhooki Mollie (wszystkie)",
+            "mollie_webhook_received_status_open": " Otrzymano webhooki Mollie (Otwarty)",
             "mollie_webhook_received_status_authorized": " Otrzymano webhook Mollie (Autoryzowany)",
             "mollie_webhook_received_status_failed": " Otrzymano webhook Mollie (Nieudany)",
             "mollie_webhook_received_status_canceled": " Otrzymano webhook Mollie (Anulowany)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Wznowiono subskrypcję Mollie",
             "mollie_subscription_skipped": " Pominięto subskrypcję Mollie",
             "mollie_subscription_renewed": " Odnowiono subskrypcję Mollie",
-            "mollie_subscription_renewal_reminder": " Przypomnienie Mollie o odnowieniu subskrypcji"
+            "mollie_subscription_renewal_reminder": " Przypomnienie Mollie o odnowieniu subskrypcji",
+            "mollie_subscription_priceChangeNotice": " Zmiana ceny subskrypcji Mollie"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Anulowano",
             "expired": "Wygasły",
             "partiallyRefunded": "Zwrócono (częściowo)",
-            "orderSuccess": "Zamówienie zrealizowane",
-            "orderFailed": "Zamówienie nieudane",
-            "orderCanceled": "Zamówienie anulowane"
+            "payment": "Płatność",
+            "success": "Sukces",
+            "priceChangeNotice": "Zmiana ceny"
         }
     }
 }

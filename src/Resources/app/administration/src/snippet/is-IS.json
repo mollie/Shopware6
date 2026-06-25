@@ -8,6 +8,7 @@
             "mollie_payment_failed": "Pöntun misheppnaðist",
             "mollie_payment_cancelled": "Pöntun aflýst",
             "mollie_webhook_received_All": " Mollie Webhook Móttekin (Allt)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Móttekin (Opið)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Móttekin (Viðurkennd)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Móttekin (Mistókst)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Móttekin (Aflýst)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": "Mollie áskrift endurtekinn",
             "mollie_subscription_skipped": "Mollie áskrift sleppt",
             "mollie_subscription_renewed": "Mollie áskrift endurnýjuð",
-            "mollie_subscription_renewal_reminder": "Mollie áminning um endurnýjun áskriftar"
+            "mollie_subscription_renewal_reminder": "Mollie áminning um endurnýjun áskriftar",
+            "mollie_subscription_priceChangeNotice": "Mollie áskrift verðbreyting"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Hætt við",
             "expired": "Útrunnið",
             "partiallyRefunded": "Endurgreitt (að hluta til)",
-            "orderSuccess": "Pöntun árángursrík",
-            "orderFailed": "Pöntun misheppnaðist",
-            "orderCanceled": "Hætt við pöntun"
+            "payment": "Greiðsla",
+            "success": "Tókst",
+            "priceChangeNotice": "Verðbreyting"
         }
     }
 }

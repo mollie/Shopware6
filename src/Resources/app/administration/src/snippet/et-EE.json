@@ -8,6 +8,7 @@
             "mollie_payment_failed": "Tellimus ebaõnnestus",
             "mollie_payment_cancelled": "Tellimus tühistatud",
             "mollie_webhook_received_All": " Mollie Veebikonks Saadud (Kõik)",
+            "mollie_webhook_received_status_open": " Mollie Veebikonks Saadud (Avatud)",
             "mollie_webhook_received_status_authorized": " Mollie Veebikonks Saadud (Volitatud)",
             "mollie_webhook_received_status_failed": " Mollie Veebikonks Saadud (Ebaõnnestunud)",
             "mollie_webhook_received_status_canceled": " Mollie Veebikonks Saadud (Tühistatud)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Mollie tellimus taaskäivitatud",
             "mollie_subscription_skipped": " Mollie tellimus vahele jäetud",
             "mollie_subscription_renewed": " Mollie tellimus uuendatud",
-            "mollie_subscription_renewal_reminder": " Mollie meeldetuletus tellimuse uuendamiseks"
+            "mollie_subscription_renewal_reminder": " Mollie meeldetuletus tellimuse uuendamiseks",
+            "mollie_subscription_priceChangeNotice": " Mollie tellimus hinnamuutus"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Tühistatud",
             "expired": "Aegunud",
             "partiallyRefunded": "Tagastatud (osaliselt)",
-            "orderSuccess": "Tellimus õnnestus",
-            "orderFailed": "Tellimus ebaõnnestus",
-            "orderCanceled": "Tellimus tühistatud"
+            "payment": "Makse",
+            "success": "Õnnestus",
+            "priceChangeNotice": "Hinnamuutus"
         }
     }
 }

@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Comandă eșuată",
             "mollie_payment_cancelled": " Comandă anulată",
             "mollie_webhook_received_All": " Webhook Mollie primit (Toate)",
+            "mollie_webhook_received_status_open": " Webhook Mollie primit (Deschis)",
             "mollie_webhook_received_status_authorized": " Webhook Mollie primit (Autorizat)",
             "mollie_webhook_received_status_failed": " Webhook Mollie primit (Eșuat)",
             "mollie_webhook_received_status_canceled": "Webhook Mollie primit (Anulat)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Abonamentul Mollie a fost reluat",
             "mollie_subscription_skipped": " Abonamentul Mollie a fost omis",
             "mollie_subscription_renewed": " Abonamentul Mollie s-a reînnoit",
-            "mollie_subscription_renewal_reminder": " Memento Mollie pentru reînnoirea abonamentului"
+            "mollie_subscription_renewal_reminder": " Memento Mollie pentru reînnoirea abonamentului",
+            "mollie_subscription_priceChangeNotice": " Abonamentul Mollie modificare de preț"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Anulat",
             "expired": "Expirat",
             "partiallyRefunded": "Rambursat (parțial)",
-            "orderSuccess": "Comandă reușită",
-            "orderFailed": "Comandă eșuată",
-            "orderCanceled": "Comandă anulată"
+            "payment": "Plată",
+            "success": "Succes",
+            "priceChangeNotice": "Modificare de preț"
         }
     }
 }

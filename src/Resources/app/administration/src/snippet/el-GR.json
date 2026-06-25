@@ -8,6 +8,7 @@
             "mollie_payment_failed": " Η παραγγελία απέτυχε",
             "mollie_payment_cancelled": " Η παραγγελία ακυρώθηκε",
             "mollie_webhook_received_All": " Λήφθηκε Webhook Mollie (Όλα)",
+            "mollie_webhook_received_status_open": " Λήφθηκε Webhook Mollie (Ανοιχτό)",
             "mollie_webhook_received_status_authorized": " Λήφθηκε Webhook Mollie (Εγκεκριμένο)",
             "mollie_webhook_received_status_failed": " Λήφθηκε Webhook Mollie (Απέτυχε)",
             "mollie_webhook_received_status_canceled": " Λήφθηκε Webhook Mollie (Ακυρωμένο)",
@@ -25,7 +26,8 @@
             "mollie_subscription_resumed": " Η συνδρομή Mollie συνεχίζεται",
             "mollie_subscription_skipped": " Η συνδρομή Mollie παραλείφθηκε",
             "mollie_subscription_renewed": " Η συνδρομή Mollie ανανεώθηκε",
-            "mollie_subscription_renewal_reminder": " Υπενθύμιση Mollie για ανανέωση συνδρομής"
+            "mollie_subscription_renewal_reminder": " Υπενθύμιση Mollie για ανανέωση συνδρομής",
+            "mollie_subscription_priceChangeNotice": " Η συνδρομή Mollie αλλαγή τιμής"
         }
     },
     "mollie-payments": {
@@ -499,9 +501,9 @@
             "canceled": "Ακυρωμένο",
             "expired": "Έληξε",
             "partiallyRefunded": "Επιστράφηκε (μερικώς)",
-            "orderSuccess": "Η παραγγελία ήταν επιτυχής",
-            "orderFailed": "Η παραγγελία απέτυχε",
-            "orderCanceled": "Η παραγγελία ακυρώθηκε"
+            "payment": "Πληρωμή",
+            "success": "Επιτυχία",
+            "priceChangeNotice": "Αλλαγή τιμής"
         }
     }
 }
