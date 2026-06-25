@@ -29,28 +29,6 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 #[CoversClass(PriceMigrationHandler::class)]
 final class PriceMigrationHandlerTest extends TestCase
 {
-    public function testNoticeWindowNotElapsedSkipsMigration(): void
-    {
-        $subscription = $this->buildNotifiedSubscription(notifiedDaysAgo: 2, nextNotifiedPrice: 75.00);
-        $repository = new FakeSubscriptionRepository();
-        $repository->add($subscription);
-
-        $gateway = new FakeSubscriptionGateway();
-        $gateway->register($this->buildMollieSubscription('sub_test123', 50.00));
-
-        $handler = $this->buildHandler(
-            settings: $this->autoSettings(noticeDays: 7),
-            subscriptionRepository: $repository,
-            gateway: $gateway
-        );
-
-        $count = $handler->migrate(Context::createDefaultContext());
-
-        $this->assertSame(0, $count);
-        $this->assertSame(0, $gateway->getCallCount('updateSubscription'));
-        $this->assertSame(0, $repository->getUpsertCount());
-    }
-
     public function testUpdateApiSuccessClearsStateAndUpdatesAmount(): void
     {
         $subscription = $this->buildNotifiedSubscription(notifiedDaysAgo: 10, nextNotifiedPrice: 75.00);

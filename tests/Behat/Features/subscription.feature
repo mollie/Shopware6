@@ -165,7 +165,8 @@ Feature: Subscription checkout
     And order payment status is "paid"
     And the subscription status is "active"
     When i change the price of product "MOL_SUB_1" to "24"
-    And the subscription price drift detector runs
+    Then the subscription price update state is "dirty"
+    When the subscription price drift detector runs
     Then the subscription price update state is "notified"
     And the subscription next notified price is "28.99"
     And the subscription history contains "price_notified"
@@ -189,7 +190,8 @@ Feature: Subscription checkout
     And order payment status is "paid"
     And the subscription status is "active"
     When i change the price of product "MOL_SUB_1" to "24"
-    And the subscription price drift detector runs
+    Then the subscription price update state is "dirty"
+    When the subscription price drift detector runs
     Then the subscription price update state is "notified"
     And the subscription next notified price is "28.99"
     When the subscription price migration handler runs

@@ -9,9 +9,7 @@ use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionPriceChangeNoticeEvent;
 use Mollie\Shopware\Component\Subscription\PriceDrift\PriceDriftDetector;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCart;
-use Mollie\Shopware\Unit\Builder\CustomerBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
-use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -25,10 +23,15 @@ use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
+/**
+ * Behaviour of the detector once a candidate has been selected. The candidate
+ * filtering (active sales channel, status, dirty state, not cancelled) lives in
+ * the DB Criteria and is covered by the integration test, not here — the fake
+ * repository returns whatever is added regardless of the Criteria filters.
+ */
 #[CoversClass(PriceDriftDetector::class)]
 final class PriceDriftDetectorTest extends TestCase
 {
@@ -93,7 +96,7 @@ final class PriceDriftDetectorTest extends TestCase
         $this->assertSame(25.00, $upsert['nextNotifiedPrice']);
     }
 
-    public function testEqualAmountDoesNotNotify(): void
+    public function testEqualAmountClearsDirtyFlagWithoutNotifying(): void
     {
         $subscription = $this->buildSubscription('subscription-id');
         $subscription->setAmount(50.00);
@@ -114,33 +117,11 @@ final class PriceDriftDetectorTest extends TestCase
 
         $this->assertSame(0, $count);
         $this->assertSame(0, $eventSpy->getEventCount());
-        $this->assertSame(0, $repository->getUpsertCount());
-    }
 
-    public function testAlreadyNotifiedSubscriptionIsSkipped(): void
-    {
-        $subscription = $this->buildSubscription('subscription-id');
-        $subscription->setAmount(50.00);
-        $subscription->setPriceUpdateState(PriceDriftDetector::STATE_NOTIFIED);
-
-        $repository = new FakeSubscriptionRepository();
-        $repository->add($subscription);
-
-        $cartBuilder = new FakeSubscriptionGroupCartBuilder($this->buildGroupCart(75.00));
-        $eventSpy = new EventSpy();
-        $detector = $this->buildDetector(
-            settings: $this->autoSettings(),
-            subscriptionRepository: $repository,
-            cartBuilder: $cartBuilder,
-            eventDispatcher: $eventSpy
-        );
-
-        $count = $detector->detect(Context::createDefaultContext());
-
-        $this->assertSame(0, $count);
-        $this->assertSame(0, $eventSpy->getEventCount());
-        $this->assertSame(0, $repository->getUpsertCount());
-        $this->assertSame(0, $cartBuilder->getCallCount());
+        // No price drift → the dirty flag is reset to none so it is not re-checked.
+        $this->assertSame(1, $repository->getUpsertCount());
+        $upsert = $repository->getLastUpsert();
+        $this->assertSame(PriceDriftDetector::STATE_NONE, $upsert['priceUpdateState']);
     }
 
     public function testKeepModeSkipsAllSubscriptionsForSalesChannel(): void
@@ -193,34 +174,10 @@ final class PriceDriftDetectorTest extends TestCase
         $this->assertSame(1, $repository->getUpsertCount());
 
         $upsert = $repository->getLastUpsert();
-        $this->assertArrayNotHasKey('priceUpdateState', $upsert);
+        // On failure the dirty flag is cleared (back to none) so it is not retried every run.
+        $this->assertSame(PriceDriftDetector::STATE_NONE, $upsert['priceUpdateState']);
         $this->assertNotEmpty($upsert['historyEntries']);
         $this->assertStringStartsWith('price_check_skipped', (string) $upsert['historyEntries'][0]['comment']);
-    }
-
-    public function testCanceledSubscriptionIsSkipped(): void
-    {
-        $subscription = $this->buildSubscription('subscription-id');
-        $subscription->setAmount(50.00);
-        $subscription->setCanceledAt(new \DateTime());
-
-        $repository = new FakeSubscriptionRepository();
-        $repository->add($subscription);
-
-        $cartBuilder = new FakeSubscriptionGroupCartBuilder($this->buildGroupCart(75.00));
-        $eventSpy = new EventSpy();
-        $detector = $this->buildDetector(
-            settings: $this->autoSettings(),
-            subscriptionRepository: $repository,
-            cartBuilder: $cartBuilder,
-            eventDispatcher: $eventSpy
-        );
-
-        $count = $detector->detect(Context::createDefaultContext());
-
-        $this->assertSame(0, $count);
-        $this->assertSame(0, $eventSpy->getEventCount());
-        $this->assertSame(0, $cartBuilder->getCallCount());
     }
 
     private function buildDetector(
@@ -232,7 +189,6 @@ final class PriceDriftDetectorTest extends TestCase
         return new PriceDriftDetector(
             $this->buildSalesChannelRepository(),
             $subscriptionRepository,
-            $this->buildCustomerRepository($this->buildCustomer()),
             new FakeSettingsService(subscriptionSettings: $settings),
             $cartBuilder,
             $eventDispatcher,
@@ -242,6 +198,8 @@ final class PriceDriftDetectorTest extends TestCase
 
     private function buildSubscription(string $id): SubscriptionEntity
     {
+        // The builder includes an order with an order customer by default, which
+        // the detector reads to resolve the mail recipient.
         return SubscriptionEntityBuilder::create()
             ->withId($id)
             ->withStatus(SubscriptionStatus::ACTIVE)
@@ -292,23 +250,5 @@ final class PriceDriftDetectorTest extends TestCase
         $repository->add($salesChannel);
 
         return $repository;
-    }
-
-    private function buildCustomerRepository(CustomerEntity $customer): FakeCustomerRepository
-    {
-        $repository = new FakeCustomerRepository();
-        $repository->add($customer);
-
-        return $repository;
-    }
-
-    private function buildCustomer(): CustomerEntity
-    {
-        return CustomerBuilder::create()
-            ->withEmail('test@example.com')
-            ->withFirstName('Jane')
-            ->withLastName('Doe')
-            ->build()
-        ;
     }
 }

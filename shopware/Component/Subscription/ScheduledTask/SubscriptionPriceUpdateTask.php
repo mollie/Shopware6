@@ -16,6 +16,6 @@ final class SubscriptionPriceUpdateTask extends ScheduledTask
 
     public static function getDefaultInterval(): int
     {
-        return 86400;
+        return 300; // every 5 minutes — drains the dirty/notified backlog quickly; idle runs are cheap
     }
 }
