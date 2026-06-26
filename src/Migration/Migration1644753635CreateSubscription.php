@@ -43,33 +43,17 @@ class Migration1644753635CreateSubscription extends MigrationStep
                 '
         );
 
-        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.id', 'id', $connection);
-        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.customer_id', 'customer_id', $connection);
-        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.product_id', 'product_id', $connection);
-        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.canceled_at', 'canceled_at', $connection);
-        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.next_payment_at', 'next_payment_at', $connection);
-        $this->buildIndex('mollie_subscription', 'idx.mollie_subscription.sales_channel_id', 'sales_channel_id', $connection);
+        $utils = new MigrationUtils($connection);
+
+        $utils->buildIndex('mollie_subscription', 'idx.mollie_subscription.id', 'id');
+        $utils->buildIndex('mollie_subscription', 'idx.mollie_subscription.customer_id', 'customer_id');
+        $utils->buildIndex('mollie_subscription', 'idx.mollie_subscription.product_id', 'product_id');
+        $utils->buildIndex('mollie_subscription', 'idx.mollie_subscription.canceled_at', 'canceled_at');
+        $utils->buildIndex('mollie_subscription', 'idx.mollie_subscription.next_payment_at', 'next_payment_at');
+        $utils->buildIndex('mollie_subscription', 'idx.mollie_subscription.sales_channel_id', 'sales_channel_id');
     }
 
     public function updateDestructive(Connection $connection): void
     {
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function buildIndex(string $table, string $indexName, string $targetField, Connection $connection): void
-    {
-        $indexExistsCheck = $connection->executeQuery("
-            SELECT COUNT(1) indexIsThere 
-            FROM INFORMATION_SCHEMA.STATISTICS 
-            WHERE table_schema=DATABASE() AND table_name='" . $table . "' AND index_name='" . $indexName . "';
-        ")->fetchAssociative();
-
-        $isExisting = ((int) $indexExistsCheck['indexIsThere'] === 1);
-
-        if (! $isExisting) {
-            $connection->executeStatement('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
-        }
     }
 }

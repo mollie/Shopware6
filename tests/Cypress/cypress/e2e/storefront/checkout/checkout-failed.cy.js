@@ -127,12 +127,20 @@ context("Checkout Failure Tests", () => {
                 molliePaymentStatus.selectCancelled();
 
                 // verify that we are back in our shop
-                // if the payment fails, the order is finished, but
-                // we still have the option to change the payment method
                 cy.url().should('include', '/account/order');
-                //in newer shopware version, if a customer cancelled a payment and order was changed to cancelled
-                //that means the order reached final state and cannot be edited afterwards
-                cy.contains('canceled and cannot be edited afterwards');
+
+                // since Shopware 6.6.8.0 a cancelled order reaches its final state
+                // and cannot be edited or paid afterwards (same threshold as C4012)
+                if (shopware.isVersionGreaterEqual('6.6.8.0')) {
+                    cy.contains('canceled and cannot be edited afterwards');
+                    return;
+                }
+
+                // in older Shopware versions the order stays editable, so the order is
+                // finished but the Mollie failure mode retry page is shown instead,
+                // giving us the option to change the payment method
+                cy.url().should('include', '/account/order/edit');
+                cy.contains('The payment is failed or was canceled.');
             })
 
             it('C4010: Continue Shopping after failed payment in Mollie Failure Mode', () => {

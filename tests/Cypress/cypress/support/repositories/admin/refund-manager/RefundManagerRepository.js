@@ -116,7 +116,10 @@ export default class RefundManagerRepository {
             return cy.get('.mollie-refund-manager-refunds .sw-context-button').eq(0);
         }
 
-        return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button]');
+        // there can be multiple refund rows (e.g. a pending one next to a cancelled one),
+        // so we always target the context button of the first/newest refund row.
+        // without .eq(0) the click fails with "can only be called on a single element"
+        return cy.get('.mollie-refund-manager-refunds button[class=sw-context-button__button]').eq(0);
     }
 
     /**
