@@ -35,6 +35,7 @@ final class VoucherPaymentMethodRemover extends AbstractPaymentRemover
         $filteredPaymentMethods = $paymentMethods->filter(function (PaymentMethodEntity $paymentMethod) {
             return $paymentMethod->getHandlerIdentifier() === VoucherPayment::class;
         });
+
         $voucherPaymentMethod = $filteredPaymentMethods->first();
 
         if (! $voucherPaymentMethod instanceof PaymentMethodEntity) {

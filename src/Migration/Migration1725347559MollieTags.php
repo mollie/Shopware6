@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kiener\MolliePayments\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Result;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
 use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Migration\MigrationStep;
@@ -47,11 +46,7 @@ class Migration1725347559MollieTags extends MigrationStep
         $stmt->bindValue(':created_at', (new \DateTime())->format('Y-m-d H:i:s'));
         $stmt->bindValue(':updated_at', null);
 
-        if (method_exists($stmt, 'executeStatement')) {
-            $stmt->executeStatement();
-        } else {
-            $stmt->execute();
-        }
+        $stmt->executeStatement();
     }
 
     private function tagExists(Connection $connection, string $id): bool
@@ -63,16 +58,6 @@ class Migration1725347559MollieTags extends MigrationStep
             ->setParameter('id', Uuid::fromHexToBytes($id))
         ;
 
-        if (method_exists($qb, 'execute')) {
-            $result = $qb->execute();
-        } else {
-            $result = $qb->executeQuery();
-        }
-
-        if ($result instanceof Result) {
-            return $result->rowCount() > 0;
-        }
-
-        return false;
+        return $qb->executeQuery()->rowCount() > 0;
     }
 }

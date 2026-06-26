@@ -13,6 +13,7 @@ use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AsDecorator(decorates: PaymentMethodRoute::class)]
 final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
@@ -22,7 +23,8 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
      */
     public function __construct(private AbstractPaymentMethodRoute $decorated,
         #[AutowireIterator('mollie.method.remover')]
-        private iterable $paymentMethodRemovers
+        private iterable $paymentMethodRemovers,
+        private RequestStack $requestStack
     ) {
     }
 
@@ -35,11 +37,18 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
     {
         $response = $this->decorated->load($request, $context, $criteria);
 
-        if ($this->shouldRemove($request) === false) {
+        // The $request handed to this route is a throwaway empty Request created by the storefront
+        // page loaders (GenericPageLoader/CheckoutConfirmPageLoader/AccountEditOrderPageLoader via
+        // RouteRequestEvent), so it never carries _controller/_route/orderId. We therefore read the
+        // page context from the main request instead. The payment-method route is loaded on every
+        // page (footer), so we only run our removers on the checkout and edit-order pages.
+        $mainRequest = $this->requestStack->getMainRequest();
+
+        if ($mainRequest === null || $this->shouldRemove($mainRequest) === false) {
             return $response;
         }
 
-        $orderId = $request->get('orderId','');
+        $orderId = (string) $mainRequest->get('orderId', '');
 
         $paymentMethods = $response->getPaymentMethods();
 
@@ -57,6 +66,7 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
     private function getControllerClass(Request $request): ?string
     {
         $controller = $request->attributes->get('_controller');
+
         if ($controller === null) {
             return null;
         }
@@ -73,6 +83,7 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
     private function shouldRemove(Request $request): bool
     {
         $controllerClass = $this->getControllerClass($request);
+
         if ($controllerClass === null) {
             return false;
         }

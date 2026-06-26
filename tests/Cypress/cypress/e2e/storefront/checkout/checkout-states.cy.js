@@ -79,16 +79,12 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             adminOrders.assertLatestOrderStatus('Open');
-            let paymentStatus = 'In Progress'
-            /**
-             * In Shopware 6.7 the action DO_PAY was removed, so we use ACTION_PROCESS for bank payments. this action sets status to open in lower than 6.7
-             */
-            if(shopware.isVersionLower('6.6.0.0')){
-                paymentStatus = 'Open'
-            }
 
-            adminOrders.assertLatestPaymentStatus(paymentStatus);
-            
+            // SEPA / bank transfer reports OPEN at Mollie, but the plugin maps it to
+            // IN_PROGRESS in Shopware (across all supported versions) so merchants are
+            // not confused by an "open" payment that is in fact still being processed.
+            adminOrders.assertLatestPaymentStatus('In Progress');
+
         })
 
         it('C4023: Test Status Paid', () => {
