@@ -22,6 +22,11 @@ class Migration1678106061OrderVersion extends MigrationStep
     {
         $utils = new MigrationUtils($connection);
 
+        // already migrated before, nothing to do
+        if ($utils->columnExists('mollie_refund', 'order_version_id')) {
+            return;
+        }
+
         // create new column for the version_id
         $utils->createColumn(
             'mollie_refund',
