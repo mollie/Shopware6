@@ -24,7 +24,7 @@ final class RoundingDifferenceFixerTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function testPositiveDifferenceIsAddedAsDigital(): void
+    public function testPositiveDifferenceIsAddedAsSurcharge(): void
     {
         $lines = new LineItemCollection([$this->lineItem(33.33), $this->lineItem(66.66)]);
 
@@ -35,12 +35,12 @@ final class RoundingDifferenceFixerTest extends TestCase
 
         $roundingLine = $result->last();
         $this->assertSame(RoundingDifferenceFixer::DEFAULT_TITLE, $roundingLine->getDescription());
-        $this->assertSame(LineItemType::DIGITAL, $roundingLine->getType());
+        $this->assertSame(LineItemType::SURCHARGE, $roundingLine->getType());
         $this->assertSame(0.01, $roundingLine->getAmount()->getValue());
         $this->assertSame('rounding', $roundingLine->getMetadata()['type']);
     }
 
-    public function testNegativeDifferenceIsAddedAsCredit(): void
+    public function testNegativeDifferenceIsAddedAsDiscount(): void
     {
         $lines = new LineItemCollection([$this->lineItem(50.00), $this->lineItem(50.01)]);
 
@@ -50,7 +50,7 @@ final class RoundingDifferenceFixerTest extends TestCase
         $this->assertCount(3, $result);
 
         $roundingLine = $result->last();
-        $this->assertSame(LineItemType::CREDIT, $roundingLine->getType());
+        $this->assertSame(LineItemType::DISCOUNT, $roundingLine->getType());
         $this->assertSame(-0.01, $roundingLine->getAmount()->getValue());
     }
 

@@ -29,9 +29,9 @@ final class RoundingDifferenceFixer implements RoundingDifferenceFixerInterface
         $price = new Money($diff, $orderTotal->getCurrency());
         $vatAmount = new Money(0.0, $orderTotal->getCurrency());
 
-        $type = LineItemType::DIGITAL;
+        $type = LineItemType::SURCHARGE;
         if ($diff < 0.0) {
-            $type = LineItemType::CREDIT;
+            $type = LineItemType::DISCOUNT;
         }
 
         $lineItem = new LineItem($name, 1, $price, $price);
