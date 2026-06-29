@@ -570,25 +570,52 @@ final class Payment extends Struct implements \JsonSerializable
         return $this->amountChargedBack !== null && $this->amountChargedBack->getValue() > 0.0;
     }
 
-    /**
-     * Effective Shopware transaction handler method, taking an implicit chargeback into account.
-     */
+    public function hasRefund(): bool
+    {
+        return isset($this->amountRefunded) && $this->amountRefunded->getValue() > 0.0;
+    }
+
+    public function isFullyRefunded(): bool
+    {
+        return $this->hasRefund()
+            && $this->amountRemaining !== null
+            && $this->amountRemaining->getValue() <= 0.0;
+    }
+
+    public function isPartiallyRefunded(): bool
+    {
+        return $this->hasRefund() && ! $this->isFullyRefunded();
+    }
+
     public function getShopwareHandlerMethod(): string
     {
         if ($this->hasChargeback()) {
             return 'chargeback';
         }
 
+        if ($this->isFullyRefunded()) {
+            return 'refund';
+        }
+
+        if ($this->isPartiallyRefunded()) {
+            return 'refundPartially';
+        }
+
         return $this->status->getShopwareHandlerMethod();
     }
 
-    /**
-     * Effective Shopware payment status, taking an implicit chargeback into account.
-     */
     public function getShopwarePaymentStatus(): string
     {
         if ($this->hasChargeback()) {
             return OrderTransactionStates::STATE_CHARGEBACK;
+        }
+
+        if ($this->isFullyRefunded()) {
+            return OrderTransactionStates::STATE_REFUNDED;
+        }
+
+        if ($this->isPartiallyRefunded()) {
+            return OrderTransactionStates::STATE_PARTIALLY_REFUNDED;
         }
 
         return $this->status->getShopwarePaymentStatus();
