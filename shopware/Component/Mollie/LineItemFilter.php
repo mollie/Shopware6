@@ -24,7 +24,7 @@ final class LineItemFilter implements LineItemFilterInterface
      * - removes set-product containers (repertus, dreisc, skweb)
      * - removes customized-products containers (their product child stays in)
      * - removes customized-product options with price = 0
-     * - removes zeobv / NetI bundle parents (children are already in the flat list)
+     * - removes zeobv / NetI bundle parents and gift-configurator parents (children are already in the flat list)
      *
      * @param CartLineItem|OrderLineItemEntity $item
      */
@@ -57,7 +57,10 @@ final class LineItemFilter implements LineItemFilterInterface
     {
         $bundleProducts = $payload['zeobvProductsInBundle'] ?? [];
         $isNetIBundle = $payload['is-neti-bundle'] ?? false;
+        $isGiftConfigurator = isset($payload['configuratorToken']);
 
-        return (is_array($bundleProducts) && count($bundleProducts) > 0) || $isNetIBundle === true;
+        return (is_array($bundleProducts) && count($bundleProducts) > 0)
+            || $isNetIBundle === true
+            || $isGiftConfigurator;
     }
 }

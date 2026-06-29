@@ -153,6 +153,23 @@ class LineItemFilterTest extends TestCase
         $this->assertCount(0, $result);
     }
 
+    /**
+     * A gift-configurator parent (carrying the configuratorToken) must be removed,
+     * just like a zeobv / NetI bundle parent.
+     */
+    public function testGiftConfiguratorParentIsSkipped(): void
+    {
+        $parent = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 30.0);
+        $parent->setPayload(['configuratorToken' => 'token-123']);
+
+        $product = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 20.0);
+
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$parent, $product]));
+
+        $this->assertCount(1, $result);
+        $this->assertSame($product->getId(), $result->first()->getId());
+    }
+
     // -------------------------------------------------------------------------
     // filterCartItems
     // -------------------------------------------------------------------------
@@ -235,6 +252,23 @@ class LineItemFilterTest extends TestCase
         $result = $this->filterCartItems(new CartLineItemCollection([$option]));
 
         $this->assertCount(0, $result);
+    }
+
+    /**
+     * Gift-configurator parent (carrying the configuratorToken) in cart must be removed.
+     */
+    public function testCartGiftConfiguratorParentIsSkipped(): void
+    {
+        $parent = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
+        $parent->setPayload(['configuratorToken' => 'token-123']);
+
+        $product = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
+        $product->setPrice($this->makeCartPrice(20.0));
+
+        $result = $this->filterCartItems(new CartLineItemCollection([$parent, $product]));
+
+        $this->assertCount(1, $result);
+        $this->assertSame($product->getId(), $result->first()->getId());
     }
 
     private function filterOrderItems(OrderLineItemCollection $items): OrderLineItemCollection
