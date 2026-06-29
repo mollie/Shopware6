@@ -45,6 +45,8 @@ final class TransactionService implements TransactionServiceInterface
 
     public function findById(string $transactionId, Context $context): TransactionDataStruct
     {
+        $transactionId = strtolower($transactionId);
+
         $criteria = new Criteria([$transactionId]);
         $criteria->addAssociation('order.orderCustomer.salutation');
         $criteria->addAssociation('order.orderCustomer.customer.salutation');

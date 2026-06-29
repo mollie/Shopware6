@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 
 #[CoversClass(Payment::class)]
 final class PaymentTest extends TestCase
@@ -80,5 +81,49 @@ final class PaymentTest extends TestCase
         $this->assertSame('thirdPartyPaymentId', $payment->getThirdPartyPaymentId());
         $this->assertSame('http://test.checkout', $payment->getCheckoutUrl());
         $this->assertSame('http://test.payment', $payment->getChangePaymentStateUrl());
+    }
+
+    public function testPaidPaymentHasNoChargeback(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setStatus(PaymentStatus::PAID);
+
+        $this->assertFalse($payment->hasChargeback());
+        $this->assertSame('paid', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
+    }
+
+    public function testChargebackIsDerivedFromAmountChargedBack(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountChargedBack' => ['value' => '10.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertTrue($payment->hasChargeback());
+        $this->assertSame('chargeback', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getShopwarePaymentStatus());
+    }
+
+    public function testZeroAmountChargedBackIsNoChargeback(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountChargedBack' => ['value' => '0.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertFalse($payment->hasChargeback());
+        $this->assertSame('paid', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
     }
 }

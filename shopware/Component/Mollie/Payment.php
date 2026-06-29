@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
@@ -52,6 +53,8 @@ final class Payment extends Struct implements \JsonSerializable
     private ?Money $amount = null;
 
     private Money $amountRefunded;
+
+    private ?Money $amountChargedBack = null;
 
     private RefundCollection $refunds;
 
@@ -365,6 +368,11 @@ final class Payment extends Struct implements \JsonSerializable
             (string) ($amountRefunded['currency'] ?? $amount['currency'] ?? ''),
         ));
 
+        $amountChargedBack = $body['amountChargedBack'] ?? null;
+        if ($amountChargedBack !== null) {
+            $payment->setAmountChargedBack(new Money((float) $amountChargedBack['value'], $amountChargedBack['currency']));
+        }
+
         $payment->setCancelable((bool) ($body['isCancelable'] ?? false));
 
         $cardLabel = $body['details']['cardLabel'] ?? null;
@@ -541,5 +549,48 @@ final class Payment extends Struct implements \JsonSerializable
     public function getRefunds(): RefundCollection
     {
         return $this->refunds;
+    }
+
+    public function getAmountChargedBack(): ?Money
+    {
+        return $this->amountChargedBack;
+    }
+
+    public function setAmountChargedBack(Money $amountChargedBack): void
+    {
+        $this->amountChargedBack = $amountChargedBack;
+    }
+
+    /**
+     * The Mollie Payments API has no dedicated chargeback status. A charged back payment keeps
+     * its "paid" status and only exposes a positive "amountChargedBack" value instead.
+     */
+    public function hasChargeback(): bool
+    {
+        return $this->amountChargedBack !== null && $this->amountChargedBack->getValue() > 0.0;
+    }
+
+    /**
+     * Effective Shopware transaction handler method, taking an implicit chargeback into account.
+     */
+    public function getShopwareHandlerMethod(): string
+    {
+        if ($this->hasChargeback()) {
+            return 'chargeback';
+        }
+
+        return $this->status->getShopwareHandlerMethod();
+    }
+
+    /**
+     * Effective Shopware payment status, taking an implicit chargeback into account.
+     */
+    public function getShopwarePaymentStatus(): string
+    {
+        if ($this->hasChargeback()) {
+            return OrderTransactionStates::STATE_CHARGEBACK;
+        }
+
+        return $this->status->getShopwarePaymentStatus();
     }
 }
