@@ -55,6 +55,8 @@ final class WebhookRoute extends AbstractWebhookRoute
     #[Route(path: '/api/mollie/webhook/{transactionId}', name: 'api.mollie.webhook', methods: ['GET', 'POST'])]
     public function notify(string $transactionId, Context $context): WebhookResponse
     {
+        $transactionId = strtolower($transactionId);
+
         $logData = [
             'transactionId' => $transactionId,
         ];
