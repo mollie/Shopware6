@@ -126,4 +126,81 @@ final class PaymentTest extends TestCase
         $this->assertSame('paid', $payment->getShopwareHandlerMethod());
         $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
     }
+
+    public function testFullRefundIsDerivedFromAmountRemaining(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountRefunded' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountRemaining' => ['value' => '0.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertTrue($payment->isFullyRefunded());
+        $this->assertFalse($payment->isPartiallyRefunded());
+        $this->assertSame('refund', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_REFUNDED, $payment->getShopwarePaymentStatus());
+    }
+
+    public function testPartialRefundIsDerivedFromAmountRefunded(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountRefunded' => ['value' => '4.00', 'currency' => 'EUR'],
+            'amountRemaining' => ['value' => '6.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertTrue($payment->isPartiallyRefunded());
+        $this->assertFalse($payment->isFullyRefunded());
+        $this->assertSame('refundPartially', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PARTIALLY_REFUNDED, $payment->getShopwarePaymentStatus());
+    }
+
+    public function testZeroAmountRefundedIsNoRefund(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountRefunded' => ['value' => '0.00', 'currency' => 'EUR'],
+            'amountRemaining' => ['value' => '10.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertFalse($payment->hasRefund());
+        $this->assertFalse($payment->isPartiallyRefunded());
+        $this->assertFalse($payment->isFullyRefunded());
+        $this->assertSame('paid', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
+    }
+
+    public function testChargebackTakesPrecedenceOverRefund(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountRefunded' => ['value' => '4.00', 'currency' => 'EUR'],
+            'amountRemaining' => ['value' => '0.00', 'currency' => 'EUR'],
+            'amountChargedBack' => ['value' => '6.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertTrue($payment->hasChargeback());
+        $this->assertSame('chargeback', $payment->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getShopwarePaymentStatus());
+    }
 }
