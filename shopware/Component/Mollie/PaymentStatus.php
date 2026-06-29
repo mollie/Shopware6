@@ -97,7 +97,7 @@ enum PaymentStatus: string
     {
         return match ($this) {
             self::PAID => 'paid',
-            self::CANCELED => 'cancel',
+            self::CANCELED, self::EXPIRED => 'cancel',
             self::AUTHORIZED => 'authorize',
             self::FAILED => 'fail',
             default => '',
