@@ -11,6 +11,7 @@ use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
 
@@ -152,6 +153,42 @@ final class LineItemTest extends TestCase
         $this->assertSame('Single voucher product', $actual->getDescription());
         $this->assertSame('SW1002', $actual->getSku());
         $this->assertCount(1, $actual->getCategories());
+    }
+
+    /**
+     * A percentage discount that spans products with different tax rates produces a
+     * line item with multiple CalculatedTax entries. Mollie only accepts a single
+     * vatRate/vatAmount per line and validates that
+     * vatAmount === totalAmount * vatRate / (100 + vatRate).
+     *
+     * For a net (B2B) customer the values must stay consistent against the gross
+     * totalAmount we send, otherwise the API rejects the payment ("vatAmount is off").
+     */
+    public function testBlendedTaxForNetDiscountIsConsistentWithGrossAmount(): void
+    {
+        $orderLineItem = $this->orderRepository->getDiscountLineItemWithMultipleTaxesNet();
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('EUR');
+
+        $actual = LineItem::fromOrderLine($orderLineItem, $currency, CartPrice::TAX_STATE_NET);
+
+        // vatAmount must be the real summed tax (-0.651 + -2.3845), not a back-derived value
+        $this->assertEqualsWithDelta(-3.0355, $actual->getVatAmount()->getValue(), 0.0001);
+
+        // gross totalAmount = net (-21.85) + tax (-3.0355)
+        $this->assertEqualsWithDelta(-24.8855, $actual->getAmount()->getValue(), 0.0001);
+
+        // average rate derived from the net base: 3.0355 / 21.85 * 100
+        $this->assertSame('13.89', $actual->getVatRate());
+
+        // the invariant Mollie enforces, computed on the serialized 2-decimal values
+        $payload = $actual->jsonSerialize();
+        $vatRate = (float) $payload['vatRate'];
+        $totalAmount = (float) $payload['totalAmount']->jsonSerialize()['value'];
+        $vatAmount = (float) $payload['vatAmount']->jsonSerialize()['value'];
+
+        $expectedVatAmount = round($totalAmount * $vatRate / (100 + $vatRate), 2);
+        $this->assertSame($expectedVatAmount, $vatAmount);
     }
 
     public function testCanCreateFromOrderLineWithMixedVoucherCategories(): void

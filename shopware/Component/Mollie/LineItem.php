@@ -439,7 +439,7 @@ final class LineItem implements \JsonSerializable
 
     private static function createBaseLineItem(string $label, string $taxStatus, CalculatedPrice $price, CurrencyEntity $currency): self
     {
-        $tax = self::calculateTax($price->getCalculatedTaxes(), $price->getTotalPrice());
+        $tax = self::calculateTax($price->getCalculatedTaxes(), $taxStatus);
 
         $unitPrice = new Money($price->getUnitPrice(), $currency->getIsoCode());
         $totalPrice = new Money($price->getTotalPrice(), $currency->getIsoCode());
@@ -462,9 +462,15 @@ final class LineItem implements \JsonSerializable
     /**
      * Mollie Payments API does allow only one vatRate and vatAmount per line item.
      * In Shopware, the shipping costs and voucher lineitems might have multiple vat rates
-     * so we need to create an avarage tax amount and recalculate it for the API
+     * so we need to blend them into a single average tax rate for the API.
+     *
+     * Mollie validates that vatAmount === totalAmount * vatRate / (100 + vatRate), where
+     * totalAmount is the gross amount we send. To stay consistent we must return the real
+     * summed tax as vatAmount and an average rate derived from the net base. Shopware's
+     * CalculatedTax::getPrice() is the net base in net tax state but the gross base in
+     * gross tax state, so we normalize it to the net base here.
      */
-    private static function calculateTax(CalculatedTaxCollection $taxCollection, float $price): ?CalculatedTax
+    private static function calculateTax(CalculatedTaxCollection $taxCollection, string $taxStatus): ?CalculatedTax
     {
         if ($taxCollection->count() === 0) {
             return null;
@@ -478,18 +484,25 @@ final class LineItem implements \JsonSerializable
 
             return null;
         }
-        $totalAmount = 0.0;
+        $totalBase = 0.0;
         $totalTaxAmount = 0.0;
         /** @var CalculatedTax $calculatedTax */
         foreach ($taxCollection as $calculatedTax) {
             $totalTaxAmount += $calculatedTax->getTax();
-            $totalAmount += $calculatedTax->getPrice();
+            $totalBase += $calculatedTax->getPrice();
         }
 
-        $averageVatRate = round($totalTaxAmount / $totalAmount * 100, 2);
-        $vatAmount = $price * ($averageVatRate / (100 + $averageVatRate));
+        $totalNet = $taxStatus === CartPrice::TAX_STATE_GROSS
+            ? $totalBase - $totalTaxAmount
+            : $totalBase;
 
-        return new CalculatedTax($vatAmount, $averageVatRate, $price);
+        if ($totalNet === 0.0) {
+            return null;
+        }
+
+        $averageVatRate = round($totalTaxAmount / $totalNet * 100, 2);
+
+        return new CalculatedTax($totalTaxAmount, $averageVatRate, $totalNet);
     }
 
     private function addCategory(VoucherCategory $voucherCategory): void
