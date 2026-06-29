@@ -169,6 +169,32 @@ final class OrderEntityBuilder
         return $this->createOrderLineItem('fake-line-item-mixed-voucher-id', 'SW1003', 'Mixed voucher product', 35.00, [1, 99, 2]);
     }
 
+    /**
+     * Builds a discount line item that spans multiple tax rates, as produced by a
+     * percentage voucher applied to a cart with products of different tax rates.
+     * The CalculatedTax entries use the net base (Shopware net tax state), mirroring
+     * the production scenario where the API rejected the blended vatAmount.
+     */
+    public function getDiscountLineItemWithMultipleTaxesNet(): OrderLineItemEntity
+    {
+        $taxes = new CalculatedTaxCollection([
+            new CalculatedTax(-0.651, 7.0, -9.30),
+            new CalculatedTax(-2.3845, 19.0, -12.55),
+        ]);
+
+        $netTotal = -21.85;
+        $price = new CalculatedPrice($netTotal, $netTotal, $taxes, new TaxRuleCollection(), 1);
+
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId('fake-discount-line-item-id');
+        $orderLineItem->setType('promotion');
+        $orderLineItem->setLabel('50 percent discount');
+        $orderLineItem->setQuantity(1);
+        $orderLineItem->setPrice($price);
+
+        return $orderLineItem;
+    }
+
     private function createOrderLineItem(string $id, string $productNumber, string $label, float $price, $voucherCategories = null): OrderLineItemEntity
     {
         $product = new ProductEntity();
