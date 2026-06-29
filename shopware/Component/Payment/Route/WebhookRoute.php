@@ -88,7 +88,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
     private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void
     {
-        $shopwareHandlerMethod = $payment->getStatus()->getShopwareHandlerMethod();
+        $shopwareHandlerMethod = $payment->getShopwareHandlerMethod();
         $logData = [
             'transactionId' => $transactionId,
             'paymentStatus' => $payment->getStatus()->value,
@@ -155,7 +155,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $salesChannelId = $shopwareOrder->getSalesChannelId();
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $paymentStatus = $payment->getStatus();
-        $shopwarePaymentStatus = $paymentStatus->getShopwarePaymentStatus();
+        $shopwarePaymentStatus = $payment->getShopwarePaymentStatus();
         $orderStateId = $shopwareOrder->getStateId();
 
         $currentOrderState = $shopwareOrder->getStateMachineState();
@@ -204,7 +204,7 @@ final class WebhookRoute extends AbstractWebhookRoute
             'totalAmount' => $amount !== null ? $amount->getValue() : null,
         ]);
 
-        if ($captured === null || (float) $captured->getValue() <= 0.0 || $payment->getStatus() !== PaymentStatus::PAID) {
+        if ($captured === null || (float) $captured->getValue() <= 0.0 || $payment->getStatus() !== PaymentStatus::PAID || $payment->hasChargeback()) {
             return;
         }
 
