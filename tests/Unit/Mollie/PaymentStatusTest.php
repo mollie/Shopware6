@@ -62,7 +62,7 @@ final class PaymentStatusTest extends TestCase
         $this->assertSame('authorize', $authorizedStatus->getShopwareHandlerMethod());
         $this->assertSame('cancel', $canceledStatus->getShopwareHandlerMethod());
         $this->assertSame('fail', $failedStatus->getShopwareHandlerMethod());
-        $this->assertSame('', $expiredStatus->getShopwareHandlerMethod());
+        $this->assertSame('cancel', $expiredStatus->getShopwareHandlerMethod());
     }
 
     public function testGetAllWebhookEvents(): void
