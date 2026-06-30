@@ -94,7 +94,11 @@ final class UpdateAddressRouteTest extends TestCase
 
     public function testUpdateBillingPersistsExistingAddressIdAndWritesHistoryEntry(): void
     {
-        $existingBilling = SubscriptionAddressBuilder::create()->withId('existing-billing-id')->build();
+        $existingBilling = SubscriptionAddressBuilder::create()
+            ->withId('existing-billing-id')
+            ->withCountryId('country-uk')
+            ->withCountryStateId('state-london')
+            ->build();
         $existingShipping = SubscriptionAddressBuilder::create()->withId('existing-shipping-id')->build();
         $dataService = new FakeSubscriptionDataService($this->buildSubscriptionData(
             billingAddress: $existingBilling,
@@ -114,6 +118,7 @@ final class UpdateAddressRouteTest extends TestCase
         $this->assertSame('existing-billing-id', $payload['billingAddress']['id']);
         $this->assertSame('subscription-id', $payload['billingAddress']['subscriptionId']);
         $this->assertSame('Jane', $payload['billingAddress']['firstName']);
+        // country is not editable in the form and is preserved from the existing address
         $this->assertSame('country-uk', $payload['billingAddress']['countryId']);
         $this->assertSame('state-london', $payload['billingAddress']['countryStateId']);
         $this->assertSame('billing address updated', $payload['historyEntries'][0]['comment']);
@@ -176,9 +181,13 @@ final class UpdateAddressRouteTest extends TestCase
         $this->assertSame('shipping address updated', $payload['historyEntries'][0]['comment']);
     }
 
-    public function testRequestDataLowercasesSalutationAndCountryStateIds(): void
+    public function testRequestDataLowercasesSalutationIdAndPreservesCountryFromExistingAddress(): void
     {
-        $existingBilling = SubscriptionAddressBuilder::create()->withId('existing-billing-id')->build();
+        $existingBilling = SubscriptionAddressBuilder::create()
+            ->withId('existing-billing-id')
+            ->withCountryId('country-uk')
+            ->withCountryStateId('state-london')
+            ->build();
         $existingShipping = SubscriptionAddressBuilder::create()->withId('existing-shipping-id')->build();
         $dataService = new FakeSubscriptionDataService($this->buildSubscriptionData(
             billingAddress: $existingBilling,
@@ -194,8 +203,9 @@ final class UpdateAddressRouteTest extends TestCase
             'street' => 'Main 1',
             'zipcode' => '12345',
             'city' => 'Berlin',
-            'countryId' => 'COUNTRY-UK',
-            'countryStateId' => 'STATE-LONDON',
+            // country is not part of the form; any submitted values must be ignored
+            'countryId' => 'COUNTRY-SHOULD-BE-IGNORED',
+            'countryStateId' => 'STATE-SHOULD-BE-IGNORED',
         ]);
 
         $route->updateBilling('subscription-id', $data, $this->buildAuthenticatedContext());
@@ -204,6 +214,38 @@ final class UpdateAddressRouteTest extends TestCase
         $this->assertSame('salutation-id', $written['salutationId']);
         $this->assertSame('country-uk', $written['countryId']);
         $this->assertSame('state-london', $written['countryStateId']);
+    }
+
+    public function testUpdateBillingReadsFieldsFromNestedAddressBag(): void
+    {
+        $existingBilling = SubscriptionAddressBuilder::create()->withId('existing-billing-id')->build();
+        $existingShipping = SubscriptionAddressBuilder::create()->withId('existing-shipping-id')->build();
+        $dataService = new FakeSubscriptionDataService($this->buildSubscriptionData(
+            billingAddress: $existingBilling,
+            shippingAddress: $existingShipping,
+        ));
+        $repository = new FakeSubscriptionRepository();
+        $route = $this->buildRoute(dataService: $dataService, subscriptionRepository: $repository);
+
+        // The storefront form names every field address[...] so the bag is nested.
+        $data = new RequestDataBag([
+            'address' => [
+                'salutationId' => 'salutation-id',
+                'firstName' => 'Jane',
+                'lastName' => 'Doe',
+                'street' => 'Main 1',
+                'zipcode' => '12345',
+                'city' => 'Berlin',
+            ],
+        ]);
+
+        $route->updateBilling('subscription-id', $data, $this->buildAuthenticatedContext());
+
+        $written = $repository->getLastUpsert()['billingAddress'];
+        $this->assertSame('salutation-id', $written['salutationId']);
+        $this->assertSame('Jane', $written['firstName']);
+        $this->assertSame('Doe', $written['lastName']);
+        $this->assertSame('Main 1', $written['street']);
     }
 
     private function buildRoute(
