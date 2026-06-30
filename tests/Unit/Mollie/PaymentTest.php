@@ -89,8 +89,8 @@ final class PaymentTest extends TestCase
         $payment->setStatus(PaymentStatus::PAID);
 
         $this->assertFalse($payment->hasChargeback());
-        $this->assertSame('paid', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
+        $this->assertSame('paid', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getStatus()->getShopwarePaymentStatus());
     }
 
     public function testChargebackIsDerivedFromAmountChargedBack(): void
@@ -106,8 +106,9 @@ final class PaymentTest extends TestCase
         $payment = Payment::createFromClientResponse($body);
 
         $this->assertTrue($payment->hasChargeback());
-        $this->assertSame('chargeback', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getShopwarePaymentStatus());
+        $this->assertSame(PaymentStatus::CHARGEBACK, $payment->getStatus());
+        $this->assertSame('chargeback', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getStatus()->getShopwarePaymentStatus());
     }
 
     public function testZeroAmountChargedBackIsNoChargeback(): void
@@ -123,8 +124,8 @@ final class PaymentTest extends TestCase
         $payment = Payment::createFromClientResponse($body);
 
         $this->assertFalse($payment->hasChargeback());
-        $this->assertSame('paid', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
+        $this->assertSame('paid', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getStatus()->getShopwarePaymentStatus());
     }
 
     public function testFullRefundIsDerivedFromAmountRemaining(): void
@@ -142,8 +143,9 @@ final class PaymentTest extends TestCase
 
         $this->assertTrue($payment->isFullyRefunded());
         $this->assertFalse($payment->isPartiallyRefunded());
-        $this->assertSame('refund', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_REFUNDED, $payment->getShopwarePaymentStatus());
+        $this->assertSame(PaymentStatus::REFUNDED, $payment->getStatus());
+        $this->assertSame('refund', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_REFUNDED, $payment->getStatus()->getShopwarePaymentStatus());
     }
 
     public function testPartialRefundIsDerivedFromAmountRefunded(): void
@@ -161,8 +163,9 @@ final class PaymentTest extends TestCase
 
         $this->assertTrue($payment->isPartiallyRefunded());
         $this->assertFalse($payment->isFullyRefunded());
-        $this->assertSame('refundPartially', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_PARTIALLY_REFUNDED, $payment->getShopwarePaymentStatus());
+        $this->assertSame(PaymentStatus::PARTIALLY_REFUNDED, $payment->getStatus());
+        $this->assertSame('refundPartially', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PARTIALLY_REFUNDED, $payment->getStatus()->getShopwarePaymentStatus());
     }
 
     public function testZeroAmountRefundedIsNoRefund(): void
@@ -181,8 +184,8 @@ final class PaymentTest extends TestCase
         $this->assertFalse($payment->hasRefund());
         $this->assertFalse($payment->isPartiallyRefunded());
         $this->assertFalse($payment->isFullyRefunded());
-        $this->assertSame('paid', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getShopwarePaymentStatus());
+        $this->assertSame('paid', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_PAID, $payment->getStatus()->getShopwarePaymentStatus());
     }
 
     public function testChargebackTakesPrecedenceOverRefund(): void
@@ -200,7 +203,8 @@ final class PaymentTest extends TestCase
         $payment = Payment::createFromClientResponse($body);
 
         $this->assertTrue($payment->hasChargeback());
-        $this->assertSame('chargeback', $payment->getShopwareHandlerMethod());
-        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getShopwarePaymentStatus());
+        $this->assertSame(PaymentStatus::CHARGEBACK, $payment->getStatus());
+        $this->assertSame('chargeback', $payment->getStatus()->getShopwareHandlerMethod());
+        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getStatus()->getShopwarePaymentStatus());
     }
 }

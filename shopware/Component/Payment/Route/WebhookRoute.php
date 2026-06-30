@@ -90,7 +90,7 @@ final class WebhookRoute extends AbstractWebhookRoute
 
     private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void
     {
-        $shopwareHandlerMethod = $payment->getShopwareHandlerMethod();
+        $shopwareHandlerMethod = $payment->getStatus()->getShopwareHandlerMethod();
         $logData = [
             'transactionId' => $transactionId,
             'paymentStatus' => $payment->getStatus()->value,
@@ -157,7 +157,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         $salesChannelId = $shopwareOrder->getSalesChannelId();
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $paymentStatus = $payment->getStatus();
-        $shopwarePaymentStatus = $payment->getShopwarePaymentStatus();
+        $shopwarePaymentStatus = $payment->getStatus()->getShopwarePaymentStatus();
         $orderStateId = $shopwareOrder->getStateId();
 
         $currentOrderState = $shopwareOrder->getStateMachineState();
@@ -206,7 +206,9 @@ final class WebhookRoute extends AbstractWebhookRoute
             'totalAmount' => $amount !== null ? $amount->getValue() : null,
         ]);
 
-        if ($captured === null || (float) $captured->getValue() <= 0.0 || $payment->getStatus() !== PaymentStatus::PAID || $payment->hasChargeback()) {
+        // A chargeback or refund no longer reports as PAID (the status is derived in
+        // Payment::createFromClientResponse), so the PAID check already excludes those cases.
+        if ($captured === null || (float) $captured->getValue() <= 0.0 || $payment->getStatus() !== PaymentStatus::PAID) {
             return;
         }
 

@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": "Mollie Webhook Mottatt (Fullført)",
             "mollie_webhook_received_status_refunded": "Mollie Webhook Mottatt (Refundert)",
             "mollie_webhook_received_status_partially_refunded": "Mollie Webhook Mottatt (Delvis refundert)",
+            "mollie_webhook_received_status_chargeback": "Mollie Webhook Mottatt (Tilbakeføring)",
             "mollie_refund_started": "Mollie refusjon startet",
             "mollie_subscription_started": "Mollie abonnement startet",
             "mollie_subscription_ended": "Mollie abonnement fullført",

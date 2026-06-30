@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Получен е Mollie уебхук (Завършен)",
             "mollie_webhook_received_status_refunded": " Получен е Mollie уебхук (Възстановена сума)",
             "mollie_webhook_received_status_partially_refunded": " Получен е Mollie уебхук (Частично възстановена сума)",
+            "mollie_webhook_received_status_chargeback": " Получен е Mollie уебхук (Сторниране)",
             "mollie_refund_started": " Започнато Mollie възстановяване на сума",
             "mollie_subscription_started": " Mollie абонамент е започнат",
             "mollie_subscription_ended": " Mollie абонамент е завършен",

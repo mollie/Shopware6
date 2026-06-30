@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Veebikonks Saadud (Lõpetatud)",
             "mollie_webhook_received_status_refunded": " Mollie Veebikonks Saadud (Tagastatud)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Veebikonks Saadud (Osaliselt tagastatud)",
+            "mollie_webhook_received_status_chargeback": " Mollie Veebikonks Saadud (Tagasidebiteerimine)",
             "mollie_refund_started": " Mollie tagasimakse algatatud",
             "mollie_subscription_started": " Mollie tellimus alustatud",
             "mollie_subscription_ended": " Mollie tellimus lõpetatud",

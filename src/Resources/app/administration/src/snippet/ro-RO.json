@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Webhook Mollie primit (Finalizat)",
             "mollie_webhook_received_status_refunded": " Webhook Mollie primit (Rambursat)",
             "mollie_webhook_received_status_partially_refunded": " Webhook Mollie primit (Rambursat parțial)",
+            "mollie_webhook_received_status_chargeback": " Webhook Mollie primit (Stornare)",
             "mollie_refund_started": " Rambursarea Mollie a început",
             "mollie_subscription_started": " Abonamentul Mollie a început",
             "mollie_subscription_ended": " Abonament Mollie finalizat",
