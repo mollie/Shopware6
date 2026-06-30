@@ -99,6 +99,11 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
             : $subscription->getShippingAddress();
         $addressId = $existing instanceof SubscriptionAddressEntity ? $existing->getId() : Uuid::randomHex();
 
+        // The address form does not allow editing the country, so the country is
+        // preserved from the existing address instead of being taken from the request.
+        $countryId = $existing instanceof SubscriptionAddressEntity ? $existing->getCountryId() : $data->countryId;
+        $countryStateId = $existing instanceof SubscriptionAddressEntity ? $existing->getCountryStateId() : $data->countryStateId;
+
         $associationKey = $type === self::TYPE_BILLING ? 'billingAddress' : 'shippingAddress';
         $historyComment = $type === self::TYPE_BILLING
             ? 'billing address updated'
@@ -106,7 +111,7 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
 
         $this->subscriptionRepository->upsert([[
             'id' => $subscription->getId(),
-            $associationKey => $this->buildAddressPayload($addressId, $subscription->getId(), $data),
+            $associationKey => $this->buildAddressPayload($addressId, $subscription->getId(), $data, $countryId, $countryStateId),
             'historyEntries' => [[
                 'statusFrom' => '',
                 'statusTo' => '',
@@ -145,9 +150,6 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
         if ($data->city === '') {
             throw UpdateAddressException::requiredFieldMissing('city');
         }
-        if ($data->countryId === '') {
-            throw UpdateAddressException::requiredFieldMissing('countryId');
-        }
     }
 
     private function assertOwnership(SubscriptionEntity $subscription, CustomerEntity $customer): void
@@ -160,7 +162,7 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
     /**
      * @return array<string,mixed>
      */
-    private function buildAddressPayload(string $addressId, string $subscriptionId, UpdateAddressData $data): array
+    private function buildAddressPayload(string $addressId, string $subscriptionId, UpdateAddressData $data, string $countryId, ?string $countryStateId): array
     {
         return [
             'id' => $addressId,
@@ -175,8 +177,8 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
             'street' => $data->street,
             'zipcode' => $data->zipcode,
             'city' => $data->city,
-            'countryId' => $data->countryId,
-            'countryStateId' => $data->countryStateId,
+            'countryId' => $countryId,
+            'countryStateId' => $countryStateId,
             'additionalAddressLine1' => $data->additionalAddressLine1,
             'additionalAddressLine2' => $data->additionalAddressLine2,
         ];
