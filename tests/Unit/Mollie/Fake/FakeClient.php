@@ -20,6 +20,7 @@ final class FakeClient extends Client
         private ?bool $embed = false,
         private ?string $checkoutUrl = null,
         private ?array $amountCaptured = null,
+        private ?array $amount = null,
     ) {
         if ($id === null) {
             $this->response = new Response(status: 500, body: json_encode([
@@ -39,6 +40,9 @@ final class FakeClient extends Client
         }
         if ($this->amountCaptured !== null) {
             $body['amountCaptured'] = $this->amountCaptured;
+        }
+        if ($this->amount !== null) {
+            $body['amount'] = $this->amount;
         }
         if ($embed) {
             $body['_embedded']['payments'][0] = $body;

@@ -5,10 +5,12 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 
 final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandler
 {
     private bool $shouldThrow = false;
+    private bool $shouldThrowIllegalTransition = false;
     private bool $called = false;
 
     public function __construct()
@@ -18,6 +20,11 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
     public function setShouldThrow(bool $shouldThrow): void
     {
         $this->shouldThrow = $shouldThrow;
+    }
+
+    public function setShouldThrowIllegalTransition(bool $shouldThrow): void
+    {
+        $this->shouldThrowIllegalTransition = $shouldThrow;
     }
 
     public function wasCalled(): bool
@@ -88,6 +95,9 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
     private function throwIfNeeded(): void
     {
         $this->called = true;
+        if ($this->shouldThrowIllegalTransition) {
+            throw new IllegalTransitionException('paid', 'paid', ['reopen']);
+        }
         if ($this->shouldThrow) {
             throw new \RuntimeException('FakeOrderTransactionStateHandler: forced failure');
         }
