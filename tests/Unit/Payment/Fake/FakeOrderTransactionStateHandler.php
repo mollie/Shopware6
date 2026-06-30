@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Context;
 final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandler
 {
     private bool $shouldThrow = false;
+    private bool $called = false;
 
     public function __construct()
     {
@@ -17,6 +18,11 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
     public function setShouldThrow(bool $shouldThrow): void
     {
         $this->shouldThrow = $shouldThrow;
+    }
+
+    public function wasCalled(): bool
+    {
+        return $this->called;
     }
 
     public function reopen(string $transactionId, Context $context): void
@@ -81,6 +87,7 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
 
     private function throwIfNeeded(): void
     {
+        $this->called = true;
         if ($this->shouldThrow) {
             throw new \RuntimeException('FakeOrderTransactionStateHandler: forced failure');
         }
