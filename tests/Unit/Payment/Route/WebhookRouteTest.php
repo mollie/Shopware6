@@ -171,6 +171,75 @@ final class WebhookRouteTest extends TestCase
         }
     }
 
+    /**
+     * When the transaction is already in the target payment state, Shopware throws an
+     * IllegalTransitionException. The webhook must skip the change and finish successfully
+     * instead of failing with a WebhookException.
+     */
+    public function testPaymentStatusAlreadyReachedIsSkipped(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $stateHandler = new FakeOrderTransactionStateHandler();
+        $stateHandler->setShouldThrowIllegalTransition(true);
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $stateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+    }
+
+    /**
+     * When the order is already in the target state, performTransition throws an
+     * IllegalTransitionException. The webhook must skip the change and finish successfully.
+     */
+    public function testOrderStatusAlreadyReachedIsSkipped(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $orderStateHandler = new FakeOrderStateHandler();
+        $orderStateHandler->setShouldThrowIllegalTransition(true);
+
+        $webhookRoute = $this->getRoute($transactionService, null, null, null, $orderStateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+    }
+
+    /**
+     * When the delivery is already shipped, the delivery state transition throws an
+     * IllegalTransitionException. The webhook must skip the change and finish successfully.
+     */
+    public function testDeliveryStatusAlreadyReachedIsSkipped(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $orderService = new FakeOrderService();
+        $orderService->setShouldThrowIllegalTransition(true);
+
+        $fakeClient = new FakeClient(
+            'mollieTestId',
+            'paid',
+            PaymentMethod::PAYPAL,
+            false,
+            null,
+            ['value' => '100.00', 'currency' => 'EUR'],
+            ['value' => '100.00', 'currency' => 'EUR'],
+        );
+
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, null, null, null, $orderService);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+    }
+
     public function testWebhookWithCapturedAmountShipsOrder(): void
     {
         $transactionService = new FakeTransactionService();
@@ -182,6 +251,7 @@ final class WebhookRouteTest extends TestCase
             PaymentMethod::PAYPAL,
             false,
             null,
+            ['value' => '100.00', 'currency' => 'EUR'],
             ['value' => '100.00', 'currency' => 'EUR'],
         );
         $webhookRoute = $this->getRoute($transactionService, $fakeClient);
@@ -214,6 +284,7 @@ final class WebhookRouteTest extends TestCase
         ?FakeOrderTransactionStateHandler $stateHandler = null,
         ?FakePaymentMethodUpdater $paymentMethodUpdater = null,
         ?FakeOrderStateHandler $orderStateHandler = null,
+        ?FakeOrderService $orderService = null,
     ): WebhookRoute {
         if ($transactionService === null) {
             $transactionService = new FakeTransactionService();
@@ -234,7 +305,7 @@ final class WebhookRouteTest extends TestCase
             new EventSpy(),
             $paymentMethodUpdater ?? new FakePaymentMethodUpdater(),
             $orderStateHandler ?? new FakeOrderStateHandler(),
-            new FakeOrderService(),
+            $orderService ?? new FakeOrderService(),
             $logger
         );
     }

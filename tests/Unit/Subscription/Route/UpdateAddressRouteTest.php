@@ -98,7 +98,8 @@ final class UpdateAddressRouteTest extends TestCase
             ->withId('existing-billing-id')
             ->withCountryId('country-uk')
             ->withCountryStateId('state-london')
-            ->build();
+            ->build()
+        ;
         $existingShipping = SubscriptionAddressBuilder::create()->withId('existing-shipping-id')->build();
         $dataService = new FakeSubscriptionDataService($this->buildSubscriptionData(
             billingAddress: $existingBilling,
@@ -187,7 +188,8 @@ final class UpdateAddressRouteTest extends TestCase
             ->withId('existing-billing-id')
             ->withCountryId('country-uk')
             ->withCountryStateId('state-london')
-            ->build();
+            ->build()
+        ;
         $existingShipping = SubscriptionAddressBuilder::create()->withId('existing-shipping-id')->build();
         $dataService = new FakeSubscriptionDataService($this->buildSubscriptionData(
             billingAddress: $existingBilling,

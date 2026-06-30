@@ -22,6 +22,7 @@ use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
+use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -134,6 +135,9 @@ final class WebhookRoute extends AbstractWebhookRoute
         try {
             $this->stateMachineHandler->{$shopwareHandlerMethod}($transactionId, $context);
             $this->logger->info('Payment status changed', $logData);
+        } catch (IllegalTransitionException $exception) {
+            $logData['exceptionMessage'] = $exception->getMessage();
+            $this->logger->warning('Payment status transition failed, transaction is already in the target state or the state machine is misconfigured', $logData);
         } catch (\Throwable $exception) {
             $logData['exceptionMessage'] = $exception->getMessage();
             $this->logger->error('Failed to change payment status', $logData);
@@ -213,6 +217,9 @@ final class WebhookRoute extends AbstractWebhookRoute
             $logData['newOrderStateId'] = $newOrderStateId;
 
             $this->logger->info('Finished - Change order status, successful', $logData);
+        } catch (IllegalTransitionException $exception) {
+            $logData['message'] = $exception->getMessage();
+            $this->logger->warning('Finished - Change order status transition failed, order is already in the target state or the state machine is misconfigured', $logData);
         } catch (\Throwable $exception) {
             $logData['message'] = $exception->getMessage();
             $this->logger->error('Finished - Change order status, Failed to change order status', $logData);
@@ -255,11 +262,21 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
         $orderDeliveryId = $firstDelivery->getId();
 
-        $this->orderService->orderDeliveryStateTransition(
-            $orderDeliveryId,
-            StateMachineTransitionActions::ACTION_SHIP,
-            new ParameterBag(),
-            $context
-        );
+        // The delivery may already be shipped (e.g. via ShipOrderRoute or a manual state change);
+        // skip the redundant transition then instead of failing the whole webhook.
+        try {
+            $this->orderService->orderDeliveryStateTransition(
+                $orderDeliveryId,
+                StateMachineTransitionActions::ACTION_SHIP,
+                new ParameterBag(),
+                $context
+            );
+        } catch (IllegalTransitionException $exception) {
+            $this->logger->warning('Delivery status transition failed, delivery is already in the target state or the state machine is misconfigured', [
+                'orderNumber' => $orderNumber,
+                'orderDeliveryId' => $orderDeliveryId,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 }
