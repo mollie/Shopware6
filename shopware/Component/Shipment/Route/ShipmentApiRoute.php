@@ -12,8 +12,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Public, operational shipment API for 3rd parties / ERP systems. These routes address orders by
- * Shopware order number and line items by product number, translate the request into the internal
- * format and delegate the actual work to the ShipOrderRoute.
+ * Shopware order number and line items by a single "item" identifier (the ShipOrderRoute resolves
+ * whether it is a line item id or a product number), translate the request into the internal format
+ * and delegate the actual work to the ShipOrderRoute.
  */
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true])]
@@ -38,11 +39,11 @@ final class ShipmentApiRoute
             throw ShippingException::missingOrderNumber();
         }
 
-        return $this->shipOrderRoute->ship($this->buildDelegateRequest($payload, $orderNumber, []), $context);
+        return $this->executeShipment($this->buildDelegateRequest($payload, $orderNumber, []), $context);
     }
 
     /**
-     * Ships a selected set of items of an order, addressed by their product numbers.
+     * Ships a selected set of items of an order, each addressed by its item identifier.
      */
     #[Route(path: '/api/mollie/ship/order/batch', name: 'api.mollie.ship.order.batch', methods: ['POST'])]
     public function shipOrderBatch(Request $request, Context $context): ShipOrderResponse
@@ -61,23 +62,22 @@ final class ShipmentApiRoute
 
         $items = [];
         foreach ($requestItems as $requestItem) {
-            $identifier = $this->extractItemIdentifier($requestItem);
-            if ($identifier === '') {
+            $item = (string) ($requestItem['item'] ?? '');
+            if ($item === '') {
                 throw ShippingException::missingItemIdentifier();
             }
 
             $items[] = [
-                'id' => $identifier,
+                'id' => $item,
                 'quantity' => (int) ($requestItem['quantity'] ?? 1),
             ];
         }
 
-        return $this->shipOrderRoute->ship($this->buildDelegateRequest($payload, $orderNumber, $items), $context);
+        return $this->executeShipment($this->buildDelegateRequest($payload, $orderNumber, $items), $context);
     }
 
     /**
-     * Ships a single item of an order, addressed either by its line item id or, when that is unknown,
-     * by its product number.
+     * Ships a single item of an order, addressed by its item identifier.
      */
     #[Route(path: '/api/mollie/ship/item', name: 'api.mollie.ship.item', methods: ['POST'])]
     public function shipItem(Request $request, Context $context): ShipOrderResponse
@@ -89,33 +89,32 @@ final class ShipmentApiRoute
             throw ShippingException::missingOrderNumber();
         }
 
-        $identifier = $this->extractItemIdentifier($payload);
-        if ($identifier === '') {
+        $item = (string) ($payload['item'] ?? '');
+        if ($item === '') {
             throw ShippingException::missingItemIdentifier();
         }
 
         $items = [[
-            'id' => $identifier,
+            'id' => $item,
             'quantity' => (int) ($payload['quantity'] ?? 1),
         ]];
 
-        return $this->shipOrderRoute->ship($this->buildDelegateRequest($payload, $orderNumber, $items), $context);
+        return $this->executeShipment($this->buildDelegateRequest($payload, $orderNumber, $items), $context);
     }
 
     /**
-     * Resolves the item identifier from a request fragment. A line item id takes precedence; when it
-     * is unknown the product number is used. The ShipOrderRoute resolves either against the order.
-     *
-     * @param array<string, mixed> $data
+     * Delegates to the central ship route and turns a no-op (nothing left to ship) into an error,
+     * so the operational API reports an unsuccessful shipment instead of a silent success.
      */
-    private function extractItemIdentifier(array $data): string
+    private function executeShipment(Request $request, Context $context): ShipOrderResponse
     {
-        $lineItemId = (string) ($data['lineItemId'] ?? '');
-        if ($lineItemId !== '') {
-            return $lineItemId;
+        $response = $this->shipOrderRoute->ship($request, $context);
+
+        if ($response->getObject()->get('mollieId') === '') {
+            throw ShippingException::shipmentNotSuccessful();
         }
 
-        return (string) ($data['productNumber'] ?? '');
+        return $response;
     }
 
     /**

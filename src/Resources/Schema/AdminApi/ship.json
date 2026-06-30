@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Mollie Shipment API",
-    "description": "Operational shipment API for 3rd parties / ERP systems. Orders are addressed by their Shopware order number and line items by their line item id or product number.",
+    "description": "Operational shipment API for 3rd parties / ERP systems. Orders are addressed by their Shopware order number and line items by a single item identifier (either a line item id or a product number; the code resolves which it is).",
     "version": "1.0.0"
   },
   "paths": {
@@ -10,7 +10,7 @@
       "post": {
         "tags": ["Mollie"],
         "summary": "Ship a full Mollie order",
-        "description": "Ships all remaining (not yet shipped or cancelled) items of an order. Calling it again once everything is shipped is an idempotent no-op.",
+        "description": "Ships all remaining (not yet shipped or cancelled) items of an order.",
         "operationId": "shipMollieOrder",
         "requestBody": {
           "required": true,
@@ -56,6 +56,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Shipment was not successful, there was nothing to ship.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentError"
+                }
+              }
+            }
           }
         }
       }
@@ -64,7 +74,7 @@
       "post": {
         "tags": ["Mollie"],
         "summary": "Ship selected items of a Mollie order",
-        "description": "Ships a selected set of items of an order. Each item is addressed either by its line item id or, when that is unknown, by its product number.",
+        "description": "Ships a selected set of items of an order. Each item is addressed by an item identifier (a line item id or a product number).",
         "operationId": "shipMollieOrderBatch",
         "requestBody": {
           "required": true,
@@ -79,24 +89,21 @@
                   },
                   "items": {
                     "type": "array",
-                    "description": "The items to ship. Provide either a lineItemId or a productNumber per item.",
+                    "description": "The items to ship.",
                     "items": {
                       "type": "object",
                       "properties": {
-                        "lineItemId": {
+                        "item": {
                           "type": "string",
-                          "description": "The Shopware order line item id (takes precedence over productNumber)."
-                        },
-                        "productNumber": {
-                          "type": "string",
-                          "description": "The Shopware product number (used when the line item id is unknown)."
+                          "description": "The item identifier: a Shopware order line item id or a product number. The code resolves which it is."
                         },
                         "quantity": {
                           "type": "integer",
                           "description": "The quantity to ship.",
                           "default": 1
                         }
-                      }
+                      },
+                      "required": ["item"]
                     }
                   },
                   "trackingCarrier": {
@@ -118,7 +125,7 @@
                 "orderNumber": "10000",
                 "items": [
                   {
-                    "productNumber": "SW10000",
+                    "item": "SW10000",
                     "quantity": 1
                   }
                 ]
@@ -136,6 +143,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Shipment was not successful, there was nothing to ship.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentError"
+                }
+              }
+            }
           }
         }
       }
@@ -144,7 +161,7 @@
       "post": {
         "tags": ["Mollie"],
         "summary": "Ship a single item of a Mollie order",
-        "description": "Ships a single item of an order, addressed either by its line item id or, when that is unknown, by its product number.",
+        "description": "Ships a single item of an order, addressed by an item identifier (a line item id or a product number).",
         "operationId": "shipMollieItem",
         "requestBody": {
           "required": true,
@@ -157,13 +174,9 @@
                     "type": "string",
                     "description": "The Shopware order number."
                   },
-                  "lineItemId": {
+                  "item": {
                     "type": "string",
-                    "description": "The Shopware order line item id (takes precedence over productNumber)."
-                  },
-                  "productNumber": {
-                    "type": "string",
-                    "description": "The Shopware product number (used when the line item id is unknown)."
+                    "description": "The item identifier: a Shopware order line item id or a product number. The code resolves which it is."
                   },
                   "quantity": {
                     "type": "integer",
@@ -183,11 +196,11 @@
                     "description": "Optional tracking URL."
                   }
                 },
-                "required": ["orderNumber"]
+                "required": ["orderNumber", "item"]
               },
               "example": {
                 "orderNumber": "10000",
-                "productNumber": "SW10000",
+                "item": "SW10000",
                 "quantity": 1
               }
             }
@@ -200,6 +213,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Shipment was not successful, there was nothing to ship.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentError"
                 }
               }
             }
@@ -222,9 +245,9 @@
             "description": "The UUID of the shipped Shopware order.",
             "example": "123e4567e89b12d3a456426614174000"
           },
-          "captureId": {
+          "mollieId": {
             "type": "string",
-            "description": "The Mollie capture id. Empty when nothing had to be shipped.",
+            "description": "The id returned by Mollie - a capture id (Payments API) or a shipment id (Orders API) depending on how the order was created.",
             "example": "cpt_4qqhO89gsT"
           },
           "updatedLineItems": {
@@ -235,7 +258,32 @@
             }
           }
         },
-        "required": ["status", "orderId", "captureId", "updatedLineItems"]
+        "required": ["status", "orderId", "mollieId", "updatedLineItems"]
+      },
+      "MollieShipmentError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "SHIPMENT_NOT_SUCCESSFUL"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "500"
+                },
+                "detail": {
+                  "type": "string",
+                  "example": "Shipment was not successful, there was nothing to ship"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

@@ -148,18 +148,16 @@ paths:
                   type: array
                   items:
                     type: object
-                    description: Provide either a lineItemId or a productNumber per item
                     properties:
-                      lineItemId:
+                      item:
                         type: string
-                        description: The Shopware order line item id (takes precedence over productNumber)
-                      productNumber:
-                        type: string
-                        description: The Shopware product number (used when the line item id is unknown)
+                        description: The item identifier - a Shopware order line item id or a product number (the code resolves which it is)
                       quantity:
                         type: integer
                         description: The quantity of the product
                         default: 1
+                    required:
+                      - item
                 trackingCode:
                   type: string
                   description: The tracking code of the order
@@ -193,12 +191,9 @@ paths:
                 orderNumber:
                   type: string
                   description: The Shopware order number
-                lineItemId:
+                item:
                   type: string
-                  description: The Shopware order line item id (takes precedence over productNumber)
-                productNumber:
-                  type: string
-                  description: The Shopware product number (used when the line item id is unknown)
+                  description: The item identifier - a Shopware order line item id or a product number (the code resolves which it is)
                 quantity:
                   type: integer
                   description: The quantity of the product
@@ -214,6 +209,7 @@ paths:
                   description: The tracking URL of the order
               required:
                 - orderNumber
+                - item
       responses:
         "200":
           description: "successful operation"
