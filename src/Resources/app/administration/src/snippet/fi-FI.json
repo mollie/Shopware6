@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook vastaanotettu (Suoritettu)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook vastaanotettu (Hyvitetty)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook vastaanotettu (Osittain hyvitetty)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook vastaanotettu (Takaisinveloitus)",
             "mollie_refund_started": " Mollie hyvityspyyntö aloitettu",
             "mollie_subscription_started": " Mollie-tilaus aloitettu",
             "mollie_subscription_ended": " Mollie-tilaus suoritettu",

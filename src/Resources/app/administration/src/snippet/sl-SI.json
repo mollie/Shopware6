@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie avtomatizirano obvestilo prejeto (končano)",
             "mollie_webhook_received_status_refunded": " Mollie avtomatizirano obvestilo prejeto (vrnjeno)",
             "mollie_webhook_received_status_partially_refunded": " Mollie avtomatizirano obvestilo prejeto (delno vrnjeno)",
+            "mollie_webhook_received_status_chargeback": " Mollie avtomatizirano obvestilo prejeto (Storniranje)",
             "mollie_refund_started": " Mollie vračilo je bilo začeto",
             "mollie_subscription_started": " Mollie naročnina se je začela",
             "mollie_subscription_ended": " Mollie naročnina se je končala",

@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Λήφθηκε Webhook Mollie (Ολοκληρωμένο)",
             "mollie_webhook_received_status_refunded": " Λήφθηκε Webhook Mollie (Επιστράφηκε)",
             "mollie_webhook_received_status_partially_refunded": " Λήφθηκε Webhook Mollie (Επιστράφηκε μερικώς)",
+            "mollie_webhook_received_status_chargeback": " Λήφθηκε Webhook Mollie (Αντιλογισμός)",
             "mollie_refund_started": " Η επιστροφή Mollie ξεκίνησε",
             "mollie_subscription_started": " Η συνδρομή Mollie ξεκίνησε",
             "mollie_subscription_ended": " Η συνδρομή Mollie ολοκληρώθηκε",

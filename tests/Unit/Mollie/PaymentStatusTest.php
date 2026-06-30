@@ -5,14 +5,18 @@ namespace Mollie\Shopware\Unit\Mollie;
 
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusAuthorizedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusCancelledEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusChargebackEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusExpiredEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusFailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusOpenEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPaidEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPartiallyRefundedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusPendingEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookStatusRefundedEvent;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 
 #[CoversClass(PaymentStatus::class)]
 final class PaymentStatusTest extends TestCase
@@ -63,6 +67,25 @@ final class PaymentStatusTest extends TestCase
         $this->assertSame('cancel', $canceledStatus->getShopwareHandlerMethod());
         $this->assertSame('fail', $failedStatus->getShopwareHandlerMethod());
         $this->assertSame('cancel', $expiredStatus->getShopwareHandlerMethod());
+        $this->assertSame('refund', PaymentStatus::REFUNDED->getShopwareHandlerMethod());
+        $this->assertSame('refundPartially', PaymentStatus::PARTIALLY_REFUNDED->getShopwareHandlerMethod());
+        $this->assertSame('chargeback', PaymentStatus::CHARGEBACK->getShopwareHandlerMethod());
+    }
+
+    public function testShopwarePaymentStatus(): void
+    {
+        $this->assertSame(OrderTransactionStates::STATE_PAID, PaymentStatus::PAID->getShopwarePaymentStatus());
+        $this->assertSame(OrderTransactionStates::STATE_REFUNDED, PaymentStatus::REFUNDED->getShopwarePaymentStatus());
+        $this->assertSame(OrderTransactionStates::STATE_PARTIALLY_REFUNDED, PaymentStatus::PARTIALLY_REFUNDED->getShopwarePaymentStatus());
+        $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, PaymentStatus::CHARGEBACK->getShopwarePaymentStatus());
+    }
+
+    public function testApprovedStatusExcludesRefundAndChargeback(): void
+    {
+        $this->assertTrue(PaymentStatus::PAID->isApproved());
+        $this->assertFalse(PaymentStatus::REFUNDED->isApproved());
+        $this->assertFalse(PaymentStatus::PARTIALLY_REFUNDED->isApproved());
+        $this->assertFalse(PaymentStatus::CHARGEBACK->isApproved());
     }
 
     public function testGetAllWebhookEvents(): void
@@ -77,10 +100,13 @@ final class PaymentStatusTest extends TestCase
             WebhookStatusCancelledEvent::class,
             WebhookStatusExpiredEvent::class,
             WebhookStatusFailedEvent::class,
+            WebhookStatusRefundedEvent::class,
+            WebhookStatusPartiallyRefundedEvent::class,
+            WebhookStatusChargebackEvent::class,
         ];
 
         $this->assertIsArray($events);
-        $this->assertCount(7, $events);
+        $this->assertCount(10, $events);
         $this->assertSame($expected, $events);
     }
 
@@ -93,5 +119,8 @@ final class PaymentStatusTest extends TestCase
         $this->assertSame(WebhookStatusCancelledEvent::class, PaymentStatus::CANCELED->getWebhookEventClass());
         $this->assertSame(WebhookStatusExpiredEvent::class, PaymentStatus::EXPIRED->getWebhookEventClass());
         $this->assertSame(WebhookStatusFailedEvent::class, PaymentStatus::FAILED->getWebhookEventClass());
+        $this->assertSame(WebhookStatusRefundedEvent::class, PaymentStatus::REFUNDED->getWebhookEventClass());
+        $this->assertSame(WebhookStatusPartiallyRefundedEvent::class, PaymentStatus::PARTIALLY_REFUNDED->getWebhookEventClass());
+        $this->assertSame(WebhookStatusChargebackEvent::class, PaymentStatus::CHARGEBACK->getWebhookEventClass());
     }
 }

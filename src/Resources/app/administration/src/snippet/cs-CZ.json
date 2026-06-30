@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook Přijat (Dokončeno)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook Přijat (Vráceno)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Přijat (Částečně vráceno)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook Přijat (Zpětné zúčtování)",
             "mollie_refund_started": " Mollie vrácení peněz zahájeno",
             "mollie_subscription_started": " Mollie předplatné zahájeno",
             "mollie_subscription_ended": " Mollie předplatné dokončeno",

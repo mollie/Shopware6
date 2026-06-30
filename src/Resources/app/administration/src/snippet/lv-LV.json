@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": "Mollie tīmekļa āķi saņemti (Pabeigti)",
             "mollie_webhook_received_status_refunded": "Mollie tīmekļa āķi saņemti (Atmaksāti)",
             "mollie_webhook_received_status_partially_refunded": "Mollie tīmekļa āķi saņemti (Daļēji Atmaksāti)",
+            "mollie_webhook_received_status_chargeback": "Mollie tīmekļa āķi saņemti (Maksājuma apstrīdēšana)",
             "mollie_refund_started": "Mollie atmaksa sākta",
             "mollie_subscription_started": " Sākta Mollie abonēšana",
             "mollie_subscription_ended": " Mollie abonēšana pabeigta",

@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook Received (Completed)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook Received (Refunded)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Received (Partially Refunded)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook Received (Chargeback)",
             "mollie_refund_started": " Mollie refund started",
             "mollie_subscription_started": " Mollie subscription started",
             "mollie_subscription_ended": " Mollie subscription completed",

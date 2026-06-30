@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Gautas Mollie „webhook“ (Įvykdyti)",
             "mollie_webhook_received_status_refunded": " Gautas Mollie „webhook“ (Grąžinti)",
             "mollie_webhook_received_status_partially_refunded": " Gautas Mollie „webhook“ (Iš dalies grąžinti)",
+            "mollie_webhook_received_status_chargeback": " Gautas Mollie „webhook“ (Atvirkštinis nurašymas)",
             "mollie_refund_started": "Mollie grąžinimo procesas pradėtas",
             "mollie_subscription_started": "Mollie prenumerata pradėta",
             "mollie_subscription_ended": "Mollie prenumerata įvykdyta",

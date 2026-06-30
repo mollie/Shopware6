@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Otrzymano webhook Mollie (Zakończony)",
             "mollie_webhook_received_status_refunded": " Otrzymano webhook Mollie (Zwrócony)",
             "mollie_webhook_received_status_partially_refunded": " Otrzymano webhook Mollie (Częściowo zwrócony)",
+            "mollie_webhook_received_status_chargeback": " Otrzymano webhook Mollie (Obciążenie zwrotne)",
             "mollie_refund_started": " Rozpoczęto zwrot Mollie",
             "mollie_subscription_started": " Rozpoczęto subskrypcję Mollie",
             "mollie_subscription_ended": " Ukończono subskrypcję Mollie",

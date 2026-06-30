@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
@@ -307,7 +306,6 @@ final class Payment extends Struct implements \JsonSerializable
     {
         $payment = new self($body['id']);
         $paymentMethod = PaymentMethod::tryFrom($body['method'] ?? '');
-        $payment->setStatus(PaymentStatus::from($body['status']));
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
         $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
         $changePaymentStateUrl = $body['_links']['changePaymentState']['href'] ?? null;
@@ -401,6 +399,21 @@ final class Payment extends Struct implements \JsonSerializable
         foreach ($body['_embedded']['refunds'] ?? [] as $refundData) {
             $payment->refunds->add(Refund::createFromClientResponse($refundData));
         }
+
+        // The Mollie Payments API has no dedicated chargeback/refund status, it keeps "paid" and
+        // only exposes the corresponding amounts. Derive the implicit status here, after all
+        // amounts are populated, so the rest of the application relies on a single status value.
+        $status = PaymentStatus::from($body['status']);
+        if ($payment->isPartiallyRefunded()) {
+            $status = PaymentStatus::PARTIALLY_REFUNDED;
+        }
+        if ($payment->isFullyRefunded()) {
+            $status = PaymentStatus::REFUNDED;
+        }
+        if ($payment->hasChargeback()) {
+            $status = PaymentStatus::CHARGEBACK;
+        }
+        $payment->setStatus($status);
 
         return $payment;
     }
@@ -585,39 +598,5 @@ final class Payment extends Struct implements \JsonSerializable
     public function isPartiallyRefunded(): bool
     {
         return $this->hasRefund() && ! $this->isFullyRefunded();
-    }
-
-    public function getShopwareHandlerMethod(): string
-    {
-        if ($this->hasChargeback()) {
-            return 'chargeback';
-        }
-
-        if ($this->isFullyRefunded()) {
-            return 'refund';
-        }
-
-        if ($this->isPartiallyRefunded()) {
-            return 'refundPartially';
-        }
-
-        return $this->status->getShopwareHandlerMethod();
-    }
-
-    public function getShopwarePaymentStatus(): string
-    {
-        if ($this->hasChargeback()) {
-            return OrderTransactionStates::STATE_CHARGEBACK;
-        }
-
-        if ($this->isFullyRefunded()) {
-            return OrderTransactionStates::STATE_REFUNDED;
-        }
-
-        if ($this->isPartiallyRefunded()) {
-            return OrderTransactionStates::STATE_PARTIALLY_REFUNDED;
-        }
-
-        return $this->status->getShopwarePaymentStatus();
     }
 }

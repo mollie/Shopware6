@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook Móttekin (Fullunnin)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook Móttekin (Endurgreidd)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Móttekin (Að hluta til endurgreidd)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook Móttekin (Endurkrafa)",
             "mollie_refund_started": "Endurgreiðsla Mollie hafin",
             "mollie_subscription_started": "Mollie áskrift hafin",
             "mollie_subscription_ended": "Mollie áskrift lokið",

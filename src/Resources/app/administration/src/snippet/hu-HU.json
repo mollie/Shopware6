@@ -18,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook beérkezett (Befejezett)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook beérkezett (Visszatérítve)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook beérkezett (Részben visszatérítve)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook beérkezett (Visszaterhelés)",
             "mollie_refund_started": " Mollie visszatérítés megkezdődött",
             "mollie_subscription_started": " Mollie előfizetés megkezdődött",
             "mollie_subscription_ended": " Mollie előfizetés befejeződött",
