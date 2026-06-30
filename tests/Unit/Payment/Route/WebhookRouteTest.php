@@ -190,6 +190,24 @@ final class WebhookRouteTest extends TestCase
         $this->assertInstanceOf(WebhookResponse::class, $response);
     }
 
+    public function testWebhookForOutdatedTransactionIsSkipped(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withNewerTransaction();
+
+        $transactionStateHandler = new FakeOrderTransactionStateHandler();
+        $orderStateHandler = new FakeOrderStateHandler();
+
+        $webhookRoute = $this->getRoute($transactionService, null, $transactionStateHandler, null, $orderStateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertFalse($transactionStateHandler->wasCalled(), 'Payment status must not change for an outdated transaction');
+        $this->assertFalse($orderStateHandler->wasCalled(), 'Order status must not change for an outdated transaction');
+    }
+
     private function getRoute(
         ?FakeTransactionService $transactionService = null,
         ?FakeClient $fakeClient = null,

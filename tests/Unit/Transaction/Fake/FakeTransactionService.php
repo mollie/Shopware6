@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -47,6 +48,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private bool $withoutOrder = false;
     private bool $withoutPaymentMethod = false;
     private bool $withoutMollieExtensionOnPaymentMethod = false;
+    private bool $withNewerTransaction = false;
 
     public function __construct()
     {
@@ -90,6 +92,11 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function withoutMollieExtensionOnPaymentMethod(): void
     {
         $this->withoutMollieExtensionOnPaymentMethod = true;
+    }
+
+    public function withNewerTransaction(): void
+    {
+        $this->withNewerTransaction = true;
     }
 
     public function withOrderCustomFields(array $customFields): void
@@ -169,6 +176,15 @@ final class FakeTransactionService implements TransactionServiceInterface
 
         if ($this->withoutOrder === false) {
             $transaction->setOrder($order);
+        }
+
+        if ($this->withNewerTransaction === true) {
+            // Simulate a newer transaction that took over the order (e.g. after the Mollie payment was
+            // cancelled and the order was finished with another payment method). DAL sorts the
+            // association by createdAt descending, so the newer transaction is the first element.
+            $newerTransaction = new OrderTransactionEntity();
+            $newerTransaction->setId('newer-transaction-id');
+            $order->setTransactions(new OrderTransactionCollection([$newerTransaction]));
         }
 
         $shippingAddress = $this->orderRepository->getOrderAddress($customer);

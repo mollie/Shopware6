@@ -71,6 +71,12 @@ final class WebhookRoute extends AbstractWebhookRoute
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $logData['orderNumber'] = $orderNumber;
 
+        if (! $this->isLatestOrderTransaction($transactionId, $shopwareOrder)) {
+            $this->logger->info('Webhook Process - Skipped, transaction is no longer the latest one of the order', $logData);
+
+            return new WebhookResponse($payment);
+        }
+
         $this->logger->info('Webhook Process - Start', $logData);
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
@@ -86,6 +92,27 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->logger->info('Webhook Process - Finished', $logData);
 
         return new WebhookResponse($payment);
+    }
+
+    /**
+     * The webhook url is bound to a single order transaction. When a payment is cancelled and the order
+     * is finished with another (possibly non-Mollie) transaction, Shopware creates a newer transaction.
+     * Calling the old transaction's webhook must not touch the order, payment or delivery state anymore,
+     * so we only continue when the webhook transaction is still the latest one of the order.
+     */
+    private function isLatestOrderTransaction(string $transactionId, OrderEntity $shopwareOrder): bool
+    {
+        $transactions = $shopwareOrder->getTransactions();
+        if ($transactions === null) {
+            return true;
+        }
+
+        $latestTransaction = $transactions->first();
+        if ($latestTransaction === null) {
+            return true;
+        }
+
+        return $latestTransaction->getId() === $transactionId;
     }
 
     private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void
