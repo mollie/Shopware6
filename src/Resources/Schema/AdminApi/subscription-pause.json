@@ -10,6 +10,7 @@
       "post": {
         "summary": "Pause Mollie Subscription",
         "description": "Pauses a subscription in Mollie.",
+        "tags": ["Mollie"],
         "operationId": "pauseMollieSubscription",
         "requestBody": {
           "required": true,

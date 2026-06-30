@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Mollie\Shopware\Component\Mollie\Capture;
+use Mollie\Shopware\Component\Mollie\CaptureStatus;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
@@ -39,6 +40,12 @@ final class FakeGateway implements MollieGatewayInterface
 
     /** @var array<string,PaymentCollection> */
     private array $subscriptionPayments = [];
+
+    /** @var list<CreateCapture> */
+    private array $capturePayloads = [];
+
+    /** @var list<CreateShipment> */
+    private array $shipmentPayloads = [];
 
     private ?Order $order = null;
     private bool $throwOnGetOrder = false;
@@ -199,12 +206,32 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
     {
-        // TODO: Implement createCapture() method.
+        $this->capturePayloads[] = $createCapture;
+
+        return new Capture('cap_fake_' . uniqid(), CaptureStatus::PENDING, $createCapture->getAmount());
+    }
+
+    /**
+     * @return list<CreateCapture>
+     */
+    public function getCapturePayloads(): array
+    {
+        return $this->capturePayloads;
     }
 
     public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment
     {
+        $this->shipmentPayloads[] = $createShipment;
+
         return new Shipment('shp_fake_' . uniqid());
+    }
+
+    /**
+     * @return list<CreateShipment>
+     */
+    public function getShipmentPayloads(): array
+    {
+        return $this->shipmentPayloads;
     }
 
     public function withOrder(Order $order): void

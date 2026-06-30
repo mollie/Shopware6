@@ -14,6 +14,9 @@ final class ShippingException extends HttpException
     public const SHIPPING_QUANTITY_TOO_HIGH = 'SHIPPING_QUANTITY_TOO_HIGH';
     public const SHIPPING_COSTS_ALREADY_CALCULATED = 'SHIPPING_COSTS_ALREADY_CALCULATED';
     public const NO_LINE_ITEMS = 'NO_LINE_ITEMS';
+    public const ORDER_NUMBER_NOT_FOUND = 'ORDER_NUMBER_NOT_FOUND';
+    public const MISSING_ORDER_NUMBER = 'MISSING_ORDER_NUMBER';
+    public const MISSING_ITEM_IDENTIFIER = 'MISSING_ITEM_IDENTIFIER';
 
     public static function orderNotFound(string $orderId): self
     {
@@ -23,6 +26,35 @@ final class ShippingException extends HttpException
             'Order {{orderId}} not found',[
                 'orderId' => $orderId,
             ]
+        );
+    }
+
+    public static function orderNumberNotFound(string $orderNumber): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::ORDER_NUMBER_NOT_FOUND,
+            'Order with number {{orderNumber}} not found',[
+                'orderNumber' => $orderNumber,
+            ]
+        );
+    }
+
+    public static function missingOrderNumber(): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::MISSING_ORDER_NUMBER,
+            'Missing argument for order number'
+        );
+    }
+
+    public static function missingItemIdentifier(): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::MISSING_ITEM_IDENTIFIER,
+            'Provide either a product number or a line item id'
         );
     }
 
