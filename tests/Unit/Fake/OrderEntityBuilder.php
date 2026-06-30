@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
 use Mollie\Shopware\Entity\Product\Product;
@@ -18,10 +19,13 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\Country\CountryEntity;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\Test\TestDefaults;
@@ -151,6 +155,56 @@ final class OrderEntityBuilder
         $collection->add($orderLineItem);
 
         return $collection;
+    }
+
+    /**
+     * Builds an order line item that carries everything the shipment flow reads: quantity, unit price,
+     * a product (for product-number resolution) and the Mollie custom fields.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createShippableLineItem(string $id, string $productNumber, int $quantity, float $unitPrice, array $mollieCustomFields = []): OrderLineItemEntity
+    {
+        $product = new ProductEntity();
+        $product->setProductNumber($productNumber);
+        $product->setName('Product ' . $productNumber);
+
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId($id);
+        $orderLineItem->setLabel('Product ' . $productNumber);
+        $orderLineItem->setQuantity($quantity);
+        $orderLineItem->setUnitPrice($unitPrice);
+        $orderLineItem->setProduct($product);
+        $orderLineItem->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
+
+        return $orderLineItem;
+    }
+
+    /**
+     * Builds a minimal order that was paid with Mollie (transaction carries the Mollie Payment
+     * extension), suitable for the shipment flow.
+     */
+    public function getOrderWithMolliePayment(OrderLineItemCollection $lineItems, ?Payment $payment = null): OrderEntity
+    {
+        $payment ??= new Payment('tr_fake_payment');
+
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('fake-transaction-id');
+        $transaction->addExtension(Mollie::EXTENSION, $payment);
+
+        $currency = new CurrencyEntity();
+        $currency->setId('fake-currency-id');
+        $currency->setIsoCode('EUR');
+
+        $order = new OrderEntity();
+        $order->setId('fakeshopwareorderid');
+        $order->setOrderNumber('10000');
+        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
+        $order->setCurrency($currency);
+        $order->setLineItems($lineItems);
+        $order->setTransactions(new OrderTransactionCollection([$transaction]));
+
+        return $order;
     }
 
     public function getLineItemWithVoucherCategory(): OrderLineItemEntity

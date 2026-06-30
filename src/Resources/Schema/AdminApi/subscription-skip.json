@@ -10,6 +10,7 @@
       "post": {
         "summary": "Skip Mollie Subscription",
         "description": "Skips the next scheduled payment for a subscription in Mollie.",
+        "tags": ["Mollie"],
         "operationId": "skipMollieSubscription",
         "requestBody": {
           "required": true,

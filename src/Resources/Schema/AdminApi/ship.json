@@ -1,0 +1,242 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Shipment API",
+    "description": "Operational shipment API for 3rd parties / ERP systems. Orders are addressed by their Shopware order number and line items by their line item id or product number.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/ship/order": {
+      "post": {
+        "tags": ["Mollie"],
+        "summary": "Ship a full Mollie order",
+        "description": "Ships all remaining (not yet shipped or cancelled) items of an order. Calling it again once everything is shipped is an idempotent no-op.",
+        "operationId": "shipMollieOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The Shopware order number."
+                  },
+                  "trackingCarrier": {
+                    "type": "string",
+                    "description": "Optional tracking carrier. When provided it takes precedence over the carrier derived from the shipping method."
+                  },
+                  "trackingCode": {
+                    "type": "string",
+                    "description": "Optional tracking code."
+                  },
+                  "trackingUrl": {
+                    "type": "string",
+                    "description": "Optional tracking URL."
+                  }
+                },
+                "required": ["orderNumber"]
+              },
+              "example": {
+                "orderNumber": "10000",
+                "trackingCarrier": "DHL",
+                "trackingCode": "00340434161094000000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mollie/ship/order/batch": {
+      "post": {
+        "tags": ["Mollie"],
+        "summary": "Ship selected items of a Mollie order",
+        "description": "Ships a selected set of items of an order. Each item is addressed either by its line item id or, when that is unknown, by its product number.",
+        "operationId": "shipMollieOrderBatch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The Shopware order number."
+                  },
+                  "items": {
+                    "type": "array",
+                    "description": "The items to ship. Provide either a lineItemId or a productNumber per item.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "lineItemId": {
+                          "type": "string",
+                          "description": "The Shopware order line item id (takes precedence over productNumber)."
+                        },
+                        "productNumber": {
+                          "type": "string",
+                          "description": "The Shopware product number (used when the line item id is unknown)."
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "The quantity to ship.",
+                          "default": 1
+                        }
+                      }
+                    }
+                  },
+                  "trackingCarrier": {
+                    "type": "string",
+                    "description": "Optional tracking carrier. When provided it takes precedence over the carrier derived from the shipping method."
+                  },
+                  "trackingCode": {
+                    "type": "string",
+                    "description": "Optional tracking code."
+                  },
+                  "trackingUrl": {
+                    "type": "string",
+                    "description": "Optional tracking URL."
+                  }
+                },
+                "required": ["orderNumber", "items"]
+              },
+              "example": {
+                "orderNumber": "10000",
+                "items": [
+                  {
+                    "productNumber": "SW10000",
+                    "quantity": 1
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mollie/ship/item": {
+      "post": {
+        "tags": ["Mollie"],
+        "summary": "Ship a single item of a Mollie order",
+        "description": "Ships a single item of an order, addressed either by its line item id or, when that is unknown, by its product number.",
+        "operationId": "shipMollieItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The Shopware order number."
+                  },
+                  "lineItemId": {
+                    "type": "string",
+                    "description": "The Shopware order line item id (takes precedence over productNumber)."
+                  },
+                  "productNumber": {
+                    "type": "string",
+                    "description": "The Shopware product number (used when the line item id is unknown)."
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "description": "The quantity to ship.",
+                    "default": 1
+                  },
+                  "trackingCarrier": {
+                    "type": "string",
+                    "description": "Optional tracking carrier. When provided it takes precedence over the carrier derived from the shipping method."
+                  },
+                  "trackingCode": {
+                    "type": "string",
+                    "description": "Optional tracking code."
+                  },
+                  "trackingUrl": {
+                    "type": "string",
+                    "description": "Optional tracking URL."
+                  }
+                },
+                "required": ["orderNumber"]
+              },
+              "example": {
+                "orderNumber": "10000",
+                "productNumber": "SW10000",
+                "quantity": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MollieShipmentResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The UUID of the shipped Shopware order.",
+            "example": "123e4567e89b12d3a456426614174000"
+          },
+          "captureId": {
+            "type": "string",
+            "description": "The Mollie capture id. Empty when nothing had to be shipped.",
+            "example": "cpt_4qqhO89gsT"
+          },
+          "updatedLineItems": {
+            "type": "array",
+            "description": "The line items that were updated by this shipment.",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": ["status", "orderId", "captureId", "updatedLineItems"]
+      }
+    }
+  }
+}

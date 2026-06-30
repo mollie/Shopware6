@@ -148,10 +148,14 @@ paths:
                   type: array
                   items:
                     type: object
+                    description: Provide either a lineItemId or a productNumber per item
                     properties:
+                      lineItemId:
+                        type: string
+                        description: The Shopware order line item id (takes precedence over productNumber)
                       productNumber:
                         type: string
-                        description: The Shopware product number
+                        description: The Shopware product number (used when the line item id is unknown)
                       quantity:
                         type: integer
                         description: The quantity of the product
@@ -189,9 +193,12 @@ paths:
                 orderNumber:
                   type: string
                   description: The Shopware order number
+                lineItemId:
+                  type: string
+                  description: The Shopware order line item id (takes precedence over productNumber)
                 productNumber:
                   type: string
-                  description: The Shopware product number
+                  description: The Shopware product number (used when the line item id is unknown)
                 quantity:
                   type: integer
                   description: The quantity of the product
@@ -207,7 +214,6 @@ paths:
                   description: The tracking URL of the order
               required:
                 - orderNumber
-                - productNumber
       responses:
         "200":
           description: "successful operation"

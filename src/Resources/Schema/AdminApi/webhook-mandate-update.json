@@ -9,6 +9,7 @@
     "/mollie/webhook/subscription/{subscriptionId}/mandate/update": {
       "get": {
         "summary": "Handle Mollie Subscription Mandate Update Webhook Notification (GET)",
+        "tags": ["Mollie"],
         "operationId": "handleMollieSubscriptionMandateUpdateWebhookGet",
         "parameters": [
           {
@@ -70,6 +71,7 @@
       },
       "post": {
         "summary": "Handle Mollie Subscription Mandate Update Webhook Notification (POST)",
+        "tags": ["Mollie"],
         "operationId": "handleMollieSubscriptionMandateUpdateWebhookPost",
         "parameters": [
           {

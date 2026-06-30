@@ -25,8 +25,10 @@ use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
+use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,42 +69,57 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
     #[Route(path: '/api/_action/mollie/ship', name: 'api.action.mollie.ship.order', methods: ['POST', 'GET'])]
     public function ship(Request $request, Context $context): ShipOrderResponse
     {
-        $orderId = (string) $request->get('orderId');
-        $orderId = strtolower($orderId);
-
-        $items = $request->get('items');
+        $orderId = strtolower((string) $request->get('orderId'));
+        $orderNumber = (string) $request->get('orderNumber', '');
+        $items = $this->normalizeItems($request->get('items'));
 
         $logContext = [
-            'orderNumber' => '',
+            'orderNumber' => $orderNumber,
             'orderId' => $orderId,
             'requestedItems' => $items,
         ];
 
         $this->logger->info('ShipOrderRoute: request received', $logContext);
 
-        if (count($items) === 0) {
-            throw ShippingException::noLineItems($orderId);
-        }
-
-        $criteria = new Criteria([$orderId]);
+        $criteria = new Criteria();
         $criteria->addAssociation('lineItems.product');
         $criteria->addAssociation('transactions');
         $criteria->addAssociation('currency');
         $criteria->addAssociation('deliveries.positions');
         $criteria->addAssociation('deliveries.shippingMethod');
 
+        if ($orderNumber !== '') {
+            $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+        } else {
+            $criteria->setIds([$orderId]);
+        }
+
         $order = $this->orderRepository->search($criteria, $context)->first();
 
         if (! $order instanceof OrderEntity) {
-            throw ShippingException::orderNotFound($orderId);
+            throw $orderNumber !== '' ? ShippingException::orderNumberNotFound($orderNumber) : ShippingException::orderNotFound($orderId);
         }
 
+        $orderId = $order->getId();
         $orderNumber = $order->getOrderNumber();
         $salesChannelId = $order->getSalesChannelId();
         if ($orderNumber === null) {
             throw ShippingException::orderNotFound($orderId);
         }
 
+        // When no specific items are requested, ship everything that is still open.
+        if (count($items) === 0) {
+            $items = $this->buildRemainingItems($order);
+        }
+
+        // Nothing left to ship: treat as an idempotent no-op so repeated/automatic shipment calls don't fail.
+        if (count($items) === 0) {
+            $this->logger->info('ShipOrderRoute: nothing to ship, order is already fully shipped or cancelled', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
+        }
+
+        $logContext['orderId'] = $orderId;
         $logContext['orderNumber'] = $orderNumber;
         $logContext['orderLineItems'] = array_map(
             static function (OrderLineItemEntity $li): array {
@@ -146,6 +163,8 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         $deliveryUpserts = $this->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection);
         $fullyShipped = $this->isFullyShipped($lineItems, $lineUpserts);
 
+        $orderShippedEvent->setShippingItems($shippingItems);
+
         $logContext['lineUpserts'] = $lineUpserts;
         $logContext['deliveryUpsertsCount'] = count($deliveryUpserts);
         $logContext['fullyShipped'] = $fullyShipped;
@@ -154,9 +173,9 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         $this->logger->info('ShipOrderRoute: collected shipping data', $logContext);
 
         if ($mollieOrderId !== null) {
-            $trackingCode = (string) $request->get('trackingCode', '');
             $lineItemIds = array_column($lineUpserts, 'id');
-            $tracking = $this->resolveTracking($trackingCode, $deliveryCollection, $lineItemIds);
+            $tracking = $this->resolveTracking($request, $deliveryCollection, $lineItemIds);
+            $orderShippedEvent->setTracking($tracking);
             $createShipment = new CreateShipment($shippingItems, $tracking);
 
             $logContext['mollieOrderId'] = $mollieOrderId;
@@ -191,6 +210,57 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         }
 
         return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $fullyShipped, $context);
+    }
+
+    /**
+     * @return list<array{id: string, quantity: int}>
+     */
+    private function normalizeItems(mixed $items): array
+    {
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $normalized[] = [
+                'id' => (string) ($item['id'] ?? ''),
+                'quantity' => (int) ($item['quantity'] ?? 0),
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Builds the list of all items of an order that are not yet fully shipped or cancelled.
+     *
+     * @return list<array{id: string, quantity: int}>
+     */
+    private function buildRemainingItems(OrderEntity $order): array
+    {
+        $items = [];
+        $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+
+        foreach ($lineItems as $lineItem) {
+            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+            $shipped = (int) ($fields['quantity'] ?? 0);
+            $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
+            $remaining = $lineItem->getQuantity() - $shipped - $cancelled;
+
+            if ($remaining > 0) {
+                $items[] = [
+                    'id' => $lineItem->getId(),
+                    'quantity' => $remaining,
+                ];
+            }
+        }
+
+        return $items;
     }
 
     /**
@@ -347,12 +417,23 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
                 ? StateMachineTransitionActions::ACTION_SHIP
                 : StateMachineTransitionActions::ACTION_SHIP_PARTIALLY;
 
-            $this->orderService->orderDeliveryStateTransition(
-                $deliveryId,
-                $transition,
-                new ParameterBag(),
-                $context
-            );
+            // The delivery may already be in the target state when this is triggered from a manual
+            // delivery state change (OrderDeliverySubscriber); skip the redundant transition then.
+            try {
+                $this->orderService->orderDeliveryStateTransition(
+                    $deliveryId,
+                    $transition,
+                    new ParameterBag(),
+                    $context
+                );
+            } catch (IllegalTransitionException $exception) {
+                $this->logger->info('ShipOrderRoute: delivery state transition skipped', [
+                    'orderId' => $orderId,
+                    'deliveryId' => $deliveryId,
+                    'transition' => $transition,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
         }
 
         $this->eventDispatcher->dispatch($orderShippedEvent);
@@ -361,10 +442,21 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
     }
 
     /**
+     * Resolves the tracking information for a shipment. Explicit carrier/code/url from the request
+     * take precedence; otherwise carrier and url are derived from the order's shipping method.
+     *
      * @param list<string> $targetLineItemIds
      */
-    private function resolveTracking(string $requestCode, OrderDeliveryCollection $deliveries, array $targetLineItemIds): ?Tracking
+    private function resolveTracking(Request $request, OrderDeliveryCollection $deliveries, array $targetLineItemIds): ?Tracking
     {
+        $requestCarrier = (string) $request->get('trackingCarrier', '');
+        $requestCode = (string) $request->get('trackingCode', '');
+        $requestUrl = (string) $request->get('trackingUrl', '');
+
+        if ($requestCarrier !== '') {
+            return new Tracking($requestCarrier, $requestCode, $requestUrl);
+        }
+
         foreach ($deliveries as $delivery) {
             $positions = $delivery->getPositions();
             if ($positions === null) {
