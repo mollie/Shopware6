@@ -157,6 +157,20 @@ final class OrderEntityBuilder
         return $collection;
     }
 
+    public function getSubscriptionLineItems(): OrderLineItemCollection
+    {
+        $subscriptionExtension = new Product();
+        $subscriptionExtension->setIsSubscription(true);
+
+        $orderLineItem = $this->createOrderLineItem('fake-subscription-line-item-id', 'SW2000', 'Fake subscription product', 10.99);
+        $orderLineItem->addExtension(Mollie::EXTENSION, $subscriptionExtension);
+
+        $collection = new OrderLineItemCollection();
+        $collection->add($orderLineItem);
+
+        return $collection;
+    }
+
     /**
      * Builds an order line item that carries everything the shipment flow reads: quantity, unit price,
      * a product (for product-number resolution) and the Mollie custom fields.

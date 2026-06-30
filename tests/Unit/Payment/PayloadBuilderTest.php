@@ -14,6 +14,7 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -24,6 +25,7 @@ use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeRecurringAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakeSubscriptionAwarePaymentHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -306,6 +308,41 @@ final class PayloadBuilderTest extends TestCase
         $this->assertNull($actual->getMandateId());
     }
 
+    public function testBuildSetsSequenceTypeFirstForSubscriptionLineItemWhenSubscriptionsEnabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+
+        $subscriptionSettings = new SubscriptionSettings(enabled: true);
+        $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: $subscriptionSettings);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withSubscriptionLineItem();
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakeSubscriptionAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertInstanceOf(CreatePayment::class, $actual);
+        $this->assertSame('first', $actual->getSequenceType()->value);
+    }
+
+    public function testBuildKeepsSequenceTypeOneoffForSubscriptionLineItemWhenSubscriptionsDisabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+
+        $subscriptionSettings = new SubscriptionSettings(enabled: false);
+        $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: $subscriptionSettings);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withSubscriptionLineItem();
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakeSubscriptionAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertInstanceOf(CreatePayment::class, $actual);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+        $this->assertNull($actual->getCustomerId());
+    }
+
     public function testBuildKeepsSequenceTypeOneoffWhenNotRecurringAwareHandler(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
@@ -542,12 +579,12 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('10000', $array['metadata']['shopwareOrderNumber']);
     }
 
-    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null): PayloadBuilder
+    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null): PayloadBuilder
     {
         if ($paymentSettings === null) {
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         }
-        $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId);
+        $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId, subscriptionSettings: $subscriptionSettings);
         $lineItemFilter = new LineItemFilter();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 

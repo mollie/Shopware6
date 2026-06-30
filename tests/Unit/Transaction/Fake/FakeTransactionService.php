@@ -44,6 +44,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private array $mollieCustomerIds = [];
     private bool $withNullLineItems = false;
     private bool $withZeroShippingCosts = false;
+    private bool $withSubscriptionLineItem = false;
 
     private bool $withoutOrder = false;
     private bool $withoutPaymentMethod = false;
@@ -119,6 +120,11 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withZeroShippingCosts = true;
     }
 
+    public function withSubscriptionLineItem(): void
+    {
+        $this->withSubscriptionLineItem = true;
+    }
+
     public function getDefaultSalesChannelEntity(): SalesChannelEntity
     {
         $salesChannel = new SalesChannelEntity();
@@ -172,6 +178,10 @@ final class FakeTransactionService implements TransactionServiceInterface
 
         if ($this->withNullLineItems === true) {
             $order->setLineItems(new OrderLineItemCollection());
+        }
+
+        if ($this->withSubscriptionLineItem === true) {
+            $order->setLineItems($this->orderRepository->getSubscriptionLineItems());
         }
 
         if ($this->withoutOrder === false) {

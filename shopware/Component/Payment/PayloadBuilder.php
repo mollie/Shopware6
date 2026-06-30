@@ -126,7 +126,8 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
                 $lineItem = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
                 $lineItemCollection->add($lineItem);
             }
-            $hasSubscriptionLineItem = $this->lineItemAnalyzer->hasSubscriptionProduct($oderLineItems);
+            $subscriptionsEnabled = $this->settingsService->getSubscriptionSettings($salesChannelId)->isEnabled();
+            $hasSubscriptionLineItem = $subscriptionsEnabled && $this->lineItemAnalyzer->hasSubscriptionProduct($oderLineItems);
         }
 
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
