@@ -157,7 +157,7 @@ class ShipOrderRouteTest extends TestCase
         $response = $this->route->ship($request, Context::createDefaultContext());
 
         static::assertInstanceOf(ShipOrderResponse::class, $response);
-        static::assertSame('', $response->getObject()->get('captureId'));
+        static::assertSame('', $response->getObject()->get('mollieId'));
         static::assertCount(0, $this->gateway->getCapturePayloads());
         static::assertCount(0, $this->lineItemRepository->getUpserts());
         static::assertSame(0, $this->eventDispatcher->getEventCount());

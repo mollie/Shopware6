@@ -17,6 +17,7 @@ final class ShippingException extends HttpException
     public const ORDER_NUMBER_NOT_FOUND = 'ORDER_NUMBER_NOT_FOUND';
     public const MISSING_ORDER_NUMBER = 'MISSING_ORDER_NUMBER';
     public const MISSING_ITEM_IDENTIFIER = 'MISSING_ITEM_IDENTIFIER';
+    public const SHIPMENT_NOT_SUCCESSFUL = 'SHIPMENT_NOT_SUCCESSFUL';
 
     public static function orderNotFound(string $orderId): self
     {
@@ -54,7 +55,16 @@ final class ShippingException extends HttpException
         return new self(
             Response::HTTP_BAD_REQUEST,
             self::MISSING_ITEM_IDENTIFIER,
-            'Provide either a product number or a line item id'
+            'Missing argument for item'
+        );
+    }
+
+    public static function shipmentNotSuccessful(): self
+    {
+        return new self(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::SHIPMENT_NOT_SUCCESSFUL,
+            'Shipment was not successful, there was nothing to ship'
         );
     }
 
