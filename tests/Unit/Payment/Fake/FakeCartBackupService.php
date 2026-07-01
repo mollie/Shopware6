@@ -12,9 +12,23 @@ final class FakeCartBackupService extends AbstractCartBackupService
 {
     private bool $shouldThrow = false;
 
+    private int $restoreCartCalls = 0;
+
+    private int $clearBackupCalls = 0;
+
     public function setShouldThrow(bool $shouldThrow): void
     {
         $this->shouldThrow = $shouldThrow;
+    }
+
+    public function getRestoreCartCalls(): int
+    {
+        return $this->restoreCartCalls;
+    }
+
+    public function getClearBackupCalls(): int
+    {
+        return $this->clearBackupCalls;
     }
 
     public function getDecorated(): AbstractCartBackupService
@@ -28,6 +42,8 @@ final class FakeCartBackupService extends AbstractCartBackupService
 
     public function restoreCart(SalesChannelContext $context): Cart
     {
+        ++$this->restoreCartCalls;
+
         if ($this->shouldThrow) {
             throw new \RuntimeException('Fake restore error');
         }
@@ -46,5 +62,6 @@ final class FakeCartBackupService extends AbstractCartBackupService
 
     public function clearBackup(SalesChannelContext $context): void
     {
+        ++$this->clearBackupCalls;
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Integration\Migration;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Kiener\MolliePayments\Migration\Migration1777881160RenewalReminderMailTemplate;
 use Kiener\MolliePayments\Migration\Migration1778100100SubscriptionPriceChangeMailTemplate;
@@ -92,10 +93,31 @@ final class SubscriptionMailFlowsTest extends TestCase
 
     private function runMigrations(Connection $connection): void
     {
+        $this->removeExistingFlows($connection);
+
         // The flow migration links the mail templates, so they must exist first.
         (new Migration1777881160RenewalReminderMailTemplate())->update($connection);
         (new Migration1778100100SubscriptionPriceChangeMailTemplate())->update($connection);
         (new Migration1782345600SubscriptionMailFlows())->update($connection);
+    }
+
+    private function removeExistingFlows(Connection $connection): void
+    {
+        $events = array_map(function (array $row): string {
+            return $row[0];
+        }, array_values(self::eventNameProvider()));
+
+        $connection->executeStatement(
+            'DELETE FROM `flow` WHERE `event_name` IN (:events)',
+            ['events' => $events],
+            ['events' => ArrayParameterType::STRING]
+        );
+
+        $connection->executeStatement(
+            'DELETE FROM `flow_template` WHERE JSON_UNQUOTE(JSON_EXTRACT(`config`, \'$.eventName\')) IN (:events)',
+            ['events' => $events],
+            ['events' => ArrayParameterType::STRING]
+        );
     }
 
     private function getConnection(): Connection

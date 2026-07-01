@@ -16,6 +16,7 @@ use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeAccountService;
+use Mollie\Shopware\Unit\Payment\Fake\FakeCartBackupService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeCartService;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodRepository;
 use Mollie\Shopware\Unit\Payment\Fake\FakeSessionGateway;
@@ -96,17 +97,22 @@ final class PayPalExpressRoutesTest extends TestCase
         $cart = new Cart('cart-token');
         $cart->addExtension(Mollie::EXTENSION, $session);
 
+        $cartBackupService = new FakeCartBackupService();
+
         $route = new CancelCheckoutRoute(
             new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
             new FakePaymentMethodRepository('paypal-express-method-id'),
             new FakeSessionGateway($session),
             new FakeCartService($cart),
+            $cartBackupService,
         );
 
         $response = $route->cancel($this->salesChannelContext);
 
         $this->assertInstanceOf(CancelCheckoutResponse::class, $response);
         $this->assertSame('session-cancel-1', $response->getSessionId());
+        $this->assertSame(1, $cartBackupService->getRestoreCartCalls());
+        $this->assertSame(1, $cartBackupService->getClearBackupCalls());
     }
 
     public function testCancelCheckoutThrowsWhenPaypalExpressIdIsNull(): void
@@ -116,6 +122,7 @@ final class PayPalExpressRoutesTest extends TestCase
             new FakePaymentMethodRepository(null),
             new FakeSessionGateway($this->buildSession('session-1')),
             new FakeCartService(new Cart('cart-token')),
+            new FakeCartBackupService(),
         );
 
         try {
@@ -133,6 +140,7 @@ final class PayPalExpressRoutesTest extends TestCase
             new FakePaymentMethodRepository('paypal-express-method-id'),
             new FakeSessionGateway($this->buildSession('session-1')),
             new FakeCartService(new Cart('cart-token')),
+            new FakeCartBackupService(),
         );
 
         try {
@@ -150,6 +158,7 @@ final class PayPalExpressRoutesTest extends TestCase
             new FakePaymentMethodRepository('paypal-express-method-id'),
             new FakeSessionGateway($this->buildSession('session-1')),
             new FakeCartService(new Cart('cart-token')),
+            new FakeCartBackupService(),
         );
 
         try {

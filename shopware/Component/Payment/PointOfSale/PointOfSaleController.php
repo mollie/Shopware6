@@ -51,7 +51,6 @@ final class PointOfSaleController extends StorefrontController
         $salesChannel = $salesChannelContext->getSalesChannel();
 
         $logParameters = [
-            'orderNumber' => $transactionId,
             'paymentId' => $paymentId,
             'salesChannelId' => $salesChannel->getId(),
             'salesChannelName' => $salesChannel->getName(),
