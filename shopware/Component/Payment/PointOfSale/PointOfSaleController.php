@@ -59,12 +59,27 @@ final class PointOfSaleController extends StorefrontController
         $this->logger->debug('Check payment status from terminal', $logParameters);
 
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $salesChannelContext->getContext());
-        $ready = $payment->getStatus() !== PaymentStatus::OPEN;
+        $status = $payment->getStatus();
+
+        $ready = $status !== PaymentStatus::OPEN;
+        $isApproved = $status->isApproved();
+
+        $redirectUrl = '';
+        if ($ready) {
+            // A successful terminal payment is finalized through Shopware (updates the
+            // transaction and lands on the finish page). A failed payment would only raise a
+            // PaymentException there and strand the customer on the terminal page, so send them
+            // straight to the edit-order page instead - matching the pre-refactor behaviour.
+            $orderId = $payment->getShopwareTransaction()->getOrderId();
+            $redirectUrl = $isApproved
+                ? $payment->getFinalizeUrl()
+                : $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $orderId]);
+        }
 
         return new JsonResponse([
             'ready' => $ready,
-            'redirectUrl' => $payment->getFinalizeUrl(),
-            'success' => true,
+            'redirectUrl' => $redirectUrl,
+            'success' => $isApproved,
         ]);
     }
 
