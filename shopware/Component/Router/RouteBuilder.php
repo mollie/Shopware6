@@ -91,7 +91,8 @@ final class RouteBuilder implements RouteBuilderInterface
     {
         $parameters = [
             'transactionId' => $transactionId,
-            'orderNumber' => $orderNumber
+            'orderNumber' => $orderNumber,
+            'paymentId' => $payment->getId(),
         ];
         $changePaymentStatusUrl = $payment->getChangePaymentStateUrl();
         if (mb_strlen($changePaymentStatusUrl) > 0) {
