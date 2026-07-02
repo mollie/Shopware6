@@ -156,10 +156,21 @@ final class TransactionService implements TransactionServiceInterface
             'salesChannelId' => $salesChannel,
         ]);
 
+        $orderCustomFields = [
+            Mollie::EXTENSION => [
+                'paymentId' => $payment->getId(),
+                'countPayments' => $payment->getCountPayments(),
+            ],
+        ];
+
         $upsertArray = [
             'id' => $transactionId,
             'customFields' => [
                 Mollie::EXTENSION => $payment->toArray(),
+            ],
+            'order' => [
+                'id' => $order->getId(),
+                'customFields' => $orderCustomFields,
             ],
         ];
 
@@ -177,7 +188,10 @@ final class TransactionService implements TransactionServiceInterface
             return $this->orderTransactionRepository->upsert([$upsertArray], $context);
         }
 
-        $orderData = ['id' => $order->getId()];
+        $orderData = [
+            'id' => $order->getId(),
+            'customFields' => $orderCustomFields,
+        ];
 
         if ($filteredMollieLines->count() > 0) {
             $lineItemsData = [];

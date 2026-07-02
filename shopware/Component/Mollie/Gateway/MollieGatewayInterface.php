@@ -17,12 +17,15 @@ use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
+use Mollie\Shopware\Component\Mollie\UpdatePayment;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 
 interface MollieGatewayInterface
 {
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment;
+
+    public function updatePayment(UpdatePayment $molliePayment, string $molliePaymentId, string $salesChannelId): Payment;
 
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order;
 

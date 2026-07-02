@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Payment\Action;
 
 use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
@@ -91,6 +92,94 @@ final class PayTest extends TestCase
         $this->assertSame($expectedUrl, $response->getTargetUrl());
         $this->assertCount(0, $gateway->getCreateOrderPayloads());
         $this->assertCount(1, $gateway->getCreatePayloads());
+    }
+
+    public function testPaymentsApiCancelsOldCancelablePaymentAndCreatesNewOne(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderCustomFields(['paymentId' => 'tr_old_payment']);
+        $transactionService->createTransaction();
+        $expectedUrl = 'https://mollie.com/checkout=token=789';
+
+        $oldPayment = new Payment('tr_old_payment');
+        $oldPayment->setCheckoutUrl($expectedUrl);
+        $oldPayment->setCancelable(true);
+
+        $gateway = new FakeGateway($expectedUrl, $oldPayment);
+        $payAction = $this->getPayAction($transactionService, $expectedUrl, $gateway);
+
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertSame(['tr_old_payment'], $gateway->getCancelledPaymentIds());
+        $this->assertCount(1, $gateway->getCreatePayloads());
+        $this->assertCount(0, $gateway->getUpdatePayloads());
+    }
+
+    public function testPaymentsApiUpdatesOldPaymentWhenItCannotBeCancelled(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderCustomFields(['paymentId' => 'tr_old_payment']);
+        $transactionService->createTransaction();
+        $expectedUrl = 'https://mollie.com/checkout=token=012';
+
+        $oldPayment = new Payment('tr_old_payment');
+        $oldPayment->setCheckoutUrl($expectedUrl);
+        $oldPayment->setCancelable(false);
+
+        $gateway = new FakeGateway($expectedUrl, $oldPayment);
+        $payAction = $this->getPayAction($transactionService, $expectedUrl, $gateway);
+
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertCount(0, $gateway->getCancelledPaymentIds());
+        $this->assertCount(0, $gateway->getCreatePayloads());
+        $updatePayloads = $gateway->getUpdatePayloads();
+        $this->assertCount(1, $updatePayloads);
+        $this->assertSame('tr_old_payment', $updatePayloads[0]['molliePaymentId']);
+
+        $updateArray = $updatePayloads[0]['payload']->toArray();
+        $this->assertArrayNotHasKey('amount', $updateArray);
+        $this->assertArrayNotHasKey('lines', $updateArray);
+        $this->assertArrayNotHasKey('sequenceType', $updateArray);
+        $this->assertArrayHasKey('method', $updateArray);
+        $this->assertArrayHasKey('redirectUrl', $updateArray);
+    }
+
+    public function testPaymentsApiIncrementsPaymentCounterStoredOnOrder(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderCustomFields(['paymentId' => 'tr_old_payment', 'countPayments' => 1]);
+        $transactionService->createTransaction();
+        $expectedUrl = 'https://mollie.com/checkout=token=345';
+
+        $oldPayment = new Payment('tr_old_payment');
+        $oldPayment->setCheckoutUrl($expectedUrl);
+        $oldPayment->setCancelable(true);
+
+        $gateway = new FakeGateway($expectedUrl, $oldPayment);
+        $payAction = $this->getPayAction($transactionService, $expectedUrl, $gateway);
+
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $createPayloads = $gateway->getCreatePayloads();
+        $this->assertCount(1, $createPayloads);
+        $this->assertStringEndsWith('-2', $createPayloads[0]->getDescription());
+    }
+
+    public function testPaymentsApiDoesNotSuffixDescriptionOnFirstAttempt(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createTransaction();
+        $expectedUrl = 'https://mollie.com/checkout=token=678';
+
+        $gateway = new FakeGateway($expectedUrl);
+        $payAction = $this->getPayAction($transactionService, $expectedUrl, $gateway);
+
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $createPayloads = $gateway->getCreatePayloads();
+        $this->assertCount(1, $createPayloads);
+        $this->assertStringEndsNotWith('-2', $createPayloads[0]->getDescription());
     }
 
     public function testOrdersApiHandlerPassesAuthenticationIdAtRootLevel(): void
