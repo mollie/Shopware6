@@ -17,6 +17,7 @@ use Mollie\Shopware\Component\Mollie\PaymentCollection;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
+use Mollie\Shopware\Component\Mollie\UpdatePayment;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
@@ -73,6 +74,13 @@ final class CachedMollieGateway implements MollieGatewayInterface
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment
     {
         return $this->decorated->createPayment($molliePayment, $salesChannelId);
+    }
+
+    public function updatePayment(UpdatePayment $molliePayment, string $molliePaymentId, string $salesChannelId): Payment
+    {
+        unset($this->paymentIdPayments[$molliePaymentId]);
+
+        return $this->decorated->updatePayment($molliePayment, $molliePaymentId, $salesChannelId);
     }
 
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order

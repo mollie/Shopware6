@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\UpdatePayment;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreateOrderPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
@@ -25,7 +26,6 @@ use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -75,7 +75,6 @@ final class Pay implements PayInterface
         $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
         $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
 
-        $transaction = $transactionDataStruct->getTransaction();
         $orderNumber = (string) $order->getOrderNumber();
         $salesChannel = $transactionDataStruct->getSalesChannel();
         $salesChannelName = (string) $salesChannel->getName();
@@ -93,7 +92,7 @@ final class Pay implements PayInterface
             return $this->executeOrdersApi($paymentHandler, $transactionDataStruct, $dataBag, $context, $order, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
         }
 
-        return $this->executePaymentsApi($paymentHandler, $transactionDataStruct, $transaction, $dataBag, $context, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
+        return $this->executePaymentsApi($paymentHandler, $transactionDataStruct, $dataBag, $context, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
     }
 
     /**
@@ -149,7 +148,6 @@ final class Pay implements PayInterface
     private function executePaymentsApi(
         AbstractMolliePaymentHandler $paymentHandler,
         TransactionDataStruct $transactionDataStruct,
-        OrderTransactionEntity $transaction,
         RequestDataBag $dataBag,
         Context $context,
         SalesChannelEntity $salesChannel,
@@ -160,7 +158,7 @@ final class Pay implements PayInterface
     ): RedirectResponse {
         $createPaymentStruct = $this->payloadBuilder->buildPayment($transactionDataStruct, $paymentHandler, $dataBag, $context);
 
-        $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
+        $countPayments = $this->updatePaymentCounter($transactionDataStruct->getOrder(), $createPaymentStruct);
 
         /** @var RequestDataBag $paymentMethods */
         $paymentMethods = $dataBag->get('paymentMethods', new DataBag());
@@ -172,7 +170,9 @@ final class Pay implements PayInterface
         /** @var ModifyCreatePaymentPayloadEvent $paymentEvent */
         $paymentEvent = $this->eventDispatcher->dispatch($paymentEvent);
         $createPaymentStruct = $paymentEvent->getPayment();
-        $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
+
+        $oldPaymentId = $transactionDataStruct->getOrder()->getCustomFields()[Mollie::EXTENSION]['paymentId'] ?? null;
+        $payment = $this->createOrUpdatePayment($createPaymentStruct, $oldPaymentId, $orderNumber, $salesChannel->getId());
 
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
@@ -196,6 +196,64 @@ final class Pay implements PayInterface
         $this->logger->info('Payment Process - Finished, redirecting customer to URL', $logData);
 
         return new RedirectResponse($redirectUrl);
+    }
+
+    /**
+     * When a customer runs the checkout of the same order again (e.g. from a second browser tab), the order already
+     * holds the payment id of the previous attempt. A cancelable payment is cancelled and replaced by a fresh one,
+     * otherwise the existing payment is updated in place instead of creating a duplicate at Mollie.
+     */
+    private function createOrUpdatePayment(CreatePayment $createPaymentStruct, ?string $oldPaymentId, string $orderNumber, string $salesChannelId): Payment
+    {
+        if ($oldPaymentId === null) {
+            return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
+        }
+
+        $oldPayment = $this->mollieGateway->getPayment($oldPaymentId, $orderNumber, $salesChannelId);
+
+        if (! $oldPayment->isCancelable()) {
+            $this->logger->info('Previous payment is not cancelable, updating it instead of creating a new one', [
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+                'molliePaymentId' => $oldPayment->getId(),
+            ]);
+
+            $updatePaymentStruct = $this->buildUpdatePayment($createPaymentStruct);
+
+            return $this->mollieGateway->updatePayment($updatePaymentStruct, $oldPayment->getId(), $salesChannelId);
+        }
+
+        $this->mollieGateway->cancelPayment($oldPayment->getId(), $orderNumber, $salesChannelId);
+        $this->logger->info('Previous payment cancelled, creating a new one', [
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+            'molliePaymentId' => $oldPayment->getId(),
+        ]);
+
+        return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
+    }
+
+    /**
+     * Copies the mutable fields from the freshly built payment payload onto an update payload. The
+     * update endpoint rejects immutable data (amount, lines, sequence type), so those are omitted.
+     */
+    private function buildUpdatePayment(CreatePayment $createPayment): UpdatePayment
+    {
+        $updatePayment = new UpdatePayment($createPayment->getDescription(), $createPayment->getRedirectUrl());
+        $updatePayment->setMethod($createPayment->getMethod());
+        $updatePayment->setCancelUrl($createPayment->getCancelUrl());
+        $updatePayment->setWebhookUrl($createPayment->getWebhookUrl());
+        $updatePayment->setLocale($createPayment->getLocale());
+        $updatePayment->setBillingAddress($createPayment->getBillingAddress());
+        $updatePayment->setShippingAddress($createPayment->getShippingAddress());
+        $updatePayment->setShopwareOrderNumber($createPayment->getShopwareOrderNumber());
+
+        $dueDate = $createPayment->getDueDate();
+        if ($dueDate !== null) {
+            $updatePayment->setDueDate($dueDate);
+        }
+
+        return $updatePayment;
     }
 
     private function processPaymentStatus(AbstractMolliePaymentHandler $paymentHandler, string $transactionId, string $orderNumber, Context $context): void
@@ -222,14 +280,21 @@ final class Pay implements PayInterface
         }
     }
 
-    private function updatePaymentCounter(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct): int
+    /**
+     * The payment attempt counter is stored on the order, not on the transaction. A customer running the checkout
+     * again (e.g. from another tab) creates a new shopware transaction, so a transaction-scoped counter would always
+     * reset to 1. Keeping it on the order lets us produce a unique payment description across all attempts.
+     */
+    private function updatePaymentCounter(OrderEntity $order, CreatePayment $createPaymentStruct): int
     {
-        $countPayments = 1;
-        $oldMollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
-        if ($oldMollieTransaction instanceof Payment) {
-            $countPayments = $oldMollieTransaction->getCountPayments() + 1;
-            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
+        $previousCount = $order->getCustomFields()[Mollie::EXTENSION]['countPayments'] ?? null;
+
+        if ($previousCount === null) {
+            return 1;
         }
+
+        $countPayments = (int) $previousCount + 1;
+        $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
 
         return $countPayments;
     }

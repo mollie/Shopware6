@@ -22,6 +22,7 @@ use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\Terminal;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
+use Mollie\Shopware\Component\Mollie\UpdatePayment;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
@@ -109,6 +110,32 @@ final class MollieGateway implements MollieGatewayInterface
             $this->logger->info('Mollie Payment created', [
                 'requestParameter' => $formParams,
                 'responseParameter' => $body,
+                'orderNumber' => $shopwareOrderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Payment::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $shopwareOrderNumber);
+        }
+    }
+
+    public function updatePayment(UpdatePayment $molliePayment, string $molliePaymentId, string $salesChannelId): Payment
+    {
+        $shopwareOrderNumber = $molliePayment->getShopwareOrderNumber();
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $formParams = $molliePayment->toArray();
+
+            $response = $client->patch('payments/' . $molliePaymentId, [
+                'form_params' => $formParams,
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Mollie Payment updated', [
+                'requestParameter' => $formParams,
+                'responseParameter' => $body,
+                'molliePaymentId' => $molliePaymentId,
                 'orderNumber' => $shopwareOrderNumber,
                 'salesChannelId' => $salesChannelId,
             ]);

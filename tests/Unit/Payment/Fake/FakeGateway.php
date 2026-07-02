@@ -21,6 +21,7 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
+use Mollie\Shopware\Component\Mollie\UpdatePayment;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
 
@@ -28,6 +29,9 @@ final class FakeGateway implements MollieGatewayInterface
 {
     /** @var list<CreatePayment> */
     private array $createPayloads = [];
+
+    /** @var list<array{payload: UpdatePayment, molliePaymentId: string}> */
+    private array $updatePayloads = [];
 
     /** @var list<CreateOrder> */
     private array $createOrderPayloads = [];
@@ -108,6 +112,21 @@ final class FakeGateway implements MollieGatewayInterface
         $this->createPayloads[] = $molliePayment;
 
         return $this->payment;
+    }
+
+    public function updatePayment(UpdatePayment $molliePayment, string $molliePaymentId, string $salesChannelId): Payment
+    {
+        $this->updatePayloads[] = ['payload' => $molliePayment, 'molliePaymentId' => $molliePaymentId];
+
+        return $this->payment;
+    }
+
+    /**
+     * @return list<array{payload: UpdatePayment, molliePaymentId: string}>
+     */
+    public function getUpdatePayloads(): array
+    {
+        return $this->updatePayloads;
     }
 
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
