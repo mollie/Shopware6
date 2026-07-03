@@ -139,6 +139,31 @@ final class PaymentTest extends TestCase
         $this->assertSame(0.01, $payment->getRoundingDiff());
     }
 
+    public function testRoundingDiffIsReadFromSkuWhenMetadataIsAbsent(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'lines' => [
+                [
+                    'name' => 'Product',
+                    'sku' => 'MOL_REGULAR',
+                    'totalAmount' => ['value' => '19.99', 'currency' => 'EUR'],
+                ],
+                [
+                    'name' => RoundingDifferenceFixer::DEFAULT_TITLE,
+                    'sku' => RoundingDifferenceFixer::SKU,
+                    'totalAmount' => ['value' => '0.01', 'currency' => 'EUR'],
+                ],
+            ],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertSame(0.01, $payment->getRoundingDiff());
+    }
+
     public function testRoundingDiffDefaultsToZeroWithoutRoundingLine(): void
     {
         $payment = Payment::createFromClientResponse([
