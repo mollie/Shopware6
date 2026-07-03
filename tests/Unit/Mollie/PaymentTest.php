@@ -7,6 +7,7 @@ namespace Mollie\Shopware\Unit\Mollie;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -81,6 +82,72 @@ final class PaymentTest extends TestCase
         $this->assertSame('thirdPartyPaymentId', $payment->getThirdPartyPaymentId());
         $this->assertSame('http://test.checkout', $payment->getCheckoutUrl());
         $this->assertSame('http://test.payment', $payment->getChangePaymentStateUrl());
+    }
+
+    public function testVoucherAmountIsSummedFromDetails(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'details' => [
+                'vouchers' => [
+                    ['amount' => ['value' => '5.00', 'currency' => 'EUR']],
+                    ['amount' => ['value' => '2.50', 'currency' => 'EUR']],
+                ],
+            ],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertSame(7.5, $payment->getVoucherAmount());
+    }
+
+    public function testVoucherAmountDefaultsToZeroWithoutVouchers(): void
+    {
+        $payment = Payment::createFromClientResponse([
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+        ]);
+
+        $this->assertSame(0.0, $payment->getVoucherAmount());
+    }
+
+    public function testRoundingDiffIsReadFromRoundingLine(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+            'lines' => [
+                [
+                    'name' => 'Product',
+                    'totalAmount' => ['value' => '19.99', 'currency' => 'EUR'],
+                    'metadata' => ['orderLineItemId' => 'abc'],
+                ],
+                [
+                    'name' => RoundingDifferenceFixer::DEFAULT_TITLE,
+                    'totalAmount' => ['value' => '0.01', 'currency' => 'EUR'],
+                    'metadata' => ['type' => RoundingDifferenceFixer::METADATA_TYPE],
+                ],
+            ],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertSame(0.01, $payment->getRoundingDiff());
+    }
+
+    public function testRoundingDiffDefaultsToZeroWithoutRoundingLine(): void
+    {
+        $payment = Payment::createFromClientResponse([
+            'id' => 'tr_test',
+            'method' => PaymentMethod::PAYPAL->value,
+            'status' => PaymentStatus::PAID->value,
+        ]);
+
+        $this->assertSame(0.0, $payment->getRoundingDiff());
     }
 
     public function testPaidPaymentHasNoChargeback(): void

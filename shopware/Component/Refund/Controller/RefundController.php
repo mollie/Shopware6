@@ -19,6 +19,7 @@ use Mollie\Shopware\Component\Refund\RefundBuilderInterface;
 use Mollie\Shopware\Component\Refund\RefundPersister;
 use Mollie\Shopware\Component\Refund\Struct\CartStruct;
 use Mollie\Shopware\Component\Refund\Struct\RefundOverviewStruct;
+use Mollie\Shopware\Component\Refund\Struct\RefundTotalsStruct;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Mollie;
@@ -82,7 +83,6 @@ final class RefundController extends AbstractController
         ]);
 
         $struct = new RefundOverviewStruct();
-        $struct->setTaxStatus((string) $order->getTaxStatus());
 
         $mollieExtension = $order->getTransactions()?->first()?->getExtension(Mollie::EXTENSION);
 
@@ -102,14 +102,7 @@ final class RefundController extends AbstractController
         $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $order->getSalesChannelId());
         $refunds = $this->enrichRefundsWithComposition($refunds, $order);
 
-        $amountRefunded = $refunds->getSumRefunded();
-        $amountPending = $refunds->getSumPending();
-        $remaining = max(0.0, $order->getAmountTotal() - $amountRefunded - $amountPending);
-
-        $totals = $struct->getTotals();
-        $totals->setRefunded($amountRefunded);
-        $totals->setPendingRefunds($amountPending);
-        $totals->setRemaining($remaining);
+        $struct->setTotals($this->buildTotals($order, $payment, $refunds));
         $struct->setRefunds($refunds);
 
         return $this->json($struct);
@@ -192,7 +185,13 @@ final class RefundController extends AbstractController
         $refund->setRefundItems($dalRefund->getRefundItems());
         $refund->setInternalDescription((string) $dalRefund->getInternalDescription());
 
-        return $this->json($refund);
+        $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $salesChannelId);
+        $totals = $this->buildTotals($order, $payment, $refunds);
+
+        return $this->json([
+            'refund' => $refund,
+            'totals' => $totals,
+        ]);
     }
 
     #[Route(
@@ -219,7 +218,29 @@ final class RefundController extends AbstractController
 
         $this->creditNoteService->cancelCreditNote($orderId, $refundId, $context);
 
-        return $this->json(['success' => true]);
+        $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, (string) $order->getSalesChannelId());
+        $totals = $this->buildTotals($order, $payment, $refunds);
+
+        return $this->json([
+            'success' => true,
+            'totals' => $totals,
+        ]);
+    }
+
+    private function buildTotals(OrderEntity $order, Payment $payment, MollieRefundCollection $refunds): RefundTotalsStruct
+    {
+        $amountRefunded = $refunds->getSumRefunded();
+        $amountPending = $refunds->getSumPending();
+        $remaining = max(0.0, $order->getAmountTotal() - $amountRefunded - $amountPending);
+
+        $totals = new RefundTotalsStruct();
+        $totals->setRefunded($amountRefunded);
+        $totals->setPendingRefunds($amountPending);
+        $totals->setRemaining($remaining);
+        $totals->setVoucherAmount($payment->getVoucherAmount());
+        $totals->setRoundingDiff($payment->getRoundingDiff());
+
+        return $totals;
     }
 
     private function enrichRefundsWithComposition(MollieRefundCollection $mollieRefunds, OrderEntity $order): MollieRefundCollection

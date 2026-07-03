@@ -13,8 +13,6 @@ final class RefundOverviewStruct extends Struct
 
     protected RefundCollection $refunds;
 
-    protected string $taxStatus = 'gross';
-
     public function __construct()
     {
         $this->totals = new RefundTotalsStruct();
@@ -30,6 +28,11 @@ final class RefundOverviewStruct extends Struct
     public function getTotals(): RefundTotalsStruct
     {
         return $this->totals;
+    }
+
+    public function setTotals(RefundTotalsStruct $totals): void
+    {
+        $this->totals = $totals;
     }
 
     public function getCart(): CartStruct
@@ -50,15 +53,5 @@ final class RefundOverviewStruct extends Struct
     public function setRefunds(RefundCollection $refunds): void
     {
         $this->refunds = $refunds;
-    }
-
-    public function getTaxStatus(): string
-    {
-        return $this->taxStatus;
-    }
-
-    public function setTaxStatus(string $taxStatus): void
-    {
-        $this->taxStatus = $taxStatus;
     }
 }

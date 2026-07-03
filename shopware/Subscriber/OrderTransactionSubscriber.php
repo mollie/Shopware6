@@ -109,6 +109,16 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 $transactionExtension->setConsumerBic((string) ($mollieCustomFields['consumerBic'] ?? ''));
             }
 
+            $voucherAmount = $mollieCustomFields['voucherAmount'] ?? null;
+            if ($voucherAmount !== null) {
+                $transactionExtension->setVoucherAmount((float) $voucherAmount);
+            }
+
+            $roundingDiff = $mollieCustomFields['roundingDiff'] ?? null;
+            if ($roundingDiff !== null) {
+                $transactionExtension->setRoundingDiff((float) $roundingDiff);
+            }
+
             $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
         }
     }

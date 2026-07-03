@@ -197,7 +197,7 @@ Component.register('mollie-refund-manager', {
          * Gets if the order tax status is gross
          */
         isTaxStatusGross() {
-            return this.order.taxStatus === 'gross';
+            return this.order.price.taxStatus === 'gross';
         },
 
         /**
@@ -566,6 +566,13 @@ Component.register('mollie-refund-manager', {
                             }
                             return Object.assign({}, r, { status: 'canceled', isPending: false, isQueued: false });
                         });
+
+                        const totals = response.totals;
+                        this.refundedAmount = totals.refunded;
+                        this.pendingRefunds = totals.pendingRefunds;
+                        this.remainingAmount = totals.remaining;
+                        this.voucherAmount = totals.voucherAmount;
+                        this.roundingDiff = totals.roundingDiff;
                     } else {
                         this._showNotificationError(response.errors[0]);
                     }
@@ -693,10 +700,10 @@ Component.register('mollie-refund-manager', {
         },
 
         _isRefundSuccess(response) {
-            return typeof response.id === 'string' || response.success === true;
+            return typeof response.refund?.id === 'string';
         },
 
-        _handleRefundSuccess(refund) {
+        _handleRefundSuccess(response) {
             this.isRefunding = false;
 
             this._showNotificationSuccess(
@@ -705,7 +712,15 @@ Component.register('mollie-refund-manager', {
 
             this.$emit('refund-success');
 
-            this.mollieRefunds = [refund].concat(this.mollieRefunds);
+            this.mollieRefunds = [response.refund].concat(this.mollieRefunds);
+
+            const totals = response.totals;
+            this.refundedAmount = totals.refunded;
+            this.pendingRefunds = totals.pendingRefunds;
+            this.remainingAmount = totals.remaining;
+            this.voucherAmount = totals.voucherAmount;
+            this.roundingDiff = totals.roundingDiff;
+
             this.btnResetCartForm_Click();
         },
         // ---------------------------------------------------------------------------------------------------------
