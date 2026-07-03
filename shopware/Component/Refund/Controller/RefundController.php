@@ -108,22 +108,6 @@ final class RefundController extends AbstractController
         return $this->json($struct);
     }
 
-    private function buildTotals(OrderEntity $order, Payment $payment, MollieRefundCollection $refunds): RefundTotalsStruct
-    {
-        $amountRefunded = $refunds->getSumRefunded();
-        $amountPending = $refunds->getSumPending();
-        $remaining = max(0.0, $order->getAmountTotal() - $amountRefunded - $amountPending);
-
-        $totals = new RefundTotalsStruct();
-        $totals->setRefunded($amountRefunded);
-        $totals->setPendingRefunds($amountPending);
-        $totals->setRemaining($remaining);
-        $totals->setVoucherAmount($payment->getVoucherAmount());
-        $totals->setRoundingDiff($payment->getRoundingDiff());
-
-        return $totals;
-    }
-
     #[Route(
         path: '/api/_action/mollie/refund',
         name: 'api.action.mollie.refund',
@@ -241,6 +225,22 @@ final class RefundController extends AbstractController
             'success' => true,
             'totals' => $totals,
         ]);
+    }
+
+    private function buildTotals(OrderEntity $order, Payment $payment, MollieRefundCollection $refunds): RefundTotalsStruct
+    {
+        $amountRefunded = $refunds->getSumRefunded();
+        $amountPending = $refunds->getSumPending();
+        $remaining = max(0.0, $order->getAmountTotal() - $amountRefunded - $amountPending);
+
+        $totals = new RefundTotalsStruct();
+        $totals->setRefunded($amountRefunded);
+        $totals->setPendingRefunds($amountPending);
+        $totals->setRemaining($remaining);
+        $totals->setVoucherAmount($payment->getVoucherAmount());
+        $totals->setRoundingDiff($payment->getRoundingDiff());
+
+        return $totals;
     }
 
     private function enrichRefundsWithComposition(MollieRefundCollection $mollieRefunds, OrderEntity $order): MollieRefundCollection

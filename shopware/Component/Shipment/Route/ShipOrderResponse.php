@@ -27,7 +27,8 @@ final class ShipOrderResponse extends StoreApiResponse
         ));
     }
 
-    public function getMollieId(): string{
+    public function getMollieId(): string
+    {
         return $this->mollieId;
     }
 }
