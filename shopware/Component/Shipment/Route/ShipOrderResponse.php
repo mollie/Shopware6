@@ -14,7 +14,7 @@ final class ShipOrderResponse extends StoreApiResponse
     /**
      * @param array<string, mixed>[] $updatedLineItems
      */
-    public function __construct(string $mollieId, string $orderId, array $updatedLineItems = [])
+    public function __construct(private string $mollieId, string $orderId, array $updatedLineItems = [])
     {
         parent::__construct(new ArrayStruct(
             [
@@ -25,5 +25,9 @@ final class ShipOrderResponse extends StoreApiResponse
             ],
             'mollie_ship_order_response'
         ));
+    }
+
+    public function getMollieId(): string{
+        return $this->mollieId;
     }
 }

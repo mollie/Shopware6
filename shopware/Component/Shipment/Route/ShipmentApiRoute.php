@@ -110,7 +110,7 @@ final class ShipmentApiRoute
     {
         $response = $this->shipOrderRoute->ship($request, $context);
 
-        if ($response->getObject()->get('mollieId') === '') {
+        if ($response->getMollieId() === '') {
             throw ShippingException::shipmentNotSuccessful();
         }
 

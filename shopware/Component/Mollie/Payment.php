@@ -55,6 +55,10 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?Money $amountChargedBack = null;
 
+    private float $voucherAmount = 0.0;
+
+    private float $roundingDiff = 0.0;
+
     private RefundCollection $refunds;
 
     private bool $cancelable = false;
@@ -371,6 +375,20 @@ final class Payment extends Struct implements \JsonSerializable
             $payment->setAmountChargedBack(new Money((float) $amountChargedBack['value'], $amountChargedBack['currency']));
         }
 
+        foreach ($body['details']['vouchers'] ?? [] as $voucher) {
+            $payment->voucherAmount += (float) ($voucher['amount']['value'] ?? 0.0);
+        }
+
+        foreach ($body['lines'] ?? [] as $line) {
+            $metadata = $line['metadata'] ?? [];
+            if (is_string($metadata)) {
+                $metadata = json_decode($metadata, true) ?: [];
+            }
+            if (($metadata['type'] ?? '') === RoundingDifferenceFixer::METADATA_TYPE) {
+                $payment->roundingDiff += (float) ($line['totalAmount']['value'] ?? 0.0);
+            }
+        }
+
         $payment->setCancelable((bool) ($body['isCancelable'] ?? false));
 
         $cardLabel = $body['details']['cardLabel'] ?? null;
@@ -572,6 +590,26 @@ final class Payment extends Struct implements \JsonSerializable
     public function setAmountChargedBack(Money $amountChargedBack): void
     {
         $this->amountChargedBack = $amountChargedBack;
+    }
+
+    public function getVoucherAmount(): float
+    {
+        return $this->voucherAmount;
+    }
+
+    public function setVoucherAmount(float $voucherAmount): void
+    {
+        $this->voucherAmount = $voucherAmount;
+    }
+
+    public function getRoundingDiff(): float
+    {
+        return $this->roundingDiff;
+    }
+
+    public function setRoundingDiff(float $roundingDiff): void
+    {
+        $this->roundingDiff = $roundingDiff;
     }
 
     /**
