@@ -111,6 +111,34 @@ final class OrderEntityBuilder
         return $collection;
     }
 
+    public function getDeliveryDiscountPromotionLineItem(string $label): OrderLineItemEntity
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId('fake-shipping-promotion-line-item-id');
+        $orderLineItem->setType('promotion');
+        $orderLineItem->setLabel($label);
+        $orderLineItem->setQuantity(1);
+        $orderLineItem->setPrice($this->getPrice(0.0, 0.0));
+        $orderLineItem->setPayload(['discountScope' => 'delivery']);
+
+        return $orderLineItem;
+    }
+
+    public function getShippingDiscountDelivery(CustomerEntity $customer): OrderDeliveryEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('DHL');
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId('fake-shipping-discount-delivery-id');
+        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
+        $delivery->setShippingCosts($this->getPrice(-4.99, 19.0));
+        $delivery->setShippingMethod($shippingMethod);
+
+        return $delivery;
+    }
+
     public function getOrderDeliveryWithoutShippingCosts(): OrderDeliveryEntity
     {
         $shippingMethod = new ShippingMethodEntity();

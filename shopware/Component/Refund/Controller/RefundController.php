@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RefundCollection as MollieRefundCollection;
+use Mollie\Shopware\Component\Mollie\RefundStatus;
 use Mollie\Shopware\Component\Refund\CreditNoteService;
 use Mollie\Shopware\Component\Refund\DAL\Order\OrderExtension;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundCollection;
@@ -97,11 +98,13 @@ final class RefundController extends AbstractController
 
         $payment = $mollieExtension;
 
-        $struct->setCart(CartStruct::fromOrder($order));
-
         $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $order->getSalesChannelId());
         $refunds = $this->enrichRefundsWithComposition($refunds, $order);
 
+        $cart = CartStruct::fromOrder($order);
+        $cart->applyRefundedQuantities($this->buildRefundedQuantities($order, $refunds));
+
+        $struct->setCart($cart);
         $struct->setTotals($this->buildTotals($order, $payment, $refunds));
         $struct->setRefunds($refunds);
 
@@ -185,12 +188,16 @@ final class RefundController extends AbstractController
         $refund->setRefundItems($dalRefund->getRefundItems());
         $refund->setInternalDescription((string) $dalRefund->getInternalDescription());
 
+        // reload so the refund extension contains the just-persisted refund
+        $order = $this->loadOrder($orderId, $context);
+
         $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $salesChannelId);
         $totals = $this->buildTotals($order, $payment, $refunds);
 
         return $this->json([
             'refund' => $refund,
             'totals' => $totals,
+            'refundedItems' => $this->buildRefundedQuantities($order, $refunds),
         ]);
     }
 
@@ -224,6 +231,7 @@ final class RefundController extends AbstractController
         return $this->json([
             'success' => true,
             'totals' => $totals,
+            'refundedItems' => $this->buildRefundedQuantities($order, $refunds),
         ]);
     }
 
@@ -241,6 +249,49 @@ final class RefundController extends AbstractController
         $totals->setRoundingDiff($payment->getRoundingDiff());
 
         return $totals;
+    }
+
+    /**
+     * Builds a map of refunded quantities per order line item / delivery, keyed by its id.
+     * Canceled and failed refunds are ignored, pending refunds are included since those
+     * amounts can no longer be refunded again.
+     *
+     * @return array<string, int>
+     */
+    private function buildRefundedQuantities(OrderEntity $order, MollieRefundCollection $refunds): array
+    {
+        $quantities = [];
+
+        $dalRefunds = $order->getExtension(OrderExtension::REFUND_PROPERTY_NAME);
+
+        if (! $dalRefunds instanceof RefundCollection) {
+            return $quantities;
+        }
+
+        /** @var RefundEntity $dalRefund */
+        foreach ($dalRefunds as $dalRefund) {
+            $mollieRefund = $refunds->findByMollieId((string) $dalRefund->getMollieRefundId());
+
+            if ($mollieRefund === null) {
+                continue;
+            }
+
+            $status = $mollieRefund->getStatus();
+            if ($status === RefundStatus::Canceled || $status === RefundStatus::Failed) {
+                continue;
+            }
+
+            foreach ($dalRefund->getRefundItems() as $refundItem) {
+                $shopwareId = $refundItem->getOrderLineItemId() ?? $refundItem->getOrderDeliveryId();
+                if ($shopwareId === null || $shopwareId === '') {
+                    continue;
+                }
+
+                $quantities[$shopwareId] = ($quantities[$shopwareId] ?? 0) + $refundItem->getQuantity();
+            }
+        }
+
+        return $quantities;
     }
 
     private function enrichRefundsWithComposition(MollieRefundCollection $mollieRefunds, OrderEntity $order): MollieRefundCollection

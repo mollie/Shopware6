@@ -384,7 +384,9 @@ final class Payment extends Struct implements \JsonSerializable
             if (is_string($metadata)) {
                 $metadata = json_decode($metadata, true) ?: [];
             }
-            if (($metadata['type'] ?? '') === RoundingDifferenceFixer::METADATA_TYPE) {
+            $isRoundingLine = ($line['sku'] ?? '') === RoundingDifferenceFixer::SKU
+                || ($metadata['type'] ?? '') === RoundingDifferenceFixer::METADATA_TYPE;
+            if ($isRoundingLine) {
                 $payment->roundingDiff += (float) ($line['totalAmount']['value'] ?? 0.0);
             }
         }

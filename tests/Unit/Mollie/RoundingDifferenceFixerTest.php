@@ -66,6 +66,16 @@ final class RoundingDifferenceFixerTest extends TestCase
         $this->assertSame('sku-123', $roundingLine->getSku());
     }
 
+    public function testMarkerSkuIsUsedWhenNoCustomSkuConfigured(): void
+    {
+        $lines = new LineItemCollection([$this->lineItem(50.00), $this->lineItem(50.01)]);
+
+        $fixer = new RoundingDifferenceFixer();
+        $result = $fixer->fixAmountDiff(new Money(100.00, 'EUR'), $lines, '', '');
+
+        $this->assertSame(RoundingDifferenceFixer::SKU, $result->last()->getSku());
+    }
+
     public function testZeroDecimalCurrencyUsesIntegerPrecision(): void
     {
         $lines = new LineItemCollection([$this->lineItem(2500.0, 'JPY'), $this->lineItem(2499.0, 'JPY')]);

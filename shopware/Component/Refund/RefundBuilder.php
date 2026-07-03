@@ -45,9 +45,12 @@ final class RefundBuilder implements RefundBuilderInterface
         }
 
         $taxStatus = (string) $order->getTaxStatus();
-        $orderLineItems = ($order->getLineItems() ?? new OrderLineItemCollection())
+        $allOrderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+        $shippingDiscountLabel = LineItem::resolveDeliveryDiscountLabel($allOrderLineItems);
+        $orderLineItems = $allOrderLineItems
             ->filter(function (OrderLineItemEntity $item): bool {
-                return $item->getType() !== ShopwareLineItem::CREDIT_LINE_ITEM_TYPE;
+                return $item->getType() !== ShopwareLineItem::CREDIT_LINE_ITEM_TYPE
+                    && ! LineItem::isDeliveryDiscountPlaceholder($item);
             })
         ;
         $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
@@ -72,11 +75,11 @@ final class RefundBuilder implements RefundBuilderInterface
         $amount = $requestAmount ?? $order->getAmountTotal();
 
         if ($isFullRefund && $alreadyRefunded <= 0.0) {
-            $lineItems = $this->buildItemsFromOrder($orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines);
+            $lineItems = $this->buildItemsFromOrder($orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines, $shippingDiscountLabel);
         }
 
         if ($hasRequestedItems) {
-            $lineItems = $this->buildFromRequestItems($requestItems, $orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines);
+            $lineItems = $this->buildFromRequestItems($requestItems, $orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines, $shippingDiscountLabel);
             // Only override amount if no explicit amount was requested
             if ($requestAmount === null) {
                 $amount = $lineItems->getTotal();
@@ -121,7 +124,7 @@ final class RefundBuilder implements RefundBuilderInterface
         return $total;
     }
 
-    private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines): LineItemCollection
+    private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection
     {
         $collection = new LineItemCollection();
 
@@ -163,7 +166,8 @@ final class RefundBuilder implements RefundBuilderInterface
                 continue;
             }
 
-            $collection->add(LineItem::fromDelivery($delivery, $currency, $taxStatus));
+            $descriptionOverride = $delivery->getShippingCosts()->getTotalPrice() < 0 ? $shippingDiscountLabel : null;
+            $collection->add(LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride));
         }
 
         return $collection;
@@ -172,7 +176,7 @@ final class RefundBuilder implements RefundBuilderInterface
     /**
      * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
      */
-    private function buildFromRequestItems(array $requestItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines): LineItemCollection
+    private function buildFromRequestItems(array $requestItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection
     {
         $collection = new LineItemCollection();
 
@@ -201,7 +205,8 @@ final class RefundBuilder implements RefundBuilderInterface
                     $itemAmount = $delivery->getShippingCosts()->getTotalPrice();
                 }
 
-                $refundLine = LineItem::fromDelivery($delivery, $currency, $taxStatus);
+                $descriptionOverride = $delivery->getShippingCosts()->getTotalPrice() < 0 ? $shippingDiscountLabel : null;
+                $refundLine = LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride);
                 $deliveryMoney = new Money($itemAmount, $currency->getIsoCode());
                 $refundLine->setAmount($deliveryMoney);
                 $refundLine->setUnitPrice($deliveryMoney);

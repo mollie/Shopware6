@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Refund\Struct;
 
+use Mollie\Shopware\Component\Mollie\LineItem as MollieLineItem;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
@@ -46,9 +47,11 @@ final class CartStruct extends Struct
             return $cart;
         }
 
+        $shippingDiscountLabel = $lineItems !== null ? MollieLineItem::resolveDeliveryDiscountLabel($lineItems) : null;
+
         foreach ($deliveries as $delivery) {
             if ($delivery->getShippingCosts()->getTotalPrice() < 0.0) {
-                $cart->addItem($cart->buildDeliveryPromotionItem($delivery));
+                $cart->addItem($cart->buildDeliveryPromotionItem($delivery, $shippingDiscountLabel));
                 continue;
             }
 
@@ -64,6 +67,19 @@ final class CartStruct extends Struct
     public function jsonSerialize(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param array<string, int> $quantities keyed by order line item / delivery id
+     */
+    public function applyRefundedQuantities(array $quantities): void
+    {
+        foreach ($this->items as $item) {
+            $id = $item->getShopware()->getId();
+            if (array_key_exists($id, $quantities)) {
+                $item->setRefunded($quantities[$id]);
+            }
+        }
     }
 
     private function addItem(CartItemStruct $item): void
@@ -151,11 +167,11 @@ final class CartStruct extends Struct
         );
     }
 
-    private function buildDeliveryPromotionItem(OrderDeliveryEntity $delivery): CartItemStruct
+    private function buildDeliveryPromotionItem(OrderDeliveryEntity $delivery, ?string $labelOverride = null): CartItemStruct
     {
         $costs = $delivery->getShippingCosts();
         $method = $delivery->getShippingMethod();
-        $label = $method instanceof ShippingMethodEntity ? (string) $method->getName() : CartItemShopwareStruct::SHIPPING;
+        $label = $labelOverride ?? ($method instanceof ShippingMethodEntity ? (string) $method->getName() : CartItemShopwareStruct::SHIPPING);
 
         return new CartItemStruct(
             new CartItemShopwareStruct(

@@ -37,6 +37,10 @@ final class LineItemFilter implements LineItemFilterInterface
             return false;
         }
 
+        if ($item instanceof OrderLineItemEntity && LineItem::isDeliveryDiscountPlaceholder($item)) {
+            return false;
+        }
+
         if ($type === self::TYPE_CUSTOM_PRODUCTS_OPTION) {
             $price = $item->getPrice();
 

@@ -67,7 +67,8 @@ final class RefundPersister
             $refundData['refundItems'] = $this->buildRefundItems($lines, $orderLineItems, $orderDeliveries);
         } elseif (count($stockItems) > 0) {
             $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
-            $refundData['refundItems'] = $this->buildRefundItemsFromRequest($stockItems, $orderLineItems);
+            $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
+            $refundData['refundItems'] = $this->buildRefundItemsFromRequest($stockItems, $orderLineItems, $orderDeliveries);
         }
 
         if (count($stockItems) > 0) {
@@ -98,9 +99,11 @@ final class RefundPersister
         foreach ($lineItems as $item) {
             $shopwareId = $item->getShopwareLineItemId();
 
+            $orderDeliveryId = null;
             if ($item->getType() === LineItemType::SHIPPING) {
                 $orderLineItemId = null;
                 $orderLineItemVersionId = $orderDeliveries->get($shopwareId)?->getVersionId();
+                $orderDeliveryId = $orderDeliveries->has($shopwareId) ? $shopwareId : null;
             } else {
                 $orderLineItemId = $shopwareId ?: null;
                 $orderLineItemVersionId = $orderLineItems->get($shopwareId)?->getVersionId();
@@ -113,6 +116,7 @@ final class RefundPersister
                 'amount' => (float) $item->getUnitPrice()->getValue(),
                 'orderLineItemId' => $orderLineItemId,
                 'orderLineItemVersionId' => $orderLineItemVersionId,
+                'orderDeliveryId' => $orderDeliveryId,
             ];
         }
 
@@ -124,7 +128,7 @@ final class RefundPersister
      *
      * @return array<array<string, mixed>>
      */
-    private function buildRefundItemsFromRequest(array $requestItems, OrderLineItemCollection $orderLineItems): array
+    private function buildRefundItemsFromRequest(array $requestItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries): array
     {
         $result = [];
 
@@ -136,6 +140,7 @@ final class RefundPersister
             // Only set orderLineItemId if the ID actually exists in order_line_item;
             // delivery IDs are not in that table and would violate the FK constraint.
             $orderLineItem = $orderLineItems->get($lineItemId);
+            $isDelivery = $orderLineItem === null && $orderDeliveries->has($lineItemId);
 
             $result[] = [
                 'mollieLineId' => '',
@@ -144,6 +149,7 @@ final class RefundPersister
                 'amount' => $totalAmount / $qty,
                 'orderLineItemId' => $orderLineItem !== null ? $lineItemId : null,
                 'orderLineItemVersionId' => $orderLineItem?->getVersionId(),
+                'orderDeliveryId' => $isDelivery ? $lineItemId : null,
             ];
         }
 
