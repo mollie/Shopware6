@@ -723,8 +723,11 @@ Component.register('mollie-refund-manager', {
                 return;
             }
 
-            this.orderItems.forEach(function (item) {
-                item.refunded = refundedItems[item.shopware.id] ?? 0;
+            // reassign a new array so sw-data-grid re-syncs its internal records
+            // and re-evaluates isItemRefundable(); mutating items in place is not
+            // picked up because the grid only watches the dataSource reference.
+            this.orderItems = this.orderItems.map(function (item) {
+                return Object.assign({}, item, { refunded: refundedItems[item.shopware.id] ?? 0 });
             });
         },
 
