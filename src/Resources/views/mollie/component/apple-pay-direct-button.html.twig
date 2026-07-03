@@ -10,15 +10,6 @@
         {% endif %}
 
 
-        {% if mollie_csrf_available %}
-            {#
-            CSRF functions are not available anymore since Shopware 6.5.
-            To avoid function-not-found exception we have to conditionally fetch the required
-            code from a separate file.
-            #}
-            {% sw_include '@MolliePayments/storefront/csrf/components/apple-pay-direct-button-csrf.twig' %}
-        {% endif %}
-
         <input type="hidden" name="id" value="{{ productId }}"/>
         <input type="hidden" name="currency" value="{{ context.currency.translated.shortName }}"/>
         <input type="hidden" name="countryCode" value="{{ context.shippingLocation.country.iso }}"/>

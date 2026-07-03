@@ -69,13 +69,6 @@
                                               class="order-table-header-context-menu-content-form"
                                               data-add-to-cart="true">
 
-                                            {% if mollie_csrf_available %}
-                                                {% block page_account_subscriptions_item_context_menu_reorder_form_csrf %}
-                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-reorder.twig' %}
-                                                {% endblock %}
-                                            {% endif %}
-
-
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_redirect %}
                                                 <input type="hidden" name="redirectTo" value="frontend.cart.offcanvas"/>
                                             {% endblock %}
@@ -123,12 +116,6 @@
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
 
-                                                {% if mollie_csrf_available %}
-                                                    {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
-                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-update-payment.twig' %}
-                                                    {% endblock %}
-                                                {% endif %}
-
                                                 {% block page_account_subscriptions_item_context_menu_update_payment_form_button %}
                                                     <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                         {{ "molliePayments.subscriptions.account.mollieSubscriptionUpdatePayment"|trans|sw_sanitize }}
@@ -148,12 +135,6 @@
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
 
-                                                    {% if mollie_csrf_available %}
-                                                        {% block page_account_subscriptions_item_context_menu_pause_form_csrf %}
-                                                            {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-pause.twig' %}
-                                                        {% endblock %}
-                                                    {% endif %}
-
                                                     {% block page_account_subscriptions_item_context_menu_pause_form_button %}
                                                         <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                             {{ "molliePayments.subscriptions.account.mollieSubscriptionPause"|trans|sw_sanitize }}
@@ -170,12 +151,6 @@
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
-
-                                                    {% if mollie_csrf_available %}
-                                                        {% block page_account_subscriptions_item_context_menu_resume_form_csrf %}
-                                                            {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-resume.twig' %}
-                                                        {% endblock %}
-                                                    {% endif %}
 
                                                     {% block page_account_subscriptions_item_context_menu_resume_form_button %}
                                                         <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
@@ -195,12 +170,6 @@
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
-
-                                                {% if mollie_csrf_available %}
-                                                    {% block page_account_subscriptions_item_context_menu_skip_form_csrf %}
-                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-skip.twig' %}
-                                                    {% endblock %}
-                                                {% endif %}
 
                                                 {% block page_account_subscriptions_item_context_menu_skip_form_button %}
                                                     <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
@@ -228,12 +197,6 @@
                                                   data-form-csrf-handler="true"
                                                   id="subscriptionsDetailForm-{{ subscriptions.Id }}"
                                                   method="post">
-
-                                                {% if mollie_csrf_available %}
-                                                    {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
-                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
-                                                    {% endblock %}
-                                                {% endif %}
 
                                                 {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
                                                     <button class="dropdown-item order-table-header-context-menu-content-link btn-mollie-subscription-cancel"
@@ -310,9 +273,6 @@
                                             <form action="{{ path('frontend.account.mollie.subscriptions.cancel', { 'subscriptionId': subscription.id }) }}"
                                                   method="post"
                                                   data-form-csrf-handler="true">
-                                                {% if mollie_csrf_available %}
-                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
-                                                {% endif %}
                                                 <button class="btn btn-primary btn-mollie-subscription-price-update-cancel"
                                                         type="submit"
                                                         data-test="btn-subscription-price-update-cancel">
@@ -451,12 +411,6 @@
                                                                                                                           'subscriptionId': subscription.id,
                                                                                                                       }
                                                                                                                   ) }}">
-
-                                                                                                                {% if mollie_csrf_available %}
-                                                                                                                    {% block component_address_subscription_billing_address_form_csrf %}
-                                                                                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-billing-update.twig' %}
-                                                                                                                    {% endblock %}
-                                                                                                                {% endif %}
 
                                                                                                                 {% block component_address_subscription_billing_address_form_hidden_inputs %}
                                                                                                                 {% endblock %}
@@ -607,12 +561,6 @@
                                                                                                                           'subscriptionId': subscription.id,
                                                                                                                       }
                                                                                                                   ) }}">
-
-                                                                                                                {% if mollie_csrf_available %}
-                                                                                                                    {% block component_address_subscription_shipping_address_form_csrf %}
-                                                                                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-shipping-update.twig' %}
-                                                                                                                    {% endblock %}
-                                                                                                                {% endif %}
 
                                                                                                                 {% block component_address_subscription_shipping_address_form_hidden_inputs %}
                                                                                                                 {% endblock %}
