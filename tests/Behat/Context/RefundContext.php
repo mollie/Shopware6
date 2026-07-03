@@ -301,9 +301,10 @@ final class RefundContext extends ShopwareContext
         try {
             $response = $controller->create($request, $context);
             $data = json_decode((string) $response->getContent(), true);
-            Storage::set(self::STORAGE_LAST_REFUND_RESPONSE, $data);
-            if (isset($data['id'])) {
-                Storage::set(self::STORAGE_LAST_REFUND_ID, $data['id']);
+            $refund = $data['refund'];
+            Storage::set(self::STORAGE_LAST_REFUND_RESPONSE, $refund);
+            if (isset($refund['id'])) {
+                Storage::set(self::STORAGE_LAST_REFUND_ID, $refund['id']);
             }
         } catch (\Throwable $e) {
             Storage::set(self::STORAGE_REFUND_EXCEPTION, $e->getMessage());
