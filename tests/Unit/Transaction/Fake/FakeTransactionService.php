@@ -44,6 +44,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private array $mollieCustomerIds = [];
     private bool $withNullLineItems = false;
     private bool $withZeroShippingCosts = false;
+    private bool $withShippingDiscountDelivery = false;
     private bool $withSubscriptionLineItem = false;
 
     private bool $withoutOrder = false;
@@ -123,6 +124,11 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function withSubscriptionLineItem(): void
     {
         $this->withSubscriptionLineItem = true;
+    }
+
+    public function withShippingDiscountDelivery(): void
+    {
+        $this->withShippingDiscountDelivery = true;
     }
 
     public function getDefaultSalesChannelEntity(): SalesChannelEntity
@@ -207,6 +213,13 @@ final class FakeTransactionService implements TransactionServiceInterface
                 $zeroPrice = new CalculatedPrice(0, 0, new CalculatedTaxCollection(), new TaxRuleCollection(), 1);
                 $delivery->setShippingCosts($zeroPrice);
             }
+        }
+
+        if ($this->withShippingDiscountDelivery === true && $deliveries !== null) {
+            $deliveries->add($this->orderRepository->getShippingDiscountDelivery($customer));
+            $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+            $lineItems->add($this->orderRepository->getDeliveryDiscountPromotionLineItem('Mollie test: free shipping'));
+            $order->setLineItems($lineItems);
         }
 
         $this->transaction = new TransactionDataStruct(

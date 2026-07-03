@@ -119,6 +119,7 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
 
         $lineItemCollection = new LineItemCollection();
         $oderLineItems = $order->getLineItems();
+        $shippingDiscountLabel = $oderLineItems !== null ? LineItem::resolveDeliveryDiscountLabel($oderLineItems) : null;
         $hasSubscriptionLineItem = false;
         if ($oderLineItems !== null) {
             $filteredLineItems = $oderLineItems->filter($this->lineItemFilter->isItemAllowed(...));
@@ -142,11 +143,13 @@ final readonly class PayloadBuilder implements PayloadBuilderInterface
                 $shippingAddress = Address::fromAddress($customer, $deliveryOrderShippingAddress);
             }
 
-            if ($delivery->getShippingCosts()->getTotalPrice() <= 0) {
+            $shippingCosts = $delivery->getShippingCosts()->getTotalPrice();
+            if (round($shippingCosts, 2) === 0.0) {
                 continue;
             }
 
-            $lineItem = LineItem::fromDelivery($delivery, $currency, $taxStatus);
+            $descriptionOverride = $shippingCosts < 0 ? $shippingDiscountLabel : null;
+            $lineItem = LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride);
             $lineItemCollection->add($lineItem);
         }
 

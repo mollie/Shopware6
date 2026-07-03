@@ -497,6 +497,34 @@ final class PayloadBuilderTest extends TestCase
         }
     }
 
+    public function testBuildKeepsNegativeShippingDiscountDelivery(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withShippingDiscountDelivery();
+
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $discountLine = null;
+        foreach ($actual->getLines() as $line) {
+            if ($line->getAmount()->getValue() < 0) {
+                $discountLine = $line;
+            }
+        }
+
+        $this->assertNotNull($discountLine, 'negative shipping discount delivery must stay in the payload');
+        $this->assertSame('discount', $discountLine->getType()->value);
+        $this->assertSame(-4.99, $discountLine->getAmount()->getValue());
+        $this->assertSame('Mollie test: free shipping', $discountLine->getDescription());
+
+        foreach ($actual->getLines() as $line) {
+            $this->assertNotSame(0.0, $line->getAmount()->getValue(), 'zero-priced delivery promotion placeholder must be filtered out');
+        }
+    }
+
     public function testBuildOrderReturnsCreateOrderInstance(): void
     {
         $builder = $this->createBuilder();

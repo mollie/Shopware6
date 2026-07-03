@@ -118,3 +118,14 @@ Feature: Basic payment checkout
     And select payment status "paid"
     Then i see success page
     And order payment status is "paid"
+
+  Scenario: payment success with 100 percent shipping discount
+    Given payment method "paypal" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And i apply promotion code "mollie_free_shipping"
+    When i start checkout with payment method "paypal"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"

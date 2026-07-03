@@ -22,6 +22,11 @@ final class CartItemStruct extends Struct
         return $this->refunded;
     }
 
+    public function setRefunded(int $refunded): void
+    {
+        $this->refunded = $refunded;
+    }
+
     public function getShopware(): CartItemShopwareStruct
     {
         return $this->shopware;

@@ -119,7 +119,7 @@ final class CartStructTest extends TestCase
         $order = new OrderEntity();
         $order->setLineItems(new OrderLineItemCollection());
         $order->setDeliveries(new OrderDeliveryCollection([
-            $this->buildDelivery('delivery-promo', 'Free shipping', -4.99),
+            $this->buildDelivery('delivery-promo', 'DHL', -4.99),
         ]));
 
         $items = CartStruct::fromOrder($order)->jsonSerialize();
@@ -128,6 +128,26 @@ final class CartStructTest extends TestCase
         $shopware = $items[0]->getShopware();
         $this->assertTrue($shopware->isPromotion());
         $this->assertFalse($shopware->isDelivery());
+    }
+
+    public function testFromOrderLabelsShippingDiscountWithVoucherName(): void
+    {
+        $placeholder = $this->buildPromotionLineItem('promo-line', 'mollie_free_shipping', 0.0);
+        $placeholder->setLabel('Mollie test: free shipping');
+        $placeholder->setPayload(['discountScope' => 'delivery']);
+
+        $order = new OrderEntity();
+        $order->setLineItems(new OrderLineItemCollection([$placeholder]));
+        $order->setDeliveries(new OrderDeliveryCollection([
+            $this->buildDelivery('delivery-promo', 'DHL', -4.99),
+        ]));
+
+        $items = CartStruct::fromOrder($order)->jsonSerialize();
+
+        $this->assertCount(1, $items);
+        $shopware = $items[0]->getShopware();
+        $this->assertTrue($shopware->isPromotion());
+        $this->assertSame('Mollie test: free shipping', $shopware->getLabel());
     }
 
     public function testFromOrderCalculatesTaxBreakdown(): void
@@ -161,6 +181,23 @@ final class CartStructTest extends TestCase
         $productItem = $items[0]->getShopware();
         $this->assertSame(2.0, $productItem->getPromotion()->getDiscount());
         $this->assertSame(8.0, $productItem->getDiscountedPrice());
+    }
+
+    public function testApplyRefundedQuantitiesSetsMatchingItems(): void
+    {
+        $order = new OrderEntity();
+        $order->setLineItems(new OrderLineItemCollection([
+            $this->buildProductLineItem('line-1', 'SW-1', 'A', 10.0, 5),
+            $this->buildProductLineItem('line-2', 'SW-2', 'B', 10.0, 5),
+        ]));
+        $order->setDeliveries(new OrderDeliveryCollection());
+
+        $cart = CartStruct::fromOrder($order);
+        $cart->applyRefundedQuantities(['line-1' => 2]);
+
+        $items = $cart->jsonSerialize();
+        $this->assertSame(2, $items[0]->getRefunded());
+        $this->assertSame(0, $items[1]->getRefunded());
     }
 
     public function testJsonSerializeReturnsItemsArray(): void

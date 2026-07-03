@@ -106,6 +106,11 @@ Component.register('mollie-refund-manager', {
             return grid.buildColumns();
         },
 
+        // includes pending refunds, since those amounts cannot be refunded again
+        isOrderFullyRefunded() {
+            return this.remainingAmount <= 0;
+        },
+
         /**
          *
          * @returns {*}
@@ -190,6 +195,14 @@ Component.register('mollie-refund-manager', {
          * @returns {boolean}
          */
         isItemRefundable(item) {
+            if (this.isOrderFullyRefunded) {
+                return false;
+            }
+
+            if (item.refunded > 0 && item.refunded >= item.shopware.quantity) {
+                return false;
+            }
+
             return this.itemService.isRefundable(item);
         },
 
@@ -573,6 +586,8 @@ Component.register('mollie-refund-manager', {
                         this.remainingAmount = totals.remaining;
                         this.voucherAmount = totals.voucherAmount;
                         this.roundingDiff = totals.roundingDiff;
+
+                        this._applyRefundedItems(response.refundedItems);
                     } else {
                         this._showNotificationError(response.errors[0]);
                     }
@@ -703,6 +718,16 @@ Component.register('mollie-refund-manager', {
             return typeof response.refund?.id === 'string';
         },
 
+        _applyRefundedItems(refundedItems) {
+            if (!refundedItems) {
+                return;
+            }
+
+            this.orderItems.forEach(function (item) {
+                item.refunded = refundedItems[item.shopware.id] ?? 0;
+            });
+        },
+
         _handleRefundSuccess(response) {
             this.isRefunding = false;
 
@@ -722,6 +747,8 @@ Component.register('mollie-refund-manager', {
             this.roundingDiff = totals.roundingDiff;
 
             this.btnResetCartForm_Click();
+
+            this._applyRefundedItems(response.refundedItems);
         },
         // ---------------------------------------------------------------------------------------------------------
         // </editor-fold>

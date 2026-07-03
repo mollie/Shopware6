@@ -20,6 +20,7 @@ final class RefundItemEntity extends Entity
     protected float $amount = 0.0;
     protected ?string $orderLineItemId = null;
     protected ?string $orderLineItemVersionId = null;
+    protected ?string $orderDeliveryId = null;
     protected ?OrderLineItemEntity $orderLineItem = null;
 
     public function getRefundId(): string
@@ -102,6 +103,16 @@ final class RefundItemEntity extends Entity
         $this->orderLineItemVersionId = $orderLineItemVersionId;
     }
 
+    public function getOrderDeliveryId(): ?string
+    {
+        return $this->orderDeliveryId;
+    }
+
+    public function setOrderDeliveryId(?string $orderDeliveryId): void
+    {
+        $this->orderDeliveryId = $orderDeliveryId;
+    }
+
     public function getOrderLineItem(): ?OrderLineItemEntity
     {
         return $this->orderLineItem;
@@ -123,6 +134,7 @@ final class RefundItemEntity extends Entity
             'quantity' => $this->quantity,
             'amount' => $this->amount,
             'orderLineItemId' => $this->orderLineItemId,
+            'orderDeliveryId' => $this->orderDeliveryId,
         ];
     }
 
@@ -137,6 +149,7 @@ final class RefundItemEntity extends Entity
         ?string $orderLineItemId,
         ?string $orderLineItemVersionId,
         ?string $refundId = null,
+        ?string $orderDeliveryId = null,
     ): array {
         $row = [
             'mollieLineId' => $mollieLineId,
@@ -145,6 +158,7 @@ final class RefundItemEntity extends Entity
             'amount' => $amount,
             'orderLineItemId' => $orderLineItemId,
             'orderLineItemVersionId' => $orderLineItemVersionId,
+            'orderDeliveryId' => $orderDeliveryId,
         ];
 
         if ($refundId !== null && $refundId !== '') {

@@ -12,7 +12,10 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Promotion\Aggregate\PromotionDiscount\PromotionDiscountEntity;
+use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -55,7 +58,7 @@ final class LineItem implements \JsonSerializable
         $this->type = LineItemType::PHYSICAL;
     }
 
-    public static function fromDelivery(OrderDeliveryEntity $delivery, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS): self
+    public static function fromDelivery(OrderDeliveryEntity $delivery, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS, ?string $descriptionOverride = null): self
     {
         $shippingMethod = $delivery->getShippingMethod();
         if (! $shippingMethod instanceof ShippingMethodEntity) {
@@ -63,8 +66,10 @@ final class LineItem implements \JsonSerializable
         }
         $shippingCosts = $delivery->getShippingCosts();
 
-        $lineItem = self::createBaseLineItem((string) $shippingMethod->getName(), $taxStatus, $shippingCosts, $currency);
-        $lineItem->setType(LineItemType::SHIPPING);
+        $description = $descriptionOverride ?? (string) $shippingMethod->getName();
+        $lineItem = self::createBaseLineItem($description, $taxStatus, $shippingCosts, $currency);
+        $type = $shippingCosts->getTotalPrice() < 0 ? LineItemType::DISCOUNT : LineItemType::SHIPPING;
+        $lineItem->setType($type);
         $lineItem->setSku(sprintf('mol-delivery-%s', $shippingMethod->getId()));
         $lineItem->setShopwareLineItemId($delivery->getId());
 
@@ -115,6 +120,33 @@ final class LineItem implements \JsonSerializable
         }
 
         return $lineItem;
+    }
+
+    public static function isDeliveryDiscountPlaceholder(OrderLineItemEntity $orderLineItem): bool
+    {
+        if ((string) $orderLineItem->getType() !== PromotionProcessor::LINE_ITEM_TYPE) {
+            return false;
+        }
+
+        $payload = $orderLineItem->getPayload() ?? [];
+
+        return ($payload['discountScope'] ?? null) === PromotionDiscountEntity::SCOPE_DELIVERY;
+    }
+
+    public static function resolveDeliveryDiscountLabel(OrderLineItemCollection $orderLineItems): ?string
+    {
+        $labels = [];
+        foreach ($orderLineItems as $orderLineItem) {
+            if (self::isDeliveryDiscountPlaceholder($orderLineItem)) {
+                $labels[] = (string) $orderLineItem->getLabel();
+            }
+        }
+
+        if (count($labels) === 0) {
+            return null;
+        }
+
+        return implode(', ', $labels);
     }
 
     /**

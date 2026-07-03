@@ -29,6 +29,14 @@ final class CartItemStructTest extends TestCase
         $this->assertSame(0, $struct->getRefunded());
     }
 
+    public function testSetRefunded(): void
+    {
+        $struct = new CartItemStruct($this->shopware);
+        $struct->setRefunded(3);
+
+        $this->assertSame(3, $struct->getRefunded());
+    }
+
     public function testGetShopware(): void
     {
         $struct = new CartItemStruct($this->shopware);

@@ -7,7 +7,7 @@
             <sw-container columns="5fr 1fr" class="order-container-top">
                 <div class="order-container-top-left">
                     <sw-button-group>
-                        <sw-button variant="context" size="small" @click="btnSelectAllItems_Click()">
+                        <sw-button variant="context" size="small" :disabled="isOrderFullyRefunded" @click="btnSelectAllItems_Click()">
                             {{ $tc('mollie-payments.refund-manager.cart.btnSelectAll') }}
                         </sw-button>
                         <sw-button variant="context" size="small" @click="btnResetCartForm_Click()">
@@ -452,7 +452,7 @@
                     <sw-button v-if="isAclRefundAllowed"
                                variant="contrast"
                                :block="true"
-                               :disabled="configVerifyRefund && !checkVerifyRefund"
+                               :disabled="isOrderFullyRefunded || (configVerifyRefund && !checkVerifyRefund)"
                                :class="{ 'tutorial-active' : tutorialPartialAmountRefundVisible || tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || tutorialResetStock || tutorialRefundShipping,'warning':true }"
                                @click="btnRefund_Click()"
                                :isLoading="isRefunding">
@@ -461,7 +461,7 @@
                     <hr style="margin-top:20px;margin-bottom:20px;"/>
                     <sw-button v-if="isAclRefundAllowed"
                                variant="danger" :block="true"
-                               :disabled="configVerifyRefund && !checkVerifyRefund"
+                               :disabled="isOrderFullyRefunded || (configVerifyRefund && !checkVerifyRefund)"
                                @click="btnRefundFull_Click()"
                                :isLoading="isRefunding"
                                :class="{ 'tutorial-active' : tutorialFullRefundVisible || tutorialResetStock || tutorialRefundShipping,'danger':true }">
