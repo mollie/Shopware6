@@ -29,6 +29,11 @@ final class FakeShipOrderRoute extends AbstractShipOrderRoute
         return $this->lastRequest;
     }
 
+    public function wasCalled(): bool
+    {
+        return $this->lastRequest !== null;
+    }
+
     public function getDecorated(): AbstractShipOrderRoute
     {
         throw new \RuntimeException('FakeShipOrderRoute is not decorated.');

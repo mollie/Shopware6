@@ -41,6 +41,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private CustomerEntityBuilder $customerRepository;
     private OrderEntityBuilder $orderRepository;
     private array $orderCustomFields = [];
+    private array $transactionCustomFields = [];
     private array $mollieCustomerIds = [];
     private bool $withNullLineItems = false;
     private bool $withZeroShippingCosts = false;
@@ -106,6 +107,14 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->orderCustomFields = $customFields;
     }
 
+    /**
+     * @param array<string, mixed> $customFields
+     */
+    public function withTransactionCustomFields(array $customFields): void
+    {
+        $this->transactionCustomFields = $customFields;
+    }
+
     public function withMollieCustomerId(string $profileId, string $mollieCustomerId): void
     {
         $this->mollieCustomerIds[$profileId] = $mollieCustomerId;
@@ -142,6 +151,9 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function createTransaction(): void
     {
         $transaction = new OrderTransactionEntity();
+        if (count($this->transactionCustomFields) > 0) {
+            $transaction->setCustomFields([Mollie::EXTENSION => $this->transactionCustomFields]);
+        }
         $currency = $this->getDefaultCurrency();
         $language = $this->getDefaultLanguage();
         $customer = $this->customerRepository->getDefaultCustomer();
