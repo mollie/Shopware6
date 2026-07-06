@@ -20,19 +20,19 @@ use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final readonly class OrderStateHandler implements OrderStateHandlerInterface
+final class OrderStateHandler implements OrderStateHandlerInterface
 {
     /**
      * @param EntityRepository<StateMachineTransitionCollection<StateMachineTransitionEntity>> $stateMachineRepository
      */
     public function __construct(
         #[Autowire(service: 'state_machine_transition.repository')]
-        private EntityRepository $stateMachineRepository,
-        private StateMachineRegistry $stateMachineRegistry,
+        private readonly EntityRepository $stateMachineRepository,
+        private readonly StateMachineRegistry $stateMachineRegistry,
         #[Autowire(service: SettingsService::class)]
-        private AbstractSettingsService $settingsService,
+        private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
     }
 

@@ -44,28 +44,28 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final readonly class PayloadBuilder implements PayloadBuilderInterface
+final class PayloadBuilder implements PayloadBuilderInterface
 {
     /**
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
      */
     public function __construct(
         #[Autowire(service: RouteBuilder::class)]
-        private RouteBuilderInterface $routeBuilder,
+        private readonly RouteBuilderInterface $routeBuilder,
         #[Autowire(service: SettingsService::class)]
-        private AbstractSettingsService $settingsService,
+        private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: MollieGateway::class)]
-        private MollieGatewayInterface $mollieGateway,
+        private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: LineItemAnalyzer::class)]
-        private LineItemAnalyzerInterface $lineItemAnalyzer,
+        private readonly LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: 'customer.repository')]
-        private EntityRepository $customerRepository,
+        private readonly EntityRepository $customerRepository,
         #[Autowire(service: LineItemFilter::class)]
-        private LineItemFilterInterface $lineItemFilter,
+        private readonly LineItemFilterInterface $lineItemFilter,
         #[Autowire(service: RoundingDifferenceFixer::class)]
-        private RoundingDifferenceFixerInterface $roundingDifferenceFixer,
+        private readonly RoundingDifferenceFixerInterface $roundingDifferenceFixer,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
     }
 

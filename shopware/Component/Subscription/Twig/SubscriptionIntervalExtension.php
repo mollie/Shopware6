@@ -11,21 +11,6 @@ use Twig\TwigFilter;
 
 final class SubscriptionIntervalExtension extends AbstractExtension
 {
-    private const SNIPPET_PER_UNIT = [
-        IntervalUnit::DAYS->value => [
-            'singular' => 'molliePayments.subscriptions.options.everyDay',
-            'plural' => 'molliePayments.subscriptions.options.everyDays',
-        ],
-        IntervalUnit::WEEKS->value => [
-            'singular' => 'molliePayments.subscriptions.options.everyWeek',
-            'plural' => 'molliePayments.subscriptions.options.everyWeeks',
-        ],
-        IntervalUnit::MONTHS->value => [
-            'singular' => 'molliePayments.subscriptions.options.everyMonth',
-            'plural' => 'molliePayments.subscriptions.options.everyMonths',
-        ],
-    ];
-
     public function __construct(private readonly TranslatorInterface $translator)
     {
     }
@@ -45,15 +30,9 @@ final class SubscriptionIntervalExtension extends AbstractExtension
 
         $interval = $product->getInterval();
         $value = $interval->getIntervalValue();
-        $unit = $interval->getIntervalUnit()->value;
+        $snippets = $this->snippetsForUnit($interval->getIntervalUnit());
 
-        if (! isset(self::SNIPPET_PER_UNIT[$unit])) {
-            return '';
-        }
-
-        $snippetKey = $value === 1
-            ? self::SNIPPET_PER_UNIT[$unit]['singular']
-            : self::SNIPPET_PER_UNIT[$unit]['plural'];
+        $snippetKey = $value === 1 ? $snippets['singular'] : $snippets['plural'];
 
         $text = $this->translator->trans($snippetKey, ['%value%' => $value]);
 
@@ -66,5 +45,26 @@ final class SubscriptionIntervalExtension extends AbstractExtension
         }
 
         return $text;
+    }
+
+    /**
+     * @return array{singular: string, plural: string}
+     */
+    private function snippetsForUnit(IntervalUnit $unit): array
+    {
+        return match ($unit) {
+            IntervalUnit::DAYS => [
+                'singular' => 'molliePayments.subscriptions.options.everyDay',
+                'plural' => 'molliePayments.subscriptions.options.everyDays',
+            ],
+            IntervalUnit::WEEKS => [
+                'singular' => 'molliePayments.subscriptions.options.everyWeek',
+                'plural' => 'molliePayments.subscriptions.options.everyWeeks',
+            ],
+            IntervalUnit::MONTHS => [
+                'singular' => 'molliePayments.subscriptions.options.everyMonth',
+                'plural' => 'molliePayments.subscriptions.options.everyMonths',
+            ],
+        };
     }
 }

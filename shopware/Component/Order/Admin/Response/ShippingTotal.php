@@ -5,14 +5,14 @@ namespace Mollie\Shopware\Component\Order\Admin\Response;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
-final readonly class ShippingTotal implements \JsonSerializable
+final class ShippingTotal implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
     public function __construct(
-        public string $amount,
-        public int $quantity,
-        public int $shippable,
+        public readonly string $amount,
+        public readonly int $quantity,
+        public readonly int $shippable,
     ) {
     }
 }
