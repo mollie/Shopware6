@@ -36,10 +36,17 @@ final class EntityExtensionsTest extends TestCase
     /**
      * @param class-string<EntityExtension> $extensionClass
      * @param class-string $expectedDefinitionClass
+     * @param class-string $expectedReferenceClass
      */
     #[DataProvider('extensionProvider')]
-    public function testGetDefinitionClassReturnsExpectedDefinition(string $extensionClass, string $expectedDefinitionClass, string $expectedEntityName): void
-    {
+    public function testGetDefinitionClassReturnsExpectedDefinition(
+        string $extensionClass,
+        string $expectedDefinitionClass,
+        string $expectedEntityName,
+        string $expectedPropertyName,
+        string $expectedReferenceClass,
+        bool $expectedCascadeDelete
+    ): void {
         $extension = new $extensionClass();
 
         $this->assertSame($expectedDefinitionClass, $extension->getDefinitionClass());
