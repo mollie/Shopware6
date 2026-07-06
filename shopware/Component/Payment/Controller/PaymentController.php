@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\Controller;
 
 use Mollie\Shopware\Component\FailureMode\PaymentPageFailedEvent;
-use Mollie\Shopware\Component\Payment\Route\AbstractReturnRoute;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
-use Mollie\Shopware\Component\Payment\Route\ReturnRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
@@ -27,8 +27,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class PaymentController extends StorefrontController
 {
     public function __construct(
-        #[Autowire(service: ReturnRoute::class)]
-        private AbstractReturnRoute $returnRoute,
+        #[Autowire(service: MollieGateway::class)]
+        private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: WebhookRoute::class)]
         private AbstractWebhookRoute $webhookRoute,
         #[Autowire(service: SettingsService::class)]
@@ -49,9 +49,8 @@ final class PaymentController extends StorefrontController
             'salesChannelId' => $salesChannelId,
         ];
         $this->logger->debug('Returning from Payment Provider', $logData);
-        $response = $this->returnRoute->return($transactionId, $salesChannelContext->getContext());
-        $paymentStatus = $response->getPaymentStatus();
-        $payment = $response->getPayment();
+        $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $salesChannelContext->getContext());
+        $paymentStatus = $payment->getStatus();
 
         $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
 
@@ -75,7 +74,7 @@ final class PaymentController extends StorefrontController
             }
         }
 
-        $query = (string) parse_url($response->getFinalizeUrl(), PHP_URL_QUERY);
+        $query = (string) parse_url($payment->getFinalizeUrl(), PHP_URL_QUERY);
         $queryParameters = [];
         parse_str($query, $queryParameters);
         $this->logger->info('Call shopware finalize transaction', $logData);

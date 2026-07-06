@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -29,14 +30,14 @@ final class ReturnRoute extends AbstractReturnRoute
         throw new DecorationPatternException(self::class);
     }
 
-    #[Route(path: '/api/mollie/payment/return/{transactionId}',name: 'api.mollie.payment-return', methods: ['GET', 'POST'])]
-    public function return(string $transactionId, Context $context): ReturnRouteResponse
+    #[Route(path: '/api/mollie/payment/return/{transactionId}', name: 'api.mollie.payment-return', methods: ['GET', 'POST'])]
+    public function return(string $transactionId, Context $context): RedirectResponse
     {
         $this->logger->debug('Return route opened',[
             'transactionId' => $transactionId,
         ]);
         $payment = $this->mollieGateway->getPaymentByTransactionId($transactionId, $context);
 
-        return new ReturnRouteResponse($payment);
+        return new RedirectResponse($payment->getFinalizeUrl());
     }
 }
