@@ -6,14 +6,14 @@ namespace Mollie\Shopware\Component\Support\Attachment;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
-final readonly class Attachment implements \JsonSerializable
+final class Attachment implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
     public function __construct(
-        public string $content,
-        public string $fileName,
-        public string $mimeType,
+        public readonly string $content,
+        public readonly string $fileName,
+        public readonly string $mimeType,
     ) {
     }
 }

@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Order\Admin\Response;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
-final readonly class OrderDetailsResponse implements \JsonSerializable
+final class OrderDetailsResponse implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
@@ -16,19 +16,19 @@ final readonly class OrderDetailsResponse implements \JsonSerializable
      * @param array<string, CancelStatusEntry> $cancelItem
      */
     public function __construct(
-        public string $mollieId,
-        public ?string $thirdPartyPaymentId,
-        public ?array $creditCard,
-        public ?array $paypal,
-        public ?array $bankTransfer,
-        public ?string $checkoutUrl,
-        public bool $isSubscription,
-        public ?string $subscriptionId,
-        public bool $subscriptionEnabled,
-        public RefundManagerConfig $refundManager,
-        public ShippingData $shipping,
-        public array $cancelItem,
-        public bool $isMollieOrder = true,
+        public readonly string $mollieId,
+        public readonly ?string $thirdPartyPaymentId,
+        public readonly ?array $creditCard,
+        public readonly ?array $paypal,
+        public readonly ?array $bankTransfer,
+        public readonly ?string $checkoutUrl,
+        public readonly bool $isSubscription,
+        public readonly ?string $subscriptionId,
+        public readonly bool $subscriptionEnabled,
+        public readonly RefundManagerConfig $refundManager,
+        public readonly ShippingData $shipping,
+        public readonly array $cancelItem,
+        public readonly bool $isMollieOrder = true,
     ) {
     }
 }
