@@ -32,6 +32,7 @@
 - Geändert: Das Storefront-JavaScript wurde auf natives Shopware-JavaScript umgestellt.
 - Behoben: Gutschriften bei Netto-Bestellungen werden nicht mehr mit einer zusätzlichen MwSt.-Schicht versehen.
 - Behoben: Kompatibilität mit dem Klarna Payment Plugin
+- Hinzugefügt: Zahlungsart Wero.
 
 # 4.25.1
 - Behoben: Kompatibilität mit Shopware 6.7.11.0 – Tippfehler im ISO-Code der slowenischen Snippet-Sprache korrigiert, der ab dieser Version von Shopware validiert wird.

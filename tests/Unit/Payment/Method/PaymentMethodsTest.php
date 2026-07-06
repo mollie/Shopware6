@@ -42,6 +42,7 @@ use Mollie\Shopware\Component\Payment\Method\TrustlyPayment;
 use Mollie\Shopware\Component\Payment\Method\TwintPayment;
 use Mollie\Shopware\Component\Payment\Method\VippsPayment;
 use Mollie\Shopware\Component\Payment\Method\VoucherPayment;
+use Mollie\Shopware\Component\Payment\Method\WeroPayment;
 use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
 use Mollie\Shopware\Unit\Payment\Fake\FakePay;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -86,6 +87,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 #[CoversClass(TwintPayment::class)]
 #[CoversClass(VippsPayment::class)]
 #[CoversClass(VoucherPayment::class)]
+#[CoversClass(WeroPayment::class)]
 final class PaymentMethodsTest extends TestCase
 {
     #[DataProvider('providePaymentMethods')]
@@ -138,6 +140,7 @@ final class PaymentMethodsTest extends TestCase
             'twint' => [TwintPayment::class, PaymentMethod::TWINT, 'TWINT'],
             'vipps' => [VippsPayment::class, PaymentMethod::VIPPS, 'Vipps'],
             'voucher' => [VoucherPayment::class, PaymentMethod::VOUCHER, 'Voucher'],
+            'wero' => [WeroPayment::class, PaymentMethod::WERO, 'Wero'],
         ];
     }
 
