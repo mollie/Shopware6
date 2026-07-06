@@ -43,6 +43,8 @@ function beforeEach(device) {
             const shopConfig = new ShopConfiguration();
             const pluginConfig = new PluginConfiguration();
             pluginConfig.setSubscriptionIndicator(true);
+            pluginConfig.setSubscriptionPriceUpdateMode('auto');
+            pluginConfig.setSubscriptionPriceUpdateNoticeDays(14);
 
             configAction.configureEnvironment(shopConfig, pluginConfig);
             beforeAllCalled = true;
