@@ -71,7 +71,7 @@ final class RouteBuilder implements RouteBuilderInterface
     {
         $routeName = 'frontend.mollie.paypal-express.finish';
         if ($this->isStoreApiRequest()) {
-            $routeName = 'astore-api.mollie.paypal-express.checkout.finish';
+            $routeName = 'store-api.mollie.paypal-express.checkout.finish';
         }
 
         return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
