@@ -8,7 +8,7 @@ use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\IpUtils;
 
-#[AsMonologProcessor(channel: 'mollie')]
+#[AsMonologProcessor(channel: 'mollie', priority: -100)]
 final class RecordAnonymizer implements ProcessorInterface
 {
     private const URL_SLUG = '/payment/finalize-transaction';
