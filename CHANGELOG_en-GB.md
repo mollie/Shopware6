@@ -1,3 +1,6 @@
+# unreleased
+- Fixed: Automatic shipment no longer attempts a Mollie API call when a delivery state changes on an order whose latest transaction is not a Mollie payment.
+
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.
 - Added: Uninstalling the plugin with the "Remove all data" option now deletes all Mollie data.

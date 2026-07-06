@@ -1,3 +1,6 @@
+# unreleased
+- Behoben: Der automatische Versand versucht keinen Mollie-API-Aufruf mehr, wenn sich der Lieferstatus einer Bestellung ändert, deren letzte Transaktion keine Mollie-Zahlung ist.
+
 # 5.0.0
 - Hinweis: Durch Autoloader-Caching kann beim Hochladen/Update des Plugins ein Fehler erscheinen. Dieser kann ignoriert werden.
 - Hinzugefügt: Beim Deinstallieren des Plugins mit der Option „Alle Daten löschen" werden nun alle Mollie-Daten gelöscht.

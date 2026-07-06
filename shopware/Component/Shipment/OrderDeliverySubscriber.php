@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Shipment;
 
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
+use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -58,6 +61,10 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
 
         $criteria = new Criteria([$orderDeliveryId]);
         $criteria->addAssociation('order');
+        $criteria->getAssociation('order.transactions')
+            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
+            ->setLimit(1)
+        ;
 
         $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
@@ -74,6 +81,13 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         }
 
         if (! $this->settingsService->getPaymentSettings($order->getSalesChannelId())->isAutomaticShipment()) {
+            return;
+        }
+
+        // Only ship via the Mollie API when the order's latest transaction is actually a Mollie payment.
+        // Otherwise a delivery state change on a non-Mollie order would trigger an API call and fail.
+        $latestTransaction = $order->getTransactions()?->first();
+        if ($latestTransaction === null || ! $latestTransaction->getExtension(Mollie::EXTENSION) instanceof Payment) {
             return;
         }
 
