@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Payment\Action;
 use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\Action\Pay;
+use Mollie\Shopware\Component\Payment\LineCollectionBuilder;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -129,7 +130,7 @@ final class PayTest extends TestCase
         $lineItemAnalyzer = new LineItemAnalyzer();
         $lineItemFilter = new LineItemFilter();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
-        $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,$lineItemFilter,$roundingDifferenceFixer,$logger);
+        $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,new LineCollectionBuilder($lineItemFilter),$roundingDifferenceFixer,$logger);
 
         $request = new \Symfony\Component\HttpFoundation\Request();
         $request->setSession(new \Symfony\Component\HttpFoundation\Session\Session(

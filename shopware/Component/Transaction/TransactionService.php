@@ -72,6 +72,7 @@ final class TransactionService implements TransactionServiceInterface
         $transactionsAssociation->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
         $transactionsAssociation->setLimit(1);
         $criteria->addAssociation('paymentMethod');
+        $criteria->addAssociation('stateMachineState');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);
         $transactionEntity = $searchResult->first();

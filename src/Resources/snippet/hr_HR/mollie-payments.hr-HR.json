@@ -57,7 +57,10 @@
                 "error": "Plaćanje nije uspjelo",
                 "failed": "Plaćanje nije uspjelo ili je otkazano. Biti ćete preusmjereni na Mollie, gdje možete dovršiti plaćanje metodom po izboru."
             },
-            "redirecting": "Preusmjeravamo vas na: "
+            "redirecting": "Preusmjeravamo vas na: ",
+            "paymentLink": {
+                "alreadyPaid": "This order has already been paid."
+            }
         },
         "payments": {
             "applePayDirect": {

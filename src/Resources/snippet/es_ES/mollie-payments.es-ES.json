@@ -57,7 +57,10 @@
                 "error": "Pago fallido",
                 "failed": "El pago ha sido rechazado o cancelado. Serás redirigido a Mollie, donde puedes finalizar tu pago con el método seleccionado. "
             },
-            "redirecting": "Redirigiéndo a: "
+            "redirecting": "Redirigiéndo a: ",
+            "paymentLink": {
+                "alreadyPaid": "This order has already been paid."
+            }
         },
         "payments": {
             "applePayDirect": {

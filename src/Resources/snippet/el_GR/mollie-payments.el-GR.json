@@ -57,7 +57,10 @@
                 "error": "Η πληρωμή απέτυχε",
                 "failed": "Η πληρωμή απέτυχε ή ακυρώθηκε. Θα ανακατευθυνθείτε στο Mollie, όπου μπορείτε να ολοκληρώσετε την πληρωμή σας με τη μέθοδο της επιλογής σας."
             },
-            "redirecting": "Ανακατεύθυνση σε: "
+            "redirecting": "Ανακατεύθυνση σε: ",
+            "paymentLink": {
+                "alreadyPaid": "This order has already been paid."
+            }
         },
         "payments": {
             "applePayDirect": {

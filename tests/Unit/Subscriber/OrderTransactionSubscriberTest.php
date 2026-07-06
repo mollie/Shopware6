@@ -21,6 +21,7 @@ final class OrderTransactionSubscriberTest extends TestCase
         $transaction = $this->buildTransaction([
             'id' => 'tr_xxx',
             'method' => 'paypal',
+            'paymentLinkId' => 'pl_123',
             'paypalPayerId' => 'PAYER-1',
             'creditCardLabel' => 'VISA',
             'creditCardNumber' => '1234',
@@ -34,6 +35,7 @@ final class OrderTransactionSubscriberTest extends TestCase
 
         $payment = $transaction->getExtension(Mollie::EXTENSION);
         $this->assertInstanceOf(Payment::class, $payment);
+        $this->assertSame('pl_123', $payment->getPaymentLinkId());
         $this->assertSame(['payerId' => 'PAYER-1'], $payment->getPaypalDetails());
         $this->assertSame(
             ['label' => 'VISA', 'number' => '1234', 'holder' => 'John Doe'],

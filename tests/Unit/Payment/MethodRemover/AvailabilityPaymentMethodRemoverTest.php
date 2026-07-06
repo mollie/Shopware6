@@ -8,6 +8,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Payment\MethodRemover\AvailabilityPaymentMethodRemover;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -76,7 +77,7 @@ final class AvailabilityPaymentMethodRemoverTest extends TestCase
             new Response(200, [], (string) json_encode(['_embedded' => ['methods' => $methods]])),
         ]);
         $client = new Client(['handler' => HandlerStack::create($mockHandler)]);
-        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new PaymentLinkGateway(new FakeClientFactory($client), new NullLogger()), new NullLogger());
 
         $handlerLocator = new PaymentHandlerLocator([
             new FakePaymentMethodHandler(),

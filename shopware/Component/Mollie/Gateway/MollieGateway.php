@@ -43,6 +43,8 @@ final class MollieGateway implements MollieGatewayInterface
         private ClientFactoryInterface $clientFactory,
         #[Autowire(service: TransactionService::class)]
         private TransactionServiceInterface $transactionService,
+        #[Autowire(service: PaymentLinkGateway::class)]
+        private PaymentLinkGatewayInterface $paymentLinkGateway,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -69,6 +71,8 @@ final class MollieGateway implements MollieGatewayInterface
         /** @var ?Payment $mollieTransaction */
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
 
+        $payment = null;
+
         if ($mollieTransaction instanceof Payment) {
             $logData['molliePaymentId'] = $mollieTransaction->getId();
             $this->logger->debug('Transaction has mollie payment data, load additional data from mollie', $logData);
@@ -78,7 +82,19 @@ final class MollieGateway implements MollieGatewayInterface
             $payment->setOrderId($mollieTransaction->getOrderId());
         }
 
-        if ($mollieTransaction === null) {
+        if ($payment === null) {
+            $paymentLinkId = $this->extractPaymentLinkId($transaction);
+            if ($paymentLinkId !== null) {
+                $this->logger->debug('Transaction has a mollie payment link, resolving the payment', $logData);
+                $payment = $this->loadPaymentFromPaymentLink($paymentLinkId, $transactionId, $orderNumber, $salesChannelId);
+                $payment->setPaymentLinkId($paymentLinkId);
+                // Persist the resolved payment so the transaction behaves like any regular Mollie order
+                // from now on (admin, refunds, subsequent webhooks read the payment id directly).
+                $this->transactionService->savePaymentExtension($transactionId, $transactionOrder, $payment, $context);
+            }
+        }
+
+        if ($payment === null) {
             $this->logger->debug('Transaction is without mollie payment data', $logData);
             $payment = $this->repairLegacyTransaction($transaction, $transactionOrder, $context);
             if ($payment === null) {
@@ -472,6 +488,43 @@ final class MollieGateway implements MollieGatewayInterface
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
+    }
+
+    private function extractPaymentLinkId(OrderTransactionEntity $transaction): ?string
+    {
+        $customFields = $transaction->getCustomFields()[Mollie::EXTENSION] ?? null;
+        if ($customFields === null) {
+            $customFields = $transaction->getTranslated()['customFields'][Mollie::EXTENSION] ?? null;
+        }
+
+        $paymentLinkId = $customFields['paymentLinkId'] ?? null;
+
+        return ($paymentLinkId !== null && $paymentLinkId !== '') ? (string) $paymentLinkId : null;
+    }
+
+    private function loadPaymentFromPaymentLink(string $paymentLinkId, string $transactionId, string $orderNumber, string $salesChannelId): Payment
+    {
+        $payments = $this->paymentLinkGateway->listPaymentLinkPayments($paymentLinkId, $orderNumber, $salesChannelId);
+
+        $latest = null;
+        foreach ($payments as $candidate) {
+            if ($latest === null) {
+                $latest = $candidate;
+                continue;
+            }
+
+            $latestCreatedAt = $latest->getCreatedAt();
+            $candidateCreatedAt = $candidate->getCreatedAt();
+            if ($latestCreatedAt === null || ($candidateCreatedAt !== null && $candidateCreatedAt > $latestCreatedAt)) {
+                $latest = $candidate;
+            }
+        }
+
+        if ($latest === null) {
+            throw new TransactionWithoutMollieDataException($transactionId);
+        }
+
+        return $latest;
     }
 
     private function getPaymentByMollieOrderId(string $mollieOrderId, string $orderNumber, string $salesChannelId): Payment

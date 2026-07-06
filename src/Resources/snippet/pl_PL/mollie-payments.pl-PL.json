@@ -57,7 +57,10 @@
                 "error": "Płatność nie powiodła się",
                 "failed": "Płatność nie powiodła się lub została anulowana. Zostaniesz przekierowany na stronę Mollie, gdzie możesz dokończyć swoją płatność, wybierając preferowaną metodę. "
             },
-            "redirecting": "Przekierowywanie do: "
+            "redirecting": "Przekierowywanie do: ",
+            "paymentLink": {
+                "alreadyPaid": "This order has already been paid."
+            }
         },
         "payments": {
             "applePayDirect": {

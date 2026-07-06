@@ -10,10 +10,6 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
-use Mollie\Shopware\Component\Mollie\LineItem;
-use Mollie\Shopware\Component\Mollie\LineItemCollection;
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
-use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\Mode;
@@ -61,8 +57,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
         private readonly LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: 'customer.repository')]
         private readonly EntityRepository $customerRepository,
-        #[Autowire(service: LineItemFilter::class)]
-        private readonly LineItemFilterInterface $lineItemFilter,
+        #[Autowire(service: LineCollectionBuilder::class)]
+        private readonly LineCollectionBuilderInterface $lineCollectionBuilder,
         #[Autowire(service: RoundingDifferenceFixer::class)]
         private readonly RoundingDifferenceFixerInterface $roundingDifferenceFixer,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -118,16 +114,11 @@ final class PayloadBuilder implements PayloadBuilderInterface
         $returnUrl = $this->routeBuilder->getReturnUrl($transactionId);
         $webhookUrl = $this->routeBuilder->getWebhookUrl($transactionId);
 
-        $lineItemCollection = new LineItemCollection();
+        $lineItemCollection = $this->lineCollectionBuilder->build($order, $deliveries, $currency, $taxStatus);
+
         $oderLineItems = $order->getLineItems();
-        $shippingDiscountLabel = $oderLineItems !== null ? LineItem::resolveDeliveryDiscountLabel($oderLineItems) : null;
         $hasSubscriptionLineItem = false;
         if ($oderLineItems !== null) {
-            $filteredLineItems = $oderLineItems->filter($this->lineItemFilter->isItemAllowed(...));
-            foreach ($filteredLineItems as $lineItem) {
-                $lineItem = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
-                $lineItemCollection->add($lineItem);
-            }
             $subscriptionsEnabled = $this->settingsService->getSubscriptionSettings($salesChannelId)->isEnabled();
             $hasSubscriptionLineItem = $subscriptionsEnabled && $this->lineItemAnalyzer->hasSubscriptionProduct($oderLineItems);
         }
@@ -143,15 +134,6 @@ final class PayloadBuilder implements PayloadBuilderInterface
             ) {
                 $shippingAddress = Address::fromAddress($customer, $deliveryOrderShippingAddress);
             }
-
-            $shippingCosts = $delivery->getShippingCosts()->getTotalPrice();
-            if (round($shippingCosts, 2) === 0.0) {
-                continue;
-            }
-
-            $descriptionOverride = $shippingCosts < 0 ? $shippingDiscountLabel : null;
-            $lineItem = LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride);
-            $lineItemCollection->add($lineItem);
         }
 
         $billingAddress = Address::fromAddress($customer, $billingOrderAddress);

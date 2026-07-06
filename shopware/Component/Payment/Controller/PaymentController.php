@@ -81,6 +81,16 @@ final class PaymentController extends StorefrontController
             }
         }
 
+        if ($payment->getFinalizeUrl() === '') {
+            // Payment link payments have no Shopware finalize token. The webhook already synchronises the
+            // order state, so the customer is sent straight to the order confirmation page.
+            if ($shopwareOrder instanceof OrderEntity) {
+                return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $shopwareOrder->getId()]);
+            }
+
+            return $this->redirectToRoute('frontend.home.page');
+        }
+
         $query = (string) parse_url($payment->getFinalizeUrl(), PHP_URL_QUERY);
         $queryParameters = [];
         parse_str($query, $queryParameters);

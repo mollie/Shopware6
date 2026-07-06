@@ -65,6 +65,8 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?string $orderId = null;
 
+    private ?string $paymentLinkId = null;
+
     public function __construct(private string $id)
     {
         $this->refunds = new RefundCollection();
@@ -527,6 +529,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setOrderId(?string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    public function getPaymentLinkId(): ?string
+    {
+        return $this->paymentLinkId;
+    }
+
+    public function setPaymentLinkId(?string $paymentLinkId): void
+    {
+        $this->paymentLinkId = $paymentLinkId;
     }
 
     public function getAuthenticationId(): ?string

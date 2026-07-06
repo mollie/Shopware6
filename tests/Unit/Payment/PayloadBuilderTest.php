@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
+use Mollie\Shopware\Component\Payment\LineCollectionBuilder;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
@@ -691,6 +692,6 @@ final class PayloadBuilderTest extends TestCase
         $lineItemFilter = new LineItemFilter();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 
-        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, $roundingDifferenceFixer, $logger ?? new NullLogger());
+        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new LineCollectionBuilder($lineItemFilter), $roundingDifferenceFixer, $logger ?? new NullLogger());
     }
 }
