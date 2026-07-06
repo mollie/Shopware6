@@ -1,4 +1,5 @@
-# unreleased
+# Unreleased
+- Behoben: Der Mollie-Bestell-Tab stürzt nicht mehr mit dem Fehler „Store with id swOrderDetail not found" ab, wenn die Bestelldetailseite auf der jeweiligen Shopware-Version nicht als Pinia-Store registriert ist.
 - Behoben: Der automatische Versand versucht keinen Mollie-API-Aufruf mehr, wenn sich der Lieferstatus einer Bestellung ändert, deren letzte Transaktion keine Mollie-Zahlung ist.
 
 # 5.0.0

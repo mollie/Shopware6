@@ -1,4 +1,5 @@
-# unreleased
+# Unreleased
+- Fixed: The Mollie order tab no longer crashes with a "Store with id swOrderDetail not found" error on Shopware versions where the order detail is not registered as a Pinia store.
 - Fixed: Automatic shipment no longer attempts a Mollie API call when a delivery state changes on an order whose latest transaction is not a Mollie payment.
 
 # 5.0.0
