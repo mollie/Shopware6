@@ -33,6 +33,7 @@
 - Changed: Storefront JavaScript has been migrated to native Shopware JavaScript.
 - Fixed: Adding credit notes to net orders no longer inflates the total with an extra VAT layer.
 - Fixed: Compatibility with the Klarna Payment plugin
+- Added: Wero payment method.
 
 # 4.25.1
 - Fixed: Compatibility with Shopware 6.7.11.0 – corrected a typo in the Slovenian snippet ISO code, which is now validated by Shopware.

@@ -72,6 +72,7 @@ const payments = [
     {caseId: 'C4255360', key: 'bizum', name: 'Bizum', sanity: false},
     {caseId: 'C4553498', key: 'vipps', name: 'Vipps', sanity: false},
     {caseId: 'C4553500', key: 'mobilepay', name: 'MobilePay', sanity: false},
+    {caseId: '', key: 'wero', name: 'Wero', sanity: false},
     // swish requires a specific currency, we cannot add it here for now (will be manually tested)
     // {caseId: '', key: 'swish', name: 'Swish', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now

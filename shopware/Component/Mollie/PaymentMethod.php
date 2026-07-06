@@ -43,4 +43,5 @@ enum PaymentMethod: string
 
     case VIPPS = 'vipps';
     case VOUCHER = 'voucher';
+    case WERO = 'wero';
 }

@@ -42,6 +42,16 @@ Feature: Basic payment checkout
       | vipps         | MOL_REGULAR   | 1        | paid          | NO             | NOK      |
       | mobilepay     | MOL_REGULAR   | 1        | paid          | DK             | DKK      |
 
+  Scenario: wero payment with pending status leads to success
+    Given payment method "wero" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "wero"
+    And select payment status "pending"
+    Then i see success page
+    And order payment status is "unconfirmed"
+
   Scenario Outline: payment success with issuer
     Given payment method "<paymentMethod>" exists and active
     And i select "<billingCountry>" as billing country
