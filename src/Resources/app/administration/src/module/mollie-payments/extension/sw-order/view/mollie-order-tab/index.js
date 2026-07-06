@@ -168,12 +168,13 @@ Component.register('mollie-order-tab', {
     methods: {
         getSwOrderDetail() {
             // eslint-disable-next-line no-undef
-            return (
-                Shopware.Store?.get?.('swOrderDetail') ??
+            if (Shopware.Store?.list?.().includes('swOrderDetail')) {
                 // eslint-disable-next-line no-undef
-                Shopware.State.get('swOrderDetail') ??
-                null
-            );
+                return Shopware.Store.get('swOrderDetail');
+            }
+
+            // eslint-disable-next-line no-undef
+            return Shopware.State?.get?.('swOrderDetail') ?? null;
         },
 
         createdComponent() {
