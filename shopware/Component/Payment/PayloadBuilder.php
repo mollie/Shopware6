@@ -18,6 +18,7 @@ use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\Mandate;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\PhoneNumber;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixerInterface;
 use Mollie\Shopware\Component\Mollie\SequenceType;
@@ -46,11 +47,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class PayloadBuilder implements PayloadBuilderInterface
 {
-    /**
-     * E.164 phone numbers start with a "+", a non-zero country code and hold at most 15 digits.
-     */
-    private const E164_PATTERN = '/^\+[1-9]\d{1,14}$/';
-
     /**
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
      */
@@ -160,9 +156,6 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
         $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
 
-        $this->removeInvalidPhoneNumber($shippingAddress, $logData);
-        $this->removeInvalidPhoneNumber($billingAddress, $logData);
-
         $orderAmount = Money::fromOrder($order, $currency);
 
         if ($paymentSettings->isFixRoundingDiffEnabled()) {
@@ -225,6 +218,10 @@ final class PayloadBuilder implements PayloadBuilderInterface
         /** @var CreatePayment $createPaymentStruct */
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $customer);
 
+        // after the handler parameters, so numbers set there (e.g. Bancomat Pay/Bizum) are covered too
+        $this->normalizePhoneNumber($createPaymentStruct->getShippingAddress(), $logData);
+        $this->normalizePhoneNumber($createPaymentStruct->getBillingAddress(), $logData);
+
         $logData['payload'] = $createPaymentStruct->toArray();
         $this->logger->info('Payment payload created for mollie API', $logData);
 
@@ -255,6 +252,13 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
         /** @var CreateOrder $createOrder */
         $createOrder = $paymentHandler->applyPaymentSpecificParameters($createOrder, $dataBag, $transactionData->getCustomer());
+
+        $orderLogData = ['orderNumber' => $createPayment->getShopwareOrderNumber()];
+        $orderShippingAddress = $createOrder->getShippingAddress();
+        if ($orderShippingAddress !== null) {
+            $this->normalizePhoneNumber($orderShippingAddress, $orderLogData);
+        }
+        $this->normalizePhoneNumber($createOrder->getBillingAddress(), $orderLogData);
 
         $this->logger->info('Order payload created for mollie API', [
             'orderNumber' => $createPayment->getShopwareOrderNumber(),
@@ -294,25 +298,32 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
     /**
      * Mollie rejects phone numbers that are not in E.164 format and fails the whole payment.
-     * To keep the checkout working we drop an invalid number from the payload and only log a
-     * masked hint (never the full number) for troubleshooting.
+     * To keep the checkout working we first try to normalize the number to E.164 (most
+     * customers enter their number in national format) and drop it from the payload if it
+     * cannot be normalized. Only a masked hint (never the full number) is logged.
      *
      * @param array<string, mixed> $logData
      */
-    private function removeInvalidPhoneNumber(Address $address, array $logData): void
+    private function normalizePhoneNumber(Address $address, array $logData): void
     {
         $phone = $address->getPhone();
-        if ($phone === '') {
+        if ($phone === '' || PhoneNumber::isValidE164($phone)) {
             return;
         }
 
-        if (preg_match(self::E164_PATTERN, $phone) === 1) {
+        $logData['phoneHint'] = mb_substr($phone, 0, 2) . '***';
+
+        $normalized = PhoneNumber::toE164($phone, $address->getCountry());
+        if ($normalized !== '') {
+            $address->setPhone($normalized);
+
+            $this->logger->info('Phone number was normalized to E.164 format for the mollie payload', $logData);
+
             return;
         }
 
         $address->setPhone('');
 
-        $logData['phoneHint'] = mb_substr($phone, 0, 2) . '***';
         $this->logger->warning('Phone number is not in E.164 format and was removed from the mollie payload to prevent a payment failure', $logData);
     }
 

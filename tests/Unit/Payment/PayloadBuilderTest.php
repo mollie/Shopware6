@@ -25,6 +25,7 @@ use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePhoneAwarePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeRecurringAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeSubscriptionAwarePaymentHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
@@ -543,7 +544,7 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('+4930123456789', $array['shippingAddress']['phone']);
     }
 
-    public function testBuildRemovesInvalidPhoneNumberAndLogsWarning(): void
+    public function testBuildNormalizesNationalPhoneNumber(): void
     {
         $logger = new FakeLogger();
         $builder = $this->createBuilder(logger: $logger);
@@ -555,13 +556,48 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
 
         $array = $actual->toArray();
+        $this->assertSame('+4930123456', $array['billingAddress']['phone']);
+        $this->assertSame('+4930123456', $array['shippingAddress']['phone']);
+
+        $this->assertTrue($logger->hasRecordThatContains(LogLevel::INFO, 'normalized to E.164'));
+        foreach ($logger->getRecords() as $record) {
+            $this->assertStringNotContainsString('030 / 123 456', json_encode($record) ?: '');
+        }
+    }
+
+    public function testBuildRemovesUnfixablePhoneNumberAndLogsWarning(): void
+    {
+        $logger = new FakeLogger();
+        $builder = $this->createBuilder(logger: $logger);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPhoneNumber('call me maybe');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
         $this->assertArrayNotHasKey('phone', $array['billingAddress']);
         $this->assertArrayNotHasKey('phone', $array['shippingAddress']);
 
         $this->assertTrue($logger->hasRecordThatContains(LogLevel::WARNING, 'E.164'));
         foreach ($logger->getRecords() as $record) {
-            $this->assertStringNotContainsString('030 / 123 456', json_encode($record) ?: '');
+            $this->assertStringNotContainsString('call me maybe', json_encode($record) ?: '');
         }
+    }
+
+    public function testBuildNormalizesPhoneNumberSetByPaymentHandler(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $dataBag = new RequestDataBag(['molliePayPhone' => '0171 / 2345678']);
+
+        $actual = $builder->buildPayment($transactionData, new FakePhoneAwarePaymentMethodHandler(), $dataBag, $this->context);
+
+        $array = $actual->toArray();
+        $this->assertSame('+491712345678', $array['billingAddress']['phone']);
     }
 
     public function testBuildOrderReturnsCreateOrderInstance(): void
