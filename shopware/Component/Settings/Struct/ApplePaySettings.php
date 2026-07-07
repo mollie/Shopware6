@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
-use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestriction;
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
@@ -30,10 +29,7 @@ final class ApplePaySettings extends Struct
     {
         $applePayDirectEnabled = $settings[self::KEY_APPLE_PAY_DIRECT_ENABLED] ?? false;
         $visibilityRestrictionsArray = $settings[self::KEY_RESTRICTIONS] ?? [];
-        $visibilityRestrictions = new VisibilityRestrictionCollection();
-        foreach ($visibilityRestrictionsArray as $visibilityRestriction) {
-            $visibilityRestrictions->add(VisibilityRestriction::from($visibilityRestriction));
-        }
+        $visibilityRestrictions = VisibilityRestrictionCollection::fromArray($visibilityRestrictionsArray);
         $allowedDomainList = $settings[self::KEY_ALLOWED_DOMAIN_LIST] ?? '';
         $allowedDomainListArray = explode(',', $allowedDomainList);
 

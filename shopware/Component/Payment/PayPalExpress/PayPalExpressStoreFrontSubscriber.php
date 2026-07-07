@@ -48,7 +48,7 @@ final class PayPalExpressStoreFrontSubscriber implements EventSubscriberInterfac
 
             $event->setParameter('mollie_paypalexpress_style', $paypalExpressSettings->getStyle());
             $event->setParameter('mollie_paypalexpress_shape', $paypalExpressSettings->getShape());
-            $event->setParameter('mollie_paypalexpress_restrictions', $paypalExpressSettings->getRestrictions());
+            $event->setParameter('mollie_paypalexpress_restrictions', $paypalExpressSettings->getRestrictions()->toArray());
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to assign paypal express data to storefront', [
                 'error' => $exception->getMessage(),

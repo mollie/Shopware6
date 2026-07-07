@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings\Struct;
 
+use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
 
@@ -15,13 +16,11 @@ final class PayPalExpressSettings extends Struct
 
     private int $shape = 0;
     private int $style = 0;
-    /**
-     * @var array<string>
-     */
-    private array $restrictions = [];
+    private VisibilityRestrictionCollection $restrictions;
 
     public function __construct(private bool $enabled)
     {
+        $this->restrictions = new VisibilityRestrictionCollection();
     }
 
     public function getEnabled(): bool
@@ -49,18 +48,12 @@ final class PayPalExpressSettings extends Struct
         $this->style = $style;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getRestrictions(): array
+    public function getRestrictions(): VisibilityRestrictionCollection
     {
         return $this->restrictions;
     }
 
-    /**
-     * @param array<string> $restrictions
-     */
-    public function setRestrictions(array $restrictions): void
+    public function setRestrictions(VisibilityRestrictionCollection $restrictions): void
     {
         $this->restrictions = $restrictions;
     }

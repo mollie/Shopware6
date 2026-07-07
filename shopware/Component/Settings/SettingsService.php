@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings;
 
+use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
@@ -109,7 +110,7 @@ final class SettingsService extends AbstractSettingsService
         $settings->setStyle((int) $style);
         $settings->setShape((int) $shape);
 
-        $settings->setRestrictions($restrictions);
+        $settings->setRestrictions(VisibilityRestrictionCollection::fromArray($restrictions));
 
         $this->settingsCache[$cacheKey] = $settings;
 
