@@ -18,6 +18,8 @@ final class CreatePaymentLink
     private ?Address $billingAddress = null;
     private ?Address $shippingAddress = null;
     private ?LineItemCollection $lines = null;
+    private SequenceType $sequenceType = SequenceType::ONEOFF;
+    private ?string $customerId = null;
     /**
      * @var string[]
      */
@@ -27,6 +29,23 @@ final class CreatePaymentLink
         private readonly string $description,
         private readonly Money $amount,
     ) {
+    }
+
+    /**
+     * Derives a payment link payload from an already built payment payload so the shared
+     * fields (addresses, lines, urls) only have to be assembled once in the PayloadBuilder.
+     * The allowed methods are intentionally not copied and are set by the builder afterwards.
+     */
+    public static function fromCreatePayment(CreatePayment $payment): self
+    {
+        $paymentLink = new self($payment->getDescription(), $payment->getAmount());
+        $paymentLink->setRedirectUrl($payment->getRedirectUrl());
+        $paymentLink->setWebhookUrl($payment->getWebhookUrl());
+        $paymentLink->setBillingAddress($payment->getBillingAddress());
+        $paymentLink->setShippingAddress($payment->getShippingAddress());
+        $paymentLink->setLines($payment->getLines());
+
+        return $paymentLink;
     }
 
     public function getDescription(): string
@@ -89,6 +108,26 @@ final class CreatePaymentLink
         $this->lines = $lines;
     }
 
+    public function getSequenceType(): SequenceType
+    {
+        return $this->sequenceType;
+    }
+
+    public function setSequenceType(SequenceType $sequenceType): void
+    {
+        $this->sequenceType = $sequenceType;
+    }
+
+    public function getCustomerId(): ?string
+    {
+        return $this->customerId;
+    }
+
+    public function setCustomerId(string $customerId): void
+    {
+        $this->customerId = $customerId;
+    }
+
     /**
      * @return string[]
      */
@@ -133,6 +172,10 @@ final class CreatePaymentLink
         }
         if (count($this->allowedMethods) > 0) {
             $data['allowedMethods'] = $this->allowedMethods;
+        }
+        $data['sequenceType'] = $this->sequenceType->value;
+        if ($this->customerId !== null && $this->customerId !== '') {
+            $data['customerId'] = $this->customerId;
         }
 
         return $data;

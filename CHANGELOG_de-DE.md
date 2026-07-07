@@ -1,5 +1,8 @@
 # Unreleased
 - Hinzugefügt: Zahlungsart Wero.
+- Hinzugefügt: Payment-Links - eine Bezahl-Link-URL für eine Bestellung, über die der Kunde die Zahlung mit Mollie abschließen kann.
+- Hinzugefügt: Ein Beispiel-Mail-Template („Zahlungslink (Mollie)"), das die Payment-Link-URL rendert und in eigene Bestellmails übernommen werden kann.
+- Hinzugefügt: ModifyCreatePaymentLinkPayloadEvent, um den Payment-Link-Request vor dem Senden an Mollie anzupassen.
 - Geändert: Der Zahlungsstatus-Webhook überspringt den Statuswechsel, wenn die Transaktion bereits im Zielstatus ist.
 - Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
 - Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.

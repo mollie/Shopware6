@@ -25,6 +25,7 @@ use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePaymentLinkMethodResolver;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePhoneAwarePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeRecurringAwarePaymentHandler;
@@ -692,6 +693,6 @@ final class PayloadBuilderTest extends TestCase
         $lineItemFilter = new LineItemFilter();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 
-        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new LineCollectionBuilder($lineItemFilter), $roundingDifferenceFixer, $logger ?? new NullLogger());
+        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), new LineCollectionBuilder($lineItemFilter), $roundingDifferenceFixer, new FakePaymentLinkMethodResolver(), $logger ?? new NullLogger());
     }
 }

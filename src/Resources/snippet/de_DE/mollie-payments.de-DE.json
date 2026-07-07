@@ -57,10 +57,7 @@
                 "error": "Zahlung fehlgeschlagen",
                 "failed": "Die Zahlung ist fehlgeschlagen oder wurde storniert. Sie werden zu Mollie weitergeleitet, wo Sie Ihre Zahlung mit der Methode Ihrer Wahl abschließen können. "
             },
-            "redirecting": "Leiten Sie weiter zu: ",
-            "paymentLink": {
-                "alreadyPaid": "Diese Bestellung wurde bereits bezahlt."
-            }
+            "redirecting": "Leiten Sie weiter zu: "
         },
         "payments": {
             "applePayDirect": {

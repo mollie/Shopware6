@@ -57,6 +57,19 @@ final class PaymentMethodRepository implements PaymentMethodRepositoryInterface
         return $this->paymentMethodRepository->search($criteria, $context)->getEntities();
     }
 
+    public function findActiveMollieMethods(string $salesChannelId, Context $context): PaymentMethodCollection
+    {
+        $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('pluginId', $pluginId));
+        $criteria->addFilter(new EqualsFilter('active', true));
+        $criteria->addFilter(new EqualsFilter('salesChannels.id', $salesChannelId));
+
+        /** @var PaymentMethodCollection<PaymentMethodEntity> */
+        return $this->paymentMethodRepository->search($criteria, $context)->getEntities();
+    }
+
     private function getCriteria(string $salesChannelId): Criteria
     {
         $criteria = new Criteria();

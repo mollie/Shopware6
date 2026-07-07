@@ -57,10 +57,7 @@
                 "error": "Platba zlyhala",
                 "failed": "Platba zlyhala alebo bola zrušená. Budete presmerovaný na Mollie, kde môžete dokončiť platbu zvolenou metódou. "
             },
-            "redirecting": "Presmerovávame vás na: ",
-            "paymentLink": {
-                "alreadyPaid": "This order has already been paid."
-            }
+            "redirecting": "Presmerovávame vás na: "
         },
         "payments": {
             "applePayDirect": {

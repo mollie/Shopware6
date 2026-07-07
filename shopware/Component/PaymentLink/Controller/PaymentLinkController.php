@@ -5,11 +5,13 @@ namespace Mollie\Shopware\Component\PaymentLink\Controller;
 
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGatewayInterface;
-use Mollie\Shopware\Component\PaymentLink\PaymentLinkBuilder;
-use Mollie\Shopware\Component\PaymentLink\PaymentLinkBuilderInterface;
+use Mollie\Shopware\Component\Payment\PayloadBuilder;
+use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
+use Mollie\Shopware\Component\PaymentLink\Event\ModifyCreatePaymentLinkPayloadEvent;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -32,12 +34,14 @@ final class PaymentLinkController extends StorefrontController
     public function __construct(
         #[Autowire(service: TransactionService::class)]
         private readonly TransactionServiceInterface $transactionService,
-        #[Autowire(service: PaymentLinkBuilder::class)]
-        private readonly PaymentLinkBuilderInterface $paymentLinkBuilder,
+        #[Autowire(service: PayloadBuilder::class)]
+        private readonly PayloadBuilderInterface $payloadBuilder,
         #[Autowire(service: PaymentLinkGateway::class)]
         private readonly PaymentLinkGatewayInterface $paymentLinkGateway,
         #[Autowire(service: 'order_transaction.repository')]
         private readonly EntityRepository $orderTransactionRepository,
+        #[Autowire(service: 'event_dispatcher')]
+        private readonly EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -59,17 +63,21 @@ final class PaymentLinkController extends StorefrontController
             throw $this->createNotFoundException();
         }
 
-        if (! $this->isTransactionPayable($transactionData->getTransaction())) {
-            $this->addFlash(self::INFO, $this->trans('molliePayments.messages.paymentLink.alreadyPaid'));
-
-            return $this->redirectToRoute('frontend.home.page');
-        }
-
         $order = $transactionData->getOrder();
         $orderNumber = (string) $order->getOrderNumber();
         $salesChannelId = $order->getSalesChannelId();
 
-        $createPaymentLink = $this->paymentLinkBuilder->build($transactionData);
+        if (! $this->isTransactionPayable($transactionData->getTransaction())) {
+            return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $order->getId()]);
+        }
+
+        $createPaymentLink = $this->payloadBuilder->buildPaymentLink($transactionData, $context);
+
+        $payloadEvent = new ModifyCreatePaymentLinkPayloadEvent($createPaymentLink, $context);
+        /** @var ModifyCreatePaymentLinkPayloadEvent $payloadEvent */
+        $payloadEvent = $this->eventDispatcher->dispatch($payloadEvent);
+        $createPaymentLink = $payloadEvent->getPaymentLink();
+
         $paymentLink = $this->paymentLinkGateway->createPaymentLink($createPaymentLink, $orderNumber, $salesChannelId);
 
         // Store the payment link id so the regular webhook and return routes can resolve the payment

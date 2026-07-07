@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
+use Mollie\Shopware\Component\Mollie\CreatePaymentLink;
 use Mollie\Shopware\Component\Mollie\Customer;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
@@ -36,6 +37,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -61,6 +63,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
         private readonly LineCollectionBuilderInterface $lineCollectionBuilder,
         #[Autowire(service: RoundingDifferenceFixer::class)]
         private readonly RoundingDifferenceFixerInterface $roundingDifferenceFixer,
+        #[Autowire(service: PaymentLinkMethodResolver::class)]
+        private readonly PaymentLinkMethodResolverInterface $paymentLinkMethodResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger
     ) {
@@ -68,24 +72,17 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
     public function buildPayment(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreatePayment
     {
+        $createPaymentStruct = $this->buildBasePayment($transactionData);
+
         $transactionId = $transactionData->getTransaction()->getId();
         $order = $transactionData->getOrder();
         $salesChannelId = $order->getSalesChannelId();
         $customer = $transactionData->getCustomer();
-        $currency = $transactionData->getCurrency();
-        $language = $transactionData->getLanguage();
         $salesChannelName = (string) $transactionData->getSalesChannel()->getName();
-        $shippingOrderAddress = $transactionData->getShippingOrderAddress();
-        $billingOrderAddress = $transactionData->getBillingOrderAddress();
-        $deliveries = $transactionData->getDeliveries();
-
-        $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
-        $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
-
-        $customerNumber = $customer->getCustomerNumber();
-        $description = (string) $order->getOrderNumber();
         $orderNumber = (string) $order->getOrderNumber();
         $taxStatus = (string) $order->getTaxStatus();
+
+        $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
         $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
         $profileId = $apiSettings->getProfileId();
 
@@ -101,62 +98,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
             'taxStatus' => $taxStatus,
         ];
 
-        if (mb_strlen($orderNumberFormat) > 0) {
-            $description = str_replace([
-                '{ordernumber}',
-                '{customernumber}'
-            ], [
-                $orderNumber,
-                $customerNumber
-            ], $orderNumberFormat);
-        }
+        $hasSubscriptionLineItem = $this->orderHasSubscription($order, $salesChannelId);
 
-        $returnUrl = $this->routeBuilder->getReturnUrl($transactionId);
-        $webhookUrl = $this->routeBuilder->getWebhookUrl($transactionId);
-
-        $lineItemCollection = $this->lineCollectionBuilder->build($order, $deliveries, $currency, $taxStatus);
-
-        $oderLineItems = $order->getLineItems();
-        $hasSubscriptionLineItem = false;
-        if ($oderLineItems !== null) {
-            $subscriptionsEnabled = $this->settingsService->getSubscriptionSettings($salesChannelId)->isEnabled();
-            $hasSubscriptionLineItem = $subscriptionsEnabled && $this->lineItemAnalyzer->hasSubscriptionProduct($oderLineItems);
-        }
-
-        $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
-
-        foreach ($deliveries as $delivery) {
-            $deliveryOrderShippingAddress = $delivery->getShippingOrderAddress();
-            if (method_exists($order, 'getPrimaryOrderDeliveryId')
-                && $deliveryOrderShippingAddress instanceof OrderAddressEntity
-                && $order->getPrimaryOrderDeliveryId() !== null
-                && $delivery->getId() === $order->getPrimaryOrderDeliveryId()
-            ) {
-                $shippingAddress = Address::fromAddress($customer, $deliveryOrderShippingAddress);
-            }
-        }
-
-        $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
-
-        $orderAmount = Money::fromOrder($order, $currency);
-
-        if ($paymentSettings->isFixRoundingDiffEnabled()) {
-            $lineItemCollection = $this->roundingDifferenceFixer->fixAmountDiff(
-                $orderAmount,
-                $lineItemCollection,
-                $paymentSettings->getFixRoundingDiffName(),
-                $paymentSettings->getFixRoundingDiffSku()
-            );
-        }
-
-        $createPaymentStruct = new CreatePayment($description, $returnUrl, $orderAmount);
-
-        $createPaymentStruct->setBillingAddress($billingAddress);
-        $createPaymentStruct->setShippingAddress($shippingAddress);
-        $createPaymentStruct->setLines($lineItemCollection);
-        $createPaymentStruct->setLocale(Locale::fromLanguage($language));
-        $createPaymentStruct->setWebhookUrl($webhookUrl);
-        $createPaymentStruct->setShopwareOrderNumber($orderNumber);
         $createPaymentStruct->setMethod($paymentHandler->getPaymentMethod());
 
         if ($paymentHandler instanceof ManualCaptureModeAwareInterface) {
@@ -210,6 +153,38 @@ final class PayloadBuilder implements PayloadBuilderInterface
         return $createPaymentStruct;
     }
 
+    public function buildPaymentLink(TransactionDataStruct $transactionData, Context $context): CreatePaymentLink
+    {
+        $createPayment = $this->buildBasePayment($transactionData);
+        $createPaymentLink = CreatePaymentLink::fromCreatePayment($createPayment);
+
+        $order = $transactionData->getOrder();
+        $salesChannelId = $order->getSalesChannelId();
+        $orderNumber = (string) $order->getOrderNumber();
+        $customer = $transactionData->getCustomer();
+
+        // A subscription needs a mandate, which mollie only creates when the first payment runs for a
+        // known customer with sequence type "first". Guests can not own a mandate, so they are skipped
+        // (a subscription order should never be placed as guest, see SubscriptionCartValidator).
+        if ($this->orderHasSubscription($order, $salesChannelId) && ! $customer->getGuest()) {
+            $createPaymentLink->setCustomerId($this->resolveOrCreateMollieCustomerId($customer, $salesChannelId, $context));
+            $createPaymentLink->setSequenceType(SequenceType::FIRST);
+        }
+
+        // The allowed methods reuse the checkout payment-method removers, so a payment link offers the
+        // same methods a customer would see in the checkout for this order.
+        $allowedMethods = $this->paymentLinkMethodResolver->resolve($transactionData, $context);
+        $createPaymentLink->setAllowedMethods($allowedMethods);
+
+        $this->logger->info('Payment link payload created for mollie API', [
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+            'allowedMethods' => $allowedMethods,
+        ]);
+
+        return $createPaymentLink;
+    }
+
     public function buildOrder(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreateOrder
     {
         $createPayment = $this->buildPayment($transactionData, $paymentHandler, $dataBag, $context);
@@ -248,6 +223,121 @@ final class PayloadBuilder implements PayloadBuilderInterface
         ]);
 
         return $createOrder;
+    }
+
+    /**
+     * Builds the handler independent part of the payment payload that is shared between a regular
+     * Mollie payment, a Mollie order and a payment link (description, amount, addresses, lines,
+     * locale and the shop side urls). Everything that depends on a concrete payment handler
+     * (method, capture mode, mollie customer, sequence type, handler parameters) is added on top
+     * by buildPayment().
+     */
+    private function buildBasePayment(TransactionDataStruct $transactionData): CreatePayment
+    {
+        $transactionId = $transactionData->getTransaction()->getId();
+        $order = $transactionData->getOrder();
+        $customer = $transactionData->getCustomer();
+        $currency = $transactionData->getCurrency();
+        $language = $transactionData->getLanguage();
+        $shippingOrderAddress = $transactionData->getShippingOrderAddress();
+        $billingOrderAddress = $transactionData->getBillingOrderAddress();
+        $deliveries = $transactionData->getDeliveries();
+
+        $paymentSettings = $this->settingsService->getPaymentSettings($order->getSalesChannelId());
+        $orderNumberFormat = $paymentSettings->getOrderNumberFormat();
+
+        $customerNumber = $customer->getCustomerNumber();
+        $description = (string) $order->getOrderNumber();
+        $orderNumber = (string) $order->getOrderNumber();
+        $taxStatus = (string) $order->getTaxStatus();
+
+        if (mb_strlen($orderNumberFormat) > 0) {
+            $description = str_replace([
+                '{ordernumber}',
+                '{customernumber}'
+            ], [
+                $orderNumber,
+                $customerNumber
+            ], $orderNumberFormat);
+        }
+
+        $returnUrl = $this->routeBuilder->getReturnUrl($transactionId);
+        $webhookUrl = $this->routeBuilder->getWebhookUrl($transactionId);
+
+        $lineItemCollection = $this->lineCollectionBuilder->build($order, $deliveries, $currency, $taxStatus);
+
+        $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
+
+        foreach ($deliveries as $delivery) {
+            $deliveryOrderShippingAddress = $delivery->getShippingOrderAddress();
+            if (method_exists($order, 'getPrimaryOrderDeliveryId')
+                && $deliveryOrderShippingAddress instanceof OrderAddressEntity
+                && $order->getPrimaryOrderDeliveryId() !== null
+                && $delivery->getId() === $order->getPrimaryOrderDeliveryId()
+            ) {
+                $shippingAddress = Address::fromAddress($customer, $deliveryOrderShippingAddress);
+            }
+        }
+
+        $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
+
+        $orderAmount = Money::fromOrder($order, $currency);
+
+        if ($paymentSettings->isFixRoundingDiffEnabled()) {
+            $lineItemCollection = $this->roundingDifferenceFixer->fixAmountDiff(
+                $orderAmount,
+                $lineItemCollection,
+                $paymentSettings->getFixRoundingDiffName(),
+                $paymentSettings->getFixRoundingDiffSku()
+            );
+        }
+
+        $createPaymentStruct = new CreatePayment($description, $returnUrl, $orderAmount);
+
+        $createPaymentStruct->setBillingAddress($billingAddress);
+        $createPaymentStruct->setShippingAddress($shippingAddress);
+        $createPaymentStruct->setLines($lineItemCollection);
+        $createPaymentStruct->setLocale(Locale::fromLanguage($language));
+        $createPaymentStruct->setWebhookUrl($webhookUrl);
+        $createPaymentStruct->setShopwareOrderNumber($orderNumber);
+
+        return $createPaymentStruct;
+    }
+
+    private function orderHasSubscription(OrderEntity $order, string $salesChannelId): bool
+    {
+        $lineItems = $order->getLineItems();
+        if ($lineItems === null) {
+            return false;
+        }
+
+        if (! $this->settingsService->getSubscriptionSettings($salesChannelId)->isEnabled()) {
+            return false;
+        }
+
+        return $this->lineItemAnalyzer->hasSubscriptionProduct($lineItems);
+    }
+
+    private function resolveOrCreateMollieCustomerId(CustomerEntity $customer, string $salesChannelId, Context $context): string
+    {
+        $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
+        $profileId = $apiSettings->getProfileId();
+        if (mb_strlen($profileId) === 0) {
+            $profileId = $this->mollieGateway->getCurrentProfile($salesChannelId)->getId();
+        }
+
+        $customerExtension = $customer->getExtension(Mollie::EXTENSION);
+        if ($customerExtension instanceof CustomerExtension) {
+            $existingCustomerId = $customerExtension->getForProfileId($profileId, $apiSettings->getMode());
+            if ($existingCustomerId !== null) {
+                return $existingCustomerId;
+            }
+        }
+
+        $mollieCustomer = $this->mollieGateway->createCustomer($customer, $salesChannelId);
+        $this->saveCustomerId($customer, $mollieCustomer, $profileId, $apiSettings->getMode(), $context);
+
+        return $mollieCustomer->getId();
     }
 
     private function modifySequenceType(CreatePayment $createPaymentStruct, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, string $salesChannelId, bool $hasSubscriptionLineItem): CreatePayment

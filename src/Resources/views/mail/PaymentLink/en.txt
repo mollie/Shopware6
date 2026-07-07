@@ -1,0 +1,10 @@
+Dear {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},
+
+thank you for your order {{ order.orderNumber }} with {{ salesChannel.name }}.
+
+Please use the following link to complete your payment:
+
+{{ rawUrl('frontend.mollie.payment-link', { 'transactionId': order.transactions.last.id }, salesChannel.domains|first.url) }}
+
+Thank you,
+{{ salesChannel.name }}

@@ -18,6 +18,7 @@ use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePaymentLinkMethodResolver;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -130,7 +131,7 @@ final class PayTest extends TestCase
         $lineItemAnalyzer = new LineItemAnalyzer();
         $lineItemFilter = new LineItemFilter();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
-        $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,new LineCollectionBuilder($lineItemFilter),$roundingDifferenceFixer,$logger);
+        $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,new LineCollectionBuilder($lineItemFilter),$roundingDifferenceFixer,new FakePaymentLinkMethodResolver(),$logger);
 
         $request = new \Symfony\Component\HttpFoundation\Request();
         $request->setSession(new \Symfony\Component\HttpFoundation\Session\Session(

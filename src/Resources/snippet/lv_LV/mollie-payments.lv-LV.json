@@ -57,10 +57,7 @@
                 "error": "Maksājums neizdevās",
                 "failed": "Maksājums neizdevās vai tika atcelts. Jūs tiksiet novirzīts uz Mollie, kur varat pabeigt savu maksājumu ar izvēlēto metodi. "
             },
-            "redirecting": "Tiek veikta pāradresācija uz: ",
-            "paymentLink": {
-                "alreadyPaid": "This order has already been paid."
-            }
+            "redirecting": "Tiek veikta pāradresācija uz: "
         },
         "payments": {
             "applePayDirect": {

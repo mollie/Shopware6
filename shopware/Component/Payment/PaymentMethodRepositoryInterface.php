@@ -18,4 +18,9 @@ interface PaymentMethodRepositoryInterface
      * @return PaymentMethodCollection<PaymentMethodEntity>
      */
     public function findAllMollieMethods(Context $context): PaymentMethodCollection;
+
+    /**
+     * @return PaymentMethodCollection<PaymentMethodEntity>
+     */
+    public function findActiveMollieMethods(string $salesChannelId, Context $context): PaymentMethodCollection;
 }

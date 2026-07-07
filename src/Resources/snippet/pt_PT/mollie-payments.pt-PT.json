@@ -57,10 +57,7 @@
                 "error": "Pagamento não efetuado",
                 "failed": "O pagamento falhou ou foi cancelado. Será redireccionado para a Mollie, onde poderá concluir o pagamento com o método da sua escolha. "
             },
-            "redirecting": "Redireccionando-o para: ",
-            "paymentLink": {
-                "alreadyPaid": "This order has already been paid."
-            }
+            "redirecting": "Redireccionando-o para: "
         },
         "payments": {
             "applePayDirect": {

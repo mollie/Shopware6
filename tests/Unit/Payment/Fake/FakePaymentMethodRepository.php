@@ -10,7 +10,7 @@ use Shopware\Core\Framework\Context;
 
 final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterface
 {
-    public function __construct(private ?string $fakeId = null)
+    public function __construct(private ?string $fakeId = null, private ?PaymentMethodCollection $mollieMethods = null)
     {
     }
 
@@ -26,6 +26,11 @@ final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterf
 
     public function findAllMollieMethods(Context $context): PaymentMethodCollection
     {
-        return new PaymentMethodCollection();
+        return $this->mollieMethods ?? new PaymentMethodCollection();
+    }
+
+    public function findActiveMollieMethods(string $salesChannelId, Context $context): PaymentMethodCollection
+    {
+        return $this->mollieMethods ?? new PaymentMethodCollection();
     }
 }

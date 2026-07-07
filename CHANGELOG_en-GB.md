@@ -1,5 +1,8 @@
 # Unreleased
 - Added: Wero payment method.
+- Added: Payment links - a pay-by-link URL for an order that lets the customer complete the payment with Mollie.
+- Added: An example mail template ("Payment Link (Mollie)") that renders the payment link URL, ready to copy into your own order mails.
+- Added: ModifyCreatePaymentLinkPayloadEvent to modify the payment link request before it is sent to Mollie.
 - Changed: The payment status webhook skips the transition when the transaction is already in the target state.
 - Fixed: Returning from the payment page no longer shows a token error when the payment was already completed. Customers are now sent to the confirmation or edit-order page based on the payment status.
 - Fixed: The Mollie order tab no longer crashes on Shopware versions that don't register the order detail as a Pinia store.

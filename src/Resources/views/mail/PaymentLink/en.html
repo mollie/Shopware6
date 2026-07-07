@@ -1,0 +1,13 @@
+Dear {{ order.orderCustomer.firstName }} {{ order.orderCustomer.lastName }},<br/>
+<br/>
+thank you for your order {{ order.orderNumber }} with {{ salesChannel.name }}.<br/>
+<br/>
+Please use the following link to complete your payment:<br/>
+<br/>
+<a href="{{ rawUrl('frontend.mollie.payment-link', { 'transactionId': order.transactions.last.id }, salesChannel.domains|first.url) }}">Pay now</a><br/>
+<br/>
+If the button does not work, copy this link into your browser:<br/>
+{{ rawUrl('frontend.mollie.payment-link', { 'transactionId': order.transactions.last.id }, salesChannel.domains|first.url) }}<br/>
+<br/>
+Thank you,<br/>
+{{ salesChannel.name }}

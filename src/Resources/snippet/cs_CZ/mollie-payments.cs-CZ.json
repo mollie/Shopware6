@@ -57,10 +57,7 @@
                 "error": "Platba selhala",
                 "failed": "Platba selhala nebo byla zrušena. Budete přesměrováni na Mollie, kde můžete dokončit platbu zvolenou metodou. "
             },
-            "redirecting": "Přesměrování na: ",
-            "paymentLink": {
-                "alreadyPaid": "This order has already been paid."
-            }
+            "redirecting": "Přesměrování na: "
         },
         "payments": {
             "applePayDirect": {

@@ -9,14 +9,15 @@ use Shopware\Core\Framework\Context;
 
 /**
  * Removes the mail templates (and their types) that the plugin registers via migrations - the
- * subscription renewal reminder and the subscription price change notification. Translations are
- * removed automatically via the cascading foreign keys.
+ * subscription renewal reminder, the subscription price change notification and the payment link
+ * mail. Translations are removed automatically via the cascading foreign keys.
  */
 final class MailTemplateDataRemover implements DataRemoverInterface
 {
     private const MAIL_TEMPLATE_TYPE_TECHNICAL_NAMES = [
         'mollie_subscriptions_renewal_reminder',
         'mollie_subscription_price_change',
+        'mollie_payment_link',
     ];
 
     public function __construct(private readonly Connection $connection)
