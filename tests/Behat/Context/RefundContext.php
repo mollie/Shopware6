@@ -146,10 +146,13 @@ final class RefundContext extends ShopwareContext
         $gateway = $this->getContainer()->get(RefundGateway::class);
         $refunds = $gateway->listRefunds($mollieExtension->getId(), (string) $order->getOrderNumber(), (string) $order->getSalesChannelId());
 
+        // The Mollie sandbox advances refunds asynchronously (queued/pending -> processing
+        // -> refunded), so counting only pending/queued is racy. A refund stays in force
+        // until it is canceled or fails, so count everything that is not canceled or failed.
         $pendingCount = count(array_filter(
             $refunds->jsonSerialize(),
             function ($refund) {
-                return $refund->getStatus() === RefundStatus::Pending || $refund->getStatus() === RefundStatus::Queued;
+                return $refund->getStatus() !== RefundStatus::Canceled && $refund->getStatus() !== RefundStatus::Failed;
             }
         ));
 

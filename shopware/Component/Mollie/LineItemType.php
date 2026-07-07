@@ -30,7 +30,7 @@ enum LineItemType: string
             default => self::DIGITAL,
         };
 
-        if ($type === self::CREDIT || $type === self::GIFT_CARD) {
+        if ($type === self::CREDIT) {
             return $type;
         }
 
