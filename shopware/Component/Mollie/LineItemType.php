@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 enum LineItemType: string
@@ -22,11 +23,24 @@ enum LineItemType: string
     {
         $oderLineItemType = (string) $orderLineItem->getType();
 
-        return match ($oderLineItemType) {
+        $type = match ($oderLineItemType) {
             LineItem::PRODUCT_LINE_ITEM_TYPE, self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value => self::PHYSICAL,
             LineItem::CREDIT_LINE_ITEM_TYPE => self::CREDIT,
             LineItem::PROMOTION_LINE_ITEM_TYPE => self::DISCOUNT,
             default => self::DIGITAL,
         };
+
+        if ($type === self::CREDIT || $type === self::GIFT_CARD) {
+            return $type;
+        }
+
+        // discounts added by third-party plugins have custom line item types, Mollie rejects
+        // negative amounts unless the type is discount, store_credit or gift_card
+        $price = $orderLineItem->getPrice();
+        if ($price instanceof CalculatedPrice && $price->getTotalPrice() < 0) {
+            return self::DISCOUNT;
+        }
+
+        return $type;
     }
 }
