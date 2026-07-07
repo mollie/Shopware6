@@ -3,6 +3,7 @@
 - Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
 - Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.
 - Behoben: Der automatische Versand löst keinen Mollie-API-Aufruf mehr für Bestellungen aus, die nicht mit Mollie bezahlt wurden.
+- Behoben: Eine ungültige Telefonnummer in der Adresse lässt die Zahlung nicht mehr fehlschlagen.
 - Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Name der Versandart leer ist. Als Ersatz wird „Shipping" verwendet.
 - Behoben: Plugin-Updates schlagen auf Shopware 6.5 nicht mehr mit einem 500er-Fehler fehl.
 - Behoben: Die Storefront bricht auf Shopware 6.5 nicht mehr mit dem Fehler „Plugin is already registered" ab.
