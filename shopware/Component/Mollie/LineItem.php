@@ -67,6 +67,10 @@ final class LineItem implements \JsonSerializable
         $shippingCosts = $delivery->getShippingCosts();
 
         $description = $descriptionOverride ?? (string) $shippingMethod->getName();
+        $description = trim($description);
+        if (mb_strlen($description) === 0) {
+            $description = 'Shipping';
+        }
         $lineItem = self::createBaseLineItem($description, $taxStatus, $shippingCosts, $currency);
         $type = $shippingCosts->getTotalPrice() < 0 ? LineItemType::DISCOUNT : LineItemType::SHIPPING;
         $lineItem->setType($type);
