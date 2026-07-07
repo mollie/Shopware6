@@ -9,6 +9,7 @@
 - Fixed: Plugin updates no longer fail with a 500 error on Shopware 6.5.
 - Fixed: The storefront no longer breaks with a "Plugin is already registered" error on Shopware 6.5.
 - Fixed: Apple Pay Direct display restrictions are now applied, so the button is hidden on the configured pages.
+- Fixed: Storefront pages no longer break on locales that Mollie does not support (e.g. cs_CZ, sk_SK). The locale now falls back to a supported one, or to en_GB.
 
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.
