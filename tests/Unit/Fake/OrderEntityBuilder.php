@@ -154,6 +154,21 @@ final class OrderEntityBuilder
         return $delivery;
     }
 
+    public function getOrderDeliveryWithEmptyShippingMethodName(CustomerEntity $customer): OrderDeliveryEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('   ');
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId('fake-delivery-empty-name');
+        $delivery->setShippingOrderAddress($this->getOrderAddress($customer));
+        $delivery->setShippingCosts($this->getPrice(4.99, 19.0));
+        $delivery->setShippingMethod($shippingMethod);
+
+        return $delivery;
+    }
+
     public function getOrderLineItemWithoutPrice(): OrderLineItemEntity
     {
         $orderLineItem = new OrderLineItemEntity();

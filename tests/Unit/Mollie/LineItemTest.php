@@ -91,6 +91,19 @@ final class LineItemTest extends TestCase
         $this->assertEquals($expected['amount'], $actual->getAmount());
     }
 
+    public function testCreateFromDeliveryFallsBackToShippingWhenNameIsEmpty(): void
+    {
+        $customerRepository = new CustomerEntityBuilder();
+        $customer = $customerRepository->getDefaultCustomer();
+        $delivery = $this->orderRepository->getOrderDeliveryWithEmptyShippingMethodName($customer);
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('EUR');
+
+        $actual = LineItem::fromDelivery($delivery, $currency);
+
+        $this->assertSame('Shipping', $actual->getDescription());
+    }
+
     public function testExpectExceptionOnEmptyLineItemPrice(): void
     {
         $this->expectException(MissingLineItemPriceException::class);
