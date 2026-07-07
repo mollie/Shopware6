@@ -1,9 +1,11 @@
 # Unreleased
-- Fixed: The Mollie order tab no longer crashes with a "Store with id swOrderDetail not found" error on Shopware versions where the order detail is not registered as a Pinia store.
-- Fixed: Automatic shipment no longer attempts a Mollie API call when a delivery state changes on an order whose latest transaction is not a Mollie payment.
-- Fixed: Payments no longer fail when the shipping method name is empty. Since the description is a required field in the Mollie API, the shipping line item now falls back to "Shipping".
-- Fixed: Plugin updates no longer abort with a 500 error on Shopware 6.5, where migrations must implement the abstract `updateDestructive` method. The affected migrations now provide this method.
-- Fixed: The storefront no longer breaks with a "Plugin is already registered" error on Shopware 6.5, where the compiled storefront JS can be collected twice during theme compilation. The plugin registration now runs only once per page.
+- Added: Wero payment method.
+- Fixed: Returning from the payment page no longer shows a token error when the payment was already completed. Customers are now sent to the confirmation or edit-order page based on the payment status.
+- Fixed: The Mollie order tab no longer crashes on Shopware versions that don't register the order detail as a Pinia store.
+- Fixed: Automatic shipment no longer triggers a Mollie API call for orders that were not paid with Mollie.
+- Fixed: Payments no longer fail when the shipping method name is empty. "Shipping" is used as a fallback.
+- Fixed: Plugin updates no longer fail with a 500 error on Shopware 6.5.
+- Fixed: The storefront no longer breaks with a "Plugin is already registered" error on Shopware 6.5.
 
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.
@@ -36,7 +38,6 @@
 - Changed: Storefront JavaScript has been migrated to native Shopware JavaScript.
 - Fixed: Adding credit notes to net orders no longer inflates the total with an extra VAT layer.
 - Fixed: Compatibility with the Klarna Payment plugin
-- Added: Wero payment method.
 
 # 4.25.1
 - Fixed: Compatibility with Shopware 6.7.11.0 – corrected a typo in the Slovenian snippet ISO code, which is now validated by Shopware.

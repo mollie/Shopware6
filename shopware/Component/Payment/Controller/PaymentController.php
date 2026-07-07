@@ -6,13 +6,17 @@ namespace Mollie\Shopware\Component\Payment\Controller;
 use Mollie\Shopware\Component\FailureMode\PaymentPageFailedEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
+use Mollie\Shopware\Component\Payment\Token\PaymentTokenRepository;
+use Mollie\Shopware\Component\Payment\Token\PaymentTokenRepositoryInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
+use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -35,6 +39,8 @@ final class PaymentController extends StorefrontController
         private AbstractSettingsService $settingsService,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: PaymentTokenRepository::class)]
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -43,6 +49,7 @@ final class PaymentController extends StorefrontController
     #[Route(path: '/mollie/payment/{transactionId}', name: 'frontend.mollie.payment', methods: ['GET', 'POST'], options: ['seo' => false])]
     public function return(string $transactionId, SalesChannelContext $salesChannelContext): Response
     {
+        $transactionId = strtolower($transactionId);
         $salesChannelId = $salesChannelContext->getSalesChannelId();
         $logData = [
             'transactionId' => $transactionId,
@@ -77,10 +84,30 @@ final class PaymentController extends StorefrontController
         $query = (string) parse_url($payment->getFinalizeUrl(), PHP_URL_QUERY);
         $queryParameters = [];
         parse_str($query, $queryParameters);
+
+        $paymentToken = $queryParameters['_sw_payment_token'] ?? null;
+
+        if (is_string($paymentToken) && $paymentToken !== '' && $this->paymentTokenRepository->isConsumed($paymentToken)) {
+            $this->logger->warning('Finalize token already consumed, skipping finalize and redirecting by payment status', $logData);
+
+            return $this->redirectAfterFinalize($payment, $shopwareOrder);
+        }
+
         $this->logger->info('Call shopware finalize transaction', $logData);
         $controller = sprintf('%s::%s', ShopwarePaymentController::class, 'finalizeTransaction');
 
-        return $this->forward($controller, [], $queryParameters);
+        try {
+            return $this->forward($controller, [], $queryParameters);
+        } catch (PaymentException $exception) {
+            if (! $this->isInvalidTokenException($exception)) {
+                throw $exception;
+            }
+
+            $logData['error'] = $exception->getMessage();
+            $this->logger->warning('Finalize failed with an invalid payment token, redirecting by payment status', $logData);
+
+            return $this->redirectAfterFinalize($payment, $shopwareOrder);
+        }
     }
 
     #[Route(path: '/mollie/webhook/{transactionId}', name: 'frontend.mollie.webhook', methods: ['GET', 'POST'], options: ['seo' => false])]
@@ -114,5 +141,27 @@ final class PaymentController extends StorefrontController
 
             return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], 422);
         }
+    }
+
+    private function isInvalidTokenException(PaymentException $exception): bool
+    {
+        return in_array($exception->getErrorCode(), [
+            PaymentException::PAYMENT_TOKEN_INVALIDATED,
+            PaymentException::PAYMENT_INVALID_TOKEN,
+        ], true);
+    }
+
+    private function redirectAfterFinalize(Payment $payment, ?OrderEntity $shopwareOrder): Response
+    {
+        if (! $shopwareOrder instanceof OrderEntity) {
+            return $this->redirectToRoute('frontend.account.order.page');
+        }
+
+        $orderId = $shopwareOrder->getId();
+        if ($payment->getStatus()->isApproved()) {
+            return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $orderId]);
+        }
+
+        return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $orderId]);
     }
 }

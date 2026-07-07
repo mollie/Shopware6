@@ -1,9 +1,11 @@
 # Unreleased
-- Behoben: Der Mollie-Bestell-Tab stürzt nicht mehr mit dem Fehler „Store with id swOrderDetail not found" ab, wenn die Bestelldetailseite auf der jeweiligen Shopware-Version nicht als Pinia-Store registriert ist.
-- Behoben: Der automatische Versand versucht keinen Mollie-API-Aufruf mehr, wenn sich der Lieferstatus einer Bestellung ändert, deren letzte Transaktion keine Mollie-Zahlung ist.
-- Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Name der Versandart leer ist. Da die Beschreibung in der Mollie-API ein Pflichtfeld ist, wird für die Versand-Position nun „Shipping" verwendet.
-- Behoben: Plugin-Updates brechen auf Shopware 6.5 nicht mehr mit einem 500er-Fehler ab. Dort muss die abstrakte Methode `updateDestructive` in Migrationen implementiert sein; die betroffenen Migrationen stellen diese Methode nun bereit.
-- Behoben: Die Storefront bricht auf Shopware 6.5 nicht mehr mit dem Fehler „Plugin is already registered" ab. Dort kann das kompilierte Storefront-JS beim Theme-Kompilieren doppelt eingesammelt werden; die Plugin-Registrierung läuft nun nur noch einmal pro Seite.
+- Hinzugefügt: Zahlungsart Wero.
+- Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
+- Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.
+- Behoben: Der automatische Versand löst keinen Mollie-API-Aufruf mehr für Bestellungen aus, die nicht mit Mollie bezahlt wurden.
+- Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Name der Versandart leer ist. Als Ersatz wird „Shipping" verwendet.
+- Behoben: Plugin-Updates schlagen auf Shopware 6.5 nicht mehr mit einem 500er-Fehler fehl.
+- Behoben: Die Storefront bricht auf Shopware 6.5 nicht mehr mit dem Fehler „Plugin is already registered" ab.
 
 # 5.0.0
 - Hinweis: Durch Autoloader-Caching kann beim Hochladen/Update des Plugins ein Fehler erscheinen. Dieser kann ignoriert werden.
@@ -35,7 +37,6 @@
 - Geändert: Das Storefront-JavaScript wurde auf natives Shopware-JavaScript umgestellt.
 - Behoben: Gutschriften bei Netto-Bestellungen werden nicht mehr mit einer zusätzlichen MwSt.-Schicht versehen.
 - Behoben: Kompatibilität mit dem Klarna Payment Plugin
-- Hinzugefügt: Zahlungsart Wero.
 
 # 4.25.1
 - Behoben: Kompatibilität mit Shopware 6.7.11.0 – Tippfehler im ISO-Code der slowenischen Snippet-Sprache korrigiert, der ab dieser Version von Shopware validiert wird.
