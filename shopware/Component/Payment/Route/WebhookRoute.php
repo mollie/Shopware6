@@ -119,15 +119,27 @@ final class WebhookRoute extends AbstractWebhookRoute
     private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void
     {
         $shopwareHandlerMethod = $payment->getStatus()->getShopwareHandlerMethod();
+        $targetPaymentStatus = $payment->getStatus()->getShopwarePaymentStatus();
+        $currentTransactionState = $payment->getShopwareTransaction()->getStateMachineState();
+        $currentPaymentStatus = $currentTransactionState !== null ? $currentTransactionState->getTechnicalName() : '';
+
         $logData = [
             'transactionId' => $transactionId,
             'paymentStatus' => $payment->getStatus()->value,
             'shopwareMethod' => $shopwareHandlerMethod,
+            'currentPaymentStatus' => $currentPaymentStatus,
+            'targetPaymentStatus' => $targetPaymentStatus,
             'orderNumber' => $orderNumber,
         ];
         $this->logger->info('Change payment status', $logData);
         if (mb_strlen($shopwareHandlerMethod) === 0) {
             $this->logger->warning('Failed to find shopware handler method for status', $logData);
+
+            return;
+        }
+
+        if ($currentPaymentStatus === $targetPaymentStatus) {
+            $this->logger->debug('Payment status transition skipped, transaction is already in the target state', $logData);
 
             return;
         }

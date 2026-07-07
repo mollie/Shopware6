@@ -32,6 +32,7 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 final class FakeTransactionService implements TransactionServiceInterface
 {
@@ -53,6 +54,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private bool $withoutPaymentMethod = false;
     private bool $withoutMollieExtensionOnPaymentMethod = false;
     private bool $withNewerTransaction = false;
+    private ?string $transactionState = null;
 
     public function __construct()
     {
@@ -101,6 +103,11 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function withNewerTransaction(): void
     {
         $this->withNewerTransaction = true;
+    }
+
+    public function withTransactionState(string $technicalName): void
+    {
+        $this->transactionState = $technicalName;
     }
 
     public function withOrderCustomFields(array $customFields): void
@@ -157,6 +164,11 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function createTransaction(): void
     {
         $transaction = new OrderTransactionEntity();
+        if ($this->transactionState !== null) {
+            $state = new StateMachineStateEntity();
+            $state->setTechnicalName($this->transactionState);
+            $transaction->setStateMachineState($state);
+        }
         if (count($this->transactionCustomFields) > 0) {
             $transaction->setCustomFields([Mollie::EXTENSION => $this->transactionCustomFields]);
         }
