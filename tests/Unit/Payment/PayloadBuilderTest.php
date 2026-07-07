@@ -17,6 +17,7 @@ use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
@@ -29,6 +30,8 @@ use Mollie\Shopware\Unit\Payment\Fake\FakeSubscriptionAwarePaymentHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -525,6 +528,42 @@ final class PayloadBuilderTest extends TestCase
         }
     }
 
+    public function testBuildKeepsValidE164PhoneNumber(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPhoneNumber('+4930123456789');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+        $this->assertSame('+4930123456789', $array['billingAddress']['phone']);
+        $this->assertSame('+4930123456789', $array['shippingAddress']['phone']);
+    }
+
+    public function testBuildRemovesInvalidPhoneNumberAndLogsWarning(): void
+    {
+        $logger = new FakeLogger();
+        $builder = $this->createBuilder(logger: $logger);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPhoneNumber('030 / 123 456');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+        $this->assertArrayNotHasKey('phone', $array['billingAddress']);
+        $this->assertArrayNotHasKey('phone', $array['shippingAddress']);
+
+        $this->assertTrue($logger->hasRecordThatContains(LogLevel::WARNING, 'E.164'));
+        foreach ($logger->getRecords() as $record) {
+            $this->assertStringNotContainsString('030 / 123 456', json_encode($record) ?: '');
+        }
+    }
+
     public function testBuildOrderReturnsCreateOrderInstance(): void
     {
         $builder = $this->createBuilder();
@@ -607,7 +646,7 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('10000', $array['metadata']['shopwareOrderNumber']);
     }
 
-    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null): PayloadBuilder
+    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null, ?LoggerInterface $logger = null): PayloadBuilder
     {
         if ($paymentSettings === null) {
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
@@ -616,6 +655,6 @@ final class PayloadBuilderTest extends TestCase
         $lineItemFilter = new LineItemFilter();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 
-        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, $roundingDifferenceFixer, new NullLogger());
+        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, $roundingDifferenceFixer, $logger ?? new NullLogger());
     }
 }

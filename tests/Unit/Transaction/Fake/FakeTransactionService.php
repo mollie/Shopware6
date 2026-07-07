@@ -47,6 +47,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private bool $withZeroShippingCosts = false;
     private bool $withShippingDiscountDelivery = false;
     private bool $withSubscriptionLineItem = false;
+    private ?string $phoneNumber = null;
 
     private bool $withoutOrder = false;
     private bool $withoutPaymentMethod = false;
@@ -135,6 +136,11 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withSubscriptionLineItem = true;
     }
 
+    public function withPhoneNumber(string $phoneNumber): void
+    {
+        $this->phoneNumber = $phoneNumber;
+    }
+
     public function withShippingDiscountDelivery(): void
     {
         $this->withShippingDiscountDelivery = true;
@@ -219,6 +225,17 @@ final class FakeTransactionService implements TransactionServiceInterface
         $billingAddress = $this->orderRepository->getOrderAddress($customer);
 
         $deliveries = $this->orderRepository->getOrderDeliveries($customer);
+
+        if ($this->phoneNumber !== null) {
+            $shippingAddress->setPhoneNumber($this->phoneNumber);
+            $billingAddress->setPhoneNumber($this->phoneNumber);
+            foreach ($deliveries as $delivery) {
+                $deliveryShippingAddress = $delivery->getShippingOrderAddress();
+                if ($deliveryShippingAddress !== null) {
+                    $deliveryShippingAddress->setPhoneNumber($this->phoneNumber);
+                }
+            }
+        }
 
         if ($this->withZeroShippingCosts === true && $deliveries !== null) {
             foreach ($deliveries as $delivery) {

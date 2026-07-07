@@ -47,6 +47,11 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class PayloadBuilder implements PayloadBuilderInterface
 {
     /**
+     * E.164 phone numbers start with a "+", a non-zero country code and hold at most 15 digits.
+     */
+    private const E164_PATTERN = '/^\+[1-9]\d{1,14}$/';
+
+    /**
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
      */
     public function __construct(
@@ -154,6 +159,9 @@ final class PayloadBuilder implements PayloadBuilderInterface
         }
 
         $billingAddress = Address::fromAddress($customer, $billingOrderAddress);
+
+        $this->removeInvalidPhoneNumber($shippingAddress, $logData);
+        $this->removeInvalidPhoneNumber($billingAddress, $logData);
 
         $orderAmount = Money::fromOrder($order, $currency);
 
@@ -282,6 +290,30 @@ final class PayloadBuilder implements PayloadBuilderInterface
         }
 
         return $createPaymentStruct;
+    }
+
+    /**
+     * Mollie rejects phone numbers that are not in E.164 format and fails the whole payment.
+     * To keep the checkout working we drop an invalid number from the payload and only log a
+     * masked hint (never the full number) for troubleshooting.
+     *
+     * @param array<string, mixed> $logData
+     */
+    private function removeInvalidPhoneNumber(Address $address, array $logData): void
+    {
+        $phone = $address->getPhone();
+        if ($phone === '') {
+            return;
+        }
+
+        if (preg_match(self::E164_PATTERN, $phone) === 1) {
+            return;
+        }
+
+        $address->setPhone('');
+
+        $logData['phoneHint'] = mb_substr($phone, 0, 2) . '***';
+        $this->logger->warning('Phone number is not in E.164 format and was removed from the mollie payload to prevent a payment failure', $logData);
     }
 
     private function saveCustomerId(CustomerEntity $customerEntity, Customer $mollieCustomer, string $profileId, Mode $mode, Context $context): CustomerEntity
