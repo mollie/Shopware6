@@ -3,6 +3,7 @@
 - Behoben: Der automatische Versand versucht keinen Mollie-API-Aufruf mehr, wenn sich der Lieferstatus einer Bestellung ändert, deren letzte Transaktion keine Mollie-Zahlung ist.
 - Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Name der Versandart leer ist. Da die Beschreibung in der Mollie-API ein Pflichtfeld ist, wird für die Versand-Position nun „Shipping" verwendet.
 - Behoben: Plugin-Updates brechen auf Shopware 6.5 nicht mehr mit einem 500er-Fehler ab. Dort muss die abstrakte Methode `updateDestructive` in Migrationen implementiert sein; die betroffenen Migrationen stellen diese Methode nun bereit.
+- Behoben: Die Storefront bricht auf Shopware 6.5 nicht mehr mit dem Fehler „Plugin is already registered" ab. Dort kann das kompilierte Storefront-JS beim Theme-Kompilieren doppelt eingesammelt werden; die Plugin-Registrierung läuft nun nur noch einmal pro Seite.
 
 # 5.0.0
 - Hinweis: Durch Autoloader-Caching kann beim Hochladen/Update des Plugins ein Fehler erscheinen. Dieser kann ignoriert werden.

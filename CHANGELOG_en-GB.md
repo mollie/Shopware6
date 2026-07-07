@@ -3,6 +3,7 @@
 - Fixed: Automatic shipment no longer attempts a Mollie API call when a delivery state changes on an order whose latest transaction is not a Mollie payment.
 - Fixed: Payments no longer fail when the shipping method name is empty. Since the description is a required field in the Mollie API, the shipping line item now falls back to "Shipping".
 - Fixed: Plugin updates no longer abort with a 500 error on Shopware 6.5, where migrations must implement the abstract `updateDestructive` method. The affected migrations now provide this method.
+- Fixed: The storefront no longer breaks with a "Plugin is already registered" error on Shopware 6.5, where the compiled storefront JS can be collected twice during theme compilation. The plugin registration now runs only once per page.
 
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.
