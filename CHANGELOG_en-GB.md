@@ -2,6 +2,7 @@
 - Fixed: The Mollie order tab no longer crashes with a "Store with id swOrderDetail not found" error on Shopware versions where the order detail is not registered as a Pinia store.
 - Fixed: Automatic shipment no longer attempts a Mollie API call when a delivery state changes on an order whose latest transaction is not a Mollie payment.
 - Fixed: Payments no longer fail when the shipping method name is empty. Since the description is a required field in the Mollie API, the shipping line item now falls back to "Shipping".
+- Fixed: Plugin updates no longer abort with a 500 error on Shopware 6.5, where migrations must implement the abstract `updateDestructive` method. The affected migrations now provide this method.
 
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.

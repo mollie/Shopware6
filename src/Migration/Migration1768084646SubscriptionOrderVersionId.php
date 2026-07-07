@@ -46,4 +46,8 @@ class Migration1768084646SubscriptionOrderVersionId extends MigrationStep
                 REFERENCES `mollie_subscription` (`id`) ON DELETE CASCADE ON UPDATE CASCADE'
         );
     }
+
+    public function updateDestructive(Connection $connection): void
+    {
+    }
 }
