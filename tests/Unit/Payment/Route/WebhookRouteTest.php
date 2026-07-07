@@ -20,6 +20,7 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 
@@ -190,6 +191,27 @@ final class WebhookRouteTest extends TestCase
         $response = $webhookRoute->notify('test', $this->context);
 
         $this->assertInstanceOf(WebhookResponse::class, $response);
+    }
+
+    /**
+     * When the transaction is already in the target payment state, the webhook must not call the
+     * state machine at all, so the IllegalTransitionException can never be raised in the first place.
+     */
+    public function testPaymentStatusTransitionSkippedWhenAlreadyInTargetState(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withTransactionState(OrderTransactionStates::STATE_PAID);
+
+        $stateHandler = new FakeOrderTransactionStateHandler();
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $stateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertFalse($stateHandler->wasCalled(), 'Payment status must not change when the transaction is already in the target state');
     }
 
     /**

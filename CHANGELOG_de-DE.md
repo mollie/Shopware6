@@ -1,5 +1,6 @@
 # Unreleased
 - Hinzugefügt: Zahlungsart Wero.
+- Geändert: Der Zahlungsstatus-Webhook überspringt den Statuswechsel, wenn die Transaktion bereits im Zielstatus ist.
 - Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
 - Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.
 - Behoben: Der automatische Versand löst keinen Mollie-API-Aufruf mehr für Bestellungen aus, die nicht mit Mollie bezahlt wurden.
