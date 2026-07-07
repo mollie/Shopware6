@@ -110,28 +110,6 @@ final class PaymentController extends StorefrontController
         }
     }
 
-    private function isInvalidTokenException(PaymentException $exception): bool
-    {
-        return in_array($exception->getErrorCode(), [
-            PaymentException::PAYMENT_TOKEN_INVALIDATED,
-            PaymentException::PAYMENT_INVALID_TOKEN,
-        ], true);
-    }
-
-    private function redirectAfterFinalize(Payment $payment, ?OrderEntity $shopwareOrder): Response
-    {
-        if (! $shopwareOrder instanceof OrderEntity) {
-            return $this->redirectToRoute('frontend.account.order.page');
-        }
-
-        $orderId = $shopwareOrder->getId();
-        if ($payment->getStatus()->isApproved()) {
-            return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $orderId]);
-        }
-
-        return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $orderId]);
-    }
-
     #[Route(path: '/mollie/webhook/{transactionId}', name: 'frontend.mollie.webhook', methods: ['GET', 'POST'], options: ['seo' => false])]
     public function webhook(string $transactionId, Context $context): Response
     {
@@ -163,5 +141,27 @@ final class PaymentController extends StorefrontController
 
             return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], 422);
         }
+    }
+
+    private function isInvalidTokenException(PaymentException $exception): bool
+    {
+        return in_array($exception->getErrorCode(), [
+            PaymentException::PAYMENT_TOKEN_INVALIDATED,
+            PaymentException::PAYMENT_INVALID_TOKEN,
+        ], true);
+    }
+
+    private function redirectAfterFinalize(Payment $payment, ?OrderEntity $shopwareOrder): Response
+    {
+        if (! $shopwareOrder instanceof OrderEntity) {
+            return $this->redirectToRoute('frontend.account.order.page');
+        }
+
+        $orderId = $shopwareOrder->getId();
+        if ($payment->getStatus()->isApproved()) {
+            return $this->redirectToRoute('frontend.checkout.finish.page', ['orderId' => $orderId]);
+        }
+
+        return $this->redirectToRoute('frontend.account.edit-order.page', ['orderId' => $orderId]);
     }
 }
