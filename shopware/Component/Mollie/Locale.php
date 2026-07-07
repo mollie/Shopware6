@@ -46,6 +46,32 @@ enum Locale: string
     {
         $languageLocale = str_replace('-', '_', $code);
 
-        return self::from($languageLocale);
+        $locale = self::tryFrom($languageLocale);
+        if ($locale !== null) {
+            return $locale;
+        }
+
+        // locale is not supported by Mollie, fall back to one with the same language (e.g. de_LU -> de_DE)
+        $parts = explode('_', $languageLocale);
+        $language = strtolower($parts[0]);
+        if ($language !== '') {
+            foreach (self::cases() as $case) {
+                if (str_starts_with($case->value, $language . '_')) {
+                    return $case;
+                }
+            }
+        }
+
+        // unknown language, fall back to one used in the same region (e.g. gsw_CH -> de_CH)
+        $region = strtoupper($parts[1] ?? '');
+        if ($region !== '') {
+            foreach (self::cases() as $case) {
+                if (str_ends_with($case->value, '_' . $region)) {
+                    return $case;
+                }
+            }
+        }
+
+        return self::enGB;
     }
 }
