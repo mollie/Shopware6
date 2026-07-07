@@ -7,6 +7,9 @@ use Mollie\Shopware\Component\Mollie\LineItemType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 
 #[CoversClass(LineItemType::class)]
@@ -78,6 +81,36 @@ final class LineItemTypeTest extends TestCase
     {
         $orderLineItem = new OrderLineItemEntity();
         $orderLineItem->setType('shipping');
+
+        $result = LineItemType::fromOderLineItem($orderLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
+    public function testFromOrderLineItemWithNegativePriceBecomesDiscount(): void
+    {
+        $testCases = [
+            'custom-discount' => LineItemType::DISCOUNT,
+            LineItem::PRODUCT_LINE_ITEM_TYPE => LineItemType::DISCOUNT,
+            LineItem::CREDIT_LINE_ITEM_TYPE => LineItemType::CREDIT,
+        ];
+
+        foreach ($testCases as $shopwareType => $expectedType) {
+            $orderLineItem = new OrderLineItemEntity();
+            $orderLineItem->setType($shopwareType);
+            $orderLineItem->setPrice(new CalculatedPrice(-10.0, -10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+            $result = LineItemType::fromOderLineItem($orderLineItem);
+
+            $this->assertSame($expectedType, $result, sprintf('Negative line item of type "%s" should map to "%s"', $shopwareType, $expectedType->value));
+        }
+    }
+
+    public function testFromOrderLineItemWithPositivePriceKeepsType(): void
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setType('custom-surcharge');
+        $orderLineItem->setPrice(new CalculatedPrice(10.0, 10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
 
         $result = LineItemType::fromOderLineItem($orderLineItem);
 
