@@ -91,6 +91,19 @@ final class LineItemTest extends TestCase
         $this->assertEquals($expected['amount'], $actual->getAmount());
     }
 
+    public function testCreateFromDeliveryUsesTranslatedShippingMethodName(): void
+    {
+        $customerRepository = new CustomerEntityBuilder();
+        $customer = $customerRepository->getDefaultCustomer();
+        $delivery = $this->orderRepository->getOrderDeliveryWithTranslatedShippingMethodName($customer);
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('EUR');
+
+        $actual = LineItem::fromDelivery($delivery, $currency);
+
+        $this->assertSame('DHL Translated', $actual->getDescription());
+    }
+
     public function testCreateFromDeliveryFallsBackToShippingWhenNameIsEmpty(): void
     {
         $customerRepository = new CustomerEntityBuilder();

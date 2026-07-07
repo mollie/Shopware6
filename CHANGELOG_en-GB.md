@@ -11,6 +11,7 @@
 - Fixed: Apple Pay Direct display restrictions are now applied, so the button is hidden on the configured pages.
 - Fixed: Storefront pages no longer break on locales that Mollie does not support (e.g. cs_CZ, sk_SK). The locale now falls back to a supported one, or to en_GB.
 - Fixed: Payments no longer fail when the cart contains a discount from a third-party plugin (custom line item type with a negative price). Such line items are now sent to Mollie as type 'discount'.
+- Fixed: The shipping line sent to Mollie now uses the translated shipping method name. Storefront languages without an own shipping method translation no longer fail (before the 'Shipping' fallback) or show the generic 'Shipping' label; the name now falls back through the language chain.
 
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.

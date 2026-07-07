@@ -66,7 +66,11 @@ final class LineItem implements \JsonSerializable
         }
         $shippingCosts = $delivery->getShippingCosts();
 
-        $description = $descriptionOverride ?? (string) $shippingMethod->getName();
+        // getName() only contains the translation of the first language in the context chain and is
+        // null e.g. for storefront languages without an own translation; getTranslation() falls back
+        // through the language chain
+        $shippingMethodName = $shippingMethod->getTranslation('name') ?? $shippingMethod->getName();
+        $description = $descriptionOverride ?? (string) $shippingMethodName;
         $description = trim($description);
         if (mb_strlen($description) === 0) {
             $description = 'Shipping';
