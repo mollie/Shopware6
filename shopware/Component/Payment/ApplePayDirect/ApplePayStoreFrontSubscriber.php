@@ -65,7 +65,7 @@ final class ApplePayStoreFrontSubscriber implements EventSubscriberInterface
             $event->setParameter('mollie_applepay_enabled', true);
             $event->setParameter('mollie_applepaydirect_phonenumber_required', (int) $shoPhoneNumberField);
             $event->setParameter('mollie_applepaydirect_enabled', $response->isEnabled());
-            $event->setParameter('mollie_applepaydirect_restrictions', $applePaySettings->getVisibilityRestrictions());
+            $event->setParameter('mollie_applepaydirect_restrictions', $applePaySettings->getVisibilityRestrictions()->toArray());
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to assign apple pay direct data to storefront', [
                 'error' => $exception->getMessage(),
