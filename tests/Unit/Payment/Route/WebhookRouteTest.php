@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Route\WebhookException;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
@@ -282,22 +283,89 @@ final class WebhookRouteTest extends TestCase
         $this->assertInstanceOf(WebhookResponse::class, $response);
     }
 
-    public function testWebhookForOutdatedTransactionIsSkipped(): void
+    /**
+     * Once the order is paid, a stale webhook with a lower status (here: failed) must not downgrade the
+     * payment method, payment status or order status. The webhook events must still be dispatched.
+     */
+    public function testStatusUpdatesSkippedWhenOrderAlreadyPaid(): void
     {
         $transactionService = new FakeTransactionService();
         $transactionService->createValidStruct();
-        $transactionService->withNewerTransaction();
+        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
 
         $transactionStateHandler = new FakeOrderTransactionStateHandler();
         $orderStateHandler = new FakeOrderStateHandler();
+        $paymentMethodUpdater = new FakePaymentMethodUpdater();
+        $eventSpy = new EventSpy();
 
-        $webhookRoute = $this->getRoute($transactionService, null, $transactionStateHandler, null, $orderStateHandler);
+        $fakeClient = new FakeClient('mollieTestId', 'failed');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $transactionStateHandler, $paymentMethodUpdater, $orderStateHandler, null, $eventSpy);
 
         $response = $webhookRoute->notify('test', $this->context);
 
         $this->assertInstanceOf(WebhookResponse::class, $response);
-        $this->assertFalse($transactionStateHandler->wasCalled(), 'Payment status must not change for an outdated transaction');
-        $this->assertFalse($orderStateHandler->wasCalled(), 'Order status must not change for an outdated transaction');
+        $this->assertFalse($transactionStateHandler->wasCalled(), 'A lower status must not downgrade an already paid order');
+        $this->assertFalse($orderStateHandler->wasCalled(), 'A lower status must not downgrade an already paid order');
+        $this->assertFalse($paymentMethodUpdater->wasCalled(), 'A lower status must not downgrade an already paid order');
+        $this->assertGreaterThanOrEqual(2, $eventSpy->getEventCount(), 'Webhook events must still be dispatched when the order is already paid');
+    }
+
+    /**
+     * When a second payment also completes as "paid" (e.g. the order was re-paid with another method),
+     * it is a new successful payment and must overwrite the payment method, payment status and order
+     * status even though the order already has a paid transaction.
+     */
+    public function testSecondPaidPaymentOverwritesAlreadyPaidOrder(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
+
+        $transactionStateHandler = new FakeOrderTransactionStateHandler();
+        $orderStateHandler = new FakeOrderStateHandler();
+        $paymentMethodUpdater = new FakePaymentMethodUpdater();
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $transactionStateHandler, $paymentMethodUpdater, $orderStateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertTrue($transactionStateHandler->wasCalled(), 'A second paid payment must update the payment status');
+        $this->assertTrue($orderStateHandler->wasCalled(), 'A second paid payment must update the order status');
+        $this->assertTrue($paymentMethodUpdater->wasCalled(), 'A second paid payment must update the payment method');
+    }
+
+    /**
+     * Refunds and chargebacks legitimately change the state of an already paid order, so the payment
+     * and order status updates must still run for them.
+     */
+    public function testRefundIsAppliedEvenWhenOrderAlreadyPaid(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
+
+        $transactionStateHandler = new FakeOrderTransactionStateHandler();
+        $orderStateHandler = new FakeOrderStateHandler();
+
+        $fakeClient = new FakeClient(
+            'mollieTestId',
+            'paid',
+            PaymentMethod::PAYPAL,
+            false,
+            null,
+            null,
+            ['value' => '100.00', 'currency' => 'EUR'],
+            ['value' => '50.00', 'currency' => 'EUR'],
+        );
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $transactionStateHandler, null, $orderStateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertTrue($transactionStateHandler->wasCalled(), 'Refund must still change the payment status of a paid order');
+        $this->assertTrue($orderStateHandler->wasCalled(), 'Refund must still change the order status of a paid order');
     }
 
     private function getRoute(
@@ -307,6 +375,7 @@ final class WebhookRouteTest extends TestCase
         ?FakePaymentMethodUpdater $paymentMethodUpdater = null,
         ?FakeOrderStateHandler $orderStateHandler = null,
         ?FakeOrderService $orderService = null,
+        ?EventSpy $eventSpy = null,
     ): WebhookRoute {
         if ($transactionService === null) {
             $transactionService = new FakeTransactionService();
@@ -320,14 +389,16 @@ final class WebhookRouteTest extends TestCase
         $logger = new NullLogger();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
         $gateway = new MollieGateway($fakeClientFactory, $transactionService, $logger);
+        $transactionResolver = new OrderTransactionResolver();
 
         return new WebhookRoute(
             $gateway,
             $stateHandler ?? new FakeOrderTransactionStateHandler(),
-            new EventSpy(),
+            $eventSpy ?? new EventSpy(),
             $paymentMethodUpdater ?? new FakePaymentMethodUpdater(),
             $orderStateHandler ?? new FakeOrderStateHandler(),
             $orderService ?? new FakeOrderService(),
+            $transactionResolver,
             $logger
         );
     }

@@ -17,6 +17,8 @@ use Mollie\Shopware\Component\Order\Admin\Response\ShippingTotal;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -27,7 +29,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Routing\ApiRouteScope;
 use Shopware\Core\PlatformRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,6 +52,8 @@ final class OrderAdminController extends AbstractController
         private readonly AbstractSettingsService $mollieSettings,
         #[Autowire(service: MollieGateway::class)]
         private readonly MollieGatewayInterface $mollieGateway,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private readonly OrderTransactionResolverInterface $transactionResolver,
     ) {
     }
 
@@ -62,11 +65,7 @@ final class OrderAdminController extends AbstractController
     public function details(string $orderId, Context $context): JsonResponse
     {
         $criteria = new Criteria([$orderId]);
-        $criteria->getAssociation('transactions')
-            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->addAssociation('stateMachineState')
-            ->setLimit(1)
-        ;
+        $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('mollieSubscriptions');
         $criteria->addAssociation('lineItems');
         $criteria->addAssociation('deliveries');
@@ -78,17 +77,19 @@ final class OrderAdminController extends AbstractController
             return new JsonResponse(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $latestTransaction = $order->getTransactions()?->first();
+        // Shopware treats the first non-cancelled/failed transaction as the current payment, not
+        // necessarily the newest, so we resolve the effective transaction instead of taking the newest.
+        $effectiveTransaction = $this->transactionResolver->resolveEffective($order);
 
-        if ($latestTransaction === null) {
+        if ($effectiveTransaction === null) {
             return new JsonResponse(['isMollieOrder' => false]);
         }
 
         /** @var null|Payment $payment */
-        $payment = $latestTransaction->getExtension(Mollie::EXTENSION);
+        $payment = $effectiveTransaction->getExtension(Mollie::EXTENSION);
 
         if (! $payment instanceof Payment) {
-            $payment = $this->restorePaymentFromOrderCustomFields($order, $latestTransaction, $context);
+            $payment = $this->restorePaymentFromOrderCustomFields($order, $effectiveTransaction, $context);
 
             if ($payment === null) {
                 return new JsonResponse(['isMollieOrder' => false]);
@@ -115,7 +116,7 @@ final class OrderAdminController extends AbstractController
         // The Mollie payment status on the loaded extension is not reliable here (no API call, status not
         // hydrated), so for the Payments API we rely on the Shopware transaction state machine: shipping/
         // cancelling is only possible while the transaction is still open or authorized, not once it is paid.
-        $transactionState = $latestTransaction->getStateMachineState()?->getTechnicalName() ?? '';
+        $transactionState = $effectiveTransaction->getStateMachineState()?->getTechnicalName() ?? '';
         $shippingAllowed = in_array($transactionState, [
             OrderTransactionStates::STATE_OPEN,
             OrderTransactionStates::STATE_AUTHORIZED,

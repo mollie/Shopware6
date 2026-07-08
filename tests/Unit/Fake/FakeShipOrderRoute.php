@@ -15,9 +15,16 @@ final class FakeShipOrderRoute extends AbstractShipOrderRoute
 
     private string $mollieId = 'cap_fake';
 
+    private bool $shouldThrow = false;
+
     public function withMollieId(string $mollieId): void
     {
         $this->mollieId = $mollieId;
+    }
+
+    public function setShouldThrow(bool $shouldThrow): void
+    {
+        $this->shouldThrow = $shouldThrow;
     }
 
     public function getLastRequest(): Request
@@ -42,6 +49,10 @@ final class FakeShipOrderRoute extends AbstractShipOrderRoute
     public function ship(Request $request, Context $context): ShipOrderResponse
     {
         $this->lastRequest = $request;
+
+        if ($this->shouldThrow) {
+            throw new \RuntimeException('FakeShipOrderRoute: forced failure');
+        }
 
         return new ShipOrderResponse($this->mollieId, 'fakeshopwareorderid', []);
     }

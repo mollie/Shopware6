@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminController;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -42,7 +43,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -63,7 +64,7 @@ final class OrderAdminControllerTest extends TestCase
         ]);
         $gateway->withOrder($mollieOrder);
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -86,7 +87,7 @@ final class OrderAdminControllerTest extends TestCase
         $gateway = new FakeGateway();
         $gateway->withGetOrderException();
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -102,7 +103,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -123,7 +124,7 @@ final class OrderAdminControllerTest extends TestCase
         ]);
         $gateway->withOrder($mollieOrder);
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -152,7 +153,7 @@ final class OrderAdminControllerTest extends TestCase
         $mollieOrder = new Order('ord-xxx', '', null, [$line1, $line2]);
         $gateway->withOrder($mollieOrder);
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -172,7 +173,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -195,7 +196,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway);
+        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderTransactionResolver());
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);

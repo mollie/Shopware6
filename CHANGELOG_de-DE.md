@@ -4,7 +4,9 @@
 - Geändert: Der Zahlungsstatus-Webhook überspringt den Statuswechsel, wenn die Transaktion bereits im Zielstatus ist.
 - Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
 - Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.
-- Behoben: Der automatische Versand löst keinen Mollie-API-Aufruf mehr für Bestellungen aus, die nicht mit Mollie bezahlt wurden.
+- Behoben: Der automatische Versand captured nur noch eine autorisierte Mollie-Zahlung und bricht den Lieferstatus-Wechsel im Admin nicht mehr ab, wenn der Mollie-Aufruf fehlschlägt.
+- Behoben: Eine bezahlte Bestellung wird von einem späteren Webhook mit niedrigerem Status nicht mehr herabgestuft; eine zweite ebenfalls als „paid“ abgeschlossene Zahlung aktualisiert die Bestellung nun.
+- Behoben: Rückerstattungen, Bestell-Stornierung und der Mollie-Bestell-Tab wählen bei Bestellungen mit mehreren Transaktionen nun die korrekte Mollie-Transaktion.
 - Behoben: Eine ungültige Telefonnummer in der Adresse lässt die Zahlung nicht mehr fehlschlagen. Nummern im nationalen Format werden nun nach E.164 normalisiert (auch für Bancomat Pay / Bizum eingegebene Nummern); nicht normalisierbare Nummern werden aus dem Payload entfernt.
 - Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Name der Versandart leer ist. Als Ersatz wird „Shipping" verwendet.
 - Behoben: Plugin-Updates schlagen auf Shopware 6.5 nicht mehr mit einem 500er-Fehler fehl.

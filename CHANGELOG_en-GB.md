@@ -4,7 +4,9 @@
 - Changed: The payment status webhook skips the transition when the transaction is already in the target state.
 - Fixed: Returning from the payment page no longer shows a token error when the payment was already completed. Customers are now sent to the confirmation or edit-order page based on the payment status.
 - Fixed: The Mollie order tab no longer crashes on Shopware versions that don't register the order detail as a Pinia store.
-- Fixed: Automatic shipment no longer triggers a Mollie API call for orders that were not paid with Mollie.
+- Fixed: Automatic shipment now only captures an authorized Mollie payment and no longer breaks the delivery status change in the admin if the Mollie call fails.
+- Fixed: A paid order is no longer downgraded by a later webhook with a lower status; a second payment that also completes as paid now updates the order.
+- Fixed: Refunds, order cancellation and the Mollie order tab now select the correct Mollie transaction on orders with multiple transactions.
 - Fixed: An invalid phone number in the address no longer makes the payment fail. Numbers in national format are now normalized to E.164 (including numbers entered for Bancomat Pay / Bizum); numbers that cannot be normalized are removed from the payload.
 - Fixed: Payments no longer fail when the shipping method name is empty. "Shipping" is used as a fallback.
 - Fixed: Plugin updates no longer fail with a 500 error on Shopware 6.5.

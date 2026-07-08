@@ -23,6 +23,8 @@ use Mollie\Shopware\Component\Refund\Struct\RefundOverviewStruct;
 use Mollie\Shopware\Component\Refund\Struct\RefundTotalsStruct;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -31,7 +33,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -61,6 +62,8 @@ final class RefundController extends AbstractController
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
         private readonly CreditNoteService $creditNoteService,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -85,9 +88,9 @@ final class RefundController extends AbstractController
 
         $struct = new RefundOverviewStruct();
 
-        $mollieExtension = $order->getTransactions()?->first()?->getExtension(Mollie::EXTENSION);
+        $payment = $this->findMolliePayment($order);
 
-        if (! $mollieExtension instanceof Payment) {
+        if (! $payment instanceof Payment) {
             $this->logger->debug('No Mollie payment found for refund overview', [
                 'orderId' => $orderId,
                 'orderNumber' => $orderNumber,
@@ -95,8 +98,6 @@ final class RefundController extends AbstractController
 
             return $this->json($struct);
         }
-
-        $payment = $mollieExtension;
 
         $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $order->getSalesChannelId());
         $refunds = $this->enrichRefundsWithComposition($refunds, $order);
@@ -325,10 +326,7 @@ final class RefundController extends AbstractController
         $criteria->addAssociation('deliveries.shippingMethod');
         $criteria->addAssociation('currency');
         $criteria->addAssociation(OrderExtension::REFUND_PROPERTY_NAME . '.refundItems');
-        $criteria->getAssociation('transactions')
-            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->setLimit(1)
-        ;
+        $criteria->addAssociation('transactions.stateMachineState');
 
         /** @var null|OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -342,18 +340,24 @@ final class RefundController extends AbstractController
 
     private function extractMolliePayment(OrderEntity $order): Payment
     {
-        $transaction = $order->getTransactions()?->first();
-
-        if ($transaction === null) {
-            throw new \RuntimeException(sprintf('No Mollie transaction found for order "%s"', $order->getId()));
-        }
-
-        $payment = $transaction->getExtension(Mollie::EXTENSION);
+        $payment = $this->findMolliePayment($order);
 
         if (! $payment instanceof Payment) {
             throw new \RuntimeException(sprintf('No Mollie payment extension found for order "%s"', $order->getId()));
         }
 
         return $payment;
+    }
+
+    private function findMolliePayment(OrderEntity $order): ?Payment
+    {
+        $transaction = $this->transactionResolver->resolveRefundable($order);
+        if ($transaction === null) {
+            return null;
+        }
+
+        $payment = $transaction->getExtension(Mollie::EXTENSION);
+
+        return $payment instanceof Payment ? $payment : null;
     }
 }

@@ -9,13 +9,14 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -34,6 +35,8 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         private readonly AbstractShipOrderRoute $shipOrderRoute,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -60,11 +63,7 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         $orderDeliveryId = $event->getTransition()->getEntityId();
 
         $criteria = new Criteria([$orderDeliveryId]);
-        $criteria->addAssociation('order');
-        $criteria->getAssociation('order.transactions')
-            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->setLimit(1)
-        ;
+        $criteria->addAssociation('order.transactions.stateMachineState');
 
         $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
@@ -84,10 +83,15 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Only ship via the Mollie API when the order's latest transaction is actually a Mollie payment.
-        // Otherwise a delivery state change on a non-Mollie order would trigger an API call and fail.
-        $latestTransaction = $order->getTransactions()?->first();
-        if ($latestTransaction === null || ! $latestTransaction->getExtension(Mollie::EXTENSION) instanceof Payment) {
+        // Shipping captures an authorized (manual capture / pay-later) payment. A paid payment is already
+        // captured (nothing to do), so we only act on the authorized transaction that can still be captured.
+        $capturable = $this->transactionResolver->resolveCapturableAuthorized($order);
+        if ($capturable === null) {
+            return;
+        }
+
+        // The authorized payment must be a Mollie payment, otherwise there is nothing to capture via Mollie.
+        if (! $capturable->getExtension(Mollie::EXTENSION) instanceof Payment) {
             return;
         }
 
@@ -97,7 +101,18 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         ]);
 
         // Delegate to the central shipment route; without items it ships everything that is still open.
-        $request = new Request([], ['orderId' => $order->getId()]);
-        $this->shipOrderRoute->ship($request, $context);
+        // A failing shipment (e.g. a Mollie API error) must not break the admin delivery state change,
+        // so any error is caught and logged instead of bubbling up into the state machine transition.
+        try {
+            $request = new Request([], ['orderId' => $order->getId()]);
+            $this->shipOrderRoute->ship($request, $context);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Automatic shipment via Mollie failed', [
+                'orderId' => $order->getId(),
+                'orderNumber' => (string) $order->getOrderNumber(),
+                'orderDeliveryId' => $orderDeliveryId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
     }
 }

@@ -21,7 +21,6 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -64,13 +63,9 @@ final class TransactionService implements TransactionServiceInterface
         $criteria->addAssociation('order.lineItems.product.media');
         $criteria->addAssociation('order.stateMachineState.stateMachine');
         $criteria->addAssociation('order.mollieSubscriptions');
-        $criteria->addAssociation('order.transactions');
-        // Only load the newest order transaction. The webhook needs it to detect whether its own
-        // transaction is still the latest one of the order (see WebhookRoute). The sorting plus the
-        // limit make DAL load a single transaction per order instead of all of them.
-        $transactionsAssociation = $criteria->getAssociation('order.transactions');
-        $transactionsAssociation->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
-        $transactionsAssociation->setLimit(1);
+        // Load all order transactions together with their state so WebhookRoute can check whether the
+        // order already has a paid transaction and skip status updates on already paid orders.
+        $criteria->addAssociation('order.transactions.stateMachineState');
         $criteria->addAssociation('paymentMethod');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);

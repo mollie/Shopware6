@@ -7,6 +7,8 @@ use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Refund\Controller\RefundController;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
@@ -18,7 +20,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -35,6 +36,8 @@ final class OrderReturnHandler
         private readonly RefundGatewayInterface $refundGateway,
         #[Autowire(service: 'order_return.repository')]
         private readonly ?EntityRepository $orderReturnRepository,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -257,7 +260,12 @@ final class OrderReturnHandler
 
     private function extractMolliePayment(OrderEntity $order): ?Payment
     {
-        $payment = $order->getTransactions()?->first()?->getExtension(Mollie::EXTENSION);
+        $transaction = $this->transactionResolver->resolveRefundable($order);
+        if ($transaction === null) {
+            return null;
+        }
+
+        $payment = $transaction->getExtension(Mollie::EXTENSION);
 
         return $payment instanceof Payment ? $payment : null;
     }
@@ -269,10 +277,7 @@ final class OrderReturnHandler
         $criteria->addAssociation('lineItems');
         $criteria->addAssociation('order.lineItems');
         $criteria->addAssociation('order.deliveries.shippingMethod');
-        $criteria->getAssociation('order.transactions')
-            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->setLimit(1)
-        ;
+        $criteria->addAssociation('order.transactions.stateMachineState');
 
         $result = $this->orderReturnRepository->search($criteria, $context);
 
