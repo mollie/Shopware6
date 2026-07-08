@@ -1,15 +1,15 @@
 {
-    "extends": "stylelint-config-standard",
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-prettier"
+    ],
     "customSyntax": "postcss-scss",
     "plugins": [
         "stylelint-scss"
     ],
     "rules": {
-        "indentation": 4,
-        "color-hex-case": "lower",
         "no-missing-end-of-source-newline": true,
         "selector-class-pattern": "",
-        "string-quotes": "single",
         "property-no-unknown": [
             true,
             {
@@ -35,15 +35,6 @@
         "at-rule-no-unknown": null,
         "scss/at-rule-no-unknown": true,
         "font-family-no-missing-generic-family-keyword": null,
-        "max-line-length": [
-            200,
-            {
-                "ignore": [
-                    "comments",
-                    "non-comments"
-                ]
-            }
-        ],
         "block-no-empty": null,
         "function-no-unknown": [
             true,
