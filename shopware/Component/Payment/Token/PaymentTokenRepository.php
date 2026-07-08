@@ -5,7 +5,6 @@ namespace Mollie\Shopware\Component\Payment\Token;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Feature;
-use Shopware\Core\Framework\Util\Hasher;
 
 /**
  * Checks whether a Shopware finalize token has already been consumed, i.e. removed from the
@@ -32,7 +31,8 @@ final class PaymentTokenRepository implements PaymentTokenRepositoryInterface
             return false;
         }
 
-        $tokenKey = substr(Hasher::hash($paymentToken, 'sha256'), 0, 32);
+        // Mirrors JWTFactoryV2::normalize(): the newer Hasher util does not exist on Shopware 6.5.
+        $tokenKey = substr(hash('sha256', $paymentToken), 0, 32);
 
         $result = $this->connection->fetchOne(
             'SELECT 1 FROM payment_token WHERE token = :token',
