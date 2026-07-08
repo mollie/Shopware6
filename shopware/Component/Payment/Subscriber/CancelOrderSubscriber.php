@@ -8,15 +8,15 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -34,6 +34,8 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: 'order.repository')]
         private EntityRepository $orderRepository,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -60,8 +62,7 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
         $context = $event->getContext();
 
         $criteria = new Criteria([$orderId]);
-        $criteria->addAssociation('transactions');
-        $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))->setLimit(1);
+        $criteria->addAssociation('transactions.stateMachineState');
 
         /** @var ?OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -77,12 +78,10 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $transactions = $order->getTransactions();
-        if (! $transactions instanceof OrderTransactionCollection) {
-            return;
-        }
-
-        $transaction = $transactions->first();
+        // Only cancel when the order's current payment is a Mollie payment. Shopware treats the first
+        // non-cancelled/failed transaction as the current one, not necessarily the newest, so we resolve
+        // the effective transaction instead of taking the newest by createdAt.
+        $transaction = $this->transactionResolver->resolveEffective($order);
         if (! $transaction instanceof OrderTransactionEntity) {
             return;
         }

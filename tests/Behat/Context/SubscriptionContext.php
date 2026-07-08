@@ -423,9 +423,14 @@ final class SubscriptionContext extends ShopwareContext
 
     private function writeSystemConfig(string $key, mixed $value): void
     {
+        // The plugin seeds a sales-channel-scoped subscription config, and a sales-channel value overrides
+        // the global one that the flagger/detector read per sales channel. Writing globally would be
+        // shadowed by that override, so we set it for the sales channel under test.
+        $salesChannelId = $this->getCurrentSalesChannelContext()->getSalesChannelId();
+
         /** @var SystemConfigService $systemConfigService */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
-        $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value);
+        $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . $key, $value, $salesChannelId);
 
         /** @var SettingsService $settingsService */
         $settingsService = $this->getContainer()->get(SettingsService::class);

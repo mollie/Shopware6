@@ -12,6 +12,8 @@ use Mollie\Shopware\Component\Payment\PaymentMethodUpdater;
 use Mollie\Shopware\Component\Payment\PaymentMethodUpdaterInterface;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandlerInterface;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -43,6 +45,8 @@ final class WebhookRoute extends AbstractWebhookRoute
         #[Autowire(service: OrderStateHandler::class)]
         private readonly OrderStateHandlerInterface $orderStateHandler,
         private readonly OrderService $orderService,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -72,19 +76,18 @@ final class WebhookRoute extends AbstractWebhookRoute
         $orderNumber = (string) $shopwareOrder->getOrderNumber();
         $logData['orderNumber'] = $orderNumber;
 
-        if (! $this->isLatestOrderTransaction($transactionId, $shopwareOrder)) {
-            $this->logger->info('Webhook Process - Skipped, transaction is no longer the latest one of the order', $logData);
-
-            return new WebhookResponse($payment);
-        }
-
         $this->logger->info('Webhook Process - Start', $logData);
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
 
-        $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
-        $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
-        $this->updateOrderStatus($payment, $shopwareOrder, $context);
+        if ($this->shouldUpdatePaymentAndOrderStatus($payment, $shopwareOrder)) {
+            $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
+            $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
+            $this->updateOrderStatus($payment, $shopwareOrder, $context);
+        } else {
+            $this->logger->info('Webhook Process - Payment method, payment status and order status update skipped, order is already paid', $logData);
+        }
+
         $this->updateDeliveryStatus($payment, $shopwareOrder, $context);
 
         $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
@@ -96,24 +99,26 @@ final class WebhookRoute extends AbstractWebhookRoute
     }
 
     /**
-     * The webhook url is bound to a single order transaction. When a payment is cancelled and the order
-     * is finished with another (possibly non-Mollie) transaction, Shopware creates a newer transaction.
-     * Calling the old transaction's webhook must not touch the order, payment or delivery state anymore,
-     * so we only continue when the webhook transaction is still the latest one of the order.
+     * The webhook url is bound to a single order transaction. Mollie keeps sending webhooks for that
+     * transaction even after the order has been paid (e.g. a second payment attempt on the same order
+     * or a late status re-sync). Once the order has a paid transaction we must not let a stale, lower
+     * status downgrade it.
+     *
+     * Exceptions that still apply to an already paid order:
+     * - refunds and chargebacks legitimately change a paid order;
+     * - a second payment that also completes as "paid" is a new successful payment (e.g. the order was
+     *   re-paid with another method), so it must overwrite the payment method, payment status and order
+     *   status instead of being ignored.
      */
-    private function isLatestOrderTransaction(string $transactionId, OrderEntity $shopwareOrder): bool
+    private function shouldUpdatePaymentAndOrderStatus(Payment $payment, OrderEntity $shopwareOrder): bool
     {
-        $transactions = $shopwareOrder->getTransactions();
-        if ($transactions === null) {
+        $status = $payment->getStatus();
+
+        if ($status->isRefundRelated() || $status === PaymentStatus::PAID) {
             return true;
         }
 
-        $latestTransaction = $transactions->first();
-        if ($latestTransaction === null) {
-            return true;
-        }
-
-        return $latestTransaction->getId() === $transactionId;
+        return ! $this->transactionResolver->hasPaidTransaction($shopwareOrder);
     }
 
     private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void

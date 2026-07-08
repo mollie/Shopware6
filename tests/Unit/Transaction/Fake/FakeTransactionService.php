@@ -53,7 +53,8 @@ final class FakeTransactionService implements TransactionServiceInterface
     private bool $withoutOrder = false;
     private bool $withoutPaymentMethod = false;
     private bool $withoutMollieExtensionOnPaymentMethod = false;
-    private bool $withNewerTransaction = false;
+    /** @var list<string> */
+    private array $orderTransactionStates = [];
     private ?string $transactionState = null;
 
     public function __construct()
@@ -100,9 +101,13 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withoutMollieExtensionOnPaymentMethod = true;
     }
 
-    public function withNewerTransaction(): void
+    /**
+     * Populate the order's transaction collection with one transaction per given state, oldest-first,
+     * so WebhookRoute can derive the order's effective payment status from them.
+     */
+    public function withOrderTransactionStates(string ...$technicalNames): void
     {
-        $this->withNewerTransaction = true;
+        $this->orderTransactionStates = array_values($technicalNames);
     }
 
     public function withTransactionState(string $technicalName): void
@@ -224,13 +229,17 @@ final class FakeTransactionService implements TransactionServiceInterface
             $transaction->setOrder($order);
         }
 
-        if ($this->withNewerTransaction === true) {
-            // Simulate a newer transaction that took over the order (e.g. after the Mollie payment was
-            // cancelled and the order was finished with another payment method). DAL sorts the
-            // association by createdAt descending, so the newer transaction is the first element.
-            $newerTransaction = new OrderTransactionEntity();
-            $newerTransaction->setId('newer-transaction-id');
-            $order->setTransactions(new OrderTransactionCollection([$newerTransaction]));
+        if ($this->orderTransactionStates !== []) {
+            $orderTransactions = new OrderTransactionCollection();
+            foreach ($this->orderTransactionStates as $index => $technicalName) {
+                $orderTransaction = new OrderTransactionEntity();
+                $orderTransaction->setId('order-transaction-' . $index);
+                $state = new StateMachineStateEntity();
+                $state->setTechnicalName($technicalName);
+                $orderTransaction->setStateMachineState($state);
+                $orderTransactions->add($orderTransaction);
+            }
+            $order->setTransactions($orderTransactions);
         }
 
         $shippingAddress = $this->orderRepository->getOrderAddress($customer);

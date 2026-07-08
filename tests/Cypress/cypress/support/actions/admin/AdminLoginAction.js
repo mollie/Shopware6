@@ -47,6 +47,21 @@ export default class AdminLoginAction {
         // the admin SPA boot after login is slow on CI - the element does appear
         // eventually, 10s was simply too tight. give it room.
         cy.get('.sw-version__info', {timeout: 60000}).should('be.visible');
+
+        this.closeUpdateNotification();
+    }
+
+    /**
+     * Some Shopware versions show a persistent "A new Shopware version is available" system
+     * notification after login. At our admin viewport it overlaps the page and intercepts clicks
+     * (e.g. on the order detail tabs), so we dismiss it if it is present. Safe to call when absent.
+     */
+    closeUpdateNotification() {
+        cy.get('body').then(($body) => {
+            if ($body.find('.sw-notification__alert .sw-alert__close').length > 0) {
+                cy.get('.sw-notification__alert .sw-alert__close').click({multiple: true, force: true});
+            }
+        });
     }
 
 }

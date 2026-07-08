@@ -277,7 +277,14 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
     cy.contains('The order has been successfully shipped.', {timeout: 20000});
-    repoOrderDetails.getOrderDetailsGeneralTab().click();
+
+    // Shopware 6.6 keeps the "Ship through Mollie" modal open after a successful shipment, and its
+    // backdrop intercepts clicks on the order tabs. Close it if it is still present.
+    closeShipModalIfOpen();
+
+    // force: a late "new Shopware version available" notification can still overlap the tab at our
+    // admin viewport even after it is dismissed on login.
+    repoOrderDetails.getOrderDetailsGeneralTab().click({force: true});
     cy.reload();
 
     repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
@@ -294,4 +301,17 @@ function assertShippingButtonIsDisabled() {
     repoOrderDetails.getMollieActionButtonShipThroughMollie()
         .should('have.attr', 'class')
         .and('match', /--disabled/);
+}
+
+/**
+ * Closes the "Ship through Mollie" modal when it is still open (Shopware 6.6 no longer closes it
+ * automatically after a successful shipment). Safe to call when no modal is present.
+ */
+function closeShipModalIfOpen() {
+    cy.get('body').then(($body) => {
+        if ($body.find('.sw-modal__close').length > 0) {
+            cy.get('.sw-modal__close').first().click({force: true});
+            cy.get('.sw-modal').should('not.exist');
+        }
+    });
 }

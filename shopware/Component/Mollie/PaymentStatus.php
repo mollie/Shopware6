@@ -63,6 +63,19 @@ enum PaymentStatus: string
     }
 
     /**
+     * Refunds and chargebacks legitimately change the state of an already paid order, so the webhook
+     * must keep applying them even when the order is already paid (see WebhookRoute).
+     */
+    public function isRefundRelated(): bool
+    {
+        return in_array($this, [
+            self::REFUNDED,
+            self::PARTIALLY_REFUNDED,
+            self::CHARGEBACK,
+        ], true);
+    }
+
+    /**
      * @return class-string<FlowEventAware>[]
      */
     public static function getAllWebhookEvents(): array
