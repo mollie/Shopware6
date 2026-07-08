@@ -3,7 +3,6 @@ apple-pay-button {
 
     --apple-pay-button-border-radius: #{$border-radius};
     --apple-pay-button-width: 100%;
-    --apple-pay-button-height: calc(
-        #{$font-size-base} * #{$input-btn-line-height} + #{$input-btn-padding-y} * 2 + #{$input-btn-border-width} * 2
-    );
+    --apple-pay-button-height:
+        calc(#{$font-size-base} * #{$input-btn-line-height} + #{$input-btn-padding-y} * 2 + #{$input-btn-border-width} * 2);
 }
