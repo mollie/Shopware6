@@ -1,4 +1,4 @@
-# Unreleased
+# 5.1.0
 - Added: Wero payment method.
 - Added: Apple Pay is now available in all browsers, not only in Safari.
 - Changed: The payment status webhook skips the transition when the transaction is already in the target state.
