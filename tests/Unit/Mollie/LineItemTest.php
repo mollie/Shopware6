@@ -217,6 +217,35 @@ final class LineItemTest extends TestCase
         $this->assertSame($expectedVatAmount, $vatAmount);
     }
 
+    /**
+     * Currencies configured with zero item-rounding decimals (e.g. PLN, SEK, CZK) make
+     * Shopware round the line tax to whole numbers: a 678.00 line at 23% stores 127.00
+     * instead of 126.78. Mollie validates vatAmount === totalAmount * vatRate / (100 + vatRate)
+     * and rejects the payment ("The 'vatAmount' field is off. Expected to be PLN 126.78 ...,
+     * got PLN 127.00"). The vatAmount must be derived from the transmitted totalAmount
+     * whenever the Shopware value breaks that invariant.
+     */
+    public function testVatAmountIsDerivedWhenShopwareRoundedTaxBreaksTheMollieInvariant(): void
+    {
+        $orderLineItem = $this->orderRepository->getLineItemWithWholeNumberRoundedTax();
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('PLN');
+
+        $actual = LineItem::fromOrderLine($orderLineItem, $currency);
+
+        $this->assertSame(126.78, $actual->getVatAmount()->getValue());
+        $this->assertSame('23', $actual->getVatRate());
+        $this->assertSame(678.0, $actual->getAmount()->getValue());
+
+        // the invariant Mollie enforces, computed on the serialized 2-decimal values
+        $payload = $actual->jsonSerialize();
+        $vatRate = (float) $payload['vatRate'];
+        $totalAmount = (float) $payload['totalAmount']->jsonSerialize()['value'];
+        $vatAmount = (float) $payload['vatAmount']->jsonSerialize()['value'];
+
+        $this->assertSame(round($totalAmount * $vatRate / (100 + $vatRate), 2), $vatAmount);
+    }
+
     public function testCanCreateFromOrderLineWithMixedVoucherCategories(): void
     {
         $orderLineItem = $this->orderRepository->getLineItemWithMixedVoucherCategories();

@@ -321,6 +321,26 @@ final class OrderEntityBuilder
         return $orderLineItem;
     }
 
+    public function getLineItemWithWholeNumberRoundedTax(): OrderLineItemEntity
+    {
+        // currencies with zero item-rounding decimals (e.g. PLN) store whole-number taxes:
+        // 678.00 at 23% is stored as 127.00 instead of 126.78
+        $taxes = new CalculatedTaxCollection([
+            new CalculatedTax(127.0, 23.0, 678.0),
+        ]);
+
+        $price = new CalculatedPrice(678.0, 678.0, $taxes, new TaxRuleCollection(), 1);
+
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId('fake-whole-number-tax-line-item-id');
+        $orderLineItem->setType('product');
+        $orderLineItem->setLabel('Whole number tax product');
+        $orderLineItem->setQuantity(1);
+        $orderLineItem->setPrice($price);
+
+        return $orderLineItem;
+    }
+
     private function createOrderLineItem(string $id, string $productNumber, string $label, float $price, $voucherCategories = null): OrderLineItemEntity
     {
         $product = new ProductEntity();

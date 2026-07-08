@@ -95,9 +95,11 @@ final class PayloadBuilderTest extends TestCase
                 [
                     'type' => 'digital',
                     'vatRate' => '19',
+                    // the fixture tax (19% of the gross 10.99) breaks the vatAmount invariant
+                    // Mollie enforces, so it is derived from the totalAmount: 10.99 * 19 / 119
                     'vatAmount' => [
                         'currency' => 'EUR',
-                        'value' => '2.09',
+                        'value' => '1.75',
                     ],
                     'sku' => 'SW1000',
                     'description' => 'Fake product',
@@ -114,9 +116,10 @@ final class PayloadBuilderTest extends TestCase
                 [
                     'type' => 'shipping_fee',
                     'vatRate' => '19',
+                    // derived like above: 4.99 * 19 / 119
                     'vatAmount' => [
                         'currency' => 'EUR',
-                        'value' => '0.95',
+                        'value' => '0.80',
                     ],
                     'sku' => 'mol-delivery-fake-shipping-method-id',
                     'description' => 'DHL',

@@ -12,6 +12,7 @@
 - Behoben: Storefront-Seiten brechen bei von Mollie nicht unterstützten Locales (z. B. cs_CZ, sk_SK) nicht mehr ab. Die Locale weicht nun auf eine unterstützte oder auf en_GB aus.
 - Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Warenkorb einen Rabatt eines Drittanbieter-Plugins enthält (eigener Positionstyp mit negativem Preis). Solche Positionen werden nun als Typ 'discount' an Mollie übertragen.
 - Behoben: Die an Mollie übertragene Versandzeile verwendet nun den übersetzten Namen der Versandart. Storefront-Sprachen ohne eigene Versandart-Übersetzung schlagen nicht mehr fehl (vor dem „Shipping“-Fallback) bzw. zeigen nicht mehr das generische „Shipping“; der Name fällt nun über die Sprachkette zurück.
+- Behoben: Zahlungen schlagen nicht mehr mit „The 'vatAmount' field is off“ fehl, wenn Shopware die Währung auf ganze Beträge rundet (0 Nachkommastellen bei der Positionsrundung, z. B. PLN, SEK, CZK). Verletzt die gerundete Shopware-Steuer Mollies vatAmount-Validierung, wird das vatAmount nun aus dem übertragenen totalAmount abgeleitet.
 
 # 5.0.0
 - Hinweis: Durch Autoloader-Caching kann beim Hochladen/Update des Plugins ein Fehler erscheinen. Dieser kann ignoriert werden.
