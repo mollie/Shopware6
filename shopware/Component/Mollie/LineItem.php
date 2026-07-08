@@ -492,8 +492,22 @@ final class LineItem implements \JsonSerializable
         $lineItem = new self($label, $price->getQuantity(), $unitPrice, $totalPrice);
 
         if ($tax instanceof CalculatedTax) {
-            $lineItem->setVatAmount(new Money($tax->getTax(), $currency->getIsoCode()));
-            $lineItem->setVatRate((string) $tax->getTaxRate());
+            $vatRate = $tax->getTaxRate();
+            $vatAmount = new Money($tax->getTax(), $currency->getIsoCode());
+
+            // Shopware rounds line taxes to the currency's item-rounding decimals (often 0 for
+            // PLN, SEK or CZK), but Mollie validates vatAmount === totalAmount × vatRate / (100 + vatRate)
+            // on the transmitted values and rejects the payment otherwise ("The 'vatAmount' field is off").
+            // If the Shopware tax breaks that invariant, derive the vatAmount from the transmitted totalAmount.
+            $decimals = $totalPrice->getDecimals();
+            $transmittedTotal = round($totalPrice->getValue(), $decimals);
+            $expectedVatAmount = round($transmittedTotal * $vatRate / (100 + $vatRate), $decimals);
+            if (round($vatAmount->getValue(), $decimals) !== $expectedVatAmount) {
+                $vatAmount = new Money($expectedVatAmount, $currency->getIsoCode());
+            }
+
+            $lineItem->setVatAmount($vatAmount);
+            $lineItem->setVatRate((string) $vatRate);
         }
 
         return $lineItem;
