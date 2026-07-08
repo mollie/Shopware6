@@ -24,11 +24,13 @@
         <input type="hidden" name="mode" value="{{ mode }}"/>
 
         {% block mollie_apple_pay_direct_button %}
-            <button type="submit" data-shop-url="{{ seoUrl('frontend.home.page') }}" data-applepay-enabled="{{ mollie_applepaydirect_enabled }}" class="btn btn-primary btn-block btn-buy apple-pay-button-with-text apple-pay-button-black js-apple-pay mollie-express-button w-100 d-none">
-                {# space to match height other buttons #}
-                &nbsp;
-                {# end important spacer #}
-            </button>
+            <apple-pay-button
+                buttonstyle="black"
+                type="buy"
+                locale="{{ app.request.locale }}"
+                data-shop-url="{{ seoUrl('frontend.home.page') }}"
+                data-applepay-enabled="{{ mollie_applepaydirect_enabled }}"
+                class="js-apple-pay mollie-express-button w-100 d-none"></apple-pay-button>
         {% endblock %}
     </div>
 {% endblock %}

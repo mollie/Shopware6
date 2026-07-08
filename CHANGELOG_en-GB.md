@@ -1,5 +1,6 @@
 # Unreleased
 - Added: Wero payment method.
+- Added: Apple Pay is now available in all browsers, not only in Safari.
 - Changed: The payment status webhook skips the transition when the transaction is already in the target state.
 - Fixed: Returning from the payment page no longer shows a token error when the payment was already completed. Customers are now sent to the confirmation or edit-order page based on the payment status.
 - Fixed: The Mollie order tab no longer crashes on Shopware versions that don't register the order detail as a Pinia store.
