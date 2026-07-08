@@ -1,0 +1,10 @@
+{% sw_extends '@Storefront/storefront/layout/meta.html.twig' %}
+
+{% block layout_head_meta_tags %}
+    {{ parent() }}
+    {% block mollie_apple_pay_sdk %}
+        {% if mollie_applepaydirect_enabled is defined and mollie_applepaydirect_enabled %}
+            <script crossorigin src="https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js"></script>
+        {% endif %}
+    {% endblock %}
+{% endblock %}
