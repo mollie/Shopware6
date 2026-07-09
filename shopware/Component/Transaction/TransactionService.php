@@ -143,19 +143,29 @@ final class TransactionService implements TransactionServiceInterface
     {
         $salesChannel = $order->getSalesChannelId();
         $orderNumber = $order->getOrderNumber();
+        $paymentData = $payment->toArray();
 
         $this->logger->debug('Save payment information in Order Transaction', [
             'transactionId' => $transactionId,
-            'data' => $payment->toArray(),
+            'data' => $paymentData,
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannel,
         ]);
 
+        $orderCustomFields = $order->getCustomFields() ?? [];
+        $orderCustomFields[Mollie::EXTENSION] = $paymentData;
+
+        $orderData = [
+            'id' => $order->getId(),
+            'customFields' => $orderCustomFields,
+        ];
+
         $upsertArray = [
             'id' => $transactionId,
             'customFields' => [
-                Mollie::EXTENSION => $payment->toArray(),
+                Mollie::EXTENSION => $paymentData,
             ],
+            'order' => $orderData,
         ];
 
         if (! $mollieOrder instanceof MollieOrder) {
@@ -171,8 +181,6 @@ final class TransactionService implements TransactionServiceInterface
         if ($filteredMollieLines->count() === 0 && $filteredMollieDeliveryLines->count() === 0) {
             return $this->orderTransactionRepository->upsert([$upsertArray], $context);
         }
-
-        $orderData = ['id' => $order->getId()];
 
         if ($filteredMollieLines->count() > 0) {
             $lineItemsData = [];
