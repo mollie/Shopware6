@@ -1,6 +1,7 @@
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.
 - Hinzugefügt: Apple Pay ist jetzt in allen Browsern verfügbar, nicht mehr nur in Safari.
+- Hinzugefügt: Die Mollie-Zahlungsdaten werden nun auch in den Zusatzfeldern der Bestellung gespeichert (nicht nur in der Transaktion), damit Warenwirtschaftssysteme wie der JTL-Connector sie auslesen können. Bestehende Bestellungen werden nachgefüllt.
 - Geändert: Der Zahlungsstatus-Webhook überspringt den Statuswechsel, wenn die Transaktion bereits im Zielstatus ist.
 - Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
 - Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.
