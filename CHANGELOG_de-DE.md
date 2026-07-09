@@ -1,3 +1,6 @@
+# Unreleased
+- Behoben: Das Aktivieren des Plugins schlägt bei Zahlungsarten ohne Übersetzung in der Systemsprache nicht mehr mit dem Fehler „name must not be empty“ fehl.
+
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.
 - Hinzugefügt: Apple Pay ist jetzt in allen Browsern verfügbar, nicht mehr nur in Safari.

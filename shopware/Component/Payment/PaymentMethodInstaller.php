@@ -141,37 +141,53 @@ final class PaymentMethodInstaller
         if ($paymentMethodSearchResult->getTotal() > 0) {
             /** @var PaymentMethodEntity $paymentMethodEntity */
             foreach ($paymentMethodSearchResult->getIterator() as $paymentMethodEntity) {
+                $handlerIdentifier = $paymentMethodEntity->getHandlerIdentifier();
+
+                // The handler always provides a non-empty name; keep it as fallback so we never
+                // upsert an empty name when a translation row (e.g. the system language) is missing.
+                $defaultName = (string) ($mapping[$handlerIdentifier]['name'] ?? '');
+                $systemName = (string) $paymentMethodEntity->getName();
+                if ($systemName === '') {
+                    $systemName = $defaultName;
+                }
+                $description = $paymentMethodEntity->getDescription();
+
                 $changedData = [
                     'id' => $paymentMethodEntity->getId(),
                     'afterOrderEnabled' => $paymentMethodEntity->getAfterOrderEnabled(),
                     'technicalName' => (string) $paymentMethodEntity->getTechnicalName(),
-                    'name' => $paymentMethodEntity->getName(),
-                    'description' => $paymentMethodEntity->getDescription(),
+                    'name' => $systemName,
+                    'description' => $description,
                     'active' => $paymentMethodEntity->getActive(),
+                    'translations' => [
+                        Defaults::LANGUAGE_SYSTEM => [
+                            'name' => $systemName,
+                            'description' => $description,
+                        ],
+                    ],
                 ];
+
                 $translations = $paymentMethodEntity->getTranslations();
-
                 if ($translations !== null) {
-                    $changedData['translations'][Defaults::LANGUAGE_SYSTEM] = [
-                        'name' => $paymentMethodEntity->getName(),
-                        'description' => $paymentMethodEntity->getDescription(),
-                    ];
-
                     foreach ($translations as $translation) {
+                        $translationName = (string) $translation->getName();
+                        if ($translationName === '') {
+                            $translationName = $defaultName;
+                        }
                         $changedData['translations'][$translation->getLanguageId()] = [
-                            'name' => $translation->getName(),
+                            'name' => $translationName,
                             'description' => $translation->getDescription(),
                         ];
                     }
                 }
 
-                $handler = $handlers[$paymentMethodEntity->getHandlerIdentifier()] ?? null;
+                $handler = $handlers[$handlerIdentifier] ?? null;
 
                 if ($handler instanceof DeprecatedMethodAwareInterface) {
                     $changedData['active'] = false;
                 }
 
-                $mapping[$paymentMethodEntity->getHandlerIdentifier()] = array_replace($mapping[$paymentMethodEntity->getHandlerIdentifier()], $changedData);
+                $mapping[$handlerIdentifier] = array_replace($mapping[$handlerIdentifier], $changedData);
             }
         }
 

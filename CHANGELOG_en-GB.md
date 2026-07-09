@@ -1,3 +1,6 @@
+# Unreleased
+- Fixed: Activating the plugin no longer fails with a "name must not be empty" error for payment methods without a system-language translation.
+
 # 5.1.0
 - Added: Wero payment method.
 - Added: Apple Pay is now available in all browsers, not only in Safari.
