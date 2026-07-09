@@ -21,15 +21,17 @@ export default class StoreAPIClient {
             response = await this.submitLogin(email, password);
         }
 
-        // TEMPORARY DIAGNOSTIC: dump the full login response to pin down why the
-        // captured token resolves to a customer-less context on 6.7.
-        const headers = {};
-        response.headers.forEach((value, key) => { headers[key] = value; });
+        // TEMPORARY DIAGNOSTIC: after login, ask the server what the captured token
+        // resolves to. If context.customer is null the token was never customer-bound.
+        const context = await this.get('/context');
         throw new Error('LOGIN DIAGNOSTIC ' + JSON.stringify({
-            status: response.status,
+            loginStatus: response.status,
             capturedToken: this.contextToken,
-            headers,
-            body: response.data,
+            contextStatus: context.status,
+            contextToken: context.headers.get('sw-context-token'),
+            customer: context.data?.customer ?? null,
+            contextCustomerId: context.data?.customerId ?? null,
+            contextApiAlias: context.data?.apiAlias ?? null,
         }));
 
         if (!this.contextToken) {
