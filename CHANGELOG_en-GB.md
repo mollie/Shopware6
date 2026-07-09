@@ -1,5 +1,5 @@
 # Unreleased
-- Fixed: Activating the plugin no longer fails with a "name must not be empty" error for payment methods without a system-language translation.
+- Fixed: Activating the plugin no longer fails with a "should not be blank" error when duplicate payment method icons exist in the media library.
 
 # 5.1.0
 - Added: Wero payment method.

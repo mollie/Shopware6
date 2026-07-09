@@ -1,5 +1,5 @@
 # Unreleased
-- Behoben: Das Aktivieren des Plugins schlägt bei Zahlungsarten ohne Übersetzung in der Systemsprache nicht mehr mit dem Fehler „name must not be empty“ fehl.
+- Behoben: Das Aktivieren des Plugins schlägt nicht mehr mit einem „should not be blank“-Fehler fehl, wenn doppelte Zahlarten-Icons in der Medienbibliothek vorhanden sind.
 
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.

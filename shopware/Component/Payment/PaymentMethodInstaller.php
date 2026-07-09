@@ -134,6 +134,11 @@ final class PaymentMethodInstaller
             /** @var MediaEntity $mediaEntity */
             foreach ($iconNamesSearchResult->getIterator() as $mediaEntity) {
                 $fileName = (string) $mediaEntity->getFileName();
+                // Duplicate media rows can share a file name; the first hit already claimed the
+                // mapping, so skip the rest - otherwise a null key would create a ghost entry.
+                if (! isset($iconMapping[$fileName])) {
+                    continue;
+                }
                 $currentHandlerIdentifier = $iconMapping[$fileName];
                 $mapping[$currentHandlerIdentifier]['mediaId'] = $mediaEntity->getId();
                 unset($iconMapping[$fileName]);
