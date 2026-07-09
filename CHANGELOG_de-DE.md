@@ -1,3 +1,6 @@
+# Unreleased
+- Behoben: Das Aktivieren des Plugins schlägt nicht mehr mit einem „should not be blank“-Fehler fehl, wenn doppelte Zahlarten-Icons in der Medienbibliothek vorhanden sind.
+
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.
 - Hinzugefügt: Apple Pay ist jetzt in allen Browsern verfügbar, nicht mehr nur in Safari.

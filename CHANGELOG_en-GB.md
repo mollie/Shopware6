@@ -1,3 +1,6 @@
+# Unreleased
+- Fixed: Activating the plugin no longer fails with a "should not be blank" error when duplicate payment method icons exist in the media library.
+
 # 5.1.0
 - Added: Wero payment method.
 - Added: Apple Pay is now available in all browsers, not only in Safari.
