@@ -29,11 +29,34 @@ trait SalesChannelTestBehaviour
         $criteria->addAssociation('currency');
         $criteria->addAssociation('shippingMethods');
 
-        $criteria->addFilter(new EqualsFilter('domains.url', $domain));
         $criteria->addFilter(new EqualsFilter('typeId', Defaults::SALES_CHANNEL_TYPE_STOREFRONT));
         $criteria->addFilter(new EqualsFilter('active', true));
 
-        return $repository->search($criteria, $context)->first();
+        $salesChannels = $repository->search($criteria, $context);
+
+        $fallback = null;
+        foreach ($salesChannels as $salesChannel) {
+            $domains = $salesChannel->getDomains();
+            if ($domains === null || $domains->count() === 0) {
+                continue;
+            }
+
+            foreach ($domains as $salesChannelDomain) {
+                if ($salesChannelDomain->getUrl() === $domain) {
+                    return $salesChannel;
+                }
+            }
+
+            if ($fallback === null) {
+                $fallback = $salesChannel;
+            }
+        }
+
+        if ($fallback instanceof SalesChannelEntity) {
+            return $fallback;
+        }
+
+        throw new \RuntimeException(sprintf('No active storefront sales channel with a domain found (looked for domain "%s").', $domain));
     }
 
     public function getSalesChannelContext(SalesChannelEntity $salesChannel, array $options = []): SalesChannelContext
