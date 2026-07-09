@@ -21,6 +21,17 @@ export default class StoreAPIClient {
             response = await this.submitLogin(email, password);
         }
 
+        // TEMPORARY DIAGNOSTIC: dump the full login response to pin down why the
+        // captured token resolves to a customer-less context on 6.7.
+        const headers = {};
+        response.headers.forEach((value, key) => { headers[key] = value; });
+        throw new Error('LOGIN DIAGNOSTIC ' + JSON.stringify({
+            status: response.status,
+            capturedToken: this.contextToken,
+            headers,
+            body: response.data,
+        }));
+
         if (!this.contextToken) {
             throw new Error(`Store API login failed with status ${response.status}: ${JSON.stringify(response.data)}`);
         }
