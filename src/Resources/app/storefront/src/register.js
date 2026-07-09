@@ -29,7 +29,11 @@ export default class MollieRegistration {
                 MollieCreditCardComponentsSw64,
                 '[data-mollie-template-creditcard-components-sw64]',
             ],
-            ['MollieCreditCardMandateManage', MollieCreditCardMandateManage, '[data-mollie-credit-card-mandate-manage]'],
+            [
+                'MollieCreditCardMandateManage',
+                MollieCreditCardMandateManage,
+                '[data-mollie-credit-card-mandate-manage]',
+            ],
             ['MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]'],
             ['MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]'],
         ];
