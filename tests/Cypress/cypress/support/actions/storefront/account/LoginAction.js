@@ -11,7 +11,7 @@ export default class LoginAction {
     doLogin(email, password) {
 
         cy.visit('/account/login');
-
+        cy.wait(600);
         repoLogin.getEmail().clear().type(email);
         repoLogin.getPassword().clear().type(password);
         repoLogin.getSubmitButton().click();

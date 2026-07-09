@@ -104,17 +104,14 @@ runs:
     - name: Update Shopware Config
       shell: bash
       run: |
-        #docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "APP_URL=https://${{ inputs._SHOP_DOMAIN }}" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
-        # disable the storefront reverse-proxy HTTP cache: in prod it can serve a
-        # cached anonymous "/account -> login" redirect to an already logged-in
-        # request (SW 6.7), which breaks the storefront login in the e2e suite.
         docker exec shop bash -c "echo "SHOPWARE_HTTP_CACHE_ENABLED=0" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "cp /var/www/html/.env /var/www/html/.env.local" || true;
         docker exec -u root bash shop -c "chown -R www-data:www-data /var/www/html" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
@@ -145,7 +142,6 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W'
 
     - name: Install Plugin
       shell: bash
