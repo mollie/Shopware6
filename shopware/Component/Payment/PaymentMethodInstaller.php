@@ -56,7 +56,25 @@ final class PaymentMethodInstaller
     {
         $upsertData = $this->loadPaymentMethodMapping($context);
 
-        return $this->shopwarePaymentMethodRepository->upsert($upsertData, $context);
+        try {
+            return $this->shopwarePaymentMethodRepository->upsert($upsertData, $context);
+        } catch (\Throwable $e) {
+            $paymentMethods = [];
+            foreach ($upsertData as $paymentMethod) {
+                $paymentMethods[] = [
+                    'technicalName' => $paymentMethod['technicalName'] ?? null,
+                    'name' => $paymentMethod['name'] ?? null,
+                    'handlerIdentifier' => $paymentMethod['handlerIdentifier'] ?? null,
+                ];
+            }
+
+            $this->logger->error('Failed to upsert Mollie payment methods', [
+                'exception' => $e->getMessage(),
+                'paymentMethods' => $paymentMethods,
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
