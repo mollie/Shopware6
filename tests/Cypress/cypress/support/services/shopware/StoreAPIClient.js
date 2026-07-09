@@ -15,6 +15,15 @@ export default class StoreAPIClient {
     }
 
     async login(email, password) {
+        let response = await this.submitLogin(email, password);
+
+        if (!this.contextToken) {
+            response = await this.submitLogin(email, password);
+        }
+        return response;
+    }
+
+    async submitLogin(email, password) {
         const response = await this.post('/account/login', { email, password });
         const token = response.data?.contextToken ?? response.headers.get('sw-context-token');
 
