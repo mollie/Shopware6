@@ -13,54 +13,46 @@ export default class MollieRegistration {
     register() {
         const pluginManager = window.PluginManager;
 
-        // global plugins - registered on 'body' so Shopware's PluginManager initializes
-        // them exactly once per page regardless of version
-        // -----------------------------------------------------------------------------
-        // hide apple pay direct buttons across the whole shop, if not available
-        pluginManager.register('MollieApplePayDirect', MollieApplePayDirect, 'body');
+        // [name, pluginClass, selector]
+        // Apple Pay Direct and PayPal Express register on 'body' so they initialize
+        // exactly once per page. The rest bind to their template markers: hide the
+        // standard Apple Pay method in checkout/account, show the credit card
+        // components, manage the credit card mandate, drive the POS terminal and run
+        // universal phone validation.
+        const registrations = [
+            ['MollieApplePayDirect', MollieApplePayDirect, 'body'],
+            ['PayPalExpressPlugin', PayPalExpressPlugin, 'body'],
+            ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]'],
+            ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]'],
+            [
+                'MollieCreditCardComponentsSw64',
+                MollieCreditCardComponentsSw64,
+                '[data-mollie-template-creditcard-components-sw64]',
+            ],
+            [
+                'MollieCreditCardMandateManage',
+                MollieCreditCardMandateManage,
+                '[data-mollie-credit-card-mandate-manage]',
+            ],
+            ['MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]'],
+            ['MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]'],
+        ];
 
-        // fix quantity select on PDP Page
-        pluginManager.register('PayPalExpressPlugin', PayPalExpressPlugin, 'body');
+        registrations.forEach(function (registration) {
+            pluginManager.register(registration[0], registration[1], registration[2]);
+        });
 
-        // hiding the standard Apple Pay method in the checkout and account area
-        // -----------------------------------------------------------------------------
-        pluginManager.register(
-            'MollieApplePayPaymentMethod',
-            MollieApplePayPaymentMethod,
-            '[data-mollie-template-applepay-account]',
-        );
-        pluginManager.register(
-            'MollieApplePayPaymentMethod',
-            MollieApplePayPaymentMethod,
-            '[data-mollie-template-applepay-checkout]',
-        );
-
-        // showing credit card components in the checkout
-        // -----------------------------------------------------------------------------
-        pluginManager.register(
-            'MollieCreditCardComponentsSw64',
-            MollieCreditCardComponentsSw64,
-            '[data-mollie-template-creditcard-components-sw64]',
-        );
-
-        // manage credit card mandate
-        // -----------------------------------------------------------------------------
-        pluginManager.register(
-            'MollieCreditCardMandateManage',
-            MollieCreditCardMandateManage,
-            '[data-mollie-credit-card-mandate-manage]',
-        );
-
-        // POS Terminal
-        // -----------------------------------------------------------------------------
-        pluginManager.register('MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]');
-
-        // UNIVERSAL PHONE VALIDATION
-        // -----------------------------------------------------------------------------
-        pluginManager.register('MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]');
-
-        // Our bundle loads after Shopware's main initializePlugins() call, so we
-        // must trigger another initialization round for our newly registered plugins.
-        pluginManager.initializePlugins();
+        // Our bundle loads after Shopware's main initializePlugins() call, so our
+        // freshly registered plugins still need to be initialized. We do this per
+        // plugin instead of calling the global pluginManager.initializePlugins():
+        // that global sweep re-initializes EVERY registered plugin on the page,
+        // including async plugins from the core or other extensions. On Shopware 6.6.x
+        // the init loop has no guard against still-unresolved async plugins, so it
+        // runs `new (() => import(...))()` and throws "is not a constructor", aborting
+        // the whole storefront bundle. Scoping to our own (synchronous) plugins avoids
+        // touching foreign async plugins entirely.
+        registrations.forEach(function (registration) {
+            pluginManager.initializePlugin(registration[0], registration[2]);
+        });
     }
 }
