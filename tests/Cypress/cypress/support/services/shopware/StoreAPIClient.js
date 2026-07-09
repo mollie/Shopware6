@@ -20,13 +20,25 @@ export default class StoreAPIClient {
         if (!this.contextToken) {
             response = await this.submitLogin(email, password);
         }
+
+        if (!this.contextToken) {
+            throw new Error(`Store API login failed with status ${response.status}: ${JSON.stringify(response.data)}`);
+        }
         return response;
     }
 
     async submitLogin(email, password) {
         const response = await this.post('/account/login', { email, password });
-        const token = response.data?.contextToken ?? response.headers.get('sw-context-token');
 
+        // Only trust the token on a successful login. On a failed login Shopware's
+        // ResponseHeaderListener echoes the anonymous request context token back in the
+        // sw-context-token header. Capturing that would pass the "token not null" check
+        // but resolve to a customer-less context, causing 403s on _loginRequired routes.
+        if (response.status < 200 || response.status >= 300) {
+            return response;
+        }
+
+        const token = response.headers.get('sw-context-token') ?? response.data?.contextToken;
         if (token) {
             this.setContextToken(token);
         }
