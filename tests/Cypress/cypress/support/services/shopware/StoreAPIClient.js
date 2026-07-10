@@ -15,18 +15,27 @@ export default class StoreAPIClient {
     }
 
     async login(email, password) {
-        const response = await this.post('/account/login', { email, password });
+        // TEMPORARY DIAGNOSTIC: is the http cache really off now, and does the login
+        // token differ per login? Same token twice => cache still on.
+        this.contextToken = null;
+        const r1 = await this.post('/account/login', { email, password });
+        const token1 = r1.headers.get('sw-context-token');
 
-        // On 6.7 the token is only in the sw-context-token header (no longer in the body).
-        // Only trust it on a successful login so a failed login doesn't capture the
-        // echoed anonymous request token and produce false-positive 403s afterwards.
-        if (response.status >= 200 && response.status < 300) {
-            const token = response.headers.get('sw-context-token') ?? response.data?.contextToken;
-            if (token) {
-                this.setContextToken(token);
-            }
-        }
-        return response;
+        this.contextToken = null;
+        const r2 = await this.post('/account/login', { email, password });
+        const token2 = r2.headers.get('sw-context-token');
+
+        this.contextToken = token2;
+        const context = await this.get('/context');
+
+        throw new Error('LOGIN DIAGNOSTIC ' + JSON.stringify({
+            loginStatus: r1.status,
+            swCache: r1.headers.get('x-symfony-cache'),
+            token1,
+            token2,
+            tokensDiffer: token1 !== token2,
+            contextCustomer: context.data?.customer ? 'PRESENT' : null,
+        }));
     }
 
     async get(url, params = {}) {
