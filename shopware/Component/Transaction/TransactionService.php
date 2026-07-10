@@ -152,8 +152,16 @@ final class TransactionService implements TransactionServiceInterface
             'salesChannelId' => $salesChannel,
         ]);
 
+        // The JTL connector reads these fixed keys (order_id, payment_id, third_party_payment_id)
+        // from the order custom fields. Map the camelCase payment data onto them so the ERP export
+        // finds the values. This only applies to the order, not the transaction.
+        $orderPaymentData = $paymentData;
+        $orderPaymentData['order_id'] = $payment->getOrderId() ?? '';
+        $orderPaymentData['payment_id'] = $payment->getId();
+        $orderPaymentData['third_party_payment_id'] = $payment->getThirdPartyPaymentId();
+
         $orderCustomFields = $order->getCustomFields() ?? [];
-        $orderCustomFields[Mollie::EXTENSION] = $paymentData;
+        $orderCustomFields[Mollie::EXTENSION] = $orderPaymentData;
 
         $orderData = [
             'id' => $order->getId(),
