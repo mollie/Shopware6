@@ -15,28 +15,21 @@ export default class StoreAPIClient {
     }
 
     async login(email, password) {
-        let response = await this.submitLogin(email, password);
+        // TEMPORARY DIAGNOSTIC: send a client-known token on login to see whether the
+        // login response echoes our request token or returns a rotated (bound) token.
+        const sentToken = 'abcdefghijklmnopqrstuvwxyz012345';
+        this.contextToken = sentToken;
 
-        if (!this.contextToken) {
-            response = await this.submitLogin(email, password);
-        }
-
-        // TEMPORARY DIAGNOSTIC: measure which sales channel the token resolves to.
+        const response = await this.submitLogin(email, password);
         const context = await this.get('/context');
         throw new Error('LOGIN DIAGNOSTIC ' + JSON.stringify({
+            sentToken,
             loginStatus: response.status,
-            loginContextToken: response.headers.get('sw-context-token'),
-            accessKey: this.salesChannelApiKey,
-            contextSalesChannelId: context.data?.salesChannel?.id ?? null,
-            contextSalesChannelName: context.data?.salesChannel?.name ?? null,
-            contextToken: context.data?.token ?? context.headers.get('sw-context-token'),
-            customer: context.data?.customer ?? null,
+            loginRespToken: response.headers.get('sw-context-token'),
+            capturedToken: this.contextToken,
+            contextRespToken: context.data?.token ?? null,
+            customer: context.data?.customer ? 'PRESENT' : null,
         }));
-
-        if (!this.contextToken) {
-            throw new Error(`Store API login failed with status ${response.status}: ${JSON.stringify(response.data)}`);
-        }
-        return response;
     }
 
     async submitLogin(email, password) {
