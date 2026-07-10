@@ -1,5 +1,6 @@
 # Unreleased
 - Behoben: Das Aktivieren des Plugins schlägt nicht mehr mit einem „should not be blank“-Fehler fehl, wenn doppelte Zahlarten-Icons in der Medienbibliothek vorhanden sind.
+- Behoben: Die Änderung des Bestellstatus läuft nicht mehr in eine Endlosschleife.
 
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.

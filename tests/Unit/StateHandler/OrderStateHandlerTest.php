@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\OrderStates;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 
 #[CoversClass(OrderStateHandler::class)]
 final class OrderStateHandlerTest extends TestCase
@@ -76,9 +77,15 @@ final class OrderStateHandlerTest extends TestCase
         ]);
 
         $stateHandler = $this->getOrderStateHandler($settings);
-        $this->expectException(\RuntimeException::class);
 
-        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
+        $this->expectException(IllegalTransitionException::class);
+
+        try {
+            $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_PAID, OrderStates::STATE_OPEN, 'test', $this->context);
+        } catch (IllegalTransitionException $exception) {
+            $this->assertSame('SYSTEM__ILLEGAL_STATE_TRANSITION', $exception->getErrorCode());
+            throw $exception;
+        }
     }
 
     public function testTransactionIsMovedOnce(): void
@@ -136,6 +143,52 @@ final class OrderStateHandlerTest extends TestCase
         $expectedTransition = ['reopen', 'cancel'];
         $this->assertSame('cancelledId', $actual);
         $this->assertSame($expectedTransition, $this->registry->getActions());
+    }
+
+    public function testInProgressToOpenIsNotReachableOnDefaultStateMachine(): void
+    {
+        $fakeOrder = $this->getOrder();
+
+        $settings = new OrderStateSettings([
+            OrderTransactionStates::STATE_AUTHORIZED => OrderStates::STATE_OPEN
+        ]);
+        $stateMachineRepository = new FakeStateMachineRepository();
+        $stateMachineRepository->createDefaultCollection();
+
+        $stateHandler = $this->getOrderStateHandler($settings, $stateMachineRepository);
+
+        $this->expectException(IllegalTransitionException::class);
+
+        try {
+            $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_AUTHORIZED, OrderStates::STATE_IN_PROGRESS, 'test', $this->context);
+        } catch (IllegalTransitionException $exception) {
+            $this->assertSame([], $this->registry->getActions());
+            $this->assertSame('SYSTEM__ILLEGAL_STATE_TRANSITION', $exception->getErrorCode());
+            throw $exception;
+        }
+    }
+
+    public function testInProgressToOpenIsNotReachableOnCustomerStateMachine(): void
+    {
+        $fakeOrder = $this->getOrder();
+
+        $settings = new OrderStateSettings([
+            OrderTransactionStates::STATE_AUTHORIZED => OrderStates::STATE_OPEN
+        ]);
+        $stateMachineRepository = new FakeStateMachineRepository();
+        $stateMachineRepository->createCustomerCollection();
+
+        $stateHandler = $this->getOrderStateHandler($settings, $stateMachineRepository);
+
+        $this->expectException(IllegalTransitionException::class);
+
+        try {
+            $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_AUTHORIZED, OrderStates::STATE_IN_PROGRESS, 'test', $this->context);
+        } catch (IllegalTransitionException $exception) {
+            $this->assertSame([], $this->registry->getActions());
+            $this->assertSame('SYSTEM__ILLEGAL_STATE_TRANSITION', $exception->getErrorCode());
+            throw $exception;
+        }
     }
 
     private function getOrder(): OrderEntity

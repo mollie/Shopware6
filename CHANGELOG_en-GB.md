@@ -1,5 +1,6 @@
 # Unreleased
 - Fixed: Activating the plugin no longer fails with a "should not be blank" error when duplicate payment method icons exist in the media library.
+- Fixed: The order status change no longer runs into an infinite recursion.
 
 # 5.1.0
 - Added: Wero payment method.

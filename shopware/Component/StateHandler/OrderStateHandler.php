@@ -16,6 +16,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionCollection;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionEntity;
+use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Shopware\Core\System\StateMachine\StateMachineRegistry;
 use Shopware\Core\System\StateMachine\Transition;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -90,10 +91,15 @@ final class OrderStateHandler implements OrderStateHandlerInterface
         $movedToTransactionId = '';
         $transitionActions = $this->loadTransitionActions($transitionList, $currentState, $targetState);
 
-        if (count($transitionActions) === 0) {
-            $this->logger->error('Failed to find a way to move the order transaction, please check your state machine state', $logData);
-            $message = sprintf('Could not find a way to move the order status from %s to status %s', $currentState, $targetState);
-            throw new \RuntimeException($message);
+        // Only execute the actions when they really lead step by step to the target state. Otherwise the
+        // target cannot be reached and we must not move the order through wrong states on the way.
+        if (count($transitionActions) === 0 || ! $this->pathLeadsToTarget($transitionList, $currentState, $transitionActions, $targetState)) {
+            $possibleTransitions = [];
+            foreach ($this->getAllowedTransitions($transitionList, $currentState) as $allowedTransition) {
+                $possibleTransitions[] = $allowedTransition->getActionName();
+            }
+
+            throw new IllegalTransitionException($currentState, $targetState, $possibleTransitions);
         }
 
         foreach ($transitionActions as $action) {
@@ -110,6 +116,30 @@ final class OrderStateHandler implements OrderStateHandlerInterface
         }
 
         return $movedToTransactionId;
+    }
+
+    /**
+     * @param string[] $actions
+     */
+    private function pathLeadsToTarget(StateMachineTransitionCollection $transitions, string $currentState, array $actions, string $targetState): bool
+    {
+        $state = $currentState;
+        foreach ($actions as $action) {
+            $nextState = null;
+            foreach ($this->getAllowedTransitions($transitions, $state) as $transition) {
+                $toState = $transition->getToStateMachineState();
+                if ($toState !== null && $transition->getActionName() === $action) {
+                    $nextState = $toState->getTechnicalName();
+                    break;
+                }
+            }
+            if ($nextState === null) {
+                return false;
+            }
+            $state = $nextState;
+        }
+
+        return $state === $targetState;
     }
 
     private function getAllowedTransitions(StateMachineTransitionCollection $transitions, string $currentState): StateMachineTransitionCollection
@@ -129,10 +159,20 @@ final class OrderStateHandler implements OrderStateHandlerInterface
     }
 
     /**
+     * @param string[] $visitedStates
+     *
      * @return string[]
      */
-    private function loadTransitionActions(StateMachineTransitionCollection $transitions, string $currentState, string $targetState): array
+    private function loadTransitionActions(StateMachineTransitionCollection $transitions, string $currentState, string $targetState, array $visitedStates = []): array
     {
+        // Remember which target states have already been traced on this branch. Without this a freely
+        // configured state machine with a cycle (e.g. reopen leading back to a state we came from) would
+        // trace the same way again and again and recurse endlessly.
+        if (in_array($targetState, $visitedStates, true)) {
+            return [];
+        }
+        $visitedStates[] = $targetState;
+
         $result = [];
         $allowedTransitions = $this->getAllowedTransitions($transitions, $currentState);
         // If there is only one allowed actions, then we execute that action
@@ -171,7 +211,7 @@ final class OrderStateHandler implements OrderStateHandlerInterface
             if ($fromState->getTechnicalName() === $currentState) {
                 return array_merge($result, array_reverse($reverseResults));
             }
-            $subResult = $this->loadTransitionActions($transitions, $currentState, $fromState->getTechnicalName());
+            $subResult = $this->loadTransitionActions($transitions, $currentState, $fromState->getTechnicalName(), $visitedStates);
 
             $reverseResults = array_merge($reverseResults, $subResult);
         }
