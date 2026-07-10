@@ -88,14 +88,11 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
+        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} --env SHOPWARE_HTTP_CACHE_ENABLED=0 -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
-        echo "Waiting for Shopware to be ready..."
-        timeout 120 sh -c 'until curl -sk https://${{ inputs._SHOP_DOMAIN }}/api/info > /dev/null 2>&1; do sleep 5; done'
-        echo "Shop is ready."
-        echo "Waiting for MySQL to be ready..."
-        timeout 60 sh -c 'until docker exec shop bash -c "mysqladmin -h 127.0.0.1 -u root -proot ping --silent" > /dev/null 2>&1; do sleep 2; done'
-        echo "MySQL is ready."
+        echo "Waiting for container to be ready..."
+        timeout 180 sh -c 'until docker logs shop 2>&1 | grep -q "container IS READY"; do sleep 2; done'
+        echo "Container is ready."
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
     - name: Fix Store API Key
       shell: bash
@@ -104,17 +101,14 @@ runs:
     - name: Update Shopware Config
       shell: bash
       run: |
-        #docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "APP_URL=https://${{ inputs._SHOP_DOMAIN }}" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
-        # disable the storefront reverse-proxy HTTP cache: in prod it can serve a
-        # cached anonymous "/account -> login" redirect to an already logged-in
-        # request (SW 6.7), which breaks the storefront login in the e2e suite.
         docker exec shop bash -c "echo "SHOPWARE_HTTP_CACHE_ENABLED=0" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "cp /var/www/html/.env /var/www/html/.env.local" || true;
         docker exec -u root bash shop -c "chown -R www-data:www-data /var/www/html" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
@@ -135,7 +129,7 @@ runs:
     - name: Configure Shopware
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true' 
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.loginRegistration.showAccountTypeSelection true' 
   
 
     - name: Prepare Shop for e2e tests
@@ -145,52 +139,51 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W'
 
     - name: Install Plugin
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console plugin:refresh'
-        docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
-        docker exec shop bash -c 'php bin/console cache:clear'
+        docker exec shop bash -c 'php bin/console --no-debug plugin:refresh'
+        docker exec shop bash -c 'php bin/console --no-debug plugin:install MolliePayments --activate'
+        docker exec shop bash -c 'php bin/console --no-debug cache:clear'
 
     - name: Configure Plugin
       if: ${{ inputs.MOLLIE_APIKEY_TEST != '' }}
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.debugMode true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
-        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
-        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsEnabled true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowPauseResume true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowSkip true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowAddressEditing true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.testMode true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.debugMode true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.mailerSettings.disableDelivery true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.mailerSettings.emailAgent ""'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsEnabled true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsAllowPauseResume true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsAllowSkip true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsAllowAddressEditing true'
         # clean settings inheritance
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
-        docker exec shop bash -c 'php bin/console cache:clear'
+        docker exec shop bash -c 'php bin/console --no-debug cache:clear'
 
     - name: Compile Theme
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console assets:install'
-        docker exec shop bash -c 'php bin/console theme:compile'
-        docker exec shop bash -c 'php bin/console cache:clear'
+        docker exec shop bash -c 'php bin/console --no-debug assets:install'
+        docker exec shop bash -c 'php bin/console --no-debug theme:compile'
+        docker exec shop bash -c 'php bin/console --no-debug cache:clear'
 
     - name: Install Fixtures
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console mollie:fixtures:load'
+        docker exec shop bash -c 'php bin/console --no-debug mollie:fixtures:load'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: DAL Validate
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console dal:validate'
+        docker exec shop bash -c 'php bin/console --no-debug dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
     - name: Integration analyzer
@@ -207,6 +200,14 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
+
+    # The PHP integration/behat tests create sales channel contexts that get persisted here.
+    # Clear them so the Cypress store-api logins start from a clean state and bind the customer
+    # to a fresh context token instead of reusing a stale, customer-less one.
+    - name: Clear stale sales channel contexts
+      shell: bash
+      run: |
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"TRUNCATE sales_channel_api_context;\""
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}

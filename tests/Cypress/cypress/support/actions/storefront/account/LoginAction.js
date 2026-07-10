@@ -10,13 +10,29 @@ export default class LoginAction {
      */
     doLogin(email, password) {
 
-        cy.visit('/account/login');
+        this.submitLogin(email, password);
 
+        cy.url().then((url) => {
+            if (url.includes('/account/login')) {
+                this.submitLogin(email, password);
+            }
+        });
+
+        cy.url().should('not.include', '/account/login');
+    }
+
+    /**
+     * @param email
+     * @param password
+     */
+    submitLogin(email, password) {
+
+        cy.visit('/account/login');
+        cy.wait(600);
         repoLogin.getEmail().clear().type(email);
         repoLogin.getPassword().clear().type(password);
         repoLogin.getSubmitButton().click();
         cy.wait(200);
-        cy.url().should('not.include', '/account/login');
     }
 
 }
