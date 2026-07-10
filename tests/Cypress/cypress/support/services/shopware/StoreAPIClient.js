@@ -21,17 +21,16 @@ export default class StoreAPIClient {
             response = await this.submitLogin(email, password);
         }
 
-        // TEMPORARY DIAGNOSTIC: after login, ask the server what the captured token
-        // resolves to. If context.customer is null the token was never customer-bound.
+        // TEMPORARY DIAGNOSTIC: measure which sales channel the token resolves to.
         const context = await this.get('/context');
         throw new Error('LOGIN DIAGNOSTIC ' + JSON.stringify({
             loginStatus: response.status,
-            capturedToken: this.contextToken,
-            contextStatus: context.status,
-            contextToken: context.headers.get('sw-context-token'),
+            loginContextToken: response.headers.get('sw-context-token'),
+            accessKey: this.salesChannelApiKey,
+            contextSalesChannelId: context.data?.salesChannel?.id ?? null,
+            contextSalesChannelName: context.data?.salesChannel?.name ?? null,
+            contextToken: context.data?.token ?? context.headers.get('sw-context-token'),
             customer: context.data?.customer ?? null,
-            contextCustomerId: context.data?.customerId ?? null,
-            contextApiAlias: context.data?.apiAlias ?? null,
         }));
 
         if (!this.contextToken) {
