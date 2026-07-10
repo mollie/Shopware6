@@ -63,7 +63,7 @@ trait SalesChannelTestBehaviour
     {
         $salesChannelContextFactory = $this->getContainer()->get(SalesChannelContextFactory::class);
 
-        return $salesChannelContextFactory->create(Uuid::fromStringToHex($salesChannel->getName()), $salesChannel->getId(), $options);
+        return $salesChannelContextFactory->create(Uuid::randomHex(), $salesChannel->getId(), $options);
     }
 
     public function getDefaultSalesChannelContext(string $domain = '', array $options = []): SalesChannelContext

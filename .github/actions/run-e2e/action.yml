@@ -201,6 +201,14 @@ runs:
       run: |
         docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
 
+    # The PHP integration/behat tests create sales channel contexts that get persisted here.
+    # Clear them so the Cypress store-api logins start from a clean state and bind the customer
+    # to a fresh context token instead of reusing a stale, customer-less one.
+    - name: Clear stale sales channel contexts
+      shell: bash
+      run: |
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"TRUNCATE sales_channel_api_context;\""
+
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
       shell: bash
