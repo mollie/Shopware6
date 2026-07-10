@@ -138,6 +138,25 @@ final class OrderStateHandlerTest extends TestCase
         $this->assertSame($expectedTransition, $this->registry->getActions());
     }
 
+    public function testTransactionIsMovedFromInProgressToOpenWithoutInfiniteRecursion(): void
+    {
+        $fakeOrder = $this->getOrder();
+
+        $settings = new OrderStateSettings([
+            OrderTransactionStates::STATE_AUTHORIZED => OrderStates::STATE_OPEN
+        ]);
+        $stateMachineRepository = new FakeStateMachineRepository();
+        $stateMachineRepository->createDefaultCollection();
+
+        $stateHandler = $this->getOrderStateHandler($settings, $stateMachineRepository);
+
+        $actual = $stateHandler->performTransition($fakeOrder, OrderTransactionStates::STATE_AUTHORIZED, OrderStates::STATE_IN_PROGRESS, 'test', $this->context);
+
+        $expectedTransition = ['cancel', 'reopen'];
+        $this->assertSame('openId', $actual);
+        $this->assertSame($expectedTransition, $this->registry->getActions());
+    }
+
     private function getOrder(): OrderEntity
     {
         $customerRepository = new CustomerEntityBuilder();

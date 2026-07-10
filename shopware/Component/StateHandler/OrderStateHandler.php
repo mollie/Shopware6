@@ -133,49 +133,35 @@ final class OrderStateHandler implements OrderStateHandlerInterface
      */
     private function loadTransitionActions(StateMachineTransitionCollection $transitions, string $currentState, string $targetState): array
     {
-        $result = [];
-        $allowedTransitions = $this->getAllowedTransitions($transitions, $currentState);
-        // If there is only one allowed actions, then we execute that action
-        if ($allowedTransitions->count() === 1) {
-            $firstTransition = $allowedTransitions->first();
-            if ($firstTransition instanceof StateMachineTransitionEntity) {
-                $result[] = $firstTransition->getActionName();
-                $toState = $firstTransition->getToStateMachineState();
-                if ($toState instanceof StateMachineStateEntity) {
-                    $currentState = $toState->getTechnicalName();
-                    if ($currentState === $targetState) {
-                        return $result;
-                    }
+        // Breadth-first search for the shortest sequence of actions leading from the current
+        // state to the target state. The visited set guards against the cycles in the order
+        // state machine (e.g. open -> cancelled -> open) that would otherwise recurse infinitely.
+        $queue = [[$currentState, []]];
+        $visited = [$currentState => true];
+
+        while (count($queue) > 0) {
+            /** @var array{0: string, 1: string[]} $current */
+            $current = array_shift($queue);
+            [$state, $actions] = $current;
+
+            if ($state === $targetState) {
+                return $actions;
+            }
+
+            foreach ($this->getAllowedTransitions($transitions, $state) as $transition) {
+                $toState = $transition->getToStateMachineState();
+                if ($toState === null) {
+                    continue;
                 }
+                $nextState = $toState->getTechnicalName();
+                if (isset($visited[$nextState])) {
+                    continue;
+                }
+                $visited[$nextState] = true;
+                $queue[] = [$nextState, array_merge($actions, [$transition->getActionName()])];
             }
         }
-        // If there are more than one way, then we look at the target state and try to find a way how to reach the target state
-        // imagine like a maze, you know where the target is, you trace your way back from target to start
-        $reverseResults = [];
-        /** @var StateMachineTransitionEntity $transition */
-        foreach ($transitions as $transition) {
-            $toState = $transition->getToStateMachineState();
-            if ($toState === null) {
-                continue;
-            }
-            if ($toState->getTechnicalName() !== $targetState) {
-                continue;
-            }
 
-            $fromState = $transition->getFromStateMachineState();
-            if ($fromState === null) {
-                continue;
-            }
-            $reverseResults[] = $transition->getActionName();
-
-            if ($fromState->getTechnicalName() === $currentState) {
-                return array_merge($result, array_reverse($reverseResults));
-            }
-            $subResult = $this->loadTransitionActions($transitions, $currentState, $fromState->getTechnicalName());
-
-            $reverseResults = array_merge($reverseResults, $subResult);
-        }
-
-        return array_merge($result, array_reverse($reverseResults));
+        return [];
     }
 }
