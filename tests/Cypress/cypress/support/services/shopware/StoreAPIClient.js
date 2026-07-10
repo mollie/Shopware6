@@ -15,37 +15,16 @@ export default class StoreAPIClient {
     }
 
     async login(email, password) {
-        // TEMPORARY DIAGNOSTIC: send a client-known token on login to see whether the
-        // login response echoes our request token or returns a rotated (bound) token.
-        const sentToken = 'abcdefghijklmnopqrstuvwxyz012345';
-        this.contextToken = sentToken;
-
-        const response = await this.submitLogin(email, password);
-        const context = await this.get('/context');
-        throw new Error('LOGIN DIAGNOSTIC ' + JSON.stringify({
-            sentToken,
-            loginStatus: response.status,
-            loginRespToken: response.headers.get('sw-context-token'),
-            capturedToken: this.contextToken,
-            contextRespToken: context.data?.token ?? null,
-            customer: context.data?.customer ? 'PRESENT' : null,
-        }));
-    }
-
-    async submitLogin(email, password) {
         const response = await this.post('/account/login', { email, password });
 
-        // Only trust the token on a successful login. On a failed login Shopware's
-        // ResponseHeaderListener echoes the anonymous request context token back in the
-        // sw-context-token header. Capturing that would pass the "token not null" check
-        // but resolve to a customer-less context, causing 403s on _loginRequired routes.
-        if (response.status < 200 || response.status >= 300) {
-            return response;
-        }
-
-        const token = response.headers.get('sw-context-token') ?? response.data?.contextToken;
-        if (token) {
-            this.setContextToken(token);
+        // On 6.7 the token is only in the sw-context-token header (no longer in the body).
+        // Only trust it on a successful login so a failed login doesn't capture the
+        // echoed anonymous request token and produce false-positive 403s afterwards.
+        if (response.status >= 200 && response.status < 300) {
+            const token = response.headers.get('sw-context-token') ?? response.data?.contextToken;
+            if (token) {
+                this.setContextToken(token);
+            }
         }
         return response;
     }
