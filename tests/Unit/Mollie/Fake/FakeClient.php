@@ -14,6 +14,11 @@ final class FakeClient extends Client
 {
     private ResponseInterface $response;
 
+    /**
+     * @var array<string, mixed>
+     */
+    private array $lastPostOptions = [];
+
     public function __construct(private ?string $id = null,
         private ?string $status = 'failed',
         private ?PaymentMethod $method = PaymentMethod::PAYPAL,
@@ -66,11 +71,20 @@ final class FakeClient extends Client
 
     public function post($uri, array $options = []): ResponseInterface
     {
+        $this->lastPostOptions = $options;
         if ($this->response->getStatusCode() === 500) {
             $request = new Request('POST', $uri);
             throw new ClientException('Exception was triggered', $request, $this->response);
         }
 
         return $this->response;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getLastPostOptions(): array
+    {
+        return $this->lastPostOptions;
     }
 }

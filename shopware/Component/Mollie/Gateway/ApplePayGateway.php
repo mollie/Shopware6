@@ -31,7 +31,7 @@ final class ApplePayGateway implements ApplePayGatewayInterface
             $response = $client->post('wallets/applepay/sessions', [
                 'form_params' => [
                     'validationUrl' => $validationUrl,
-                    'domain' => str_replace(['https://', 'http://'], '', $domain),
+                    'domain' => $this->extractHost($domain),
                 ]
             ]);
 
@@ -41,5 +41,17 @@ final class ApplePayGateway implements ApplePayGatewayInterface
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }
+    }
+
+    private function extractHost(string $domain): string
+    {
+        $domain = trim($domain);
+        if (preg_match('#^https?://#i', $domain) !== 1) {
+            $domain = 'https://' . $domain;
+        }
+
+        $host = parse_url($domain, PHP_URL_HOST);
+
+        return is_string($host) ? $host : $domain;
     }
 }
