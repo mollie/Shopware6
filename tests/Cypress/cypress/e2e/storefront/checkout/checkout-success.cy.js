@@ -53,6 +53,7 @@ const payments = [
     {caseId: 'C4101', key: 'credit-card', name: 'Card', sanity: false},
     {caseId: 'C4111', key: 'paypal', name: 'PayPal', sanity: true},
     {caseId: 'C466903', key: 'billie', name: 'Billie', sanity: false},
+    {caseId: '', key: 'billink', name: 'Billink', sanity: false},
     {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
     {caseId: 'C4237625', key: 'klarna', name: 'Klarna', sanity: false},
     {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
@@ -169,7 +170,7 @@ context("Checkout Tests", () => {
 
                     mollieSandbox.initSandboxCookie();
 
-                    if (payment.key === 'billie' || payment.key === 'klarna' || payment.key === 'riverty') {
+                    if (payment.key === 'billie' || payment.key === 'billink' || payment.key === 'klarna' || payment.key === 'riverty') {
 
                         molliePayment.selectAuthorized();
 
