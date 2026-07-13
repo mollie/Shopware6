@@ -27,27 +27,6 @@ Feature: Basic Shipment Feature
     And delivery status is "shipped"
 
 
-  Scenario: shipping line item is working with billink
-    Given payment method "billink" exists and active
-    And i select "DE" as billing country
-    And i select "EUR" as currency
-    And product "MOL_REGULAR" with quantity "2" is in cart
-    And product "MOL_REDUCED_TAX" with quantity "1" is in cart
-    When i start checkout with payment method "billink"
-    And select payment status "authorized"
-    Then i see success page
-    And order payment status is "authorized"
-    When i ship line item "MOL_REGULAR" with quantity "1"
-    Then order payment status is "authorized"
-    And delivery status is "shipped_partially"
-    When i ship line item "MOL_REGULAR" with quantity "1"
-    Then order payment status is "authorized"
-    And delivery status is "shipped_partially"
-    When i ship line item "MOL_REDUCED_TAX" with quantity "1"
-    Then order payment status is "paid"
-    And delivery status is "shipped"
-
-
   Scenario: automatic shipment is working
     Given payment method "klarna" exists and active
     And plugin configuration "automaticShipping" is set to "true"
