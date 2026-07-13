@@ -6,6 +6,8 @@
 - Behoben: Die Änderung des Bestellstatus läuft nicht mehr in eine Endlosschleife.
 - Behoben: Die Order-Custom-Fields enthalten jetzt zusätzlich `order_id`, `payment_id` und `third_party_payment_id` für den JTL-Connector. Bestehende Bestellungen werden nachgezogen.
 - Behoben: Apple Pay Direct schlägt nicht mehr mit „Invalid domain passed" fehl, wenn die Verkaufskanal-Domain ein Protokoll oder einen Pfad enthält. An Mollie wird nun nur noch der Host übertragen.
+- Behoben: Der Checkout auf Verkaufskanal-Domains mit Pfad-Präfix kehrt nun korrekt zurück und finalisiert, statt „Sales Channel Not Found" zu zeigen; auch Mollie-Webhooks werden aufgelöst.
+- Behoben: Für eine bereits bezahlte oder autorisierte Bestellung wird keine zweite Mollie-Zahlung mehr erzeugt, wodurch Doppelbelastungen verhindert werden.
 
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.

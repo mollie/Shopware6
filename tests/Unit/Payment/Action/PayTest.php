@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -22,6 +23,7 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -115,6 +117,40 @@ final class PayTest extends TestCase
         $this->assertArrayNotHasKey('payment', $orderArray);
     }
 
+    public function testPaidOrderDoesNotCreateAnotherPaymentAndRedirectsToReturnUrl(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
+        $transactionService->createTransaction();
+
+        $gateway = new FakeGateway('https://mollie.com/checkout=token=789');
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout=token=789', $gateway);
+
+        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame('returnUrl', $response->getTargetUrl());
+        $this->assertCount(0, $gateway->getCreatePayloads());
+        $this->assertCount(0, $gateway->getCreateOrderPayloads());
+    }
+
+    public function testAuthorizedOrderDoesNotCreateAnotherPayment(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_AUTHORIZED);
+        $transactionService->createTransaction();
+
+        $gateway = new FakeGateway('https://mollie.com/checkout=token=789');
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout=token=789', $gateway);
+
+        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame('returnUrl', $response->getTargetUrl());
+        $this->assertCount(0, $gateway->getCreatePayloads());
+        $this->assertCount(0, $gateway->getCreateOrderPayloads());
+    }
+
     private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl, ?FakeGateway $gateway = null): Pay
     {
         $eventDispatcher = new EventSpy();
@@ -138,6 +174,8 @@ final class PayTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $fakeRouteBuilder, $eventDispatcher, $requestStack, $logger);
+        $transactionResolver = new OrderTransactionResolver();
+
+        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $fakeRouteBuilder, $eventDispatcher, $requestStack, $transactionResolver, $logger);
     }
 }

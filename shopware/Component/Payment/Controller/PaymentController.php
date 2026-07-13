@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Controller\PaymentController as ShopwarePaymentController;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Routing\RequestTransformerInterface;
 use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
@@ -82,8 +83,12 @@ final class PaymentController extends StorefrontController
         }
 
         $query = (string) parse_url($payment->getFinalizeUrl(), PHP_URL_QUERY);
+        parse_str($query, $parsedQuery);
+
         $queryParameters = [];
-        parse_str($query, $queryParameters);
+        foreach ($parsedQuery as $key => $value) {
+            $queryParameters[(string) $key] = $value;
+        }
 
         $paymentToken = $queryParameters['_sw_payment_token'] ?? null;
 
@@ -94,10 +99,24 @@ final class PaymentController extends StorefrontController
         }
 
         $this->logger->info('Call shopware finalize transaction', $logData);
+
+        // Forward to Shopware's finalize controller. We copy the inheritable routing attributes
+        // and set "sw-skip-transformer" so the sub-request keeps the resolved sales channel and
+        // the HttpKernel does not re-run the request transformer - which would strip the domain
+        // path prefix (e.g. /de) a second time and fail to resolve the sales channel.
+        $attributes = ['sw-skip-transformer' => true];
+        $mainRequest = $this->container->get('request_stack')->getCurrentRequest();
+        if ($mainRequest !== null) {
+            $attributes = array_merge(
+                $this->container->get(RequestTransformerInterface::class)->extractInheritableAttributes($mainRequest),
+                $attributes
+            );
+        }
+
         $controller = sprintf('%s::%s', ShopwarePaymentController::class, 'finalizeTransaction');
 
         try {
-            return $this->forward($controller, [], $queryParameters);
+            return $this->forward($controller, $attributes, $queryParameters);
         } catch (PaymentException $exception) {
             if (! $this->isInvalidTokenException($exception)) {
                 throw $exception;

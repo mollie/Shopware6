@@ -19,6 +19,8 @@ use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
@@ -56,6 +58,8 @@ final class Pay implements PayInterface
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'request_stack')]
         private RequestStack $requestStack,
+        #[Autowire(service: OrderTransactionResolver::class)]
+        private OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -88,6 +92,12 @@ final class Pay implements PayInterface
         ];
 
         $this->logger->info('Payment Process - Start', $logData);
+
+        if ($this->hasSettledPayment($order)) {
+            $this->logger->warning('Order already has a paid or authorized payment, skipping creation of a new Mollie payment', $logData);
+
+            return new RedirectResponse($shopwareFinalizeUrl);
+        }
 
         if ($paymentHandler instanceof OrdersApiAwareInterface) {
             return $this->executeOrdersApi($paymentHandler, $transactionDataStruct, $dataBag, $context, $order, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
@@ -220,6 +230,21 @@ final class Pay implements PayInterface
             $logData['message'] = $exception->getMessage();
             $this->logger->error('Failed to change payment status', $logData);
         }
+    }
+
+    /**
+     * A new Mollie payment must never be created for an order that already holds a completed payment.
+     * Otherwise a customer who is redirected onto the edit-order form after a successful payment (e.g.
+     * following a broken return url) would be charged a second time. Paid and authorized transactions
+     * both represent money that is already committed at Mollie.
+     */
+    private function hasSettledPayment(OrderEntity $order): bool
+    {
+        if ($this->transactionResolver->hasPaidTransaction($order)) {
+            return true;
+        }
+
+        return $this->transactionResolver->resolveCapturableAuthorized($order) !== null;
     }
 
     private function updatePaymentCounter(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct): int
