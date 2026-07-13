@@ -14,6 +14,7 @@ use Mollie\Shopware\Component\Payment\Method\BanContactPayment;
 use Mollie\Shopware\Component\Payment\Method\BankTransferPayment;
 use Mollie\Shopware\Component\Payment\Method\BelfiusPayment;
 use Mollie\Shopware\Component\Payment\Method\BilliePayment;
+use Mollie\Shopware\Component\Payment\Method\BillinkPayment;
 use Mollie\Shopware\Component\Payment\Method\BizumPayment;
 use Mollie\Shopware\Component\Payment\Method\BlikPayment;
 use Mollie\Shopware\Component\Payment\Method\CardPayment;
@@ -59,6 +60,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 #[CoversClass(BankTransferPayment::class)]
 #[CoversClass(BelfiusPayment::class)]
 #[CoversClass(BilliePayment::class)]
+#[CoversClass(BillinkPayment::class)]
 #[CoversClass(BizumPayment::class)]
 #[CoversClass(BlikPayment::class)]
 #[CoversClass(CardPayment::class)]
@@ -112,6 +114,7 @@ final class PaymentMethodsTest extends TestCase
             'banktransfer' => [BankTransferPayment::class, PaymentMethod::BANK_TRANSFER, 'Banktransfer'],
             'belfius' => [BelfiusPayment::class, PaymentMethod::BELFIUS, 'Belfius'],
             'billie' => [BilliePayment::class, PaymentMethod::BILLIE, 'Billie'],
+            'billink' => [BillinkPayment::class, PaymentMethod::BILLINK, 'Billink'],
             'bizum' => [BizumPayment::class, PaymentMethod::BIZUM, 'Bizum'],
             'blik' => [BlikPayment::class, PaymentMethod::BLIK, 'Blik'],
             'card' => [CardPayment::class, PaymentMethod::CREDIT_CARD, 'Card'],

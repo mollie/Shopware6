@@ -61,6 +61,7 @@ Feature: Basic payment checkout
       | banktransfer  | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | belfius       | MOL_REGULAR   | 1        | paid          | BE             | EUR      |
       | billie        | MOL_REGULAR   | 1        | authorized    | DE             | EUR      |
+      | billink       | MOL_REGULAR   | 1        | authorized    | DE             | EUR      |
       | bizum         | MOL_REGULAR   | 1        | paid          | ES             | EUR      |
       | blik          | MOL_REGULAR   | 1        | paid          | DE             | PLN      |
       | eps           | MOL_REGULAR   | 1        | paid          | DE             | EUR      |

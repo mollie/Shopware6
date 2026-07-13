@@ -13,6 +13,7 @@ enum PaymentMethod: string
     case BANK_TRANSFER = 'banktransfer';
     case BELFIUS = 'belfius';
     case BILLIE = 'billie';
+    case BILLINK = 'billink';
     case BIZUM = 'bizum';
     case BLIK = 'blik';
     case CREDIT_CARD = 'creditcard';
