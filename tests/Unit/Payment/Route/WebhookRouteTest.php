@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
+use Mollie\Shopware\Unit\Fake\FakeShipOrderRoute;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderStateHandler;
@@ -376,6 +377,7 @@ final class WebhookRouteTest extends TestCase
         ?FakeOrderStateHandler $orderStateHandler = null,
         ?FakeOrderService $orderService = null,
         ?EventSpy $eventSpy = null,
+        ?FakeShipOrderRoute $shipOrderRoute = null,
     ): WebhookRoute {
         if ($transactionService === null) {
             $transactionService = new FakeTransactionService();
@@ -390,6 +392,7 @@ final class WebhookRouteTest extends TestCase
         $fakeClientFactory = new FakeClientFactory($fakeClient);
         $gateway = new MollieGateway($fakeClientFactory, $transactionService, $logger);
         $transactionResolver = new OrderTransactionResolver();
+        $shipOrderRoute = $shipOrderRoute ?? new FakeShipOrderRoute();
 
         return new WebhookRoute(
             $gateway,
@@ -399,6 +402,7 @@ final class WebhookRouteTest extends TestCase
             $orderStateHandler ?? new FakeOrderStateHandler(),
             $orderService ?? new FakeOrderService(),
             $transactionResolver,
+            $shipOrderRoute,
             $logger
         );
     }

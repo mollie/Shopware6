@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Content\Product\State;
 
 #[CoversClass(LineItemType::class)]
 final class LineItemTypeTest extends TestCase
@@ -35,6 +36,17 @@ final class LineItemTypeTest extends TestCase
         $result = LineItemType::fromOderLineItem($orderLineItem);
 
         $this->assertSame(LineItemType::PHYSICAL, $result);
+    }
+
+    public function testFromOrderLineItemWithDownloadStateBecomesDigital(): void
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setType(LineItem::PRODUCT_LINE_ITEM_TYPE);
+        $orderLineItem->assign(['states' => [State::IS_DOWNLOAD]]);
+
+        $result = LineItemType::fromOderLineItem($orderLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
     }
 
     public function testFromOrderLineItemWithCustomProductsType(): void

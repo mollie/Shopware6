@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Subscriber;
 
+use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
@@ -27,6 +29,8 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
         private AbstractSettingsService $settingsService,
         #[Autowire(service: WebhookRoute::class)]
         private AbstractWebhookRoute $webhookRoute,
+        #[Autowire(service: MollieGateway::class)]
+        private CachedMollieGateway $mollieGateway,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -63,6 +67,10 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
         }
         $this->logger->warning('Executing Webhook in Dev mode');
         sleep(2);
+        // Shipping just captured the payment, so the cached (still authorized) payment must be dropped;
+        // otherwise the re-triggered webhook reads the stale status from the in-process cache and never
+        // reaches paid. In production every webhook is its own request, so the cache is empty anyway.
+        $this->mollieGateway->clearCache();
         $this->webhookRoute->notify($event->getTransactionId(), $event->getContext());
     }
 
@@ -75,6 +83,7 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
         }
         $this->logger->warning('Executing Webhook in Dev mode after cancel');
         sleep(2);
+        $this->mollieGateway->clearCache();
         $this->webhookRoute->notify($event->getTransactionId(), $event->getContext());
     }
 }

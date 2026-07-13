@@ -10,6 +10,8 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\PaymentMethodUpdater;
 use Mollie\Shopware\Component\Payment\PaymentMethodUpdaterInterface;
+use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
+use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandlerInterface;
 use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
@@ -21,12 +23,14 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
+use Shopware\Core\Content\Product\State;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -47,6 +51,8 @@ final class WebhookRoute extends AbstractWebhookRoute
         private readonly OrderService $orderService,
         #[Autowire(service: OrderTransactionResolver::class)]
         private readonly OrderTransactionResolverInterface $transactionResolver,
+        #[Autowire(service: ShipOrderRoute::class)]
+        private readonly AbstractShipOrderRoute $shipOrderRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -89,6 +95,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
 
         $this->updateDeliveryStatus($payment, $shopwareOrder, $context);
+        $this->autoCaptureDigitalItems($payment, $shopwareOrder, $context);
 
         $webhookStatusEventClass = $payment->getStatus()->getWebhookEventClass();
         $webhookStatusEvent = new $webhookStatusEventClass($payment, $shopwareOrder, $context);
@@ -295,5 +302,74 @@ final class WebhookRoute extends AbstractWebhookRoute
                 'message' => $exception->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Digital (downloadable) line items can never be shipped in Shopware, so no shipment event will ever
+     * capture them for a manual capture / pay-later payment. As soon as such a payment is authorized we
+     * capture the digital line items here. A digital-only order is captured in full (and reaches "paid"
+     * via Mollie's follow-up webhook), while a mixed order is only captured partially - its physical part
+     * is still captured on the real shipment, so we flag its delivery as partially shipped.
+     */
+    private function autoCaptureDigitalItems(Payment $payment, OrderEntity $shopwareOrder, Context $context): void
+    {
+        // Act on the fresh Mollie status: only an authorized payment can still be captured, and only
+        // manual capture / pay-later methods (Klarna, Billie, Riverty) ever reach the authorized status,
+        // so this status check implicitly limits the auto-capture to those methods. Relying on the
+        // Shopware transaction state would be stale here, because it is only transitioned to authorized
+        // earlier in this same webhook and the in-memory order still holds the old state.
+        if ($payment->getStatus() !== PaymentStatus::AUTHORIZED) {
+            return;
+        }
+
+        $digitalItems = $this->collectDigitalItems($shopwareOrder);
+        if (count($digitalItems) === 0) {
+            return;
+        }
+
+        $orderId = $shopwareOrder->getId();
+        $logData = [
+            'orderId' => $orderId,
+            'orderNumber' => (string) $shopwareOrder->getOrderNumber(),
+            'digitalItems' => $digitalItems,
+        ];
+        $this->logger->info('Auto-capturing digital line items for authorized order', $logData);
+
+        // A failing capture must not break the webhook, so any error is caught and logged. A digital-only
+        // order is captured in full and reaches "paid" via Mollie's follow-up webhook; a mixed order is
+        // only captured partially and stays authorized until its physical part is shipped. The physical
+        // delivery keeps its own state (open) - digital items are not part of any delivery.
+        try {
+            $request = new Request([], ['orderId' => $orderId, 'items' => $digitalItems]);
+            $this->shipOrderRoute->ship($request, $context);
+        } catch (\Throwable $exception) {
+            $logData['error'] = $exception->getMessage();
+            $this->logger->error('Auto-capture of digital line items failed', $logData);
+        }
+    }
+
+    /**
+     * @return list<array{id: string, quantity: int}>
+     */
+    private function collectDigitalItems(OrderEntity $shopwareOrder): array
+    {
+        $items = [];
+        $lineItems = $shopwareOrder->getLineItems();
+        if ($lineItems === null) {
+            return $items;
+        }
+
+        foreach ($lineItems as $lineItem) {
+            if (! in_array(State::IS_DOWNLOAD, $lineItem->getStates(), true)) {
+                continue;
+            }
+
+            $items[] = [
+                'id' => $lineItem->getId(),
+                'quantity' => $lineItem->getQuantity(),
+            ];
+        }
+
+        return $items;
     }
 }
