@@ -87,6 +87,7 @@ trait CheckoutTestBehaviour
         $checkoutController = $this->getContainer()->get(CheckoutController::class);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('tos', true);
+        $requestDataBag->set('revocation', true);
 
         $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
 

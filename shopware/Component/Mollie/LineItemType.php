@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Mollie;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Content\Product\State;
 
 enum LineItemType: string
 {
@@ -39,6 +40,11 @@ enum LineItemType: string
         $price = $orderLineItem->getPrice();
         if ($price instanceof CalculatedPrice && $price->getTotalPrice() < 0) {
             return self::DISCOUNT;
+        }
+
+        // downloadable products carry the is-download state and must be reported as digital to Mollie
+        if ($type === self::PHYSICAL && \in_array(State::IS_DOWNLOAD, $orderLineItem->getStates(), true)) {
+            return self::DIGITAL;
         }
 
         return $type;

@@ -8,12 +8,14 @@ use Behat\Hook\BeforeScenario;
 use Behat\Hook\BeforeSuite;
 use Mollie\Shopware\Behat\Storage;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
 use PHPUnit\TextUI\Configuration\Builder;
-use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Framework\Context as FrameworkContext;
 
 final class BootstrapContext implements Context
 {
-    use IntegrationTestBehaviour;
+    use SalesChannelTestBehaviour;
 
     #[BeforeSuite]
     public static function bootstrap(): void
@@ -31,5 +33,17 @@ final class BootstrapContext implements Context
         $settingsService->clearCache();
 
         Storage::clear();
+
+        $this->clearCart();
+    }
+
+    private function clearCart(): void
+    {
+        $salesChannel = $this->findSalesChannelByDomain($_ENV['APP_URL'], FrameworkContext::createDefaultContext());
+        $salesChannelContext = $this->getSalesChannelContext($salesChannel);
+
+        /** @var CartService $cartService */
+        $cartService = $this->getContainer()->get(CartService::class);
+        $cartService->deleteCart($salesChannelContext);
     }
 }

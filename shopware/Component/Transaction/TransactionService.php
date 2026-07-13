@@ -94,10 +94,6 @@ final class TransactionService implements TransactionServiceInterface
             $firstDeliveryLine = $order->getPrimaryOrderDelivery();
         }
 
-        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
-            throw TransactionDataException::orderWithoutDeliveries($order->getId());
-        }
-
         $language = $order->getLanguage();
         /** @phpstan-ignore identical.alwaysFalse */
         if ($language === null) {
@@ -109,13 +105,20 @@ final class TransactionService implements TransactionServiceInterface
             throw TransactionDataException::orderWithoutCurrency($order->getId());
         }
 
-        $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
-        if (! $shippingOrderAddress instanceof OrderAddressEntity) {
-            throw TransactionDataException::orderDeliveryWithoutShippingAddress($order->getId(), $firstDeliveryLine->getId());
-        }
         $billingAddress = $order->getBillingAddress();
         if (! $billingAddress instanceof OrderAddressEntity) {
             throw TransactionDataException::orderWithoutBillingAddress($order->getId());
+        }
+
+        // Digital orders (e.g. downloadable products) have no delivery and therefore no shipping
+        // address. Fall back to the billing address so the Mollie payload stays valid.
+        $shippingOrderAddress = $billingAddress;
+        if ($firstDeliveryLine instanceof OrderDeliveryEntity) {
+            $deliveryShippingAddress = $firstDeliveryLine->getShippingOrderAddress();
+            if (! $deliveryShippingAddress instanceof OrderAddressEntity) {
+                throw TransactionDataException::orderDeliveryWithoutShippingAddress($order->getId(), $firstDeliveryLine->getId());
+            }
+            $shippingOrderAddress = $deliveryShippingAddress;
         }
         $orderCustomer = $order->getOrderCustomer();
         if (! $orderCustomer instanceof OrderCustomerEntity) {
