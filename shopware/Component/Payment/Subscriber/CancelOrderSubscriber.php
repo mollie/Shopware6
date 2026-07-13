@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Subscriber;
 
+use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -107,6 +108,20 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
             $molliePaymentId = $molliePayment->getId();
             $this->mollieGateway->cancelPayment($molliePaymentId, $orderNumber, $salesChannelId);
             $this->logger->info('Auto-cancelled Mollie payment', ['molliePaymentId' => $molliePaymentId, 'orderNumber' => $orderNumber]);
+        } catch (ApiException $e) {
+            if ($e->isCancellationNotPossible()) {
+                $this->logger->warning('Mollie order/payment is no longer in a cancellable state, skipping auto-cancel', [
+                    'orderNumber' => $orderNumber,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return;
+            }
+
+            $this->logger->error('Failed to auto-cancel Mollie order/payment', [
+                'orderNumber' => $orderNumber,
+                'error' => $e->getMessage(),
+            ]);
         } catch (\Throwable $e) {
             $this->logger->error('Failed to auto-cancel Mollie order/payment', [
                 'orderNumber' => $orderNumber,
