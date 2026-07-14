@@ -9,6 +9,7 @@
 - Fixed: Apple Pay Direct no longer fails with "Invalid domain passed" when the sales channel domain contains a protocol or path. Only the host is now sent to Mollie.
 - Fixed: Checkout on sales channel domains with a path prefix now returns and finalizes correctly instead of showing "Sales Channel Not Found", and Mollie webhooks resolve.
 - Fixed: No second Mollie payment is created for an order that is already paid or authorized, preventing double charges.
+- Fixed: The Mollie order detail tab no longer removes tabs added by other plugins to the same extension point.
 
 # 5.1.0
 - Added: Wero payment method.
