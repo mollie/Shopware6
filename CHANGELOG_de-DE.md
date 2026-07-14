@@ -1,6 +1,7 @@
 # Unreleased
 - Hinzugefügt: Zahlungsart Billink.
 - Geändert: Auto-Stornierung protokolliert eine Warnung statt eines Fehlers, wenn Mollie die Zahlung/Bestellung nicht mehr stornieren kann.
+- Geändert: Die Storefront lädt und speichert die Mollie-Profil-ID nun, wenn sie fehlt.
 - Behoben: Digitale Produkte (Downloads) ohne Lieferadresse können jetzt bezahlt werden.
 - Behoben: Das Aktivieren des Plugins schlägt nicht mehr mit einem „should not be blank“-Fehler fehl, wenn doppelte Zahlarten-Icons in der Medienbibliothek vorhanden sind.
 - Behoben: Die Änderung des Bestellstatus läuft nicht mehr in eine Endlosschleife.

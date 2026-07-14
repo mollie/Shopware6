@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Subscriber;
 
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Mandate\Route\AbstractListMandatesRoute;
@@ -33,6 +35,8 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         private AbstractListMandatesRoute $listMandatesRoute,
         #[Autowire(service: ListTerminalsRoute::class)]
         private AbstractListTerminalsRoute $listTerminalsRoute,
+        #[Autowire(service: MollieGateway::class)]
+        private MollieGatewayInterface $mollieGateway,
         private LocaleProvider $localeProvider,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
@@ -70,7 +74,7 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
             );
             $this->addMollieLocale($page, $localeCode);
 
-            $this->addProfileId($page, $apiSettings);
+            $this->addProfileId($page, $apiSettings, $salesChannelId);
             $this->addCreditCardSettings($page, $mollieExtension, $salesChannelContext);
             $this->addPosTerminals($page, $mollieExtension, $salesChannelContext);
         } catch (\Throwable $exception) {
@@ -114,10 +118,18 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    private function addProfileId(Page $page, ApiSettings $apiSettings): void
+    private function addProfileId(Page $page, ApiSettings $apiSettings, string $salesChannelId): void
     {
+        $profileId = $apiSettings->getProfileId();
+        if ($profileId === '') {
+            $profile = $this->mollieGateway->getCurrentProfile($salesChannelId);
+            $profileId = $profile->getId();
+            $apiSettings->setProfileId($profileId);
+            $this->settings->setApiSettings($apiSettings, $salesChannelId);
+        }
+
         $page->assign([
-            'mollie_profile_id' => $apiSettings->getProfileId()
+            'mollie_profile_id' => $profileId
         ]);
     }
 

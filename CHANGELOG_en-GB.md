@@ -1,6 +1,7 @@
 # Unreleased
 - Added: Billink payment method.
 - Changed: Auto-cancellation now logs a warning instead of an error when Mollie can no longer cancel the payment/order.
+- Changed: The storefront now loads and stores the Mollie profile ID when it is missing.
 - Fixed: Digital products (downloads) without a delivery address can now be paid for.
 - Fixed: Activating the plugin no longer fails with a "should not be blank" error when duplicate payment method icons exist in the media library.
 - Fixed: The order status change no longer runs into an infinite recursion.
