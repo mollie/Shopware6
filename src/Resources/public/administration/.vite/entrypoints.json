@@ -3,11 +3,11 @@
   "entryPoints": {
     "mollie-payments": {
       "css": [
-        "/bundles/molliepayments/administration/assets/mollie-payments-lsI9fpj_.css"
+        "/bundles/molliepayments/administration/css/mollie-payments.css"
       ],
       "dynamic": [],
       "js": [
-        "/bundles/molliepayments/administration/assets/mollie-payments-BJbP_aDo.js"
+        "/bundles/molliepayments/administration/js/mollie-payments.js"
       ],
       "legacy": false,
       "preload": []
@@ -16,10 +16,10 @@
   "legacy": false,
   "metadatas": {},
   "version": [
-    "7.1.0",
+    "7.0.4",
     7,
-    1,
-    0
+    0,
+    4
   ],
   "viteServer": null
 }
