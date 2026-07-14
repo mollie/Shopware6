@@ -1,5 +1,6 @@
 # Unreleased
 - Added: Billink payment method.
+- Added: E-invoices (ZUGFeRD/XRechnung) now contain the payment means for Mollie payment methods.
 - Changed: Auto-cancellation now logs a warning instead of an error when Mollie can no longer cancel the payment/order.
 - Changed: The storefront now loads and stores the Mollie profile ID when it is missing.
 - Fixed: Digital products (downloads) without a delivery address can now be paid for.
