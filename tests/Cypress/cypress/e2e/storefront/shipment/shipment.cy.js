@@ -287,7 +287,10 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
     repoOrderDetails.getOrderDetailsGeneralTab().click({force: true});
     cy.reload();
 
-    repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
+    // wait for Vue to finish rendering the state select after the reload: the timeout must live on
+    // the cy.get() so the .should() retries the query until the field is populated (an empty "" text
+    // otherwise fails the assertion before Vue has hydrated the admin SPA).
+    repoOrderDetails.getDeliveryStatusTop({timeout: 20000}).should('contain.text', statusLabel);
 
     if (shopware.isVersionLower('6.5')) {
         /** since 6.5 you don't see the shipped items in summary **/

@@ -117,8 +117,12 @@ export default class AdminOrdersAction {
             repoOrdersDetails.getOrderDetailsTab().click();
         }
 
+        // the order detail page grew taller, so the tracking-code input (and the "add" popover entry
+        // it reveals) can sit below the fold. scroll it into view before interacting, and force the
+        // add-button click since the popover entry may still be partly outside the viewport.
+        repoOrdersDetails.getTrackingCode(trackingCode).scrollIntoView();
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
-        repoOrdersDetails.getTrackingCodeAddButton().click();
+        repoOrdersDetails.getTrackingCodeAddButton().click(forceOption);
 
         cy.wait(1000);
 
