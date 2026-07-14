@@ -163,6 +163,42 @@ export default class OrderDetailsRepository {
         return cy.get('.sw-order-detail__tabs .sw-order-detail__tabs-tab-mollie');
     }
 
+    /**
+     * Loading overlay the admin shows while a page fetches its data.
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLoadingOverlay(options = {}) {
+        return cy.get('.sw-loader', options);
+    }
+
+    /**
+     * Loading skeleton the admin shows while a page fetches its data.
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getLoadingSkeleton(options = {}) {
+        return cy.get('.sw-skeleton', options);
+    }
+
+    /**
+     * Loading skeleton the Mollie tab shows while it fetches the Mollie order.
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getMollieTabLoadingSkeleton(options = {}) {
+        return cy.get('.mollie-order-tab .sw-skeleton', options);
+    }
+
+    /**
+     * Mollie payment info card; only rendered once the tab finished loading a Mollie order.
+     *
+     * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+     */
+    getMollieTabContent(options = {}) {
+        return cy.get('.sw-order-detail-base__mollie-info', options);
+    }
+
     getMollieRefundManagerDialog(){
         return cy.get('#modalTitleEl');
     }
