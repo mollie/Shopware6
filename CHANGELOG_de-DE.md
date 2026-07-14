@@ -1,5 +1,6 @@
 # Unreleased
 - Hinzugefügt: Zahlungsart Billink.
+- Hinzugefügt: E-Rechnungen (ZUGFeRD/XRechnung) enthalten jetzt das Zahlungsmittel für Mollie-Zahlarten.
 - Geändert: Auto-Stornierung protokolliert eine Warnung statt eines Fehlers, wenn Mollie die Zahlung/Bestellung nicht mehr stornieren kann.
 - Geändert: Die Storefront lädt und speichert die Mollie-Profil-ID nun, wenn sie fehlt.
 - Geändert: Der Zahlungsstatus wird nicht mehr geändert, wenn die Transaktion bereits im Zielstatus ist.

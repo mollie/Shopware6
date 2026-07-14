@@ -45,4 +45,17 @@ enum PaymentMethod: string
     case VIPPS = 'vipps';
     case VOUCHER = 'voucher';
     case WERO = 'wero';
+
+    /**
+     * UNTDID 4461 payment means type code for e-invoices (ZUGFeRD/XRechnung).
+     */
+    public function eInvoicePaymentMeansCode(): int
+    {
+        return match ($this) {
+            self::CREDIT_CARD => 48,
+            self::BANK_TRANSFER => 58,
+            self::DIRECT_DEBIT, self::BACS => 59,
+            default => 68,
+        };
+    }
 }
