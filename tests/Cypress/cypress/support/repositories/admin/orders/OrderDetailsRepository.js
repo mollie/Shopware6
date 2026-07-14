@@ -9,11 +9,11 @@ export default class OrderDetailsRepository {
      *
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
-    getDeliveryStatusTop() {
+    getDeliveryStatusTop(options = {}) {
         if (shopware.isVersionGreaterEqual('6.5')) {
-            return cy.get('.sw-order-general-info__order-state-delivery .sw-block-field__block .sw-single-select__selection-text');
+            return cy.get('.sw-order-general-info__order-state-delivery .sw-block-field__block .sw-single-select__selection-text', options);
         }
-        return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
+        return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName', options);
     }
 
     getPaymentStatusTop() {
