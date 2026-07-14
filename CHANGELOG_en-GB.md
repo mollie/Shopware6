@@ -1,4 +1,6 @@
 # Unreleased
+- Added: Subscription products can also be offered as a one-time purchase, configurable in the product's Mollie tab.
+- Added: The add-to-cart route accepts a new `mollieSubscribe` parameter to add a product as a subscription (for headless usage).
 - Added: Billink payment method.
 - Added: E-invoices (ZUGFeRD/XRechnung) now contain the payment means for Mollie payment methods.
 - Changed: Auto-cancellation now logs a warning instead of an error when Mollie can no longer cancel the payment/order.

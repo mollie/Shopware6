@@ -4,8 +4,8 @@
  {% block page_checkout_register_personal_guest %}
 
      {% set isMollieSubscription = false %}
-     {% for element in page.cart.data.elements %}
-         {% if(element._entityName == "product" and element.translated.customFields.mollie_payments_product_subscription_enabled) %}
+     {% for lineItem in page.cart.lineItems %}
+         {% if lineItem.extensions.mollie_payments.subscription %}
              {% set isMollieSubscription = true %}
          {% endif %}
      {% endfor %}

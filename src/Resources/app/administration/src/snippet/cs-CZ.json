@@ -419,6 +419,8 @@
                 "title": "Mollie Předplatné",
                 "description": "Správa vašich opakovaných plateb je snadnější než kdy dříve díky našim užitečným funkcím. Posuňte své podnikání na novou úroveň s efektivními možnostmi sledování, jednoduchými integracemi a dalšími funkcemi. S předplatnými Mollie můžete snadno vytvářet produkty na předplatné i naplánovat opakované platby, které budou probíhat v nastaveném intervalu a období.",
                 "mollieSubscriptionProduct": "Produkt předplatného",
+                "mollieAllowOneTime": "Nabízet také jako jednorázový nákup",
+                "mollieAllowOneTimeHelp": "Na stránce produktu zobrazí další tlačítko „Přidat do košíku“, aby bylo možné produkt koupit bez předplatného.",
                 "mollieSubscriptionIntervalAmount": "Opakovat platbu každý",
                 "mollieSubscriptionIntervalType": "Jednotka intervalu",
                 "mollieSubscriptionRepetitionAmount": "Počet opakování",

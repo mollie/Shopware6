@@ -22,6 +22,7 @@ final class CustomFieldsInstaller
     private const ID_SUBSCRIPTION_INTERVAL = 'e2ee7ee0fcb44b2c8fb41d91edcc0b16';
     private const ID_SUBSCRIPTION_INTERVAL_UNIT = '5dde0b79c6804c2a93e6137e8699cd0f';
     private const ID_SUBSCRIPTION_REPETITION = '786f49b48bf34a418c5edb5503f31de5';
+    private const ID_SUBSCRIPTION_ALLOW_ONETIME = 'd6f0a9c1b7e24f3f9a1c2d3e4f5a6b7c';
     // --------------------------------------------------------------------------------
     private const ID_ADDRESS_FIELDSET = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4';
     private const ID_RELATION_ADDRESS = 'b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5';
@@ -269,6 +270,28 @@ final class CustomFieldsInstaller
                                 'en-GB' => 'Total number of charges for the subscription to complete. Leave empty for an ongoing subscription.',
                                 'de-DE' => 'Gesamtzahl der Gebühren für den Abschluss des Abonnements. Für ein laufendes Abonnement leer lassen.',
                                 'nl-NL' => 'Totaal aantal kosten voor het voltooien van het abonnement. Laat leeg voor een doorlopend abonnement.',
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => self::ID_SUBSCRIPTION_ALLOW_ONETIME,
+                        'name' => 'mollie_payments_product_subscription_allow_onetime',
+                        'active' => true,
+                        'allowCartExpose' => true,
+                        'type' => CustomFieldTypes::SWITCH,
+                        'config' => [
+                            'customFieldPosition' => 6,
+                            'componentName' => 'sw-field',
+                            'customFieldType' => 'switch',
+                            'label' => [
+                                'en-GB' => 'Also purchasable as a one-time buy',
+                                'de-DE' => 'Auch als Einmalkauf möglich',
+                                'nl-NL' => 'Ook als eenmalige aankoop mogelijk',
+                            ],
+                            'helpText' => [
+                                'en-GB' => 'When enabled, the product detail page shows both an "Add to cart" and a "Subscribe" button, so the same product can be bought one-off and as a subscription.',
+                                'de-DE' => 'Wenn aktiviert, zeigt die Produktseite sowohl einen "In den Warenkorb"- als auch einen "Abonnieren"-Button, sodass dasselbe Produkt einmalig und als Abo gekauft werden kann.',
+                                'nl-NL' => 'Indien ingeschakeld toont de productpagina zowel een "In winkelwagen"- als een "Abonneren"-knop, zodat hetzelfde product eenmalig en als abonnement kan worden gekocht.',
                             ],
                         ],
                     ],

@@ -45,6 +45,13 @@ final class CheckoutContext extends ShopwareContext
         $this->addItemToCart($productNumber, $salesChannelContext, $quantity);
     }
 
+    #[Given('product :arg1 with quantity :arg2 is in cart as subscription')]
+    public function productWithQuantityIsInCartAsSubscription(string $productNumber, int $quantity): void
+    {
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $this->addSubscriptionItemToCart($productNumber, $salesChannelContext, $quantity);
+    }
+
     #[Given('i apply promotion code :arg1')]
     public function iApplyPromotionCode(string $code): void
     {

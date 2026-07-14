@@ -112,6 +112,21 @@ final class SubscriptionContext extends ShopwareContext
         }
     }
 
+    #[Then('the order has :arg1 subscriptions')]
+    public function theOrderHasSubscriptions(int $expectedCount): void
+    {
+        $orderId = Storage::get('orderId');
+        $context = $this->getCurrentSalesChannelContext()->getContext();
+
+        $subscriptions = $this->getOrderSubscriptions($orderId, $context);
+
+        Assert::assertSame(
+            $expectedCount,
+            $subscriptions->count(),
+            sprintf('Expected %d subscriptions for order %s, got %d', $expectedCount, $orderId, $subscriptions->count())
+        );
+    }
+
     #[Then('i remember the subscription for renewal')]
     public function iRememberTheSubscriptionForRenewal(): void
     {

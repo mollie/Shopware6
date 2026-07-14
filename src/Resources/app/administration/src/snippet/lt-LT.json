@@ -419,6 +419,8 @@
                 "title": "Mollie prenumeratos",
                 "description": "Valdyti pasikartojančius mokėjimus dar niekada nebuvo taip paprasta – padės mūsų naudingos funkcijos. Pakelkite savo verslą į kitą lygį naudodami efektyvias stebėjimo galimybes, paprastą integravimą ir dar daugiau. Naudodami Mollie prenumeratas, galite lengvai kurti prenumeruojamus produktus ir suplanuoti periodinius mokėjimus taip, kad jie būtų vykdomi nustatytu dažniu ir laikotarpiu.",
                 "mollieSubscriptionProduct": "Prenumeratos produktas",
+                "mollieAllowOneTime": "Siūlyti ir kaip vienkartinį pirkimą",
+                "mollieAllowOneTimeHelp": "Produkto puslapyje rodo papildomą mygtuką „Įdėti į krepšelį\", kad produktą būtų galima įsigyti be prenumeratos.",
                 "mollieSubscriptionIntervalAmount": "Kartoti mokėjimą kas",
                 "mollieSubscriptionIntervalType": "Intervalo vienetas",
                 "mollieSubscriptionRepetitionAmount": "Pasikartojimų skaičius",

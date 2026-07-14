@@ -419,6 +419,8 @@
                 "title": "Mollie pretplate",
                 "description": "Upravljanje ponavljajućim plaćanjima lakše je nego ikad uz naše korisne značajke. Podignite svoje poslovanje na višu razinu uz učinkovite opcije praćenja, jednostavne integracije i još mnogo toga. Uz Mollie pretplate možete jednostavno kreirati pretplatničke proizvode i zakazati ponavljajuća plaćanja koja će se izvršavati prema postavljenom intervalu i razdoblju.",
                 "mollieSubscriptionProduct": "Pretplatnički proizvod",
+                "mollieAllowOneTime": "Ponudi i kao jednokratnu kupnju",
+                "mollieAllowOneTimeHelp": "Prikazuje dodatni gumb „Dodaj u košaricu\" na stranici proizvoda kako bi se proizvod mogao kupiti bez pretplate.",
                 "mollieSubscriptionIntervalAmount": "Ponavljaj uplatu svaki",
                 "mollieSubscriptionIntervalType": "Jedinica intervala",
                 "mollieSubscriptionRepetitionAmount": "Broj ponavljanja",

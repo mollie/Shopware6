@@ -419,6 +419,8 @@
                 "title": "Mollie Prenumerationer",
                 "description": "Att hantera dina återkommande betalningar är enklare än någonsin med våra hjälpsamma funktioner. Ta din verksamhet till nästa nivå med effektiva spårningsalternativ, enkla integrationer och mer. Med Mollie-prenumerationer kan du enkelt skapa prenumerationsprodukter och schemalägga återkommande betalningar att äga rum vid det konfigurerade intervallet och perioden.",
                 "mollieSubscriptionProduct": "Prenumerationsprodukt",
+                "mollieAllowOneTime": "Erbjud även som engångsköp",
+                "mollieAllowOneTimeHelp": "Visar en extra \"Lägg i varukorg\"-knapp på produktsidan så att produkten kan köpas utan prenumeration.",
                 "mollieSubscriptionIntervalAmount": "Upprepa betalning varje",
                 "mollieSubscriptionIntervalType": "Intervall enhet",
                 "mollieSubscriptionRepetitionAmount": "Antal upprepningar",

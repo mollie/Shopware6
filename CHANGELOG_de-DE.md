@@ -1,4 +1,6 @@
 # Unreleased
+- Hinzugefügt: Abo-Produkte können zusätzlich als Einmalkauf angeboten werden, konfigurierbar im Mollie-Tab des Produkts.
+- Hinzugefügt: Die Add-to-Cart-Route akzeptiert einen neuen Parameter `mollieSubscribe`, um ein Produkt als Abo hinzuzufügen (für Headless-Nutzung).
 - Hinzugefügt: Zahlungsart Billink.
 - Hinzugefügt: E-Rechnungen (ZUGFeRD/XRechnung) enthalten jetzt das Zahlungsmittel für Mollie-Zahlarten.
 - Geändert: Auto-Stornierung protokolliert eine Warnung statt eines Fehlers, wenn Mollie die Zahlung/Bestellung nicht mehr stornieren kann.

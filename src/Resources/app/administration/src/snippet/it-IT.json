@@ -419,6 +419,8 @@
                 "title": "Abbonamenti Mollie",
                 "description": "Gestire i tuoi pagamenti ricorrenti è più facile che mai grazie alle nostre utili funzionalità. Porta la tua attività al livello successivo con opzioni di tracciamento efficienti, integrazioni semplici e molto altro. Con gli abbonamenti Mollie, puoi facilmente creare prodotti in abbonamento e programmare pagamenti ricorrenti che avvengano all'intervallo e periodo configurati.",
                 "mollieSubscriptionProduct": "Prodotto in abbonamento",
+                "mollieAllowOneTime": "Offri anche come acquisto singolo",
+                "mollieAllowOneTimeHelp": "Mostra un pulsante «Aggiungi al carrello» aggiuntivo nella pagina del prodotto, così il prodotto può essere acquistato senza abbonamento.",
                 "mollieSubscriptionIntervalAmount": "Ripeti il pagamento ogni",
                 "mollieSubscriptionIntervalType": "Unità di intervallo",
                 "mollieSubscriptionRepetitionAmount": "Numero di ripetizioni",

@@ -13,6 +13,7 @@ final class Product extends Struct
 {
     private VoucherCategoryCollection $voucherCategories;
     private bool $isSubscription = false;
+    private bool $allowStandalonePurchase = false;
     private Interval $interval;
 
     private int $repetition = 0;
@@ -40,6 +41,16 @@ final class Product extends Struct
     public function setIsSubscription(bool $isSubscription): void
     {
         $this->isSubscription = $isSubscription;
+    }
+
+    public function allowsStandalonePurchase(): bool
+    {
+        return $this->allowStandalonePurchase;
+    }
+
+    public function setAllowStandalonePurchase(bool $allowStandalonePurchase): void
+    {
+        $this->allowStandalonePurchase = $allowStandalonePurchase;
     }
 
     public function getInterval(): Interval
@@ -94,9 +105,11 @@ final class Product extends Struct
         $subscriptionUnit = $customFields['mollie_payments_product_subscription_interval_unit'] ?? '';
         if ((bool) $subscriptionEnabled && (int) $subscriptionInterval > 0 && mb_strlen($subscriptionUnit) > 0) {
             $subscriptionRepetitions = $customFields['mollie_payments_product_subscription_repetition'] ?? 0;
+            $allowStandalone = $customFields['mollie_payments_product_subscription_allow_onetime'] ?? false;
             $productExtension->setIsSubscription(true);
             $productExtension->setInterval(new Interval($subscriptionInterval,IntervalUnit::from($subscriptionUnit)));
             $productExtension->setRepetition((int) $subscriptionRepetitions);
+            $productExtension->setAllowStandalonePurchase((bool) $allowStandalone);
         }
 
         return $productExtension;

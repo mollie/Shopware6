@@ -419,6 +419,8 @@
                 "title": "Mollie áskriftir",
                 "description": "Að stýra endurteknum greiðslum er auðveldari en nokkru sinni fyrr með nytsamlegu eiginleikunum okkar. Færðu fyrirtæki þitt á næsta stig með virkri eftirfylgni, einföldum samþættingum og fleiru. Með Mollie áskriftum geturðu auðveldlega skapað áskriftarvörur og skipulagt endurteknar greiðslur sem eiga að eiga sér stað á tilskildnu tímabili.",
                 "mollieSubscriptionProduct": "Áskriftarvara",
+                "mollieAllowOneTime": "Bjóða einnig sem stakan kaup",
+                "mollieAllowOneTimeHelp": "Sýnir auka „Setja í körfu\" hnapp á vörusíðunni svo hægt sé að kaupa vöruna án áskriftar.",
                 "mollieSubscriptionIntervalAmount": "Endurtaka greiðslu á hverju",
                 "mollieSubscriptionIntervalType": "Tímabilseining",
                 "mollieSubscriptionRepetitionAmount": "Fjöldi eða endurtekningar",

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Integration\Data;
 
 use Mollie\Shopware\Component\Payment\Controller\PaymentController;
+use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
@@ -55,6 +56,30 @@ trait CheckoutTestBehaviour
         ]);
 
         return $cartLineItemController->addLineItems($cart, $requestDataBag, $request, $salesChannelContext);
+    }
+
+    /**
+     * Adds the product as its subscription variant, i.e. the line item shaped exactly as the
+     * SubscriptionCartItemAddRoute decorator produces it after a storefront "Subscribe" click:
+     * a distinct line item id (so it does not merge with a one-off of the same product) plus the
+     * subscription payload marker. A distinct id keeps the one-off and the subscription line
+     * separate, and the marker makes LineItemSubscriber flag only this line as a subscription.
+     */
+    public function addSubscriptionItemToCart(string $productNumber, SalesChannelContext $salesChannelContext, int $quantity = 1): void
+    {
+        $cartService = $this->getContainer()->get(CartService::class);
+        $cart = $cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+
+        $product = $this->getProductByNumber($productNumber, $salesChannelContext->getContext());
+
+        $subscriptionLineItemId = Mollie::SUBSCRIPTION_LINE_ITEM_PREFIX . $product->getId();
+
+        $lineItem = new LineItem($subscriptionLineItemId, LineItem::PRODUCT_LINE_ITEM_TYPE, $product->getId(), $quantity);
+        $lineItem->setStackable(true);
+        $lineItem->setRemovable(true);
+        $lineItem->setPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY, true);
+
+        $cartService->add($cart, $lineItem, $salesChannelContext);
     }
 
     public function addPromotionToCart(string $code, SalesChannelContext $salesChannelContext): void
