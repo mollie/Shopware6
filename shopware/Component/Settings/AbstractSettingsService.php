@@ -23,6 +23,8 @@ abstract class AbstractSettingsService
 
     abstract public function getApiSettings(?string $salesChannelId = null): ApiSettings;
 
+    abstract public function setApiSettings(ApiSettings $apiSettings, ?string $salesChannelId = null): ApiSettings;
+
     abstract public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings;
 
     abstract public function getEnvironmentSettings(): EnvironmentSettings;

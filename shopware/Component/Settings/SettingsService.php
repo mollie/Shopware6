@@ -137,6 +137,23 @@ final class SettingsService extends AbstractSettingsService
         return $settings;
     }
 
+    public function setApiSettings(ApiSettings $apiSettings, ?string $salesChannelId = null): ApiSettings
+    {
+        $shopwareArray = $apiSettings->toShopwareArray();
+
+        $values = [];
+        foreach ($shopwareArray as $key => $value) {
+            $values[self::SYSTEM_CONFIG_DOMAIN . '.' . $key] = $value;
+        }
+        $this->systemConfigService->setMultiple($values, $salesChannelId);
+
+        $newSettings = ApiSettings::createFromShopwareArray($shopwareArray);
+        $cacheKey = ApiSettings::class . '_' . ($salesChannelId ?? 'all');
+        $this->settingsCache[$cacheKey] = $newSettings;
+
+        return $newSettings;
+    }
+
     public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings
     {
         $cacheKey = SubscriptionSettings::class . '_' . ($salesChannelId ?? 'all');

@@ -76,6 +76,14 @@ final class FakeSettingsService extends AbstractSettingsService
         return $this->apiSettings;
     }
 
+    public function setApiSettings(ApiSettings $apiSettings, ?string $salesChannelId = null): ApiSettings
+    {
+        $this->apiSettings = $apiSettings;
+        $this->profileId = $apiSettings->getProfileId();
+
+        return $apiSettings;
+    }
+
     public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings
     {
         return $this->paymentSettings;
