@@ -65,32 +65,21 @@ trait CheckoutTestBehaviour
      * subscription payload marker. A distinct id keeps the one-off and the subscription line
      * separate, and the marker makes LineItemSubscriber flag only this line as a subscription.
      */
-    public function addSubscriptionItemToCart(string $productNumber, SalesChannelContext $salesChannelContext, int $quantity = 1): Response
+    public function addSubscriptionItemToCart(string $productNumber, SalesChannelContext $salesChannelContext, int $quantity = 1): void
     {
         $cartService = $this->getContainer()->get(CartService::class);
         $cart = $cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
-        /** @var CartLineItemController $cartLineItemController */
-        $cartLineItemController = $this->getContainer()->get(CartLineItemController::class);
 
         $product = $this->getProductByNumber($productNumber, $salesChannelContext->getContext());
-        $request = $this->createStoreFrontRequest($salesChannelContext);
 
         $subscriptionLineItemId = Mollie::SUBSCRIPTION_LINE_ITEM_PREFIX . $product->getId();
 
-        $lineItemDataBag = new RequestDataBag([
-            'id' => $subscriptionLineItemId,
-            'referencedId' => $product->getId(),
-            'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
-            'quantity' => $quantity,
-            'payload' => [Mollie::SUBSCRIPTION_PAYLOAD_KEY => '1'],
-        ]);
+        $lineItem = new LineItem($subscriptionLineItemId, LineItem::PRODUCT_LINE_ITEM_TYPE, $product->getId(), $quantity);
+        $lineItem->setStackable(true);
+        $lineItem->setRemovable(true);
+        $lineItem->setPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY, true);
 
-        $requestDataBag = new RequestDataBag();
-        $requestDataBag->set('lineItems', [
-            $subscriptionLineItemId => $lineItemDataBag
-        ]);
-
-        return $cartLineItemController->addLineItems($cart, $requestDataBag, $request, $salesChannelContext);
+        $cartService->add($cart, $lineItem, $salesChannelContext);
     }
 
     public function addPromotionToCart(string $code, SalesChannelContext $salesChannelContext): void
