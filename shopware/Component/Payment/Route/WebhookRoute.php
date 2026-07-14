@@ -144,14 +144,27 @@ final class WebhookRoute extends AbstractWebhookRoute
             'orderNumber' => $orderNumber,
         ];
         $this->logger->info('Change payment status', $logData);
-        if (mb_strlen($shopwareHandlerMethod) === 0) {
-            $this->logger->warning('Failed to find shopware handler method for status', $logData);
+
+        if ($currentPaymentStatus === $targetPaymentStatus) {
+            $this->logger->debug('Payment status transition skipped, transaction is already in the target state', $logData);
 
             return;
         }
 
-        if ($currentPaymentStatus === $targetPaymentStatus) {
-            $this->logger->debug('Payment status transition skipped, transaction is already in the target state', $logData);
+        if (mb_strlen($shopwareHandlerMethod) === 0) {
+            $status = $payment->getStatus();
+            // open and pending have no shopware transition by design - the transaction never reaches
+            // the "open"/"unconfirmed" target through a handler, so these known statuses are skipped
+            // silently. The minutely status-update task re-checks not-yet-paid orders and would
+            // otherwise flood the log with warnings for every poll. Only an unmapped status is worth
+            // a warning.
+            if ($status === PaymentStatus::OPEN || $status === PaymentStatus::PENDING) {
+                $this->logger->debug('Payment status has no shopware transition, skipping', $logData);
+
+                return;
+            }
+
+            $this->logger->warning('Failed to find shopware handler method for status', $logData);
 
             return;
         }
