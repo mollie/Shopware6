@@ -7,8 +7,6 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Document\Zugferd\ZugferdInvoiceGeneratedEvent;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\Feature;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ZugferdInvoiceGeneratedSubscriber implements EventSubscriberInterface
@@ -22,7 +20,7 @@ final class ZugferdInvoiceGeneratedSubscriber implements EventSubscriberInterfac
 
     public function onInvoiceGenerated(ZugferdInvoiceGeneratedEvent $event): void
     {
-        $transaction = $this->resolveTransaction($event->order);
+        $transaction = $event->order->getTransactions()?->last();
         if (! $transaction instanceof OrderTransactionEntity) {
             return;
         }
@@ -43,14 +41,5 @@ final class ZugferdInvoiceGeneratedSubscriber implements EventSubscriberInterfac
             typeCode: (string) $method->eInvoicePaymentMeansCode(),
             information: $transaction->getPaymentMethod()?->getName()
         );
-    }
-
-    private function resolveTransaction(OrderEntity $order): ?OrderTransactionEntity
-    {
-        if (Feature::has('v6.8.0.0') && Feature::isActive('v6.8.0.0')) {
-            return $order->getPrimaryOrderTransaction();
-        }
-
-        return $order->getTransactions()?->last();
     }
 }
