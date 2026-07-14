@@ -11,7 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class RouteBuilder implements RouteBuilderInterface
 {
     public function __construct(
-        #[Autowire(service: 'router.default')]
+        #[Autowire(service: 'router')]
         private RouterInterface $router,
         #[Autowire(service: 'request_stack')]
         private RequestStack $requestStack)
