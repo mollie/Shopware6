@@ -11,6 +11,7 @@
 - Behoben: Der Checkout auf Verkaufskanal-Domains mit Pfad-Präfix kehrt nun korrekt zurück und finalisiert, statt „Sales Channel Not Found" zu zeigen; auch Mollie-Webhooks werden aufgelöst.
 - Behoben: Für eine bereits bezahlte oder autorisierte Bestellung wird keine zweite Mollie-Zahlung mehr erzeugt, wodurch Doppelbelastungen verhindert werden.
 - Behoben: Der Mollie-Tab in der Bestelldetailansicht entfernt keine Tabs mehr, die andere Plugins am selben Erweiterungspunkt hinzufügen.
+- Behoben: Der Mollie-Tab im Produkt ist ohne Produkt-Bearbeitungsrecht schreibgeschützt.
 
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.

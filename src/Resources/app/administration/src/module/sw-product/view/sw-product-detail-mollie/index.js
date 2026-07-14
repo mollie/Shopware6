@@ -5,7 +5,7 @@ import './sw-product-detail-mollie.scss';
 Shopware.Component.register('sw-product-detail-mollie', {
     template,
 
-    inject: ['repositoryFactory'],
+    inject: ['repositoryFactory', 'acl'],
 
     metaInfo() {
         return {
@@ -122,6 +122,14 @@ Shopware.Component.register('sw-product-detail-mollie', {
          */
         isDefaultLanguage() {
             return this.languageId === this.systemLanguageId;
+        },
+
+        /**
+         *
+         * @returns {boolean}
+         */
+        allowEdit() {
+            return this.acl.can('product.editor');
         },
     },
 

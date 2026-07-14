@@ -38,7 +38,7 @@
                         <template #content="props">
                             <sw-multi-select
                                     class="mollie-voucher-type"
-                                    :disabled="props.isInherited"
+                                    :disabled="props.isInherited || !allowEdit"
                                     :value="props.currentValue"
                                     :options="voucherTypes"
                                     v-model:value="props.currentValue"
@@ -103,7 +103,7 @@
                                         :map-inheritance="props"
                                         :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionProduct')"
                                         class="mollie-subscription-enabled"
-                                        :disabled="props.isInherited"
+                                        :disabled="props.isInherited || !allowEdit"
                                         :value="props.currentValue"
                                         v-model:value="props.currentValue"
                                         @change="props.updateCurrentValue"
@@ -126,7 +126,7 @@
                             <template #content="props">
                                 <sw-number-field
                                         numberType="int"
-                                        :disabled="props.isInherited"
+                                        :disabled="props.isInherited || !allowEdit"
                                         :value="props.currentValue"
                                         v-model:value="props.currentValue"
                                         @change="props.updateCurrentValue"
@@ -144,7 +144,7 @@
                             <template #content="props">
                                 <sw-single-select
                                         :options="subscriptionIntervalTypes"
-                                        :disabled="props.isInherited"
+                                        :disabled="props.isInherited || !allowEdit"
                                         :value="props.currentValue"
                                         v-model:value="props.currentValue"
                                         @change="props.updateCurrentValue"
@@ -166,7 +166,7 @@
                             <template #content="props">
                                 <sw-text-field
                                         :placeholder="$tc('mollie-payments.subscriptions.product.mollieSubscriptionRepetitionPlaceholder')"
-                                        :disabled="props.isInherited"
+                                        :disabled="props.isInherited || !allowEdit"
                                         :value="props.currentValue"
                                         v-model:value="props.currentValue"
                                         @change="props.updateCurrentValue"
