@@ -419,6 +419,8 @@
                 "title": "Mollie Subscriptions",
                 "description": "Jūsu regulāro maksājumu pārvaldīšana ir vieglāka nekā jebkad agrāk ar mūsu noderīgajām funkcijām. Paceliet savu biznesu jaunā līmenī ar efektīvām izsekosanas iespējām, vienkāršām integrācijām un vairāk. Ar Mollie abonementiem jūs varat viegli izveidot abonementa produktus un ieplānot regulārus maksājumus, lai tie notiktu noteiktajos intervālos un periodos.",
                 "mollieSubscriptionProduct": "Abonementa Produkts",
+                "mollieAllowOneTime": "Piedāvāt arī kā vienreizēju pirkumu",
+                "mollieAllowOneTimeHelp": "Produkta lapā parāda papildu pogu „Pievienot grozam\", lai produktu varētu iegādāties bez abonementa.",
                 "mollieSubscriptionIntervalAmount": "Atkārtot maksājumu katru",
                 "mollieSubscriptionIntervalType": "Intervāla vienība",
                 "mollieSubscriptionRepetitionAmount": "Atkārtojumu skaits",

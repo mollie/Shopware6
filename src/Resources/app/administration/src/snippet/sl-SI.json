@@ -419,6 +419,8 @@
                 "title": "Mollie naročnine",
                 "description": "Upravljajte vaša ponavljajoča se plačila lažje kot kdaj koli prej z našimi uporabnimi funkcijami. Popeljite svoj posel na naslednjo raven z učinkovitimi možnostmi sledenja, preprostimi integracijami in še več. S pomočjo Mollie naročnin lahko enostavno ustvarite naročniške izdelke in načrtujete ponavljajoča se plačila, ki bodo izvedena ob nastavljenem intervalu in obdobju.",
                 "mollieSubscriptionProduct": "Izdelki naročnin",
+                "mollieAllowOneTime": "Ponudi tudi kot enkratni nakup",
+                "mollieAllowOneTimeHelp": "Na strani izdelka prikaže dodaten gumb „Dodaj v košarico\", da je izdelek mogoče kupiti brez naročnine.",
                 "mollieSubscriptionIntervalAmount": "Ponovite plačilo vsak",
                 "mollieSubscriptionIntervalType": "Enota intervala",
                 "mollieSubscriptionRepetitionAmount": "Število ponovitev",

@@ -419,6 +419,8 @@
                 "title": "Mollie-tilaukset",
                 "description": "Toistuvien maksujesi hallinta on helpompaa kuin koskaan hyödyllisten ominaisuuksiemme ansiosta. Vie yrityksesi uudelle tasolle tehokkailla seurantavaihtoehdoilla, yksinkertaisilla integroinneilla ja monilla muilla tavoilla. Mollie-tilausten avulla voit helposti luoda tilaustuotteita ja ajoittaa toistuvia maksuja suoritettavaksi määritetyllä aikavälillä ja ajanjaksolla.",
                 "mollieSubscriptionProduct": "Tilaustuote",
+                "mollieAllowOneTime": "Tarjoa myös kertaostona",
+                "mollieAllowOneTimeHelp": "Näyttää tuotesivulla ylimääräisen \"Lisää ostoskoriin\" -painikkeen, jotta tuotteen voi ostaa ilman tilausta.",
                 "mollieSubscriptionIntervalAmount": "Toista maksu joka",
                 "mollieSubscriptionIntervalType": "Aikaväliyksikkö",
                 "mollieSubscriptionRepetitionAmount": "Toistojen määrä",

@@ -419,6 +419,8 @@
                 "title": "Subscrições Mollie",
                 "description": "Gerir os seus pagamentos recorrentes é mais fácil do que nunca com as nossas funcionalidades úteis. Leve o seu negócio ao próximo nível com opções de acompanhamento eficientes, integrações simples e muito mais. Com as subscrições Mollie, pode criar facilmente produtos de subscrição e programar pagamentos recorrentes para ocorrerem no intervalo e período configurados.",
                 "mollieSubscriptionProduct": "Produto de Subscrição",
+                "mollieAllowOneTime": "Oferecer também como compra única",
+                "mollieAllowOneTimeHelp": "Mostra um botão adicional «Adicionar ao carrinho» na página do produto para que possa ser comprado sem subscrição.",
                 "mollieSubscriptionIntervalAmount": "Repetir pagamento a cada",
                 "mollieSubscriptionIntervalType": "Unidade de intervalo",
                 "mollieSubscriptionRepetitionAmount": "Número de repetições",

@@ -419,6 +419,8 @@
                 "title": "Mollie Abonnementen",
                 "description": "Het beheren van uw terugkerende betalingen is eenvoudiger dan ooit met onze handige functies. Breng uw bedrijf naar een hoger niveau met efficiënte trackingopties, eenvoudige integraties en meer. Met Mollie-abonnementen kun je eenvoudig abonnementsproducten maken en terugkerende betalingen plannen die plaatsvinden op het ingestelde interval en de ingestelde periode.",
                 "mollieSubscriptionProduct": "Is dit een abonnementsproduct?",
+                "mollieAllowOneTime": "Ook als eenmalige aankoop aanbieden",
+                "mollieAllowOneTimeHelp": "Toont een extra knop \"In winkelwagen\" op de productpagina zodat het product zonder abonnement kan worden gekocht.",
                 "mollieSubscriptionIntervalAmount": "Herhaal betaling elke",
                 "mollieSubscriptionIntervalType": "Type abonnementsinterval",
                 "mollieSubscriptionRepetitionAmount": "Herhaal betaling",

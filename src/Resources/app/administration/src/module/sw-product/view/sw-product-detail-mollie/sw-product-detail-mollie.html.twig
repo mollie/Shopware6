@@ -116,6 +116,31 @@
                     {# --------------------------------------------------------------------------------------------- #}
                     {# --------------------------------------------------------------------------------------------- #}
                     {# --------------------------------------------------------------------------------------------- #}
+                    <sw-container columns="1fr" v-if="isDefaultLanguage">
+                        <sw-inherit-wrapper
+                                v-model="product.customFields.mollie_payments_product_subscription_allow_onetime"
+                                v-model:value="product.customFields.mollie_payments_product_subscription_allow_onetime"
+                                :has-parent="!!parentProduct.id"
+                                :inherited-value="parentProduct.customFields.mollie_payments_product_subscription_allow_onetime">
+                            <template #content="props">
+                                <sw-switch-field
+                                        :map-inheritance="props"
+                                        :label="$tc('mollie-payments.subscriptions.product.mollieAllowOneTime')"
+                                        :helpText="$tc('mollie-payments.subscriptions.product.mollieAllowOneTimeHelp')"
+                                        class="mollie-subscription-allow-onetime"
+                                        :disabled="props.isInherited || !allowEdit"
+                                        :value="props.currentValue"
+                                        v-model:value="props.currentValue"
+                                        @change="props.updateCurrentValue"
+                                        @update:value="props.updateCurrentValue"
+                                >
+                                </sw-switch-field>
+                            </template>
+                        </sw-inherit-wrapper>
+                    </sw-container>
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
+                    {# --------------------------------------------------------------------------------------------- #}
                     <sw-container columns="1fr 1fr" gap="30px">
                         <sw-inherit-wrapper
                                 :label="$tc('mollie-payments.subscriptions.product.mollieSubscriptionIntervalAmount')"

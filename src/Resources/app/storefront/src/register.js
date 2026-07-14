@@ -5,6 +5,7 @@ import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
 import PayPalExpressPlugin from './mollie-payments/plugins/express/paypal-express.plugin';
 import MolliePhonePlugin from './mollie-payments/plugins/phone-plugin';
+import MollieSubscribeButtonPlugin from './mollie-payments/plugins/subscribe-button.plugin';
 
 export default class MollieRegistration {
     /**
@@ -36,6 +37,7 @@ export default class MollieRegistration {
             ],
             ['MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]'],
             ['MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]'],
+            ['MollieSubscribeButton', MollieSubscribeButtonPlugin, '[data-mollie-subscribe-button]'],
         ];
 
         registrations.forEach(function (registration) {

@@ -1,11 +1,11 @@
 {
   "main.js": {
-    "file": "js/mollie-payments.js",
+    "file": "assets/mollie-payments-BJbP_aDo.js",
     "name": "mollie-payments",
     "src": "main.js",
     "isEntry": true,
     "css": [
-      "css/mollie-payments.css"
+      "assets/mollie-payments-lsI9fpj_.css"
     ]
   }
 }

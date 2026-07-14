@@ -419,6 +419,8 @@
                 "title": "Mollie abonnementer",
                 "description": "At håndtere dine gentagne betalinger er lettere end nogensinde med vores nyttige funktioner. Tag din virksomhed til næste niveau med effektive sporingsmuligheder, enkle integrationer og mere. Med Mollie abonnementer kan du nemt oprette abonnementsprodukter og planlægge gentagne betalinger til at finde sted på det konfigurerede interval og periode.",
                 "mollieSubscriptionProduct": "Abonnementsprodukt",
+                "mollieAllowOneTime": "Tilbyd også som engangskøb",
+                "mollieAllowOneTimeHelp": "Viser en ekstra \"Læg i kurv\"-knap på produktsiden, så produktet kan købes uden abonnement.",
                 "mollieSubscriptionIntervalAmount": "Gentag betaling hver",
                 "mollieSubscriptionIntervalType": "Interval enhed",
                 "mollieSubscriptionRepetitionAmount": "Antal gentagelser",

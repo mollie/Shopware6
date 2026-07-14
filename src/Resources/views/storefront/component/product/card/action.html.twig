@@ -45,8 +45,10 @@
 
 {% endblock %}
 
-{% set showButton = mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
-{% set subscribeButton %}
+{% set mollieSubscriptionEnabled = mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
+{% set mollieAllowOneTime = mollieSubscriptionEnabled and product.translated.customFields.mollie_payments_product_subscription_allow_onetime %}
+
+{% set subscribeOnlyButton %}
     <div class="d-grid">
         <button class="btn btn-block btn-buy"
                 title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
@@ -55,18 +57,36 @@
     </div>
 {% endset %}
 
+{% set subscribeExtraButton %}
+    <div class="d-grid mt-2">
+        <button class="btn btn-secondary btn-block btn-buy"
+                type="submit"
+                data-mollie-subscribe-button
+                data-mollie-subscribe-button-options='{{ { productId: product.id }|json_encode }}'
+                title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
+            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
+        </button>
+    </div>
+{% endset %}
+
 {% block component_product_box_action_buy_button %}
-    {% if showButton %}
-        {{ subscribeButton }}
+    {% if mollieSubscriptionEnabled and not mollieAllowOneTime %}
+        {{ subscribeOnlyButton }}
     {% else %}
         {{ parent() }}
+        {% if mollieAllowOneTime %}
+            {{ subscribeExtraButton }}
+        {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block page_product_detail_product_buy_button %}
-    {% if showButton %}
-        {{ subscribeButton }}
+    {% if mollieSubscriptionEnabled and not mollieAllowOneTime %}
+        {{ subscribeOnlyButton }}
     {% else %}
         {{ parent() }}
+        {% if mollieAllowOneTime %}
+            {{ subscribeExtraButton }}
+        {% endif %}
     {% endif %}
 {% endblock %}

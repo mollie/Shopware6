@@ -419,6 +419,8 @@
                 "title": "Mollie Tellimused",
                 "description": "Meie kasulike funktsioonide abil on korduvate maksete haldamine lihtsam kui kunagi varem. Vii oma äri uuele tasemele tõhusate jälgimisvõimaluste, lihtsate integratsioonide ja muude funktsioonide abil. Mollie tellimustega saad hõlpsasti luua tellimustooted ja planeerida korduvaid maksed, mis toimuvad konfigureeritud intervalli ja perioodi järel.",
                 "mollieSubscriptionProduct": "Tellimuse toode",
+                "mollieAllowOneTime": "Paku ka ühekordse ostuna",
+                "mollieAllowOneTimeHelp": "Kuvab tootelehel täiendava nupu „Lisa ostukorvi\", et toodet saaks osta ilma tellimuseta.",
                 "mollieSubscriptionIntervalAmount": "Korda makset iga",
                 "mollieSubscriptionIntervalType": "Ajavahemiku ühik",
                 "mollieSubscriptionRepetitionAmount": "Korduste arv",

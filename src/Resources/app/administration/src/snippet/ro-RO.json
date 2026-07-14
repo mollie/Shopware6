@@ -419,6 +419,8 @@
                 "title": "Abonamente Mollie",
                 "description": "Gestionarea plăților recurente este mai ușoară ca niciodată cu caracteristicile noastre utile. Duceți-vă afacerea la nivelul următor cu opțiuni eficiente de urmărire, integrații simple și multe altele. Cu abonamentele Mollie, puteți crea cu ușurință produse de abonament și programa plăți recurente care să aibă loc la intervalul și perioada configurate.",
                 "mollieSubscriptionProduct": "Produs de abonament",
+                "mollieAllowOneTime": "Oferă și ca achiziție unică",
+                "mollieAllowOneTimeHelp": "Afișează un buton suplimentar „Adaugă în coș\" pe pagina produsului, astfel încât produsul să poată fi cumpărat fără abonament.",
                 "mollieSubscriptionIntervalAmount": "Repetă plata la fiecare",
                 "mollieSubscriptionIntervalType": "Unitate de interval",
                 "mollieSubscriptionRepetitionAmount": "Numărul de repetiții",

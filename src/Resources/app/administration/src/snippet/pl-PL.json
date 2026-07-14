@@ -419,6 +419,8 @@
                 "title": "Subskrypcje Mollie",
                 "description": "Zarządzanie płatnościami cyklicznymi nigdy nie było prostsze dzięki naszym pomocnym funkcjom. Dzięki Mollie możesz łatwo tworzyć produkty subskrypcyjne i ustawiać cykliczne płatności w zaplanowanych odstępach czasowych. Nasze narzędzia umożliwiają efektywne śledzenie, prostą integrację oraz inne funkcje, które pozwolą Ci przenieść Twój biznes na wyższy poziom.",
                 "mollieSubscriptionProduct": "Produkt subskrypcyjny",
+                "mollieAllowOneTime": "Oferuj także jako zakup jednorazowy",
+                "mollieAllowOneTimeHelp": "Wyświetla dodatkowy przycisk „Dodaj do koszyka\" na stronie produktu, aby można było go kupić bez subskrypcji.",
                 "mollieSubscriptionIntervalAmount": "Powtarzaj płatność co",
                 "mollieSubscriptionIntervalType": "Jednostka interwału",
                 "mollieSubscriptionRepetitionAmount": "Liczba powtórzeń",

@@ -419,6 +419,8 @@
                 "title": "Mollie Előfizetések",
                 "description": "Az általunk kínált funkcióknak köszönhetően nagyon egyszerű az ismétlődő fizetések kezelése. Emelje vállalkozását a következő szintre a nyomkövetési lehetőségekkel, az egyszerű integrációkkal és sok mással. A Mollie Subscriptions segítségével előfizetéseket hozhat létre, és ütemezheti az ismétlődő fizetéseket meghatározott időközönként és időszakonkénti fizetéssel.",
                 "mollieSubscriptionProduct": "Előfizetési termék",
+                "mollieAllowOneTime": "Egyszeri vásárlásként is elérhető",
+                "mollieAllowOneTimeHelp": "Egy további „Kosárba\" gombot jelenít meg a termékoldalon, hogy a termék előfizetés nélkül is megvásárolható legyen.",
                 "mollieSubscriptionIntervalAmount": "Kifizetés ismétlése minden",
                 "mollieSubscriptionIntervalType": "Időköz típusa",
                 "mollieSubscriptionRepetitionAmount": "Ismétlések száma",
