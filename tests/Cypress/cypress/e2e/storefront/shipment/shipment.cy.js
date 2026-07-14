@@ -287,10 +287,16 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
     repoOrderDetails.getOrderDetailsGeneralTab().click({force: true});
     cy.reload();
 
-    // wait for Vue to finish rendering the state select after the reload: the timeout must live on
-    // the cy.get() so the .should() retries the query until the field is populated (an empty "" text
-    // otherwise fails the assertion before Vue has hydrated the admin SPA).
-    repoOrderDetails.getDeliveryStatusTop({timeout: 20000}).should('contain.text', statusLabel);
+    // after the reload the admin re-hydrates and shows loading overlays/skeletons; wait for them to
+    // disappear before reading the delivery status, otherwise we assert against a half-loaded page on
+    // the resource-constrained CI (a fixed cy.wait() is too short there).
+    repoOrderDetails.getLoadingOverlay({timeout: 20000}).should('not.exist');
+    repoOrderDetails.getLoadingSkeleton({timeout: 20000}).should('not.exist');
+
+    // the timeout must live on the cy.get() so the .should() retries the query until the field is
+    // populated (an empty "" text otherwise fails the assertion before Vue finished rendering the
+    // state select).
+    repoOrderDetails.getDeliveryStatusTop({timeout: 20000}).should('be.visible').and('contain.text', statusLabel);
 
     if (shopware.isVersionLower('6.5')) {
         /** since 6.5 you don't see the shipped items in summary **/
