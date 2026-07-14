@@ -66,6 +66,9 @@ final class TransactionService implements TransactionServiceInterface
         // Load all order transactions together with their state so WebhookRoute can check whether the
         // order already has a paid transaction and skip status updates on already paid orders.
         $criteria->addAssociation('order.transactions.stateMachineState');
+        // Load the state of the transaction itself so WebhookRoute can skip the payment status
+        // transition when the transaction is already in the target state.
+        $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('paymentMethod');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);
