@@ -151,6 +151,29 @@ final class PayTest extends TestCase
         $this->assertCount(0, $gateway->getCreateOrderPayloads());
     }
 
+    public function testSettledPaymentDataIsCopiedToCurrentTransaction(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
+        $transactionService->withMolliePaymentOnOrderTransactions();
+        $transactionService->createTransaction();
+
+        $gateway = new FakeGateway('https://mollie.com/checkout');
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout', $gateway);
+
+        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('current-transaction', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertSame('returnUrl', $response->getTargetUrl());
+        $this->assertCount(0, $gateway->getCreatePayloads());
+        $this->assertCount(0, $gateway->getCreateOrderPayloads());
+
+        $saved = $transactionService->getSavedPaymentExtensions();
+        $this->assertCount(1, $saved);
+        $this->assertSame('current-transaction', $saved[0]['transactionId']);
+        $this->assertSame('settled-payment-0', $saved[0]['payment']->getId());
+        $this->assertSame('returnUrl', $saved[0]['payment']->getFinalizeUrl());
+    }
+
     private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl, ?FakeGateway $gateway = null): Pay
     {
         $eventDispatcher = new EventSpy();

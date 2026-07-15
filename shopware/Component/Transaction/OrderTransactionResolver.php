@@ -42,6 +42,16 @@ final class OrderTransactionResolver implements OrderTransactionResolverInterfac
         return $this->latestInStates($order, [OrderTransactionStates::STATE_AUTHORIZED]);
     }
 
+    public function resolveSettled(OrderEntity $order): ?OrderTransactionEntity
+    {
+        $paid = $this->latestInStates($order, [OrderTransactionStates::STATE_PAID]);
+        if ($paid !== null) {
+            return $paid;
+        }
+
+        return $this->resolveCapturableAuthorized($order);
+    }
+
     public function resolveRefundable(OrderEntity $order): ?OrderTransactionEntity
     {
         return $this->latestInStates($order, [

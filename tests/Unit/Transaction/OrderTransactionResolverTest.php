@@ -73,6 +73,32 @@ final class OrderTransactionResolverTest extends TestCase
         self::assertNull($this->resolver->resolveCapturableAuthorized($order));
     }
 
+    public function testResolveSettledPrefersPaidOverAuthorized(): void
+    {
+        $authorized = $this->createTransaction('authorized', OrderTransactionStates::STATE_AUTHORIZED, 1000);
+        $paid = $this->createTransaction('paid', OrderTransactionStates::STATE_PAID, 2000);
+
+        $order = $this->createOrder($authorized, $paid);
+
+        self::assertSame($paid, $this->resolver->resolveSettled($order));
+    }
+
+    public function testResolveSettledFallsBackToAuthorizedWhenNotPaid(): void
+    {
+        $authorized = $this->createTransaction('authorized', OrderTransactionStates::STATE_AUTHORIZED, 1000);
+
+        $order = $this->createOrder($authorized);
+
+        self::assertSame($authorized, $this->resolver->resolveSettled($order));
+    }
+
+    public function testResolveSettledReturnsNullWhenNeitherPaidNorAuthorized(): void
+    {
+        $order = $this->createOrder($this->createTransaction('open', OrderTransactionStates::STATE_OPEN, 1000));
+
+        self::assertNull($this->resolver->resolveSettled($order));
+    }
+
     public function testResolveRefundableAcceptsPaidPartiallyRefundedAndRefunded(): void
     {
         foreach ([

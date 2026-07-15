@@ -93,8 +93,11 @@ final class Pay implements PayInterface
 
         $this->logger->info('Payment Process - Start', $logData);
 
-        if ($this->hasSettledPayment($order)) {
+        $settledTransaction = $this->transactionResolver->resolveSettled($order);
+        if ($settledTransaction instanceof OrderTransactionEntity) {
             $this->logger->warning('Order already has a paid or authorized payment, skipping creation of a new Mollie payment', $logData);
+
+            $this->reuseSettledPayment($settledTransaction, $transactionId, $order, $shopwareFinalizeUrl, $context, $logData);
 
             return new RedirectResponse($shopwareFinalizeUrl);
         }
@@ -237,14 +240,31 @@ final class Pay implements PayInterface
      * Otherwise a customer who is redirected onto the edit-order form after a successful payment (e.g.
      * following a broken return url) would be charged a second time. Paid and authorized transactions
      * both represent money that is already committed at Mollie.
+     *
+     * The guard skips payment creation, but finalize still runs for the current transaction and resolves
+     * the Mollie payment by that transaction's extension. So the existing payment data from the settled
+     * transaction is copied onto the current one, otherwise finalize finds no Mollie data and fails the
+     * transaction even though the money is already there.
+     *
+     * @param array<string, string> $logData
      */
-    private function hasSettledPayment(OrderEntity $order): bool
+    private function reuseSettledPayment(OrderTransactionEntity $settledTransaction, string $transactionId, OrderEntity $order, string $shopwareFinalizeUrl, Context $context, array $logData): void
     {
-        if ($this->transactionResolver->hasPaidTransaction($order)) {
-            return true;
+        if ($settledTransaction->getId() === $transactionId) {
+            return;
         }
 
-        return $this->transactionResolver->resolveCapturableAuthorized($order) !== null;
+        $settledPayment = $settledTransaction->getExtension(Mollie::EXTENSION);
+        if (! $settledPayment instanceof Payment) {
+            $this->logger->warning('Settled transaction has no Mollie payment data, cannot copy it to the current transaction', $logData);
+
+            return;
+        }
+
+        $settledPayment->setFinalizeUrl($shopwareFinalizeUrl);
+        $this->transactionService->savePaymentExtension($transactionId, $order, $settledPayment, $context);
+
+        $this->logger->info('Copied Mollie payment data from settled transaction to the current transaction', $logData);
     }
 
     private function updatePaymentCounter(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct): int
