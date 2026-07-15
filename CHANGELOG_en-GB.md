@@ -17,6 +17,7 @@
 - Fixed: The Mollie order detail tab no longer removes tabs added by other plugins to the same extension point.
 - Fixed: The product Mollie tab is read-only without the product edit permission.
 - Fixed: Partial refunds in the refund manager now work correctly across multiple refunds per line item, with the correct refunded quantity, composition and remaining order amount.
+- Fixed: The Mollie ship and refund actions are available again in the Flow Builder.
 
 # 5.1.0
 - Added: Wero payment method.

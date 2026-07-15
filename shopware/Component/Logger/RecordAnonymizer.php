@@ -21,7 +21,7 @@ final class RecordAnonymizer implements ProcessorInterface
         $extraData = $recordArray['extra'] ?? [];
         if (isset($extraData['ip'])) {
             // replace it with our anonymous IP
-            $extraData['ip'] = IpUtils::anonymize(trim((string) $extraData['ip']));
+            $extraData['ip'] = $this->anonymizeIp((string) $extraData['ip']);
         }
 
         if (isset($extraData['url'])) {
@@ -44,6 +44,19 @@ final class RecordAnonymizer implements ProcessorInterface
         );
     }
 
+    private function anonymizeIp(string $ip): string
+    {
+        // IpUtils masks the host part to 0 (e.g. 1.2.3.0), which customers
+        // mistake for a real IP. Replace the masked part with * to make it obvious.
+        $anonymized = IpUtils::anonymize(trim($ip));
+
+        if (strpos($anonymized, '.') !== false) {
+            return (string) preg_replace('/\.\d+$/', '.*', $anonymized);
+        }
+
+        return (string) preg_replace('/::$/', ':*', $anonymized);
+    }
+
     private function anonymize(string $url): string
     {
         // we do not want to save the used tokens in our log file
@@ -64,9 +77,9 @@ final class RecordAnonymizer implements ProcessorInterface
      */
     private function maskPersonalDataInArray(array $data): array
     {
-        $sensitiveFields = ['givenName', 'familyName', 'organizationName', 'email', 'phone', 'streetAndNumber', 'postalCode'];
+        $sensitiveFields = ['givenName', 'familyName', 'organizationName', 'email', 'phone', 'streetAndNumber', 'postalCode', 'cardHolder'];
         $urlFields = ['redirectUrl', 'webhookUrl', 'cancelUrl', 'href', 'checkoutUrl', 'finalizeUrl'];
-        $tokenFields = ['applePayPaymentToken'];
+        $tokenFields = ['applePayPaymentToken', 'cardToken'];
 
         foreach ($data as $key => &$value) {
             if (is_array($value)) {

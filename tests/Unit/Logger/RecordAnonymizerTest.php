@@ -32,7 +32,7 @@ final class RecordAnonymizerTest extends TestCase
         ]);
         $result = $anonymizer($record);
         $expected = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [], [
-            'ip' => '127.0.0.0'
+            'ip' => '127.0.0.*'
         ]);
 
         $this->assertEquals($expected, $result);
@@ -49,7 +49,7 @@ final class RecordAnonymizerTest extends TestCase
         $result = $anonymizer($record);
 
         $expected = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [], [
-            'ip' => '3c3d:d7f6:25ef:29fd::'
+            'ip' => '3c3d:d7f6:25ef:29fd:*'
         ]);
         $this->assertEquals($expected, $result);
     }
@@ -65,7 +65,7 @@ final class RecordAnonymizerTest extends TestCase
 
         $result = $anonymizer($record);
         $expected = new LogRecord($now, 'test', Level::Info, 'nothing has changed', [], [
-            'ip' => '3c3d:d7f6:25ef:29fd::',
+            'ip' => '3c3d:d7f6:25ef:29fd:*',
             'url' => 'https://shop.phpunit.mollie/payment/finalize-transaction'
         ]);
 
@@ -116,6 +116,25 @@ final class RecordAnonymizerTest extends TestCase
         $this->assertStringNotContainsString('balale', $result['context']['checkoutUrl']);
         $this->assertStringContainsString('_sw_payment_token=ey**', $result['context']['finalizeUrl']);
         $this->assertStringNotContainsString('eyeo555n4777nclr771n5zcidj6ym96m3456', $result['context']['finalizeUrl']);
+    }
+
+    public function testCreditCardDetailsAreAnonymized(): void
+    {
+        $anonymizer = new RecordAnonymizer();
+        $now = new \DateTimeImmutable();
+        $record = new LogRecord($now, 'test', Level::Info, 'Additional data from mollie loaded', [
+            'body' => [
+                'details' => [
+                    'cardHolder' => 'Maximilian Mollie',
+                    'cardToken' => 'tkn_abc123def456',
+                ]
+            ]
+        ]);
+
+        $result = $anonymizer($record);
+
+        $this->assertEquals('**', $result['context']['body']['details']['cardHolder']);
+        $this->assertEquals('**', $result['context']['body']['details']['cardToken']);
     }
 
     public function testApplePayPaymentTokenIsAnonymized(): void
