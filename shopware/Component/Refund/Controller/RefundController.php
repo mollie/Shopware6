@@ -163,12 +163,16 @@ final class RefundController extends AbstractController
             $lineInfo = $this->buildLineInfo($order);
 
             // Cap each requested line to its remaining maximum (line total minus what was
-            // already refunded) so a single line can never be over-refunded, and refund only
-            // the sum of the capped amounts.
+            // already refunded) so a single line can never be over-refunded. Only recompute
+            // the refund amount when an explicit amount was requested; a quantity-based line
+            // item refund keeps a null amount so the builder derives it from the line items
+            // (and the Orders-API line refund path stays intact).
             $items = $this->capItemsToLineMax($items, $refundedPerLine, $lineInfo);
-            $requestAmount = array_sum(array_map(function ($item) {
-                return (float) ($item['amount'] ?? 0.0);
-            }, $items));
+            if ($requestAmount !== null) {
+                $requestAmount = array_sum(array_map(function ($item) {
+                    return (float) ($item['amount'] ?? 0.0);
+                }, $items));
+            }
         }
 
         $createRefund = $this->refundBuilder->build(
