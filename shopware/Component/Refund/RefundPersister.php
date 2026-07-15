@@ -173,10 +173,11 @@ final class RefundPersister
 
             $split = $this->refundItemSplitter->split($requestedAmount, $lineMax, $quantity, $alreadyRefunded);
 
+            $fullUnits = max(1, $split['fullUnits']);
             if ($split['fullUnits'] > 0) {
                 $amount = $this->takeFromBudget($split['fullUnits'] * $split['unitPrice'], $distributed, $budget);
                 if ($amount > 0.0) {
-                    $result[] = $this->refundItemRow($label, $split['fullUnits'], $amount / $split['fullUnits'], $orderLineItemId, $orderLineItemVersionId, $orderDeliveryId);
+                    $result[] = $this->refundItemRow($label, $fullUnits, $amount / $fullUnits, $orderLineItemId, $orderLineItemVersionId, $orderDeliveryId);
                 }
             }
 

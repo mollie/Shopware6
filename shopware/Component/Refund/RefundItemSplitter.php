@@ -21,7 +21,10 @@ final class RefundItemSplitter
     public function split(float $requestedAmount, float $lineMax, int $quantity, float $alreadyRefunded): array
     {
         $requestedAmount = round($requestedAmount, Mollie::ROUNDING_PRECISION);
-        $unitPrice = $quantity > 0 ? round($lineMax / $quantity, Mollie::ROUNDING_PRECISION) : $lineMax;
+        // Guard the divisor so quantity 0 can never cause a division by zero (max(1, ...)).
+        // Do NOT round the unit price: a rounded price (e.g. 1.499 -> 1.50) would make
+        // floor(lineAmount / unitPrice) report one unit too few for a full-quantity refund.
+        $unitPrice = $lineMax / max(1, $quantity);
 
         $lineRemaining = max(0.0, round($lineMax - $alreadyRefunded, Mollie::ROUNDING_PRECISION));
         $lineAmount = min($requestedAmount, $lineRemaining);
