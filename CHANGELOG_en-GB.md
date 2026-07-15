@@ -6,6 +6,7 @@
 - Changed: Auto-cancellation now logs a warning instead of an error when Mollie can no longer cancel the payment/order.
 - Changed: The storefront now loads and stores the Mollie profile ID when it is missing.
 - Changed: The payment status is no longer changed when the transaction is already in the target status.
+- Changed: The pending-order redirect only starts the session on relevant storefront routes.
 - Fixed: Digital products (downloads) without a delivery address can now be paid for.
 - Fixed: Activating the plugin no longer fails with a "should not be blank" error when duplicate payment method icons exist in the media library.
 - Fixed: The order status change no longer runs into an infinite recursion.
