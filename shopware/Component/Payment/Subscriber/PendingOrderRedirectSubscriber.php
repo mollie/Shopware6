@@ -37,6 +37,13 @@ class PendingOrderRedirectSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $route = $request->attributes->get('_route');
 
+        // Bail out before touching the session on unrelated routes. Accessing the
+        // session triggers session_start() and its exclusive lock, which would
+        // serialize every main request (incl. Admin API) behind the session lock.
+        if ($route !== 'frontend.mollie.payment' && $route !== 'frontend.account.order.page') {
+            return;
+        }
+
         if (! $request->hasSession()) {
             return;
         }
@@ -53,10 +60,6 @@ class PendingOrderRedirectSubscriber implements EventSubscriberInterface
             $request->getSession()->remove(Pay::SESSION_KEY_PENDING_ORDER);
             $this->logger->debug('[PendingOrderRedirect] cleared session key on mollie return');
 
-            return;
-        }
-
-        if ($route !== 'frontend.account.order.page') {
             return;
         }
 
