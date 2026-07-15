@@ -11,9 +11,11 @@ use Shopware\Core\Content\Flow\Dispatching\StorableFlow;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\OrderAware;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+#[AutoconfigureTag('flow.action', ['key' => 'action.mollie.order.refund', 'priority' => 900])]
 final class RefundOrderAction extends FlowAction implements EventSubscriberInterface
 {
     private const DESCRIPTION = 'Refund through Shopware Flow Builder';
