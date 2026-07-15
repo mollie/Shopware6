@@ -79,26 +79,35 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
+        $logArray = [
+            'orderId' => $order->getId(),
+            'orderNumber' => (string) $order->getOrderNumber(),
+            'orderDeliveryId' => $orderDeliveryId,
+            'salesChannelId' => $order->getSalesChannelId(),
+        ];
+
         if (! $this->settingsService->getPaymentSettings($order->getSalesChannelId())->isAutomaticShipment()) {
+            $this->logger->debug('Automatic shipment is disabled for the saleschannel',$logArray);
+
             return;
         }
+        $this->logger->info('Starting automatic shipment', $logArray);
 
         // Shipping captures an authorized (manual capture / pay-later) payment. A paid payment is already
         // captured (nothing to do), so we only act on the authorized transaction that can still be captured.
         $capturable = $this->transactionResolver->resolveCapturableAuthorized($order);
         if ($capturable === null) {
+            $this->logger->warning('Latest order transaction is not authorized',$logArray);
+
             return;
         }
-
+        $logArray['latestTransactionId'] = $capturable->getId();
         // The authorized payment must be a Mollie payment, otherwise there is nothing to capture via Mollie.
         if (! $capturable->getExtension(Mollie::EXTENSION) instanceof Payment) {
+            $this->logger->debug('Latest order transaction does not have Payment data',$logArray);
+
             return;
         }
-
-        $this->logger->info('Starting automatic shipment for order: ' . (string) $order->getOrderNumber(), [
-            'orderId' => $order->getId(),
-            'orderDeliveryId' => $orderDeliveryId,
-        ]);
 
         // Delegate to the central shipment route; without items it ships everything that is still open.
         // A failing shipment (e.g. a Mollie API error) must not break the admin delivery state change,
@@ -107,12 +116,8 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
             $request = new Request([], ['orderId' => $order->getId()]);
             $this->shipOrderRoute->ship($request, $context);
         } catch (\Throwable $exception) {
-            $this->logger->error('Automatic shipment via Mollie failed', [
-                'orderId' => $order->getId(),
-                'orderNumber' => (string) $order->getOrderNumber(),
-                'orderDeliveryId' => $orderDeliveryId,
-                'error' => $exception->getMessage(),
-            ]);
+            $logArray['exception'] = $exception->getMessage();
+            $this->logger->error('Automatic shipment via Mollie failed',$logArray);
         }
     }
 }
