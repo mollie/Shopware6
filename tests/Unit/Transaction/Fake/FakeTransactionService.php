@@ -56,6 +56,9 @@ final class FakeTransactionService implements TransactionServiceInterface
     /** @var list<string> */
     private array $orderTransactionStates = [];
     private ?string $transactionState = null;
+    private bool $withMollieExtensionOnOrderTransactions = false;
+    /** @var list<array{transactionId: string, payment: Payment}> */
+    private array $savedPaymentExtensions = [];
 
     public function __construct()
     {
@@ -75,10 +78,29 @@ final class FakeTransactionService implements TransactionServiceInterface
 
     public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent
     {
+        $this->savedPaymentExtensions[] = ['transactionId' => $transactionId, 'payment' => $payment];
+
         $context = new Context(new SystemSource());
         $nestedEventCollection = new NestedEventCollection();
 
         return new EntityWrittenContainerEvent($context, $nestedEventCollection, []);
+    }
+
+    /**
+     * @return list<array{transactionId: string, payment: Payment}>
+     */
+    public function getSavedPaymentExtensions(): array
+    {
+        return $this->savedPaymentExtensions;
+    }
+
+    /**
+     * Attach a Mollie payment extension to every order transaction created via withOrderTransactionStates,
+     * so a settled transaction carries the same Mollie data a real one would.
+     */
+    public function withMolliePaymentOnOrderTransactions(): void
+    {
+        $this->withMollieExtensionOnOrderTransactions = true;
     }
 
     public function createValidStruct(): void
@@ -237,6 +259,14 @@ final class FakeTransactionService implements TransactionServiceInterface
                 $state = new StateMachineStateEntity();
                 $state->setTechnicalName($technicalName);
                 $orderTransaction->setStateMachineState($state);
+
+                if ($this->withMollieExtensionOnOrderTransactions === true) {
+                    $settledPayment = new Payment('settled-payment-' . $index);
+                    $settledPayment->setMethod(PaymentMethod::CREDIT_CARD);
+                    $settledPayment->setFinalizeUrl('settled/finalize');
+                    $orderTransaction->addExtension(Mollie::EXTENSION, $settledPayment);
+                }
+
                 $orderTransactions->add($orderTransaction);
             }
             $order->setTransactions($orderTransactions);

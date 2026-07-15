@@ -23,6 +23,13 @@ interface OrderTransactionResolverInterface
     public function resolveCapturableAuthorized(OrderEntity $order): ?OrderTransactionEntity;
 
     /**
+     * The transaction that already holds committed money at Mollie: the paid transaction if present,
+     * otherwise the latest capturable authorized one. Used by the paid-guard to reuse the existing Mollie
+     * payment instead of creating a second one. Returns null when the order has neither.
+     */
+    public function resolveSettled(OrderEntity $order): ?OrderTransactionEntity;
+
+    /**
      * The transaction that holds the captured, refundable payment. After the first refund its state moves
      * paid -> partially_refunded -> refunded, so all three are accepted.
      */
