@@ -199,11 +199,49 @@ Component.register('mollie-refund-manager', {
                 return false;
             }
 
-            if (item.refunded > 0 && item.refunded >= item.shopware.quantity) {
+            // block only when the whole refundable amount of the line item has been
+            // refunded. quantity is not a reliable signal, since a partial-amount refund
+            // of a single unit already counts as one refunded quantity.
+            const refundedAmount = item.refundedAmount ?? 0;
+            if (refundedAmount > 0 && refundedAmount + 0.005 >= this._getItemMaxRefundable(item)) {
                 return false;
             }
 
             return this.itemService.isRefundable(item);
+        },
+
+        /**
+         * Gets the maximum amount that can be refunded for the provided item.
+         * For net orders the tax is added on top of the line total, since the
+         * refund can also include the tax portion.
+         * @param item
+         * @returns {number}
+         */
+        _getItemMaxRefundable(item) {
+            let max = item.shopware.totalPrice;
+
+            if (!this.isTaxStatusGross() && item.shopware.tax) {
+                max += item.shopware.tax.totalItemTax;
+            }
+
+            return this._roundToTwo(max);
+        },
+
+        /**
+         * Caps the entered refund amount of a line item to the amount that can
+         * still be refunded, so the merchant cannot refund more than the line
+         * item's maximum. Promotions are skipped since they carry no input.
+         * @param item
+         */
+        _capItemRefundAmount(item) {
+            if (this.isItemPromotion(item)) {
+                return;
+            }
+
+            const remaining = this.getItemRemainingRefundable(item);
+            if (item.refundAmount > remaining) {
+                item.refundAmount = remaining;
+            }
         },
 
         /**
@@ -269,7 +307,19 @@ Component.register('mollie-refund-manager', {
          */
         onItemAmountChanged(item) {
             this.itemService.onAmountChanged(item);
+            this._capItemRefundAmount(item);
             this._calculateFinalAmount();
+        },
+
+        /**
+         * Gets the amount that can still be refunded for the provided item,
+         * i.e. its maximum minus the already refunded amount.
+         * @param item
+         * @returns {number}
+         */
+        getItemRemainingRefundable(item) {
+            const remaining = this._getItemMaxRefundable(item) - (item.refundedAmount ?? 0);
+            return remaining > 0 ? this._roundToTwo(remaining) : 0;
         },
 
         /**
@@ -587,7 +637,7 @@ Component.register('mollie-refund-manager', {
                         this.voucherAmount = totals.voucherAmount;
                         this.roundingDiff = totals.roundingDiff;
 
-                        this._applyRefundedItems(response.refundedItems);
+                        this._applyRefundedItems(response.refundedItems, response.refundedAmountItems);
                     } else {
                         this._showNotificationError(response.errors[0]);
                     }
@@ -635,6 +685,7 @@ Component.register('mollie-refund-manager', {
                     response.cart.forEach(function (item) {
                         const localItem = {
                             refunded: item.refunded,
+                            refundedAmount: item.refundedAmount,
                             shopware: item.shopware,
                         };
                         me.itemService.resetRefundData(localItem);
@@ -718,16 +769,21 @@ Component.register('mollie-refund-manager', {
             return typeof response.refund?.id === 'string';
         },
 
-        _applyRefundedItems(refundedItems) {
+        _applyRefundedItems(refundedItems, refundedAmountItems) {
             if (!refundedItems) {
                 return;
             }
+
+            const amounts = refundedAmountItems ?? {};
 
             // reassign a new array so sw-data-grid re-syncs its internal records
             // and re-evaluates isItemRefundable(); mutating items in place is not
             // picked up because the grid only watches the dataSource reference.
             this.orderItems = this.orderItems.map(function (item) {
-                return Object.assign({}, item, { refunded: refundedItems[item.shopware.id] ?? 0 });
+                return Object.assign({}, item, {
+                    refunded: refundedItems[item.shopware.id] ?? 0,
+                    refundedAmount: amounts[item.shopware.id] ?? 0,
+                });
             });
         },
 
@@ -751,7 +807,7 @@ Component.register('mollie-refund-manager', {
 
             this.btnResetCartForm_Click();
 
-            this._applyRefundedItems(response.refundedItems);
+            this._applyRefundedItems(response.refundedItems, response.refundedAmountItems);
         },
         // ---------------------------------------------------------------------------------------------------------
         // </editor-fold>

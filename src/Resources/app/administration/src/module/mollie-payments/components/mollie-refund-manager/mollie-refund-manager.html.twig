@@ -79,6 +79,8 @@
                                      v-model:value="item.refundAmount"
                                      v-if="isItemRefundable(item) && !isItemPromotion(item)"
                                      :allowEmpty="true"
+                                     :min="0"
+                                     :max="getItemRemainingRefundable(item)"
                                      :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}"
                                      @change="onItemAmountChanged(item)"
                                      @update:value="onItemAmountChanged(item)">

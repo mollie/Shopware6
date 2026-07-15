@@ -12,6 +12,8 @@ final class CartItemStruct extends Struct
 
     private int $refunded = 0;
 
+    private float $refundedAmount = 0.0;
+
     public function __construct(
         private CartItemShopwareStruct $shopware,
     ) {
@@ -25,6 +27,16 @@ final class CartItemStruct extends Struct
     public function setRefunded(int $refunded): void
     {
         $this->refunded = $refunded;
+    }
+
+    public function getRefundedAmount(): float
+    {
+        return $this->refundedAmount;
+    }
+
+    public function setRefundedAmount(float $refundedAmount): void
+    {
+        $this->refundedAmount = $refundedAmount;
     }
 
     public function getShopware(): CartItemShopwareStruct
