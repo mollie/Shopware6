@@ -200,6 +200,23 @@ final class CartStructTest extends TestCase
         $this->assertSame(0, $items[1]->getRefunded());
     }
 
+    public function testApplyRefundedAmountsSetsMatchingItems(): void
+    {
+        $order = new OrderEntity();
+        $order->setLineItems(new OrderLineItemCollection([
+            $this->buildProductLineItem('line-1', 'SW-1', 'A', 10.0, 5),
+            $this->buildProductLineItem('line-2', 'SW-2', 'B', 10.0, 5),
+        ]));
+        $order->setDeliveries(new OrderDeliveryCollection());
+
+        $cart = CartStruct::fromOrder($order);
+        $cart->applyRefundedAmounts(['line-1' => 12.5]);
+
+        $items = $cart->jsonSerialize();
+        $this->assertSame(12.5, $items[0]->getRefundedAmount());
+        $this->assertSame(0.0, $items[1]->getRefundedAmount());
+    }
+
     public function testJsonSerializeReturnsItemsArray(): void
     {
         $order = new OrderEntity();

@@ -82,6 +82,19 @@ final class CartStruct extends Struct
         }
     }
 
+    /**
+     * @param array<string, float> $amounts keyed by order line item / delivery id
+     */
+    public function applyRefundedAmounts(array $amounts): void
+    {
+        foreach ($this->items as $item) {
+            $id = $item->getShopware()->getId();
+            if (array_key_exists($id, $amounts)) {
+                $item->setRefundedAmount($amounts[$id]);
+            }
+        }
+    }
+
     private function addItem(CartItemStruct $item): void
     {
         $this->items[] = $item;

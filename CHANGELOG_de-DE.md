@@ -16,6 +16,7 @@
 - Behoben: Für eine bereits bezahlte oder autorisierte Bestellung wird keine zweite Mollie-Zahlung mehr erzeugt, wodurch Doppelbelastungen verhindert werden.
 - Behoben: Der Mollie-Tab in der Bestelldetailansicht entfernt keine Tabs mehr, die andere Plugins am selben Erweiterungspunkt hinzufügen.
 - Behoben: Der Mollie-Tab im Produkt ist ohne Produkt-Bearbeitungsrecht schreibgeschützt.
+- Behoben: Teil-Erstattungen im Refund-Manager funktionieren nun korrekt über mehrere Erstattungen pro Position hinweg – mit korrekter erstatteter Menge, Zusammensetzung und verbleibendem Bestellbetrag.
 
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.
