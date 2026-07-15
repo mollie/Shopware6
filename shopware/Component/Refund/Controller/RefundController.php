@@ -161,18 +161,6 @@ final class RefundController extends AbstractController
             $existingRefunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $salesChannelId);
             $refundedPerLine = $this->buildRefundedAmounts($order, $existingRefunds);
             $lineInfo = $this->buildLineInfo($order);
-
-            // Cap each requested line to its remaining maximum (line total minus what was
-            // already refunded) so a single line can never be over-refunded. Only recompute
-            // the refund amount when an explicit amount was requested; a quantity-based line
-            // item refund keeps a null amount so the builder derives it from the line items
-            // (and the Orders-API line refund path stays intact).
-            $items = $this->capItemsToLineMax($items, $refundedPerLine, $lineInfo);
-            if ($requestAmount !== null) {
-                $requestAmount = array_sum(array_map(function ($item) {
-                    return (float) ($item['amount'] ?? 0.0);
-                }, $items));
-            }
         }
 
         $createRefund = $this->refundBuilder->build(
@@ -421,35 +409,6 @@ final class RefundController extends AbstractController
         }
 
         return $amounts;
-    }
-
-    /**
-     * Caps each requested item's amount to the remaining refundable amount of its line item
-     * (line total minus already refunded), so no single line can be over-refunded.
-     *
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int, label?: string}> $items
-     * @param array<string, float> $refundedPerLine
-     * @param array<string, array{max: float, quantity: int}> $lineInfo
-     *
-     * @return array<array{id: string, quantity: int, amount: float, resetStock: int, label?: string}>
-     */
-    private function capItemsToLineMax(array $items, array $refundedPerLine, array $lineInfo): array
-    {
-        foreach ($items as $index => $item) {
-            $lineId = (string) ($item['id'] ?? '');
-
-            if (! isset($lineInfo[$lineId])) {
-                continue;
-            }
-
-            $lineRemaining = max(0.0, round($lineInfo[$lineId]['max'] - ($refundedPerLine[$lineId] ?? 0.0), Mollie::ROUNDING_PRECISION));
-
-            if ((float) ($item['amount'] ?? 0.0) > $lineRemaining) {
-                $items[$index]['amount'] = $lineRemaining;
-            }
-        }
-
-        return $items;
     }
 
     /**

@@ -86,6 +86,16 @@ final class RefundItemSplitterTest extends TestCase
         $this->assertSame(0.0, $split['excess']);
     }
 
+    public function testFullQuantityWithFractionalUnitPriceKeepsAllUnits(): void
+    {
+        // 10 units of 1.499 = 14.99; a rounded unit price (1.50) would report 9 units.
+        $split = $this->splitter->split(14.99, 14.99, 10, 0.0);
+
+        $this->assertSame(10, $split['fullUnits']);
+        $this->assertSame(0.0, $split['remainder']);
+        $this->assertSame(0.0, $split['excess']);
+    }
+
     public function testNoUnitPriceTreatsAmountAsRemainder(): void
     {
         // quantity 0 (e.g. no usable unit price) -> whole amount is a partial entry
