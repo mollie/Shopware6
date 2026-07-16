@@ -54,12 +54,14 @@ export default class OrderAttributes {
 
         const mollieData = this.customFields.mollie_payments;
 
-        // Old orders store the data camelCase / only on the transaction; keep that value instead of
-        // overwriting it with an empty snake_case order field.
         this._orderId = this._firstNonEmpty(mollieData['order_id'], mollieData['orderId'], this._orderId);
         this._paymentId = this._firstNonEmpty(mollieData['payment_id'], mollieData['id'], this._paymentId);
         this._swSubscriptionId = this._convertString(mollieData['swSubscriptionId']);
-        this._paymentRef = this._firstNonEmpty(mollieData['third_party_payment_id'], mollieData['thirdPartyPaymentId'], this._paymentRef);
+        this._paymentRef = this._firstNonEmpty(
+            mollieData['third_party_payment_id'],
+            mollieData['thirdPartyPaymentId'],
+            this._paymentRef,
+        );
         this._creditCardAttributes = new CreditcardAttributes(mollieData);
     }
 
@@ -156,8 +158,8 @@ export default class OrderAttributes {
      * @private
      */
     _firstNonEmpty(...values) {
-        for (const value of values) {
-            const str = this._convertString(value);
+        for (let i = 0; i < values.length; i++) {
+            const str = this._convertString(values[i]);
             if (str !== '') {
                 return str;
             }
