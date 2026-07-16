@@ -22,6 +22,8 @@ use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
 final class FakeGateway implements MollieGatewayInterface
@@ -49,6 +51,11 @@ final class FakeGateway implements MollieGatewayInterface
 
     private ?Order $order = null;
     private bool $throwOnGetOrder = false;
+
+    private ?Payment $repairPayment = null;
+    private bool $repairResultConfigured = false;
+    private bool $throwOnRepair = false;
+    private int $repairCallCount = 0;
 
     /** @var list<string> */
     private array $validApiKeys = [];
@@ -122,6 +129,33 @@ final class FakeGateway implements MollieGatewayInterface
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
         return $this->payment;
+    }
+
+    public function withRepairResult(?Payment $payment): void
+    {
+        $this->repairPayment = $payment;
+        $this->repairResultConfigured = true;
+    }
+
+    public function withRepairThrowing(): void
+    {
+        $this->throwOnRepair = true;
+    }
+
+    public function getRepairCallCount(): int
+    {
+        return $this->repairCallCount;
+    }
+
+    public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
+    {
+        ++$this->repairCallCount;
+
+        if ($this->throwOnRepair) {
+            throw new \RuntimeException('Mollie API not reachable');
+        }
+
+        return $this->repairResultConfigured ? $this->repairPayment : $this->payment;
     }
 
     public function withValidApiKey(string $key): void

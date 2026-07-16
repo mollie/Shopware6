@@ -18,11 +18,15 @@ use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
 interface MollieGatewayInterface
 {
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment;
+
+    public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment;
 
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order;
 

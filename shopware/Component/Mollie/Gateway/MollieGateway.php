@@ -474,32 +474,7 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
-    private function getPaymentByMollieOrderId(string $mollieOrderId, string $orderNumber, string $salesChannelId): Payment
-    {
-        try {
-            $client = $this->clientFactory->create($salesChannelId);
-            $response = $client->get('orders/' . $mollieOrderId, [
-                'query' => [
-                    'embed' => 'payments',
-                ]
-            ]);
-            $body = json_decode($response->getBody()->getContents(), true);
-            $paymentsBody = $body['_embedded']['payments'][0] ?? [];
-
-            $this->logger->debug('Additional data from mollie loaded based on mollie order id', [
-                'mollieOrderId' => $mollieOrderId,
-                'orderNumber' => $orderNumber,
-                'salesChannelId' => $salesChannelId,
-                'body' => $paymentsBody,
-            ]);
-
-            return Payment::createFromClientResponse($paymentsBody);
-        } catch (ClientException $exception) {
-            throw $this->convertException($exception, $orderNumber);
-        }
-    }
-
-    private function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
+    public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
     {
         $transactionId = $transaction->getId();
         $orderNumber = (string) $order->getOrderNumber();
@@ -535,5 +510,30 @@ final class MollieGateway implements MollieGatewayInterface
         $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
 
         return $payment;
+    }
+
+    private function getPaymentByMollieOrderId(string $mollieOrderId, string $orderNumber, string $salesChannelId): Payment
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+            $response = $client->get('orders/' . $mollieOrderId, [
+                'query' => [
+                    'embed' => 'payments',
+                ]
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+            $paymentsBody = $body['_embedded']['payments'][0] ?? [];
+
+            $this->logger->debug('Additional data from mollie loaded based on mollie order id', [
+                'mollieOrderId' => $mollieOrderId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+                'body' => $paymentsBody,
+            ]);
+
+            return Payment::createFromClientResponse($paymentsBody);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
     }
 }

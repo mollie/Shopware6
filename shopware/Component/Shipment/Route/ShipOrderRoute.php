@@ -13,6 +13,7 @@ use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Mollie\Tracking;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
+use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -143,6 +144,10 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         if ($firstTransaction === null) {
             throw ShippingException::orderNotFound($orderId);
         }
+
+        $repairEvent = new RepairLegacyTransactionEvent($firstTransaction, $order, $context);
+        $this->eventDispatcher->dispatch($repairEvent);
+
         $payment = $firstTransaction->getExtension(Mollie::EXTENSION);
         if (! $payment instanceof Payment) {
             throw ShippingException::orderNotFound($orderId);

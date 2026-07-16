@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Shipment\CancelItemEvent;
+use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
 use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
@@ -87,6 +88,9 @@ final class CancelItemRoute
         if ($latestAuthorized === null) {
             return new JsonResponse(['success' => false, 'message' => 'notAuthorized'], 400);
         }
+
+        $repairEvent = new RepairLegacyTransactionEvent($latestAuthorized, $order, $context);
+        $this->eventDispatcher->dispatch($repairEvent);
 
         $payment = $latestAuthorized->getExtension(Mollie::EXTENSION);
         if (! $payment instanceof Payment) {
