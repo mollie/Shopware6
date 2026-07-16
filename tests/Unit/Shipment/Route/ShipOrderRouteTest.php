@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
+use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
@@ -56,6 +57,7 @@ class ShipOrderRouteTest extends TestCase
             $this->gateway,
             $this->eventDispatcher,
             $orderService,
+            new OrderTransactionResolver(),
             $logger,
         );
     }
@@ -161,6 +163,42 @@ class ShipOrderRouteTest extends TestCase
         static::assertCount(0, $this->gateway->getCapturePayloads());
         static::assertCount(0, $this->lineItemRepository->getUpserts());
         static::assertSame(0, $this->eventDispatcher->getEventCount());
+    }
+
+    public function testShipIsANoopWhenPaymentIsNotCapturable(): void
+    {
+        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
+        $order = $this->orderBuilder->getOrderWithNonCapturablePayment(new OrderLineItemCollection([$lineItem]));
+        $this->orderRepository->add($order);
+
+        $request = new Request([], ['orderId' => $order->getId()]);
+
+        $response = $this->route->ship($request, Context::createDefaultContext());
+
+        static::assertInstanceOf(ShipOrderResponse::class, $response);
+        static::assertCount(0, $this->gateway->getCapturePayloads());
+        static::assertCount(0, $this->lineItemRepository->getUpserts());
+        // No OrderShippedEvent (and not even the repair event) is dispatched when there is nothing to ship.
+        static::assertSame(0, $this->eventDispatcher->getEventCount());
+    }
+
+    public function testShipIsANoopWhenTransactionHasNoMolliePayment(): void
+    {
+        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
+        $order = $this->orderBuilder->getOrderWithoutMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $this->orderRepository->add($order);
+
+        $request = new Request([], ['orderId' => $order->getId()]);
+
+        $response = $this->route->ship($request, Context::createDefaultContext());
+
+        static::assertInstanceOf(ShipOrderResponse::class, $response);
+        static::assertCount(0, $this->gateway->getCapturePayloads());
+        static::assertCount(0, $this->lineItemRepository->getUpserts());
+        // The repair event is dispatched, but no OrderShippedEvent follows since no payment was found.
+        foreach ($this->eventDispatcher->getEvents() as $event) {
+            static::assertNotInstanceOf(OrderShippedEvent::class, $event);
+        }
     }
 
     public function testShipThrowsWhenOrderIsNotFound(): void
