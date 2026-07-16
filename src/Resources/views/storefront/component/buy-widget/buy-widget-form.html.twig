@@ -1,39 +1,11 @@
 {% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
 
-{% set mollieSubscriptionEnabled = mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
-{% set mollieAllowOneTime = mollieSubscriptionEnabled and product.translated.customFields.mollie_payments_product_subscription_allow_onetime %}
-
 {% block buy_widget_buy_button %}
-
-    {% if mollieSubscriptionEnabled and not mollieAllowOneTime %}
-        {# subscription-only product: replace the default button with the subscribe button #}
-        <div class="d-grid">
-            <button class="btn btn-primary btn-block btn-buy"
-                    title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}"
-                    aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-                {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-            </button>
-        </div>
-    {% else %}
-        {# non-subscription or dual-mode product: keep the default one-off "add to cart" button #}
-        {{ parent() }}
-
-        {% if mollieAllowOneTime %}
-            {% block mollie_buy_widget_subscribe_button %}
-                <div class="d-grid mt-2">
-                    <button class="btn btn-secondary btn-block btn-buy"
-                            type="submit"
-                            data-mollie-subscribe-button
-                            data-mollie-subscribe-button-options='{{ { productId: product.id }|json_encode }}'
-                            title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}"
-                            aria-label="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-                        {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-                    </button>
-                </div>
-            {% endblock %}
-        {% endif %}
-    {% endif %}
-
+    {% set mollieDefaultButton %}{{ parent() }}{% endset %}
+    {% sw_include '@MolliePayments/mollie/component/subscription-buy-button.html.twig' with {
+        product: product,
+        defaultButton: mollieDefaultButton
+    } %}
 {% endblock %}
 
 {% block buy_widget_buy_form_inner %}
