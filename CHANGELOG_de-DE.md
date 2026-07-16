@@ -18,6 +18,7 @@
 - Behoben: Der Mollie-Tab im Produkt ist ohne Produkt-Bearbeitungsrecht schreibgeschützt.
 - Behoben: Teil-Erstattungen im Refund-Manager funktionieren nun korrekt über mehrere Erstattungen pro Position hinweg – mit korrekter erstatteter Menge, Zusammensetzung und verbleibendem Bestellbetrag.
 - Behoben: Die Mollie-Actions „Versenden" und „Erstatten" sind im Flow Builder wieder verfügbar.
+- Behoben: Bestellungen per Banküberweisung leiten beim Browser-Zurück nicht mehr auf das Bestell-Bearbeiten-Formular weiter, da sie während der Verarbeitung nicht bearbeitet werden dürfen.
 
 # 5.1.0
 - Hinzugefügt: Zahlungsart Wero.

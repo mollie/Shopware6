@@ -15,6 +15,7 @@ use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
+use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferPaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
@@ -174,7 +175,45 @@ final class PayTest extends TestCase
         $this->assertSame('returnUrl', $saved[0]['payment']->getFinalizeUrl());
     }
 
-    private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl, ?FakeGateway $gateway = null): Pay
+    public function testPendingOrderSessionKeyIsSetForNonBankTransferPayment(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createTransaction();
+
+        $requestStack = $this->createRequestStack();
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout', null, $requestStack);
+
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertNotEmpty($requestStack->getSession()->get(Pay::SESSION_KEY_PENDING_ORDER));
+    }
+
+    public function testPendingOrderSessionKeyIsNotSetForBankTransferPayment(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createTransaction();
+
+        $requestStack = $this->createRequestStack();
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout', null, $requestStack);
+
+        $payAction->execute(new FakeBankTransferPaymentHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertNull($requestStack->getSession()->get(Pay::SESSION_KEY_PENDING_ORDER));
+    }
+
+    private function createRequestStack(): RequestStack
+    {
+        $request = new \Symfony\Component\HttpFoundation\Request();
+        $request->setSession(new \Symfony\Component\HttpFoundation\Session\Session(
+            new \Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage()
+        ));
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        return $requestStack;
+    }
+
+    private function getPayAction(FakeTransactionService $transactionService, string $checkoutUrl, ?FakeGateway $gateway = null, ?RequestStack $requestStack = null): Pay
     {
         $eventDispatcher = new EventSpy();
         $fakeRouteBuilder = new FakeRouteBuilder();
@@ -190,12 +229,14 @@ final class PayTest extends TestCase
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
         $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,$lineItemFilter,$roundingDifferenceFixer,$logger);
 
-        $request = new \Symfony\Component\HttpFoundation\Request();
-        $request->setSession(new \Symfony\Component\HttpFoundation\Session\Session(
-            new \Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage()
-        ));
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
+        if ($requestStack === null) {
+            $request = new \Symfony\Component\HttpFoundation\Request();
+            $request->setSession(new \Symfony\Component\HttpFoundation\Session\Session(
+                new \Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage()
+            ));
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+        }
 
         $transactionResolver = new OrderTransactionResolver();
 

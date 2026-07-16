@@ -76,8 +76,14 @@ final class Pay implements PayInterface
         $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
-        $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
-        $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
+
+        // Bank transfer orders take several days to settle and must not be editable
+        // afterwards, so we skip the pending-order session key that would redirect
+        // the customer onto the edit-order form on browser back.
+        if (! $paymentHandler instanceof BankTransferAwareInterface) {
+            $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
+            $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
+        }
 
         $transaction = $transactionDataStruct->getTransaction();
         $orderNumber = (string) $order->getOrderNumber();
