@@ -492,13 +492,20 @@ final class MollieGateway implements MollieGatewayInterface
 
             return null;
         }
-        $mollieOrderId = $customFields['order_id'] ?? null;
+        // Repaired/new orders keep the mollie order id on the order (snake_case order_id); legacy orders
+        // may only carry it on the transaction (camelCase orderId). An empty string counts as missing -
+        // otherwise "orders/" is requested, which is the orders list endpoint and rejects the embed param.
+        $transactionCustomFields = $transaction->getCustomFields()[Mollie::EXTENSION] ?? [];
+        $mollieOrderId = (string) ($customFields['order_id'] ?? '');
+        if ($mollieOrderId === '') {
+            $mollieOrderId = (string) ($transactionCustomFields['orderId'] ?? '');
+        }
         $returnUrl = $customFields['transactionReturnUrl'] ?? null;
-        if ($mollieOrderId === null || $returnUrl === null) {
+        if ($mollieOrderId === '' || $returnUrl === null || $returnUrl === '') {
             $logData['mollieOrderId'] = $mollieOrderId;
             $logData['returnUrl'] = $returnUrl;
 
-            $this->logger->error('Order does have mollie custom fields but mollie oder id or return url is not set', $logData);
+            $this->logger->error('Order does have mollie custom fields but mollie order id or return url is not set', $logData);
 
             return null;
         }

@@ -1,3 +1,6 @@
+# Unreleased
+- Fixed: For legacy orders the Mollie ID is shown again in the order list and detail view, and the Mollie tab can be opened again.
+
 # 5.2.0
 - Added: Subscription products can also be offered as a one-time purchase, configurable in the product's Mollie tab.
 - Added: The add-to-cart route accepts a new `mollieSubscribe` parameter to add a product as a subscription (for headless usage).

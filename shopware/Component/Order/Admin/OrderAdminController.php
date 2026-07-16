@@ -291,13 +291,16 @@ final class OrderAdminController extends AbstractController
         $orderMollieFields = ($order->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
 
         $paymentId = (string) ($orderMollieFields['payment_id'] ?? '');
-        if ($paymentId === '') {
+        $orderId = (string) ($orderMollieFields['order_id'] ?? '');
+
+        // Legacy orders created through the Mollie Orders API only have an order id, never a payment id.
+        // A single non-empty id is enough to treat it as a mollie order so the tab still opens.
+        if ($paymentId === '' && $orderId === '') {
             return null;
         }
 
         $payment = new Payment($paymentId);
 
-        $orderId = (string) ($orderMollieFields['order_id'] ?? '');
         if ($orderId !== '') {
             $payment->setOrderId($orderId);
         }
