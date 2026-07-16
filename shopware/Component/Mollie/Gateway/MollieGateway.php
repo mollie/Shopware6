@@ -495,7 +495,7 @@ final class MollieGateway implements MollieGatewayInterface
         $transactionCustomFields = $transaction->getCustomFields()[Mollie::EXTENSION] ?? [];
         $mollieOrderId = (string) ($customFields['order_id'] ?? '');
         if ($mollieOrderId === '') {
-            $mollieOrderId = (string) ($transactionCustomFields['orderId'] ?? '');
+            $mollieOrderId = (string) ($transactionCustomFields['order_id'] ?? $transactionCustomFields['orderId'] ?? '');
         }
         $returnUrl = $customFields['transactionReturnUrl'] ?? null;
         if ($mollieOrderId === '' || $returnUrl === null || $returnUrl === '') {
