@@ -492,9 +492,6 @@ final class MollieGateway implements MollieGatewayInterface
 
             return null;
         }
-        // Repaired/new orders keep the mollie order id on the order (snake_case order_id); legacy orders
-        // may only carry it on the transaction (camelCase orderId). An empty string counts as missing -
-        // otherwise "orders/" is requested, which is the orders list endpoint and rejects the embed param.
         $transactionCustomFields = $transaction->getCustomFields()[Mollie::EXTENSION] ?? [];
         $mollieOrderId = (string) ($customFields['order_id'] ?? '');
         if ($mollieOrderId === '') {
