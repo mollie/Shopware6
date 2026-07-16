@@ -18,6 +18,8 @@ use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 
@@ -89,6 +91,11 @@ final class CachedMollieGateway implements MollieGatewayInterface
         $this->transactionPayments[$key] = $this->decorated->getPaymentByTransactionId($transactionId, $context);
 
         return $this->transactionPayments[$key];
+    }
+
+    public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
+    {
+        return $this->decorated->repairLegacyTransaction($transaction, $order, $context);
     }
 
     public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment

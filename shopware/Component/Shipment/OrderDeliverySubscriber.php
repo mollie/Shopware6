@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Shipment;
 
-use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
-use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -35,8 +31,6 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         private readonly AbstractShipOrderRoute $shipOrderRoute,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -63,7 +57,7 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         $orderDeliveryId = $event->getTransition()->getEntityId();
 
         $criteria = new Criteria([$orderDeliveryId]);
-        $criteria->addAssociation('order.transactions.stateMachineState');
+        $criteria->addAssociation('order');
 
         $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
@@ -93,25 +87,10 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         }
         $this->logger->info('Starting automatic shipment', $logArray);
 
-        // Shipping captures an authorized (manual capture / pay-later) payment. A paid payment is already
-        // captured (nothing to do), so we only act on the authorized transaction that can still be captured.
-        $capturable = $this->transactionResolver->resolveCapturableAuthorized($order);
-        if ($capturable === null) {
-            $this->logger->warning('Latest order transaction is not authorized',$logArray);
-
-            return;
-        }
-        $logArray['latestTransactionId'] = $capturable->getId();
-        // The authorized payment must be a Mollie payment, otherwise there is nothing to capture via Mollie.
-        if (! $capturable->getExtension(Mollie::EXTENSION) instanceof Payment) {
-            $this->logger->debug('Latest order transaction does not have Payment data',$logArray);
-
-            return;
-        }
-
-        // Delegate to the central shipment route; without items it ships everything that is still open.
-        // A failing shipment (e.g. a Mollie API error) must not break the admin delivery state change,
-        // so any error is caught and logged instead of bubbling up into the state machine transition.
+        // All shipment logic (legacy repair, capturable/authorized check, Orders vs Payments API) lives in
+        // the ship route, which is also used headless. This subscriber only reacts to the admin delivery
+        // state change and delegates. A failing shipment (e.g. a Mollie API error) must not break the admin
+        // state change, so any error is caught and logged instead of bubbling up into the state transition.
         try {
             $request = new Request([], ['orderId' => $order->getId()]);
             $this->shipOrderRoute->ship($request, $context);

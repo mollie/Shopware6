@@ -19,6 +19,7 @@
 - Fixed: Partial refunds in the refund manager now work correctly across multiple refunds per line item, with the correct refunded quantity, composition and remaining order amount.
 - Fixed: The Mollie ship and refund actions are available again in the Flow Builder.
 - Fixed: Bank transfer orders no longer redirect to the edit-order form on browser back, since they must not be edited while settling.
+- Fixed: Orders from older plugin versions can be shipped, refunded and cancelled again.
 
 # 5.1.0
 - Added: Wero payment method.

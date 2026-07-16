@@ -21,6 +21,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
@@ -258,25 +259,17 @@ final class OrderEntityBuilder
      */
     public function getOrderWithMolliePayment(OrderLineItemCollection $lineItems, ?Payment $payment = null): OrderEntity
     {
-        $payment ??= new Payment('tr_fake_payment');
+        return $this->buildOrderWithTransaction($lineItems, $payment ?? new Payment('tr_fake_payment'), OrderTransactionStates::STATE_AUTHORIZED);
+    }
 
-        $transaction = new OrderTransactionEntity();
-        $transaction->setId('fake-transaction-id');
-        $transaction->addExtension(Mollie::EXTENSION, $payment);
+    public function getOrderWithNonCapturablePayment(OrderLineItemCollection $lineItems): OrderEntity
+    {
+        return $this->buildOrderWithTransaction($lineItems, new Payment('tr_fake_payment'), OrderTransactionStates::STATE_PAID);
+    }
 
-        $currency = new CurrencyEntity();
-        $currency->setId('fake-currency-id');
-        $currency->setIsoCode('EUR');
-
-        $order = new OrderEntity();
-        $order->setId('fakeshopwareorderid');
-        $order->setOrderNumber('10000');
-        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
-        $order->setCurrency($currency);
-        $order->setLineItems($lineItems);
-        $order->setTransactions(new OrderTransactionCollection([$transaction]));
-
-        return $order;
+    public function getOrderWithoutMolliePayment(OrderLineItemCollection $lineItems): OrderEntity
+    {
+        return $this->buildOrderWithTransaction($lineItems, null, OrderTransactionStates::STATE_AUTHORIZED);
     }
 
     public function getLineItemWithVoucherCategory(): OrderLineItemEntity
@@ -339,6 +332,33 @@ final class OrderEntityBuilder
         $orderLineItem->setPrice($price);
 
         return $orderLineItem;
+    }
+
+    private function buildOrderWithTransaction(OrderLineItemCollection $lineItems, ?Payment $payment, string $transactionState): OrderEntity
+    {
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('fake-transaction-id');
+        if ($payment !== null) {
+            $transaction->addExtension(Mollie::EXTENSION, $payment);
+        }
+
+        $stateEntity = new StateMachineStateEntity();
+        $stateEntity->setTechnicalName($transactionState);
+        $transaction->setStateMachineState($stateEntity);
+
+        $currency = new CurrencyEntity();
+        $currency->setId('fake-currency-id');
+        $currency->setIsoCode('EUR');
+
+        $order = new OrderEntity();
+        $order->setId('fakeshopwareorderid');
+        $order->setOrderNumber('10000');
+        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
+        $order->setCurrency($currency);
+        $order->setLineItems($lineItems);
+        $order->setTransactions(new OrderTransactionCollection([$transaction]));
+
+        return $order;
     }
 
     private function createOrderLineItem(string $id, string $productNumber, string $label, float $price, $voucherCategories = null): OrderLineItemEntity

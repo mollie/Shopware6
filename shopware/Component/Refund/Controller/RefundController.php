@@ -24,6 +24,7 @@ use Mollie\Shopware\Component\Refund\Struct\RefundOverviewStruct;
 use Mollie\Shopware\Component\Refund\Struct\RefundTotalsStruct;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
 use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Mollie;
@@ -94,7 +95,7 @@ final class RefundController extends AbstractController
 
         $struct = new RefundOverviewStruct();
 
-        $payment = $this->findMolliePayment($order);
+        $payment = $this->findMolliePayment($order, $context);
 
         if (! $payment instanceof Payment) {
             $this->logger->debug('No Mollie payment found for refund overview', [
@@ -129,7 +130,7 @@ final class RefundController extends AbstractController
         $orderId = (string) $request->get('orderId');
 
         $order = $this->loadOrder($orderId, $context);
-        $payment = $this->extractMolliePayment($order);
+        $payment = $this->extractMolliePayment($order, $context);
         $orderNumber = (string) $order->getOrderNumber();
         $salesChannelId = (string) $order->getSalesChannelId();
 
@@ -229,7 +230,7 @@ final class RefundController extends AbstractController
         $refundId = (string) $request->get('refundId');
 
         $order = $this->loadOrder($orderId, $context);
-        $payment = $this->extractMolliePayment($order);
+        $payment = $this->extractMolliePayment($order, $context);
         $orderNumber = (string) $order->getOrderNumber();
 
         $this->logger->info('Refund cancel requested', [
@@ -488,9 +489,9 @@ final class RefundController extends AbstractController
         return $order;
     }
 
-    private function extractMolliePayment(OrderEntity $order): Payment
+    private function extractMolliePayment(OrderEntity $order, Context $context): Payment
     {
-        $payment = $this->findMolliePayment($order);
+        $payment = $this->findMolliePayment($order, $context);
 
         if (! $payment instanceof Payment) {
             throw new \RuntimeException(sprintf('No Mollie payment extension found for order "%s"', $order->getId()));
@@ -499,12 +500,15 @@ final class RefundController extends AbstractController
         return $payment;
     }
 
-    private function findMolliePayment(OrderEntity $order): ?Payment
+    private function findMolliePayment(OrderEntity $order, Context $context): ?Payment
     {
         $transaction = $this->transactionResolver->resolveRefundable($order);
         if ($transaction === null) {
             return null;
         }
+
+        $repairEvent = new RepairLegacyTransactionEvent($transaction, $order, $context);
+        $this->eventDispatcher->dispatch($repairEvent);
 
         $payment = $transaction->getExtension(Mollie::EXTENSION);
 
