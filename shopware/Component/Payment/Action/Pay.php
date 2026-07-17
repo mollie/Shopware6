@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreateOrderPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
@@ -19,8 +20,6 @@ use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
@@ -58,8 +57,6 @@ final class Pay implements PayInterface
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'request_stack')]
         private RequestStack $requestStack,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -98,15 +95,6 @@ final class Pay implements PayInterface
         ];
 
         $this->logger->info('Payment Process - Start', $logData);
-
-        $settledTransaction = $this->transactionResolver->resolveSettled($order);
-        if ($settledTransaction instanceof OrderTransactionEntity) {
-            $this->logger->warning('Order already has a paid or authorized payment, skipping creation of a new Mollie payment', $logData);
-
-            $this->reuseSettledPayment($settledTransaction, $transactionId, $order, $shopwareFinalizeUrl, $context, $logData);
-
-            return new RedirectResponse($shopwareFinalizeUrl);
-        }
 
         if ($paymentHandler instanceof OrdersApiAwareInterface) {
             return $this->executeOrdersApi($paymentHandler, $transactionDataStruct, $dataBag, $context, $order, $salesChannel, $transactionId, $orderNumber, $shopwareFinalizeUrl, $logData);
@@ -179,7 +167,7 @@ final class Pay implements PayInterface
     ): RedirectResponse {
         $createPaymentStruct = $this->payloadBuilder->buildPayment($transactionDataStruct, $paymentHandler, $dataBag, $context);
 
-        $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
+        $countPayments = $this->updatePaymentCounter($transactionDataStruct->getOrder(), $createPaymentStruct);
 
         /** @var RequestDataBag $paymentMethods */
         $paymentMethods = $dataBag->get('paymentMethods', new DataBag());
@@ -191,7 +179,7 @@ final class Pay implements PayInterface
         /** @var ModifyCreatePaymentPayloadEvent $paymentEvent */
         $paymentEvent = $this->eventDispatcher->dispatch($paymentEvent);
         $createPaymentStruct = $paymentEvent->getPayment();
-        $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
+        $payment = $this->createOrReusePayment($transaction, $createPaymentStruct, $orderNumber, $salesChannel->getId());
 
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
@@ -242,44 +230,53 @@ final class Pay implements PayInterface
     }
 
     /**
-     * A new Mollie payment must never be created for an order that already holds a completed payment.
-     * Otherwise a customer who is redirected onto the edit-order form after a successful payment (e.g.
-     * following a broken return url) would be charged a second time. Paid and authorized transactions
-     * both represent money that is already committed at Mollie.
+     * Shopware reuses the same transaction when the customer retries with the same payment method,
+     * so the transaction may already hold a Mollie payment. To keep a single payment per transaction
+     * we decide, based on the existing payment:
+     * - none yet -> create a new payment (payments API);
+     * - still open/pending and cancelable -> cancel it and create a fresh payment for the current cart;
+     * - still open/pending but not cancelable -> reuse it and update the editable fields;
+     * - already dead (failed/expired/cancelled) -> create a fresh payment.
      *
-     * The guard skips payment creation, but finalize still runs for the current transaction and resolves
-     * the Mollie payment by that transaction's extension. So the existing payment data from the settled
-     * transaction is copied onto the current one, otherwise finalize finds no Mollie data and fails the
-     * transaction even though the money is already there.
-     *
-     * @param array<string, string> $logData
+     * A changed cart total makes Shopware open a new transaction (no existing payment), so the reuse
+     * paths always operate on an unchanged amount.
      */
-    private function reuseSettledPayment(OrderTransactionEntity $settledTransaction, string $transactionId, OrderEntity $order, string $shopwareFinalizeUrl, Context $context, array $logData): void
+    private function createOrReusePayment(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct, string $orderNumber, string $salesChannelId): Payment
     {
-        if ($settledTransaction->getId() === $transactionId) {
-            return;
+        $existing = $transaction->getExtension(Mollie::EXTENSION);
+        if (! $existing instanceof Payment || $existing->getId() === '') {
+            return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
         }
 
-        $settledPayment = $settledTransaction->getExtension(Mollie::EXTENSION);
-        if (! $settledPayment instanceof Payment) {
-            $this->logger->warning('Settled transaction has no Mollie payment data, cannot copy it to the current transaction', $logData);
+        $existingId = $existing->getId();
+        $live = $this->mollieGateway->getPayment($existingId, $orderNumber, $salesChannelId);
 
-            return;
+        if ($live->isCancelable()) {
+            $this->mollieGateway->cancelPayment($existingId, $orderNumber, $salesChannelId);
+
+            return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
         }
 
-        $settledPayment->setFinalizeUrl($shopwareFinalizeUrl);
-        $this->transactionService->savePaymentExtension($transactionId, $order, $settledPayment, $context);
+        if (in_array($live->getStatus(), [PaymentStatus::OPEN, PaymentStatus::PENDING], true)) {
+            return $this->mollieGateway->updatePayment($existingId, $createPaymentStruct, $orderNumber, $salesChannelId);
+        }
 
-        $this->logger->info('Copied Mollie payment data from settled transaction to the current transaction', $logData);
+        return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
     }
 
-    private function updatePaymentCounter(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct): int
+    /**
+     * The payment description carries the attempt number so several Mollie payments of the same
+     * order are distinguishable. Deriving it from the number of order transactions is reliable even
+     * though Shopware reuses one transaction per payment method (a stored per-transaction counter
+     * would stay at 1 for every freshly created transaction).
+     */
+    private function updatePaymentCounter(OrderEntity $order, CreatePayment $createPaymentStruct): int
     {
-        $countPayments = 1;
-        $oldMollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
-        if ($oldMollieTransaction instanceof Payment) {
-            $countPayments = $oldMollieTransaction->getCountPayments() + 1;
-            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
+        $transactions = $order->getTransactions();
+        $countPayments = $transactions !== null ? $transactions->count() : 1;
+
+        if ($countPayments > 1) {
+            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . ($countPayments - 1));
         }
 
         return $countPayments;

@@ -7,8 +7,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Refund\Controller\RefundController;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
@@ -36,8 +35,6 @@ final class OrderReturnHandler
         private readonly RefundGatewayInterface $refundGateway,
         #[Autowire(service: 'order_return.repository')]
         private readonly ?EntityRepository $orderReturnRepository,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -260,7 +257,8 @@ final class OrderReturnHandler
 
     private function extractMolliePayment(OrderEntity $order): ?Payment
     {
-        $transaction = $this->transactionResolver->resolveRefundable($order);
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transaction = $transactions->getCurrentOrderTransaction();
         if ($transaction === null) {
             return null;
         }

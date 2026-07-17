@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Payment\ExpressMethod\AccountService;
 use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Context;
@@ -19,6 +20,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 #[CoversClass(AccountService::class)]
+#[Group('core')]
 final class AccountServiceTest extends TestCase
 {
     use ShopwareTestBehaviour;

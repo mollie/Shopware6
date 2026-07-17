@@ -8,12 +8,14 @@ use Kiener\MolliePayments\Migration\Migration1777881160RenewalReminderMailTempla
 use Kiener\MolliePayments\Migration\Migration1782889200RefreshRenewalReminderMailTemplate;
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 #[CoversClass(Migration1782889200RefreshRenewalReminderMailTemplate::class)]
+#[Group('core')]
 final class RefreshRenewalReminderMailTemplateTest extends TestCase
 {
     use ShopwareTestBehaviour;

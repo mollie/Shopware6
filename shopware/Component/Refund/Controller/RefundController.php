@@ -25,8 +25,7 @@ use Mollie\Shopware\Component\Refund\Struct\RefundTotalsStruct;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -69,8 +68,6 @@ final class RefundController extends AbstractController
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
         private readonly CreditNoteService $creditNoteService,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -502,7 +499,8 @@ final class RefundController extends AbstractController
 
     private function findMolliePayment(OrderEntity $order, Context $context): ?Payment
     {
-        $transaction = $this->transactionResolver->resolveRefundable($order);
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transaction = $transactions->getCurrentOrderTransaction();
         if ($transaction === null) {
             return null;
         }

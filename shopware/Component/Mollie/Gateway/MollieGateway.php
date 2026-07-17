@@ -119,6 +119,34 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
+    public function updatePayment(string $molliePaymentId, CreatePayment $molliePayment, string $orderNumber, string $salesChannelId): Payment
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            // The Mollie update-payment endpoint only accepts a subset of the create payload; amount
+            // and lines are immutable (a changed cart total makes Shopware open a new transaction).
+            $updatableFields = ['description', 'redirectUrl', 'cancelUrl', 'webhookUrl', 'metadata', 'locale'];
+            $formParams = array_intersect_key($molliePayment->toArray(), array_flip($updatableFields));
+
+            $response = $client->patch('payments/' . $molliePaymentId, [
+                'form_params' => $formParams,
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Mollie Payment updated', [
+                'molliePaymentId' => $molliePaymentId,
+                'requestParameter' => $formParams,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Payment::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
+        }
+    }
+
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
     {
         $orderNumber = $createOrder->getOrderNumber();

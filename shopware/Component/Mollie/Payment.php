@@ -33,6 +33,7 @@ final class Payment extends Struct implements \JsonSerializable
 
     private string $finalizeUrl = '';
     private int $countPayments = 1;
+    private bool $reconciled = false;
     private string $changePaymentStateUrl;
 
     private ?string $authenticationId = null;
@@ -113,6 +114,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setCountPayments(int $countPayments): void
     {
         $this->countPayments = $countPayments;
+    }
+
+    public function isReconciled(): bool
+    {
+        return $this->reconciled;
+    }
+
+    public function setReconciled(bool $reconciled): void
+    {
+        $this->reconciled = $reconciled;
     }
 
     public function getShopwareTransaction(): OrderTransactionEntity
