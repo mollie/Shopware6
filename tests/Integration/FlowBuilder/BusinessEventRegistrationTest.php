@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Integration\FlowBuilder;
 
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
@@ -16,6 +17,7 @@ use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
  * admin. A dispatched-but-unregistered event silently works only for manually
  * named flows and is invisible in Flow Builder.
  */
+#[Group('core')]
 final class BusinessEventRegistrationTest extends TestCase
 {
     use ShopwareTestBehaviour;

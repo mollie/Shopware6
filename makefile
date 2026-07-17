@@ -120,9 +120,9 @@ stan: ##3 Starts the PHPStan Analyser
 phpunit: ##3 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
-phpintegration: ##3 Starts all PHPUnit Tests
+phpintegration: ##3 Starts all PHPUnit Tests [groups=core to limit to a group]
 
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),)
 
 behat:
 	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml --format progress --colors

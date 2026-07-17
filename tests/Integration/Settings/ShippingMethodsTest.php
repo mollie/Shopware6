@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMeth
 use Mollie\Shopware\Integration\Data\SalesChannelTestBehaviour;
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @infection-ignore-all
  */
 #[CoversClass(GetShippingMethodsRoute::class)]
+#[Group('core')]
 final class ShippingMethodsTest extends TestCase
 {
     use ShopwareTestBehaviour;

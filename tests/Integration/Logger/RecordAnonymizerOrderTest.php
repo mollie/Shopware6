@@ -9,10 +9,12 @@ use Monolog\Logger;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\WebProcessor;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 
 #[CoversClass(RecordAnonymizer::class)]
+#[Group('core')]
 final class RecordAnonymizerOrderTest extends TestCase
 {
     use ShopwareTestBehaviour;

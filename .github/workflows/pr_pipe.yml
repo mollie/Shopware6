@@ -81,5 +81,8 @@ jobs:
             # -------------------------------------------
             RUN_CYPRESS: true
             TESTRAIL: false
-            # only run @core tests, because we have no API key here
+            # no Mollie API key on pull requests, so only run tests that don't hit the API:
+            # @core Cypress specs, the 'core' PHPUnit group, and no Behat (all API-dependent).
             FILTERS: "@core"
+            PHPUNIT_GROUPS: "core"
+            RUN_BEHAT: false

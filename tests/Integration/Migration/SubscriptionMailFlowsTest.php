@@ -11,10 +11,12 @@ use Kiener\MolliePayments\Migration\Migration1782345600SubscriptionMailFlows;
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 
 #[CoversClass(Migration1782345600SubscriptionMailFlows::class)]
+#[Group('core')]
 final class SubscriptionMailFlowsTest extends TestCase
 {
     use ShopwareTestBehaviour;
