@@ -98,6 +98,14 @@ runs:
       shell: bash
       run: |
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel SET access_key='${{ inputs._STORE_API_KEY }}' WHERE id = (SELECT sales_channel_id FROM sales_channel_domain WHERE url = 'https://${{ inputs._SHOP_DOMAIN }}' LIMIT 1);\""
+    - name: Disable Composer Platform Check
+      shell: bash
+      run: |
+        # Some dockware images ship a composer.lock whose platform requirement is PHP >=8.3
+        # while the container runs PHP 8.2, so vendor/composer/platform_check.php fatals on
+        # every bin/console call. Disable the runtime check and regenerate the autoloader.
+        docker exec shop bash -c 'composer config platform-check false'
+        docker exec shop bash -c 'composer dump-autoload --no-scripts' || true
     - name: Disable Usage-Data Consent Banner
       shell: bash
       run: |
@@ -145,11 +153,14 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
-        # Pin PHPUnit to a PHP 8.2 compatible major before merging the plugin's require-dev
-        # (phpunit >=10). Some dockware images (e.g. 6.7.2.2) lock shopware/dev-tools with a
-        # constraint that otherwise resolves phpunit to ^12, which requires PHP >=8.3 and fails.
-        docker exec shop bash -c 'composer require --dev --no-scripts -W "phpunit/phpunit:^11.4"'
-        docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
+        # Some dockware images lock packages to releases that require PHP >=8.3 while the
+        # container runs PHP 8.2. Downgrade them to the newest PHP 8.2 compatible release
+        # that still satisfies shopware/core, before merging the plugin's require-dev.
+        # lcobucci/clock: 6.7.3.1 / 6.7.4.2 lock 3.4.0 (needs >=8.3); core only needs ^3.1.0.
+        docker exec shop bash -c 'composer require --no-scripts -W --ignore-platform-reqs "lcobucci/clock:>=3.1 <3.4"'
+        # phpunit: the merged require-dev (phpunit >=10) otherwise resolves to ^12 (needs >=8.3).
+        docker exec shop bash -c 'composer require --dev --no-scripts -W --ignore-platform-reqs "phpunit/phpunit:^11.4"'
+        docker exec shop bash -c 'composer require --ignore-platform-reqs wikimedia/composer-merge-plugin:*'
 
     - name: Install Plugin
       shell: bash

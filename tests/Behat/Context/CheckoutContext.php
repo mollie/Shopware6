@@ -11,6 +11,7 @@ use Behat\Step\When;
 use Mollie\Shopware\Behat\Storage;
 use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
@@ -149,10 +150,34 @@ final class CheckoutContext extends ShopwareContext
     public function orderPaymentStatusIs(string $expectedPaymentStatus): void
     {
         $orderId = Storage::get(self::STORAGE_ORDER_ID);
-        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+
+        $order = $this->getOrderById($orderId, $salesChannelContext);
         /** @var OrderTransactionEntity $oderTransaction */
         $oderTransaction = $order->getTransactions()->first();
         $actualOrderState = $oderTransaction->getStateMachineState()->getTechnicalName();
+
+        // Mollie can take a few seconds to move an authorized payment to "paid" after the shipment
+        // capture, and the shop only re-syncs once (DevWebHookSubscriber). When the status has not
+        // caught up yet, re-fire the webhook sync (as Mollie would retry the webhook) and re-read.
+        // This is test-only polling; the plugin behaviour is not changed.
+        /** @var WebhookRoute $webhookRoute */
+        $webhookRoute = $this->getContainer()->get(WebhookRoute::class);
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+
+        $attempt = 0;
+        while ($actualOrderState !== $expectedPaymentStatus && $attempt < 5) {
+            ++$attempt;
+            sleep(2);
+            $mollieGateway->clearCache();
+            $webhookRoute->notify($oderTransaction->getId(), $salesChannelContext->getContext());
+
+            $order = $this->getOrderById($orderId, $salesChannelContext);
+            /** @var OrderTransactionEntity $oderTransaction */
+            $oderTransaction = $order->getTransactions()->first();
+            $actualOrderState = $oderTransaction->getStateMachineState()->getTechnicalName();
+        }
 
         Assert::assertSame($expectedPaymentStatus, $actualOrderState);
     }
