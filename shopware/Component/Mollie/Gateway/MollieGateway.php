@@ -492,13 +492,17 @@ final class MollieGateway implements MollieGatewayInterface
 
             return null;
         }
-        $mollieOrderId = $customFields['order_id'] ?? null;
+        $transactionCustomFields = $transaction->getCustomFields()[Mollie::EXTENSION] ?? [];
+        $mollieOrderId = (string) ($customFields['order_id'] ?? '');
+        if ($mollieOrderId === '') {
+            $mollieOrderId = (string) ($transactionCustomFields['order_id'] ?? $transactionCustomFields['orderId'] ?? '');
+        }
         $returnUrl = $customFields['transactionReturnUrl'] ?? null;
-        if ($mollieOrderId === null || $returnUrl === null) {
+        if ($mollieOrderId === '' || $returnUrl === null || $returnUrl === '') {
             $logData['mollieOrderId'] = $mollieOrderId;
             $logData['returnUrl'] = $returnUrl;
 
-            $this->logger->error('Order does have mollie custom fields but mollie oder id or return url is not set', $logData);
+            $this->logger->error('Order does have mollie custom fields but mollie order id or return url is not set', $logData);
 
             return null;
         }

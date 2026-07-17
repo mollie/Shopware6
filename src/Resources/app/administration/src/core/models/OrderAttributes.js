@@ -38,7 +38,9 @@ export default class OrderAttributes {
         }
         this._isMolliePayments = true;
 
-        this._paymentId = latestTransaction?.customFields?.mollie_payments?.id ?? '';
+        const txMollie = latestTransaction?.customFields?.mollie_payments ?? {};
+        this._orderId = this._convertString(txMollie['orderId']);
+        this._paymentId = this._convertString(txMollie['id']);
 
         this.customFields = orderEntity.customFields;
 
@@ -52,10 +54,14 @@ export default class OrderAttributes {
 
         const mollieData = this.customFields.mollie_payments;
 
-        this._orderId = this._convertString(mollieData['order_id']);
-        this._paymentId = this._convertString(mollieData['payment_id']);
+        this._orderId = this._firstNonEmpty(mollieData['order_id'], mollieData['orderId'], this._orderId);
+        this._paymentId = this._firstNonEmpty(mollieData['payment_id'], mollieData['id'], this._paymentId);
         this._swSubscriptionId = this._convertString(mollieData['swSubscriptionId']);
-        this._paymentRef = this._convertString(mollieData['third_party_payment_id']);
+        this._paymentRef = this._firstNonEmpty(
+            mollieData['third_party_payment_id'],
+            mollieData['thirdPartyPaymentId'],
+            this._paymentRef,
+        );
         this._creditCardAttributes = new CreditcardAttributes(mollieData);
     }
 
@@ -143,5 +149,22 @@ export default class OrderAttributes {
         }
 
         return String(value);
+    }
+
+    /**
+     *
+     * @param values
+     * @returns {string}
+     * @private
+     */
+    _firstNonEmpty(...values) {
+        for (let i = 0; i < values.length; i++) {
+            const str = this._convertString(values[i]);
+            if (str !== '') {
+                return str;
+            }
+        }
+
+        return '';
     }
 }

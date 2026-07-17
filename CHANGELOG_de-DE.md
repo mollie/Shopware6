@@ -1,3 +1,6 @@
+# Unreleased
+- Behoben: Bei Alt-Bestellungen wird die Mollie-ID in Bestellliste und -detailansicht wieder angezeigt und der Mollie-Tab lässt sich wieder öffnen.
+
 # 5.2.0
 - Hinzugefügt: Abo-Produkte können zusätzlich als Einmalkauf angeboten werden, konfigurierbar im Mollie-Tab des Produkts.
 - Hinzugefügt: Die Add-to-Cart-Route akzeptiert einen neuen Parameter `mollieSubscribe`, um ein Produkt als Abo hinzuzufügen (für Headless-Nutzung).

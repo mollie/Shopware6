@@ -291,13 +291,14 @@ final class OrderAdminController extends AbstractController
         $orderMollieFields = ($order->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
 
         $paymentId = (string) ($orderMollieFields['payment_id'] ?? '');
-        if ($paymentId === '') {
+        $orderId = (string) ($orderMollieFields['order_id'] ?? '');
+
+        if ($paymentId === '' && $orderId === '') {
             return null;
         }
 
         $payment = new Payment($paymentId);
 
-        $orderId = (string) ($orderMollieFields['order_id'] ?? '');
         if ($orderId !== '') {
             $payment->setOrderId($orderId);
         }
