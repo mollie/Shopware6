@@ -32,7 +32,11 @@ export default class AdminLoginAction {
             .clear()
             .type('admin');
 
-        cy.get('#sw-field--password')
+        // Target the password field by type instead of #sw-field--password: the mt-password-field
+        // shipped with Shopware 6.7.2.2 - 6.7.4.2 does not render the id derived from its name,
+        // so the id selector never matches there. There is exactly one password input on the
+        // login page, so this is stable across the whole 6.5 - 6.7 matrix.
+        cy.get('input[type="password"]')
             .should('be.visible')
             .clear()
             .type('shopware');
