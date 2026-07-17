@@ -10,6 +10,12 @@
     "rules": {
         "no-missing-end-of-source-newline": true,
         "selector-class-pattern": "",
+        "selector-disallowed-list": [
+            ["/\\.js-/"],
+            {
+                "message": "js- classes are JS/test hooks only and must not be used for styling. Use a dedicated custom class instead."
+            }
+        ],
         "property-no-unknown": [
             true,
             {
