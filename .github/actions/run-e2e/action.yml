@@ -91,13 +91,20 @@ runs:
         docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} --env SHOPWARE_HTTP_CACHE_ENABLED=0 -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
         echo "Waiting for container to be ready..."
-        timeout 180 sh -c 'until docker logs shop 2>&1 | grep -q "container IS READY"; do sleep 2; done'
+        timeout 420 sh -c 'until docker logs shop 2>&1 | grep -q "container IS READY"; do sleep 2; done' || { echo "::error::Container did not become ready in time"; docker logs shop; exit 1; }
         echo "Container is ready."
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
     - name: Fix Store API Key
       shell: bash
       run: |
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel SET access_key='${{ inputs._STORE_API_KEY }}' WHERE id = (SELECT sales_channel_id FROM sales_channel_domain WHERE url = 'https://${{ inputs._SHOP_DOMAIN }}' LIMIT 1);\""
+    - name: Disable Usage-Data Consent Banner
+      shell: bash
+      run: |
+        # Sets the "Help us improve Shopware" consent so the banner does not overlay the
+        # admin during Cypress. Only 'accepted' hides it; nothing is transmitted since no
+        # message-queue worker runs in the CI container.
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.usageData.consentState accepted' || true
     - name: Update Shopware Config
       shell: bash
       run: |
@@ -138,6 +145,10 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
+        # Pin PHPUnit to a PHP 8.2 compatible major before merging the plugin's require-dev
+        # (phpunit >=10). Some dockware images (e.g. 6.7.2.2) lock shopware/dev-tools with a
+        # constraint that otherwise resolves phpunit to ^12, which requires PHP >=8.3 and fails.
+        docker exec shop bash -c 'composer require --dev --no-scripts -W "phpunit/phpunit:^11.4"'
         docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
 
     - name: Install Plugin
