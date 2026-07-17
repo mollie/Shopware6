@@ -168,7 +168,7 @@ final class CheckoutContext extends ShopwareContext
 
         $attempt = 0;
         while ($actualOrderState !== $expectedPaymentStatus && $attempt < 5) {
-            $attempt++;
+            ++$attempt;
             sleep(2);
             $mollieGateway->clearCache();
             $webhookRoute->notify($oderTransaction->getId(), $salesChannelContext->getContext());
