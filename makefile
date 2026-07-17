@@ -121,8 +121,8 @@ phpunit: ##3 Starts all PHPUnit Tests
 	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
 
 phpintegration: ##3 Starts all PHPUnit Tests
-	#we call "real" phpunit, it seems like in sw 6.4 the vendor/bin/phpunit is overwritten by shopware
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
+
+	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
 
 behat:
 	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml --format progress --colors

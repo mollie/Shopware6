@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Payment\Action;
 
 use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\Action\Pay;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -24,7 +25,6 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -118,61 +118,45 @@ final class PayTest extends TestCase
         $this->assertArrayNotHasKey('payment', $orderArray);
     }
 
-    public function testPaidOrderDoesNotCreateAnotherPaymentAndRedirectsToReturnUrl(): void
+    public function testOpenExistingPaymentIsReusedViaUpdate(): void
     {
         $transactionService = new FakeTransactionService();
-        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
+        $transactionService->createValidStruct();
         $transactionService->createTransaction();
 
-        $gateway = new FakeGateway('https://mollie.com/checkout=token=789');
-        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout=token=789', $gateway);
+        $existing = new Payment('testMollieId');
+        $existing->setStatus(PaymentStatus::OPEN);
+        $existing->setCheckoutUrl('https://mollie.com/checkout=token=open');
+        $gateway = new FakeGateway('https://mollie.com/checkout=token=open', $existing);
 
-        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout=token=open', $gateway);
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('returnUrl', $response->getTargetUrl());
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+
+        $this->assertCount(1, $gateway->getUpdatePayloads());
         $this->assertCount(0, $gateway->getCreatePayloads());
-        $this->assertCount(0, $gateway->getCreateOrderPayloads());
+        $this->assertSame('testMollieId', $gateway->getUpdatePayloads()[0]['paymentId']);
     }
 
-    public function testAuthorizedOrderDoesNotCreateAnotherPayment(): void
+    public function testCancelableExistingPaymentIsCancelledAndRecreated(): void
     {
         $transactionService = new FakeTransactionService();
-        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_AUTHORIZED);
+        $transactionService->createValidStruct();
         $transactionService->createTransaction();
 
-        $gateway = new FakeGateway('https://mollie.com/checkout=token=789');
-        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout=token=789', $gateway);
+        $existing = new Payment('testMollieId');
+        $existing->setStatus(PaymentStatus::OPEN);
+        $existing->setCancelable(true);
+        $existing->setCheckoutUrl('https://mollie.com/checkout=token=new');
+        $gateway = new FakeGateway('https://mollie.com/checkout=token=new', $existing);
 
-        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
+        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout=token=new', $gateway);
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('returnUrl', $response->getTargetUrl());
-        $this->assertCount(0, $gateway->getCreatePayloads());
-        $this->assertCount(0, $gateway->getCreateOrderPayloads());
-    }
+        $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
 
-    public function testSettledPaymentDataIsCopiedToCurrentTransaction(): void
-    {
-        $transactionService = new FakeTransactionService();
-        $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
-        $transactionService->withMolliePaymentOnOrderTransactions();
-        $transactionService->createTransaction();
-
-        $gateway = new FakeGateway('https://mollie.com/checkout');
-        $payAction = $this->getPayAction($transactionService, 'https://mollie.com/checkout', $gateway);
-
-        $response = $payAction->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('current-transaction', 'returnUrl'), new RequestDataBag(), new Context(new SystemSource()));
-
-        $this->assertSame('returnUrl', $response->getTargetUrl());
-        $this->assertCount(0, $gateway->getCreatePayloads());
-        $this->assertCount(0, $gateway->getCreateOrderPayloads());
-
-        $saved = $transactionService->getSavedPaymentExtensions();
-        $this->assertCount(1, $saved);
-        $this->assertSame('current-transaction', $saved[0]['transactionId']);
-        $this->assertSame('settled-payment-0', $saved[0]['payment']->getId());
-        $this->assertSame('returnUrl', $saved[0]['payment']->getFinalizeUrl());
+        $this->assertSame(['testMollieId'], $gateway->getCancelledPaymentIds());
+        $this->assertCount(1, $gateway->getCreatePayloads());
+        $this->assertCount(0, $gateway->getUpdatePayloads());
     }
 
     public function testPendingOrderSessionKeyIsSetForNonBankTransferPayment(): void
@@ -238,8 +222,6 @@ final class PayTest extends TestCase
             $requestStack->push($request);
         }
 
-        $transactionResolver = new OrderTransactionResolver();
-
-        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $fakeRouteBuilder, $eventDispatcher, $requestStack, $transactionResolver, $logger);
+        return new Pay($transactionService, $builder, $gateway, $fakeOrderTransactionStateHandler, $fakeRouteBuilder, $eventDispatcher, $requestStack, $logger);
     }
 }

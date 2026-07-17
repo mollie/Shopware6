@@ -51,6 +51,7 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
 
             $method = $mollieCustomFields['method'] ?? null;
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
+            $reconciled = $mollieCustomFields['reconciled'] ?? false;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
             $authenticationId = $mollieCustomFields['authenticationId'] ?? null;
             $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
@@ -64,6 +65,7 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
 
             $transactionExtension = new Payment($paymentId);
             $transactionExtension->setCountPayments($countPayments);
+            $transactionExtension->setReconciled((bool) $reconciled);
             if ($finalizeUrl !== null) {
                 $transactionExtension->setFinalizeUrl($finalizeUrl);
             }

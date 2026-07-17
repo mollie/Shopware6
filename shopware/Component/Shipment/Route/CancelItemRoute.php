@@ -9,12 +9,12 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Shipment\CancelItemEvent;
 use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Content\Product\Stock\AbstractStockStorage;
 use Shopware\Core\Content\Product\Stock\StockAlteration;
 use Shopware\Core\Content\Product\Stock\StockStorage;
@@ -43,8 +43,6 @@ final class CancelItemRoute
         private readonly AbstractStockStorage $stockStorage,
         #[Autowire(service: 'event_dispatcher')]
         private readonly EventDispatcherInterface $eventDispatcher,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
     ) {
     }
 
@@ -82,10 +80,12 @@ final class CancelItemRoute
         $orderNumber = (string) $order->getOrderNumber();
 
         // Cancelling items only applies to an authorized (manual capture / pay-later) payment. A paid
-        // payment is already captured and would need a refund instead, so the resolver returns null when
-        // the order is already paid or has no authorized transaction.
-        $latestAuthorized = $this->transactionResolver->resolveCapturableAuthorized($order);
-        if ($latestAuthorized === null) {
+        // payment is already captured and would need a refund instead, so we only proceed when the
+        // order's current payment is authorized.
+        $mollieTransactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $latestAuthorized = $mollieTransactions->getCurrentOrderTransaction();
+        $currentState = $latestAuthorized?->getStateMachineState();
+        if ($latestAuthorized === null || $currentState === null || $currentState->getTechnicalName() !== OrderTransactionStates::STATE_AUTHORIZED) {
             return new JsonResponse(['success' => false, 'message' => 'notAuthorized'], 400);
         }
 

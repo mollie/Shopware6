@@ -34,6 +34,9 @@ final class FakeGateway implements MollieGatewayInterface
     /** @var list<CreateOrder> */
     private array $createOrderPayloads = [];
 
+    /** @var list<array{paymentId: string, payment: CreatePayment}> */
+    private array $updatePayloads = [];
+
     /** @var list<string> */
     private array $cancelledPaymentIds = [];
 
@@ -115,6 +118,21 @@ final class FakeGateway implements MollieGatewayInterface
         $this->createPayloads[] = $molliePayment;
 
         return $this->payment;
+    }
+
+    public function updatePayment(string $molliePaymentId, CreatePayment $molliePayment, string $orderNumber, string $salesChannelId): Payment
+    {
+        $this->updatePayloads[] = ['paymentId' => $molliePaymentId, 'payment' => $molliePayment];
+
+        return $this->payment;
+    }
+
+    /**
+     * @return list<array{paymentId: string, payment: CreatePayment}>
+     */
+    public function getUpdatePayloads(): array
+    {
+        return $this->updatePayloads;
     }
 
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order

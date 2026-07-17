@@ -9,7 +9,6 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Route\WebhookException;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
@@ -323,36 +322,32 @@ final class WebhookRouteTest extends TestCase
     }
 
     /**
-     * Once the order is paid, a stale webhook with a lower status (here: failed) must not downgrade the
-     * payment method, payment status or order status. The webhook events must still be dispatched.
+     * The webhook reflects only its own transaction's payment. There is no order-wide guard anymore,
+     * so even a lower status (here: failed) updates that transaction and dispatches the events;
+     * duplicate payments are resolved separately by the reconciler.
      */
-    public function testStatusUpdatesSkippedWhenOrderAlreadyPaid(): void
+    public function testLowerStatusStillUpdatesItsOwnTransaction(): void
     {
         $transactionService = new FakeTransactionService();
         $transactionService->createValidStruct();
         $transactionService->withOrderTransactionStates(OrderTransactionStates::STATE_PAID);
 
         $transactionStateHandler = new FakeOrderTransactionStateHandler();
-        $orderStateHandler = new FakeOrderStateHandler();
-        $paymentMethodUpdater = new FakePaymentMethodUpdater();
         $eventSpy = new EventSpy();
 
         $fakeClient = new FakeClient('mollieTestId', 'failed');
-        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $transactionStateHandler, $paymentMethodUpdater, $orderStateHandler, null, $eventSpy);
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $transactionStateHandler, null, null, null, $eventSpy);
 
         $response = $webhookRoute->notify('test', $this->context);
 
         $this->assertInstanceOf(WebhookResponse::class, $response);
-        $this->assertFalse($transactionStateHandler->wasCalled(), 'A lower status must not downgrade an already paid order');
-        $this->assertFalse($orderStateHandler->wasCalled(), 'A lower status must not downgrade an already paid order');
-        $this->assertFalse($paymentMethodUpdater->wasCalled(), 'A lower status must not downgrade an already paid order');
-        $this->assertGreaterThanOrEqual(2, $eventSpy->getEventCount(), 'Webhook events must still be dispatched when the order is already paid');
+        $this->assertTrue($transactionStateHandler->wasCalled(), 'The webhook must update its own transaction regardless of other transactions');
+        $this->assertGreaterThanOrEqual(2, $eventSpy->getEventCount(), 'Webhook events must still be dispatched');
     }
 
     /**
-     * When a second payment also completes as "paid" (e.g. the order was re-paid with another method),
-     * it is a new successful payment and must overwrite the payment method, payment status and order
-     * status even though the order already has a paid transaction.
+     * A second payment that also completes as "paid" (e.g. the order was re-paid with another method)
+     * updates the payment method, payment status and order status.
      */
     public function testSecondPaidPaymentOverwritesAlreadyPaidOrder(): void
     {
@@ -430,7 +425,6 @@ final class WebhookRouteTest extends TestCase
         $logger = $logger ?? new NullLogger();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
         $gateway = new MollieGateway($fakeClientFactory, $transactionService, $logger);
-        $transactionResolver = new OrderTransactionResolver();
         $shipOrderRoute = $shipOrderRoute ?? new FakeShipOrderRoute();
 
         return new WebhookRoute(
@@ -440,7 +434,6 @@ final class WebhookRouteTest extends TestCase
             $paymentMethodUpdater ?? new FakePaymentMethodUpdater(),
             $orderStateHandler ?? new FakeOrderStateHandler(),
             $orderService ?? new FakeOrderService(),
-            $transactionResolver,
             $shipOrderRoute,
             $logger
         );

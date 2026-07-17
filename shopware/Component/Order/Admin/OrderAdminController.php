@@ -17,8 +17,7 @@ use Mollie\Shopware\Component\Order\Admin\Response\ShippingTotal;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -52,8 +51,6 @@ final class OrderAdminController extends AbstractController
         private readonly AbstractSettingsService $mollieSettings,
         #[Autowire(service: MollieGateway::class)]
         private readonly MollieGatewayInterface $mollieGateway,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
     ) {
     }
 
@@ -77,9 +74,8 @@ final class OrderAdminController extends AbstractController
             return new JsonResponse(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);
         }
 
-        // Shopware treats the first non-cancelled/failed transaction as the current payment, not
-        // necessarily the newest, so we resolve the effective transaction instead of taking the newest.
-        $effectiveTransaction = $this->transactionResolver->resolveEffective($order);
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $effectiveTransaction = $transactions->getCurrentOrderTransaction();
 
         if ($effectiveTransaction === null) {
             return new JsonResponse(['isMollieOrder' => false]);

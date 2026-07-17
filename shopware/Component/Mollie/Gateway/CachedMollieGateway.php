@@ -77,6 +77,13 @@ final class CachedMollieGateway implements MollieGatewayInterface
         return $this->decorated->createPayment($molliePayment, $salesChannelId);
     }
 
+    public function updatePayment(string $molliePaymentId, CreatePayment $molliePayment, string $orderNumber, string $salesChannelId): Payment
+    {
+        unset($this->paymentIdPayments[$molliePaymentId]);
+
+        return $this->decorated->updatePayment($molliePaymentId, $molliePayment, $orderNumber, $salesChannelId);
+    }
+
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order
     {
         return $this->decorated->createOrder($createOrder, $salesChannelId);

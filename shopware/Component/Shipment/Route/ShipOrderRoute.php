@@ -14,14 +14,14 @@ use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Mollie\Tracking;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
@@ -59,8 +59,6 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
         private readonly OrderService $orderService,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -144,26 +142,25 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         if ($transactions === null || $transactions->count() === 0) {
             throw ShippingException::orderNotFound($orderId);
         }
-        $firstTransaction = $transactions->first();
-        if ($firstTransaction === null) {
-            throw ShippingException::orderNotFound($orderId);
-        }
 
-        // Only an order with a capturable authorized payment can be shipped: a paid payment is already
-        // captured and a fully handled order has nothing left, so both the Payments API capture and the
-        // Orders API shipment would fail at Mollie. Treat it as an idempotent no-op and, importantly, do
-        // not fire the OrderShippedEvent when nothing is shipped. This is the guard the automatic-shipment
-        // subscriber previously did; it now lives here so headless callers are covered too.
-        if ($this->transactionResolver->resolveCapturableAuthorized($order) === null) {
+        $mollieTransactions = new MollieOrderTransactionCollection($transactions);
+        $currentTransaction = $mollieTransactions->getCurrentOrderTransaction();
+
+        // Only an order whose current payment is authorized (manual capture / pay-later) can be shipped:
+        // a paid payment is already captured and a fully handled order has nothing left, so both the
+        // Payments API capture and the Orders API shipment would fail at Mollie. Treat anything else as
+        // an idempotent no-op and, importantly, do not fire the OrderShippedEvent when nothing is shipped.
+        $currentState = $currentTransaction?->getStateMachineState();
+        if ($currentTransaction === null || $currentState === null || $currentState->getTechnicalName() !== OrderTransactionStates::STATE_AUTHORIZED) {
             $this->logger->info('ShipOrderRoute: no capturable authorized payment, nothing to ship', $logContext);
 
             return new ShipOrderResponse('', $orderId, []);
         }
 
-        $repairEvent = new RepairLegacyTransactionEvent($firstTransaction, $order, $context);
+        $repairEvent = new RepairLegacyTransactionEvent($currentTransaction, $order, $context);
         $this->eventDispatcher->dispatch($repairEvent);
 
-        $payment = $firstTransaction->getExtension(Mollie::EXTENSION);
+        $payment = $currentTransaction->getExtension(Mollie::EXTENSION);
         if (! $payment instanceof Payment) {
             // Not a Mollie order (or legacy data could not be repaired): there is nothing to ship at
             // Mollie. Treated as an idempotent no-op so headless callers and the automatic-shipment
@@ -180,7 +177,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             throw ShippingException::orderNotFound($orderId);
         }
 
-        $orderShippedEvent = new OrderShippedEvent($firstTransaction->getId(), $context);
+        $orderShippedEvent = new OrderShippedEvent($currentTransaction->getId(), $context);
         $mollieOrderId = $payment->getOrderId();
 
         $shippingItems = new ShippingItemCollection();

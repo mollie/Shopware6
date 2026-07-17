@@ -8,7 +8,6 @@ use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
@@ -57,7 +56,6 @@ class ShipOrderRouteTest extends TestCase
             $this->gateway,
             $this->eventDispatcher,
             $orderService,
-            new OrderTransactionResolver(),
             $logger,
         );
     }

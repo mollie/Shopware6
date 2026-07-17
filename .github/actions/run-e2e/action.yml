@@ -112,7 +112,12 @@ runs:
         # Sets the "Help us improve Shopware" consent so the banner does not overlay the
         # admin during Cypress. Only 'accepted' hides it; nothing is transmitted since no
         # message-queue worker runs in the CI container.
+        # <= 6.7.8 reads this system_config key.
         docker exec shop bash -c 'php bin/console --no-debug system:config:set core.usageData.consentState accepted' || true
+        # >= 6.7.9.1 moved consent to the generic consent_state table (name=backend_data,
+        # identifier=system). The system_config key above is only copied into it once by a
+        # migration at update time, so setting it afterwards no longer hides the banner.
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), 'backend_data', 'system', 'accepted', 'migration', NOW()) ON DUPLICATE KEY UPDATE state='accepted', updated_at=NOW();\"" || true
     - name: Update Shopware Config
       shell: bash
       run: |

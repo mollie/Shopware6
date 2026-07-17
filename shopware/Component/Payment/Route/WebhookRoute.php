@@ -14,8 +14,6 @@ use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandlerInterface;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -49,8 +47,6 @@ final class WebhookRoute extends AbstractWebhookRoute
         #[Autowire(service: OrderStateHandler::class)]
         private readonly OrderStateHandlerInterface $orderStateHandler,
         private readonly OrderService $orderService,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private readonly OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: ShipOrderRoute::class)]
         private readonly AbstractShipOrderRoute $shipOrderRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -86,13 +82,12 @@ final class WebhookRoute extends AbstractWebhookRoute
         $webhookEvent = new WebhookEvent($payment, $shopwareOrder, $context);
         $this->eventDispatcher->dispatch($webhookEvent);
 
-        if ($this->shouldUpdatePaymentAndOrderStatus($payment, $shopwareOrder)) {
-            $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
-            $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
-            $this->updateOrderStatus($payment, $shopwareOrder, $context);
-        } else {
-            $this->logger->info('Webhook Process - Payment method, payment status and order status update skipped, order is already paid', $logData);
-        }
+        // Each webhook url is bound to a single transaction and only reflects that transaction's own
+        // Mollie payment. Duplicate payments of the order are resolved separately by the reconciler
+        // (DuplicatePaymentSubscriber), so there is no order-wide guard here anymore.
+        $this->updatePaymentStatus($payment, $transactionId, $orderNumber, $context);
+        $this->updatePaymentMethod($payment, $orderNumber, $shopwareOrder->getSalesChannelId(), $context);
+        $this->updateOrderStatus($payment, $shopwareOrder, $context);
 
         $this->updateDeliveryStatus($payment, $shopwareOrder, $context);
         $this->autoCaptureDigitalItems($payment, $shopwareOrder, $context);
@@ -103,29 +98,6 @@ final class WebhookRoute extends AbstractWebhookRoute
         $this->logger->info('Webhook Process - Finished', $logData);
 
         return new WebhookResponse($payment);
-    }
-
-    /**
-     * The webhook url is bound to a single order transaction. Mollie keeps sending webhooks for that
-     * transaction even after the order has been paid (e.g. a second payment attempt on the same order
-     * or a late status re-sync). Once the order has a paid transaction we must not let a stale, lower
-     * status downgrade it.
-     *
-     * Exceptions that still apply to an already paid order:
-     * - refunds and chargebacks legitimately change a paid order;
-     * - a second payment that also completes as "paid" is a new successful payment (e.g. the order was
-     *   re-paid with another method), so it must overwrite the payment method, payment status and order
-     *   status instead of being ignored.
-     */
-    private function shouldUpdatePaymentAndOrderStatus(Payment $payment, OrderEntity $shopwareOrder): bool
-    {
-        $status = $payment->getStatus();
-
-        if ($status->isRefundRelated() || $status === PaymentStatus::PAID) {
-            return true;
-        }
-
-        return ! $this->transactionResolver->hasPaidTransaction($shopwareOrder);
     }
 
     private function updatePaymentStatus(Payment $payment, string $transactionId, string $orderNumber, Context $context): void

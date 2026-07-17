@@ -1,4 +1,6 @@
 # Unreleased
+- Hinzugefügt: Nach einer erfolgreichen Zahlung werden ältere, doppelte Mollie-Zahlungen der Bestellung automatisch storniert oder erstattet.
+- Geändert: Bei erneutem Bezahlen mit derselben Zahlart wird die bestehende Mollie-Zahlung wiederverwendet statt einer zweiten erzeugt.
 - Behoben: Bei Alt-Bestellungen wird die Mollie-ID in Bestellliste und -detailansicht wieder angezeigt und der Mollie-Tab lässt sich wieder öffnen.
 
 # 5.2.0

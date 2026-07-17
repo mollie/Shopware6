@@ -9,8 +9,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolver;
-use Mollie\Shopware\Component\Transaction\OrderTransactionResolverInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -35,8 +34,6 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: 'order.repository')]
         private EntityRepository $orderRepository,
-        #[Autowire(service: OrderTransactionResolver::class)]
-        private OrderTransactionResolverInterface $transactionResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -79,10 +76,9 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Only cancel when the order's current payment is a Mollie payment. Shopware treats the first
-        // non-cancelled/failed transaction as the current one, not necessarily the newest, so we resolve
-        // the effective transaction instead of taking the newest by createdAt.
-        $transaction = $this->transactionResolver->resolveEffective($order);
+        // Only cancel when the order's current payment is a Mollie payment.
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transaction = $transactions->getCurrentOrderTransaction();
         if (! $transaction instanceof OrderTransactionEntity) {
             return;
         }
