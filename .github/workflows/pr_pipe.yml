@@ -81,8 +81,10 @@ jobs:
             # -------------------------------------------
             RUN_CYPRESS: true
             TESTRAIL: false
-            # no Mollie API key on pull requests, so only run tests that don't hit the API:
-            # @core Cypress specs, the 'core' PHPUnit group, and no Behat (all API-dependent).
+            # Cypress always runs @core only on PRs — the full suite takes too long.
             FILTERS: "@core"
-            PHPUNIT_GROUPS: "core"
-            RUN_BEHAT: false
+            # PHPUnit/Behat depend on the Mollie API key: fork PRs have none, so run only
+            # the API-free 'core' group and skip Behat. When the key IS available (e.g. a
+            # maintainer's own PR) run all integration tests and Behat.
+            PHPUNIT_GROUPS: ${{ secrets.MOLLIE_APIKEY_TEST == '' && 'core' || '' }}
+            RUN_BEHAT: ${{ secrets.MOLLIE_APIKEY_TEST != '' }}

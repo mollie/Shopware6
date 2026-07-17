@@ -53,11 +53,18 @@ use PHPUnit\Framework\Attributes\Group;
 final class MyIntegrationTest extends TestCase
 ```
 
-The PR pipeline runs `make phpintegration groups=core`, so only tagged tests run there.
 Tests that call the Mollie API (e.g. `startCheckout()`, the gateway, a raw client) stay
-**untagged** and are automatically skipped on PRs; they run in full in the nightly/CI
-pipelines. Behat is API-dependent as a whole and is disabled on PRs via `RUN_BEHAT: false`
-in `run-e2e`.
+**untagged**. For PHPUnit and Behat the PR pipeline keys off whether the
+`MOLLIE_APIKEY_TEST` secret is present:
+
+- **No key** (fork PRs): `PHPUNIT_GROUPS=core` + `RUN_BEHAT=false`, so only API-free
+  integration tests run and Behat is skipped.
+- **Key present** (e.g. a maintainer's own PR): no group filter + `RUN_BEHAT=true` — all
+  integration tests and Behat run, same as nightly/CI.
+
+Behat is API-dependent as a whole, hence the `RUN_BEHAT` switch in `run-e2e`. Cypress is
+**not** gated this way — it always runs the `@core` filter on PRs because the full Cypress
+suite takes too long.
 
 Reason: A new API test left untagged simply won't run on PRs instead of failing there.
 But a new **core** test left untagged also won't run on PRs — so tag every API-free
