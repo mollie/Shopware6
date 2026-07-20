@@ -126,6 +126,27 @@ wäre still kaputtgegangen. R und C gehören daher zusammen.
 > (Storefront) ausführen – erst danach passt das kompilierte JS zum neuen Selektor, und die
 > dann entstehenden `dist/storefront/js/...`-Änderungen gehören mitcommittet.
 
+### I — Cypress `< 6.4`-Bereinigung (Test-Code)
+Alle toten `6.4`-Versionsweichen in der Cypress-Suite entfernt; `6.5`/`6.6`/`6.7`-Weichen
+bleiben (die unterscheiden weiterhin unterstützte Versionen).
+
+- `PaymentAction.js`: Methoden `openPaymentsModal()` (nur `< 6.4`) und `closePaymentsModal()`
+  (ab 6.4 ein No-Op) entfernt; `showPaymentMethods()` auf den `>= 6.4`-Pfad reduziert (6.7-Guard
+  bleibt); `switchPaymentMethod()` ohne den `closePaymentsModal()`-Aufruf. Dadurch ungenutzt und
+  ebenfalls entfernt: `PaymentsRepository`-Import + `repoPayments`.
+- `AdminPluginAction.js`: `openPluginConfiguration()` fest auf die Extension-Config-Route
+  (`sw/extension/config`), der alte `sw/plugin/settings`-Zweig raus.
+- `creditcard.cy.js`: fünf `if (isVersionGreaterEqual(6.4)) {…} else { closePaymentsModal }`
+  auf den `>=`-Zweig reduziert, zwei `isVersionLower(6.4)`-Close-Blöcke, fünf
+  `isVersionEqual('6.4.0.0')`-Skips (Shopware-Bug NEXT-15044) und zwei lose
+  `closePaymentsModal()`-Aufrufe entfernt.
+- `checkout-failed.cy.js`: zwei `6.4.10.0`-Weichen auf den (immer wahren) `>=`-Zweig reduziert;
+  die `6.6.8.0`-Weiche bleibt.
+- `checkout-states.cy.js`: `isVersionLower('6.4.1')`-Sonderfall („Paid") entfernt.
+- `vouchers.cy.js` / `subscription.cy.js`: je ein `isVersionLower(6.4)`-Skip entfernt.
+
+Summe Cypress: 7 Dateien, ~132 Zeilen entfernt. Rein Test-Code, keine Produktivlogik betroffen.
+
 ---
 
 ## Bewusst NICHT geändert
@@ -136,8 +157,11 @@ wäre still kaputtgegangen. R und C gehören daher zusammen.
 | `mollie-subscriptions-list/index.js` → `compatibilityIcons()` | Kommentar „Shopware's compatibility mapping will be removed in 6.5" bezieht sich auf **Shopware-internes** Icon-Mapping. Genau weil Shopware das gedroppt hat, sichert das Plugin den Icon-Namen selbst ab → für 6.5+ potenziell nötig. Vor einer Vereinfachung erst prüfen, ob `icons-regular-undo` in 6.6/6.7 registriert ist. |
 | `core/service/utils/version-compare.utils.js` (+ Spec) | Wird weiterhin von der Support-Modal für `getHumanReadableVersion()` gebraucht (kein Versions-Gate). |
 
-## Aufgeschoben (größerer/eigener Umfang)
+## Aufgeschoben
 
-| Stelle | Warum aufgeschoben |
-|---|---|
-| `tests/Cypress/.../PaymentAction.js` (`openPaymentsModal`/`closePaymentsModal`) | Als `@version < 6.4` markiert, aber die Methoden werden an ~15 Test-Stellen aufgerufen; sauberes Entfernen erfordert alle Aufrufer. Reiner Test-Code, niedrige Priorität. |
+Keine offenen `< 6.4`/`6.4.x`-Punkte mehr – alle Fundstellen sind entweder bereinigt
+(D, F, H, A, E, L, R, C, I) oder bewusst behalten (siehe oben).
+
+**Optionaler nächster Schritt (außerhalb des 6.4-Themas):** Da das Minimum bereits `6.5.8` ist,
+sind streng genommen auch reine `6.5`-Weichen (z.B. `isVersionGreaterEqual('6.5')`) immer wahr.
+Deren Bereinigung wäre ein eigener Durchgang und wurde hier bewusst nicht angefasst.

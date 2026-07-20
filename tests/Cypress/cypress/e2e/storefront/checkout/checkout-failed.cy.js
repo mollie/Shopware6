@@ -195,11 +195,7 @@ context("Checkout Failure Tests", () => {
                 // but we still need to complete the payment and edit the order
                 cy.url().should('include', '/account/order/edit/');
 
-                if (shopware.isVersionGreaterEqual('6.4.10.0')) {
-                    cy.contains('We have received your order, but we were not able to process your payment');
-                } else {
-                    cy.contains('We received your order, but we were not able to process your payment');
-                }
+                cy.contains('We have received your order, but we were not able to process your payment');
 
 
                 paymentAction.switchPaymentMethod('Banktransfer');
@@ -238,11 +234,8 @@ context("Checkout Failure Tests", () => {
                 if (shopware.isVersionGreaterEqual('6.6.8.0')) {
                     cy.contains('was canceled and cannot be edited afterwards.');
                     return;
-                } else if (shopware.isVersionGreaterEqual('6.4.10.0')) {
-                    cy.contains('We have received your order, but the payment was aborted');
-                } else {
-                    cy.contains('We received your order, but the payment was aborted');
                 }
+                cy.contains('We have received your order, but the payment was aborted');
 
                 paymentAction.switchPaymentMethod('Banktransfer');
 

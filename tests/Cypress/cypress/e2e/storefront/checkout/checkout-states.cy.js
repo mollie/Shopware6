@@ -120,9 +120,6 @@ context("Order Status Mapping Tests", () => {
 
             adminLogin.login();
             let expectedPaymentStatus = 'Authorized';
-            if (shopware.isVersionLower('6.4.1')) {
-                expectedPaymentStatus = 'Paid';
-            }
             adminOrders.assertLatestOrderStatus('In progress');
             adminOrders.assertLatestPaymentStatus(expectedPaymentStatus);
         })
