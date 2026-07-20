@@ -1,4 +1,5 @@
 # Unreleased
+- Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
 - Added: After a successful payment, older duplicate Mollie payments of the order are automatically cancelled or refunded.
 - Changed: Retrying with the same payment method now reuses the existing Mollie payment instead of creating a second one.
 - Changed: The transaction custom fields now also expose `order_id`, `payment_id` and `third_party_payment_id` for external ERP integrations.

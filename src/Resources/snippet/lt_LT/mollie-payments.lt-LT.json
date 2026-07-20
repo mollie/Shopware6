@@ -57,7 +57,11 @@
                 "error": "Mokėjimas nepavyko",
                 "failed": "Mokėjimas nepavyko arba buvo atšauktas. Būsite nukreipti į Mollie, kur galėsite užbaigti savo mokėjimą pasirinktu būdų. "
             },
-            "redirecting": "Nukreipiama į: "
+            "redirecting": "Nukreipiama į: ",
+            "paymentLink": {
+                "error": "Šio užsakymo nebegalima apmokėti.",
+                "alreadyPaid": "Šis užsakymas jau apmokėtas."
+            }
         },
         "payments": {
             "applePayDirect": {

@@ -57,7 +57,11 @@
                 "error": "A kifizetés sikertelen",
                 "failed": "A fizetést elutasították vagy törölték. A rendszer átirányít Mollie-ba, ahol a kiválasztott fizetési móddal véglegesítheti fizetését. "
             },
-            "redirecting": "Átirányítás a következőre: "
+            "redirecting": "Átirányítás a következőre: ",
+            "paymentLink": {
+                "error": "Ez a rendelés már nem fizethető.",
+                "alreadyPaid": "Ez a rendelés már ki van fizetve."
+            }
         },
         "payments": {
             "applePayDirect": {

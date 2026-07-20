@@ -57,7 +57,11 @@
                 "error": "Maksu epäonnistui",
                 "failed": "Maksu epäonnistui tai se peruttiin. Sinut ohjataan Mollien verkkosivuille, jossa voit suorittaa maksun valitsemallasi maksutavalla. "
             },
-            "redirecting": "Sinut ohjataan osoitteeseen: "
+            "redirecting": "Sinut ohjataan osoitteeseen: ",
+            "paymentLink": {
+                "error": "Tätä tilausta ei voi enää maksaa.",
+                "alreadyPaid": "Tämä tilaus on jo maksettu."
+            }
         },
         "payments": {
             "applePayDirect": {

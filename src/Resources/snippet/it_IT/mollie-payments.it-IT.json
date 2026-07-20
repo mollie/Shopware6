@@ -57,7 +57,11 @@
                 "error": "Pagamento non riuscito",
                 "failed": "Il pagamento non è riuscito o è stato annullato. Sarà reindirizzato a Mollie, dove potrà completare il pagamento con il metodo di sua scelta. "
             },
-            "redirecting": "Reindirizzamento a: "
+            "redirecting": "Reindirizzamento a: ",
+            "paymentLink": {
+                "error": "Questo ordine non può più essere pagato.",
+                "alreadyPaid": "Questo ordine è già stato pagato."
+            }
         },
         "payments": {
             "applePayDirect": {

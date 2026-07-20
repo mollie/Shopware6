@@ -1,4 +1,5 @@
 # Unreleased
+- Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
 - Hinzugefügt: Nach einer erfolgreichen Zahlung werden ältere, doppelte Mollie-Zahlungen der Bestellung automatisch storniert oder erstattet.
 - Geändert: Bei erneutem Bezahlen mit derselben Zahlart wird die bestehende Mollie-Zahlung wiederverwendet statt einer zweiten erzeugt.
 - Geändert: Die Transaktions-Custom-Fields enthalten jetzt zusätzlich `order_id`, `payment_id` und `third_party_payment_id` für externe ERP-Integrationen.

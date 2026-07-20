@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Exception\TransactionWithoutMollieDataException;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
@@ -33,7 +34,7 @@ final class MollieGatewayTest extends TestCase
         $transactionService = new FakeTransactionService();
         $transactionService->createValidStruct();
 
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $context = new Context(new SystemSource());
 
@@ -55,7 +56,7 @@ final class MollieGatewayTest extends TestCase
             'transactionReturnUrl' => 'payment/finalize',
         ]);
 
-        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $context = new Context(new SystemSource());
 
@@ -77,7 +78,7 @@ final class MollieGatewayTest extends TestCase
             'transactionReturnUrl' => 'payment/finalize',
         ]);
 
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $context = new Context(new SystemSource());
 
@@ -91,7 +92,7 @@ final class MollieGatewayTest extends TestCase
         $fakeClientFactory = new FakeClientFactory($fakeClient);
         $transactionService = new FakeTransactionService();
 
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
@@ -106,7 +107,7 @@ final class MollieGatewayTest extends TestCase
         $transactionService->withOrderCustomFields([
             'transactionReturnUrl' => 'payment/finalize',
         ]);
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
@@ -122,7 +123,7 @@ final class MollieGatewayTest extends TestCase
         $transactionService->withOrderCustomFields([
             'order_id' => 'test',
         ]);
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
@@ -137,7 +138,7 @@ final class MollieGatewayTest extends TestCase
         $fakeClientFactory = new FakeClientFactory($fakeClient);
 
         $transactionService->createValidStruct();
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
         $context = new Context(new SystemSource());
         $gateway->getPaymentByTransactionId('test', $context);
     }
@@ -148,7 +149,7 @@ final class MollieGatewayTest extends TestCase
         $fakeClientFactory = new FakeClientFactory($fakeClient);
         $transactionService = new FakeTransactionService();
 
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $createPayment = new CreatePayment('test','test',new Money(10.00,'EUR'));
         $createPayment->setShopwareOrderNumber('10000');
@@ -165,7 +166,7 @@ final class MollieGatewayTest extends TestCase
         $fakeClientFactory = new FakeClientFactory($fakeClient);
 
         $transactionService = new FakeTransactionService();
-        $gateway = new MollieGateway($fakeClientFactory,$transactionService, new NullLogger());
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new NullLogger()), new NullLogger());
 
         $createPayment = new CreatePayment('test','test',new Money(10.00,'EUR'));
         $createPayment->setShopwareOrderNumber('10000');
@@ -183,7 +184,7 @@ final class MollieGatewayTest extends TestCase
             ],
         ]);
         $client = new Client(['handler' => HandlerStack::create(new MockHandler([new Response(200, [], (string) $body)]))]);
-        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new PaymentLinkGateway(new FakeClientFactory($client), new NullLogger()), new NullLogger());
 
         $result = $gateway->getActivePaymentMethods(new Money(100.0, 'EUR'), 'DE', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
 
@@ -194,7 +195,7 @@ final class MollieGatewayTest extends TestCase
     {
         $body = json_encode(['_embedded' => ['methods' => []]]);
         $client = new Client(['handler' => HandlerStack::create(new MockHandler([new Response(200, [], (string) $body)]))]);
-        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new PaymentLinkGateway(new FakeClientFactory($client), new NullLogger()), new NullLogger());
 
         $result = $gateway->getActivePaymentMethods(new Money(100.0, 'EUR'), '', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
 
@@ -206,7 +207,7 @@ final class MollieGatewayTest extends TestCase
         $this->expectException(ApiException::class);
 
         $client = new Client(['handler' => HandlerStack::create(new MockHandler([new Response(422, [], (string) json_encode(['detail' => 'failed']))]))]);
-        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new NullLogger());
+        $gateway = new MollieGateway(new FakeClientFactory($client), new FakeTransactionService(), new PaymentLinkGateway(new FakeClientFactory($client), new NullLogger()), new NullLogger());
 
         $gateway->getActivePaymentMethods(new Money(100.0, 'EUR'), 'DE', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
     }

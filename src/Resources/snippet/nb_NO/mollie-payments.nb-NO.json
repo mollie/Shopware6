@@ -57,7 +57,11 @@
                 "error": "Betalingen mislyktes",
                 "failed": "Betalingen mislykkets eller ble kansellert. Du vil bli omdirigert til Mollie, hvor du kan fullføre betalingen med din valgte betalingsmetode "
             },
-            "redirecting": "Omdirigerer deg til: "
+            "redirecting": "Omdirigerer deg til: ",
+            "paymentLink": {
+                "error": "Denne ordren kan ikke lenger betales.",
+                "alreadyPaid": "Denne ordren er allerede betalt."
+            }
         },
         "payments": {
             "applePayDirect": {

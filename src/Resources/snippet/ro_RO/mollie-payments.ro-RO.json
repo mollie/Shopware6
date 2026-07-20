@@ -57,7 +57,11 @@
                 "error": "Plata a eșuat",
                 "failed": "Plata a eșuat sau a fost anulată. Veți fi redirecționat către Mollie, unde puteți finaliza plata cu metoda aleasă."
             },
-            "redirecting": "Te redirecționăm către: "
+            "redirecting": "Te redirecționăm către: ",
+            "paymentLink": {
+                "error": "Această comandă nu mai poate fi plătită.",
+                "alreadyPaid": "Această comandă a fost deja plătită."
+            }
         },
         "payments": {
             "applePayDirect": {

@@ -57,7 +57,11 @@
                 "error": "Makse ebaõnnestus",
                 "failed": "Makse on ebaõnnestunud või tühistatud. Sind suunatakse Mollie lehele, kus saad oma makse lõpetada valitud meetodiga "
             },
-            "redirecting": "Suuname sind edasi: "
+            "redirecting": "Suuname sind edasi: ",
+            "paymentLink": {
+                "error": "Seda tellimust ei saa enam tasuda.",
+                "alreadyPaid": "See tellimus on juba tasutud."
+            }
         },
         "payments": {
             "applePayDirect": {
