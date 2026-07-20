@@ -21,23 +21,15 @@ export default class MollieRegistration {
         // components, manage the credit card mandate, drive the POS terminal and run
         // universal phone validation.
         const registrations = [
-            ['MollieApplePayDirect', MollieApplePayDirect, 'body'],
-            ['PayPalExpressPlugin', PayPalExpressPlugin, 'body'],
-            ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]'],
-            ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]'],
-            [
-                'MollieCreditCardComponents',
-                MollieCreditCardComponents,
-                '[data-mollie-template-creditcard-components]',
-            ],
-            [
-                'MollieCreditCardMandateManage',
-                MollieCreditCardMandateManage,
-                '[data-mollie-credit-card-mandate-manage]',
-            ],
-            ['MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]'],
-            ['MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]'],
-            ['MollieSubscribeButton', MollieSubscribeButtonPlugin, '[data-mollie-subscribe-button]'],
+            [ 'MollieApplePayDirect', MollieApplePayDirect, 'body' ],
+            [ 'PayPalExpressPlugin', PayPalExpressPlugin, 'body' ],
+            [ 'MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]' ],
+            [ 'MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]' ],
+            [ 'MollieCreditCardComponents', MollieCreditCardComponents, '[data-mollie-template-creditcard-components]' ],
+            [ 'MollieCreditCardMandateManage', MollieCreditCardMandateManage, '[data-mollie-credit-card-mandate-manage]' ],
+            [ 'MolliePosTerminal', MolliePosTerminalPlugin, '[data-mollie-template-pos-terminal]' ],
+            [ 'MolliePhonePlugin', MolliePhonePlugin, '[data-mollie-phone-validation]' ],
+            [ 'MollieSubscribeButton', MollieSubscribeButtonPlugin, '[data-mollie-subscribe-button]' ],
         ];
 
         registrations.forEach(function (registration) {
