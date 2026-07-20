@@ -10,7 +10,7 @@ const CREDIT_CARD_RADIO_INPUT_SELECTOR = '#changePaymentForm input[type="radio"]
 const ERROR_CLS = 'error';
 const FOCUS_CLS = 'is-focused';
 
-export default class MollieCreditCardComponentsSw64 extends MollieCreditCardMandate {
+export default class MollieCreditCardComponents extends MollieCreditCardMandate {
     static options = {
         ...MollieCreditCardMandate.options,
         paymentId: null,
