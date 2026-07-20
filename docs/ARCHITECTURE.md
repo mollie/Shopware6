@@ -11,7 +11,6 @@ Goal: Quickly understand **where things happen** and **where to look in code**.
 |--------|---------|
 | `/shopware` | All new PHP code, domain & infrastructure |
 | `/src` | Legacy code (being migrated) |
-| `/polyfill` | Compatibility layer for different Shopware versions |
 | `/tests` | Automated tests |
 | `/config` | Tooling configs (PHPUnit, PHPCS, etc.) |
 | `/docs` | Documentation |
@@ -34,6 +33,5 @@ Goal: Quickly understand **where things happen** and **where to look in code**.
 ## Notes
 
 - Avoid `/src` for new code.
-- `/polyfill` contains backwards compatibility for Shopware < 6.4.
 - Namespace for new code: `Mollie\Shopware`.
 - Always write tests for new features in `/tests`.

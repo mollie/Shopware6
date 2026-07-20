@@ -1,6 +1,5 @@
 import template from './mollie-pluginconfig-section-info.html.twig';
 import './mollie-pluginconfig-section-info.scss';
-import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
 // eslint-disable-next-line no-undef
 const { Component, Mixin } = Shopware;
@@ -13,15 +12,11 @@ Component.register('mollie-pluginconfig-section-info', {
     data() {
         return {
             isSupportOpen: false,
-            versionCompare: null,
         };
     },
 
     shortcuts: {
         'SYSTEMKEY+i': 'openConfigImport',
-    },
-    created() {
-        this.versionCompare = new VersionCompare();
     },
     computed: {
         /**
@@ -41,7 +36,8 @@ Component.register('mollie-pluginconfig-section-info', {
         },
 
         hasSalesChannelList() {
-            return this.versionCompare.greaterOrEqual(Shopware.Context.app.config.version, '6.4.2');
+            // Minimum supported Shopware version is >= 6.5.8, so the sales channel list is always available.
+            return true;
         },
     },
 

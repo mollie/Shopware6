@@ -119,12 +119,7 @@ Component.register('mollie-subscriptions-list', {
 
             let criteria = new Criteria();
 
-            // Compatibility for 6.4.4, as admin search was improved in 6.4.5
-            if ('addQueryScores' in this) {
-                criteria = await this.addQueryScores(this.term, criteria);
-            } else {
-                criteria.setTerm(this.term);
-            }
+            criteria = await this.addQueryScores(this.term, criteria);
 
             criteria.addSorting(Criteria.sort(this.sortBy, this.sortDirection, this.naturalSorting));
             criteria.addAssociation('customer');
