@@ -120,14 +120,19 @@ runs:
       shell: bash
       run: |
         # Sets the "Help us improve Shopware" consent so the banner does not overlay the
-        # admin during Cypress. Only 'accepted' hides it; nothing is transmitted since no
-        # message-queue worker runs in the CI container.
+        # admin during Cypress. Nothing is transmitted since no message-queue worker runs
+        # in the CI container.
         # <= 6.7.8 reads this system_config key.
         docker exec shop bash -c 'php bin/console --no-debug system:config:set core.usageData.consentState accepted' || true
-        # >= 6.7.9.1 moved consent to the generic consent_state table (name=backend_data,
-        # identifier=system). The system_config key above is only copied into it once by a
-        # migration at update time, so setting it afterwards no longer hides the banner.
-        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), 'backend_data', 'system', 'accepted', 'migration', NOW()) ON DUPLICATE KEY UPDATE state='accepted', updated_at=NOW();\"" || true
+        # >= 6.7.9.1 moved consent to the generic consent_state table.
+        # The intrusive global MODAL ("Help us improve Shopware") is gated ONLY by the
+        # 'product_analytics' consent, whose identifier is the admin user's id (hex) - NOT
+        # the 'backend_data'/'system' row. The modal hides as soon as product_analytics has
+        # any status != 'unset', so seed a 'declined' row for every admin user (declined
+        # avoids enabling any tracking).
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) SELECT UNHEX(REPLACE(UUID(),'-','')), 'product_analytics', LOWER(HEX(u.id)), 'declined', u.username, NOW(3) FROM \\\`user\\\` u ON DUPLICATE KEY UPDATE state=VALUES(state), updated_at=VALUES(updated_at);\"" || true
+        # The Settings > Usage data page card is gated by the 'backend_data'/'system' row.
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), 'backend_data', 'system', 'accepted', 'migration', NOW(3)) ON DUPLICATE KEY UPDATE state='accepted', updated_at=NOW(3);\"" || true
     - name: Update Shopware Config
       shell: bash
       run: |
