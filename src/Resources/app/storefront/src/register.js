@@ -28,7 +28,7 @@ export default class MollieRegistration {
             [
                 'MollieCreditCardComponents',
                 MollieCreditCardComponents,
-                '[data-mollie-template-creditcard-components-sw64]',
+                '[data-mollie-template-creditcard-components]',
             ],
             [
                 'MollieCreditCardMandateManage',

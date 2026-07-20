@@ -92,6 +92,40 @@ State→Store-Migration von Shopware **6.6/6.7** – muss bleiben.
 Verweise auf ein `/polyfill`-Verzeichnis entfernt. Dieses Verzeichnis existiert im Repo nicht
 (mehr); die Doku war veraltet.
 
+### R — Rename Storefront-Plugin `creditcard-components-sw64`
+Das `sw64` (= Shopware 6.4) im Namen war nur noch irreführend – die alte `< 6.4`-Variante des
+Plugins wurde bereits früher entfernt, übrig blieb allein die „sw64"-Version.
+
+- Datei `creditcard-components-sw64.plugin.js` → `creditcard-components.plugin.js` (per
+  `git mv`, Historie bleibt erhalten).
+- Klasse `MollieCreditCardComponentsSw64` → `MollieCreditCardComponents`.
+- In `register.js`: Import, Registrierungsname und Klassensymbol angepasst.
+
+### C — `sw64`-Flag entfernt (`cc-fields.html.twig`, `payment-method.html.twig`, `register.js`)
+Das `sw64`-Flag war ab 6.5 immer `true`; der `else`-Zweig war toter `< 6.4`-Code. `cc-fields`
+wird ausschließlich von `payment-method` inkludiert (immer mit `sw64: true`), daher konnte der
+Zweig gefahrlos raus.
+
+- `payment-method.html.twig`: `sw64: true` entfernt (das `with {}` fiel damit weg) + der
+  veraltete Kommentar `{# compatible with >= sw6.4 #}`.
+- `cc-fields.html.twig`: `{% if sw64 %}`-Weichen an allen drei Stellen entfernt → feste,
+  saubere Namen: id `mollie_components_credit_card`, Template-Attribut
+  `data-mollie-template-creditcard-components`, Options-Attribut
+  `data-mollie-credit-card-components-options`.
+- `register.js`: Selektor auf `[data-mollie-template-creditcard-components]` angeglichen.
+
+**Wichtiger Zusammenhang mit R (Lern-Notiz):** Shopware liest die Plugin-Optionen aus einem
+Attribut namens `data-<kebab(pluginName)>-options`. Durch den Rename auf
+`MollieCreditCardComponents` erwartet Shopware jetzt `data-mollie-credit-card-components-options`.
+Hätte man nur das Flag „aufgehübscht" und das Attribut auf `…-sw64-options` gelassen, wären
+`profileId`, `locale`, `testMode` usw. **nicht mehr angekommen** und die Kreditkarten-Komponente
+wäre still kaputtgegangen. R und C gehören daher zusammen.
+
+> **Build erforderlich:** R und C fassen Storefront-Quellcode an. Das aktuell eingecheckte
+> Bundle bindet noch auf den alten Selektor `…-sw64`. Vor Test/Merge einmal `make build`
+> (Storefront) ausführen – erst danach passt das kompilierte JS zum neuen Selektor, und die
+> dann entstehenden `dist/storefront/js/...`-Änderungen gehören mitcommittet.
+
 ---
 
 ## Bewusst NICHT geändert
@@ -106,5 +140,4 @@ Verweise auf ein `/polyfill`-Verzeichnis entfernt. Dieses Verzeichnis existiert 
 
 | Stelle | Warum aufgeschoben |
 |---|---|
-| `payment-method.html.twig` + `cc-fields.html.twig` + `register.js` (`sw64`-Flag) | Kein toter Code, aber die `sw64`-Verzweigung ist ab 6.5 immer `true`. Vereinfachung greift in 3 Dateien inkl. JS-Plugin-Name → separat entscheiden. |
 | `tests/Cypress/.../PaymentAction.js` (`openPaymentsModal`/`closePaymentsModal`) | Als `@version < 6.4` markiert, aber die Methoden werden an ~15 Test-Stellen aufgerufen; sauberes Entfernen erfordert alle Aufrufer. Reiner Test-Code, niedrige Priorität. |

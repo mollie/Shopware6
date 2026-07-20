@@ -53,11 +53,11 @@
         {% endblock %}
 
         {% block mollie_credit_card_mandate_form_component %}
-            <div id="mollie_components_credit_card{% if sw64 %}_sw64{% endif %}"
+            <div id="mollie_components_credit_card"
                  class="mollie-components-credit-card"
-                 data-mollie-template-creditcard-components{% if sw64 %}-sw64{% endif %}
+                 data-mollie-template-creditcard-components
                     {% if page.enable_credit_card_components == true %}
-                data-mollie-credit-card-components-{% if sw64 %}sw64-{% endif %}options='{
+                data-mollie-credit-card-components-options='{
                     "customerId": "{{ context.customer.id }}",
                     "locale": "{{ page.mollie_locale }}",
                     "profileId": "{{ page.mollie_profile_id }}",
