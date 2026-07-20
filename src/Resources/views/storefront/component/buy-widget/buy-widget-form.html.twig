@@ -11,22 +11,26 @@
 {% block buy_widget_buy_form_inner %}
     {{ parent() }}
 
-    {% set buyable = product.available and product.childCount <= 0 and product.calculatedMaxPurchase > 0 %}
+    {# The buy-widget component is also rendered in listing / cross-selling contexts where
+       `page` is not available, so the scoped `product` is the reliable reference here
+       (consistent across Shopware 6.5-6.7). #}
+    {% set mollieProduct = product %}
+    {% set buyable = mollieProduct.available and mollieProduct.childCount <= 0 and mollieProduct.calculatedMaxPurchase > 0 %}
 
     {% set productPrice = 0 %}
 
-    {% if product.calculatedPrices|length == 1 %}
-        {% set productPrice = product.calculatedPrices.first.unitPrice %}
+    {% if mollieProduct.calculatedPrices|length == 1 %}
+        {% set productPrice = mollieProduct.calculatedPrices.first.unitPrice %}
     {% else %}
-        {% set productPrice = product.calculatedPrice.unitPrice %}
+        {% set productPrice = mollieProduct.calculatedPrice.unitPrice %}
         {% if listPrice.percentage > 0 %}
             {% set productPrice = listPrice.price %}
         {% endif %}
     {% endif %}
 
 
-    {% set applePayVisible = mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and ((buyable and productPrice) > 0) %}
-    {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) and ((buyable and productPrice) > 0) %}
+    {% set applePayVisible = mollie_applepaydirect_enabled and ('pdp' not in mollie_applepaydirect_restrictions) and buyable and productPrice > 0 %}
+    {% set paypalExpressVisible = mollie_paypalexpress_enabled and ('pdp' not in mollie_paypalexpress_restrictions) and buyable and productPrice > 0 %}
     {% set noticeVisible = applePayVisible or paypalExpressVisible %}
 
     {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
