@@ -189,8 +189,11 @@ export default class AdminCreateOrderAction {
      * across versions and languages, unlike the input's aria-label/placeholder which are translated.
      */
     selectSingleField(fieldSelector, optionLabel) {
-        cy.get(`${fieldSelector} input.sw-entity-single-select__selection-input`, {timeout: 20000}).click(forceOption).clear(forceOption).type(optionLabel);
-        cy.contains('.sw-select-result', optionLabel, {timeout: 20000}).click();
+        // Once the select is open its result popover (position: fixed) renders on top of the input, so
+        // typing is done with force to skip the "covered by a .sw-select-result option" actionability
+        // check that otherwise fails from Shopware 6.7.8 on.
+        cy.get(`${fieldSelector} input.sw-entity-single-select__selection-input`, {timeout: 20000}).click(forceOption).clear(forceOption).type(optionLabel, forceOption);
+        cy.contains('.sw-select-result', optionLabel, {timeout: 20000}).click(forceOption);
     }
 
 }
