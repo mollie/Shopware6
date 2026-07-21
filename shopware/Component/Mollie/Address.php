@@ -199,9 +199,21 @@ final class Address implements \JsonSerializable
         $this->streetAdditional = $streetAdditional;
     }
 
+    /**
+     * Mollie rejects phone numbers that are not in E.164 format and fails the whole payment.
+     * We therefore normalize on assignment: an already valid (or empty) number is kept as is,
+     * otherwise we try to convert it to E.164 and drop it (empty string) when that is not possible.
+     * The country has to be set before the phone for the national-format conversion to work.
+     */
     public function setPhone(string $phone): void
     {
-        $this->phone = $phone;
+        if ($phone === '' || PhoneNumber::isValidE164($phone)) {
+            $this->phone = $phone;
+
+            return;
+        }
+
+        $this->phone = PhoneNumber::toE164($phone, $this->country);
     }
 
     public function getTitle(): string

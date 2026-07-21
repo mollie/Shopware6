@@ -25,6 +25,7 @@ final class PaymentSettings extends Struct
 
     private const KEY_USE_MOLLIE_LIMITS = 'useMolliePaymentMethodLimits';
     private const KEY_AUTOMATIC_CANCELLATION = 'automaticCancellation';
+    private const KEY_PAYMENT_LINK_ALLOW_METHOD_SELECTION = 'paymentLinkAllowMethodSelection';
 
     public function __construct(private string $orderNumberFormat,
         private int $dueDateDays,
@@ -38,6 +39,7 @@ final class PaymentSettings extends Struct
         private bool $fixRoundingDiffEnabled = false,
         private string $fixRoundingDiffName = '',
         private string $fixRoundingDiffSku = '',
+        private bool $paymentLinkAllowMethodSelection = false,
     ) {
     }
 
@@ -58,8 +60,9 @@ final class PaymentSettings extends Struct
         $fixRoundingDiffEnabled = $settings[self::KEY_FIX_ROUNDING_DIFF_ENABLED] ?? false;
         $fixRoundingDiffName = $settings[self::KEY_FIX_ROUNDING_DIFF_NAME] ?? '';
         $fixRoundingDiffSku = $settings[self::KEY_FIX_ROUNDING_DIFF_SKU] ?? '';
+        $paymentLinkAllowMethodSelection = $settings[self::KEY_PAYMENT_LINK_ALLOW_METHOD_SELECTION] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation, (bool) $fixRoundingDiffEnabled, (string) $fixRoundingDiffName, (string) $fixRoundingDiffSku);
+        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation, (bool) $fixRoundingDiffEnabled, (string) $fixRoundingDiffName, (string) $fixRoundingDiffSku, (bool) $paymentLinkAllowMethodSelection);
     }
 
     public function getOrderNumberFormat(): string
@@ -124,5 +127,10 @@ final class PaymentSettings extends Struct
     public function getFixRoundingDiffSku(): string
     {
         return $this->fixRoundingDiffSku;
+    }
+
+    public function isPaymentLinkMethodSelectionAllowed(): bool
+    {
+        return $this->paymentLinkAllowMethodSelection;
     }
 }

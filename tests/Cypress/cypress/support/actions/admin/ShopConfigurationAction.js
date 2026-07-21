@@ -86,6 +86,8 @@ export default class ShopConfigurationAction {
             "MolliePayments.config.orderStateWithAFailedTransaction": 'open',
             "MolliePayments.config.orderStateWithACancelledTransaction": 'cancelled',
             "MolliePayments.config.refundManagerEnabled": true,
+            "MolliePayments.config.paymentLinkAllowMethodSelection": pluginConfig.getPaymentLinkMethodSelection(),
+            "MolliePayments.config.useMolliePaymentMethodLimits": pluginConfig.getUseMolliePaymentMethodLimits(),
             // ------------------------------------------------------------------
             "MolliePayments.config.subscriptionsEnabled": true,
             "MolliePayments.config.subscriptionsShowIndicator": pluginConfig.getSubscriptionIndicator(),

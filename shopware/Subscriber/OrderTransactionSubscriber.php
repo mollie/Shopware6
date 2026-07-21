@@ -44,8 +44,11 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
 
             $paymentId = $mollieCustomFields['id'] ?? null;
+            $paymentLinkId = $mollieCustomFields['paymentLinkId'] ?? null;
 
-            if ($paymentId === null) {
+            // A "pay by link" transaction only has a payment link id until the customer actually
+            // pays, so still attach the extension when there is no payment id yet.
+            if ($paymentId === null && $paymentLinkId === null) {
                 continue;
             }
 
@@ -63,7 +66,10 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             $checkoutUrl = $mollieCustomFields['checkoutUrl'] ?? null;
             $changePaymentStateUrl = $mollieCustomFields['changePaymentStateUrl'] ?? null;
 
-            $transactionExtension = new Payment($paymentId);
+            $transactionExtension = new Payment((string) ($paymentId ?? ''));
+            if ($paymentLinkId !== null) {
+                $transactionExtension->setPaymentLinkId((string) $paymentLinkId);
+            }
             $transactionExtension->setCountPayments($countPayments);
             $transactionExtension->setReconciled((bool) $reconciled);
             if ($finalizeUrl !== null) {

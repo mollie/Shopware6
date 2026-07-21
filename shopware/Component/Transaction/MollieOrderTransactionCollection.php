@@ -25,29 +25,66 @@ final class MollieOrderTransactionCollection
      */
     public function getCurrentOrderTransaction(): ?OrderTransactionEntity
     {
+        // Oldest first, fall back to the newest: additional cancelled/failed retries are skipped, so
+        // the transaction the merchant sees as current is the one we ship/cancel/refund.
+        return $this->findTransaction(
+            [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED],
+            false,
+            true,
+            true
+        );
+    }
+
+    /**
+     * The newest transaction (by createdAt) that still awaits payment (state open or reminded) -
+     * i.e. the one a payment link should be paid for. Returns null when there is none.
+     */
+    public function getLatestPayableTransaction(): ?OrderTransactionEntity
+    {
+        return $this->findTransaction(
+            [OrderTransactionStates::STATE_OPEN, OrderTransactionStates::STATE_REMINDED],
+            true,
+            false,
+            false
+        );
+    }
+
+    /**
+     * Returns the first transaction (by createdAt, newest first when $newestFirst) whose state is
+     * in $states, or - when $exclude - the first whose state is not in $states. Falls back to the
+     * newest transaction when nothing matches and $fallbackToNewest is set, otherwise to null.
+     *
+     * @param string[] $states
+     */
+    private function findTransaction(array $states, bool $newestFirst, bool $exclude, bool $fallbackToNewest): ?OrderTransactionEntity
+    {
         if ($this->transactions === null) {
             return null;
         }
 
         $elements = array_values($this->transactions->getElements());
-        usort($elements, function (OrderTransactionEntity $a, OrderTransactionEntity $b): int {
-            return ($a->getCreatedAt()?->getTimestamp() ?? 0) <=> ($b->getCreatedAt()?->getTimestamp() ?? 0);
+        usort($elements, function (OrderTransactionEntity $a, OrderTransactionEntity $b) use ($newestFirst): int {
+            $comparison = ($a->getCreatedAt()?->getTimestamp() ?? 0) <=> ($b->getCreatedAt()?->getTimestamp() ?? 0);
+
+            return $newestFirst ? -$comparison : $comparison;
         });
 
-        $newest = null;
         foreach ($elements as $transaction) {
-            $newest = $transaction;
-
             $state = $transaction->getStateMachineState();
             if ($state === null) {
                 continue;
             }
 
-            if (! in_array($state->getTechnicalName(), [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED], true)) {
+            if (in_array($state->getTechnicalName(), $states, true) !== $exclude) {
                 return $transaction;
             }
         }
 
-        return $newest;
+        if (! $fallbackToNewest || count($elements) === 0) {
+            return null;
+        }
+
+        // Elements are sorted, so the newest is first when $newestFirst, otherwise last.
+        return $newestFirst ? $elements[0] : $elements[array_key_last($elements)];
     }
 }

@@ -57,7 +57,11 @@
                 "error": "Payment failed",
                 "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. "
             },
-            "redirecting": "Redirecting you to: "
+            "redirecting": "Redirecting you to: ",
+            "paymentLink": {
+                "error": "This order can no longer be paid.",
+                "alreadyPaid": "This order has already been paid."
+            }
         },
         "payments": {
             "applePayDirect": {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\MethodRemover;
 
+use Mollie\Shopware\Component\PaymentLink\Controller\PaymentLinkController;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractPaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRouteResponse;
@@ -93,6 +94,7 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
             [
                 CheckoutController::class,
                 AccountOrderController::class,
+                PaymentLinkController::class,
             ]
         );
     }

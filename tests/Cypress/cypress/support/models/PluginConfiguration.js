@@ -9,6 +9,8 @@ export default class PluginConfiguration {
         this._creditCardComponents = false;
         this._applePayDirectEnabled = false;
         this._paypalExpressRestrictions = [];
+        this._paymentLinkMethodSelection = false;
+        this._useMolliePaymentMethodLimits = false;
     }
 
 
@@ -67,6 +69,22 @@ export default class PluginConfiguration {
 
     setPaypalExpressRestrictions(value) {
         this._paypalExpressRestrictions = value;
+    }
+
+    getPaymentLinkMethodSelection() {
+        return this._paymentLinkMethodSelection;
+    }
+
+    setPaymentLinkMethodSelection(value) {
+        this._paymentLinkMethodSelection = value;
+    }
+
+    getUseMolliePaymentMethodLimits() {
+        return this._useMolliePaymentMethodLimits;
+    }
+
+    setUseMolliePaymentMethodLimits(value) {
+        this._useMolliePaymentMethodLimits = value;
     }
 
 }

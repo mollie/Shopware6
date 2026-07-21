@@ -66,7 +66,14 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?string $orderId = null;
 
-    public function __construct(private string $id)
+    /**
+     * Set for "pay by link" transactions: the Mollie payment link id created before an actual
+     * payment exists. Persisted alongside the regular payment data on the transaction so the
+     * return/webhook flow can resolve the real payment via the payment link.
+     */
+    private ?string $paymentLinkId = null;
+
+    public function __construct(private string $id = '')
     {
         $this->refunds = new RefundCollection();
     }
@@ -538,6 +545,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setOrderId(?string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    public function getPaymentLinkId(): ?string
+    {
+        return $this->paymentLinkId;
+    }
+
+    public function setPaymentLinkId(?string $paymentLinkId): void
+    {
+        $this->paymentLinkId = $paymentLinkId;
     }
 
     public function getAuthenticationId(): ?string

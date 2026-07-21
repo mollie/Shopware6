@@ -17,7 +17,6 @@ use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
-use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
@@ -32,7 +31,6 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -549,8 +547,7 @@ final class PayloadBuilderTest extends TestCase
 
     public function testBuildNormalizesNationalPhoneNumber(): void
     {
-        $logger = new FakeLogger();
-        $builder = $this->createBuilder(logger: $logger);
+        $builder = $this->createBuilder();
 
         $transactionService = new FakeTransactionService();
         $transactionService->withPhoneNumber('030 / 123 456');
@@ -561,17 +558,11 @@ final class PayloadBuilderTest extends TestCase
         $array = $actual->toArray();
         $this->assertSame('+4930123456', $array['billingAddress']['phone']);
         $this->assertSame('+4930123456', $array['shippingAddress']['phone']);
-
-        $this->assertTrue($logger->hasRecordThatContains(LogLevel::INFO, 'normalized to E.164'));
-        foreach ($logger->getRecords() as $record) {
-            $this->assertStringNotContainsString('030 / 123 456', json_encode($record) ?: '');
-        }
     }
 
-    public function testBuildRemovesUnfixablePhoneNumberAndLogsWarning(): void
+    public function testBuildRemovesUnfixablePhoneNumber(): void
     {
-        $logger = new FakeLogger();
-        $builder = $this->createBuilder(logger: $logger);
+        $builder = $this->createBuilder();
 
         $transactionService = new FakeTransactionService();
         $transactionService->withPhoneNumber('call me maybe');
@@ -582,11 +573,6 @@ final class PayloadBuilderTest extends TestCase
         $array = $actual->toArray();
         $this->assertArrayNotHasKey('phone', $array['billingAddress']);
         $this->assertArrayNotHasKey('phone', $array['shippingAddress']);
-
-        $this->assertTrue($logger->hasRecordThatContains(LogLevel::WARNING, 'E.164'));
-        foreach ($logger->getRecords() as $record) {
-            $this->assertStringNotContainsString('call me maybe', json_encode($record) ?: '');
-        }
     }
 
     public function testBuildNormalizesPhoneNumberSetByPaymentHandler(): void

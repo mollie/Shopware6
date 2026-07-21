@@ -493,6 +493,56 @@
             <helpText lang="sk-SK">Automaticky vytvárajte zákazníkov vo svojom Mollie Dashboarde, aby ste videli všetky platby konkrétneho zákazníka.</helpText><helpText lang="bg-BG">Клиентите автоматично се създават във вашето Mollie Табло, за да видите всички плащания на даден клиент.</helpText>
         </input-field>
         <input-field type="bool">
+            <name>paymentLinkAllowMethodSelection</name>
+            <defaultValue>false</defaultValue>
+            <label>Allow payment method selection for payment links</label>
+            <label lang="de-DE">Auswahl der Zahlarten bei Payment Links erlauben</label>
+            <label lang="nl-NL">Selectie van betaalmethoden voor betaallinks toestaan</label>
+            <label lang="it-IT">Consenti la selezione del metodo di pagamento per i link di pagamento</label>
+            <label lang="pt-PT">Permitir a seleção do método de pagamento nos links de pagamento</label>
+            <label lang="es-ES">Permitir la selección del método de pago en los enlaces de pago</label>
+            <label lang="sv-SE">Tillåt val av betalningsmetod för betalningslänkar</label>
+            <label lang="nb-NO">Tillat valg av betalingsmetode for betalingslenker</label>
+            <label lang="pl-PL">Zezwól na wybór metody płatności w linkach płatności</label>
+            <label lang="cs-CZ">Povolit výběr platební metody u platebních odkazů</label>
+            <label lang="sl-SI">Dovoli izbiro plačilnega načina pri plačilnih povezavah</label>
+            <label lang="hu-HU">Fizetési mód választásának engedélyezése fizetési linkeknél</label>
+            <label lang="fi-FI">Salli maksutavan valinta maksulinkeissä</label>
+            <label lang="da-DK">Tillad valg af betalingsmetode til betalingslinks</label>
+            <label lang="el-GR">Επιτρέψτε την επιλογή μεθόδου πληρωμής για συνδέσμους πληρωμής</label>
+            <label lang="hr-HR">Dopusti odabir načina plaćanja za poveznice za plaćanje</label>
+            <label lang="et-EE">Luba maksemeetodi valik makselinkide puhul</label>
+            <label lang="is-IS">Leyfa val á greiðslumáta fyrir greiðslutengla</label>
+            <label lang="lt-LT">Leisti pasirinkti mokėjimo būdą mokėjimo nuorodose</label>
+            <label lang="lv-LV">Atļaut maksājuma metodes izvēli maksājumu saitēm</label>
+            <label lang="ro-RO">Permite selectarea metodei de plată pentru linkurile de plată</label>
+            <label lang="sk-SK">Povoliť výber platobnej metódy pri platobných odkazoch</label>
+            <label lang="bg-BG">Разрешаване на избор на метод на плащане за връзки за плащане</label>
+            <helpText>When enabled, a payment link lets the customer pick from all payment methods available for the order instead of only the one assigned to the order.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, kann der Kunde beim Payment Link aus allen für die Bestellung verfügbaren Zahlarten wählen, statt nur der bei der Bestellung hinterlegten.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, kan de klant bij een betaallink kiezen uit alle voor de bestelling beschikbare betaalmethoden in plaats van alleen de aan de bestelling toegewezen methode.</helpText>
+            <helpText lang="it-IT">Se attivato, un link di pagamento consente al cliente di scegliere tra tutti i metodi di pagamento disponibili per l'ordine, anziché solo quello assegnato all'ordine.</helpText>
+            <helpText lang="pt-PT">Quando ativado, um link de pagamento permite ao cliente escolher entre todos os métodos de pagamento disponíveis para a encomenda, em vez de apenas o atribuído à encomenda.</helpText>
+            <helpText lang="es-ES">Si está activado, un enlace de pago permite al cliente elegir entre todos los métodos de pago disponibles para el pedido, en lugar de solo el asignado al pedido.</helpText>
+            <helpText lang="sv-SE">När det är aktiverat kan kunden via en betalningslänk välja bland alla betalningsmetoder som är tillgängliga för ordern, i stället för endast den som är kopplad till ordern.</helpText>
+            <helpText lang="nb-NO">Når aktivert, lar en betalingslenke kunden velge blant alle betalingsmetoder som er tilgjengelige for ordren, i stedet for bare den som er tilknyttet ordren.</helpText>
+            <helpText lang="pl-PL">Po włączeniu link płatności pozwala klientowi wybrać spośród wszystkich metod płatności dostępnych dla zamówienia, zamiast tylko tej przypisanej do zamówienia.</helpText>
+            <helpText lang="cs-CZ">Pokud je povoleno, platební odkaz umožní zákazníkovi vybrat ze všech platebních metod dostupných pro objednávku místo pouze té přiřazené k objednávce.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, lahko stranka prek plačilne povezave izbira med vsemi plačilnimi načini, ki so na voljo za naročilo, in ne le tistim, ki je dodeljen naročilu.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a fizetési link lehetővé teszi, hogy az ügyfél a rendeléshez elérhető összes fizetési mód közül válasszon, nem csak a rendeléshez rendelt módot.</helpText>
+            <helpText lang="fi-FI">Kun tämä on käytössä, maksulinkki antaa asiakkaan valita kaikista tilaukselle saatavilla olevista maksutavoista sen sijaan, että käytössä olisi vain tilaukseen liitetty tapa.</helpText>
+            <helpText lang="da-DK">Når det er aktiveret, kan kunden via et betalingslink vælge mellem alle betalingsmetoder, der er tilgængelige for ordren, i stedet for kun den, der er tilknyttet ordren.</helpText>
+            <helpText lang="el-GR">Όταν είναι ενεργοποιημένο, ένας σύνδεσμος πληρωμής επιτρέπει στον πελάτη να επιλέξει από όλες τις διαθέσιμες μεθόδους πληρωμής για την παραγγελία, αντί μόνο για εκείνη που έχει ανατεθεί στην παραγγελία.</helpText>
+            <helpText lang="hr-HR">Kada je omogućeno, poveznica za plaćanje omogućuje kupcu odabir između svih načina plaćanja dostupnih za narudžbu, umjesto samo onog dodijeljenog narudžbi.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, saab klient makselingi kaudu valida kõigi tellimuse jaoks saadaolevate maksemeetodite hulgast, mitte ainult tellimusele määratud meetodi.</helpText>
+            <helpText lang="is-IS">Þegar þetta er virkt getur viðskiptavinurinn með greiðslutengli valið úr öllum greiðslumátum sem eru í boði fyrir pöntunina, í stað þess eina sem pöntuninni var úthlutað.</helpText>
+            <helpText lang="lt-LT">Įjungus, mokėjimo nuoroda leidžia klientui pasirinkti iš visų užsakymui prieinamų mokėjimo būdų, o ne tik to, kuris priskirtas užsakymui.</helpText>
+            <helpText lang="lv-LV">Ja iespējots, maksājuma saite ļauj klientam izvēlēties no visām pasūtījumam pieejamajām maksājuma metodēm, nevis tikai no pasūtījumam piešķirtās.</helpText>
+            <helpText lang="ro-RO">Când este activat, un link de plată permite clientului să aleagă dintre toate metodele de plată disponibile pentru comandă, în loc doar de cea atribuită comenzii.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, platobný odkaz umožní zákazníkovi vybrať si zo všetkých platobných metód dostupných pre objednávku namiesto len tej priradenej k objednávke.</helpText>
+            <helpText lang="bg-BG">Когато е активирано, връзката за плащане позволява на клиента да избира измежду всички налични за поръчката методи на плащане, вместо само зададения за поръчката.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>useMolliePaymentMethodLimits</name>
             <defaultValue>false</defaultValue>
             <label>Use Mollie's availability rules for payment methods</label>

@@ -57,7 +57,11 @@
                 "error": "Betaling mislukt",
                 "failed": "De betaling is mislukt of geannuleerd. U wordt doorgestuurd naar Mollie waar u uw betaling kunt afronden met de methode naar keuze. "
             },
-            "redirecting": "Doorsturen naar: "
+            "redirecting": "Doorsturen naar: ",
+            "paymentLink": {
+                "error": "Deze bestelling kan niet meer worden betaald.",
+                "alreadyPaid": "Deze bestelling is al betaald."
+            }
         },
         "payments": {
             "applePayDirect": {
