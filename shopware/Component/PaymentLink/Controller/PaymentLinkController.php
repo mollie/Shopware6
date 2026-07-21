@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentLink;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentLinkPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentLinkCreatedEvent;
@@ -207,7 +208,7 @@ final class PaymentLinkController extends StorefrontController
     /**
      * The Mollie payment method of the order's transaction, or null when it is not a Mollie method.
      */
-    private function getMollieMethod(OrderTransactionEntity $transaction): ?string
+    private function getMollieMethod(OrderTransactionEntity $transaction): ?PaymentMethod
     {
         $paymentMethod = $transaction->getPaymentMethod();
         if ($paymentMethod === null) {
@@ -216,7 +217,7 @@ final class PaymentLinkController extends StorefrontController
 
         $extension = $paymentMethod->getExtension(Mollie::EXTENSION);
 
-        return $extension instanceof MolliePaymentMethodExtension ? $extension->getPaymentMethod()->value : null;
+        return $extension instanceof MolliePaymentMethodExtension ? $extension->getPaymentMethod() : null;
     }
 
     /**
@@ -226,10 +227,10 @@ final class PaymentLinkController extends StorefrontController
      *
      * @return string[]
      */
-    private function resolveAllowedMethods(string $orderPaymentMethod, PaymentSettings $paymentSettings, SalesChannelContext $context): array
+    private function resolveAllowedMethods(PaymentMethod $orderPaymentMethod, PaymentSettings $paymentSettings, SalesChannelContext $context): array
     {
         if (! $paymentSettings->isPaymentLinkMethodSelectionAllowed()) {
-            return [$orderPaymentMethod];
+            return $this->orderMethodAsAllowedMethods($orderPaymentMethod);
         }
 
         $paymentMethodRequest = new Request(['onlyAvailable' => true]);
@@ -238,18 +239,41 @@ final class PaymentLinkController extends StorefrontController
         $methods = [];
         foreach ($response->getPaymentMethods() as $availablePaymentMethod) {
             $extension = $availablePaymentMethod->getExtension(Mollie::EXTENSION);
-            if ($extension instanceof MolliePaymentMethodExtension) {
-                $methods[] = $extension->getPaymentMethod()->value;
+            if (! $extension instanceof MolliePaymentMethodExtension) {
+                continue;
+            }
+
+            // Payment links accept fewer methods than the Payments API in "allowedMethods"; sending
+            // an unsupported one makes Mollie reject the whole request, so skip those here.
+            $mollieMethod = $extension->getPaymentMethod();
+            if ($mollieMethod->isSupportedForPaymentLink()) {
+                $methods[] = $mollieMethod->value;
             }
         }
 
-        // The removers may strip every method (e.g. none available for the order); fall back to the
-        // method the order was placed with so the link still offers a payable option.
+        // Several Shopware methods can map to the same Mollie method (e.g. the Orders and Payments
+        // API variants of PayPal/Klarna), so drop the duplicates before sending them.
+        $methods = array_values(array_unique($methods));
+
+        // The removers/filter may strip every method (e.g. none available or link-supported); fall
+        // back to the method the order was placed with so the link still offers a payable option.
         if (count($methods) === 0) {
-            return [$orderPaymentMethod];
+            return $this->orderMethodAsAllowedMethods($orderPaymentMethod);
         }
 
         return $methods;
+    }
+
+    /**
+     * The order's own method as the sole allowed method - but only when payment links support it.
+     * Otherwise no restriction is sent (empty), so Mollie offers all methods of the profile instead
+     * of rejecting the request over an unsupported method.
+     *
+     * @return string[]
+     */
+    private function orderMethodAsAllowedMethods(PaymentMethod $orderPaymentMethod): array
+    {
+        return $orderPaymentMethod->isSupportedForPaymentLink() ? [$orderPaymentMethod->value] : [];
     }
 
     /**
