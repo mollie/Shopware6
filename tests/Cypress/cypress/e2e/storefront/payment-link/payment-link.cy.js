@@ -198,9 +198,21 @@ context("Payment Link", () => {
 
                 openPaymentLink(orderId);
 
-                // a subscription order first shows a mandate confirmation on Mollie; continue past it
-                // (the submit button, language-independent) before the payment method selection appears
-                cy.get('button[type="submit"]', {timeout: 30000}).first().should('be.visible').click();
+                // A subscription order sometimes shows a mandate confirmation on Mollie before the
+                // payment method selection, and sometimes goes straight to it. Wait for the Mollie
+                // page to finish loading first (its pages are server-rendered, so once the document is
+                // complete the mandate button is already in the DOM if that step exists), then continue
+                // past the mandate step only when its submit button is actually present. This avoids
+                // both the "button never found" timeout when the step is skipped and prematurely
+                // skipping it while the cross-origin redirect is still loading.
+                cy.document({timeout: 30000}).its('readyState').should('eq', 'complete');
+                cy.get('body').then(($body) => {
+                    const mandateSubmit = $body.find('button[type="submit"]:visible');
+
+                    if (mandateSubmit.length > 0) {
+                        cy.wrap(mandateSubmit).first().click();
+                    }
+                });
 
                 molliePaymentMethods.selectEPS();
 
