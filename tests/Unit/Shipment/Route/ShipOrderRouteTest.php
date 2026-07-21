@@ -163,8 +163,10 @@ class ShipOrderRouteTest extends TestCase
         static::assertSame(0, $this->eventDispatcher->getEventCount());
     }
 
-    public function testShipIsANoopWhenPaymentIsNotCapturable(): void
+    public function testShipShipsEvenWhenPaymentIsNotAuthorized(): void
     {
+        // Merchants may set an authorized order to paid themselves (for their ERP); those orders must
+        // still be shipped instead of being treated as a no-op.
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
         $order = $this->orderBuilder->getOrderWithNonCapturablePayment(new OrderLineItemCollection([$lineItem]));
         $this->orderRepository->add($order);
@@ -174,10 +176,34 @@ class ShipOrderRouteTest extends TestCase
         $response = $this->route->ship($request, Context::createDefaultContext());
 
         static::assertInstanceOf(ShipOrderResponse::class, $response);
-        static::assertCount(0, $this->gateway->getCapturePayloads());
+        static::assertCount(1, $this->gateway->getCapturePayloads());
+        static::assertCount(1, $this->lineItemRepository->getUpserts());
+
+        $event = $this->eventDispatcher->getEvent();
+        static::assertInstanceOf(OrderShippedEvent::class, $event);
+    }
+
+    public function testShipSwallowsMollieApiErrorInsteadOfInterruptingStateChange(): void
+    {
+        // A failing Mollie shipment (e.g. the payment was already captured) must not interrupt the
+        // delivery state change: the error is logged and nothing is persisted or dispatched.
+        $this->gateway->withCaptureThrowing();
+
+        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $this->orderRepository->add($order);
+
+        $request = new Request([], ['orderId' => $order->getId()]);
+
+        $response = $this->route->ship($request, Context::createDefaultContext());
+
+        static::assertInstanceOf(ShipOrderResponse::class, $response);
+        static::assertSame('', $response->getObject()->get('mollieId'));
         static::assertCount(0, $this->lineItemRepository->getUpserts());
-        // No OrderShippedEvent (and not even the repair event) is dispatched when there is nothing to ship.
-        static::assertSame(0, $this->eventDispatcher->getEventCount());
+
+        foreach ($this->eventDispatcher->getEvents() as $event) {
+            static::assertNotInstanceOf(OrderShippedEvent::class, $event);
+        }
     }
 
     public function testShipIsANoopWhenTransactionHasNoMolliePayment(): void
