@@ -1,4 +1,4 @@
-# Unreleased
+# 5.3.0
 - Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
 - Added: After a successful payment, older duplicate Mollie payments of the order are automatically cancelled or refunded.
 - Added: Support for NetiNextEasyCoupon voucher products.
