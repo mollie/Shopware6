@@ -181,10 +181,11 @@ class LineItemFilterTest extends TestCase
 
         $voucherChild = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'easy-coupon-extra-option-voucher', 495.95);
         $serviceChild = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'easy-coupon-extra-option', 2.0);
+        $postalChild = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'easy-coupon-extra-option-postal', 1.5);
 
-        $result = $this->filterOrderItems(new OrderLineItemCollection([$parent, $voucherChild, $serviceChild]));
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$parent, $voucherChild, $serviceChild, $postalChild]));
 
-        $this->assertCount(2, $result);
+        $this->assertCount(3, $result);
         $ids = array_keys(iterator_to_array($result));
         $this->assertNotContains($parent->getId(), $ids);
     }
