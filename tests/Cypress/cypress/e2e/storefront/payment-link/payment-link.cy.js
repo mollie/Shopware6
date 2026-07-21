@@ -200,7 +200,7 @@ context("Payment Link", () => {
 
                 // a subscription order first shows a mandate confirmation on Mollie; continue past it
                 // (the submit button, language-independent) before the payment method selection appears
-                cy.get('button.mollie-ui-button[type="submit"]', {timeout: 30000}).first().click();
+                cy.get('button[type="submit"]', {timeout: 30000}).first().click();
 
                 molliePaymentMethods.selectEPS();
 

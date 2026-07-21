@@ -43,13 +43,13 @@ export default class AdminCreateOrderAction {
         // --- sales channel popup -------------------------------------------------------------
         // Selecting a customer with access to multiple channels opens a modal to pick one. The
         // dropdown results render in a detached popover (outside the modal), so they are queried at
-        // the top level, not within the modal. This step only exists from Shopware 6.7 on; earlier
+        // the top level, not within the modal. This step only exists from Shopware 6.6 on; earlier
         // versions go straight to the product tab after picking the customer.
-        if (shopware.isVersionGreaterEqual('6.7')) {
+        if (shopware.isVersionGreaterEqual('6.6')) {
             cy.get('.sw-order-customer-grid__sales-channel-selection-modal', {timeout: 20000}).should('be.visible');
             cy.get('.sw-order-customer-grid__sales-channel-selection .sw-select__selection', {timeout: 20000}).click();
             cy.contains('.sw-select-result', 'Storefront', {timeout: 20000}).click();
-            cy.get('[data-analytics-id="sw-order-customer-grid.select-sales-channel"]', {timeout: 20000}).click();
+            cy.get('[data-analytics-id="sw-order-customer-grid.select-sales-channel"], .sw-order-customer-grid__sales-channel-selection-modal .sw-button--primary', {timeout: 20000}).click();
         }
 
         // --- add the products ----------------------------------------------------------------
