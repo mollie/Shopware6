@@ -2,6 +2,7 @@
 - Hinzugefügt: Nach einer erfolgreichen Zahlung werden ältere, doppelte Mollie-Zahlungen der Bestellung automatisch storniert oder erstattet.
 - Geändert: Bei erneutem Bezahlen mit derselben Zahlart wird die bestehende Mollie-Zahlung wiederverwendet statt einer zweiten erzeugt.
 - Geändert: Die Transaktions-Custom-Fields enthalten jetzt zusätzlich `order_id`, `payment_id` und `third_party_payment_id` für externe ERP-Integrationen.
+- Geändert: Der automatische Versand setzt keine autorisierte Zahlung mehr voraus, sodass manuell auf „bezahlt" gestellte Bestellungen weiterhin versendet werden.
 - Behoben: Bei Alt-Bestellungen wird die Mollie-ID in Bestellliste und -detailansicht wieder angezeigt und der Mollie-Tab lässt sich wieder öffnen.
 - Behoben: Adressfelder werden vor dem Senden an die Mollie-API getrimmt, wodurch Fehler durch führende oder nachgestellte Leerzeichen vermieden werden.
 

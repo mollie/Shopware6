@@ -21,7 +21,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
@@ -146,13 +145,13 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         $mollieTransactions = new MollieOrderTransactionCollection($transactions);
         $currentTransaction = $mollieTransactions->getCurrentOrderTransaction();
 
-        // Only an order whose current payment is authorized (manual capture / pay-later) can be shipped:
-        // a paid payment is already captured and a fully handled order has nothing left, so both the
-        // Payments API capture and the Orders API shipment would fail at Mollie. Treat anything else as
-        // an idempotent no-op and, importantly, do not fire the OrderShippedEvent when nothing is shipped.
-        $currentState = $currentTransaction?->getStateMachineState();
-        if ($currentTransaction === null || $currentState === null || $currentState->getTechnicalName() !== OrderTransactionStates::STATE_AUTHORIZED) {
-            $this->logger->info('ShipOrderRoute: no capturable authorized payment, nothing to ship', $logContext);
+        // We no longer gate on the payment being authorized: merchants may flip an authorized order to
+        // "paid" themselves (for their ERP), and those orders must still be shipped. We only require a
+        // current transaction here; whether it is actually a Mollie payment is decided below via the
+        // Mollie payment extension, and the Mollie API call itself is wrapped so a failing shipment
+        // (e.g. an already captured payment) never interrupts the delivery state change.
+        if ($currentTransaction === null) {
+            $this->logger->info('ShipOrderRoute: no current transaction, nothing to ship', $logContext);
 
             return new ShipOrderResponse('', $orderId, []);
         }
@@ -205,7 +204,17 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
             $this->logger->info('ShipOrderRoute: calling Mollie createShipment (Orders API)', $logContext);
 
-            $shipment = $this->mollieGateway->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
+            try {
+                $shipment = $this->mollieGateway->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
+            } catch (\Throwable $exception) {
+                // Shipping at Mollie may fail (e.g. the payment was already captured because the merchant
+                // set the order to paid manually). This must not interrupt the delivery state change, so we
+                // only log the error and stop here.
+                $logContext['exception'] = $exception->getMessage();
+                $this->logger->error('ShipOrderRoute: Mollie createShipment failed, skipping shipment', $logContext);
+
+                return new ShipOrderResponse('', $orderId, []);
+            }
 
             $logContext['mollieShipmentId'] = $shipment->getId();
 
@@ -220,16 +229,26 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         $this->logger->info('ShipOrderRoute: calling Mollie createCapture (Payments API)', $logContext);
 
-        $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, (string) $orderNumber, $salesChannelId);
+        try {
+            $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, (string) $orderNumber, $salesChannelId);
+
+            if ($fullyShipped && $this->hasCancelledItems($lineItems)) {
+                $this->logger->info('ShipOrderRoute: all items handled with cancellations, releasing authorization (Payments API)', $logContext);
+                $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
+            }
+        } catch (\Throwable $exception) {
+            // Capturing at Mollie may fail (e.g. the payment was already captured because the merchant
+            // set the order to paid manually). This must not interrupt the delivery state change, so we
+            // only log the error and stop here.
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->error('ShipOrderRoute: Mollie createCapture failed, skipping shipment', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
+        }
 
         $logContext['mollieCaptureId'] = $capture->getId();
 
         $this->logger->info('ShipOrderRoute: Mollie createCapture response', $logContext);
-
-        if ($fullyShipped && $this->hasCancelledItems($lineItems)) {
-            $this->logger->info('ShipOrderRoute: all items handled with cancellations, releasing authorization (Payments API)', $logContext);
-            $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
-        }
 
         return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $fullyShipped, $context);
     }
