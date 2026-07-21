@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 const forceOption = {force: true};
 
 /**
@@ -39,11 +43,14 @@ export default class AdminCreateOrderAction {
         // --- sales channel popup -------------------------------------------------------------
         // Selecting a customer with access to multiple channels opens a modal to pick one. The
         // dropdown results render in a detached popover (outside the modal), so they are queried at
-        // the top level, not within the modal.
-        cy.get('.sw-order-customer-grid__sales-channel-selection-modal', {timeout: 20000}).should('be.visible');
-        cy.get('.sw-order-customer-grid__sales-channel-selection .sw-select__selection', {timeout: 20000}).click();
-        cy.contains('.sw-select-result', 'Storefront', {timeout: 20000}).click();
-        cy.get('[data-analytics-id="sw-order-customer-grid.select-sales-channel"]', {timeout: 20000}).click();
+        // the top level, not within the modal. This step only exists from Shopware 6.7 on; earlier
+        // versions go straight to the product tab after picking the customer.
+        if (shopware.isVersionGreaterEqual('6.7')) {
+            cy.get('.sw-order-customer-grid__sales-channel-selection-modal', {timeout: 20000}).should('be.visible');
+            cy.get('.sw-order-customer-grid__sales-channel-selection .sw-select__selection', {timeout: 20000}).click();
+            cy.contains('.sw-select-result', 'Storefront', {timeout: 20000}).click();
+            cy.get('[data-analytics-id="sw-order-customer-grid.select-sales-channel"]', {timeout: 20000}).click();
+        }
 
         // --- add the products ----------------------------------------------------------------
         cy.get('.sw-order-create-initial-modal__tab-product', {timeout: 20000}).click();
@@ -61,18 +68,18 @@ export default class AdminCreateOrderAction {
         // The payment method must be a Mollie method so a payment link can be created for it, and
         // the shipping method must be the Mollie test shipment used across the E2E suite.
         cy.get('.sw-order-create-initial-modal__tab-options', {timeout: 20000}).click();
-        this.selectByAriaLabel('Payment method', paymentMethodName);
-        this.selectByAriaLabel('Shipping method', shippingMethodName);
+        this.selectSingleField('.sw-order-create-options__payment-method', paymentMethodName);
+        this.selectSingleField('.sw-order-create-options__shipping-method', shippingMethodName);
 
         // --- preview + save ------------------------------------------------------------------
         // "Preview order" navigates to the create/general page and calculates the order. Only save
         // once we are on that page and the summary shows a non-zero total, otherwise an empty order
         // is saved before the calculation finished.
-        cy.get('[data-analytics-id="sw-order-create-initial-modal.preview-order"]', {timeout: 20000}).click();
+        cy.get('[data-analytics-id="sw-order-create-initial-modal.preview-order"], .sw-order-create-initial-modal__button-preview', {timeout: 20000}).click();
         cy.url({timeout: 20000}).should('include', '/sw/order/create/general');
         cy.get('.sw-order-create-summary', {timeout: 20000}).should('be.visible').and('not.contain', '€0.00');
 
-        cy.get('[data-analytics-id="sw-order-create.save-order"]', {timeout: 20000}).click();
+        cy.get('[data-analytics-id="sw-order-create.save-order"], .smart-bar__actions .sw-button-process.sw-button--primary', {timeout: 20000}).click();
 
         // "Send order confirmation to customer?" reminder - we do not send a mail here.
         cy.contains('.sw-modal button', 'No', {timeout: 20000}).click(forceOption);
@@ -177,11 +184,12 @@ export default class AdminCreateOrderAction {
     }
 
     /**
-     * Opens a Shopware single-select by the aria-label of its input, filters by the option label
-     * and picks the matching result from the detached results popover.
+     * Opens the Shopware single-select identified by its component class, filters by the option label
+     * and picks the matching result from the detached results popover. The component class is stable
+     * across versions and languages, unlike the input's aria-label/placeholder which are translated.
      */
-    selectByAriaLabel(ariaLabel, optionLabel) {
-        cy.get(`input[aria-label="${ariaLabel}"]`, {timeout: 20000}).click(forceOption).clear(forceOption).type(optionLabel);
+    selectSingleField(fieldSelector, optionLabel) {
+        cy.get(`${fieldSelector} input.sw-entity-single-select__selection-input`, {timeout: 20000}).click(forceOption).clear(forceOption).type(optionLabel);
         cy.contains('.sw-select-result', optionLabel, {timeout: 20000}).click();
     }
 
