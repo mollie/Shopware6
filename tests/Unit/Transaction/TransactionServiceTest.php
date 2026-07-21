@@ -34,7 +34,7 @@ final class TransactionServiceTest extends TestCase
         $this->assertSame('paypal_thirdParty', $orderExtension['third_party_payment_id']);
     }
 
-    public function testTransactionCustomFieldsDoNotContainJtlMappedKeys(): void
+    public function testTransactionCustomFieldsContainLegacyMappedKeys(): void
     {
         $repository = new FakeOrderTransactionRepository();
         $service = new TransactionService($repository, new FakeLogger());
@@ -44,9 +44,9 @@ final class TransactionServiceTest extends TestCase
         $upsert = $repository->getUpserts()[0];
         $transactionExtension = $upsert['customFields'][Mollie::EXTENSION];
 
-        $this->assertArrayNotHasKey('order_id', $transactionExtension);
-        $this->assertArrayNotHasKey('payment_id', $transactionExtension);
-        $this->assertArrayNotHasKey('third_party_payment_id', $transactionExtension);
+        $this->assertSame('ord_orderId', $transactionExtension['order_id']);
+        $this->assertSame('tr_paymentId', $transactionExtension['payment_id']);
+        $this->assertSame('paypal_thirdParty', $transactionExtension['third_party_payment_id']);
     }
 
     private function buildPayment(): Payment

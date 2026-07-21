@@ -158,16 +158,16 @@ final class TransactionService implements TransactionServiceInterface
             'salesChannelId' => $salesChannel,
         ]);
 
-        // The JTL connector reads these fixed keys (order_id, payment_id, third_party_payment_id)
-        // from the order custom fields. Map the camelCase payment data onto them so the ERP export
-        // finds the values. This only applies to the order, not the transaction.
-        $orderPaymentData = $paymentData;
-        $orderPaymentData['order_id'] = $payment->getOrderId() ?? '';
-        $orderPaymentData['payment_id'] = $payment->getId();
-        $orderPaymentData['third_party_payment_id'] = $payment->getThirdPartyPaymentId();
+        // External ERP integrations read these fixed keys (order_id, payment_id, third_party_payment_id)
+        // from the custom fields: the JTL connector from the order, ManiacSeller from the transaction.
+        // Map the camelCase payment data onto them on both entities so the exports find the values.
+        $legacyPaymentData = $paymentData;
+        $legacyPaymentData['order_id'] = $payment->getOrderId() ?? '';
+        $legacyPaymentData['payment_id'] = $payment->getId();
+        $legacyPaymentData['third_party_payment_id'] = $payment->getThirdPartyPaymentId();
 
         $orderCustomFields = $order->getCustomFields() ?? [];
-        $orderCustomFields[Mollie::EXTENSION] = $orderPaymentData;
+        $orderCustomFields[Mollie::EXTENSION] = $legacyPaymentData;
 
         $orderData = [
             'id' => $order->getId(),
@@ -177,7 +177,7 @@ final class TransactionService implements TransactionServiceInterface
         $upsertArray = [
             'id' => $transactionId,
             'customFields' => [
-                Mollie::EXTENSION => $paymentData,
+                Mollie::EXTENSION => $legacyPaymentData,
             ],
             'order' => $orderData,
         ];
