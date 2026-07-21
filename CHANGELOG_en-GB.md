@@ -2,6 +2,7 @@
 - Added: After a successful payment, older duplicate Mollie payments of the order are automatically cancelled or refunded.
 - Changed: Retrying with the same payment method now reuses the existing Mollie payment instead of creating a second one.
 - Fixed: For legacy orders the Mollie ID is shown again in the order list and detail view, and the Mollie tab can be opened again.
+- Fixed: Address fields are now trimmed before being sent to the Mollie API, preventing errors caused by leading or trailing whitespace.
 
 # 5.2.0
 - Added: Subscription products can also be offered as a one-time purchase, configurable in the product's Mollie tab.
