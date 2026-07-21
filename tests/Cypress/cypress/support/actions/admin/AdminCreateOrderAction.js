@@ -11,12 +11,14 @@ export default class AdminCreateOrderAction {
 
     /**
      * @param {string} customerEmail
-     * @param {string} productName    product name or number as shown in the product search
+     * @param {string|string[]} products  one or more product numbers as shown in the product search
      * @param {string} paymentMethodName
      * @param {string} shippingMethodName
      * @returns {Cypress.Chainable<string>} the created order id
      */
-    createOrder(customerEmail, productName, paymentMethodName, shippingMethodName) {
+    createOrder(customerEmail, products, paymentMethodName, shippingMethodName) {
+
+        const productNumbers = Array.isArray(products) ? products : [products];
 
         // The dedicated create dialog spares us clicking through the order list.
         cy.visit('/admin#/sw/order/create/initial');
@@ -43,19 +45,17 @@ export default class AdminCreateOrderAction {
         cy.contains('.sw-select-result', 'Storefront', {timeout: 20000}).click();
         cy.get('[data-analytics-id="sw-order-customer-grid.select-sales-channel"]', {timeout: 20000}).click();
 
-        // --- add a product -------------------------------------------------------------------
+        // --- add the products ----------------------------------------------------------------
         cy.get('.sw-order-create-initial-modal__tab-product', {timeout: 20000}).click();
-        cy.contains('button', 'Add product', {timeout: 20000}).click(forceOption);
 
-        // Fill the freshly added row. The store-api cart context call behind the scenes sometimes
-        // fails once (returns a 403), which saves the row without a calculated price; redoing the
-        // inline edit recovers it. addProductRow retries until the line item shows a real total.
-        this.addProductRow(productName);
-
-        // Final guard: the order must have a calculated line item total before we continue.
-        cy.get('.sw-data-grid__row--0 .sw-data-grid__cell--totalPrice', {timeout: 20000})
-            .should('contain', '€')
-            .and('not.contain', '€0.00');
+        // Each "Add product" prepends a new empty row at the top (row 0) and pushes the existing rows
+        // down, so every product is filled in row 0. The store-api cart context call behind the
+        // scenes sometimes fails once (returns a 403), which saves a row without a calculated price;
+        // addProductRow redoes the inline edit until the line item shows a total.
+        productNumbers.forEach((productNumber) => {
+            cy.contains('button', 'Add product', {timeout: 20000}).click(forceOption);
+            this.addProductRow(productNumber);
+        });
 
         // --- options tab: payment + shipping method ------------------------------------------
         // The payment method must be a Mollie method so a payment link can be created for it, and
@@ -90,54 +90,60 @@ export default class AdminCreateOrderAction {
     }
 
     /**
-     * Fills the first (already added) product row: makes it editable via double-click, searches the
-     * product and confirms it. Occasionally the row is saved without a calculated price because the
-     * underlying store-api cart context call failed once - the row then shows a zero total. In that
-     * case we simply redo the inline edit, which is exactly what recovers it when done by hand.
+     * Fills the (already added) product row at the given index: makes it editable via double-click,
+     * searches the product and confirms it. Occasionally the row is saved without a calculated price
+     * because the underlying store-api cart context call failed once - the row then shows a zero
+     * total. In that case we simply redo the inline edit, which is what recovers it when done by hand.
      *
      * @param {string} productName
+     * @param {number} rowIndex
      * @param {number} remainingAttempts
      */
-    addProductRow(productName, remainingAttempts = 3) {
+    addProductRow(productName, rowIndex = 0, remainingAttempts = 3) {
+
+        const row = '.sw-data-grid__row--' + rowIndex;
 
         // The new row is not editable yet - double-clicking the item cell turns it into an
         // inline-edit row that then shows the product select.
-        cy.get('.sw-data-grid__row--0 .sw-data-grid__cell--label', {timeout: 20000}).dblclick();
+        cy.get(row + ' .sw-data-grid__cell--label', {timeout: 20000}).dblclick();
 
         // Open the product select in the item column and search.
-        cy.get('.sw-data-grid__row--0 .sw-order-product-select .sw-select__selection', {timeout: 20000}).click();
-        cy.get('.sw-data-grid__row--0 .sw-order-product-select input.sw-entity-single-select__selection-input')
+        cy.get(row + ' .sw-order-product-select .sw-select__selection', {timeout: 20000}).click();
+        cy.get(row + ' .sw-order-product-select input.sw-entity-single-select__selection-input')
             .clear()
             .type(productName);
 
         // Narrow the suggestions down to the single matching product and pick it.
-        this.pickSingleProductResult();
+        this.pickSingleProductResult(rowIndex);
 
-        cy.get('.sw-data-grid__row--0 .sw-data-grid__inline-edit-save', {timeout: 20000}).click();
-        cy.get('.sw-data-grid__row--0.is--inline-edit').should('not.exist');
+        cy.get(row + ' .sw-data-grid__inline-edit-save', {timeout: 20000}).click();
+        cy.get(row + '.is--inline-edit').should('not.exist');
 
         // Give the async price calculation a moment to settle. On success the total is populated
         // quickly; on the 403 race it stays at zero, so a short settle is enough to tell them apart.
         cy.wait(2000);
 
-        cy.get('.sw-data-grid__row--0 .sw-data-grid__cell--totalPrice', {timeout: 20000}).then(($cell) => {
+        cy.get(row + ' .sw-data-grid__cell--totalPrice', {timeout: 20000}).then(($cell) => {
             const priceText = $cell.text();
             const hasPrice = priceText.includes('€') && !priceText.includes('€0.00');
 
             if (!hasPrice && remainingAttempts > 1) {
-                this.addProductRow(productName, remainingAttempts - 1);
+                this.addProductRow(productName, rowIndex, remainingAttempts - 1);
             }
         });
     }
 
     /**
-     * Waits for the product suggestions to narrow to a single result and clicks it. The debounced
-     * search does not always filter after typing, so while more (or none) than one result is shown
-     * we delete one character from the input to re-trigger the search and check again.
+     * Waits for the product suggestions of the row at the given index to narrow to a single result
+     * and clicks it. The debounced search does not always filter after typing, so while more (or
+     * none) than one result is shown we delete one character from the input to re-trigger it.
      *
+     * @param {number} rowIndex
      * @param {number} remainingAttempts
      */
-    pickSingleProductResult(remainingAttempts = 6) {
+    pickSingleProductResult(rowIndex = 0, remainingAttempts = 6) {
+
+        const input = '.sw-data-grid__row--' + rowIndex + ' .sw-order-product-select input.sw-entity-single-select__selection-input';
 
         // give the debounced search a moment before inspecting the result list
         cy.wait(500);
@@ -163,11 +169,10 @@ export default class AdminCreateOrderAction {
 
             // delete one character to re-trigger the search, give it a second to filter, then check
             // the results again
-            cy.get('.sw-data-grid__row--0 .sw-order-product-select input.sw-entity-single-select__selection-input')
-                .type('{backspace}');
+            cy.get(input).type('{backspace}');
             cy.wait(1000);
 
-            this.pickSingleProductResult(remainingAttempts - 1);
+            this.pickSingleProductResult(rowIndex, remainingAttempts - 1);
         });
     }
 

@@ -528,6 +528,7 @@ Exception:
                         <sw-container columns="1fr 1fr" gap="0px 30px">
                             {% block sw_order_detail_card_basic_field_amount %}
                                 <sw-text-field v-model:value="subscription.amount" v-model="subscription.amount"
+                                               class="cy-subscription-amount"
                                                :label="$tc('mollie-payments.subscriptions.detail.labelAmount')"
                                                disabled="disabled">
                                     <template slot="suffix">

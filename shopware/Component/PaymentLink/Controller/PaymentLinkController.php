@@ -39,6 +39,8 @@ use Shopware\Core\Checkout\Payment\SalesChannel\PaymentMethodRoute;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -86,6 +88,8 @@ final class PaymentLinkController extends StorefrontController
         private TokenFactoryInterfaceV2 $tokenFactory,
         #[Autowire(service: AccountService::class)]
         private AccountService $accountService,
+        #[Autowire(service: SalesChannelContextPersister::class)]
+        private SalesChannelContextPersister $contextPersister,
         #[Autowire(service: 'request_stack')]
         private RequestStack $requestStack,
         #[Autowire(service: 'event_dispatcher')]
@@ -328,7 +332,19 @@ final class PaymentLinkController extends StorefrontController
     private function loginOrderCustomer(string $customerId, SalesChannelContext $context): void
     {
         try {
-            $this->accountService->loginById($customerId, $context);
+            $newToken = $this->accountService->loginById($customerId, $context);
+
+            // AccountService only builds the logged-in context in memory and switches the session to
+            // its new token; it never persists the customer under that token. Without persisting it
+            // the return request rebuilds an anonymous context from the token, so the finish page
+            // (which loads the order for the logged-in customer) redirects to the cart. Persist the
+            // customer under the new token so the return request is logged in.
+            $this->contextPersister->save(
+                $newToken,
+                [SalesChannelContextService::CUSTOMER_ID => $customerId],
+                $context->getSalesChannelId(),
+                $customerId
+            );
 
             // Mark this as a temporary login: the customer is logged out again right after the
             // finish page loaded, so opening the link does not leave a stranger logged in.
