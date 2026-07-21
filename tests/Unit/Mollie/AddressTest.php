@@ -60,6 +60,53 @@ final class AddressTest extends TestCase
         $this->assertSame($expected['title'], $actual->getTitle());
     }
 
+    public function testJsonSerializeTrimsWhitespace(): void
+    {
+        $address = new Address(
+            ' fake@unit.test ',
+            ' Not specified ',
+            ' Tester ',
+            ' Test ',
+            ' Test Street ',
+            ' 12345 ',
+            ' Test City ',
+            ' DE '
+        );
+        $address->setStreetAdditional('  Appartment 2  ');
+        $address->setOrganizationName('  Test Company  ');
+        $address->setPhone('  +1234567890  ');
+
+        $expected = [
+            'title' => 'Not specified',
+            'givenName' => 'Tester',
+            'familyName' => 'Test',
+            'streetAndNumber' => 'Test Street',
+            'postalCode' => '12345',
+            'email' => 'fake@unit.test',
+            'city' => 'Test City',
+            'country' => 'DE',
+            'streetAdditional' => 'Appartment 2',
+            'organizationName' => 'Test Company',
+            'phone' => '+1234567890',
+        ];
+
+        $this->assertSame($expected, $address->jsonSerialize());
+    }
+
+    public function testJsonSerializeDropsWhitespaceOnlyOptionalFields(): void
+    {
+        $address = new Address('fake@unit.test', 'Not specified', 'Tester', 'Test', 'Test Street', '12345', 'Test City', 'DE');
+        $address->setStreetAdditional('   ');
+        $address->setOrganizationName('   ');
+        $address->setPhone('   ');
+
+        $actual = $address->jsonSerialize();
+
+        $this->assertArrayNotHasKey('streetAdditional', $actual);
+        $this->assertArrayNotHasKey('organizationName', $actual);
+        $this->assertArrayNotHasKey('phone', $actual);
+    }
+
     public function testExpectExceptionOnEmptySalutation()
     {
         $customer = $this->customerRepository->getDefaultCustomerWithoutSalutation();

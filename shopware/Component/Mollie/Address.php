@@ -148,24 +148,27 @@ final class Address implements \JsonSerializable
     public function jsonSerialize(): array
     {
         $data = [
-            'title' => $this->title,
-            'givenName' => $this->givenName,
-            'familyName' => $this->familyName,
-            'streetAndNumber' => $this->streetAndNumber,
-            'postalCode' => $this->postalCode,
-            'email' => $this->email,
-            'city' => $this->city,
-            'country' => $this->country,
+            'title' => trim($this->title),
+            'givenName' => trim($this->givenName),
+            'familyName' => trim($this->familyName),
+            'streetAndNumber' => trim($this->streetAndNumber),
+            'postalCode' => trim($this->postalCode),
+            'email' => trim($this->email),
+            'city' => trim($this->city),
+            'country' => trim($this->country),
         ];
 
-        if ($this->streetAdditional !== '') {
-            $data['streetAdditional'] = $this->streetAdditional;
+        $streetAdditional = trim($this->streetAdditional);
+        if ($streetAdditional !== '') {
+            $data['streetAdditional'] = $streetAdditional;
         }
-        if ($this->organizationName !== '') {
-            $data['organizationName'] = $this->organizationName;
+        $organizationName = trim($this->organizationName);
+        if ($organizationName !== '') {
+            $data['organizationName'] = $organizationName;
         }
-        if ($this->phone !== '') {
-            $data['phone'] = $this->phone;
+        $phone = trim($this->phone);
+        if ($phone !== '') {
+            $data['phone'] = $phone;
         }
 
         return $data;
