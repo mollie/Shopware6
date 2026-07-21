@@ -50,7 +50,7 @@ context("Checkout Tests", () => {
     describe('Successful Checkout on a path-prefixed sales channel domain', () => {
         context(devices.getDescription(device), () => {
 
-            it('Pay with PayPal and return successfully under the /' + PREFIX + ' domain prefix @core', () => {
+            it('Pay with PayPal and return successfully under the /' + PREFIX + ' domain prefix', () => {
 
                 cy.wrap(null).then(() => {
                     if (!configured) {
