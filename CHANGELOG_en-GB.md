@@ -3,6 +3,7 @@
 - Added: After a successful payment, older duplicate Mollie payments of the order are automatically cancelled or refunded.
 - Changed: Retrying with the same payment method now reuses the existing Mollie payment instead of creating a second one.
 - Changed: The transaction custom fields now also expose `order_id`, `payment_id` and `third_party_payment_id` for external ERP integrations.
+- Changed: Automatic shipment no longer requires the payment to be authorized, so orders manually set to paid are still shipped.
 - Fixed: For legacy orders the Mollie ID is shown again in the order list and detail view, and the Mollie tab can be opened again.
 - Fixed: Address fields are now trimmed before being sent to the Mollie API, preventing errors caused by leading or trailing whitespace.
 

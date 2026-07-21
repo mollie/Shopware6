@@ -52,6 +52,8 @@ final class FakeGateway implements MollieGatewayInterface
     /** @var list<CreateShipment> */
     private array $shipmentPayloads = [];
 
+    private bool $throwOnCapture = false;
+
     private ?Order $order = null;
     private bool $throwOnGetOrder = false;
 
@@ -256,8 +258,17 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->subscriptionPayments[$mollieSubscriptionId] ?? new PaymentCollection();
     }
 
+    public function withCaptureThrowing(): void
+    {
+        $this->throwOnCapture = true;
+    }
+
     public function createCapture(CreateCapture $createCapture, string $paymentId, string $orderNumber, string $salesChannelId): Capture
     {
+        if ($this->throwOnCapture) {
+            throw new \RuntimeException('Mollie API not reachable');
+        }
+
         $this->capturePayloads[] = $createCapture;
 
         return new Capture('cap_fake_' . uniqid(), CaptureStatus::PENDING, $createCapture->getAmount());
