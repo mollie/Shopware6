@@ -1,4 +1,4 @@
-import MollieCreditCardComponentsSw64 from './mollie-payments/plugins/creditcard-components-sw64.plugin';
+import MollieCreditCardComponents from './mollie-payments/plugins/creditcard-components.plugin';
 import MollieApplePayDirect from './mollie-payments/plugins/express/apple-pay-direct.plugin';
 import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-payment-method.plugin';
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
@@ -25,11 +25,7 @@ export default class MollieRegistration {
             ['PayPalExpressPlugin', PayPalExpressPlugin, 'body'],
             ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]'],
             ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]'],
-            [
-                'MollieCreditCardComponentsSw64',
-                MollieCreditCardComponentsSw64,
-                '[data-mollie-template-creditcard-components-sw64]',
-            ],
+            ['MollieCreditCardComponents', MollieCreditCardComponents, '[data-mollie-template-creditcard-components]'],
             [
                 'MollieCreditCardMandateManage',
                 MollieCreditCardMandateManage,

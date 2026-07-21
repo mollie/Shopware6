@@ -1,34 +1,11 @@
 import ConfirmRepository from 'Repositories/storefront/checkout/ConfirmRepository';
-import PaymentsRepository from 'Repositories/storefront/checkout/PaymentsRepository';
 import Shopware from "Services/shopware/Shopware";
 
 const shopware = new Shopware();
 
 const repoConfirm = new ConfirmRepository();
-const repoPayments = new PaymentsRepository();
 
 export default class PaymentAction {
-
-
-    /**
-     * @version Shopware < 6.4
-     */
-    openPaymentsModal() {
-        repoConfirm.getSwitchPaymentMethodsButton().click();
-    }
-
-    /**
-     * @version Shopware < 6.4
-     */
-    closePaymentsModal() {
-        if (shopware.isVersionGreaterEqual(6.4)) {
-            return;
-        }
-        // always force, because the save button
-        // might not be visible with a larger payments list
-        repoPayments.getSubmitButton().click({force: true});
-        cy.wait(1000);
-    }
 
     /**
      * @version Shopware >= 6.4
@@ -48,11 +25,7 @@ export default class PaymentAction {
         if (shopware.isVersionGreaterEqual(6.7)) {
             return;
         }
-        if (shopware.isVersionGreaterEqual(6.4)) {
-            this.showAllPaymentMethods();
-            return;
-        }
-        this.openPaymentsModal();
+        this.showAllPaymentMethods();
     }
     /**
      * @param paymentName
@@ -65,7 +38,6 @@ export default class PaymentAction {
         if (paymentName === 'POS Terminal') {
             this.selectPosTerminal();
         }
-        this.closePaymentsModal();
     }
 
     /**

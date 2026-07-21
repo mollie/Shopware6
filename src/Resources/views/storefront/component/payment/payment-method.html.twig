@@ -1,4 +1,3 @@
-{# compatible with >= sw6.4 #}
 {% sw_extends '@Storefront/storefront/component/payment/payment-method.html.twig' %}
 
 {% block component_payment_method_description %}
@@ -6,9 +5,7 @@
 
     {# load mollie creditcard components #}
     {% if payment.translated.customFields.mollie_payment_method_name == 'creditcard' %}
-        {% sw_include '@MolliePayments/storefront/component/payment/component/cc-fields.html.twig' with {
-            sw64: true
-        } %}
+        {% sw_include '@MolliePayments/storefront/component/payment/component/cc-fields.html.twig' %}
     {% elseif payment.translated.customFields.mollie_payment_method_name == 'pointofsale' %}
         {% sw_include '@MolliePayments/storefront/component/payment/component/pos-fields.html.twig' %}
     {% elseif payment.translated.customFields.mollie_payment_method_name in ['bancomatpay', 'bizum'] %}

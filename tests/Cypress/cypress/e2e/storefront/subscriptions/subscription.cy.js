@@ -283,12 +283,6 @@ describe('Subscription', () => {
 
                 it('C4077: Subscription Payment methods are limited on editOrder page', () => {
 
-                    // hiding of payment methods does not work
-                    // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
-                    if (shopware.isVersionLower(6.4)) {
-                        return;
-                    }
-
                     beforeEach(device);
 
                     cy.wrap(null).then(() => {
