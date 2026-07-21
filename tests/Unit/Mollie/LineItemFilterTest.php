@@ -170,6 +170,25 @@ class LineItemFilterTest extends TestCase
         $this->assertSame($product->getId(), $result->first()->getId());
     }
 
+    /**
+     * A NetiNextEasyCoupon voucher-product parent must be removed. Its voucher and
+     * service-fee children carry the actual price and stay in the payload.
+     */
+    public function testEasyCouponVoucherParentIsSkipped(): void
+    {
+        $parent = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 497.95);
+        $parent->setPayload(['netiNextEasyCoupon' => ['voucherValue' => 25.0]]);
+
+        $voucherChild = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'easy-coupon-extra-option-voucher', 495.95);
+        $serviceChild = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'easy-coupon-extra-option', 2.0);
+
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$parent, $voucherChild, $serviceChild]));
+
+        $this->assertCount(2, $result);
+        $ids = array_keys(iterator_to_array($result));
+        $this->assertNotContains($parent->getId(), $ids);
+    }
+
     // -------------------------------------------------------------------------
     // filterCartItems
     // -------------------------------------------------------------------------
@@ -269,6 +288,24 @@ class LineItemFilterTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertSame($product->getId(), $result->first()->getId());
+    }
+
+    /**
+     * NetiNextEasyCoupon voucher-product parent in cart must be removed.
+     */
+    public function testCartEasyCouponVoucherParentIsSkipped(): void
+    {
+        $parent = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
+        $parent->setPayload(['netiNextEasyCoupon' => ['voucherValue' => 25.0]]);
+        $parent->setPrice($this->makeCartPrice(497.95));
+
+        $voucherChild = new CartLineItem(Uuid::randomHex(), 'easy-coupon-extra-option-voucher');
+        $voucherChild->setPrice($this->makeCartPrice(495.95));
+
+        $result = $this->filterCartItems(new CartLineItemCollection([$parent, $voucherChild]));
+
+        $this->assertCount(1, $result);
+        $this->assertSame($voucherChild->getId(), $result->first()->getId());
     }
 
     private function filterOrderItems(OrderLineItemCollection $items): OrderLineItemCollection

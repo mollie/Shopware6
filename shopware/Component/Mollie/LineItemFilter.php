@@ -12,6 +12,8 @@ final class LineItemFilter implements LineItemFilterInterface
     public const TYPE_CUSTOM_PRODUCTS = 'customized-products';
     public const TYPE_CUSTOM_PRODUCTS_OPTION = 'customized-products-option';
 
+    private const EASY_COUPON_PAYLOAD_KEY = 'netiNextEasyCoupon';
+
     private const CONTAINER_TYPES = [
         'repertus_product_container',
         'dreisc-set',
@@ -25,6 +27,7 @@ final class LineItemFilter implements LineItemFilterInterface
      * - removes customized-products containers (their product child stays in)
      * - removes customized-product options with price = 0
      * - removes zeobv / NetI bundle parents and gift-configurator parents (children are already in the flat list)
+     * - removes NetiNextEasyCoupon voucher-product parents (their voucher / service-fee children carry the price)
      *
      * @param CartLineItem|OrderLineItemEntity $item
      */
@@ -62,9 +65,11 @@ final class LineItemFilter implements LineItemFilterInterface
         $bundleProducts = $payload['zeobvProductsInBundle'] ?? [];
         $isNetIBundle = $payload['is-neti-bundle'] ?? false;
         $isGiftConfigurator = isset($payload['configuratorToken']);
+        $isEasyCouponVoucher = isset($payload[self::EASY_COUPON_PAYLOAD_KEY]);
 
         return (is_array($bundleProducts) && count($bundleProducts) > 0)
             || $isNetIBundle === true
-            || $isGiftConfigurator;
+            || $isGiftConfigurator
+            || $isEasyCouponVoucher;
     }
 }
