@@ -49,7 +49,10 @@ export default class AdminCreateOrderAction {
             cy.get('.sw-order-customer-grid__sales-channel-selection-modal', {timeout: 20000}).should('be.visible');
             cy.get('.sw-order-customer-grid__sales-channel-selection .sw-select__selection', {timeout: 20000}).click();
             cy.contains('.sw-select-result', 'Storefront', {timeout: 20000}).click();
-            cy.get('[data-analytics-id="sw-order-customer-grid.select-sales-channel"], .sw-order-customer-grid__sales-channel-selection-modal .sw-button--primary', {timeout: 20000}).click();
+            // The confirm button is the modal's primary button. Its component prefix changed from
+            // sw-button--primary to the Meteor mt-button--primary (6.7.2), so match the shared
+            // "button--primary" class suffix, which covers every version.
+            cy.get('.sw-order-customer-grid__sales-channel-selection-modal [class*="button--primary"]', {timeout: 20000}).click();
         }
 
         // --- add the products ----------------------------------------------------------------
@@ -75,11 +78,15 @@ export default class AdminCreateOrderAction {
         // "Preview order" navigates to the create/general page and calculates the order. Only save
         // once we are on that page and the summary shows a non-zero total, otherwise an empty order
         // is saved before the calculation finished.
-        cy.get('[data-analytics-id="sw-order-create-initial-modal.preview-order"], .sw-order-create-initial-modal__button-preview', {timeout: 20000}).click();
+        // Preview is the modal footer's only primary button (Cancel is secondary). Match the shared
+        // "button--primary" suffix so it works before and after the Meteor mt-button rename (6.7.2).
+        cy.get('.sw-order-create-initial-modal .sw-modal__footer [class*="button--primary"]', {timeout: 20000}).click();
         cy.url({timeout: 20000}).should('include', '/sw/order/create/general');
         cy.get('.sw-order-create-summary', {timeout: 20000}).should('be.visible').and('not.contain', '€0.00');
 
-        cy.get('[data-analytics-id="sw-order-create.save-order"], .smart-bar__actions .sw-button-process.sw-button--primary', {timeout: 20000}).click();
+        // Save is the smart bar's primary action. Match the shared "button--primary" suffix so it
+        // works before and after the Meteor mt-button rename (6.7.2).
+        cy.get('.smart-bar__actions [class*="button--primary"]', {timeout: 20000}).click();
 
         // "Send order confirmation to customer?" reminder - we do not send a mail here.
         cy.contains('.sw-modal button', 'No', {timeout: 20000}).click(forceOption);
