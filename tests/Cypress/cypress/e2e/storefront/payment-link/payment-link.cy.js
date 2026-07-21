@@ -88,7 +88,7 @@ context("Payment Link", () => {
 
     context(devices.getDescription(device), () => {
 
-        it('pay an existing order via a payment link @core', () => {
+        it('pay an existing order via a payment link', () => {
 
             beforeEach(device);
 
@@ -118,7 +118,7 @@ context("Payment Link", () => {
             });
         });
 
-        it('pay a payment link with a different method (credit card) chosen on Mollie @core', () => {
+        it('pay a payment link with a different method (credit card) chosen on Mollie', () => {
 
             beforeEach(device);
 
@@ -152,7 +152,7 @@ context("Payment Link", () => {
             });
         });
 
-        it('pay a digital-product order with Klarna via a payment link and auto-capture it @core', () => {
+        it('pay a digital-product order with Klarna via a payment link and auto-capture it', () => {
 
             beforeEach(device);
 
@@ -184,7 +184,7 @@ context("Payment Link", () => {
             });
         });
 
-        it('buying a normal and a subscription product only bills the subscription product plus shipping @core', () => {
+        it('buying a normal and a subscription product only bills the subscription product plus shipping', () => {
 
             beforeEach(device);
 
