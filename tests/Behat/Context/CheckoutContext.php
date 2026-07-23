@@ -465,6 +465,21 @@ final class CheckoutContext extends ShopwareContext
         $legacyCapture->setDescription('legacy net capture');
         $mollieGateway->createCapture($legacyCapture, $payment->getId(), (string) $order->getOrderNumber(), $order->getSalesChannelId());
 
+        // Mollie processes captures asynchronously; wait until the net capture is reflected on the
+        // payment before the order is shipped, so the reconciliation reads a stable state (captured =
+        // net, remaining = tax) instead of racing the API and reporting "nothing to reconcile".
+        $attempt = 0;
+        while ($attempt < 10) {
+            $mollieGateway->clearCache();
+            $freshPayment = $mollieGateway->getPayment($payment->getId(), (string) $order->getOrderNumber(), $order->getSalesChannelId());
+            $capturedAmount = $freshPayment->getCapturedAmount()?->getValue() ?? 0.0;
+            if ($capturedAmount >= $netAmount - 0.005) {
+                break;
+            }
+            $attempt++;
+            sleep(1);
+        }
+
         /** @var EntityRepository $lineRepository */
         $lineRepository = $this->getContainer()->get('order_line_item.repository');
         $lineRepository->upsert($lineUpserts, $context);
