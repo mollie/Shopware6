@@ -11,8 +11,19 @@
      {% endfor %}
 
      {% if(isMollieSubscription == true) %}
-         {# we must require a registration, so hide the "do not create customer" checkbox #}
-         {# but the form field is still required to be true, otherwise we continue as guest #}
+         {# Subscriptions require a real customer account. Correctness is already
+            enforced server-side by SubscriptionCartValidator, which adds a
+            blocking InvalidGuestAccountError for guest carts containing a
+            subscription. This block only handles the UX: hide the guest option
+            so the customer never runs into that block.
+
+            We still render parent() (visually hidden) instead of dropping it, so
+            that other plugins/themes extending this same block keep their output.
+            The core guest checkbox stays unchecked and therefore submits nothing;
+            our hidden field then forces createCustomerAccount to true. #}
+         <div class="d-none" aria-hidden="true">
+             {{ parent() }}
+         </div>
          <input type="hidden" name="createCustomerAccount" value="true">
      {% else %}
          {{ parent() }}

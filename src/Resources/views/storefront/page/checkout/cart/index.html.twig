@@ -14,26 +14,6 @@
     {{ parent() }}
 {% endblock %}
 
-{% block page_checkout_cart_shipping_costs_form_group_payment_method %}
-
-    <div class="form-group">
-        <label for="paymentMethodId">{{ "checkout.paymentMethod"|trans|sw_sanitize }}</label>
-        <select class="custom-select form-select" type="text" id="paymentMethodId" name="paymentMethodId">
-            {% for payment in page.paymentMethods %}
-                <option value="{{ payment.id }}"
-                        {% if payment.id == context.paymentMethod.id %} selected="selected"{% endif %}>
-                    {{ payment.translated.name }}
-
-                    {% if "Mollie" in payment.handlerIdentifier and page.isMollieTestMode == true %}
-                        ({{ "molliePayments.testMode.label"|trans }})
-                    {% endif %}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-{% endblock %}
-
-
 {% block page_checkout_aside_actions %}
     {{ parent() }}
 
