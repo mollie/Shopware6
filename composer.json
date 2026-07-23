@@ -82,9 +82,7 @@
         "behat/gherkin": "^4",
         "phpstan/phpstan-phpunit": "^2.0",
         "ext-fileinfo": "*",
-        "ext-dom": "*",
-        "phpmetrics/phpmetrics": "^2.10",
-        "nimut/phpunit-merger": "^2.0"
+        "ext-dom": "*"
     },
     "scripts": {
         "post-install-cmd": [
