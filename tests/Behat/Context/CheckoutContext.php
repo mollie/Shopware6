@@ -476,7 +476,7 @@ final class CheckoutContext extends ShopwareContext
             if ($capturedAmount >= $netAmount - 0.005) {
                 break;
             }
-            $attempt++;
+            ++$attempt;
             sleep(1);
         }
 
