@@ -107,6 +107,26 @@ final class AddressTest extends TestCase
         $this->assertArrayNotHasKey('phone', $actual);
     }
 
+    public function testJsonSerializeTruncatesTitleToMollieLimit(): void
+    {
+        // Mollie rejects a "title" longer than 20 characters with an Unprocessable Entity error.
+        $address = new Address(
+            'fake@unit.test',
+            'This salutation is way too long',
+            'Tester',
+            'Test',
+            'Test Street',
+            '12345',
+            'Test City',
+            'DE'
+        );
+
+        $actual = $address->jsonSerialize();
+
+        $this->assertSame('This salutation is w', $actual['title']);
+        $this->assertLessThanOrEqual(20, mb_strlen($actual['title']));
+    }
+
     public function testExpectExceptionOnEmptySalutation()
     {
         $customer = $this->customerRepository->getDefaultCustomerWithoutSalutation();

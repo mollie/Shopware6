@@ -12,6 +12,13 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 final class Address implements \JsonSerializable
 {
     public const CUSTOM_FIELDS_KEY = 'mollie_payments_express_address_id';
+
+    /**
+     * Maximum length Mollie accepts for the address "title" field. Longer values are
+     * rejected with an "Unprocessable Entity" error and abort the whole payment creation.
+     */
+    private const MAX_TITLE_LENGTH = 20;
+
     private string $title;
     private string $givenName;
     private string $familyName;
@@ -148,7 +155,7 @@ final class Address implements \JsonSerializable
     public function jsonSerialize(): array
     {
         $data = [
-            'title' => trim($this->title),
+            'title' => $this->limitTitle(trim($this->title)),
             'givenName' => trim($this->givenName),
             'familyName' => trim($this->familyName),
             'streetAndNumber' => trim($this->streetAndNumber),
@@ -214,6 +221,20 @@ final class Address implements \JsonSerializable
         }
 
         $this->phone = PhoneNumber::toE164($phone, $this->country);
+    }
+
+    /**
+     * The salutation display name is used as the Mollie "title". Some (especially
+     * localized) salutations are longer than Mollie's 20 character limit and would
+     * abort the payment, so the value is trimmed down to the accepted length.
+     */
+    private function limitTitle(string $title): string
+    {
+        if (mb_strlen($title) > self::MAX_TITLE_LENGTH) {
+            return mb_substr($title, 0, self::MAX_TITLE_LENGTH);
+        }
+
+        return $title;
     }
 
     public function getTitle(): string
