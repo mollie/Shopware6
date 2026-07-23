@@ -1,3 +1,6 @@
+# Unreleased
+- Behoben: Die Erfassung beim Versand sendet für Netto-Kunden nun den Bruttobetrag.
+
 # 5.3.0
 - Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
 - Hinzugefügt: Nach einer erfolgreichen Zahlung werden ältere, doppelte Mollie-Zahlungen der Bestellung automatisch storniert oder erstattet.

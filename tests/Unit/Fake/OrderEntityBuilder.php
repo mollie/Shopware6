@@ -247,6 +247,7 @@ final class OrderEntityBuilder
         $orderLineItem->setLabel('Product ' . $productNumber);
         $orderLineItem->setQuantity($quantity);
         $orderLineItem->setUnitPrice($unitPrice);
+        $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0, $quantity));
         $orderLineItem->setProduct($product);
         $orderLineItem->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
 
@@ -396,6 +397,6 @@ final class OrderEntityBuilder
 
         $calculatedTax = new CalculatedTax($taxAmount, $taxRate, $totalPrice);
 
-        return new CalculatedPrice($totalPrice, $unitPrice, new CalculatedTaxCollection([$calculatedTax]), new TaxRuleCollection(), $quantity);
+        return new CalculatedPrice($unitPrice, $totalPrice, new CalculatedTaxCollection([$calculatedTax]), new TaxRuleCollection(), $quantity);
     }
 }

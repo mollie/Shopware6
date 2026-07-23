@@ -160,7 +160,11 @@ class ShipOrderRouteTest extends TestCase
         static::assertSame('', $response->getObject()->get('mollieId'));
         static::assertCount(0, $this->gateway->getCapturePayloads());
         static::assertCount(0, $this->lineItemRepository->getUpserts());
-        static::assertSame(0, $this->eventDispatcher->getEventCount());
+        // The transaction repair event is dispatched (needed to resolve the payment for reconciliation),
+        // but nothing is shipped, so no OrderShippedEvent follows.
+        foreach ($this->eventDispatcher->getEvents() as $event) {
+            static::assertNotInstanceOf(OrderShippedEvent::class, $event);
+        }
     }
 
     public function testShipShipsEvenWhenPaymentIsNotAuthorized(): void

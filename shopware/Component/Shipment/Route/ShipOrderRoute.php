@@ -8,6 +8,8 @@ use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
@@ -29,6 +31,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -41,6 +44,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true])]
 final class ShipOrderRoute extends AbstractShipOrderRoute
 {
+    /**
+     * Sub-cent tolerance for reconciliation amount comparisons (capture top-up / release decision).
+     */
+    private const RECONCILE_THRESHOLD = 0.005;
+
     /**
      * @param EntityRepository<OrderCollection> $orderRepository
      * @param EntityRepository<OrderLineItemCollection> $orderLineRepository
@@ -114,12 +122,11 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             $items = $this->buildRemainingItems($order);
         }
 
-        // Nothing left to ship: treat as an idempotent no-op so repeated/automatic shipment calls don't fail.
-        if (count($items) === 0) {
-            $this->logger->info('ShipOrderRoute: nothing to ship, order is already fully shipped or cancelled', $logContext);
-
-            return new ShipOrderResponse('', $orderId, []);
-        }
+        // Nothing left to ship in Shopware: this is not necessarily a no-op. Older orders were
+        // captured with a too low (net) amount, so the shipped items may still owe their taxes at
+        // Mollie. We keep flowing to resolve the Mollie payment and reconcile the open authorization
+        // below instead of returning early here.
+        $nothingToShip = count($items) === 0;
 
         $logContext['orderId'] = $orderId;
         $logContext['orderNumber'] = $orderNumber;
@@ -175,13 +182,18 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         if ($currency === null) {
             throw ShippingException::orderNotFound($orderId);
         }
+        $taxStatus = (string) $order->getTaxStatus();
 
         $orderShippedEvent = new OrderShippedEvent($currentTransaction->getId(), $context);
         $mollieOrderId = $payment->getOrderId();
 
+        if ($nothingToShip) {
+            return $this->reconcileAuthorizedRemainder($order, $payment, $currency, $taxStatus, (string) $orderNumber, $salesChannelId, $mollieOrderId, $deliveryCollection, $lineItems, $logContext);
+        }
+
         $shippingItems = new ShippingItemCollection();
-        $lineUpserts = $this->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems);
-        $deliveryUpserts = $this->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection);
+        $lineUpserts = $this->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems, $currency, $taxStatus);
+        $deliveryUpserts = $this->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection, $currency, $taxStatus);
         $fullyShipped = $this->isFullyShipped($lineItems, $lineUpserts);
 
         $orderShippedEvent->setShippingItems($shippingItems);
@@ -223,7 +235,29 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $shipment->getId(), 'shipmentId', $orderId, $orderShippedEvent, $fullyShipped, $context);
         }
 
+        // Each shipment captures the gross amount of exactly its own items (incl. their taxes).
         $createCapture = new CreateCapture($shippingItems, $currency->getIsoCode());
+
+        $hasCancelledItems = $this->hasCancelledItems($lineItems);
+
+        // Capture the rounding difference once, on the first shipment (alongside the shipping costs).
+        // It is stored on the order at payment creation (Shopware allows 4 decimals per currency while
+        // Mollie allows only 2) and is never a Shopware line item. Orders created before this was
+        // persisted fall back to the value on the Mollie payment. It is folded into the (larger,
+        // positive) capture amount, so a negative difference only makes the capture a cent smaller -
+        // no negative amount is ever sent, and the captured total lands exactly on the order total.
+        // With cancellations it stays in the released remainder instead.
+        if (! $hasCancelledItems && ! $this->hasPriorShipments($lineItems)) {
+            $mollieCustomFields = $order->getCustomFields()[Mollie::EXTENSION] ?? [];
+            $roundingDiff = array_key_exists('rounding_diff', $mollieCustomFields)
+                ? (float) $mollieCustomFields['rounding_diff']
+                : $this->resolveRoundingDifference($paymentId, (string) $orderNumber, $salesChannelId, $logContext);
+
+            if (abs($roundingDiff) > self::RECONCILE_THRESHOLD) {
+                $adjustedAmount = new Money($shippingItems->getTotalAmount() + $roundingDiff, $currency->getIsoCode());
+                $createCapture->setAmount($adjustedAmount);
+            }
+        }
 
         $logContext['molliePaymentId'] = $paymentId;
 
@@ -231,11 +265,6 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         try {
             $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, (string) $orderNumber, $salesChannelId);
-
-            if ($fullyShipped && $this->hasCancelledItems($lineItems)) {
-                $this->logger->info('ShipOrderRoute: all items handled with cancellations, releasing authorization (Payments API)', $logContext);
-                $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
-            }
         } catch (\Throwable $exception) {
             // Capturing at Mollie may fail (e.g. the payment was already captured because the merchant
             // set the order to paid manually). This must not interrupt the delivery state change, so we
@@ -246,11 +275,208 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             return new ShipOrderResponse('', $orderId, []);
         }
 
+        // With cancellations the shipped items are captured above and the rest of the authorization
+        // (cancelled items + rounding difference) is released so it is not charged to the customer.
+        // Releasing is best-effort and asynchronous, so a failure must not undo the successful capture.
+        if ($fullyShipped && $hasCancelledItems) {
+            try {
+                $this->logger->info('ShipOrderRoute: order fully handled with cancellations, releasing remaining authorization (Payments API)', $logContext);
+                $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
+            } catch (\Throwable $exception) {
+                $logContext['exception'] = $exception->getMessage();
+                $this->logger->error('ShipOrderRoute: releasing authorization failed', $logContext);
+            }
+        }
+
         $logContext['mollieCaptureId'] = $capture->getId();
 
         $this->logger->info('ShipOrderRoute: Mollie createCapture response', $logContext);
 
         return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $fullyShipped, $context);
+    }
+
+    /**
+     * Reconciles an order that has nothing left to ship in Shopware but still has an open Mollie
+     * authorization (Payments API). This covers older orders captured with a too low (net) amount and
+     * the rounding-difference line that never exists as a Shopware line item: the shipped items are
+     * topped up to their gross amount, and any authorization beyond the shipped gross (cancelled
+     * items, rounding difference) is released so it is not charged to the customer.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function reconcileAuthorizedRemainder(
+        OrderEntity $order,
+        Payment $payment,
+        CurrencyEntity $currency,
+        string $taxStatus,
+        string $orderNumber,
+        string $salesChannelId,
+        ?string $mollieOrderId,
+        OrderDeliveryCollection $deliveryCollection,
+        OrderLineItemCollection $lineItems,
+        array $logContext
+    ): ShipOrderResponse {
+        $orderId = $order->getId();
+
+        // The Orders API is line-item based; there is no single amount to top up here.
+        if ($mollieOrderId !== null) {
+            $this->logger->info('ShipOrderRoute: nothing to ship, order is already fully shipped or cancelled', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
+        }
+
+        $paymentId = $payment->getId();
+
+        try {
+            $freshPayment = $this->mollieGateway->getPayment($paymentId, $orderNumber, $salesChannelId);
+        } catch (\Throwable $exception) {
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->error('ShipOrderRoute: could not load Mollie payment for reconciliation', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
+        }
+
+        $remaining = $freshPayment->getAmountRemaining();
+        if ($remaining === null || $remaining->getValue() <= self::RECONCILE_THRESHOLD) {
+            $this->logger->info('ShipOrderRoute: nothing to ship and no open authorization to reconcile', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
+        }
+
+        $alreadyCaptured = $freshPayment->getCapturedAmount()?->getValue() ?? 0.0;
+        $authorized = $freshPayment->getAmount()?->getValue() ?? 0.0;
+
+        // Without cancellations the whole order was shipped, so the full authorized amount (incl. taxes
+        // and rounding difference) is owed. With cancellations only the shipped items are owed; the
+        // rest is released below.
+        $target = $this->hasCancelledItems($lineItems)
+            ? $this->sumShippedGross($lineItems, $deliveryCollection, $currency, $taxStatus)
+            : $authorized;
+
+        $shortfall = $target - $alreadyCaptured;
+        $mollieId = '';
+
+        // Top up the capture so the shipped items are fully captured incl. their taxes/rounding.
+        if ($shortfall > self::RECONCILE_THRESHOLD) {
+            $emptyItems = new ShippingItemCollection();
+            $reconcileCapture = new CreateCapture($emptyItems, $currency->getIsoCode());
+            $shortfallAmount = new Money($shortfall, $currency->getIsoCode());
+            $reconcileCapture->setAmount($shortfallAmount);
+            $reconcileCapture->setDescription(sprintf('Tax reconciliation for order %s', $orderNumber));
+
+            try {
+                $capture = $this->mollieGateway->createCapture($reconcileCapture, $paymentId, $orderNumber, $salesChannelId);
+                $mollieId = $capture->getId();
+                $logContext['reconciledAmount'] = $shortfall;
+                $this->logger->info('ShipOrderRoute: reconciled missing amount via capture', $logContext);
+            } catch (\Throwable $exception) {
+                $logContext['exception'] = $exception->getMessage();
+                $this->logger->error('ShipOrderRoute: reconciliation capture failed', $logContext);
+
+                return new ShipOrderResponse('', $orderId, []);
+            }
+        }
+
+        // Release the authorization that exceeds the target (cancelled items), so Mollie can settle the
+        // payment to paid and the customer is not charged for it.
+        if ($authorized - $target > self::RECONCILE_THRESHOLD) {
+            try {
+                $this->mollieGateway->releaseAuthorization($paymentId, $orderNumber, $salesChannelId);
+                if ($mollieId === '') {
+                    $mollieId = $paymentId;
+                }
+            } catch (\Throwable $exception) {
+                $logContext['exception'] = $exception->getMessage();
+                $this->logger->error('ShipOrderRoute: releasing authorization during reconciliation failed', $logContext);
+            }
+        }
+
+        if ($mollieId === '') {
+            $this->logger->info('ShipOrderRoute: nothing to reconcile', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
+        }
+
+        return new ShipOrderResponse($mollieId, $orderId, []);
+    }
+
+    /**
+     * Sums the gross amount of everything that has already been shipped (line items and shipping
+     * costs), using LineItem's net->gross normalization so it matches the amount that should have
+     * been captured.
+     */
+    private function sumShippedGross(OrderLineItemCollection $lineItems, OrderDeliveryCollection $deliveryCollection, CurrencyEntity $currency, string $taxStatus): float
+    {
+        $total = 0.0;
+
+        foreach ($lineItems as $lineItem) {
+            $shippedQuantity = (int) (($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0);
+            if ($shippedQuantity <= 0) {
+                continue;
+            }
+            $grossLine = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
+            $total += $grossLine->getUnitPrice()->getValue() * $shippedQuantity;
+        }
+
+        foreach ($deliveryCollection as $delivery) {
+            $shippedQuantity = (int) (($delivery->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0);
+            if ($shippedQuantity <= 0 || $delivery->getShippingMethod() === null) {
+                continue;
+            }
+            $grossDelivery = LineItem::fromDelivery($delivery, $currency, $taxStatus);
+            $total += $grossDelivery->getUnitPrice()->getValue() * $shippedQuantity;
+        }
+
+        return $total;
+    }
+
+    /**
+     * The rounding difference tracked on the Mollie payment lines (Shopware allows 4 decimals per
+     * currency, Mollie only 2). Fallback for orders created before it was persisted on the order.
+     * Best-effort: returns 0.0 when the payment cannot be loaded.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function resolveRoundingDifference(string $paymentId, string $orderNumber, string $salesChannelId, array $logContext): float
+    {
+        try {
+            $payment = $this->mollieGateway->getPayment($paymentId, $orderNumber, $salesChannelId);
+
+            return $payment->getRoundingDiff();
+        } catch (\Throwable $exception) {
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->error('ShipOrderRoute: could not resolve rounding difference', $logContext);
+
+            return 0.0;
+        }
+    }
+
+    /**
+     * Whether any line item has already been shipped in an earlier shipment. Used to capture
+     * the rounding difference only once, on the first shipment.
+     */
+    private function hasPriorShipments(OrderLineItemCollection $lineItems): bool
+    {
+        foreach ($lineItems as $lineItem) {
+            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+            if ((int) ($fields['quantity'] ?? 0) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasCancelledItems(OrderLineItemCollection $lineItems): bool
+    {
+        foreach ($lineItems as $lineItem) {
+            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
+            if ((int) ($fields['cancelled_quantity'] ?? 0) > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -309,7 +535,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    private function collectLineItemUpserts(array $items, OrderLineItemCollection $lineItems, string $orderId, ShippingItemCollection $shippingItems): array
+    private function collectLineItemUpserts(array $items, OrderLineItemCollection $lineItems, string $orderId, ShippingItemCollection $shippingItems, CurrencyEntity $currency, string $taxStatus): array
     {
         $lineUpserts = [];
 
@@ -340,10 +566,13 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             $name = $product !== null ? (string) $product->getName() : (string) $lineItem->getLabel();
             $mollieLineId = ($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
 
+            // Reuse LineItem's net->gross normalization so the capture amount matches the amount sent
+            // at payment creation; getUnitPrice() alone is net for net-tax orders.
+            $grossLine = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
             $shippingItem = new ShippingItem(
                 $requestedQuantity,
                 $requestedQuantity . 'x ' . $name,
-                $lineItem->getUnitPrice() * $requestedQuantity,
+                $grossLine->getUnitPrice()->getValue() * $requestedQuantity,
                 $mollieLineId !== null ? (string) $mollieLineId : null,
             );
             $shippingItems->add($shippingItem);
@@ -364,7 +593,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    private function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection): array
+    private function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection, CurrencyEntity $currency, string $taxStatus): array
     {
         $deliveryUpserts = [];
         $targetLineItemIds = array_column($lineUpserts, 'id');
@@ -403,10 +632,13 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
             $mollieLineId = ($delivery->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
 
+            // Reuse LineItem's net->gross normalization so shipping costs are captured gross for
+            // net-tax orders, consistent with the payment payload.
+            $grossDelivery = LineItem::fromDelivery($delivery, $currency, $taxStatus);
             $shippingItem = new ShippingItem(
                 $shippingCostsQuantity,
                 $shippingCostsQuantity . 'x ' . $shippingMethod->getName(),
-                $shippingCosts->getUnitPrice() * $shippingCostsQuantity,
+                $grossDelivery->getUnitPrice()->getValue() * $shippingCostsQuantity,
                 $mollieLineId !== null ? (string) $mollieLineId : null,
             );
             $shippingItems->add($shippingItem);
@@ -564,18 +796,6 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
             return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
         });
-    }
-
-    private function hasCancelledItems(OrderLineItemCollection $lineItems): bool
-    {
-        foreach ($lineItems as $lineItem) {
-            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
-            if ((int) ($fields['cancelled_quantity'] ?? 0) > 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
