@@ -178,6 +178,7 @@ runs:
         # that still satisfies shopware/core, before merging the plugin's require-dev.
         # lcobucci/clock: 6.7.3.1 / 6.7.4.2 lock 3.4.0 (needs >=8.3); core only needs ^3.1.0.
         docker exec shop bash -c 'composer require --no-scripts -W --ignore-platform-reqs "lcobucci/clock:>=3.1 <3.4"'
+        docker exec shop bash -c 'composer require --no-scripts -W --ignore-platform-reqs "phpunit/php-code-coverage 10"'
         # phpunit: the merged require-dev (phpunit >=10) otherwise resolves to ^12 (needs >=8.3).
         docker exec shop bash -c 'composer require --dev --no-scripts -W --ignore-platform-reqs "phpunit/phpunit:^11.4"'
         docker exec shop bash -c 'composer require --ignore-platform-reqs -W wikimedia/composer-merge-plugin:*'
