@@ -165,6 +165,10 @@ final class TransactionService implements TransactionServiceInterface
         $legacyPaymentData['order_id'] = $payment->getOrderId() ?? '';
         $legacyPaymentData['payment_id'] = $payment->getId();
         $legacyPaymentData['third_party_payment_id'] = $payment->getThirdPartyPaymentId();
+        // Shopware allows 4 decimals per currency while Mollie allows only 2, so the line items can
+        // differ from the order total by a rounding amount that is not a Shopware line item. Persist it
+        // so the shipment capture can add it to the (Payments API) capture on the first shipment.
+        $legacyPaymentData['rounding_diff'] = $payment->getRoundingDiff();
 
         $orderCustomFields = $order->getCustomFields() ?? [];
         $orderCustomFields[Mollie::EXTENSION] = $legacyPaymentData;
