@@ -5,8 +5,8 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Exception\ClientException;
 use Mollie\Shopware\Component\Mollie\CreatePaymentLink;
-use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
+use Mollie\Shopware\Component\Mollie\PaymentHydrator;
 use Mollie\Shopware\Component\Mollie\PaymentLink;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -18,6 +18,8 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
     public function __construct(
         #[Autowire(service: ClientFactory::class)]
         private ClientFactoryInterface $clientFactory,
+        #[Autowire(service: PaymentHydrator::class)]
+        private PaymentHydrator $paymentHydrator,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -83,7 +85,7 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
 
             $collection = new PaymentCollection();
             foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
-                $payment = Payment::createFromClientResponse($paymentBody);
+                $payment = $this->paymentHydrator->hydrate($paymentBody);
                 $collection->set($payment->getId(), $payment);
             }
 

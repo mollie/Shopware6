@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment\Route;
 
+use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
+use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
+use Mollie\Shopware\Component\Shipment\ShipmentPersister;
+use Mollie\Shopware\Component\Shipment\ShipmentTrackingResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
@@ -49,13 +53,25 @@ class ShipOrderRouteTest extends TestCase
         $orderService = new FakeOrderService();
         $logger = new NullLogger();
 
-        $this->route = new ShipOrderRoute(
-            $this->orderRepository,
+        $itemResolver = new ShipmentItemResolver();
+        $trackingResolver = new ShipmentTrackingResolver();
+        $persister = new ShipmentPersister(
             $this->lineItemRepository,
             $this->deliveryRepository,
+            $orderService,
+            $this->eventDispatcher,
+            $logger,
+        );
+        $reconciler = new AuthorizationReconciler($this->gateway, $itemResolver, $logger);
+
+        $this->route = new ShipOrderRoute(
+            $this->orderRepository,
             $this->gateway,
             $this->eventDispatcher,
-            $orderService,
+            $itemResolver,
+            $trackingResolver,
+            $reconciler,
+            $persister,
             $logger,
         );
     }
