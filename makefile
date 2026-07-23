@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-.PHONY: help prod dev clean build fixtures pr release
+.PHONY: help prod dev clean build fixtures pr release report
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
@@ -123,6 +123,32 @@ phpunit: ##3 Starts all PHPUnit Tests
 phpintegration: ##3 Starts all PHPUnit Tests [groups=core to limit to a group]
 
 	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),)
+
+report: ##3 Runs unit + integration tests, merges the JUnit reports and builds a PHPMetrics report at <shop-url>/phpmetrics
+	# ----------------------------------------------------------------
+	# reset previous report output
+	rm -rf ./.reports/phpunit/junit ./.reports/phpunit/combined.junit.xml ./.reports/phpmetrics ../../../public/phpmetrics
+	mkdir -p ./.reports/phpunit/junit ./.reports/phpmetrics
+	# ----------------------------------------------------------------
+	# 1) Unit tests -> local plugin vendor + plain autoloader bootstrap
+	php vendor/bin/phpunit --configuration=./config/phpunit.xml --log-junit ./.reports/phpunit/junit/unit.junit.xml
+	# ----------------------------------------------------------------
+	# 2) Integration tests -> Shopware vendor + kernel bootstrap (run from Shopware root)
+	cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),) --log-junit ./custom/plugins/MolliePayments/.reports/phpunit/junit/integration.junit.xml
+	# ----------------------------------------------------------------
+	# 3) Merge both JUnit reports into one combined report
+	php vendor/bin/phpunit-merger log ./.reports/phpunit/junit ./.reports/phpunit/combined.junit.xml
+	# phpunit-merger writes a bogus file="0" on the <testsuite> nodes; strip it so
+	# PHPMetrics falls back to the real per-<testcase> file paths instead of aborting.
+	sed -i 's/ file="0"//g' ./.reports/phpunit/combined.junit.xml
+	# ----------------------------------------------------------------
+	# 4) PHPMetrics report using the combined JUnit (shows which classes are covered by tests)
+	#    --composer  points the dependency analysis at the plugin manifest (removes the "no composer.json" warning)
+	#    --report-json  emits machine-readable per-class metrics (ccn, mi, loc, ...) for tooling / analysis
+	php vendor/bin/phpmetrics --junit=./.reports/phpunit/combined.junit.xml --composer=./composer.json --report-html=../../../public/phpmetrics --report-json=./.reports/phpmetrics/metrics.json ./src ./shopware
+	@echo ""
+	@echo "PHPMetrics HTML report available at <shop-url>/phpmetrics"
+	@echo "PHPMetrics JSON metrics at .reports/phpmetrics/metrics.json"
 
 behat:
 	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml --format progress --colors

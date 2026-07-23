@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Payment\Route;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentHydrator;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Route\WebhookException;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
@@ -425,7 +426,7 @@ final class WebhookRouteTest extends TestCase
 
         $logger = $logger ?? new NullLogger();
         $fakeClientFactory = new FakeClientFactory($fakeClient);
-        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, $logger), $logger);
+        $gateway = new MollieGateway($fakeClientFactory, $transactionService, new PaymentLinkGateway($fakeClientFactory, new PaymentHydrator(), $logger), new PaymentHydrator(), $logger);
         $shipOrderRoute = $shipOrderRoute ?? new FakeShipOrderRoute();
 
         return new WebhookRoute(

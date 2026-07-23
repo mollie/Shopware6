@@ -18,6 +18,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
+use Mollie\Shopware\Component\Mollie\PaymentHydrator;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\Terminal;
@@ -45,6 +46,8 @@ final class MollieGateway implements MollieGatewayInterface
         private TransactionServiceInterface $transactionService,
         #[Autowire(service: PaymentLinkGateway::class)]
         private PaymentLinkGatewayInterface $paymentLinkGateway,
+        #[Autowire(service: PaymentHydrator::class)]
+        private PaymentHydrator $paymentHydrator,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -124,7 +127,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $shopwareOrderNumber);
         }
@@ -152,7 +155,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -352,7 +355,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'body' => $body
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -371,7 +374,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'responseParameter' => $body,
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -405,7 +408,7 @@ final class MollieGateway implements MollieGatewayInterface
 
             $collection = new PaymentCollection();
             foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
-                $payment = Payment::createFromClientResponse($paymentBody);
+                $payment = $this->paymentHydrator->hydrate($paymentBody);
                 $collection->set($payment->getId(), $payment);
             }
 
@@ -618,7 +621,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'body' => $paymentsBody,
             ]);
 
-            return Payment::createFromClientResponse($paymentsBody);
+            return $this->paymentHydrator->hydrate($paymentsBody);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
