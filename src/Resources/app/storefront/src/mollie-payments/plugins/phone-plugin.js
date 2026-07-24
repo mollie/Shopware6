@@ -19,13 +19,13 @@ export default class MolliePhonePlugin extends Plugin {
 
         const errorMessageElement = document.querySelector(MOLLIE_PHONE_ERROR_MESSAGE_SELECTOR);
 
-        phoneField.addEventListener('focus', (e) => {
+        this._addListener(phoneField, 'focus', (e) => {
             inputFieldWrapper.classList.add(WAS_VALIDATED_CLS);
             e.target.removeAttribute(INVALID_ATTR);
             errorMessageElement.classList.add(DISPLAY_NONE_CLS);
         });
 
-        phoneField.addEventListener('blur', (e) => {
+        this._addListener(phoneField, 'blur', (e) => {
             const form = e.target.form;
             if (form.reportValidity() === false) {
                 e.target.setAttribute(INVALID_ATTR, true);

@@ -1,5 +1,4 @@
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import DeviceDetectionHelper from '../helper/device-detection.helper';
 import CsrfAjaxModeHelper from '../helper/csrf-ajax-mode.helper';
 import ConfirmPageRepository from '../repository/confirm-page-repository';
 
@@ -266,34 +265,9 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
     }
 
     /**
-     * In IE we have to add the TOS checkbox to the form
-     * when starting it from Javascript.
-     * the original TOS is based on form-associations which do not work in IE.
-     * So we just grab the value and pass it as hidden form so that
-     * Shopware will receive it.
-     *
      * @param form
      */
     continueShopwareCheckout(form) {
-        if (DeviceDetectionHelper.isIEBrowser()) {
-            const createInput = function (name, val) {
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.name = name;
-                input.checked = val;
-                input.style.display = 'none';
-
-                return input;
-            };
-
-            const checkTOS = document.getElementById('tos');
-
-            // we might not always have the TOS checkbox (editOrder)
-            // but if we have it, we have to add it again
-            if (checkTOS !== undefined && checkTOS !== null) {
-                form.insertAdjacentElement('beforeend', createInput('tos', checkTOS.checked));
-            }
-        }
         const csrfMode = new CsrfAjaxModeHelper(window.csrf);
         if (!csrfMode.isActive()) {
             form.submit();

@@ -26,7 +26,7 @@ export default class MollieSubscribeButtonPlugin extends Plugin {
 
         // capture phase, so the hidden field exists before Shopware's add-to-cart plugin
         // serializes the form on the bubbling submit event.
-        this._form.addEventListener('submit', this._onSubmit, true);
+        this._addListener(this._form, 'submit', this._onSubmit, true);
     }
 
     _onSubmit(event) {

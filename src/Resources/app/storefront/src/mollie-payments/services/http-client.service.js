@@ -46,7 +46,7 @@ export default class HttpClientService {
             const responseType = xhr.getResponseHeader('content-type');
             const body = 'response' in xhr ? xhr.response : xhr.responseText;
 
-            if (responseType.indexOf('application/json') > -1) {
+            if (responseType && responseType.indexOf('application/json') > -1) {
                 callbackSuccess(JSON.parse(body));
             } else {
                 callbackSuccess(body);
@@ -54,7 +54,7 @@ export default class HttpClientService {
         };
 
         xhr.onerror = function () {
-            if (!callbackError || typeof callbackSuccess !== 'function') {
+            if (!callbackError || typeof callbackError !== 'function') {
                 return;
             }
 

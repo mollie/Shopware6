@@ -2,6 +2,7 @@ import BuyBoxRepository from '../../repository/buy-box-repository';
 
 const DISPLAY_NONE_CLS = 'd-none';
 const INVALID_CLS = 'is-invalid';
+const OBSERVED_HOOK = 'js-mollie-observed';
 
 export default class PrivacyNotesService {
     constructor(document) {
@@ -15,14 +16,14 @@ export default class PrivacyNotesService {
      * When all express payment buttons are hidden, the privacy note is also hidden to avoid confusion.
      */
     initCheckbox() {
-        const privacyNotes = this._document.querySelectorAll('.mollie-privacy-note:not(.observed)');
+        const privacyNotes = this._document.querySelectorAll(`.mollie-privacy-note:not(.${OBSERVED_HOOK})`);
 
         for (let i = 0; i < privacyNotes.length; i++) {
             const currentNote = privacyNotes[i];
 
             currentNote.classList.remove(DISPLAY_NONE_CLS);
 
-            currentNote.classList.add('observed');
+            currentNote.classList.add(OBSERVED_HOOK);
 
             const buyElement = this._repoBuyBox.findClosestBuyBox(currentNote);
 
