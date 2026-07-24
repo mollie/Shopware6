@@ -15,9 +15,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Rebuilds the Mollie Payment extension from the legacy Mollie custom fields stored on the order
- * (pre-5.0 data where the transaction no longer carries the extension) and writes it back onto the
- * transaction so subsequent reads find it. Returns null when the order has no recoverable Mollie data.
+ * Rebuilds the Mollie Payment extension from the Mollie custom fields and writes it back onto the
+ * transaction so subsequent reads find it. Reads the transaction's custom fields first (they survive
+ * the legacy JTL migration that could blank the order's fields) and falls back to the order, accepting
+ * both camelCase (5.x) and snake_case (pre-5.0) key spellings. Returns null when neither carries a
+ * recoverable Mollie id.
  */
 final class OrderPaymentRecovery
 {
@@ -32,10 +34,21 @@ final class OrderPaymentRecovery
 
     public function restore(OrderEntity $order, OrderTransactionEntity $transaction, Context $context): ?Payment
     {
-        $orderMollieFields = ($order->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
+        $txFields = ($transaction->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
+        $orderFields = ($order->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
 
-        $paymentId = (string) ($orderMollieFields['payment_id'] ?? '');
-        $orderId = (string) ($orderMollieFields['order_id'] ?? '');
+        $paymentId = $this->firstNonEmpty(
+            $txFields['id'] ?? null,
+            $txFields['payment_id'] ?? null,
+            $orderFields['payment_id'] ?? null,
+            $orderFields['id'] ?? null,
+        );
+        $orderId = $this->firstNonEmpty(
+            $txFields['orderId'] ?? null,
+            $txFields['order_id'] ?? null,
+            $orderFields['order_id'] ?? null,
+            $orderFields['orderId'] ?? null,
+        );
 
         if ($paymentId === '' && $orderId === '') {
             return null;
@@ -47,43 +60,70 @@ final class OrderPaymentRecovery
             $payment->setOrderId($orderId);
         }
 
-        $method = (string) ($orderMollieFields['payment_method'] ?? '');
+        $method = $this->firstNonEmpty(
+            $txFields['method'] ?? null,
+            $orderFields['payment_method'] ?? null,
+        );
         $paymentMethod = $method !== '' ? PaymentMethod::tryFrom($method) : null;
         if ($paymentMethod !== null) {
             $payment->setMethod($paymentMethod);
         }
 
-        $thirdPartyPaymentId = (string) ($orderMollieFields['third_party_payment_id'] ?? '');
+        $thirdPartyPaymentId = $this->firstNonEmpty(
+            $txFields['thirdPartyPaymentId'] ?? null,
+            $txFields['third_party_payment_id'] ?? null,
+            $orderFields['third_party_payment_id'] ?? null,
+            $orderFields['thirdPartyPaymentId'] ?? null,
+        );
         if ($thirdPartyPaymentId !== '') {
             $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
         }
 
-        $checkoutUrl = (string) ($orderMollieFields['molliePaymentUrl'] ?? '');
+        $checkoutUrl = $this->firstNonEmpty(
+            $txFields['checkoutUrl'] ?? null,
+            $orderFields['molliePaymentUrl'] ?? null,
+            $orderFields['checkoutUrl'] ?? null,
+        );
         if ($checkoutUrl !== '') {
             $payment->setCheckoutUrl($checkoutUrl);
         }
 
-        $creditCardLabel = (string) ($orderMollieFields['creditCardLabel'] ?? '');
+        $creditCardLabel = $this->firstNonEmpty(
+            $txFields['creditCardLabel'] ?? null,
+            $orderFields['creditCardLabel'] ?? null,
+        );
         if ($creditCardLabel !== '') {
             $payment->setCreditCardLabel($creditCardLabel);
-            $payment->setCreditCardNumber((string) ($orderMollieFields['creditCardNumber'] ?? ''));
-            $payment->setCreditCardHolder((string) ($orderMollieFields['creditCardHolder'] ?? ''));
+            $payment->setCreditCardNumber($this->firstNonEmpty(
+                $txFields['creditCardNumber'] ?? null,
+                $orderFields['creditCardNumber'] ?? null,
+            ));
+            $payment->setCreditCardHolder($this->firstNonEmpty(
+                $txFields['creditCardHolder'] ?? null,
+                $orderFields['creditCardHolder'] ?? null,
+            ));
         }
 
-        $paypalPayerId = (string) ($orderMollieFields['paypalPayerId'] ?? '');
+        $paypalPayerId = $this->firstNonEmpty(
+            $txFields['paypalPayerId'] ?? null,
+            $orderFields['paypalPayerId'] ?? null,
+        );
         if ($paypalPayerId !== '') {
             $payment->setPaypalPayerId($paypalPayerId);
         }
 
-        $bankAccount = (string) ($orderMollieFields['bankAccount'] ?? '');
+        $bankAccount = $this->firstNonEmpty(
+            $txFields['bankAccount'] ?? null,
+            $orderFields['bankAccount'] ?? null,
+        );
         if ($bankAccount !== '') {
-            $payment->setBankName((string) ($orderMollieFields['bankName'] ?? ''));
+            $payment->setBankName($this->firstNonEmpty($txFields['bankName'] ?? null, $orderFields['bankName'] ?? null));
             $payment->setBankAccount($bankAccount);
-            $payment->setBankBic((string) ($orderMollieFields['bankBic'] ?? ''));
-            $payment->setTransferReference((string) ($orderMollieFields['transferReference'] ?? ''));
-            $payment->setConsumerName((string) ($orderMollieFields['consumerName'] ?? ''));
-            $payment->setConsumerAccount((string) ($orderMollieFields['consumerAccount'] ?? ''));
-            $payment->setConsumerBic((string) ($orderMollieFields['consumerBic'] ?? ''));
+            $payment->setBankBic($this->firstNonEmpty($txFields['bankBic'] ?? null, $orderFields['bankBic'] ?? null));
+            $payment->setTransferReference($this->firstNonEmpty($txFields['transferReference'] ?? null, $orderFields['transferReference'] ?? null));
+            $payment->setConsumerName($this->firstNonEmpty($txFields['consumerName'] ?? null, $orderFields['consumerName'] ?? null));
+            $payment->setConsumerAccount($this->firstNonEmpty($txFields['consumerAccount'] ?? null, $orderFields['consumerAccount'] ?? null));
+            $payment->setConsumerBic($this->firstNonEmpty($txFields['consumerBic'] ?? null, $orderFields['consumerBic'] ?? null));
         }
 
         $this->orderRepository->upsert([
@@ -99,5 +139,17 @@ final class OrderPaymentRecovery
         ], $context);
 
         return $payment;
+    }
+
+    private function firstNonEmpty(mixed ...$values): string
+    {
+        foreach ($values as $value) {
+            $string = (string) ($value ?? '');
+            if ($string !== '') {
+                return $string;
+            }
+        }
+
+        return '';
     }
 }
