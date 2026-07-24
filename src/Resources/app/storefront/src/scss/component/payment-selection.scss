@@ -28,7 +28,7 @@
         margin-top: 15px;
 
         .custom-select:invalid {
-            border: 1px solid red;
+            border: 1px solid $danger;
         }
     }
 
@@ -40,7 +40,7 @@
         margin-top: 15px;
 
         .custom-select:invalid {
-            border: 1px solid red;
+            border: 1px solid $danger;
         }
     }
 }

@@ -31,7 +31,7 @@
                                 {% endblock %}
 
                                 {% if modifiable and mandate.beingUsedForSubscription %}
-                                    <span class="badge badge-lg order-item-status-badge order-item-status-badge-canceled" style="margin:0px;margin-left:20px;">
+                                    <span class="badge badge-lg order-item-status-badge order-item-status-badge-canceled mollie-mandate-subscription-badge">
                                      {{ "molliePayments.components.mandate.subscriptionBadge"|trans|striptags }}
                                     </span>
                                 {% endif %}

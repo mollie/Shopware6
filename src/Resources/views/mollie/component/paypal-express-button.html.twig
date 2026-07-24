@@ -29,8 +29,8 @@
 
     <div class="{{ cols }}">
         <button name="paypal-express" class="mollie-paypal-button mollie-express-button paypal-button-{{ shape }} paypal-theme-{{ theme }}" data-form-action="{{ path('frontend.mollie.paypal-express.start') }}">
-            <img src="{{ image }}" width="80px;"/>
-            <p style="font-weight: 100;margin:0;margin-left:8px">Checkout</p>
+            <img src="{{ image }}" class="mollie-paypal-button-image" alt="PayPal"/>
+            <p class="mollie-paypal-button-label">Checkout</p>
             <div class="loader">
 
             </div>
