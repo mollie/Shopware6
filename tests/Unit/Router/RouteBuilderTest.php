@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Router;
 
 use Mollie\Shopware\Component\Router\RouteBuilder;
+use Mollie\Shopware\Unit\Fake\FakeRouter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
 
 #[CoversClass(RouteBuilder::class)]
 final class RouteBuilderTest extends TestCase
@@ -120,42 +118,9 @@ final class RouteBuilderTest extends TestCase
 
     private function createRouteBuilder(string $generatedUrl, RequestStack $requestStack, string $appUrl): RouteBuilder
     {
-        $router = $this->createRouter($generatedUrl);
+        $router = new FakeRouter($generatedUrl);
 
         return new RouteBuilder($router, $requestStack, $appUrl);
-    }
-
-    private function createRouter(string $generatedUrl): RouterInterface
-    {
-        return new class($generatedUrl) implements RouterInterface {
-            public function __construct(private string $generatedUrl)
-            {
-            }
-
-            public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
-            {
-                return $this->generatedUrl;
-            }
-
-            public function setContext(RequestContext $context): void
-            {
-            }
-
-            public function getContext(): RequestContext
-            {
-                return new RequestContext();
-            }
-
-            public function getRouteCollection(): RouteCollection
-            {
-                return new RouteCollection();
-            }
-
-            public function match(string $pathinfo): array
-            {
-                return [];
-            }
-        };
     }
 
     private function createStoreApiRequestStack(): RequestStack
