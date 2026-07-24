@@ -42,6 +42,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -94,6 +95,8 @@ final class PaymentLinkController extends StorefrontController
         private RequestStack $requestStack,
         #[Autowire(service: 'event_dispatcher')]
         private EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: SystemConfigService::class)]
+        private SystemConfigService $systemConfigService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -374,13 +377,28 @@ final class PaymentLinkController extends StorefrontController
             $transaction->getPaymentMethodId(),
             $transaction->getId(),
             $this->generateUrl('frontend.checkout.finish.page', ['orderId' => $orderId]),
-            null,
+            $this->resolveFinalizeTokenLifetime($order->getSalesChannelId()),
             $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $orderId]),
         );
 
         $token = $this->tokenFactory->generateToken($tokenStruct);
 
         return $this->generateUrl('payment.finalize.transaction', ['_sw_payment_token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    /**
+     * Mirrors Shopware core: the configured finalize transaction time (in minutes) is converted to
+     * seconds for the token lifetime. Returns null when unconfigured so TokenStruct applies its own
+     * default, keeping the payment link consistent with a regular checkout.
+     */
+    private function resolveFinalizeTokenLifetime(string $salesChannelId): ?int
+    {
+        $paymentFinalizeTransactionTime = $this->systemConfigService->get('core.cart.paymentFinalizeTransactionTime', $salesChannelId);
+        if (! is_numeric($paymentFinalizeTransactionTime)) {
+            return null;
+        }
+
+        return (int) $paymentFinalizeTransactionTime * 60;
     }
 
     private function storePaymentLinkData(OrderTransactionEntity $transaction, string $paymentLinkId, string $finalizeUrl, Context $context): void

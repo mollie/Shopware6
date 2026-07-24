@@ -61,7 +61,6 @@ Feature: Basic payment checkout
       | banktransfer  | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | belfius       | MOL_REGULAR   | 1        | paid          | BE             | EUR      |
       | billie        | MOL_REGULAR   | 1        | authorized    | DE             | EUR      |
-      | billink       | MOL_REGULAR   | 1        | authorized    | DE             | EUR      |
       | bizum         | MOL_REGULAR   | 1        | paid          | ES             | EUR      |
       | blik          | MOL_REGULAR   | 1        | paid          | DE             | PLN      |
       | eps           | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
@@ -79,6 +78,16 @@ Feature: Basic payment checkout
       | twint         | MOL_REGULAR   | 1        | paid          | DE             | CHF      |
       | vipps         | MOL_REGULAR   | 1        | paid          | NO             | NOK      |
       | mobilepay     | MOL_REGULAR   | 1        | paid          | DK             | DKK      |
+
+  Scenario: billink payment success with a private address
+    Given payment method "billink" exists and active
+    And i select "DE" as billing country without company
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "billink"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "authorized"
 
   Scenario: wero payment with pending status leads to success
     Given payment method "wero" exists and active

@@ -140,9 +140,7 @@ class OrderDeliverySubscriberTest extends TestCase
         $orderTransaction->setId('fakeshopwaretransactionid');
         $orderTransaction->setOrderId($order->getId());
         $orderTransaction->setStateMachineState($state);
-        $orderTransaction->setCustomFields([
-            Mollie::EXTENSION => new Payment('fake-mollie-payment-id'),
-        ]);
+        $orderTransaction->addExtension(Mollie::EXTENSION, new Payment('fake-mollie-payment-id'));
 
         $order->setTransactions(new OrderTransactionCollection([$orderTransaction]));
 

@@ -223,20 +223,6 @@ final class Address implements \JsonSerializable
         $this->phone = PhoneNumber::toE164($phone, $this->country);
     }
 
-    /**
-     * The salutation display name is used as the Mollie "title". Some (especially
-     * localized) salutations are longer than Mollie's 20 character limit and would
-     * abort the payment, so the value is trimmed down to the accepted length.
-     */
-    private function limitTitle(string $title): string
-    {
-        if (mb_strlen($title) > self::MAX_TITLE_LENGTH) {
-            return mb_substr($title, 0, self::MAX_TITLE_LENGTH);
-        }
-
-        return $title;
-    }
-
     public function getTitle(): string
     {
         return $this->title;
@@ -312,5 +298,19 @@ final class Address implements \JsonSerializable
         }
 
         return md5(implode('-', $keys));
+    }
+
+    /**
+     * The salutation display name is used as the Mollie "title". Some (especially
+     * localized) salutations are longer than Mollie's 20 character limit and would
+     * abort the payment, so the value is trimmed down to the accepted length.
+     */
+    private function limitTitle(string $title): string
+    {
+        if (mb_strlen($title) > self::MAX_TITLE_LENGTH) {
+            return mb_substr($title, 0, self::MAX_TITLE_LENGTH);
+        }
+
+        return $title;
     }
 }

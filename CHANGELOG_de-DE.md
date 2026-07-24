@@ -1,6 +1,8 @@
 # Unreleased
+- Geändert: In Headless-Setups werden die Store-API-Webhook- und Return-URLs nun aus APP_URL statt aus dem Proxy-Host gebildet, damit Mollie sie erreichen kann.
 - Behoben: Die Erfassung beim Versand sendet für Netto-Kunden nun den Bruttobetrag.
 - Behoben: Anreden mit mehr als 20 Zeichen brechen die Zahlungserstellung nicht mehr ab; der Adress-Titel wird nun auf Mollies 20-Zeichen-Limit gekürzt.
+- Behoben: Der automatische Versand beim Wechsel des Lieferstatus läuft nun nur noch für über Mollie bezahlte Bestellungen.
 
 # 5.3.0
 - Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
