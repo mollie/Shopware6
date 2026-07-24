@@ -71,7 +71,7 @@ final class PluginSettingsHandler extends AbstractHandler
     {
         $loggerSettings = $this->settingsService->getLoggerSettings();
 
-        $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : LogLevel::INFO;
+        $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : LogLevel::WARNING;
         $maxFiles = $loggerSettings->getLogFileDays();
 
         return new RotatingFileHandler($this->filePath, $maxFiles, $logLevel);

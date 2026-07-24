@@ -1,5 +1,7 @@
 # Unreleased
 - Changed: In headless setups the store-api webhook and return URLs are now built from APP_URL instead of the proxy host, so Mollie can reach them.
+- Changed: The log level for the disabled debug mode of the settings was changed from `INFO` to `WARNING` to prevent spam in log files.
+- Fixed: The log level for order-related log entries now uses the correct log level from the debug mode setting (`DEBUG` or `WARNING`).
 - Fixed: Shipment capture now sends the gross amount for net-tax customers.
 - Fixed: Salutations longer than 20 characters no longer abort payment creation; the address title is now truncated to Mollie's 20 character limit.
 - Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.

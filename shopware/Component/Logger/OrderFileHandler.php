@@ -3,15 +3,19 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Logger;
 
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Level;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class OrderFileHandler extends AbstractHandler
 {
     public function __construct(
+        #[Autowire(service: SettingsService::class)]
+        private AbstractSettingsService $settingsService,
         private OrderLogStorage $storage,
         bool $bubble = false
     ) {
@@ -34,13 +38,15 @@ final class OrderFileHandler extends AbstractHandler
 
         $orderLogPath = $this->storage->resolveLogFile($orderNumber);
 
+        $loggerSettings = $this->settingsService->getLoggerSettings();
+        $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : LogLevel::WARNING;
+
         try {
-            $handler = new StreamHandler($orderLogPath, LogLevel::DEBUG);
-            $handler->handle($record);
-        } catch (\Exception $e) {
+            $handler = new StreamHandler($orderLogPath, $logLevel, $this->bubble);
+
+            return $handler->handle($record);
+        } catch (\Exception) {
             return false;
         }
-
-        return $record->level->value < Level::Warning->value;
     }
 }

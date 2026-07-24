@@ -1,5 +1,7 @@
 # Unreleased
 - Geändert: In Headless-Setups werden die Store-API-Webhook- und Return-URLs nun aus APP_URL statt aus dem Proxy-Host gebildet, damit Mollie sie erreichen kann.
+- Geändert: Das Log-Level wurde für den deaktivierten Debug-Modus der Einstellungen wurden von `INFO` zu `WARNING` geändert, um Spam in Logdateien zu verhindern.
+- Behoben: Das Log-Level für Order-bezogene Logeinträge verwendet nun das korrekte Log-Level der Debug-Modus Einstellung (`DEBUG` oder `WARNING`).
 - Behoben: Die Erfassung beim Versand sendet für Netto-Kunden nun den Bruttobetrag.
 - Behoben: Anreden mit mehr als 20 Zeichen brechen die Zahlungserstellung nicht mehr ab; der Adress-Titel wird nun auf Mollies 20-Zeichen-Limit gekürzt.
 - Behoben: Der automatische Versand beim Wechsel des Lieferstatus läuft nun nur noch für über Mollie bezahlte Bestellungen.
