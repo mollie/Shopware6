@@ -129,22 +129,6 @@ final class WebhookRouteTest extends TestCase
         }
     }
 
-    public function testPaymentWithoutMethodThrowsWebhookException(): void
-    {
-        $transactionService = new FakeTransactionService();
-        $transactionService->createValidStruct();
-
-        $fakeClient = new FakeClient('mollieTestId', 'paid', null);
-        $webhookRoute = $this->getRoute($transactionService, $fakeClient);
-
-        try {
-            $webhookRoute->notify('test', $this->context);
-            $this->fail('Expected WebhookException was not thrown');
-        } catch (WebhookException $exception) {
-            $this->assertSame(WebhookException::PAYMENT_WITHOUT_METHOD, $exception->getErrorCode());
-        }
-    }
-
     public function testTransactionWithoutPaymentMethodThrowsWebhookException(): void
     {
         $transactionService = new FakeTransactionService();

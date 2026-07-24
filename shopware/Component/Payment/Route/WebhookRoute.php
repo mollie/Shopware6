@@ -156,19 +156,15 @@ final class WebhookRoute extends AbstractWebhookRoute
 
     private function updatePaymentMethod(Payment $payment, string $orderNumber, string $salesChannelId, Context $context): void
     {
+        $molliePaymentMethod = $payment->getMethod();
+        if ($molliePaymentMethod === null) {
+            // Legacy transactions or cancelled transactions may not have a Mollie payment method, so we skip the update in that case.
+            return;
+        }
+
         $transaction = $payment->getShopwareTransaction();
         $transactionId = $transaction->getId();
         $transactionPaymentMethod = $transaction->getPaymentMethod();
-
-        $molliePaymentMethod = $payment->getMethod();
-        if ($molliePaymentMethod === null) {
-            // Only throw an exception for new transactions, legacy transactions which include a orderId, but no method should be skipped.
-            if ($payment->getOrderId()) {
-                return;
-            }
-
-            throw WebhookException::paymentWithoutMethod($transactionId, $payment->getId());
-        }
         if ($transactionPaymentMethod === null) {
             throw WebhookException::transactionWithoutPaymentMethod($transactionId);
         }

@@ -3,7 +3,7 @@
 - Fixed: Shipment capture now sends the gross amount for net-tax customers.
 - Fixed: Salutations longer than 20 characters no longer abort payment creation; the address title is now truncated to Mollie's 20 character limit.
 - Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.
-- Fixed: Updating the payment method in the webhook flow is now correctly skipped for legacy orders instead of throwing an error due to missing data.
+- Fixed: Updating the payment method in the webhook flow is now correctly skipped for legacy orders and cancelled orders.
 
 # 5.3.0
 - Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
