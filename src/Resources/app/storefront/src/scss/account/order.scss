@@ -3,32 +3,32 @@
 }
 
 .order-item-status-badge.order-item-status-badge-active {
-    background-color: #0042a0;
-    color: #fff;
+    background-color: $mollie-subscription-active;
+    color: $white;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-canceled {
-    background-color: #b30000;
-    color: #fff;
+    background-color: $mollie-subscription-canceled;
+    color: $white;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-paused {
-    background-color: #595959;
-    color: #fff;
+    background-color: $mollie-subscription-paused;
+    color: $white;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-skipped {
-    background-color: #ffb100;
-    color: #000;
+    background-color: $mollie-subscription-skipped;
+    color: $black;
     margin: 10px 0;
 }
 
 .order-item-status-badge.order-item-status-badge-resumed {
-    background-color: #0042a0;
-    color: #fff;
+    background-color: $mollie-subscription-active;
+    color: $white;
     margin: 10px 0;
 }
 
