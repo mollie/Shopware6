@@ -162,6 +162,11 @@ final class WebhookRoute extends AbstractWebhookRoute
 
         $molliePaymentMethod = $payment->getMethod();
         if ($molliePaymentMethod === null) {
+            // Only throw an exception for new transactions, legacy transactions which include a orderId, but no method should be skipped.
+            if ($payment->getOrderId()) {
+                return;
+            }
+
             throw WebhookException::paymentWithoutMethod($transactionId, $payment->getId());
         }
         if ($transactionPaymentMethod === null) {
