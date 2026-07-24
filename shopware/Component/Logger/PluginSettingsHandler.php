@@ -16,24 +16,19 @@ final class PluginSettingsHandler extends AbstractHandler
 {
     private const LOG_CHANNEL = 'mollie';
     private ?AbstractHandler $fileHandler = null;
-    private Connection $connection;
-    private string $filePath;
     private ?bool $connectedCache = null;
-
-    private AbstractSettingsService $settingsService;
 
     public function __construct(
         #[Autowire(service: SettingsService::class)]
-        AbstractSettingsService $settingsService,
-        Connection $connection,
+        private AbstractSettingsService $settingsService,
+        private Connection $connection,
         #[Autowire(value: '%kernel.logs_dir%/mollie_%kernel.environment%.log')]
-        string $filePath,
-        bool $bubble = true)
-    {
+        private string $filePath,
+        #[Autowire(value: '%mollie.logger.level%')]
+        private string $logLevel = LogLevel::INFO,
+        bool $bubble = true
+    ) {
         parent::__construct(LogLevel::DEBUG, $bubble);
-        $this->connection = $connection;
-        $this->filePath = $filePath;
-        $this->settingsService = $settingsService;
     }
 
     public function handle(LogRecord $record): bool
@@ -71,7 +66,7 @@ final class PluginSettingsHandler extends AbstractHandler
     {
         $loggerSettings = $this->settingsService->getLoggerSettings();
 
-        $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : LogLevel::INFO;
+        $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : $this->logLevel;
         $maxFiles = $loggerSettings->getLogFileDays();
 
         return new RotatingFileHandler($this->filePath, $maxFiles, $logLevel);
