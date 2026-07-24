@@ -14,7 +14,9 @@ final class RouteBuilder implements RouteBuilderInterface
         #[Autowire(service: 'router')]
         private RouterInterface $router,
         #[Autowire(service: 'request_stack')]
-        private RequestStack $requestStack)
+        private RequestStack $requestStack,
+        #[Autowire(value: '%env(default::APP_URL)%')]
+        private string $appUrl = '')
     {
     }
 
@@ -26,7 +28,9 @@ final class RouteBuilder implements RouteBuilderInterface
             $routeName = 'api.mollie.payment-return';
         }
 
-        return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
+        $url = $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
     }
 
     public function getWebhookUrl(string $transactionId): string
@@ -36,7 +40,9 @@ final class RouteBuilder implements RouteBuilderInterface
             $routeName = 'api.mollie.webhook';
         }
 
-        return $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
+        $url = $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
     }
 
     public function getSubscriptionWebhookUrl(string $subscriptionId): string
@@ -46,7 +52,9 @@ final class RouteBuilder implements RouteBuilderInterface
             $routeName = 'api.mollie.webhook.subscription';
         }
 
-        return $this->router->generate($routeName, ['subscriptionId' => $subscriptionId], RouterInterface::ABSOLUTE_URL);
+        $url = $this->router->generate($routeName, ['subscriptionId' => $subscriptionId], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
     }
 
     public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string
@@ -60,11 +68,13 @@ final class RouteBuilder implements RouteBuilderInterface
 
     public function getSubscriptionPaymentUpdateWebhookUrl(string $subscriptionId): string
     {
-        return $this->router->generate(
+        $url = $this->router->generate(
             'api.mollie.webhook.subscription.mandate.update',
             ['subscriptionId' => $subscriptionId],
             RouterInterface::ABSOLUTE_URL
         );
+
+        return $this->normalizeUrl($url);
     }
 
     public function getPaypalExpressRedirectUrl(): string
@@ -110,5 +120,49 @@ final class RouteBuilder implements RouteBuilderInterface
         }
 
         return str_starts_with($request->getPathInfo(), '/store-api');
+    }
+
+    /**
+     * In a headless setup the store-api request originates from the storefront proxy (e.g. a Nuxt/Nitro
+     * server), so the router builds absolute URLs against the proxy host instead of Shopware's public
+     * domain. The resulting webhook and return URLs then point to a host Mollie cannot reach. For store-api
+     * requests we therefore rebuild the origin (scheme/host/port) from Shopware's configured APP_URL, which
+     * is the actual public domain of the backend. This only applies to the api.mollie.* routes served by
+     * Shopware itself; storefront routes and their sales channel domains are left untouched. It is a no-op
+     * for the classic (non-headless) checkout and when APP_URL is unset or points at localhost.
+     */
+    private function normalizeUrl(string $url): string
+    {
+        if (! $this->isStoreApiRequest()) {
+            return $url;
+        }
+
+        $appHost = parse_url($this->appUrl, PHP_URL_HOST);
+        if (! is_string($appHost) || $appHost === '' || $appHost === 'localhost') {
+            return $url;
+        }
+
+        $parts = parse_url($url);
+        if ($parts === false || ! isset($parts['path'])) {
+            return $url;
+        }
+
+        $appScheme = parse_url($this->appUrl, PHP_URL_SCHEME);
+        $appPort = parse_url($this->appUrl, PHP_URL_PORT);
+
+        $origin = (is_string($appScheme) && $appScheme !== '' ? $appScheme : 'https') . '://' . $appHost;
+        if (is_int($appPort)) {
+            $origin .= ':' . $appPort;
+        }
+
+        $normalized = $origin . $parts['path'];
+        if (isset($parts['query'])) {
+            $normalized .= '?' . $parts['query'];
+        }
+        if (isset($parts['fragment'])) {
+            $normalized .= '#' . $parts['fragment'];
+        }
+
+        return $normalized;
     }
 }
