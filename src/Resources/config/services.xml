@@ -9,6 +9,11 @@
         <import resource="packages/**/*.xml"/>
     </imports>
 
+    <parameters>
+        <!-- Minimum log level for the Mollie log handlers. Override in your project (e.g. config/services.yaml) to change verbosity. Ignored while debug mode is enabled. -->
+        <parameter key="mollie.logger.level">info</parameter>
+    </parameters>
+
     <services>
         <defaults autowire="true" autoconfigure="true"/>
 

@@ -1,4 +1,5 @@
 # Unreleased
+- Hinzugefügt: Das minimale Log-Level der Mollie-Log-Handler ist nun über den Container-Parameter `mollie.logger.level` konfigurierbar; der Debug-Modus übersteuert es und erzwingt das Debug-Level.
 - Geändert: In Headless-Setups werden die Store-API-Webhook- und Return-URLs nun aus APP_URL statt aus dem Proxy-Host gebildet, damit Mollie sie erreichen kann.
 - Behoben: Die Erfassung beim Versand sendet für Netto-Kunden nun den Bruttobetrag.
 - Behoben: Anreden mit mehr als 20 Zeichen brechen die Zahlungserstellung nicht mehr ab; der Adress-Titel wird nun auf Mollies 20-Zeichen-Limit gekürzt.

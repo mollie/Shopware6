@@ -3,19 +3,26 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Logger;
 
-use Monolog\Handler\AbstractHandler;
+use Doctrine\DBAL\Connection;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Monolog\Handler\StreamHandler;
-use Monolog\Level;
 use Monolog\LogRecord;
 use Psr\Log\LogLevel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class OrderFileHandler extends AbstractHandler
+final class OrderFileHandler extends AbstractSettingsLogHandler
 {
     public function __construct(
         private OrderLogStorage $storage,
+        #[Autowire(service: SettingsService::class)]
+        AbstractSettingsService $settingsService,
+        Connection $connection,
+        #[Autowire(value: '%mollie.logger.level%')]
+        string $logLevel = LogLevel::INFO,
         bool $bubble = false
     ) {
-        parent::__construct(LogLevel::DEBUG, $bubble);
+        parent::__construct($settingsService, $connection, $logLevel, $bubble);
     }
 
     public function handle(LogRecord $record): bool
@@ -35,12 +42,14 @@ final class OrderFileHandler extends AbstractHandler
         $orderLogPath = $this->storage->resolveLogFile($orderNumber);
 
         try {
-            $handler = new StreamHandler($orderLogPath, LogLevel::DEBUG);
-            $handler->handle($record);
+            $handler = new StreamHandler($orderLogPath, $this->resolveLogLevel(), $this->bubble);
+
+            // StreamHandler::handle() returns "false === bubble": with bubble=false the record is
+            // consumed here (only the per-order file); with bubble=true it keeps propagating to the
+            // following handlers as well, e.g. the main Mollie log.
+            return $handler->handle($record);
         } catch (\Exception $e) {
             return false;
         }
-
-        return $record->level->value < Level::Warning->value;
     }
 }
