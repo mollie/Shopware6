@@ -1,6 +1,7 @@
 # Unreleased
 - Added: The minimum log level of the Mollie log handlers can now be configured via the `mollie.logger.level` container parameter; debug mode overrides it and forces the debug level.
 - Changed: In headless setups the store-api webhook and return URLs are now built from APP_URL instead of the proxy host, so Mollie can reach them.
+- Changed: Webhooks for Mollie payments without a payment method no longer fail; the current payment method is kept.
 - Fixed: Shipment capture now sends the gross amount for net-tax customers.
 - Fixed: Salutations longer than 20 characters no longer abort payment creation; the address title is now truncated to Mollie's 20 character limit.
 - Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.
