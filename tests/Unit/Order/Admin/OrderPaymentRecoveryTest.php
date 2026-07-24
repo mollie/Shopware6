@@ -67,6 +67,81 @@ final class OrderPaymentRecoveryTest extends TestCase
         self::assertArrayHasKey(Mollie::EXTENSION, $upsert['transactions'][0]['customFields']);
     }
 
+    public function testRestoreRebuildsPaymentFromLegacySnakeCaseTransactionCustomFields(): void
+    {
+        $order = new OrderEntity();
+        $order->setId('order-1');
+        $order->setCustomFields([Mollie::EXTENSION => []]);
+
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('tx-1');
+        $transaction->setCustomFields([
+            Mollie::EXTENSION => [
+                'payment_id' => 'tr_1',
+                'order_id' => 'ord_1',
+                'third_party_payment_id' => 'pp_1',
+            ],
+        ]);
+
+        $payment = $this->recovery->restore($order, $transaction, Context::createDefaultContext());
+
+        self::assertNotNull($payment);
+        self::assertSame('tr_1', $payment->getId());
+        self::assertSame('ord_1', $payment->getOrderId());
+        self::assertSame('pp_1', $payment->getThirdPartyPaymentId());
+    }
+
+    public function testRestoreRebuildsPaymentFromCamelCaseTransactionCustomFields(): void
+    {
+        $order = new OrderEntity();
+        $order->setId('order-1');
+        $order->setCustomFields([]);
+
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('tx-1');
+        $transaction->setCustomFields([
+            Mollie::EXTENSION => [
+                'id' => 'tr_1',
+                'orderId' => 'ord_1',
+                'thirdPartyPaymentId' => 'pp_1',
+            ],
+        ]);
+
+        $payment = $this->recovery->restore($order, $transaction, Context::createDefaultContext());
+
+        self::assertNotNull($payment);
+        self::assertSame('tr_1', $payment->getId());
+        self::assertSame('ord_1', $payment->getOrderId());
+        self::assertSame('pp_1', $payment->getThirdPartyPaymentId());
+    }
+
+    public function testTransactionCustomFieldsTakePrecedenceOverOrder(): void
+    {
+        $order = new OrderEntity();
+        $order->setId('order-1');
+        $order->setCustomFields([
+            Mollie::EXTENSION => [
+                'payment_id' => 'tr_order',
+                'order_id' => 'ord_order',
+            ],
+        ]);
+
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('tx-1');
+        $transaction->setCustomFields([
+            Mollie::EXTENSION => [
+                'id' => 'tr_transaction',
+                'orderId' => 'ord_transaction',
+            ],
+        ]);
+
+        $payment = $this->recovery->restore($order, $transaction, Context::createDefaultContext());
+
+        self::assertNotNull($payment);
+        self::assertSame('tr_transaction', $payment->getId());
+        self::assertSame('ord_transaction', $payment->getOrderId());
+    }
+
     public function testRestoreReturnsNullWhenNoMollieDataPresent(): void
     {
         $order = new OrderEntity();

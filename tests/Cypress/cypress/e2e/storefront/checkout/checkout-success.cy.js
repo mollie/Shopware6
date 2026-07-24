@@ -128,6 +128,9 @@ context("Checkout Tests", () => {
                         checkout.changeBillingCountry('Belgium');
                     } else if (payment.key === 'bizum') {
                         checkout.changeBillingCountry('Spain');
+                    } else if (payment.key === 'billink') {
+                        // Billink no longer works as a B2B order, so the checkout must be private (no company)
+                        checkout.makeBillingAddressPrivate();
                     } else {
                         checkout.changeBillingCountry('Germany');
                     }

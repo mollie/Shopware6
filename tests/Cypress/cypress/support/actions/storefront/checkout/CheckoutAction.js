@@ -157,4 +157,53 @@ export default class CheckoutAction {
             cy.reload();
         }
     }
+
+    /**
+     * Billink treats an order with a company as a B2B order, which Mollie's API now rejects for our
+     * sandbox. This opens the address editor, removes the company and switches the account type to
+     * private so the checkout is created as a B2C order and Billink is accepted again.
+     */
+    makeBillingAddressPrivate() {
+
+        if (shopware.isVersionGreaterEqual('6.7.0.0')) {
+            cy.get('.confirm-address .card-actions:eq(0) > button, .confirm-address .card-actions:eq(0) > a').click();
+            cy.wait(1000);
+            cy.get('.modal-dialog-address #shipping-address-tab-pane .address-manager-select-address button').first().click();
+            cy.get('.dropdown-menu .address-manager-modal-address-form[data-address-type="shipping"]').first().click();
+        }
+
+        if (shopware.isVersionLower('6.7.0.0')) {
+            cy.get('.js-confirm-overview-addresses .card:eq(0) .card-actions a[data-address-editor]').click();
+            cy.wait(2000);
+            cy.get('.address-editor-edit').click();
+            cy.wait(1000);
+        }
+
+        cy.get('select.country-select:eq(0)').select('Germany');
+
+        // clear the company while the field is still visible, then switch the (customer-wide) account
+        // type to private, which drops the company requirement and makes the whole order B2C.
+        cy.get('body').then(($body) => {
+            const companyField = $body.find('input[name$="[company]"]:visible');
+            if (companyField.length > 0) {
+                cy.wrap(companyField.first()).clear();
+            }
+        });
+        cy.get('select[name$="[accountType]"], select[name="accountType"]').first().select('Private');
+
+        if (shopware.isVersionGreaterEqual('6.7.0.0')) {
+            cy.get('.address-form-create-submit').click();
+        } else {
+            cy.get('.address-form-actions:eq(0) button').click();
+        }
+
+        if (shopware.isVersionGreaterEqual('6.6.8.0') && shopware.isVersionLower('6.6.9.0')) {
+            cy.wait(1000);
+            cy.get('.js-pseudo-modal .modal-dialog .btn-close').click();
+        }
+
+        if (shopware.isVersionGreaterEqual('6.7.0.0')) {
+            cy.reload();
+        }
+    }
 }
