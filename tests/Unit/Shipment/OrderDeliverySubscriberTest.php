@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment;
 
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Shipment\OrderDeliverySubscriber;
+use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\FakeShipOrderRoute;
@@ -14,6 +16,8 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryDefinition;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -127,6 +131,20 @@ class OrderDeliverySubscriberTest extends TestCase
         $order->setId('fakeshopwareorderid');
         $order->setOrderNumber('10000');
         $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
+
+        $state = new StateMachineStateEntity();
+        $state->setId('paid-state-id');
+        $state->setTechnicalName('paid');
+
+        $orderTransaction = new OrderTransactionEntity();
+        $orderTransaction->setId('fakeshopwaretransactionid');
+        $orderTransaction->setOrderId($order->getId());
+        $orderTransaction->setStateMachineState($state);
+        $orderTransaction->setCustomFields([
+            Mollie::EXTENSION => new Payment('fake-mollie-payment-id'),
+        ]);
+
+        $order->setTransactions(new OrderTransactionCollection([$orderTransaction]));
 
         return $order;
     }

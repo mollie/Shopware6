@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Shipment;
 
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
+use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
@@ -57,19 +61,27 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         $orderDeliveryId = $event->getTransition()->getEntityId();
 
         $criteria = new Criteria([$orderDeliveryId]);
-        $criteria->addAssociation('order');
+        $criteria->addAssociation('order.transactions.stateMachineState');
 
         $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
-            $this->logger->error('Delivery not found for ' . $orderDeliveryId);
-
             return;
         }
 
         $order = $orderDelivery->getOrder();
         if ($order === null) {
-            $this->logger->error('Order association missing for delivery ' . $orderDeliveryId);
+            return;
+        }
 
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transaction = $transactions->getCurrentOrderTransaction();
+        if (! $transaction instanceof OrderTransactionEntity) {
+            return;
+        }
+
+        /** @var ?Payment $molliePayment */
+        $molliePayment = $transaction->getExtension(Mollie::EXTENSION);
+        if (! $molliePayment instanceof Payment) {
             return;
         }
 
