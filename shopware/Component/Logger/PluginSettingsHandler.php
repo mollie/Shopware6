@@ -12,23 +12,22 @@ use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class PluginSettingsHandler extends AbstractHandler
+final class PluginSettingsHandler extends AbstractSettingsLogHandler
 {
     private const LOG_CHANNEL = 'mollie';
     private ?AbstractHandler $fileHandler = null;
-    private ?bool $connectedCache = null;
 
     public function __construct(
         #[Autowire(service: SettingsService::class)]
-        private AbstractSettingsService $settingsService,
-        private Connection $connection,
+        AbstractSettingsService $settingsService,
+        Connection $connection,
         #[Autowire(value: '%kernel.logs_dir%/mollie_%kernel.environment%.log')]
         private string $filePath,
         #[Autowire(value: '%mollie.logger.level%')]
-        private string $logLevel = LogLevel::INFO,
+        string $logLevel = LogLevel::INFO,
         bool $bubble = true
     ) {
-        parent::__construct(LogLevel::DEBUG, $bubble);
+        parent::__construct($settingsService, $connection, $logLevel, $bubble);
     }
 
     public function handle(LogRecord $record): bool
@@ -51,23 +50,10 @@ final class PluginSettingsHandler extends AbstractHandler
         return $this->bubble === false;
     }
 
-    private function isConnected(): bool
-    {
-        if ($this->connectedCache !== null) {
-            return $this->connectedCache;
-        }
-
-        $this->connectedCache = $this->connection->isConnected();
-
-        return $this->connectedCache;
-    }
-
     private function initializeHandler(): AbstractHandler
     {
-        $loggerSettings = $this->settingsService->getLoggerSettings();
-
-        $logLevel = $loggerSettings->isDebugMode() ? LogLevel::DEBUG : $this->logLevel;
-        $maxFiles = $loggerSettings->getLogFileDays();
+        $maxFiles = $this->settingsService->getLoggerSettings()->getLogFileDays();
+        $logLevel = $this->resolveLogLevel();
 
         return new RotatingFileHandler($this->filePath, $maxFiles, $logLevel);
     }

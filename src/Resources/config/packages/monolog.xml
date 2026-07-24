@@ -10,13 +10,12 @@
     <monolog:config>
         <monolog:channel>mollie</monolog:channel>
 
+        <!-- type="service" handlers configure their own level and bubble in the constructor; the level/bubble attributes are ignored here by Symfony. -->
         <monolog:handler
                 name="mollie_order_file"
                 channel="mollie"
                 type="service"
                 id="Mollie\Shopware\Component\Logger\OrderFileHandler"
-                level="debug"
-                bubble="true"
         />
 
         <monolog:handler
@@ -24,7 +23,6 @@
                 channel="mollie"
                 type="service"
                 id="Mollie\Shopware\Component\Logger\PluginSettingsHandler"
-                level="debug"
         />
     </monolog:config>
 </container>
