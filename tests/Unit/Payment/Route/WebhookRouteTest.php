@@ -129,20 +129,25 @@ final class WebhookRouteTest extends TestCase
         }
     }
 
-    public function testPaymentWithoutMethodThrowsWebhookException(): void
+    /**
+     * A Mollie payment without a method (an open payment, or a method Mollie has since removed)
+     * must not fail the webhook. The current Shopware payment method is kept and the rest of the
+     * webhook still runs.
+     */
+    public function testPaymentWithoutMethodKeepsCurrentPaymentMethod(): void
     {
         $transactionService = new FakeTransactionService();
         $transactionService->createValidStruct();
 
-        $fakeClient = new FakeClient('mollieTestId', 'paid', null);
-        $webhookRoute = $this->getRoute($transactionService, $fakeClient);
+        $paymentMethodUpdater = new FakePaymentMethodUpdater();
 
-        try {
-            $webhookRoute->notify('test', $this->context);
-            $this->fail('Expected WebhookException was not thrown');
-        } catch (WebhookException $exception) {
-            $this->assertSame(WebhookException::PAYMENT_WITHOUT_METHOD, $exception->getErrorCode());
-        }
+        $fakeClient = new FakeClient('mollieTestId', 'paid', null);
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, null, $paymentMethodUpdater);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertFalse($paymentMethodUpdater->wasCalled(), 'The payment method must be left untouched when Mollie has no method');
     }
 
     public function testTransactionWithoutPaymentMethodThrowsWebhookException(): void

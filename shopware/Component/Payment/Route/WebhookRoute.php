@@ -158,12 +158,26 @@ final class WebhookRoute extends AbstractWebhookRoute
     {
         $transaction = $payment->getShopwareTransaction();
         $transactionId = $transaction->getId();
+        $molliePaymentMethod = $payment->getMethod();
+        $logData = [
+            'transactionId' => $transactionId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+            'paymentId' => $payment->getId(),
+        ];
+
+        if ($molliePaymentMethod === null) {
+            // The Mollie payment carries no method - either it is still open and the customer has
+            // not picked one, or Mollie has since removed a method an old payment once used. There
+            // is nothing to map to a Shopware payment method then, so the current one is kept as is
+            // instead of failing the whole webhook.
+            $this->logger->debug('Mollie payment has no payment method, keeping the current Shopware payment method',$logData);
+
+            return;
+        }
+
         $transactionPaymentMethod = $transaction->getPaymentMethod();
 
-        $molliePaymentMethod = $payment->getMethod();
-        if ($molliePaymentMethod === null) {
-            throw WebhookException::paymentWithoutMethod($transactionId, $payment->getId());
-        }
         if ($transactionPaymentMethod === null) {
             throw WebhookException::transactionWithoutPaymentMethod($transactionId);
         }
@@ -173,11 +187,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         if ($molliePaymentMethodExtension === null) {
             throw WebhookException::transactionWithoutMolliePayment($transactionId);
         }
-        $logData = [
-            'transactionId' => $transactionId,
-            'orderNumber' => $orderNumber,
-            'salesChannelId' => $salesChannelId,
-        ];
+
         try {
             $newPaymentMethodId = $this->paymentMethodUpdater->updatePaymentMethod($molliePaymentMethodExtension,$molliePaymentMethod,$transactionId,$orderNumber,$salesChannelId,$context);
             $logData['newPaymentMethodId'] = $newPaymentMethodId;
