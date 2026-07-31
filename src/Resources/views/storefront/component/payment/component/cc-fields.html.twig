@@ -77,28 +77,28 @@
                     </div>
                     <div class="block-group">
                         <div class="block">
-                            <label for="cardHolder">{{ "molliePayments.components.creditCard.cardHolderLabel"|trans|striptags }}</label>
-                            <div id="cardHolder" class="input--field mollie"></div>
-                            <div id="cardHolderError" class="error-message"></div>
+                            <label id="cardHolderLabel">{{ "molliePayments.components.creditCard.cardHolderLabel"|trans|striptags }}</label>
+                            <div id="cardHolder" class="input--field mollie" role="group" aria-labelledby="cardHolderLabel"></div>
+                            <div id="cardHolderError" class="error-message" role="alert"></div>
                         </div>
                     </div>
                     <div class="block-group">
                         <div class="block">
-                            <label for="cardNumber">{{ "molliePayments.components.creditCard.cardNumberLabel"|trans|striptags }}</label>
-                            <div id="cardNumber" class="input--field mollie"></div>
-                            <div id="cardNumberError" class="error-message"></div>
+                            <label id="cardNumberLabel">{{ "molliePayments.components.creditCard.cardNumberLabel"|trans|striptags }}</label>
+                            <div id="cardNumber" class="input--field mollie" role="group" aria-labelledby="cardNumberLabel"></div>
+                            <div id="cardNumberError" class="error-message" role="alert"></div>
                         </div>
                     </div>
                     <div class="block-group">
                         <div class="b1 block">
-                            <label for="expiryDate">{{ "molliePayments.components.creditCard.cardExpiryDateLabel"|trans|striptags }}</label>
-                            <div id="expiryDate" class="input--field mollie"></div>
-                            <div id="expiryDateError" class="error-message"></div>
+                            <label id="expiryDateLabel">{{ "molliePayments.components.creditCard.cardExpiryDateLabel"|trans|striptags }}</label>
+                            <div id="expiryDate" class="input--field mollie" role="group" aria-labelledby="expiryDateLabel"></div>
+                            <div id="expiryDateError" class="error-message" role="alert"></div>
                         </div>
                         <div class="b2 block">
-                            <label for="verificationCode">{{ "molliePayments.components.creditCard.cardVerificationCodeLabel"|trans|striptags }}</label>
-                            <div id="verificationCode" class="input--field mollie"></div>
-                            <div id="verificationCodeError" class="error-message"></div>
+                            <label id="verificationCodeLabel">{{ "molliePayments.components.creditCard.cardVerificationCodeLabel"|trans|striptags }}</label>
+                            <div id="verificationCode" class="input--field mollie" role="group" aria-labelledby="verificationCodeLabel"></div>
+                            <div id="verificationCodeError" class="error-message" role="alert"></div>
                         </div>
                     </div>
 

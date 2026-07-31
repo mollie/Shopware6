@@ -13,17 +13,20 @@
         <label for="molliePayPhone">{{ "molliePayments.components.phoneField.headLine"|trans|striptags }}:</label>
         <input id="molliePayPhone"
                placeholder="+49123456789"
-               name="molliePayPhone" 
-               form="confirmOrderForm" 
-               type="text"
+               name="molliePayPhone"
+               form="confirmOrderForm"
+               type="tel"
+               inputmode="tel"
+               autocomplete="tel"
                pattern="\+[1-9]\d{1,14}"
                class="form-control"
-               autocomplete="off"
+               aria-errormessage="molliePayPhoneError"
                value="{{ context.customer.activeBillingAddress.phoneNumber }}"
               />
-        <small class="form-text js-validation-message invalid-feedback d-none"
-               data-form-validation-invalid-phone="true" invalid="true">
-
+        <small id="molliePayPhoneError"
+               class="form-text js-validation-message invalid-feedback d-none"
+               data-form-validation-invalid-phone="true"
+               role="alert">
             {{ "molliePayments.components.phoneField.phoneErrorMessage"|trans|striptags }}
         </small>
     </div>

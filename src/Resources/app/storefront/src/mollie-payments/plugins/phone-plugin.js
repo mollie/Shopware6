@@ -6,7 +6,7 @@ const MOLLIE_PHONE_ERROR_MESSAGE_SELECTOR = '.mollie-phone-field [data-form-vali
 
 const DISPLAY_NONE_CLS = 'd-none';
 const WAS_VALIDATED_CLS = 'was-validated';
-const INVALID_ATTR = 'invalid';
+const INVALID_ATTR = 'aria-invalid';
 
 export default class MolliePhonePlugin extends Plugin {
     init() {
@@ -28,7 +28,7 @@ export default class MolliePhonePlugin extends Plugin {
         this._addListener(phoneField, 'blur', (e) => {
             const form = e.target.form;
             if (form.reportValidity() === false) {
-                e.target.setAttribute(INVALID_ATTR, true);
+                e.target.setAttribute(INVALID_ATTR, 'true');
                 errorMessageElement.classList.remove(DISPLAY_NONE_CLS);
             }
             return form.reportValidity();
