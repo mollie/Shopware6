@@ -1,5 +1,4 @@
 import MollieCreditCardMandate from '../core/creditcard-mandate.plugin';
-import CsrfAjaxModeHelper from '../helper/csrf-ajax-mode.helper';
 import ConfirmPageRepository from '../repository/confirm-page-repository';
 
 const CARD_HOLDER_SELECTOR = '#cardHolder';
@@ -265,12 +264,10 @@ export default class MollieCreditCardComponents extends MollieCreditCardMandate 
     }
 
     /**
+     * Submits the confirm order form to continue the standard Shopware checkout.
      * @param form
      */
     continueShopwareCheckout(form) {
-        const csrfMode = new CsrfAjaxModeHelper(window.csrf);
-        if (!csrfMode.isActive()) {
-            form.submit();
-        }
+        form.submit();
     }
 }
