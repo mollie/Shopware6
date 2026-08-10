@@ -79,27 +79,14 @@ final class SubscriptionDataService implements SubscriptionDataServiceInterface
         }
 
         $subscriptionBillingAddress = $subscriptionEntity->getBillingAddress();
-        $subscriptionShippingAddress = $subscriptionEntity->getShippingAddress();
-
-        if (! $subscriptionBillingAddress instanceof SubscriptionAddressEntity && ! $subscriptionShippingAddress instanceof SubscriptionAddressEntity) {
-            $this->logger->error('Subscription has no addresses', $logData);
+        if (! $subscriptionBillingAddress instanceof SubscriptionAddressEntity) {
+            $this->logger->error('Subscription billing address was not found', $logData);
             throw new SubscriptionWithoutAddressException($subscriptionId);
         }
-
-        // Older plugin versions stored no shipping address when it was identical to the billing address.
-        // The missing side is written back onto the entity so every consumer of it sees both addresses.
-        if (! $subscriptionBillingAddress instanceof SubscriptionAddressEntity) {
-            $this->logger->info('Subscription has no billing address, falling back to the shipping address', $logData);
-            $subscriptionBillingAddress = $subscriptionShippingAddress;
-            $subscriptionEntity->setBillingAddress($subscriptionBillingAddress);
-            $subscriptionEntity->setBillingAddressId($subscriptionBillingAddress->getId());
-        }
-
+        $subscriptionShippingAddress = $subscriptionEntity->getShippingAddress();
         if (! $subscriptionShippingAddress instanceof SubscriptionAddressEntity) {
-            $this->logger->info('Subscription has no shipping address, falling back to the billing address', $logData);
-            $subscriptionShippingAddress = $subscriptionBillingAddress;
-            $subscriptionEntity->setShippingAddress($subscriptionShippingAddress);
-            $subscriptionEntity->setShippingAddressId($subscriptionShippingAddress->getId());
+            $this->logger->error('Subscription shipping address was not found', $logData);
+            throw new SubscriptionWithoutAddressException($subscriptionId);
         }
 
         return new SubscriptionDataStruct(
