@@ -17,7 +17,7 @@
         {% set theme = 'black' %}
         {% set image = asset('bundles/molliepayments/static/ppe-white.png', 'asset') %}
     {% else %}
-        {% set themeso  = 'gold' %}
+        {% set theme = 'gold' %}
     {% endif %}
 
 
@@ -29,6 +29,7 @@
 
     <div class="{{ cols }}">
         <button name="paypal-express"
+                type="button"
                 class="mollie-paypal-button js-mollie-paypal-button mollie-express-button paypal-button-{{ shape }} paypal-theme-{{ theme }}"
                 data-form-action="{{ path('frontend.mollie.paypal-express.start') }}">
             <img src="{{ image }}" class="mollie-paypal-button-image" alt="PayPal"/>
