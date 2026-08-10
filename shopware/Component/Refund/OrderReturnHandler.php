@@ -22,7 +22,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 
-final class OrderReturnHandler
+final class OrderReturnHandler implements OrderReturnHandlerInterface
 {
     private readonly bool $featureDisabled;
 
