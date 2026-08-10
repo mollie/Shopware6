@@ -5,6 +5,7 @@
 - Behoben: Die Erfassung beim Versand sendet für Netto-Kunden nun den Bruttobetrag.
 - Behoben: Anreden mit mehr als 20 Zeichen brechen die Zahlungserstellung nicht mehr ab; der Adress-Titel wird nun auf Mollies 20-Zeichen-Limit gekürzt.
 - Behoben: Der automatische Versand beim Wechsel des Lieferstatus läuft nun nur noch für über Mollie bezahlte Bestellungen.
+- Behoben: Abo-Verlängerungen schlagen bei Alt-Abonnements nicht mehr fehl und erstellen die Verlängerungsbestellung wieder zuverlässig.
 
 # 5.3.0
 - Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
