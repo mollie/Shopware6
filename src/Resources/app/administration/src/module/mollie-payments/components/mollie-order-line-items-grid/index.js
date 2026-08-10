@@ -79,6 +79,15 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
     },
 
     watch: {
+        // The grid is rendered before the order details of the Mollie tab are loaded, so both status
+        // objects arrive after the component was created. Without these watchers the grid would keep
+        // its empty status and every ship/cancel action would stay disabled.
+        initialShippingStatus(value) {
+            if (value !== null && value !== undefined) {
+                this.shippingStatus = value;
+            }
+        },
+
         initialCancelStatus(value) {
             if (value !== null && value !== undefined) {
                 this.cancelStatus = value;
@@ -109,25 +118,9 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
         if (this.initialCancelStatus !== null) {
             this.cancelStatus = this.initialCancelStatus;
         }
-
-        if (this.initialShippingStatus === null || this.initialCancelStatus === null) {
-            this.reloadData();
-        }
     },
 
     methods: {
-        async reloadData() {
-            await this.loadMollieShippingStatus();
-        },
-
-        async loadMollieShippingStatus() {
-            await this.MolliePaymentsShippingService.status({ orderId: this.order.id }).then(
-                function (response) {
-                    this.shippingStatus = response;
-                }.bind(this),
-            );
-        },
-
         loadMollieCancelStatus(cancelResponse) {
             if (!cancelResponse || !cancelResponse.success || !cancelResponse.data) {
                 return;
@@ -158,12 +151,13 @@ Component.extend('mollie-order-line-items-grid', 'sw-order-line-items-grid', {
             this.updateTrackingPrefilling();
         },
 
+        // The refreshed status arrives through the initialShippingStatus prop: the Mollie tab reloads
+        // the order details when the EventShippedOrder event is emitted.
         onCloseShipItemModal() {
             this.isShipItemLoading = false;
             this.showShipItemModal = false;
             this.shipQuantity = 0;
             this.resetTracking();
-            this.reloadData();
         },
 
         onOpenCancelItemModal(item) {

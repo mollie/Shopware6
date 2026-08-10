@@ -4,12 +4,14 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Order\Admin;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminController;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminStatusBuilder;
 use Mollie\Shopware\Component\Order\Admin\OrderPaymentRecovery;
+use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -44,7 +46,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -65,7 +67,7 @@ final class OrderAdminControllerTest extends TestCase
         ]);
         $gateway->withOrder($mollieOrder);
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -88,7 +90,7 @@ final class OrderAdminControllerTest extends TestCase
         $gateway = new FakeGateway();
         $gateway->withGetOrderException();
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -104,7 +106,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -125,7 +127,7 @@ final class OrderAdminControllerTest extends TestCase
         ]);
         $gateway->withOrder($mollieOrder);
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -154,7 +156,7 @@ final class OrderAdminControllerTest extends TestCase
         $mollieOrder = new Order('ord-xxx', '', null, [$line1, $line2]);
         $gateway->withOrder($mollieOrder);
 
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -165,7 +167,12 @@ final class OrderAdminControllerTest extends TestCase
         $this->assertSame(5, $total['shippable']);
     }
 
-    public function testPaymentsApiLineItemsAreNotShippableOrCancelableForPaidTransaction(): void
+    /**
+     * A manual-capture payment (Klarna, Riverty, ...) is already reported as paid by Mollie after the
+     * first partial capture, so the remaining items must stay shippable. Cancelling them is not
+     * possible anymore, because that requires an authorized payment.
+     */
+    public function testPaymentsApiLineItemsAreShippableButNotCancelableForPaidTransaction(): void
     {
         $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
         $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_PAID, $lineItems);
@@ -174,7 +181,30 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $shipping = $body['shipping']['status']['shopware-line-1'];
+        $this->assertTrue($shipping['isShippable']);
+        $this->assertSame(2, $shipping['shippableQuantity']);
+
+        $cancel = $body['cancelItem']['shopware-line-1'];
+        $this->assertFalse($cancel['isCancelable']);
+        $this->assertSame(0, $cancel['cancelableQuantity']);
+    }
+
+    public function testPaymentsApiLineItemsAreNotShippableForCancelledTransaction(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_CANCELLED, $lineItems);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -182,10 +212,25 @@ final class OrderAdminControllerTest extends TestCase
         $shipping = $body['shipping']['status']['shopware-line-1'];
         $this->assertFalse($shipping['isShippable']);
         $this->assertSame(0, $shipping['shippableQuantity']);
+    }
 
-        $cancel = $body['cancelItem']['shopware-line-1'];
-        $this->assertFalse($cancel['isCancelable']);
-        $this->assertSame(0, $cancel['cancelableQuantity']);
+    public function testShippingTotalForPaymentsApiReportsShippableItems(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_AUTHORIZED, $lineItems);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $gateway = new FakeGateway();
+        $controller = $this->buildController($repository, $gateway);
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $total = $body['shipping']['total'];
+        $this->assertSame(0, $total['quantity']);
+        $this->assertSame(2, $total['shippable']);
     }
 
     public function testPaymentsApiLineItemsAreShippableAndCancelableForAuthorizedTransaction(): void
@@ -197,7 +242,7 @@ final class OrderAdminControllerTest extends TestCase
         $repository->add($order);
 
         $gateway = new FakeGateway();
-        $controller = new OrderAdminController($repository, new FakeSettingsService(), $gateway, new OrderAdminStatusBuilder(), new OrderPaymentRecovery($repository));
+        $controller = $this->buildController($repository, $gateway);
 
         $response = $controller->details('order-1', $this->context);
         $body = json_decode((string) $response->getContent(), true);
@@ -209,6 +254,17 @@ final class OrderAdminControllerTest extends TestCase
         $cancel = $body['cancelItem']['shopware-line-1'];
         $this->assertTrue($cancel['isCancelable']);
         $this->assertSame(2, $cancel['cancelableQuantity']);
+    }
+
+    private function buildController(FakeOrderSearchRepository $repository, FakeGateway $gateway): OrderAdminController
+    {
+        $lineItemFilter = new LineItemFilter();
+        $itemResolver = new ShipmentItemResolver($lineItemFilter);
+        $statusBuilder = new OrderAdminStatusBuilder($itemResolver, $lineItemFilter);
+        $settingsService = new FakeSettingsService();
+        $paymentRecovery = new OrderPaymentRecovery($repository);
+
+        return new OrderAdminController($repository, $settingsService, $gateway, $statusBuilder, $paymentRecovery);
     }
 
     private function buildOrder(string $molliePaymentId, ?string $mollieOrderId, ?string $transactionState = null, ?OrderLineItemCollection $lineItems = null): OrderEntity

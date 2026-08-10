@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Order\Admin;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminStatusBuilder;
+use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
+use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -18,18 +21,58 @@ final class OrderAdminStatusBuilderTest extends TestCase
 {
     private OrderAdminStatusBuilder $builder;
 
+    private OrderEntityBuilder $orderBuilder;
+
     protected function setUp(): void
     {
-        $this->builder = new OrderAdminStatusBuilder();
+        $lineItemFilter = new LineItemFilter();
+        $itemResolver = new ShipmentItemResolver($lineItemFilter);
+        $this->builder = new OrderAdminStatusBuilder($itemResolver, $lineItemFilter);
+        $this->orderBuilder = new OrderEntityBuilder();
     }
 
-    public function testBuildShippingTotalIsZeroWithoutMollieOrder(): void
+    public function testBuildShippingTotalForPaymentsApiCountsOpenItemsAsShippable(): void
     {
-        $total = $this->builder->buildShippingTotal(null);
+        $lineItem = $this->orderBuilder->createShippableLineItem('li1', 'SW1', 3, 10.0);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+
+        $total = $this->builder->buildShippingTotal(null, $order, true);
 
         self::assertSame('0.00', $total->amount);
         self::assertSame(0, $total->quantity);
+        self::assertSame(3, $total->shippable);
+    }
+
+    public function testBuildShippingTotalForPaymentsApiDerivesShippedItemsFromCustomFields(): void
+    {
+        $lineItem = $this->orderBuilder->createShippableLineItem('li1', 'SW1', 3, 10.0, ['quantity' => 1]);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+
+        $total = $this->builder->buildShippingTotal(null, $order, true);
+
+        self::assertSame('10.00', $total->amount);
+        self::assertSame(1, $total->quantity);
+        self::assertSame(2, $total->shippable);
+    }
+
+    public function testBuildShippingTotalForPaymentsApiHasNoShippableItemsWhenShippingNotAllowed(): void
+    {
+        $lineItem = $this->orderBuilder->createShippableLineItem('li1', 'SW1', 3, 10.0);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+
+        $total = $this->builder->buildShippingTotal(null, $order, false);
+
         self::assertSame(0, $total->shippable);
+    }
+
+    public function testBuildShippingTotalAmountHasNoThousandsSeparator(): void
+    {
+        $lineItem = $this->orderBuilder->createShippableLineItem('li1', 'SW1', 2, 1500.0, ['quantity' => 1]);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+
+        $total = $this->builder->buildShippingTotal(null, $order, true);
+
+        self::assertSame('1500.00', $total->amount);
     }
 
     public function testCancelStatusForPaymentsApiDerivesFromShopwareLineItems(): void
@@ -64,6 +107,18 @@ final class OrderAdminStatusBuilderTest extends TestCase
         self::assertTrue($status['li1']->isShippable);
         self::assertSame(3, $status['li1']->shippableQuantity);
         self::assertSame(0, $status['li1']->quantityShipped);
+    }
+
+    public function testShippingStatusForPaymentsApiSkipsContainerLineItems(): void
+    {
+        $container = $this->orderBuilder->createContainerLineItem('container1', 'Personalize this product', 10.0);
+        $product = $this->orderBuilder->createShippableLineItem('li1', 'SW1', 1, 10.0);
+        $lineItems = new OrderLineItemCollection([$container, $product]);
+
+        $status = $this->builder->buildShippingStatus('', null, $lineItems, true);
+
+        self::assertArrayNotHasKey('container1', $status);
+        self::assertArrayHasKey('li1', $status);
     }
 
     public function testShippingStatusForOrdersApiDerivesFromMollieOrderLines(): void
