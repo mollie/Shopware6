@@ -7,6 +7,7 @@
 - Behoben: Der automatische Versand beim Wechsel des Lieferstatus läuft nun nur noch für über Mollie bezahlte Bestellungen.
 - Behoben: Abo-Verlängerungen schlagen bei Alt-Abonnements nicht mehr fehl und erstellen die Verlängerungsbestellung wieder zuverlässig.
 - Behoben: Das Öffnen einer Bestellung in der Administration löst für vorhandene Retouren keine doppelte Erstattung mehr aus.
+- Behoben: Adresszusätze und Firmennamen, die nur aus Leerzeichen bestehen, werden nicht mehr für die Mollie-Adresse verwendet.
 - Behoben: Beim Lesen von Bestellungen über die API werden keine `Undefined array key "refunds"`-Warnungen mehr geloggt.
 
 # 5.3.0

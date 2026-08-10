@@ -66,16 +66,11 @@ final class Address implements \JsonSerializable
         if ($orderAddress->getPhoneNumber() !== null) {
             $address->setPhone($orderAddress->getPhoneNumber());
         }
-        $additionalAddressLines = [];
-        if ($orderAddress->getAdditionalAddressLine1()) {
-            $additionalAddressLines[] = $orderAddress->getAdditionalAddressLine1();
+        $streetAdditional = $address->joinAdditionalLines($orderAddress->getAdditionalAddressLine1(), $orderAddress->getAdditionalAddressLine2());
+        if ($streetAdditional !== '') {
+            $address->setStreetAdditional($streetAdditional);
         }
-        if ($orderAddress->getAdditionalAddressLine2()) {
-            $additionalAddressLines[] = $orderAddress->getAdditionalAddressLine2();
-        }
-        if (count($additionalAddressLines) > 0) {
-            $address->setStreetAdditional(implode(' ', $additionalAddressLines));
-        }
+
         if ($orderAddress->getCompany() !== null) {
             $address->setOrganizationName($orderAddress->getCompany());
         }
@@ -99,15 +94,9 @@ final class Address implements \JsonSerializable
             $country !== null ? (string) $country->getIso() : '',
         );
 
-        $additionalAddressLines = [];
-        if ($customerAddress->getAdditionalAddressLine1()) {
-            $additionalAddressLines[] = $customerAddress->getAdditionalAddressLine1();
-        }
-        if ($customerAddress->getAdditionalAddressLine2()) {
-            $additionalAddressLines[] = $customerAddress->getAdditionalAddressLine2();
-        }
-        if (count($additionalAddressLines) > 0) {
-            $address->setStreetAdditional(implode(' ', $additionalAddressLines));
+        $streetAdditional = $address->joinAdditionalLines($customerAddress->getAdditionalAddressLine1(), $customerAddress->getAdditionalAddressLine2());
+        if ($streetAdditional !== '') {
+            $address->setStreetAdditional($streetAdditional);
         }
 
         $phone = $customerAddress->getPhoneNumber();
@@ -198,12 +187,16 @@ final class Address implements \JsonSerializable
 
     public function setOrganizationName(string $organizationName): void
     {
-        $this->organizationName = $organizationName;
+        $this->organizationName = trim($organizationName);
     }
 
+    /**
+     * Mollie rejects a "streetAdditional" that holds nothing but whitespaces, so the value is
+     * normalized on assignment and stays empty when there is no real content behind it.
+     */
     public function setStreetAdditional(string $streetAdditional): void
     {
-        $this->streetAdditional = $streetAdditional;
+        $this->streetAdditional = trim($streetAdditional);
     }
 
     /**
@@ -298,6 +291,23 @@ final class Address implements \JsonSerializable
         }
 
         return md5(implode('-', $keys));
+    }
+
+    private function joinAdditionalLines(?string $line1, ?string $line2): string
+    {
+        $lines = [];
+
+        $line1 = trim((string) $line1);
+        if ($line1 !== '') {
+            $lines[] = $line1;
+        }
+
+        $line2 = trim((string) $line2);
+        if ($line2 !== '') {
+            $lines[] = $line2;
+        }
+
+        return implode(' ', $lines);
     }
 
     /**

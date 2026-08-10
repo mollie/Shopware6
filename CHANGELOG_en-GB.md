@@ -7,6 +7,7 @@
 - Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.
 - Fixed: Subscription renewals no longer fail for legacy subscriptions and now reliably create the renewal order.
 - Fixed: Opening an order in the administration no longer triggers a duplicate refund for existing returns.
+- Fixed: Additional address lines and companies that only contain whitespaces are no longer used for the Mollie address.
 - Fixed: Reading orders via the API no longer logs `Undefined array key "refunds"` warnings.
 
 # 5.3.0
