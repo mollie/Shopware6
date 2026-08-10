@@ -87,11 +87,12 @@ final class SubscriptionDataServiceTest extends TestCase
         $service->findById('subscription-id', Context::createDefaultContext());
     }
 
-    public function testFindByIdThrowsWhenBillingAddressIsMissing(): void
+    public function testFindByIdThrowsWhenSubscriptionHasNoAddressAtAll(): void
     {
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
             ->withoutBillingAddress()
+            ->withoutShippingAddress()
             ->build()
         ;
 
@@ -105,7 +106,28 @@ final class SubscriptionDataServiceTest extends TestCase
         $service->findById('subscription-id', Context::createDefaultContext());
     }
 
-    public function testFindByIdThrowsWhenShippingAddressIsMissing(): void
+    public function testFindByIdFallsBackToShippingAddressWhenBillingAddressIsMissing(): void
+    {
+        $subscription = SubscriptionEntityBuilder::create()
+            ->withId('subscription-id')
+            ->withoutBillingAddress()
+            ->build()
+        ;
+
+        $repository = new FakeSubscriptionRepository();
+        $repository->add($subscription);
+
+        $service = $this->getService($repository);
+
+        $result = $service->findById('subscription-id', Context::createDefaultContext());
+
+        $shippingAddress = $result->getShippingAddress();
+        $this->assertSame($shippingAddress, $result->getBillingAddress());
+        $this->assertSame($shippingAddress, $subscription->getBillingAddress());
+        $this->assertSame($shippingAddress->getId(), $subscription->getBillingAddressId());
+    }
+
+    public function testFindByIdFallsBackToBillingAddressWhenShippingAddressIsMissing(): void
     {
         $subscription = SubscriptionEntityBuilder::create()
             ->withId('subscription-id')
@@ -118,9 +140,12 @@ final class SubscriptionDataServiceTest extends TestCase
 
         $service = $this->getService($repository);
 
-        $this->expectException(SubscriptionWithoutAddressException::class);
+        $result = $service->findById('subscription-id', Context::createDefaultContext());
 
-        $service->findById('subscription-id', Context::createDefaultContext());
+        $billingAddress = $result->getBillingAddress();
+        $this->assertSame($billingAddress, $result->getShippingAddress());
+        $this->assertSame($billingAddress, $subscription->getShippingAddress());
+        $this->assertSame($billingAddress->getId(), $subscription->getShippingAddressId());
     }
 
     private function getService(FakeSubscriptionRepository $repository): SubscriptionDataService

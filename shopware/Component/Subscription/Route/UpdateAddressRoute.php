@@ -97,7 +97,11 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
         $existing = $type === self::TYPE_BILLING
             ? $subscription->getBillingAddress()
             : $subscription->getShippingAddress();
-        $addressId = $existing instanceof SubscriptionAddressEntity ? $existing->getId() : Uuid::randomHex();
+        $counterpart = $type === self::TYPE_BILLING
+            ? $subscription->getShippingAddress()
+            : $subscription->getBillingAddress();
+
+        $addressId = $this->resolveAddressId($existing, $counterpart);
 
         // The address form does not allow editing the country, so the country is
         // preserved from the existing address instead of being taken from the request.
@@ -128,6 +132,23 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
         ]);
 
         return new UpdateAddressResponse($subscription->getId(), $addressId, $type);
+    }
+
+    /**
+     * Billing and shipping share one address row whenever both addresses are identical, so editing
+     * only one of them has to split the row instead of overwriting the other address as well.
+     */
+    private function resolveAddressId(?SubscriptionAddressEntity $existing, ?SubscriptionAddressEntity $counterpart): string
+    {
+        if (! $existing instanceof SubscriptionAddressEntity) {
+            return Uuid::randomHex();
+        }
+
+        if ($counterpart instanceof SubscriptionAddressEntity && $counterpart->getId() === $existing->getId()) {
+            return Uuid::randomHex();
+        }
+
+        return $existing->getId();
     }
 
     private function assertRequiredFields(UpdateAddressData $data): void
