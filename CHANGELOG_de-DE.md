@@ -10,6 +10,7 @@
 - Behoben: Adresszusätze und Firmennamen, die nur aus Leerzeichen bestehen, werden nicht mehr für die Mollie-Adresse verwendet.
 - Behoben: Beim Lesen von Bestellungen über die API werden keine `Undefined array key "refunds"`-Warnungen mehr geloggt.
 - Behoben: Der Versand von Bestellungen mit individuellen Produkten oder Produkt-Sets schlägt bei Mollie nicht mehr fehl.
+- Behoben: Der Mollie-Tab und die Spalten in der Bestellübersicht verschwinden in anderen Sprachen nicht mehr.
 
 # 5.3.0
 - Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
