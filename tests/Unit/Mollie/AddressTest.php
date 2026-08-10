@@ -60,6 +60,34 @@ final class AddressTest extends TestCase
         $this->assertSame($expected['title'], $actual->getTitle());
     }
 
+    public function testWhitespaceOnlyAdditionalAddressLinesAreIgnored(): void
+    {
+        $customer = $this->customerRepository->getDefaultCustomer();
+        $orderAddress = $this->orderRepository->getOrderAddress($customer);
+        $orderAddress->setAdditionalAddressLine1('   ');
+        $orderAddress->setAdditionalAddressLine2('   ');
+        $orderAddress->setCompany('   ');
+
+        $actual = Address::fromAddress($customer, $orderAddress);
+
+        $this->assertSame('', $actual->getStreetAdditional());
+        $this->assertSame('', $actual->getOrganizationName());
+        $this->assertArrayNotHasKey('streetAdditional', $actual->jsonSerialize());
+        $this->assertArrayNotHasKey('organizationName', $actual->jsonSerialize());
+    }
+
+    public function testAdditionalAddressLinesAreTrimmedBeforeTheyAreJoined(): void
+    {
+        $customer = $this->customerRepository->getDefaultCustomer();
+        $orderAddress = $this->orderRepository->getOrderAddress($customer);
+        $orderAddress->setAdditionalAddressLine1('  Appartment 2  ');
+        $orderAddress->setAdditionalAddressLine2('   ');
+
+        $actual = Address::fromAddress($customer, $orderAddress);
+
+        $this->assertSame('Appartment 2', $actual->getStreetAdditional());
+    }
+
     public function testJsonSerializeTrimsWhitespace(): void
     {
         $address = new Address(
