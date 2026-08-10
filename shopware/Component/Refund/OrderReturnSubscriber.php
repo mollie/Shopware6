@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Refund;
 
+use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityWriteResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class OrderReturnSubscriber implements EventSubscriberInterface
@@ -15,7 +18,8 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
     private const STATE_CANCELLED = 'cancelled';
 
     public function __construct(
-        private readonly OrderReturnHandler $orderReturnHandler,
+        #[Autowire(service: OrderReturnHandler::class)]
+        private readonly OrderReturnHandlerInterface $orderReturnHandler,
     ) {
     }
 
@@ -29,6 +33,12 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
 
     public function onOrderReturnWritten(EntityWrittenEvent $event): void
     {
+        // Opening an order in the admin clones its returns into a non-live order version.
+        // Those clones are INSERTs and must not trigger another refund (issue #1421).
+        if (! $this->isLiveVersion($event->getContext())) {
+            return;
+        }
+
         foreach ($event->getWriteResults() as $result) {
             if ($result->getOperation() !== EntityWriteResult::OPERATION_INSERT) {
                 continue;
@@ -49,6 +59,10 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if (! $this->isLiveVersion($event->getContext())) {
+            return;
+        }
+
         $returnId = $event->getTransition()->getEntityId();
         $context = $event->getContext();
 
@@ -60,5 +74,10 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
                 $this->orderReturnHandler->cancel($returnId, $context);
                 break;
         }
+    }
+
+    private function isLiveVersion(Context $context): bool
+    {
+        return $context->getVersionId() === Defaults::LIVE_VERSION;
     }
 }
