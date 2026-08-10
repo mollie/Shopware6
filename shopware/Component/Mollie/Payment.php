@@ -6,10 +6,15 @@ namespace Mollie\Shopware\Component\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
+use Shopware\Core\Framework\Struct\VariablesAccessTrait;
 
 final class Payment extends Struct implements \JsonSerializable
 {
     use JsonSerializableTrait;
+    // Both traits resolve get_object_vars() in this class scope, so getVars() reports the same
+    // private properties that jsonSerialize() emits. Shopware's JsonEntityEncoder looks every
+    // serialized key up in getVars() and warns about undefined array keys otherwise.
+    use VariablesAccessTrait;
 
     private PaymentStatus $status;
     private OrderTransactionEntity $shopwareTransaction;

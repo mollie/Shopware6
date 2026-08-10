@@ -56,6 +56,17 @@ final class PaymentTest extends TestCase
         $this->assertEquals($expectedArray, $payment->toArray());
     }
 
+    public function testGetVarsCoversEverySerializedKey(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setMethod(PaymentMethod::PAYPAL);
+        $payment->setStatus(PaymentStatus::PENDING);
+
+        $missing = array_diff(array_keys($payment->jsonSerialize()), array_keys($payment->getVars()));
+
+        $this->assertSame([], $missing);
+    }
+
     public function testCreatePaymentFromArray(): void
     {
         $body = [

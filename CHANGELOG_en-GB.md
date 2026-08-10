@@ -7,6 +7,7 @@
 - Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.
 - Fixed: Subscription renewals no longer fail for legacy subscriptions and now reliably create the renewal order.
 - Fixed: Opening an order in the administration no longer triggers a duplicate refund for existing returns.
+- Fixed: Reading orders via the API no longer logs `Undefined array key "refunds"` warnings.
 
 # 5.3.0
 - Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
