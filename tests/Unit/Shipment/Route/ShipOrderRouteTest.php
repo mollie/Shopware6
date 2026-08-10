@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment\Route;
 
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
@@ -53,7 +54,8 @@ class ShipOrderRouteTest extends TestCase
         $orderService = new FakeOrderService();
         $logger = new NullLogger();
 
-        $itemResolver = new ShipmentItemResolver();
+        $lineItemFilter = new LineItemFilter();
+        $itemResolver = new ShipmentItemResolver($lineItemFilter);
         $trackingResolver = new ShipmentTrackingResolver();
         $persister = new ShipmentPersister(
             $this->lineItemRepository,
@@ -160,6 +162,28 @@ class ShipOrderRouteTest extends TestCase
         static::assertSame(2, $quantities['lineitemid1']);
         // already shipped 1 of 3, so the remaining 2 bring the shipped quantity to 3
         static::assertSame(3, $quantities['lineitemid2']);
+    }
+
+    public function testShipDoesNotCaptureContainerLineItems(): void
+    {
+        // Container line items (e.g. SwagCustomizedProducts) duplicate the price of their children and
+        // are never sent to Mollie. Capturing them too exceeded the authorized amount and made Mollie
+        // reject the capture with "The amount to capture is higher than the remaining authorized amount".
+        $container = $this->orderBuilder->createContainerLineItem('containerid', 'Personalize this product', 10.0);
+        $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$container, $product]));
+        $this->orderRepository->add($order);
+
+        $request = new Request([], ['orderId' => $order->getId()]);
+
+        $this->route->ship($request, Context::createDefaultContext());
+
+        static::assertCount(1, $this->gateway->getCapturePayloads());
+        static::assertSame(10.0, $this->gateway->getCapturePayloads()[0]->getAmount()->getValue());
+
+        $upserts = $this->lineItemRepository->getUpserts();
+        static::assertCount(1, $upserts);
+        static::assertSame('lineitemid', $upserts[0]['id']);
     }
 
     public function testShipIsAnIdempotentNoopWhenNothingRemains(): void

@@ -9,6 +9,7 @@
 - Fixed: Opening an order in the administration no longer triggers a duplicate refund for existing returns.
 - Fixed: Additional address lines and companies that only contain whitespaces are no longer used for the Mollie address.
 - Fixed: Reading orders via the API no longer logs `Undefined array key "refunds"` warnings.
+- Fixed: Shipping orders with customized products or product sets no longer fails at Mollie.
 
 # 5.3.0
 - Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.

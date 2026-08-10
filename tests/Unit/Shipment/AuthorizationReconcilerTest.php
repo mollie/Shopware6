@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment;
 
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
@@ -26,7 +27,7 @@ final class AuthorizationReconcilerTest extends TestCase
     public function testCaptureViaPaymentsApiCapturesAndReturnsCaptureId(): void
     {
         $gateway = new FakeGateway();
-        $reconciler = new AuthorizationReconciler($gateway, new ShipmentItemResolver(), new NullLogger());
+        $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
         $shippingItems->add(new ShippingItem(1, '1x Product', 10.0, null));
@@ -52,7 +53,7 @@ final class AuthorizationReconcilerTest extends TestCase
     {
         $gateway = new FakeGateway();
         $gateway->withCaptureThrowing();
-        $reconciler = new AuthorizationReconciler($gateway, new ShipmentItemResolver(), new NullLogger());
+        $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
         $shippingItems->add(new ShippingItem(1, '1x Product', 10.0, null));
@@ -75,7 +76,7 @@ final class AuthorizationReconcilerTest extends TestCase
     public function testReconcileReturnsEmptyResponseForOrdersApiOrders(): void
     {
         $gateway = new FakeGateway();
-        $reconciler = new AuthorizationReconciler($gateway, new ShipmentItemResolver(), new NullLogger());
+        $reconciler = $this->createReconciler($gateway);
 
         // Orders API is line-item based; there is no single amount to reconcile, so this is a no-op.
         $response = $reconciler->reconcileAuthorizedRemainder(
@@ -93,6 +94,15 @@ final class AuthorizationReconcilerTest extends TestCase
 
         self::assertSame('', $response->getMollieId());
         self::assertCount(0, $gateway->getCapturePayloads());
+    }
+
+    private function createReconciler(FakeGateway $gateway): AuthorizationReconciler
+    {
+        $lineItemFilter = new LineItemFilter();
+        $itemResolver = new ShipmentItemResolver($lineItemFilter);
+        $logger = new NullLogger();
+
+        return new AuthorizationReconciler($gateway, $itemResolver, $logger);
     }
 
     private function currency(): CurrencyEntity

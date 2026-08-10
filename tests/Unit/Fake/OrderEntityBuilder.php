@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
@@ -250,6 +251,24 @@ final class OrderEntityBuilder
         $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0, $quantity));
         $orderLineItem->setProduct($product);
         $orderLineItem->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
+
+        return $orderLineItem;
+    }
+
+    /**
+     * A container line item as created by e.g. SwagCustomizedProducts: its price duplicates the price
+     * of its children, so it is never part of the Mollie payload.
+     */
+    public function createContainerLineItem(string $id, string $label, float $unitPrice): OrderLineItemEntity
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setId($id);
+        $orderLineItem->setLabel($label);
+        $orderLineItem->setType(LineItemFilter::TYPE_CUSTOM_PRODUCTS);
+        $orderLineItem->setQuantity(1);
+        $orderLineItem->setUnitPrice($unitPrice);
+        $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0, 1));
+        $orderLineItem->setCustomFields([]);
 
         return $orderLineItem;
     }

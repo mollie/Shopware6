@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment;
 
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
@@ -24,7 +25,8 @@ final class ShipmentItemResolverTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resolver = new ShipmentItemResolver();
+        $lineItemFilter = new LineItemFilter();
+        $this->resolver = new ShipmentItemResolver($lineItemFilter);
         $this->orderBuilder = new OrderEntityBuilder();
     }
 
@@ -54,6 +56,55 @@ final class ShipmentItemResolverTest extends TestCase
         $order->setLineItems(new OrderLineItemCollection([$lineItem]));
 
         self::assertSame([['id' => 'id', 'quantity' => 1]], $this->resolver->buildRemainingItems($order));
+    }
+
+    public function testBuildRemainingItemsSkipsContainerLineItems(): void
+    {
+        $container = $this->orderBuilder->createContainerLineItem('containerid', 'Personalize this product', 10.0);
+        $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW1', 1, 10.0);
+        $order = new OrderEntity();
+        $order->setLineItems(new OrderLineItemCollection([$container, $product]));
+
+        self::assertSame([['id' => 'lineitemid', 'quantity' => 1]], $this->resolver->buildRemainingItems($order));
+    }
+
+    public function testCollectLineItemUpsertsSkipsContainerLineItems(): void
+    {
+        // The container duplicates the price of its child, so capturing both would exceed the
+        // authorized amount at Mollie.
+        $container = $this->orderBuilder->createContainerLineItem('containerid', 'Personalize this product', 10.0);
+        $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
+        $lineItems = new OrderLineItemCollection([$container, $product]);
+        $order = $this->orderBuilder->getOrderWithMolliePayment($lineItems);
+        $currency = $order->getCurrency();
+        self::assertNotNull($currency);
+
+        $shippingItems = new ShippingItemCollection();
+
+        $upserts = $this->resolver->collectLineItemUpserts(
+            [['id' => 'containerid', 'quantity' => 1], ['id' => 'lineitemid', 'quantity' => 1]],
+            $lineItems,
+            $order->getId(),
+            $shippingItems,
+            $currency,
+            (string) $order->getTaxStatus(),
+        );
+
+        self::assertCount(1, $upserts);
+        self::assertSame('lineitemid', $upserts[0]['id']);
+        self::assertCount(1, $shippingItems->all());
+        self::assertSame(10.0, $shippingItems->getTotalAmount());
+    }
+
+    public function testIsFullyShippedIgnoresContainerLineItems(): void
+    {
+        $container = $this->orderBuilder->createContainerLineItem('containerid', 'Personalize this product', 10.0);
+        $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW1', 1, 10.0);
+        $lineItems = new OrderLineItemCollection([$container, $product]);
+
+        $upserts = [['id' => 'lineitemid', 'customFields' => [Mollie::EXTENSION => ['quantity' => 1]]]];
+
+        self::assertTrue($this->resolver->isFullyShipped($lineItems, $upserts));
     }
 
     public function testHasCancelledItems(): void
