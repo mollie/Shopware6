@@ -182,6 +182,24 @@ final class UpdateAddressRouteTest extends TestCase
         $this->assertSame('shipping address updated', $payload['historyEntries'][0]['comment']);
     }
 
+    public function testUpdateShippingSplitsAddressRowSharedWithBilling(): void
+    {
+        $sharedAddress = SubscriptionAddressBuilder::create()->withId('shared-address-id')->build();
+        $dataService = new FakeSubscriptionDataService($this->buildSubscriptionData(
+            billingAddress: $sharedAddress,
+            shippingAddress: $sharedAddress,
+        ));
+        $repository = new FakeSubscriptionRepository();
+
+        $route = $this->buildRoute(dataService: $dataService, subscriptionRepository: $repository);
+
+        $response = $route->updateShipping('subscription-id', $this->buildValidRequestData(), $this->buildAuthenticatedContext());
+
+        $writtenAddressId = $repository->getLastUpsert()['shippingAddress']['id'];
+        $this->assertNotSame('shared-address-id', $writtenAddressId);
+        $this->assertSame($writtenAddressId, $response->getObject()->get('addressId'));
+    }
+
     public function testRequestDataLowercasesSalutationIdAndPreservesCountryFromExistingAddress(): void
     {
         $existingBilling = SubscriptionAddressBuilder::create()
