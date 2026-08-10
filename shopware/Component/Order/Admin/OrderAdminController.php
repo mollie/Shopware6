@@ -62,7 +62,8 @@ final class OrderAdminController extends AbstractController
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('mollieSubscriptions');
         $criteria->addAssociation('lineItems');
-        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.shippingMethod');
+        $criteria->addAssociation('currency');
 
         /** @var null|OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -107,13 +108,23 @@ final class OrderAdminController extends AbstractController
         $mollieOrder = $this->loadMollieOrder($mollieOrderId, $salesChannelId);
 
         // The Mollie payment status on the loaded extension is not reliable here (no API call, status not
-        // hydrated), so for the Payments API we rely on the Shopware transaction state machine: shipping/
-        // cancelling is only possible while the transaction is still open or authorized, not once it is paid.
+        // hydrated), so we rely on the Shopware transaction state machine.
         $transactionState = $effectiveTransaction->getStateMachineState()?->getTechnicalName() ?? '';
-        $shippingAllowed = in_array($transactionState, [
-            OrderTransactionStates::STATE_OPEN,
-            OrderTransactionStates::STATE_AUTHORIZED,
+
+        // Shipping is only blocked when the payment can no longer be captured at all. A "paid"
+        // transaction must stay shippable: Mollie already reports a manual-capture payment (Klarna,
+        // Riverty, ...) as paid after the first partial capture, and merchants set orders to paid
+        // manually for their ERP. Whether something is actually captured is decided by ShipOrderRoute.
+        $shippingAllowed = ! in_array($transactionState, [
+            OrderTransactionStates::STATE_CANCELLED,
+            OrderTransactionStates::STATE_FAILED,
+            OrderTransactionStates::STATE_REFUNDED,
+            OrderTransactionStates::STATE_CHARGEBACK,
         ], true);
+
+        // Cancelling items releases a part of the authorization, which Mollie only allows while the
+        // payment is authorized (see CancelItemRoute).
+        $cancelAllowed = $transactionState === OrderTransactionStates::STATE_AUTHORIZED;
 
         return new JsonResponse(new OrderDetailsResponse(
             $mollieId,
@@ -127,10 +138,10 @@ final class OrderAdminController extends AbstractController
             $this->mollieSettings->getSubscriptionSettings($salesChannelId)->isEnabled(),
             $this->buildRefundManagerConfig($salesChannelId),
             new ShippingData(
-                $this->statusBuilder->buildShippingTotal($mollieOrder),
+                $this->statusBuilder->buildShippingTotal($mollieOrder, $order, $shippingAllowed),
                 $this->statusBuilder->buildShippingStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $shippingAllowed, $order->getDeliveries()),
             ),
-            $this->statusBuilder->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $shippingAllowed),
+            $this->statusBuilder->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $cancelAllowed),
         ));
     }
 

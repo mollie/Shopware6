@@ -53,24 +53,6 @@ class MolliePaymentsShippingService extends ApiService {
 
     /**
      *
-     * @param data
-     * @returns {*}
-     */
-    status(data = { orderId: null }) {
-        return this.__post('/status', data);
-    }
-
-    /**
-     *
-     * @param data
-     * @returns {*}
-     */
-    total(data = { orderId: null }) {
-        return this.__post('/total', data);
-    }
-
-    /**
-     *
      * @param endpoint
      * @param data
      * @param headers

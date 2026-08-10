@@ -11,6 +11,7 @@
 - Fixed: Reading orders via the API no longer logs `Undefined array key "refunds"` warnings.
 - Fixed: Shipping orders with customized products or product sets no longer fails at Mollie.
 - Fixed: The Mollie tab and order list columns no longer disappear in non-default languages.
+- Fixed: Shipping via the Mollie order tab works again, including partially shipped orders with a manual capture (Klarna, Riverty, ...).
 
 # 5.3.0
 - Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
