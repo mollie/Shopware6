@@ -1,4 +1,5 @@
 import template from './sw-order-detail.html.twig';
+import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 // eslint-disable-next-line no-undef
 const { Component } = Shopware;
@@ -15,26 +16,9 @@ Component.override('sw-order-detail', {
         },
 
         isMollieOrder() {
-            const order = this.order;
+            const attributes = new OrderAttributes(this.order);
 
-            if (!order || !order.transactions) {
-                return false;
-            }
-
-            const transactions = order.transactions;
-            let latest = typeof transactions.first === 'function' ? transactions.first() : transactions[0];
-
-            if (!latest) {
-                return false;
-            }
-
-            transactions.forEach(function (t) {
-                if (t.createdAt > latest.createdAt) {
-                    latest = t;
-                }
-            });
-
-            return !!latest?.paymentMethod?.customFields?.mollie_payment_method_name;
+            return attributes.isMollieOrder();
         },
     },
 });

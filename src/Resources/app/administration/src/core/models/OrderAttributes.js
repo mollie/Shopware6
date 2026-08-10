@@ -12,26 +12,33 @@ export default class OrderAttributes {
         this._creditCardAttributes = null;
         this._paymentRef = null;
         this._isMolliePayments = false;
-        if (orderEntity === null) {
+        if (!orderEntity) {
             return;
         }
 
         const transactions = orderEntity.transactions;
-        let latestTransaction = transactions?.first();
 
-        if (transactions.length > 1) {
-            transactions.forEach(function (transaction) {
-                if (transaction.createdAt > latestTransaction.createdAt) {
-                    latestTransaction = transaction;
-                }
-            });
+        if (!transactions) {
+            return;
         }
+
+        let latestTransaction = typeof transactions.first === 'function' ? transactions.first() : transactions[0];
 
         if (!latestTransaction) {
             return;
         }
 
-        const isMolliePayments = latestTransaction.paymentMethod?.customFields?.mollie_payment_method_name ?? null;
+        transactions.forEach(function (transaction) {
+            if (transaction.createdAt > latestTransaction.createdAt) {
+                latestTransaction = transaction;
+            }
+        });
+
+        const paymentMethod = latestTransaction.paymentMethod;
+        // customFields of payment_method are translatable, so the raw property is empty for every
+        // language without its own translation row. "translated" holds the resolved fallback chain.
+        const paymentMethodCustomFields = paymentMethod?.translated?.customFields ?? paymentMethod?.customFields;
+        const isMolliePayments = paymentMethodCustomFields?.mollie_payment_method_name ?? null;
 
         if (!isMolliePayments) {
             return;
