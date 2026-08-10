@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Shipment;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
@@ -14,14 +16,25 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Pure computation of what a shipment consists of: resolves requested items against the order,
  * builds the line/delivery custom-field upserts and the Mollie ShippingItemCollection, and answers
- * shipment-state questions (fully shipped, prior shipments, cancellations). Holds no dependencies.
+ * shipment-state questions (fully shipped, prior shipments, cancellations).
+ *
+ * Only line items that were part of the Mollie payload are considered. Container line items (e.g.
+ * the customized-products container or product sets) duplicate the price of their children and are
+ * never sent to Mollie, so shipping them would capture more than the authorized amount.
  */
 final class ShipmentItemResolver
 {
+    public function __construct(
+        #[Autowire(service: LineItemFilter::class)]
+        private readonly LineItemFilterInterface $lineItemFilter,
+    ) {
+    }
+
     /**
      * @return list<array{id: string, quantity: int}>
      */
@@ -57,6 +70,10 @@ final class ShipmentItemResolver
         $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
 
         foreach ($lineItems as $lineItem) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+                continue;
+            }
+
             $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
             $shipped = (int) ($fields['quantity'] ?? 0);
             $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
@@ -90,6 +107,12 @@ final class ShipmentItemResolver
 
             if (! $lineItem instanceof OrderLineItemEntity) {
                 throw ShippingException::lineItemNotFound(strtolower($rawId), $orderId);
+            }
+
+            // Was never part of the Mollie payload, so there is nothing to capture for it. Skipped
+            // instead of rejected, so explicitly passing the full order line list still works.
+            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+                continue;
             }
 
             $oldState = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? ['quantity' => 0];
@@ -208,7 +231,7 @@ final class ShipmentItemResolver
 
         foreach ($lineItems as $lineItem) {
             $shippedQuantity = (int) (($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0);
-            if ($shippedQuantity <= 0) {
+            if ($shippedQuantity <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
                 continue;
             }
             $grossLine = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
@@ -234,6 +257,10 @@ final class ShipmentItemResolver
     public function hasPriorShipments(OrderLineItemCollection $lineItems): bool
     {
         foreach ($lineItems as $lineItem) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+                continue;
+            }
+
             $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
             if ((int) ($fields['quantity'] ?? 0) > 0) {
                 return true;
@@ -246,6 +273,10 @@ final class ShipmentItemResolver
     public function hasCancelledItems(OrderLineItemCollection $lineItems): bool
     {
         foreach ($lineItems as $lineItem) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+                continue;
+            }
+
             $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
             if ((int) ($fields['cancelled_quantity'] ?? 0) > 0) {
                 return true;
@@ -269,7 +300,7 @@ final class ShipmentItemResolver
         }
 
         foreach ($lineItems as $lineItem) {
-            if ($lineItem->getQuantity() <= 0) {
+            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
                 continue;
             }
 

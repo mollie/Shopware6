@@ -6,6 +6,8 @@ namespace Mollie\Shopware\Component\Shipment\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Shipment\CancelItemEvent;
 use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
@@ -41,6 +43,8 @@ final class CancelItemRoute
         private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: StockStorage::class)]
         private readonly AbstractStockStorage $stockStorage,
+        #[Autowire(service: LineItemFilter::class)]
+        private readonly LineItemFilterInterface $lineItemFilter,
         #[Autowire(service: 'event_dispatcher')]
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -192,7 +196,9 @@ final class CancelItemRoute
     private function isFullyHandled(OrderLineItemCollection $allLineItems, string $updatedLineId, int $updatedCancelledQty): bool
     {
         foreach ($allLineItems as $lineItem) {
-            if ($lineItem->getQuantity() <= 0) {
+            // Container line items are not part of the Mollie payload, so they never carry a shipped
+            // or cancelled quantity and would block the release of the authorization forever.
+            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
                 continue;
             }
 
