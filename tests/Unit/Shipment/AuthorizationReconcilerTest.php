@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Shipment;
 
 use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
@@ -47,6 +48,69 @@ final class AuthorizationReconcilerTest extends TestCase
         self::assertNotNull($mollieId);
         self::assertCount(1, $gateway->getCapturePayloads());
         self::assertSame(10.0, $gateway->getCapturePayloads()[0]->getAmount()->getValue());
+    }
+
+    public function testFullShipmentCapturesAuthorizedRemainderRegardlessOfLineItemTotal(): void
+    {
+        // The shipped line items sum to only 91.92 because the rounding-difference line is not a
+        // Shopware line item. On a full shipment the capture must still land on the full authorized
+        // 91.94 (amount - amountCaptured), independent of the rounding-line recognition.
+        $payment = new Payment('tr_1');
+        $payment->setAmount(new Money(91.94, 'EUR'));
+        $payment->setCapturedAmount(new Money(0.0, 'EUR'));
+
+        $gateway = new FakeGateway('', $payment);
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, '1x Product', 91.92, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $payment,
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            true,
+            [],
+        );
+
+        self::assertNotNull($mollieId);
+        self::assertCount(1, $gateway->getCapturePayloads());
+        self::assertSame(91.94, $gateway->getCapturePayloads()[0]->getAmount()->getValue());
+    }
+
+    public function testFullShipmentTopsUpOnlyTheUncapturedRemainder(): void
+    {
+        // A prior shipment already captured 50.00 of the authorized 90.00; the final full shipment
+        // must top up exactly the remaining 40.00.
+        $payment = new Payment('tr_1');
+        $payment->setAmount(new Money(90.0, 'EUR'));
+        $payment->setCapturedAmount(new Money(50.0, 'EUR'));
+
+        $gateway = new FakeGateway('', $payment);
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, '1x Product', 39.98, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $payment,
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            true,
+            [],
+        );
+
+        self::assertNotNull($mollieId);
+        self::assertCount(1, $gateway->getCapturePayloads());
+        self::assertSame(40.0, $gateway->getCapturePayloads()[0]->getAmount()->getValue());
     }
 
     public function testCaptureViaPaymentsApiReturnsNullWhenMollieCallFails(): void

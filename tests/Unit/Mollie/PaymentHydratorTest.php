@@ -8,6 +8,8 @@ use Mollie\Shopware\Component\Mollie\PaymentHydrator;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
+use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -117,6 +119,67 @@ final class PaymentHydratorTest extends TestCase
         $payment = (new PaymentHydrator())->hydrate($body);
 
         $this->assertSame(0.01, $payment->getRoundingDiff());
+    }
+
+    public function testRoundingDiffIsReadFromConfiguredCustomSku(): void
+    {
+        $paymentSettings = PaymentSettings::createFromShopwareArray(['fixRoundingDiffSKU' => 'RUND-DIFF']);
+        $hydrator = new PaymentHydrator(new FakeSettingsService(null, $paymentSettings));
+
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            'lines' => [
+                [
+                    'name' => RoundingDifferenceFixer::DEFAULT_TITLE,
+                    'sku' => 'RUND-DIFF',
+                    'totalAmount' => ['value' => '0.02', 'currency' => 'EUR'],
+                ],
+            ],
+        ];
+
+        $payment = $hydrator->hydrate($body, 'sales-channel');
+
+        $this->assertSame(0.02, $payment->getRoundingDiff());
+    }
+
+    public function testDefaultSkuIsStillRecognizedWhenCustomSkuConfigured(): void
+    {
+        $paymentSettings = PaymentSettings::createFromShopwareArray(['fixRoundingDiffSKU' => 'RUND-DIFF']);
+        $hydrator = new PaymentHydrator(new FakeSettingsService(null, $paymentSettings));
+
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            'lines' => [
+                [
+                    'sku' => RoundingDifferenceFixer::SKU,
+                    'totalAmount' => ['value' => '0.01', 'currency' => 'EUR'],
+                ],
+            ],
+        ];
+
+        $payment = $hydrator->hydrate($body, 'sales-channel');
+
+        $this->assertSame(0.01, $payment->getRoundingDiff());
+    }
+
+    public function testConfiguredCustomSkuIsNotRecognizedWithoutSettings(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            'lines' => [
+                [
+                    'sku' => 'RUND-DIFF',
+                    'totalAmount' => ['value' => '0.02', 'currency' => 'EUR'],
+                ],
+            ],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame(0.0, $payment->getRoundingDiff());
     }
 
     public function testRefundedCurrencyFallsBackToAmountCurrency(): void

@@ -3,19 +3,33 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
 final class PaymentHydrator
 {
     /**
+     * Nullable so the static Payment::createFromClientResponse() path keeps working without the
+     * container: without settings the rounding line is only recognized by the default SKU/metadata.
+     */
+    public function __construct(
+        #[Autowire(service: SettingsService::class)]
+        private readonly ?AbstractSettingsService $settingsService = null,
+    ) {
+    }
+
+    /**
      * @param array<mixed> $body
      */
-    public function hydrate(array $body): Payment
+    public function hydrate(array $body, ?string $salesChannelId = null): Payment
     {
         $payment = new Payment($body['id']);
 
         $this->hydrateScalars($payment, $body);
         $this->hydrateAmounts($payment, $body);
         $this->hydrateVoucherAmount($payment, $body);
-        $this->hydrateRoundingDiff($payment, $body);
+        $this->hydrateRoundingDiff($payment, $body, $salesChannelId);
         $this->hydratePaymentDetails($payment, $body);
         $this->hydrateRefunds($payment, $body);
         $this->hydrateStatus($payment, $body);
@@ -117,17 +131,28 @@ final class PaymentHydrator
     }
 
     /**
+     * The rounding line is recognized by its SKU. Merchants can configure a custom SKU in the plugin
+     * settings, so we match both that configured SKU and the default one. The metadata fallback stays
+     * for completeness but is not reliable, as Mollie does not return line item metadata.
+     *
      * @param array<mixed> $body
      */
-    private function hydrateRoundingDiff(Payment $payment, array $body): void
+    private function hydrateRoundingDiff(Payment $payment, array $body, ?string $salesChannelId): void
     {
+        $configuredSku = '';
+        if ($this->settingsService !== null) {
+            $configuredSku = $this->settingsService->getPaymentSettings($salesChannelId)->getFixRoundingDiffSku();
+        }
+
         $roundingDiff = 0.0;
         foreach ($body['lines'] ?? [] as $line) {
             $metadata = $line['metadata'] ?? [];
             if (is_string($metadata)) {
                 $metadata = json_decode($metadata, true) ?: [];
             }
-            $isRoundingLine = ($line['sku'] ?? '') === RoundingDifferenceFixer::SKU
+            $sku = $line['sku'] ?? '';
+            $isRoundingLine = $sku === RoundingDifferenceFixer::SKU
+                || ($configuredSku !== '' && $sku === $configuredSku)
                 || ($metadata['type'] ?? '') === RoundingDifferenceFixer::METADATA_TYPE;
             if ($isRoundingLine) {
                 $roundingDiff += (float) ($line['totalAmount']['value'] ?? 0.0);

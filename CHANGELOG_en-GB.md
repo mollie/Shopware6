@@ -3,6 +3,7 @@
 - Changed: In headless setups the store-api webhook and return URLs are now built from APP_URL instead of the proxy host, so Mollie can reach them.
 - Changed: Webhooks for Mollie payments without a payment method no longer fail; the current payment method is kept.
 - Fixed: Shipment capture now sends the gross amount for net-tax customers.
+- Fixed: The rounding difference is now captured and refunded correctly with a custom rounding SKU.
 - Fixed: Salutations longer than 20 characters no longer abort payment creation; the address title is now truncated to Mollie's 20 character limit.
 - Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.
 - Fixed: Subscription renewals no longer fail for legacy subscriptions and now reliably create the renewal order.

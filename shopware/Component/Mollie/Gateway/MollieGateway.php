@@ -127,7 +127,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            return $this->paymentHydrator->hydrate($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $shopwareOrderNumber);
         }
@@ -155,7 +155,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            return $this->paymentHydrator->hydrate($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -355,7 +355,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'body' => $body
             ]);
 
-            return $this->paymentHydrator->hydrate($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -374,7 +374,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'responseParameter' => $body,
             ]);
 
-            return $this->paymentHydrator->hydrate($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -408,7 +408,7 @@ final class MollieGateway implements MollieGatewayInterface
 
             $collection = new PaymentCollection();
             foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
-                $payment = $this->paymentHydrator->hydrate($paymentBody);
+                $payment = $this->paymentHydrator->hydrate($paymentBody, $salesChannelId);
                 $collection->set($payment->getId(), $payment);
             }
 
@@ -621,7 +621,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'body' => $paymentsBody,
             ]);
 
-            return $this->paymentHydrator->hydrate($paymentsBody);
+            return $this->paymentHydrator->hydrate($paymentsBody, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }

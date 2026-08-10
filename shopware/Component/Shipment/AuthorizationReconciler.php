@@ -67,23 +67,9 @@ final class AuthorizationReconciler
 
         $hasCancelledItems = $this->itemResolver->hasCancelledItems($lineItems);
 
-        // Capture the rounding difference once, on the first shipment (alongside the shipping costs).
-        // It is stored on the order at payment creation (Shopware allows 4 decimals per currency while
-        // Mollie allows only 2) and is never a Shopware line item. Orders created before this was
-        // persisted fall back to the value on the Mollie payment. It is folded into the (larger,
-        // positive) capture amount, so a negative difference only makes the capture a cent smaller -
-        // no negative amount is ever sent, and the captured total lands exactly on the order total.
-        // With cancellations it stays in the released remainder instead.
-        if (! $hasCancelledItems && ! $this->itemResolver->hasPriorShipments($lineItems)) {
-            $mollieCustomFields = $order->getCustomFields()[Mollie::EXTENSION] ?? [];
-            $roundingDiff = array_key_exists('rounding_diff', $mollieCustomFields)
-                ? (float) $mollieCustomFields['rounding_diff']
-                : $this->resolveRoundingDifference($paymentId, $orderNumber, $salesChannelId, $logContext);
-
-            if (abs($roundingDiff) > self::RECONCILE_THRESHOLD) {
-                $adjustedAmount = new Money($shippingItems->getTotalAmount() + $roundingDiff, $currency->getIsoCode());
-                $createCapture->setAmount($adjustedAmount);
-            }
+        $captureAmount = $this->resolveCaptureAmount($payment, $shippingItems, $order, $lineItems, $currency, $orderNumber, $salesChannelId, $fullyShipped, $hasCancelledItems, $logContext);
+        if ($captureAmount !== null) {
+            $createCapture->setAmount($captureAmount);
         }
 
         $logContext['molliePaymentId'] = $paymentId;
@@ -228,6 +214,81 @@ final class AuthorizationReconciler
     }
 
     /**
+     * Resolves the amount to capture, or null to keep the default (the gross of exactly the shipped
+     * line items). The rounding difference (Shopware allows 4 decimals per currency, Mollie only 2) is
+     * never a Shopware line item, so it has to be added here in the cases below.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function resolveCaptureAmount(
+        Payment $payment,
+        ShippingItemCollection $shippingItems,
+        OrderEntity $order,
+        OrderLineItemCollection $lineItems,
+        CurrencyEntity $currency,
+        string $orderNumber,
+        string $salesChannelId,
+        bool $fullyShipped,
+        bool $hasCancelledItems,
+        array $logContext
+    ): ?Money {
+        $paymentId = $payment->getId();
+
+        // Full shipment without cancellations: the entire authorized amount is owed. Derive the capture
+        // directly from the Mollie payment (authorized minus already captured) rather than summing the
+        // shipped line items plus a separately tracked rounding difference. This lands the capture
+        // exactly on the authorized total - incl. taxes and the sub-cent rounding difference - without
+        // depending on recognizing the rounding line by SKU or metadata (both fail once a custom
+        // rounding SKU is configured), and trues up the final shipment of a multi-shipment order
+        // regardless of what earlier shipments captured.
+        if ($fullyShipped && ! $hasCancelledItems) {
+            $freshPayment = $this->resolveFreshPayment($paymentId, $orderNumber, $salesChannelId, $logContext);
+            if ($freshPayment === null) {
+                return null;
+            }
+
+            $authorized = $freshPayment->getAmount()?->getValue() ?? 0.0;
+            $alreadyCaptured = $freshPayment->getCapturedAmount()?->getValue() ?? 0.0;
+            $remainder = $authorized - $alreadyCaptured;
+            if ($remainder <= self::RECONCILE_THRESHOLD) {
+                return null;
+            }
+
+            return new Money($remainder, $currency->getIsoCode());
+        }
+
+        // With cancellations the rounding difference stays in the released remainder; later shipments
+        // (prior shipments exist) are trued up by the full-shipment branch above. So only the very first
+        // partial shipment of an uncancelled order needs to carry the rounding difference.
+        if ($hasCancelledItems || $this->itemResolver->hasPriorShipments($lineItems)) {
+            return null;
+        }
+
+        $roundingDiff = $this->resolveOrderRoundingDifference($order, $paymentId, $orderNumber, $salesChannelId, $logContext);
+        if (abs($roundingDiff) <= self::RECONCILE_THRESHOLD) {
+            return null;
+        }
+
+        return new Money($shippingItems->getTotalAmount() + $roundingDiff, $currency->getIsoCode());
+    }
+
+    /**
+     * The rounding difference persisted on the order at payment creation, falling back to the value on
+     * the Mollie payment for orders created before it was persisted.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function resolveOrderRoundingDifference(OrderEntity $order, string $paymentId, string $orderNumber, string $salesChannelId, array $logContext): float
+    {
+        $mollieCustomFields = $order->getCustomFields()[Mollie::EXTENSION] ?? [];
+        if (array_key_exists('rounding_diff', $mollieCustomFields)) {
+            return (float) $mollieCustomFields['rounding_diff'];
+        }
+
+        return $this->resolveRoundingDifference($paymentId, $orderNumber, $salesChannelId, $logContext);
+    }
+
+    /**
      * The rounding difference tracked on the Mollie payment lines (Shopware allows 4 decimals per
      * currency, Mollie only 2). Fallback for orders created before it was persisted on the order.
      * Best-effort: returns 0.0 when the payment cannot be loaded.
@@ -245,6 +306,25 @@ final class AuthorizationReconciler
             $this->logger->error('AuthorizationReconciler: could not resolve rounding difference', $logContext);
 
             return 0.0;
+        }
+    }
+
+    /**
+     * Loads the current Mollie payment so the full-shipment capture can be derived from its authorized
+     * and already captured amounts. Best-effort: returns null when the payment cannot be loaded, so the
+     * capture falls back to the shipped line-item total.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function resolveFreshPayment(string $paymentId, string $orderNumber, string $salesChannelId, array $logContext): ?Payment
+    {
+        try {
+            return $this->mollieGateway->getPayment($paymentId, $orderNumber, $salesChannelId);
+        } catch (\Throwable $exception) {
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->error('AuthorizationReconciler: could not load Mollie payment for capture reconciliation', $logContext);
+
+            return null;
         }
     }
 }
