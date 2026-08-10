@@ -85,7 +85,7 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
 
             $collection = new PaymentCollection();
             foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
-                $payment = $this->paymentHydrator->hydrate($paymentBody);
+                $payment = $this->paymentHydrator->hydrate($paymentBody, $salesChannelId);
                 $collection->set($payment->getId(), $payment);
             }
 
