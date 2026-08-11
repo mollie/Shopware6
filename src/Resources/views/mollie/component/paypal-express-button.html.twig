@@ -32,7 +32,7 @@
                 class="mollie-paypal-button js-mollie-paypal-button mollie-express-button paypal-button-{{ shape }} paypal-theme-{{ theme }}"
                 data-form-action="{{ path('frontend.mollie.paypal-express.start') }}">
             <img src="{{ image }}" class="mollie-paypal-button-image" alt="PayPal"/>
-            <p class="mollie-paypal-button-label">Checkout</p>
+            <p class="mollie-paypal-button-label">{{ 'molliePayments.components.paypalExpress.checkout'|trans|sw_sanitize }}</p>
             <div class="loader"></div>
         </button>
     </div>

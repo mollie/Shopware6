@@ -26,7 +26,12 @@
                 "selectBank": "Izberite banko"
             },
             "pos": {
-                "selectTerminal": "Izberite terminal"
+                "selectTerminal": "Izberite terminal",
+                "returnToWebsite": "Nazaj na spletno mesto",
+                "terminalInstructions": "Sledite navodilom na terminalu",
+                "paymentSuccess": "Vaše plačilo je bilo uspešno!",
+                "paymentFailed": "Vaše plačilo ni bilo uspešno!",
+                "paymentFailedNoDebit": "S kartice ni bil odtegnjen noben znesek"
             },
             "mandate": {
                 "sectionTitle": "Shranjene kartice",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonska številka",
                 "phoneErrorMessage": "Telefonska številka je obvezna. Na primer +386 41 111 222"
+            },
+            "paypalExpress": {
+                "checkout": "Blagajna"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Vaša naročnina se bo sedaj nadaljevala",
                 "successSkip": "Vaša naročnina je bila začasno zaustavljena",
                 "successUpdateAddress": "Vaš naslov je bil uspešno posodobljen",
-                "successUpdatePayment": "Vaš način plačila je bil uspešno posodobljen"
+                "successUpdatePayment": "Vaš način plačila je bil uspešno posodobljen",
+                "actionsMenuLabel": "Dejanja naročnine"
             },
             "options": {
                 "everyDay": "Vsak dan",
@@ -132,6 +141,7 @@
         },
         "testMode": {
             "label": "Testni način"
-        }
+        },
+        "closeModal": "Zapri"
     }
 }

@@ -26,7 +26,12 @@
                 "selectBank": "Vælg bank"
             },
             "pos": {
-                "selectTerminal": "Vælg terminal"
+                "selectTerminal": "Vælg terminal",
+                "returnToWebsite": "Tilbage til webstedet",
+                "terminalInstructions": "Følg instruktionerne på terminalen",
+                "paymentSuccess": "Din betaling lykkedes!",
+                "paymentFailed": "Din betaling mislykkedes!",
+                "paymentFailedNoDebit": "Der er ikke trukket penge fra kortet"
             },
             "mandate": {
                 "sectionTitle": "Gemt kort",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonnummer",
                 "phoneErrorMessage": "Telefonnummer er påkrævet. For eksempel +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Til kassen"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Dit abonnement vil nu blive genoptaget",
                 "successSkip": "Dit abonnement er blevet sprunget over",
                 "successUpdateAddress": "Din adresse er blevet opdateret",
-                "successUpdatePayment": "Din betalingsmetode er blevet opdateret"
+                "successUpdatePayment": "Din betalingsmetode er blevet opdateret",
+                "actionsMenuLabel": "Abonnementshandlinger"
             },
             "options": {
                 "everyDay": "Hver dag",
@@ -132,6 +141,7 @@
         },
         "testMode": {
             "label": "Testtilstand"
-        }
+        },
+        "closeModal": "Luk"
     }
 }

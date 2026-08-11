@@ -26,7 +26,12 @@
                 "selectBank": "Vali pank"
             },
             "pos": {
-                "selectTerminal": "Vali terminal"
+                "selectTerminal": "Vali terminal",
+                "returnToWebsite": "Tagasi veebisaidile",
+                "terminalInstructions": "Järgige terminali juhiseid",
+                "paymentSuccess": "Teie makse õnnestus!",
+                "paymentFailed": "Teie makse ebaõnnestus!",
+                "paymentFailedNoDebit": "Kaardilt ei võetud raha maha"
             },
             "mandate": {
                 "sectionTitle": "Salvestatud kaardid",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefoninumber",
                 "phoneErrorMessage": "Telefoninumber on kohustuslik. Näiteks +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Kassasse"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Sinu tellimus taastatakse nüüd",
                 "successSkip": "Sinu tellimus on vahele jäetud",
                 "successUpdateAddress": "Sinu aadress on edukalt uuendatud",
-                "successUpdatePayment": "Sinu makseviis on edukalt uuendatud"
+                "successUpdatePayment": "Sinu makseviis on edukalt uuendatud",
+                "actionsMenuLabel": "Tellimuse toimingud"
             },
             "options": {
                 "everyDay": "Iga päev",
@@ -132,6 +141,7 @@
         },
         "testMode": {
             "label": "Testrežiim"
-        }
+        },
+        "closeModal": "Sulge"
     }
 }

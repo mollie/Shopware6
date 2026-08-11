@@ -35,7 +35,7 @@
                                         id="accountOrderDropdown"
                                         data-toggle="dropdown"
                                         data-bs-toggle="dropdown"
-                                        aria-label="Subscription Actions"
+                                        aria-label="{{ 'molliePayments.subscriptions.account.actionsMenuLabel'|trans|striptags }}"
                                         aria-haspopup="true"
                                         aria-expanded="false">
                                     {% sw_icon 'more-horizontal' %}
@@ -387,7 +387,7 @@
                                                                                                 class="close"
                                                                                                 data-dismiss="modal"
                                                                                                 data-bs-dismiss="modal"
-                                                                                                aria-label="Close">
+                                                                                                aria-label="{{ 'molliePayments.closeModal'|trans|striptags }}">
                                                                                             <span aria-hidden="true">&times;</span>
                                                                                         </button>
                                                                                         </div>
@@ -537,7 +537,7 @@
                                                                                                     class="close"
                                                                                                     data-dismiss="modal"
                                                                                                     data-bs-dismiss="modal"
-                                                                                                    aria-label="Close">
+                                                                                                    aria-label="{{ 'molliePayments.closeModal'|trans|striptags }}">
                                                                                                 <span aria-hidden="true">&times;</span>
                                                                                             </button>
                                                                                         {% endblock %}

@@ -26,7 +26,12 @@
                 "selectBank": "Επιλέξτε τράπεζα"
             },
             "pos": {
-                "selectTerminal": "Επιλέξτε τερματικό"
+                "selectTerminal": "Επιλέξτε τερματικό",
+                "returnToWebsite": "Επιστροφή στον ιστότοπο",
+                "terminalInstructions": "Ακολουθήστε τις οδηγίες στο τερματικό",
+                "paymentSuccess": "Η πληρωμή σας ολοκληρώθηκε με επιτυχία!",
+                "paymentFailed": "Η πληρωμή σας δεν ολοκληρώθηκε!",
+                "paymentFailedNoDebit": "Δεν χρεώθηκε κανένα ποσό από την κάρτα"
             },
             "mandate": {
                 "sectionTitle": "Αποθηκευμένες κάρτες",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Αριθμός τηλεφώνου",
                 "phoneErrorMessage": "Απαιτείται αριθμός τηλεφώνου. Για παράδειγμα +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Ολοκλήρωση αγοράς"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Η συνδρομή σας θα συνεχιστεί τώρα",
                 "successSkip": "Η συνδρομή σας έχει παραληφθεί",
                 "successUpdateAddress": "Η διεύθυνση σας ενημερώθηκε επιτυχώς",
-                "successUpdatePayment": "Η μέθοδος πληρωμής σας ενημερώθηκε επιτυχώς"
+                "successUpdatePayment": "Η μέθοδος πληρωμής σας ενημερώθηκε επιτυχώς",
+                "actionsMenuLabel": "Ενέργειες συνδρομής"
             },
             "options": {
                 "everyDay": "Κάθε μέρα",
@@ -132,6 +141,7 @@
         },
         "testMode": {
             "label": "Δοκιμαστική λειτουργία"
-        }
+        },
+        "closeModal": "Κλείσιμο"
     }
 }

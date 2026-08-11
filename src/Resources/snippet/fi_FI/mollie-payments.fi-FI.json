@@ -26,7 +26,12 @@
                 "selectBank": "Valitse pankki"
             },
             "pos": {
-                "selectTerminal": "Valitse maksupääte"
+                "selectTerminal": "Valitse maksupääte",
+                "returnToWebsite": "Takaisin verkkosivustolle",
+                "terminalInstructions": "Seuraa päätteen ohjeita",
+                "paymentSuccess": "Maksusi onnistui!",
+                "paymentFailed": "Maksusi epäonnistui!",
+                "paymentFailedNoDebit": "Kortilta ei veloitettu rahaa"
             },
             "mandate": {
                 "sectionTitle": "Tallennetut kortit",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Puhelinnumero",
                 "phoneErrorMessage": "Puhelinnumero on pakollinen. Esimerkiksi +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Kassalle"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Tilaustasi jatketaan nyt",
                 "successSkip": "Tilauksesi on ohitettu",
                 "successUpdateAddress": "Osoitteesi on päivitetty onnistuneesti",
-                "successUpdatePayment": "Maksutapasi on päivitetty onnistuneesti"
+                "successUpdatePayment": "Maksutapasi on päivitetty onnistuneesti",
+                "actionsMenuLabel": "Tilauksen toiminnot"
             },
             "options": {
                 "everyDay": "Joka päivä",
@@ -132,6 +141,7 @@
         },
         "testMode": {
             "label": "Testitila"
-        }
+        },
+        "closeModal": "Sulje"
     }
 }
