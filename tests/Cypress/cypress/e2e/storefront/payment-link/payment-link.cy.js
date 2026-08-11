@@ -11,6 +11,7 @@ import AdminSubscriptionsAction from "Actions/admin/AdminSubscriptionsAction";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";
 import PluginConfiguration from "../../../support/models/PluginConfiguration";
 import CreditCardScreen from "../../../support/actions/mollie/screens/CreditCartScreen";
+import MollieCheckoutScreen from "../../../support/actions/mollie/screens/MollieCheckoutScreen";
 import SubscriptionsListRepository from "Repositories/admin/subscriptions/SubscriptionsListRepository";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
 // ------------------------------------------------------
@@ -36,6 +37,7 @@ const mollieSandbox = new MollieSandbox();
 const molliePayment = new PaymentStatusScreen();
 const molliePaymentMethods = new PaymentListScreen();
 const mollieCreditCard = new CreditCardScreen();
+const mollieCheckout = new MollieCheckoutScreen();
 
 const device = devices.getFirstDevice();
 
@@ -72,6 +74,7 @@ function configurePaymentLink(allowMethodSelection) {
  * Opens the pay URL a merchant would put into the confirmation mail. The controller answers with a
  * 302 to the payment link page on the Mollie domain; cy.visit() cannot target a cross-origin
  * redirect directly, so we keep the shop session alive and trigger it as an in-app navigation.
+ * Mollie can show intermediate steps on that page, so we always continue to the method list.
  */
 function openPaymentLink(orderId) {
     shopware.prepareDomainChange();
@@ -81,6 +84,8 @@ function openPaymentLink(orderId) {
     });
 
     cy.url({timeout: 30000}).should('include', 'mollie.com');
+
+    mollieCheckout.continueToCheckout();
 }
 
 
@@ -196,23 +201,9 @@ context("Payment Link", () => {
             // EPS is used because it can create the mandate a subscription needs (PayPal cannot).
             createOrder.createOrder('cypress@mollie.com', ['MOL_REGULAR', 'MOL_SUB_1'], 'eps', 'Mollie Test Shipment').then((orderId) => {
 
+                // openPaymentLink already submitted the mandate confirmation a subscription order
+                // can show on Mollie before the payment method selection
                 openPaymentLink(orderId);
-
-                // A subscription order sometimes shows a mandate confirmation on Mollie before the
-                // payment method selection, and sometimes goes straight to it. Wait for the Mollie
-                // page to finish loading first (its pages are server-rendered, so once the document is
-                // complete the mandate button is already in the DOM if that step exists), then continue
-                // past the mandate step only when its submit button is actually present. This avoids
-                // both the "button never found" timeout when the step is skipped and prematurely
-                // skipping it while the cross-origin redirect is still loading.
-                cy.document({timeout: 30000}).its('readyState').should('eq', 'complete');
-                cy.get('body').then(($body) => {
-                    const mandateSubmit = $body.find('button[type="submit"]:visible');
-
-                    if (mandateSubmit.length > 0) {
-                        cy.wrap(mandateSubmit).first().click();
-                    }
-                });
 
                 molliePaymentMethods.selectEPS();
 
