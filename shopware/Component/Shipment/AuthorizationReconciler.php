@@ -62,8 +62,10 @@ final class AuthorizationReconciler
     ): ?string {
         $paymentId = $payment->getId();
 
-        // Each shipment captures the gross amount of exactly its own items (incl. their taxes).
-        $createCapture = new CreateCapture($shippingItems, $currency->getIsoCode());
+        // Each shipment captures the gross amount of exactly its own items (incl. their taxes). The
+        // description ends up in the Mollie balances/settlement report, so it is the plain Shopware
+        // order number instead of the shipped item names to keep the report reconcilable.
+        $createCapture = new CreateCapture($shippingItems, $currency->getIsoCode(), $orderNumber);
 
         $hasCancelledItems = $this->itemResolver->hasCancelledItems($lineItems);
 
@@ -172,10 +174,10 @@ final class AuthorizationReconciler
         // Top up the capture so the shipped items are fully captured incl. their taxes/rounding.
         if ($shortfall > self::RECONCILE_THRESHOLD) {
             $emptyItems = new ShippingItemCollection();
-            $reconcileCapture = new CreateCapture($emptyItems, $currency->getIsoCode());
+            $reconcileDescription = sprintf('shipping-%s', $orderNumber);
+            $reconcileCapture = new CreateCapture($emptyItems, $currency->getIsoCode(), $reconcileDescription);
             $shortfallAmount = new Money($shortfall, $currency->getIsoCode());
             $reconcileCapture->setAmount($shortfallAmount);
-            $reconcileCapture->setDescription(sprintf('Tax reconciliation for order %s', $orderNumber));
 
             try {
                 $capture = $this->mollieGateway->createCapture($reconcileCapture, $paymentId, $orderNumber, $salesChannelId);
