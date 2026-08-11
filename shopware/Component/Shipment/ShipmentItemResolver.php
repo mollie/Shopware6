@@ -128,8 +128,6 @@ final class ShipmentItemResolver
                 throw ShippingException::shippingQuantityTooHigh($lineItem->getId(), $orderId, $newQuantity, $lineItem->getQuantity());
             }
 
-            $product = $lineItem->getProduct();
-            $name = $product !== null ? (string) $product->getName() : (string) $lineItem->getLabel();
             $mollieLineId = ($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
 
             // Reuse LineItem's net->gross normalization so the capture amount matches the amount sent
@@ -137,7 +135,6 @@ final class ShipmentItemResolver
             $grossLine = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
             $shippingItem = new ShippingItem(
                 $requestedQuantity,
-                $requestedQuantity . 'x ' . $name,
                 $grossLine->getUnitPrice()->getValue() * $requestedQuantity,
                 $mollieLineId !== null ? (string) $mollieLineId : null,
             );
@@ -191,8 +188,7 @@ final class ShipmentItemResolver
                 continue;
             }
 
-            $shippingMethod = $delivery->getShippingMethod();
-            if ($shippingMethod === null) {
+            if ($delivery->getShippingMethod() === null) {
                 continue;
             }
 
@@ -203,7 +199,6 @@ final class ShipmentItemResolver
             $grossDelivery = LineItem::fromDelivery($delivery, $currency, $taxStatus);
             $shippingItem = new ShippingItem(
                 $shippingCostsQuantity,
-                $shippingCostsQuantity . 'x ' . $shippingMethod->getName(),
                 $grossDelivery->getUnitPrice()->getValue() * $shippingCostsQuantity,
                 $mollieLineId !== null ? (string) $mollieLineId : null,
             );

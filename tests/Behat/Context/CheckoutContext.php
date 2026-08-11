@@ -459,10 +459,9 @@ final class CheckoutContext extends ShopwareContext
         $payment = $mollieGateway->getPaymentByTransactionId($transaction->getId(), $context);
 
         $emptyItems = new ShippingItemCollection();
-        $legacyCapture = new CreateCapture($emptyItems, $currency->getIsoCode());
+        $legacyCapture = new CreateCapture($emptyItems, $currency->getIsoCode(), 'legacy net capture');
         $legacyAmount = new Money($netAmount, $currency->getIsoCode());
         $legacyCapture->setAmount($legacyAmount);
-        $legacyCapture->setDescription('legacy net capture');
         $mollieGateway->createCapture($legacyCapture, $payment->getId(), (string) $order->getOrderNumber(), $order->getSalesChannelId());
 
         // Mollie processes captures asynchronously; wait until the net capture is reflected on the

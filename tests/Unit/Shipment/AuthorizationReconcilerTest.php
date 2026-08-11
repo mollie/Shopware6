@@ -31,7 +31,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
-        $shippingItems->add(new ShippingItem(1, '1x Product', 10.0, null));
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
             new Payment('tr_1'),
@@ -50,6 +50,32 @@ final class AuthorizationReconcilerTest extends TestCase
         self::assertSame(10.0, $gateway->getCapturePayloads()[0]->getAmount()->getValue());
     }
 
+    public function testCaptureDescriptionContainsTheOrderNumber(): void
+    {
+        // The capture description shows up in the Mollie balances report, so it must identify the
+        // order instead of listing the shipped items.
+        $gateway = new FakeGateway();
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $reconciler->captureViaPaymentsApi(
+            new Payment('tr_1'),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertCount(1, $gateway->getCapturePayloads());
+        self::assertSame('SW10001', $gateway->getCapturePayloads()[0]->getDescription());
+    }
+
     public function testFullShipmentCapturesAuthorizedRemainderRegardlessOfLineItemTotal(): void
     {
         // The shipped line items sum to only 91.92 because the rounding-difference line is not a
@@ -63,7 +89,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
-        $shippingItems->add(new ShippingItem(1, '1x Product', 91.92, null));
+        $shippingItems->add(new ShippingItem(1, 91.92, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
             $payment,
@@ -94,7 +120,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
-        $shippingItems->add(new ShippingItem(1, '1x Product', 39.98, null));
+        $shippingItems->add(new ShippingItem(1, 39.98, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
             $payment,
@@ -120,7 +146,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
-        $shippingItems->add(new ShippingItem(1, '1x Product', 10.0, null));
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
             new Payment('tr_1'),
