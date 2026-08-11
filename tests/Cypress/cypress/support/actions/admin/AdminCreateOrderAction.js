@@ -121,11 +121,13 @@ export default class AdminCreateOrderAction {
         // inline-edit row that then shows the product select.
         cy.get(row + ' .sw-data-grid__cell--label', {timeout: 20000}).dblclick();
 
-        // Open the product select in the item column and search.
+        // Open the product select in the item column and search. As soon as it is open, its result
+        // popover (position: fixed) is rendered over the input, so clear/type are forced to skip the
+        // actionability check that otherwise fails with "covered by a .sw-product-variant-info".
         cy.get(row + ' .sw-order-product-select .sw-select__selection', {timeout: 20000}).click();
-        cy.get(row + ' .sw-order-product-select input.sw-entity-single-select__selection-input')
-            .clear()
-            .type(productName);
+        cy.get(row + ' .sw-order-product-select input.sw-entity-single-select__selection-input', {timeout: 20000})
+            .clear(forceOption)
+            .type(productName, forceOption);
 
         // Narrow the suggestions down to the single matching product and pick it.
         this.pickSingleProductResult(rowIndex);
@@ -183,7 +185,7 @@ export default class AdminCreateOrderAction {
 
             // delete one character to re-trigger the search, give it a second to filter, then check
             // the results again
-            cy.get(input).type('{backspace}');
+            cy.get(input, {timeout: 20000}).type('{backspace}', forceOption);
             cy.wait(1000);
 
             this.pickSingleProductResult(rowIndex, remainingAttempts - 1);
