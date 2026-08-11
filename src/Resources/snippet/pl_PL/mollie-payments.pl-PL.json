@@ -26,7 +26,12 @@
                 "selectBank": "Wybierz bank"
             },
             "pos": {
-                "selectTerminal": "Wybierz terminal"
+                "selectTerminal": "Wybierz terminal",
+                "returnToWebsite": "Powrót do strony",
+                "terminalInstructions": "Postępuj zgodnie z instrukcjami na terminalu",
+                "paymentSuccess": "Twoja płatność zakończyła się powodzeniem!",
+                "paymentFailed": "Twoja płatność nie powiodła się!",
+                "paymentFailedNoDebit": "Z karty nie pobrano żadnych środków"
             },
             "mandate": {
                 "sectionTitle": "Zapisane karty",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Numer telefonu",
                 "phoneErrorMessage": "Numer telefonu jest wymagany (na przykład +31208202070)"
+            },
+            "paypalExpress": {
+                "checkout": "Do kasy"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Twoja subskrypcja zostanie wznowiona",
                 "successSkip": "Twoja subskrypcja została pominięta",
                 "successUpdateAddress": "Twój adres został zaktualizowany pomyślnie",
-                "successUpdatePayment": "Twoja metoda płatności została zaktualizowana pomyślnie"
+                "successUpdatePayment": "Twoja metoda płatności została zaktualizowana pomyślnie",
+                "actionsMenuLabel": "Akcje subskrypcji"
             },
             "options": {
                 "everyDay": "Codziennie",

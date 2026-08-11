@@ -26,7 +26,12 @@
                 "selectBank": "Válasszon bankot"
             },
             "pos": {
-                "selectTerminal": "Válasszon terminált"
+                "selectTerminal": "Válasszon terminált",
+                "returnToWebsite": "Vissza a webhelyre",
+                "terminalInstructions": "Kövesse a terminál utasításait",
+                "paymentSuccess": "A fizetése sikeres volt!",
+                "paymentFailed": "A fizetése nem volt sikeres!",
+                "paymentFailedNoDebit": "Nem történt levonás a kártyáról"
             },
             "mandate": {
                 "sectionTitle": "Mentett kártyák",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonszám",
                 "phoneErrorMessage": "A telefonszám kötelező. Például +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Pénztár"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Az előfizetés mostantól folytatódik",
                 "successSkip": "Az előfizetés ki lett hagyva",
                 "successUpdateAddress": "A címe sikeresen frissítve lett",
-                "successUpdatePayment": "A fizetési módja sikeresen frissítve lett"
+                "successUpdatePayment": "A fizetési módja sikeresen frissítve lett",
+                "actionsMenuLabel": "Előfizetési műveletek"
             },
             "options": {
                 "everyDay": "Minden nap",

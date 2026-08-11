@@ -26,7 +26,12 @@
                 "selectBank": "Seleccionar banco"
             },
             "pos": {
-                "selectTerminal": "Seleccionar terminal"
+                "selectTerminal": "Seleccionar terminal",
+                "returnToWebsite": "Volver al sitio web",
+                "terminalInstructions": "Sigue las instrucciones en el terminal",
+                "paymentSuccess": "¡Tu pago se ha realizado correctamente!",
+                "paymentFailed": "¡Tu pago no se ha realizado correctamente!",
+                "paymentFailedNoDebit": "No se ha cargado ningún importe en la tarjeta"
             },
             "mandate": {
                 "sectionTitle": "Tarjetas guardadas",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Número de teléfono",
                 "phoneErrorMessage": "Se requiere un número de teléfono. Por ejemplo: +34 665 202 070"
+            },
+            "paypalExpress": {
+                "checkout": "Pagar"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Se ha reanudado tu suscripción",
                 "successSkip": "Tu suscripción se ha pospuesto",
                 "successUpdateAddress": "Tu dirección se ha actualizado",
-                "successUpdatePayment": "Tu método de pago se ha actualizado"
+                "successUpdatePayment": "Tu método de pago se ha actualizado",
+                "actionsMenuLabel": "Acciones de suscripción"
             },
             "options": {
                 "everyDay": "Cada día",

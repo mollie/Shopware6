@@ -26,7 +26,12 @@
                 "selectBank": "Velg bank"
             },
             "pos": {
-                "selectTerminal": "Velg terminal"
+                "selectTerminal": "Velg terminal",
+                "returnToWebsite": "Tilbake til nettstedet",
+                "terminalInstructions": "Følg instruksjonene på terminalen",
+                "paymentSuccess": "Betalingen din var vellykket!",
+                "paymentFailed": "Betalingen din var ikke vellykket!",
+                "paymentFailedNoDebit": "Ingen penger er trukket fra kortet"
             },
             "mandate": {
                 "sectionTitle": "Lagrede kort",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonnummer",
                 "phoneErrorMessage": "Telefonnummer er påkrevd. For eksempel +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Til kassen"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Abonnementet ditt vil nå bli gjenopptatt",
                 "successSkip": "Abonnementet ditt har blitt hoppet over",
                 "successUpdateAddress": "Adressen din er nå oppdatert",
-                "successUpdatePayment": "Betalingsmetoden din er nå oppdatert"
+                "successUpdatePayment": "Betalingsmetoden din er nå oppdatert",
+                "actionsMenuLabel": "Abonnementshandlinger"
             },
             "options": {
                 "everyDay": "Hver dag",

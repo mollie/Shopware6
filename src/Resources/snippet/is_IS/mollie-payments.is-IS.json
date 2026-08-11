@@ -26,7 +26,12 @@
                 "selectBank": "Veldu banka"
             },
             "pos": {
-                "selectTerminal": "Veldu greiðslustöð"
+                "selectTerminal": "Veldu greiðslustöð",
+                "returnToWebsite": "Til baka á vefsíðuna",
+                "terminalInstructions": "Fylgdu leiðbeiningunum á posanum",
+                "paymentSuccess": "Greiðslan þín tókst!",
+                "paymentFailed": "Greiðslan þín tókst ekki!",
+                "paymentFailedNoDebit": "Engin upphæð var skuldfærð af kortinu"
             },
             "mandate": {
                 "sectionTitle": "Vistuð kort",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Símanúmer",
                 "phoneErrorMessage": "Símanúmer er nauðsynlegt. Til dæmis +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Ganga frá kaupum"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Áskriftin þín verður nú hafin á ný",
                 "successSkip": "Þinni áskrift hefur verið sleppt",
                 "successUpdateAddress": "Heimilisfangið þitt hefur verið uppfært með góðu móti",
-                "successUpdatePayment": "Þinn greiðslumáti hefur verið uppfærður með góðu móti"
+                "successUpdatePayment": "Þinn greiðslumáti hefur verið uppfærður með góðu móti",
+                "actionsMenuLabel": "Áskriftaraðgerðir"
             },
             "options": {
                 "everyDay": "Á hverjum degi",

@@ -26,7 +26,12 @@
                 "selectBank": "Vyberte banku"
             },
             "pos": {
-                "selectTerminal": "Vyberte terminál"
+                "selectTerminal": "Vyberte terminál",
+                "returnToWebsite": "Zpět na web",
+                "terminalInstructions": "Postupujte podle pokynů na terminálu",
+                "paymentSuccess": "Vaše platba proběhla úspěšně!",
+                "paymentFailed": "Vaše platba nebyla úspěšná!",
+                "paymentFailedNoDebit": "Z karty nebyly strženy žádné peníze"
             },
             "mandate": {
                 "sectionTitle": "Uložené karty",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonní číslo",
                 "phoneErrorMessage": "Telefonní číslo je povinné. Například +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Pokladna"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Vaše předplatné bude nyní obnoveno",
                 "successSkip": "Vaše předplatné bylo přeskočeno",
                 "successUpdateAddress": "Vaše adresa byla úspěšně aktualizována",
-                "successUpdatePayment": "Váš způsob platby byl úspěšně aktualizován"
+                "successUpdatePayment": "Váš způsob platby byl úspěšně aktualizován",
+                "actionsMenuLabel": "Akce předplatného"
             },
             "options": {
                 "everyDay": "Každý den",

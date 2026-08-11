@@ -26,7 +26,12 @@
                 "selectBank": "Odaberi banku"
             },
             "pos": {
-                "selectTerminal": "Odaberi terminal"
+                "selectTerminal": "Odaberi terminal",
+                "returnToWebsite": "Povratak na web-mjesto",
+                "terminalInstructions": "Slijedite upute na terminalu",
+                "paymentSuccess": "Vaše plaćanje je uspješno!",
+                "paymentFailed": "Vaše plaćanje nije uspjelo!",
+                "paymentFailedNoDebit": "S kartice nije skinut nikakav iznos"
             },
             "mandate": {
                 "sectionTitle": "Spremljene kartice",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Broj telefona",
                 "phoneErrorMessage": "Broj telefona je obavezan. Na primjer +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Blagajna"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Vaša će se pretplata sada nastaviti",
                 "successSkip": "Vaša je pretplata preskočena",
                 "successUpdateAddress": "Adresa je uspješno ažurirana",
-                "successUpdatePayment": "Metoda plaćanja je uspješno ažurirana"
+                "successUpdatePayment": "Metoda plaćanja je uspješno ažurirana",
+                "actionsMenuLabel": "Radnje pretplate"
             },
             "options": {
                 "everyDay": "Svakog dana",

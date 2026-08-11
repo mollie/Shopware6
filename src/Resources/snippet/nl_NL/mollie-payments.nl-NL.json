@@ -26,7 +26,12 @@
                 "selectBank": "Selecteer bank"
             },
             "pos": {
-                "selectTerminal": "Selecteer terminal"
+                "selectTerminal": "Selecteer terminal",
+                "returnToWebsite": "Terug naar website",
+                "terminalInstructions": "Volg de instructies op de terminal",
+                "paymentSuccess": "Je betaling is geslaagd!",
+                "paymentFailed": "Je betaling is niet geslaagd!",
+                "paymentFailedNoDebit": "Er is geen geld van de kaart afgeschreven"
             },
             "mandate": {
                 "sectionTitle": "Opgeslagen kaarten",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefoonnummer",
                 "phoneErrorMessage": "Telefoonnummer is vereist. Bijvoorbeeld +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Afrekenen"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Your subscription will now be resumed",
                 "successSkip": "Your subscription has been skipped",
                 "successUpdateAddress": "Uw adres is succesvol bijgewerkt",
-                "successUpdatePayment": "De betaalmethode is succesvol geüpdatet"
+                "successUpdatePayment": "De betaalmethode is succesvol geüpdatet",
+                "actionsMenuLabel": "Abonnementsacties"
             },
             "options": {
                 "everyDay": "Elke dag",

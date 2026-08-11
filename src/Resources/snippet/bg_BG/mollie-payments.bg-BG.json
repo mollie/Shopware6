@@ -26,7 +26,12 @@
                 "selectBank": "Изберете банка"
             },
             "pos": {
-                "selectTerminal": "Изберете терминал"
+                "selectTerminal": "Изберете терминал",
+                "returnToWebsite": "Обратно към уебсайта",
+                "terminalInstructions": "Следвайте инструкциите на терминала",
+                "paymentSuccess": "Плащането ви беше успешно!",
+                "paymentFailed": "Плащането ви не беше успешно!",
+                "paymentFailedNoDebit": "От картата не са удържани средства"
             },
             "mandate": {
                 "sectionTitle": "Запазени карти",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Телефонен номер",
                 "phoneErrorMessage": "Телефонният номер е задължителен. Например +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Плащане"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Вашият абонамент ще бъде възобновен сега",
                 "successSkip": "Вашият абонамент беше пропуснат",
                 "successUpdateAddress": "Вашият адрес беше успешно актуализиран",
-                "successUpdatePayment": "Вашият метод на плащане беше успешно актуализиран"
+                "successUpdatePayment": "Вашият метод на плащане беше успешно актуализиран",
+                "actionsMenuLabel": "Действия за абонамент"
             },
             "options": {
                 "everyDay": "Всеки ден",

@@ -26,7 +26,12 @@
                 "selectBank": "Izvēlieties banku"
             },
             "pos": {
-                "selectTerminal": "Izvēlieties termināli"
+                "selectTerminal": "Izvēlieties termināli",
+                "returnToWebsite": "Atgriezties vietnē",
+                "terminalInstructions": "Izpildiet norādījumus terminālī",
+                "paymentSuccess": "Jūsu maksājums bija veiksmīgs!",
+                "paymentFailed": "Jūsu maksājums neizdevās!",
+                "paymentFailedNoDebit": "No kartes netika norakstīta nauda"
             },
             "mandate": {
                 "sectionTitle": "Saglabātās kartes",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Tālruņa numurs",
                 "phoneErrorMessage": "Tālruņa numurs ir obligāts. Piemēram, +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Apmaksa"
             }
         },
         "messages": {
@@ -114,7 +122,8 @@
                 "successResume": "Jūsu abonements tagad tiks atsākts",
                 "successSkip": "Jūsu abonements ir izlaists",
                 "successUpdateAddress": "Jūsu adrese ir veiksmīgi atjaunināta",
-                "successUpdatePayment": "Jūsu maksājuma metode ir veiksmīgi atjaunināta"
+                "successUpdatePayment": "Jūsu maksājuma metode ir veiksmīgi atjaunināta",
+                "actionsMenuLabel": "Abonementa darbības"
             },
             "options": {
                 "everyDay": "Katru dienu",
