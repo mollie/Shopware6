@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Testtilstand"
-        },
-        "closeModal": "Luk"
+        }
     }
 }

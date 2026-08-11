@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Bandymo režimas"
-        },
-        "closeModal": "Uždaryti"
+        }
     }
 }

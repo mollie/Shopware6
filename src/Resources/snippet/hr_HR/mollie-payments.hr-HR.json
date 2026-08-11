@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Testni način rada"
-        },
-        "closeModal": "Zatvori"
+        }
     }
 }

@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Testa režīms"
-        },
-        "closeModal": "Aizvērt"
+        }
     }
 }

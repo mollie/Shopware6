@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Testmodus"
-        },
-        "closeModal": "Lukk"
+        }
     }
 }

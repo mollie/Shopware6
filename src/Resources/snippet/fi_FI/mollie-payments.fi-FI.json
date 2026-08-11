@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Testitila"
-        },
-        "closeModal": "Sulje"
+        }
     }
 }

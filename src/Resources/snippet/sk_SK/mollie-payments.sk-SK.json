@@ -141,7 +141,6 @@
         },
         "testMode": {
             "label": "Testovací režim"
-        },
-        "closeModal": "Zavrieť"
+        }
     }
 }
