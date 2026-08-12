@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.4.0
 - Hinzugefügt: Das minimale Log-Level der Mollie-Log-Handler ist nun über den Container-Parameter `mollie.logger.level` konfigurierbar; der Debug-Modus übersteuert es und erzwingt das Debug-Level.
 - Geändert: In Headless-Setups werden die Store-API-Webhook- und Return-URLs nun aus APP_URL statt aus dem Proxy-Host gebildet, damit Mollie sie erreichen kann.
 - Geändert: Webhooks für Mollie-Zahlungen ohne Zahlart schlagen nicht mehr fehl; die aktuelle Zahlart wird beibehalten.
