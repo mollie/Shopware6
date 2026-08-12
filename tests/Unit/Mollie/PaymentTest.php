@@ -310,4 +310,52 @@ final class PaymentTest extends TestCase
         $this->assertSame('chargeback', $payment->getStatus()->getShopwareHandlerMethod());
         $this->assertSame(OrderTransactionStates::STATE_CHARGEBACK, $payment->getStatus()->getShopwarePaymentStatus());
     }
+
+    public function testRefundableAmountIsTheRemainingAmount(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::KLARNA->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '84.49', 'currency' => 'EUR'],
+            'amountRefunded' => ['value' => '0.00', 'currency' => 'EUR'],
+            'amountRemaining' => ['value' => '54.62', 'currency' => 'EUR'],
+            'amountCaptured' => ['value' => '54.62', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertSame(54.62, $payment->getRefundableAmount());
+    }
+
+    public function testRefundableAmountFallsBackToTheCapturedAmount(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::KLARNA->value,
+            'status' => PaymentStatus::PAID->value,
+            'amount' => ['value' => '84.49', 'currency' => 'EUR'],
+            'amountRefunded' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountCaptured' => ['value' => '50.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertSame(40.0, $payment->getRefundableAmount());
+    }
+
+    public function testRefundableAmountIsUnknownWithoutCaptureInformation(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'method' => PaymentMethod::KLARNA->value,
+            'status' => PaymentStatus::AUTHORIZED->value,
+            'amount' => ['value' => '84.49', 'currency' => 'EUR'],
+            'amountCaptured' => ['value' => '0.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = Payment::createFromClientResponse($body);
+
+        $this->assertNull($payment->getRefundableAmount());
+    }
 }

@@ -491,7 +491,9 @@ Component.register('mollie-refund-manager', {
                     if (this._isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors?.[0]);
+                        this._showNotificationError(
+                            this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'),
+                        );
                     }
                 })
                 .finally(() => {
@@ -519,7 +521,9 @@ Component.register('mollie-refund-manager', {
                     if (this._isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors?.[0]);
+                        this._showNotificationError(
+                            this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'),
+                        );
                     }
                 })
                 .finally(() => {
@@ -639,11 +643,15 @@ Component.register('mollie-refund-manager', {
 
                         this._applyRefundedItems(response.refundedItems, response.refundedAmountItems);
                     } else {
-                        this._showNotificationError(response.errors[0]);
+                        this._showNotificationError(
+                            this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'),
+                        );
                     }
                 })
                 .catch((response) => {
-                    this._showNotificationError(response.error);
+                    this._showNotificationError(
+                        this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'),
+                    );
                 });
         },
 
@@ -669,7 +677,7 @@ Component.register('mollie-refund-manager', {
                 orderId: this.order.id,
             })
                 .then((response) => {
-                    if (!response || response.success === false) {
+                    if (!response || response.success === false || response.errors) {
                         this.isRefundDataLoading = false;
                         return;
                     }

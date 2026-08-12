@@ -547,4 +547,26 @@ final class Payment extends Struct implements \JsonSerializable
     {
         return $this->hasRefund() && ! $this->isFullyRefunded();
     }
+
+    /**
+     * The amount Mollie still accepts for a refund. Mollie can only refund money that has actually
+     * been captured, so for manual capture methods (e.g. Klarna) a partially captured or released
+     * authorization is the real ceiling - not the order total. "amountRemaining" already accounts
+     * for existing refunds and is only returned for paid payments; the captured amount is the
+     * fallback. Null means Mollie reported no ceiling, so the caller must not cap the amount.
+     */
+    public function getRefundableAmount(): ?float
+    {
+        if ($this->amountRemaining !== null) {
+            return $this->amountRemaining->getValue();
+        }
+
+        if ($this->capturedAmount === null || $this->capturedAmount->getValue() <= 0.0) {
+            return null;
+        }
+
+        $refunded = isset($this->amountRefunded) ? $this->amountRefunded->getValue() : 0.0;
+
+        return $this->capturedAmount->getValue() - $refunded;
+    }
 }
