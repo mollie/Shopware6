@@ -648,7 +648,7 @@ Component.register('mollie-refund-manager', {
                         );
                     }
                 })
-                .catch((response) => {
+                .catch(() => {
                     this._showNotificationError(
                         this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'),
                     );
