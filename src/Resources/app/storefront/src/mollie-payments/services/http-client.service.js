@@ -39,17 +39,23 @@ export default class HttpClientService {
         xhr.setRequestHeader('Content-Type', contentType);
 
         xhr.onload = function () {
-            if (!callbackSuccess || typeof callbackSuccess !== 'function') {
-                return;
-            }
-
             const responseType = xhr.getResponseHeader('content-type');
             const body = 'response' in xhr ? xhr.response : xhr.responseText;
 
+            let payload = body;
             if (responseType && responseType.indexOf('application/json') > -1) {
-                callbackSuccess(JSON.parse(body));
-            } else {
-                callbackSuccess(body);
+                try {
+                    payload = JSON.parse(body);
+                } catch (e) {
+                    if (typeof callbackError === 'function') {
+                        callbackError(e);
+                    }
+                    return;
+                }
+            }
+
+            if (typeof callbackSuccess === 'function') {
+                callbackSuccess(payload);
             }
         };
 
