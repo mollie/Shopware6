@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as ShopwareLineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -26,6 +27,7 @@ final class RefundBuilder implements RefundBuilderInterface
     public function __construct(
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
+        private RefundableTotalCalculator $refundableTotalCalculator,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -60,6 +62,7 @@ final class RefundBuilder implements RefundBuilderInterface
 
         $lineItems = new LineItemCollection();
         $mollieLines = null;
+        $mollieRefundable = null;
 
         if ($payment->getOrderId() !== null) {
             $mollieOrder = $this->mollieGateway->getOrder($payment->getOrderId(), $salesChannelId);
@@ -68,6 +71,7 @@ final class RefundBuilder implements RefundBuilderInterface
         } else {
             $molliePayment = $this->mollieGateway->getPayment($payment->getId(), $orderNumber, $salesChannelId);
             $existingRefunds = $molliePayment->getRefunds();
+            $mollieRefundable = $molliePayment->getRefundableAmount();
         }
 
         $alreadyRefunded = $existingRefunds->getSumRefunded() + $existingRefunds->getSumPending();
@@ -86,9 +90,14 @@ final class RefundBuilder implements RefundBuilderInterface
             }
         }
 
-        $baseTotal = $this->computeBaseTotal($orderLineItems, $orderDeliveries);
+        $baseTotal = $this->refundableTotalCalculator->calculate($order);
         $maxRefundable = max(0.0, $baseTotal - $alreadyRefunded);
-        $amount = min($amount, $maxRefundable);
+
+        if ($mollieRefundable !== null) {
+            $maxRefundable = min($maxRefundable, max(0.0, $mollieRefundable));
+        }
+
+        $amount = round(min($amount, $maxRefundable), Mollie::ROUNDING_PRECISION);
 
         $money = new Money($amount, $currency->getIsoCode());
 
@@ -104,24 +113,13 @@ final class RefundBuilder implements RefundBuilderInterface
         $this->logger->debug('Refund payload built', [
             'orderNumber' => $orderNumber,
             'amount' => $amount,
+            'maxRefundable' => $maxRefundable,
+            'mollieRefundable' => $mollieRefundable,
             'lineCount' => $lineItems->count(),
             'isOrderRefund' => $createRefund instanceof CreateOrderRefund,
         ]);
 
         return $createRefund;
-    }
-
-    private function computeBaseTotal(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries): float
-    {
-        $total = 0.0;
-        foreach ($orderLineItems as $lineItem) {
-            $total += $lineItem->getTotalPrice();
-        }
-        foreach ($orderDeliveries as $delivery) {
-            $total += $delivery->getShippingCosts()->getTotalPrice();
-        }
-
-        return $total;
     }
 
     private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection

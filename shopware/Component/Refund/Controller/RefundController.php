@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Refund\Controller;
 
 use Mollie\Shopware\Component\FlowBuilder\Event\Refund\RefundStartedEvent;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
-use Mollie\Shopware\Component\Mollie\LineItem as MollieLineItem;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RefundCollection as MollieRefundCollection;
 use Mollie\Shopware\Component\Mollie\RefundStatus;
@@ -16,6 +17,7 @@ use Mollie\Shopware\Component\Refund\DAL\Order\OrderExtension;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundCollection;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
 use Mollie\Shopware\Component\Refund\Event\ModifyCreateRefundPayloadEvent;
+use Mollie\Shopware\Component\Refund\RefundableTotalCalculator;
 use Mollie\Shopware\Component\Refund\RefundBuilder;
 use Mollie\Shopware\Component\Refund\RefundBuilderInterface;
 use Mollie\Shopware\Component\Refund\RefundPersister;
@@ -29,10 +31,7 @@ use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem as ShopwareLineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
@@ -61,9 +60,12 @@ final class RefundController extends AbstractController
         private readonly EntityRepository $orderRepository,
         #[Autowire(service: RefundGateway::class)]
         private readonly RefundGatewayInterface $refundGateway,
+        #[Autowire(service: MollieGateway::class)]
+        private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: RefundBuilder::class)]
         private readonly RefundBuilderInterface $refundBuilder,
         private readonly RefundPersister $refundPersister,
+        private readonly RefundableTotalCalculator $refundableTotalCalculator,
         private readonly EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
@@ -103,15 +105,15 @@ final class RefundController extends AbstractController
             return $this->json($struct);
         }
 
-        $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $order->getSalesChannelId());
-        $refunds = $this->enrichRefundsWithComposition($refunds, $order);
+        $freshPayment = $this->loadFreshPayment($payment, $order);
+        $refunds = $this->enrichRefundsWithComposition($freshPayment->getRefunds(), $order);
 
         $cart = CartStruct::fromOrder($order);
         $cart->applyRefundedQuantities($this->buildRefundedQuantities($order, $refunds));
         $cart->applyRefundedAmounts($this->buildRefundedAmounts($order, $refunds));
 
         $struct->setCart($cart);
-        $struct->setTotals($this->buildTotals($order, $payment, $refunds));
+        $struct->setTotals($this->buildTotals($order, $payment, $freshPayment));
         $struct->setRefunds($refunds);
 
         return $this->json($struct);
@@ -156,7 +158,7 @@ final class RefundController extends AbstractController
         $refundedPerLine = [];
         $lineInfo = [];
         if ($hasRequestedItems) {
-            $existingRefunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $salesChannelId);
+            $existingRefunds = $this->loadFreshPayment($payment, $order)->getRefunds();
             $refundedPerLine = $this->buildRefundedAmounts($order, $existingRefunds);
             $lineInfo = $this->buildLineInfo($order);
         }
@@ -205,8 +207,9 @@ final class RefundController extends AbstractController
         // reload so the refund extension contains the just-persisted refund
         $order = $this->loadOrder($orderId, $context);
 
-        $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, $salesChannelId);
-        $totals = $this->buildTotals($order, $payment, $refunds);
+        $freshPayment = $this->loadFreshPayment($payment, $order);
+        $refunds = $freshPayment->getRefunds();
+        $totals = $this->buildTotals($order, $payment, $freshPayment);
 
         return $this->json([
             'refund' => $refund,
@@ -240,8 +243,9 @@ final class RefundController extends AbstractController
 
         $this->creditNoteService->cancelCreditNote($orderId, $refundId, $context);
 
-        $refunds = $this->refundGateway->listRefunds($payment->getId(), $orderNumber, (string) $order->getSalesChannelId());
-        $totals = $this->buildTotals($order, $payment, $refunds);
+        $freshPayment = $this->loadFreshPayment($payment, $order);
+        $refunds = $freshPayment->getRefunds();
+        $totals = $this->buildTotals($order, $payment, $freshPayment);
 
         return $this->json([
             'success' => true,
@@ -251,15 +255,24 @@ final class RefundController extends AbstractController
         ]);
     }
 
-    private function buildTotals(OrderEntity $order, Payment $payment, MollieRefundCollection $refunds): RefundTotalsStruct
+    private function buildTotals(OrderEntity $order, Payment $payment, Payment $freshPayment): RefundTotalsStruct
     {
+        $refunds = $freshPayment->getRefunds();
         $amountRefunded = $refunds->getSumRefunded();
         $amountPending = $refunds->getSumPending();
         // Use the original refundable total (non-credit line items + shipping), NOT
         // order->getAmountTotal(): credit notes add a negative credit line item and
         // recalculate the order, which would otherwise shrink the total on every refund.
-        $refundableTotal = $this->computeRefundableTotal($order);
+        $refundableTotal = $this->refundableTotalCalculator->calculate($order);
         $remaining = max(0.0, $refundableTotal - $amountRefunded - $amountPending);
+
+        // Mollie can only refund captured money, so a manual capture method that captured less
+        // than the order total (e.g. after a cancellation) is the real ceiling. Order API refunds
+        // are line item based, there Mollie derives the amount itself.
+        $mollieRefundable = $payment->getOrderId() === null ? $freshPayment->getRefundableAmount() : null;
+        if ($mollieRefundable !== null) {
+            $remaining = min($remaining, max(0.0, $mollieRefundable));
+        }
 
         $this->logger->debug('Refund totals computed', [
             'orderNumber' => $order->getOrderNumber(),
@@ -267,6 +280,7 @@ final class RefundController extends AbstractController
             'refundableTotal' => $refundableTotal,
             'refunded' => $amountRefunded,
             'pending' => $amountPending,
+            'mollieRefundable' => $mollieRefundable,
             'remaining' => $remaining,
             'mollieRefunds' => array_map(function ($refund) {
                 return ['amount' => $refund->getAmount()->getValue(), 'status' => $refund->getStatus()->value];
@@ -284,33 +298,18 @@ final class RefundController extends AbstractController
     }
 
     /**
-     * Computes the original refundable total of the order: the sum of the non-credit line
-     * items plus shipping. Credit line items (added by credit notes) and delivery discount
-     * placeholders are excluded, so the total stays stable across refunds even though the
-     * credit notes recalculate order->getAmountTotal() downwards. Mirrors the base used by
-     * RefundBuilder for the refund cap.
+     * Loads the payment from Mollie including its refunds (the gateway embeds them), so a single
+     * request covers both the refund list and the current amounts. The transaction extension can
+     * not be used for the amounts: it is written during checkout and does not know about later
+     * captures or refunds.
      */
-    private function computeRefundableTotal(OrderEntity $order): float
+    private function loadFreshPayment(Payment $payment, OrderEntity $order): Payment
     {
-        $total = 0.0;
-
-        foreach ($order->getLineItems() ?? new OrderLineItemCollection() as $lineItem) {
-            if ($lineItem->getType() === ShopwareLineItem::CREDIT_LINE_ITEM_TYPE) {
-                continue;
-            }
-
-            if (MollieLineItem::isDeliveryDiscountPlaceholder($lineItem)) {
-                continue;
-            }
-
-            $total += $lineItem->getTotalPrice();
-        }
-
-        foreach ($order->getDeliveries() ?? new OrderDeliveryCollection() as $delivery) {
-            $total += $delivery->getShippingCosts()->getTotalPrice();
-        }
-
-        return round($total, Mollie::ROUNDING_PRECISION);
+        return $this->mollieGateway->getPayment(
+            $payment->getId(),
+            (string) $order->getOrderNumber(),
+            (string) $order->getSalesChannelId()
+        );
     }
 
     /**
