@@ -14,6 +14,7 @@
 - Behoben: Der Versand von Bestellungen mit individuellen Produkten oder Produkt-Sets schlägt bei Mollie nicht mehr fehl.
 - Behoben: Der Mollie-Tab und die Spalten in der Bestellübersicht verschwinden in anderen Sprachen nicht mehr.
 - Behoben: Der Versand über den Mollie-Tab funktioniert wieder, auch bei teilgelieferten Bestellungen mit manueller Erfassung (Klarna, Riverty, ...).
+- Behoben: Die Mollie-Zahlarten verschwinden unter Shopware 6.6 mit `APP_DEBUG=1` nicht mehr aus dem Checkout.
 
 # 5.3.0
 - Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
