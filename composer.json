@@ -61,7 +61,8 @@
     },
     "suggest": {
         "shopware/storefront": "Require '*'. Enables features like Creditcard Components and iDeal issuer selector.",
-        "shopware/administration": "Require '*'. Enables features like partial shipping and refunding."
+        "shopware/administration": "Require '*'. Enables features like partial shipping and refunding.",
+        "shopware/elasticsearch": "Require '*'. Enables the subscription entries in the administration search."
     },
     "require": {
         "php": ">=8.2",
