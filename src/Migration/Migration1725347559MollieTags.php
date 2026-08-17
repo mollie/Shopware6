@@ -5,14 +5,12 @@ namespace Kiener\MolliePayments\Migration;
 
 use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Subscription\SubscriptionTag;
-use Shopware\Core\Framework\Log\Package;
 use Shopware\Core\Framework\Migration\MigrationStep;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
  * @internal
  */
-#[Package('core')]
 class Migration1725347559MollieTags extends MigrationStep
 {
     public function getCreationTimestamp(): int
