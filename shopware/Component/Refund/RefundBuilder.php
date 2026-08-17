@@ -101,10 +101,12 @@ final class RefundBuilder implements RefundBuilderInterface
 
         $money = new Money($amount, $currency->getIsoCode());
 
+        $refundLines = $mollieLines !== null ? $this->resolveMollieLineIds($lineItems, $mollieLines, $orderNumber) : $lineItems;
+
         // Use order-based refund with line items only when no custom amount is requested;
         // a custom amount requires payment-level refund so Mollie honors the amount.
-        if ($payment->getOrderId() !== null && $lineItems->count() > 0 && $requestAmount === null) {
-            $createRefund = new CreateOrderRefund($payment->getOrderId(), $lineItems);
+        if ($payment->getOrderId() !== null && $refundLines->count() > 0 && $requestAmount === null) {
+            $createRefund = new CreateOrderRefund($payment->getOrderId(), $refundLines);
             $createRefund->setDescription($description);
         } else {
             $createRefund = new CreatePaymentRefund($payment->getId(), $money, $description);
@@ -120,6 +122,43 @@ final class RefundBuilder implements RefundBuilderInterface
         ]);
 
         return $createRefund;
+    }
+
+    /**
+     * The Mollie line id comes from the "order_line_id" custom field, which older plugin versions
+     * only wrote for line items and never for deliveries. Since every refund line carries its
+     * Shopware id, fall back to the live Mollie order for the missing ones - otherwise the shipping
+     * line of such an order is sent without an id and Mollie rejects the whole refund with
+     * "Line x contains invalid data. The 'id' field is missing".
+     */
+    private function resolveMollieLineIds(LineItemCollection $lineItems, LineItemCollection $mollieLines, string $orderNumber): LineItemCollection
+    {
+        foreach ($lineItems as $lineItem) {
+            if ($lineItem->getId() !== '') {
+                continue;
+            }
+
+            $mollieLineId = (string) $mollieLines->findByShopwareId($lineItem->getShopwareLineItemId())?->getId();
+            if ($mollieLineId === '') {
+                continue;
+            }
+
+            $lineItem->setId($mollieLineId);
+        }
+
+        $refundLines = $lineItems->filter(function (LineItem $lineItem): bool {
+            return $lineItem->getId() !== '';
+        });
+
+        if ($refundLines->count() !== $lineItems->count()) {
+            $this->logger->warning('Refund lines without a Mollie line id are skipped', [
+                'orderNumber' => $orderNumber,
+                'lineCount' => $lineItems->count(),
+                'skippedCount' => $lineItems->count() - $refundLines->count(),
+            ]);
+        }
+
+        return $refundLines;
     }
 
     private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection

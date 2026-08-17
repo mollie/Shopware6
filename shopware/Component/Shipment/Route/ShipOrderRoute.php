@@ -7,6 +7,7 @@ namespace Mollie\Shopware\Component\Shipment\Route;
 use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Mollie\Tracking;
@@ -165,9 +166,11 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             return $this->reconciler->reconcileAuthorizedRemainder($order, $payment, $currency, $taxStatus, (string) $orderNumber, $salesChannelId, $mollieOrderId, $deliveryCollection, $lineItems, $logContext);
         }
 
+        $mollieLines = $mollieOrderId !== null ? $this->loadMollieLines($mollieOrderId, $salesChannelId, $logContext) : null;
+
         $shippingItems = new ShippingItemCollection();
-        $lineUpserts = $this->itemResolver->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems, $currency, $taxStatus);
-        $deliveryUpserts = $this->itemResolver->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection, $currency, $taxStatus);
+        $lineUpserts = $this->itemResolver->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems, $currency, $taxStatus, $mollieLines);
+        $deliveryUpserts = $this->itemResolver->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection, $currency, $taxStatus, $mollieLines);
         $fullyShipped = $this->itemResolver->isFullyShipped($lineItems, $lineUpserts);
 
         $orderShippedEvent->setShippingItems($shippingItems);
@@ -223,6 +226,26 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         }
 
         return $order;
+    }
+
+    /**
+     * Older plugin versions never persisted the Mollie line id of the deliveries, so the shipping
+     * costs of those orders would silently drop out of the shipment payload. The Mollie order knows
+     * the id of every line, so it serves as the fallback. Best-effort: a failing call only costs the
+     * fallback, the shipment itself still goes out.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function loadMollieLines(string $mollieOrderId, string $salesChannelId, array $logContext): ?LineItemCollection
+    {
+        try {
+            return $this->mollieGateway->getOrder($mollieOrderId, $salesChannelId)->getLines();
+        } catch (\Throwable $exception) {
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->warning('ShipOrderRoute: could not load the Mollie order to resolve missing line ids', $logContext);
+
+            return null;
+        }
     }
 
     /**
