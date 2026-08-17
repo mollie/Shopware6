@@ -7,6 +7,14 @@ PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.js
 
 NODE_VERSION:=$(shell node -v)
 
+# Tool set for "make validate". A literal comma cannot be written inside a make
+# function call, so this is resolved here instead of inline in the recipe.
+ifdef only
+VALIDATE_TOOLS := $(only)
+else
+VALIDATE_TOOLS := sw-cli,phpstan
+endif
+
 ifndef nossl
 	EXPORT_CMD := export NODE_OPTIONS=--openssl-legacy-provider &&
 else
@@ -223,7 +231,7 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 	@echo "CONGRATULATIONS"
 	@echo "ZIP file available at plugins/.build/"
 
-validate: ##4 Runs the Shopware extension verifier against a release ZIP [zip=<path>, reporter=<format>]
+validate: ##4 Runs the Shopware extension verifier against a release ZIP [zip=<path>, only=<tools>, reporter=<format>]
 	# This is the same tooling the Shopware Store runs on upload, so it catches
 	# rejections before we submit. It deliberately validates the ZIP and not the
 	# source directory: only the ZIP carries the mounted .shopware-extension.yml
@@ -233,6 +241,14 @@ validate: ##4 Runs the Shopware extension verifier against a release ZIP [zip=<p
 	#
 	# Exit code is non-zero for error-level findings only; warnings are printed
 	# but do not fail the build, which mirrors what the Store does on upload.
+	#
+	# Default tool set:
+	#   phpstan  is what the Store shows as "Statische Code Analyse"
+	#   sw-cli   is a tool in the same --only list, not a separate mode - dropping
+	#            it would also drop metadata.icon.size, packaging and snippet checks
+	# ESLint, Stylelint and the Twig linters are left out on purpose: they already
+	# run as their own jobs in step_review.yml. Override with only=<tools> or
+	# only=all to run everything.
 	@ZIP="$(zip)"; \
 	if [ -z "$$ZIP" ]; then ZIP=$$(ls ../.build/MolliePayments*.zip 2>/dev/null | head -1); fi; \
 	if [ ! -f "$$ZIP" ]; then \
@@ -245,4 +261,6 @@ validate: ##4 Runs the Shopware extension verifier against a release ZIP [zip=<p
 		-e HOME=/tmp \
 		-v "$$(cd "$$(dirname "$$ZIP")" && pwd)":/build \
 		ghcr.io/shopware/shopware-cli:latest \
-		extension validate --full "/build/$$(basename "$$ZIP")" $(if $(reporter),--reporter $(reporter),)
+		extension validate --full "/build/$$(basename "$$ZIP")" \
+		$(if $(filter-out all,$(VALIDATE_TOOLS)),--only "$(VALIDATE_TOOLS)",) \
+		$(if $(reporter),--reporter $(reporter),)
