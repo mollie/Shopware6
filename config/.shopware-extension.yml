@@ -14,7 +14,8 @@ build:
           - .phpunuhi
           - .prettierignore
           - .reports
-          - .shopware-extension.yml
+          # NOT excluded: the store's plugin check reads validation.ignore from
+          # this file inside the ZIP. Excluding it means the check runs unfiltered.
           - AGENTS.md
           - config
           - docs
@@ -28,3 +29,39 @@ build:
           - .gitignore
           - src/Resources/app/storefront/tests
           - src/Resources/app/administrator/tests
+
+# The store's plugin check analyses the ZIP with its own PHPStan config, so
+# neither config/.phpstan.neon nor inline @phpstan-ignore comments apply here:
+# "Internal error" and class.notFound on extends/implements are non-ignorable
+# in PHPStan and bypass the ignore machinery entirely. The only lever we have
+# is this list, which filters the verifier's output.
+validation:
+  ignore:
+    # SwagCommercial is a paid package and can never be installed in the check
+    # environment. OrderReturnHandler degrades gracefully at runtime when the
+    # order_return repository is absent (see $featureDisabled).
+    - message: 'Internal error: Class Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnLineItemEntity was not found while trying to analyse it'
+
+    # Removed in Shopware 6.7. Both are only reached on <6.7 code paths, but the
+    # check resolves shopware/core to the highest version allowed by our
+    # constraint (>=6.5.8.0 <6.8), i.e. 6.7, where the classes no longer exist.
+    - message: 'Internal error: Class Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException was not found while trying to analyse it'
+
+    # Optional bundles. These are in require-dev so headless setups do not pull
+    # in the Storefront; the entries below are a fallback for the case where the
+    # check environment installs only "require".
+    - message: 'Internal error: Class Shopware\Storefront\Controller\AccountOrderController was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Controller\StorefrontController was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Event\StorefrontRenderEvent was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\Page was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\PageLoadedEvent was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\MetaInformation was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\GenericPageLoaderInterface was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\Account\Order\AccountEditOrderPage was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoader was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoader was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Storefront\Page\Checkout\Finish\CheckoutFinishPageLoadedEvent was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Administration\Snippet\SnippetFinderInterface was not found while trying to analyse it'
+    - message: 'Internal error: Class Shopware\Elasticsearch\Admin\Indexer\AbstractAdminIndexer was not found while trying to analyse it'

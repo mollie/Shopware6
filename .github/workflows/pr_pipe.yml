@@ -41,6 +41,36 @@ jobs:
       - name: Build Plugin
         uses: ./MolliePayments/.github/actions/build-plugin
 
+  # Runs the same verifier the Shopware Store runs on upload, against the ZIP we
+  # would actually submit. Separate job instead of a step in the build-plugin
+  # action, because that action is shared with the E2E and nightly pipelines,
+  # which only need the artifact.
+  validate:
+    name: Shopware Extension Verifier
+    needs: build
+    runs-on: ubuntu-latest
+    # Non-blocking for now: the current baseline still has open error-level
+    # findings (plugin icon size, #[Package('core')] in the migrations,
+    # Connection::PARAM_STR_ARRAY). Drop this line once they are fixed, then
+    # the job gates uploads like the Store does.
+    continue-on-error: true
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v6
+        with:
+          path: MolliePayments
+
+      - name: Mount Build Cache
+        uses: actions/cache@v6
+        with:
+          key: cache-build-${{ github.run_id }}
+          path: ~/.build
+
+      - name: Validate Release ZIP
+        working-directory: MolliePayments
+        run: make validate zip=$HOME/.build/MolliePayments.zip -B
+
   e2e:
     name: E2E Core | Shopware ${{ matrix.shopware }}
     needs: build
