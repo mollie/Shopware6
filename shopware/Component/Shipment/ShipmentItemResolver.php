@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Shipment;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
@@ -95,7 +96,7 @@ final class ShipmentItemResolver
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    public function collectLineItemUpserts(array $items, OrderLineItemCollection $lineItems, string $orderId, ShippingItemCollection $shippingItems, CurrencyEntity $currency, string $taxStatus): array
+    public function collectLineItemUpserts(array $items, OrderLineItemCollection $lineItems, string $orderId, ShippingItemCollection $shippingItems, CurrencyEntity $currency, string $taxStatus, ?LineItemCollection $mollieLines = null): array
     {
         $lineUpserts = [];
 
@@ -128,15 +129,14 @@ final class ShipmentItemResolver
                 throw ShippingException::shippingQuantityTooHigh($lineItem->getId(), $orderId, $newQuantity, $lineItem->getQuantity());
             }
 
-            $mollieLineId = ($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
-
             // Reuse LineItem's net->gross normalization so the capture amount matches the amount sent
-            // at payment creation; getUnitPrice() alone is net for net-tax orders.
+            // at payment creation; getUnitPrice() alone is net for net-tax orders. It also carries the
+            // Mollie line id from the custom fields.
             $grossLine = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
             $shippingItem = new ShippingItem(
                 $requestedQuantity,
                 $grossLine->getUnitPrice()->getValue() * $requestedQuantity,
-                $mollieLineId !== null ? (string) $mollieLineId : null,
+                $this->resolveMollieLineId($grossLine, $mollieLines),
             );
             $shippingItems->add($shippingItem);
 
@@ -156,7 +156,7 @@ final class ShipmentItemResolver
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    public function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection, CurrencyEntity $currency, string $taxStatus): array
+    public function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection, CurrencyEntity $currency, string $taxStatus, ?LineItemCollection $mollieLines = null): array
     {
         $deliveryUpserts = [];
         $targetLineItemIds = array_column($lineUpserts, 'id');
@@ -192,15 +192,14 @@ final class ShipmentItemResolver
                 continue;
             }
 
-            $mollieLineId = ($delivery->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
-
             // Reuse LineItem's net->gross normalization so shipping costs are captured gross for
-            // net-tax orders, consistent with the payment payload.
+            // net-tax orders, consistent with the payment payload. It also carries the Mollie line id
+            // from the custom fields.
             $grossDelivery = LineItem::fromDelivery($delivery, $currency, $taxStatus);
             $shippingItem = new ShippingItem(
                 $shippingCostsQuantity,
                 $grossDelivery->getUnitPrice()->getValue() * $shippingCostsQuantity,
-                $mollieLineId !== null ? (string) $mollieLineId : null,
+                $this->resolveMollieLineId($grossDelivery, $mollieLines),
             );
             $shippingItems->add($shippingItem);
 
@@ -321,5 +320,22 @@ final class ShipmentItemResolver
         return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
             return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
         });
+    }
+
+    /**
+     * The Mollie line id comes from the "order_line_id" custom field, which older plugin versions
+     * only wrote for line items and never for deliveries. Without it the line is dropped from the
+     * shipment payload (see ShippingItemCollection), so the shipping costs of such an order are never
+     * marked as shipped at Mollie. Fall back to the live Mollie order for those.
+     */
+    private function resolveMollieLineId(LineItem $line, ?LineItemCollection $mollieLines): ?string
+    {
+        if ($line->getId() !== '') {
+            return $line->getId();
+        }
+
+        $mollieLineId = (string) $mollieLines?->findByShopwareId($line->getShopwareLineItemId())?->getId();
+
+        return $mollieLineId !== '' ? $mollieLineId : null;
     }
 }

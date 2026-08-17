@@ -1,4 +1,5 @@
 # Unreleased
+- Fixed: The shipping costs of orders from older plugin versions are refunded, returned and marked as shipped at Mollie correctly again.
 
 # 5.4.0
 - Added: The minimum log level of the Mollie log handlers can now be configured via the `mollie.logger.level` container parameter; debug mode overrides it and forces the debug level.

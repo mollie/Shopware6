@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Refund;
 
+use Mollie\Shopware\Component\Mollie\CreateOrderRefund;
 use Mollie\Shopware\Component\Mollie\CreatePaymentRefund;
+use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Refund\RefundableTotalCalculator;
 use Mollie\Shopware\Component\Refund\RefundBuilder;
@@ -28,6 +31,57 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 #[CoversClass(RefundBuilder::class)]
 final class RefundBuilderTest extends TestCase
 {
+    /**
+     * Orders paid with an older plugin version never got an "order_line_id" custom field on the
+     * delivery, so the shipping line has to take its Mollie line id from the live Mollie order.
+     * Without it Mollie rejects the whole refund with "Line 1 contains invalid data. The 'id' field
+     * is missing" and nothing at all is refunded.
+     */
+    public function testDeliveryWithoutCustomFieldTakesTheMollieLineIdFromTheMollieOrder(): void
+    {
+        $order = $this->buildNetOrder();
+
+        $lineItems = $order->getLineItems();
+        self::assertInstanceOf(OrderLineItemCollection::class, $lineItems);
+        $lineItem = $lineItems->get('line-1');
+        self::assertInstanceOf(OrderLineItemEntity::class, $lineItem);
+        // the old plugin version persisted the mollie line id for products...
+        $lineItem->setCustomFields(['mollie_payments' => ['order_line_id' => 'odl_product_1']]);
+        // ...but never for the delivery, so its custom fields stay empty
+
+        $mollieProductLine = new LineItem('Line line-1', 2, new Money(25.10, 'EUR'), new Money(50.20, 'EUR'));
+        $mollieProductLine->setId('odl_product_1');
+        $mollieProductLine->setShopwareLineItemId('line-1');
+        $mollieProductLine->setRefundableQuantity(2);
+
+        $mollieShippingLine = new LineItem('Mollie Test Shipment', 1, new Money(4.19, 'EUR'), new Money(4.19, 'EUR'));
+        $mollieShippingLine->setId('odl_shipping_1');
+        $mollieShippingLine->setShopwareLineItemId('delivery-1');
+        $mollieShippingLine->setRefundableQuantity(1);
+
+        $gateway = new FakeGateway('', new Payment('tr_test'));
+        $gateway->withOrder(new Order('ord_test', '', null, [$mollieProductLine, $mollieShippingLine]));
+
+        $transactionPayment = new Payment('tr_test');
+        $transactionPayment->setOrderId('ord_test');
+
+        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), new FakeLogger());
+
+        $createRefund = $builder->build($transactionPayment, $order, [
+            ['id' => 'line-1', 'quantity' => 2, 'amount' => 50.20, 'resetStock' => 0],
+            ['id' => 'delivery-1', 'quantity' => 1, 'amount' => 4.19, 'resetStock' => 0],
+        ], '');
+
+        self::assertInstanceOf(CreateOrderRefund::class, $createRefund);
+
+        $payload = $createRefund->toArray();
+
+        self::assertSame([
+            ['id' => 'odl_product_1', 'quantity' => 2],
+            ['id' => 'odl_shipping_1', 'quantity' => 1],
+        ], $payload['lines']);
+    }
+
     /**
      * Klarna captured only a part of the authorization (the rest was released), so Mollie
      * rejects anything above the captured amount with "The specified amount cannot be refunded".
