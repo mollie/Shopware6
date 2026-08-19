@@ -1,4 +1,5 @@
 # Unreleased
+- Fixed: Opening a payment link a second time works again.
 - Fixed: The shipping costs of orders from older plugin versions are refunded, returned and marked as shipped at Mollie correctly again.
 
 # 5.4.0

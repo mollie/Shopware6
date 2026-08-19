@@ -1,4 +1,5 @@
 # Unreleased
+- Behoben: Das erneute Öffnen eines Payment-Links funktioniert wieder.
 - Behoben: Die Versandkosten von Bestellungen aus älteren Plugin-Versionen werden bei Mollie nun wieder korrekt erstattet, retourniert und als versendet markiert.
 
 # 5.4.0
