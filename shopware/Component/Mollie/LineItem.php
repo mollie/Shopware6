@@ -107,8 +107,7 @@ final class LineItem implements \JsonSerializable
         $lineItem->setType(LineItemType::fromCartLineItem($cartLineItem));
         $lineItem->setShopwareLineItemId($cartLineItem->getId());
 
-        $payload = $cartLineItem->getPayload() ?? [];
-        $productNumber = $payload['productNumber'] ?? null;
+        $productNumber = $cartLineItem->getPayload()['productNumber'] ?? null;
         $lineItem->setSku(is_string($productNumber) && $productNumber !== '' ? $productNumber : $cartLineItem->getId());
 
         return $lineItem;

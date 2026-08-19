@@ -51,7 +51,7 @@ final class ShippingOptionCollection extends Collection
         return $values;
     }
 
-    protected function getExpectedClass(): ?string
+    protected function getExpectedClass(): string
     {
         return ShippingOption::class;
     }
