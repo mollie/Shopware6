@@ -184,6 +184,7 @@ final class PaymentLinkController extends StorefrontController
         $createPaymentLink = $modifyEvent->getPaymentLink();
 
         $paymentLink = $this->createOrUpdatePaymentLink($createPaymentLink, $orderNumber, $salesChannelId, $existingPaymentLinkId);
+
         $paymentLinkId = $paymentLink->getId();
         $paymentLinkUrl = $paymentLink->getUrl();
         $logData['paymentLinkId'] = $paymentLinkId;

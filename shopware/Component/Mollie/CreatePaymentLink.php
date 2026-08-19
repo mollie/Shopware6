@@ -53,6 +53,23 @@ final class CreatePaymentLink
     }
 
     /**
+     * Payload for PATCH /v2/payment-links/{id}. The endpoint only accepts a subset of the create
+     * payload and rejects everything else with a 422 "Non-existent body parameter" - so we send an
+     * allow-listed copy instead of the full create payload. The amount is immutable once the link
+     * exists, `minimumAmount`, `archived` and `testmode` are not part of our create payload.
+     *
+     * @see https://docs.mollie.com/reference/update-payment-link
+     *
+     * @return array<string, mixed>
+     */
+    public function toUpdateArray(): array
+    {
+        $updatableFields = ['description', 'allowedMethods', 'lines', 'billingAddress', 'shippingAddress'];
+
+        return array_intersect_key($this->toArray(), array_flip($updatableFields));
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array

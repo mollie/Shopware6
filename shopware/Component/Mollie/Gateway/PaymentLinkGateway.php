@@ -54,9 +54,8 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId);
 
-            // The amount is immutable once the link exists, so it must not be sent on update.
-            $formParams = $createPaymentLink->toArray();
-            unset($formParams['amount']);
+            // PATCH accepts only a subset of the create payload, so we must not send the full one.
+            $formParams = $createPaymentLink->toUpdateArray();
 
             $response = $client->patch('payment-links/' . $paymentLinkId, [
                 'form_params' => $formParams,
@@ -84,6 +83,7 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
             $body = json_decode($response->getBody()->getContents(), true);
 
             $collection = new PaymentCollection();
+
             foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
                 $payment = $this->paymentHydrator->hydrate($paymentBody, $salesChannelId);
                 $collection->set($payment->getId(), $payment);
