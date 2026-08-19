@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Router;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\FinishCheckoutRoute;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
@@ -97,9 +98,21 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
     }
 
-    public function getExpressComponentsRedirectUrl(): string
+    /**
+     * There is no order yet when the session is created, and a cart cannot be looked up by
+     * the Mollie session id, so the cart token is handed to Mollie as a query parameter and
+     * comes back with the redirect.
+     */
+    public function getExpressComponentsRedirectUrl(string $cartToken): string
     {
-        return $this->router->generate('frontend.mollie.express-components.finish', [], RouterInterface::ABSOLUTE_URL);
+        $routeName = 'frontend.mollie.express-components.finish';
+        if ($this->isStoreApiRequest()) {
+            $routeName = 'store-api.mollie.express-components.checkout.finish';
+        }
+
+        $url = $this->router->generate($routeName, [FinishCheckoutRoute::CART_TOKEN_PARAMETER => $cartToken], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
     }
 
     public function getExpressComponentsCancelUrl(): string

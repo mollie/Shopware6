@@ -7,8 +7,6 @@ use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreateSession;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
-use Mollie\Shopware\Component\Mollie\LineItem;
-use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Router\RouteBuilder;
@@ -18,15 +16,22 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Entity\Customer\Customer;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Cart\AbstractCartPersister;
+use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\CartPersister;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
-use Shopware\Core\Content\Product\SalesChannel\SalesChannelProductEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SessionBuilder implements SessionBuilderInterface
 {
+    /**
+     * Cart extension holding the session of the express components. Deliberately not
+     * Mollie::EXTENSION, that key already carries the PayPal express session.
+     */
+    public const CART_EXTENSION = 'mollie_express_components';
+
     /**
      * Details Mollie has to collect from the shopper inside the express component
      * when no logged in customer provides them.
@@ -36,90 +41,108 @@ final class SessionBuilder implements SessionBuilderInterface
     public function __construct(
         #[Autowire(service: SessionGateway::class)]
         private SessionGatewayInterface $sessionGateway,
+        #[Autowire(service: SessionLineBuilder::class)]
+        private SessionLineBuilderInterface $lineBuilder,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settings,
-        #[Autowire(service: SessionStorage::class)]
-        private SessionStorageInterface $sessionStorage,
+        #[Autowire(service: CartPersister::class)]
+        private AbstractCartPersister $cartPersister,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
     }
 
-    public function buildFromProduct(SalesChannelProductEntity $product, SalesChannelContext $salesChannelContext): Session
+    public function buildFromCart(Cart $cart, SalesChannelContext $salesChannelContext): Session
     {
-        $productId = $product->getId();
-        $customerId = $salesChannelContext->getCustomer()?->getId();
+        $amount = new Money($cart->getPrice()->getTotalPrice(), $salesChannelContext->getCurrency()->getIsoCode());
 
-        $existingSession = $this->loadExistingSession($productId, $customerId, $salesChannelContext);
+        $existingSession = $this->loadExistingSession($cart, $amount, $salesChannelContext);
         if ($existingSession instanceof Session) {
             return $existingSession;
         }
 
         $session = $this->sessionGateway->createSession(
-            $this->buildCreateSession($product, $salesChannelContext),
+            $this->buildCreateSession($cart, $amount, $salesChannelContext),
             $salesChannelContext
         );
 
-        $this->sessionStorage->set($productId, $customerId, $session->getId());
+        $cart->addExtension(self::CART_EXTENSION, $session);
+        $this->cartPersister->save($cart, $salesChannelContext);
 
         return $session;
     }
 
-    private function loadExistingSession(string $productId, ?string $customerId, SalesChannelContext $salesChannelContext): ?Session
+    /**
+     * A session cannot be edited after it was created, so it is only reused while it still
+     * matches the cart. Any change to the total means a new session has to be created.
+     */
+    private function loadExistingSession(Cart $cart, Money $amount, SalesChannelContext $salesChannelContext): ?Session
     {
-        $sessionId = $this->sessionStorage->get($productId, $customerId);
-        if ($sessionId === null) {
+        $storedSession = $cart->getExtension(self::CART_EXTENSION);
+        if (! $storedSession instanceof Session) {
             return null;
         }
 
         try {
-            return $this->sessionGateway->getSession($sessionId, $salesChannelContext);
+            $session = $this->sessionGateway->getSession($storedSession->getId(), $salesChannelContext);
         } catch (\Throwable $exception) {
             $this->logger->warning('Stored express components session could not be loaded, creating a new one', [
                 'error' => $exception->getMessage(),
-                'sessionId' => $sessionId,
-                'productId' => $productId,
-                'customerId' => $customerId,
+                'sessionId' => $storedSession->getId(),
+                'salesChannelId' => $salesChannelContext->getSalesChannelId(),
             ]);
-
-            $this->sessionStorage->remove($productId, $customerId);
 
             return null;
         }
-    }
 
-    private function buildCreateSession(SalesChannelProductEntity $product, SalesChannelContext $salesChannelContext): CreateSession
-    {
-        $currencyIso = $salesChannelContext->getCurrency()->getIsoCode();
-        $calculatedPrice = $product->getCalculatedPrice();
+        if (! $this->matchesAmount($session, $amount)) {
+            $this->logger->debug('Express components session no longer matches the cart total, creating a new one', [
+                'sessionId' => $session->getId(),
+                'salesChannelId' => $salesChannelContext->getSalesChannelId(),
+            ]);
 
-        $unitPriceValue = $calculatedPrice->getUnitPrice();
-        if ($salesChannelContext->getTaxState() === CartPrice::TAX_STATE_NET) {
-            $unitPriceValue += $calculatedPrice->getCalculatedTaxes()->getAmount() / max(1, $calculatedPrice->getQuantity());
+            return null;
         }
 
-        $description = (string) ($product->getTranslation('name') ?? $product->getName());
-        $amount = new Money($unitPriceValue, $currencyIso);
+        return $session;
+    }
 
-        $lineItem = new LineItem($description, 1, new Money($unitPriceValue, $currencyIso), $amount);
-        $lineItem->setSku($product->getProductNumber());
+    private function matchesAmount(Session $session, Money $amount): bool
+    {
+        $sessionAmount = $session->getAmount();
+        if (! $sessionAmount instanceof Money) {
+            return false;
+        }
 
-        $lines = new LineItemCollection();
-        $lines->add($lineItem);
+        if ($sessionAmount->getCurrency() !== $amount->getCurrency()) {
+            return false;
+        }
 
+        $decimals = $amount->getDecimals();
+
+        return round($sessionAmount->getValue(), $decimals) === round($amount->getValue(), $decimals);
+    }
+
+    private function buildCreateSession(Cart $cart, Money $amount, SalesChannelContext $salesChannelContext): CreateSession
+    {
         $createSession = new CreateSession(
-            $description,
-            $this->routeBuilder->getExpressComponentsRedirectUrl(),
+            $this->buildDescription($salesChannelContext),
+            $this->routeBuilder->getExpressComponentsRedirectUrl($cart->getToken()),
             $amount
         );
         $createSession->setCancelUrl($this->routeBuilder->getExpressComponentsCancelUrl());
-        $createSession->setLines($lines);
+        $createSession->setLines($this->lineBuilder->build($cart, $amount, $salesChannelContext));
 
         $this->applyCustomer($createSession, $salesChannelContext);
 
         return $createSession;
+    }
+
+    private function buildDescription(SalesChannelContext $salesChannelContext): string
+    {
+        return (string) $salesChannelContext->getSalesChannel()->getName();
     }
 
     private function applyCustomer(CreateSession $createSession, SalesChannelContext $salesChannelContext): void

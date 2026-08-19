@@ -1,0 +1,25 @@
+{# Mount point for the Mollie express component. Everything it needs comes from the page
+   extension assigned by the ExpressComponentsCartSubscriber; the mounting itself happens in
+   the MollieExpressComponents storefront plugin, because the offcanvas cart is loaded via
+   ajax and inline scripts in injected markup are never executed.
+
+   `applePayVisible` and `paypalExpressVisible` are the visibility flags the surrounding
+   template already computed for the plugin's own express buttons. Wherever such a button is
+   rendered, the matching button inside the component is hidden so the shopper is not offered
+   the same payment method twice. #}
+{% set mollieExpress = page.extensions.mollieExpressComponents|default(null) %}
+
+{% if mollieExpress is not null and mollieExpress.clientAccessToken is not empty %}
+    {% set mollieExpressOptions = {
+        buttons: {
+            applepay: { visibility: applePayVisible|default(false) ? 'hidden' : 'automatic' },
+            paypal: { visibility: paypalExpressVisible|default(false) ? 'hidden' : 'automatic' }
+        }
+    } %}
+
+    <div class="mt-2 mollie-express-component"
+         data-mollie-express-component
+         data-client-access-token="{{ mollieExpress.clientAccessToken }}"
+         data-locale="{{ app.request.locale }}"
+         data-options="{{ mollieExpressOptions|json_encode }}"></div>
+{% endif %}

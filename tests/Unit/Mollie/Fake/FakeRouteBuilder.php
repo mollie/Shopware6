@@ -45,7 +45,7 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         // TODO: Implement getPaypalExpressCancelUrl() method.
     }
 
-    public function getExpressComponentsRedirectUrl(): string
+    public function getExpressComponentsRedirectUrl(string $cartToken): string
     {
         return $this->expressComponentsRedirectUrl;
     }

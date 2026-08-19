@@ -7,6 +7,8 @@ use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
 use Mollie\Shopware\Entity\Product\Product;
 use Mollie\Shopware\Mollie;
+use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
@@ -86,6 +88,47 @@ final class LineItem implements \JsonSerializable
         if ($mollieLineId !== null) {
             $lineItem->setId((string) $mollieLineId);
         }
+
+        return $lineItem;
+    }
+
+    /**
+     * A cart line item carries the same price shape as an order line item, but the payload
+     * holds the product number instead of a loaded product entity.
+     */
+    public static function fromCartLineItem(CartLineItem $cartLineItem, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS): self
+    {
+        $price = $cartLineItem->getPrice();
+        if (! $price instanceof CalculatedPrice) {
+            throw new MissingLineItemPriceException((string) $cartLineItem->getLabel());
+        }
+
+        $lineItem = self::createBaseLineItem((string) $cartLineItem->getLabel(), $taxStatus, $price, $currency);
+        $lineItem->setType(LineItemType::fromCartLineItem($cartLineItem));
+        $lineItem->setShopwareLineItemId($cartLineItem->getId());
+
+        $payload = $cartLineItem->getPayload() ?? [];
+        $productNumber = $payload['productNumber'] ?? null;
+        $lineItem->setSku(is_string($productNumber) && $productNumber !== '' ? $productNumber : $cartLineItem->getId());
+
+        return $lineItem;
+    }
+
+    public static function fromCartDelivery(Delivery $delivery, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS): self
+    {
+        $shippingMethod = $delivery->getShippingMethod();
+        $shippingCosts = $delivery->getShippingCosts();
+
+        $shippingMethodName = $shippingMethod->getTranslation('name') ?? $shippingMethod->getName();
+        $description = trim((string) $shippingMethodName);
+        if (mb_strlen($description) === 0) {
+            $description = 'Shipping';
+        }
+
+        $lineItem = self::createBaseLineItem($description, $taxStatus, $shippingCosts, $currency);
+        $type = $shippingCosts->getTotalPrice() < 0 ? LineItemType::DISCOUNT : LineItemType::SHIPPING;
+        $lineItem->setType($type);
+        $lineItem->setSku(sprintf('mol-delivery-%s', $shippingMethod->getId()));
 
         return $lineItem;
     }
