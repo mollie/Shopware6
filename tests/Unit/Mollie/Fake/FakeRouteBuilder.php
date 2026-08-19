@@ -15,6 +15,8 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         private string $subscriptionWebhookUrl = '',
         private string $subscriptionPaymentUpdateReturnUrl = '',
         private string $subscriptionPaymentUpdateWebhookUrl = '',
+        private string $expressComponentsRedirectUrl = '',
+        private string $expressComponentsCancelUrl = '',
     ) {
     }
 
@@ -41,6 +43,16 @@ final class FakeRouteBuilder implements RouteBuilderInterface
     public function getPaypalExpressCancelUrl(): string
     {
         // TODO: Implement getPaypalExpressCancelUrl() method.
+    }
+
+    public function getExpressComponentsRedirectUrl(): string
+    {
+        return $this->expressComponentsRedirectUrl;
+    }
+
+    public function getExpressComponentsCancelUrl(): string
+    {
+        return $this->expressComponentsCancelUrl;
     }
 
     public function getSubscriptionWebhookUrl(string $subscriptionId): string

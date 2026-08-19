@@ -78,13 +78,17 @@ final class Address implements \JsonSerializable
         return $address;
     }
 
-    public static function fromCustomerAddress(CustomerAddressEntity $customerAddress): self
+    /**
+     * The addresses attached to a SalesChannelContext customer are loaded without their
+     * customer association, so the email has to be passed in by the caller in that case.
+     */
+    public static function fromCustomerAddress(CustomerAddressEntity $customerAddress, string $fallbackEmail = ''): self
     {
         $customer = $customerAddress->getCustomer();
         $country = $customerAddress->getCountry();
 
         $address = new self(
-            $customer !== null ? $customer->getEmail() : '',
+            $customer !== null ? $customer->getEmail() : $fallbackEmail,
             '',
             (string) $customerAddress->getFirstName(),
             (string) $customerAddress->getLastName(),

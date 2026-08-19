@@ -97,6 +97,16 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
     }
 
+    public function getExpressComponentsRedirectUrl(): string
+    {
+        return $this->router->generate('frontend.mollie.express-components.finish', [], RouterInterface::ABSOLUTE_URL);
+    }
+
+    public function getExpressComponentsCancelUrl(): string
+    {
+        return $this->router->generate('frontend.mollie.express-components.cancel', [], RouterInterface::ABSOLUTE_URL);
+    }
+
     public function getPosCheckoutUrl(Payment $payment,string $transactionId, string $orderNumber): string
     {
         $parameters = [

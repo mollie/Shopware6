@@ -17,6 +17,10 @@ interface RouteBuilderInterface
 
     public function getPaypalExpressCancelUrl(): string;
 
+    public function getExpressComponentsRedirectUrl(): string;
+
+    public function getExpressComponentsCancelUrl(): string;
+
     public function getSubscriptionWebhookUrl(string $subscriptionId): string;
 
     public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string;

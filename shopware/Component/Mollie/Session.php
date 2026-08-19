@@ -12,6 +12,7 @@ final class Session extends Struct implements \JsonSerializable
 
     private string $authenticationId;
     private string $redirectUrl;
+    private string $clientAccessToken = '';
     private ?Address $billingAddress = null;
     private ?Address $shippingAddress = null;
     private bool $acceptedDataProtection = false;
@@ -30,6 +31,7 @@ final class Session extends Struct implements \JsonSerializable
         $redirectUrl = $body['_links']['redirect']['href'] ?? '';
         $session->setAuthenticationId($authenticateId);
         $session->setRedirectUrl($redirectUrl);
+        $session->setClientAccessToken((string) ($body['clientAccessToken'] ?? ''));
 
         $shippingAddress = $body['shippingAddress'] ?? null;
         $billingAddress = $body['billingAddress'] ?? null;
@@ -91,6 +93,16 @@ final class Session extends Struct implements \JsonSerializable
     public function setRedirectUrl(string $redirectUrl): void
     {
         $this->redirectUrl = $redirectUrl;
+    }
+
+    public function getClientAccessToken(): string
+    {
+        return $this->clientAccessToken;
+    }
+
+    public function setClientAccessToken(string $clientAccessToken): void
+    {
+        $this->clientAccessToken = $clientAccessToken;
     }
 
     public function getBillingAddress(): ?Address

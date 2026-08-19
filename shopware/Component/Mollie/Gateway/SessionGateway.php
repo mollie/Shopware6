@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Exception\ClientException;
+use Mollie\Shopware\Component\Mollie\CreateSession;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Session;
@@ -29,6 +30,35 @@ final class SessionGateway implements SessionGatewayInterface
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
+    }
+
+    public function createSession(CreateSession $createSession, SalesChannelContext $salesChannelContext): Session
+    {
+        try {
+            $salesChannelId = $salesChannelContext->getSalesChannelId();
+            $client = $this->clientFactory->create($salesChannelId);
+            $formParams = $createSession->toArray();
+
+            $this->logger->debug('Creating mollie session', [
+                'requestParameter' => $formParams,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            $response = $client->post('sessions', [
+                'form_params' => $formParams,
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Mollie session created', [
+                'requestParameter' => $formParams,
+                'responseParameter' => $body,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Session::createFromClientResponse($body);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
     }
 
     public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext): Session
@@ -64,6 +94,27 @@ final class SessionGateway implements SessionGatewayInterface
             $session->setAuthenticationId('');
 
             return $session;
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception);
+        }
+    }
+
+    public function getSession(string $sessionId, SalesChannelContext $salesChannelContext): Session
+    {
+        try {
+            $salesChannelId = $salesChannelContext->getSalesChannelId();
+            $client = $this->clientFactory->create($salesChannelId);
+
+            $response = $client->get('sessions/' . $sessionId);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Mollie session fetched', [
+                'sessionId' => $sessionId,
+                'responseParameter' => $body,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return Session::createFromClientResponse($body);
         } catch (ClientException $exception) {
             throw $this->convertException($exception);
         }
