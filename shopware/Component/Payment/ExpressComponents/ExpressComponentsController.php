@@ -60,10 +60,4 @@ final class ExpressComponentsController extends StorefrontController
             return $this->redirectToRoute('frontend.checkout.cart.page');
         }
     }
-
-    #[Route(name: 'frontend.mollie.express-components.cancel', path: '/mollie/express-components/cancel', methods: ['POST', 'GET'], options: ['seo' => false])]
-    public function cancelCheckout(Request $request, SalesChannelContext $salesChannelContext): Response
-    {
-        return $this->redirectToRoute('frontend.checkout.cart.page');
-    }
 }

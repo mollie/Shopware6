@@ -130,16 +130,6 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->normalizeUrl($url);
     }
 
-    public function getExpressComponentsCancelUrl(): string
-    {
-        return $this->router->generate('frontend.mollie.express-components.cancel', [], RouterInterface::ABSOLUTE_URL);
-    }
-
-    /**
-     * Mollie calls this url server to server whenever the shopper picks a different address
-     * inside the express component. It carries the sales channel and the cart, because the
-     * callback payload only holds the Mollie session id.
-     */
     public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string
     {
         $url = $this->router->generate(

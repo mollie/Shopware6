@@ -1,4 +1,5 @@
 # Unreleased
+- Hinzugefügt: Mollie Express Components (Beta) im Warenkorb, Off-Canvas und Checkout.
 - Geändert: Bancontact mit Status "open" gilt nun als fehlgeschlagen.
 - Behoben: PayPal Express ist nach der Rückkehr sofort die einzige Zahlart im Checkout.
 - Behoben: Das erneute Öffnen eines Payment-Links funktioniert wieder.

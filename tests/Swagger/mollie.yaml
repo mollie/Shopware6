@@ -352,6 +352,46 @@ paths:
           description: "successful operation"
 
 
+  /api/mollie/express-components/shipping-options/{salesChannelId}/{cartToken}:
+    post:
+      tags:
+        - "Express Components"
+      summary: "Returns the available shipping options for an address the customer picked inside the express component"
+      description: "Called by Mollie server to server and therefore without authentication, like the webhooks. The sales channel and the cart are part of the url because the callback payload only carries the session id."
+      parameters:
+        - in: "path"
+          name: "salesChannelId"
+          description: "ID of the Shopware sales channel the session belongs to"
+          required: true
+        - in: "path"
+          name: "cartToken"
+          description: "Token of the cart the session was created for"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  description: "ID of the Mollie session. sess_xyz, ..."
+                shippingAddress:
+                  type: object
+                  properties:
+                    postalCode:
+                      type: string
+                    city:
+                      type: string
+                    region:
+                      type: string
+                    country:
+                      type: string
+                      description: "ISO code of the country, e.g. NL"
+      responses:
+        "200":
+          description: "successful operation"
+
   /mollie/webhook/{transactionId}:
     post:
       tags:

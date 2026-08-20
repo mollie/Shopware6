@@ -21,8 +21,6 @@ interface RouteBuilderInterface
 
     public function getExpressComponentsOrderRedirectUrl(string $orderId): string;
 
-    public function getExpressComponentsCancelUrl(): string;
-
     public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string;
 
     public function getCheckoutFinishUrl(string $orderId): string;

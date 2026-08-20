@@ -16,7 +16,6 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         private string $subscriptionPaymentUpdateReturnUrl = '',
         private string $subscriptionPaymentUpdateWebhookUrl = '',
         private string $expressComponentsRedirectUrl = '',
-        private string $expressComponentsCancelUrl = '',
         private string $expressComponentsShippingCallbackUrl = '',
         private string $checkoutFinishUrl = '',
         private string $editOrderUrl = '',
@@ -56,11 +55,6 @@ final class FakeRouteBuilder implements RouteBuilderInterface
     public function getExpressComponentsOrderRedirectUrl(string $orderId): string
     {
         return $this->expressComponentsRedirectUrl;
-    }
-
-    public function getExpressComponentsCancelUrl(): string
-    {
-        return $this->expressComponentsCancelUrl;
     }
 
     public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string

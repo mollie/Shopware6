@@ -1,4 +1,5 @@
 # Unreleased
+- Added: Mollie express components (beta) in the cart, off-canvas and checkout.
 - Changed: Bancontact with status "open" now counts as failed.
 - Fixed: PayPal Express is the only payment method in the checkout right after returning.
 - Fixed: Opening a payment link a second time works again.

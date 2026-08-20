@@ -27,8 +27,8 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -48,26 +48,6 @@ final class SessionBuilder implements SessionBuilderInterface
      */
     public const ORDER_CUSTOM_FIELD = 'mollie_express_components';
     public const ORDER_CUSTOM_FIELD_SESSION_ID = 'session_id';
-
-    /**
-     * A session only exists in the environment it was created in, so test and live sessions are
-     * kept apart. Otherwise switching the mode leaves the cart or the order pointing at a session
-     * the other environment does not know.
-     */
-    public static function cartExtensionKey(Mode $mode): string
-    {
-        return self::CART_EXTENSION . '_' . $mode->value;
-    }
-
-    /**
-     * @param array<mixed> $customFields
-     */
-    public static function readOrderSessionId(array $customFields, Mode $mode): ?string
-    {
-        $sessionId = ($customFields[self::ORDER_CUSTOM_FIELD][$mode->value] ?? [])[self::ORDER_CUSTOM_FIELD_SESSION_ID] ?? null;
-
-        return is_string($sessionId) && $sessionId !== '' ? $sessionId : null;
-    }
 
     /**
      * Details Mollie collects from the shopper inside the express component. They are sent for a
@@ -98,6 +78,26 @@ final class SessionBuilder implements SessionBuilderInterface
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
+    }
+
+    /**
+     * A session only exists in the environment it was created in, so test and live sessions are
+     * kept apart. Otherwise switching the mode leaves the cart or the order pointing at a session
+     * the other environment does not know.
+     */
+    public static function cartExtensionKey(Mode $mode): string
+    {
+        return self::CART_EXTENSION . '_' . $mode->value;
+    }
+
+    /**
+     * @param array<mixed> $customFields
+     */
+    public static function readOrderSessionId(array $customFields, Mode $mode): ?string
+    {
+        $sessionId = ($customFields[self::ORDER_CUSTOM_FIELD][$mode->value] ?? [])[self::ORDER_CUSTOM_FIELD_SESSION_ID] ?? null;
+
+        return is_string($sessionId) && $sessionId !== '' ? $sessionId : null;
     }
 
     public function buildFromCart(Cart $cart, SalesChannelContext $salesChannelContext): Session
@@ -141,7 +141,6 @@ final class SessionBuilder implements SessionBuilderInterface
             $this->routeBuilder->getExpressComponentsOrderRedirectUrl($order->getId()),
             $amount
         );
-        $createSession->setCancelUrl($this->routeBuilder->getExpressComponentsCancelUrl());
         $createSession->setLines($this->lineBuilder->buildFromOrder($order, $amount, $salesChannelContext));
         $createSession->setShippingOptions($this->buildOrderShippingOptions($order, $salesChannelContext));
 
@@ -323,7 +322,6 @@ final class SessionBuilder implements SessionBuilderInterface
             $this->routeBuilder->getExpressComponentsRedirectUrl($cart->getToken()),
             $amount
         );
-        $createSession->setCancelUrl($this->routeBuilder->getExpressComponentsCancelUrl());
         $createSession->setLines($this->lineBuilder->build($cart, $amount, $salesChannelContext));
 
         $this->applyCustomer($createSession, $salesChannelContext);
