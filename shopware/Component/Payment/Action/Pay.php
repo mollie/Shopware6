@@ -236,6 +236,8 @@ final class Pay implements PayInterface
      * - none yet -> create a new payment (payments API);
      * - still open/pending and cancelable -> cancel it and create a fresh payment for the current cart;
      * - still open/pending but not cancelable -> reuse it and update the editable fields;
+     * - already paid/authorized (express checkout) -> reuse it and update the fields Mollie still
+     *   accepts on a finalized payment;
      * - already dead (failed/expired/cancelled) -> create a fresh payment.
      *
      * A changed cart total makes Shopware open a new transaction (no existing payment), so the reuse
@@ -258,6 +260,17 @@ final class Pay implements PayInterface
         }
 
         if (in_array($live->getStatus(), [PaymentStatus::OPEN, PaymentStatus::PENDING], true)) {
+            return $this->mollieGateway->updatePayment($existingId, $createPaymentStruct, $orderNumber, $salesChannelId);
+        }
+
+        // An express checkout is paid inside the wallet before the order exists, so the payment is
+        // already paid or authorized by the time this runs. Creating a second one would charge the
+        // shopper twice, so the existing payment only gets the data Shopware knows now: description,
+        // webhook url and metadata. The redirect url is not among them - Mollie refuses to update it
+        // on a finalized payment.
+        if (in_array($live->getStatus(), [PaymentStatus::PAID, PaymentStatus::AUTHORIZED], true)) {
+            $createPaymentStruct->omitRedirectUrl();
+
             return $this->mollieGateway->updatePayment($existingId, $createPaymentStruct, $orderNumber, $salesChannelId);
         }
 

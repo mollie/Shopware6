@@ -3,21 +3,44 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ExpressComponents\Route;
 
+use Mollie\Shopware\Component\Mollie\Address;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Session;
+use Mollie\Shopware\Component\Mollie\ShippingOption;
 use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsException;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionBuilder;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractAccountService;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AccountService;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
+use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
+use Mollie\Shopware\Component\Router\RouteBuilder;
+use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Checkout\Payment\SalesChannel\AbstractHandlePaymentMethodRoute;
+use Shopware\Core\Checkout\Payment\SalesChannel\HandlePaymentMethodRoute;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
+use Shopware\Core\System\SalesChannel\SalesChannel\AbstractContextSwitchRoute;
+use Shopware\Core\System\SalesChannel\SalesChannel\ContextSwitchRoute;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,6 +53,11 @@ use Symfony\Component\Routing\Attribute\Route;
  * Mollie session id: the session lives in the cart payload, which is stored as a blob. The
  * cart token is therefore part of the redirect url. It also tells a later step whether the
  * checkout started from a cart or from an existing order.
+ *
+ * The route is a mix of the two existing express flows: the customer data comes out of the
+ * Mollie session like in PayPal express, the order is then created from the cart like in
+ * Apple Pay direct. The payment itself already exists on Mollie's side, so it is only
+ * attached to the order instead of being created again.
  */
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
@@ -42,8 +70,24 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         private AbstractSettingsService $settingsService,
         #[Autowire(service: SessionGateway::class)]
         private SessionGatewayInterface $sessionGateway,
+        #[Autowire(service: MollieGateway::class)]
+        private MollieGatewayInterface $mollieGateway,
+        #[Autowire(service: AccountService::class)]
+        private AbstractAccountService $accountService,
+        #[Autowire(service: PaymentMethodRepository::class)]
+        private PaymentMethodRepositoryInterface $paymentMethodRepository,
+        #[Autowire(service: TransactionService::class)]
+        private TransactionServiceInterface $transactionService,
+        #[Autowire(service: CartOrderRoute::class)]
+        private AbstractCartOrderRoute $cartOrderRoute,
+        #[Autowire(service: HandlePaymentMethodRoute::class)]
+        private AbstractHandlePaymentMethodRoute $handlePaymentMethodRoute,
+        #[Autowire(service: RouteBuilder::class)]
+        private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
+        #[Autowire(service: ContextSwitchRoute::class)]
+        private AbstractContextSwitchRoute $contextSwitchRoute,
         private CartService $cartService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
@@ -87,11 +131,164 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         }
 
         $session = $this->sessionGateway->getSession($storedSession->getId(), $cartContext);
-
         $logData['sessionId'] = $session->getId();
+
+        if (! $session->getStatus()->isCompleted()) {
+            $this->logger->error('Express components session is not completed', $logData);
+            throw ExpressComponentsException::sessionNotCompleted($session->getId(), $session->getStatus()->value);
+        }
+
+        $billingAddress = $session->getBillingAddress();
+        $shippingAddress = $session->getShippingAddress();
+        if (! $billingAddress instanceof Address || ! $shippingAddress instanceof Address) {
+            $this->logger->error('Express components session carries no addresses', $logData);
+            throw ExpressComponentsException::addressMissing($session->getId());
+        }
+
+        $paymentMethodId = $this->getPaymentMethodId($session, $cartContext);
+        $logData['paymentMethodId'] = $paymentMethodId;
+
+        $orderContext = $this->accountService->loginOrCreateAccount($paymentMethodId, $billingAddress, $shippingAddress, $cartContext);
+        $logData['customerId'] = $orderContext->getCustomer()?->getId();
+        $this->logger->debug('Express components guest account created or logged in', $logData);
+
+        $orderContext = $this->applyShippingMethod($session, $orderContext, $logData);
+
+        // the account and the shipping method changed the context, so the cart has to be
+        // recalculated before it becomes an order
+        $orderCart = $this->cartService->getCart($orderContext->getToken(), $orderContext);
+        $orderResponse = $this->cartOrderRoute->order($orderCart, $orderContext, new RequestDataBag());
+        $order = $orderResponse->getOrder();
+
+        $logData['orderId'] = $order->getId();
+        $logData['orderNumber'] = $order->getOrderNumber();
+        $this->logger->debug('Express components order created', $logData);
+
+        $this->attachPayment($session, $order, $orderContext, $logData);
+        $redirectUrl = $this->handlePayment($order->getId(), $orderContext, $logData);
+
         $this->logger->info('Finished - finish express components checkout', $logData);
 
-        return new FinishCheckoutResponse($session->getId(), $cartContext->getToken());
+        return new FinishCheckoutResponse(
+            $session->getId(),
+            $orderContext->getToken(),
+            $order->getId(),
+            (string) $order->getOrderNumber(),
+            $redirectUrl
+        );
+    }
+
+    /**
+     * Runs the regular Shopware payment handling on the fresh order, which is what patches the
+     * Mollie payment with everything only Shopware knows: the description built from the order
+     * number, the webhook url and the metadata. Because the payment id is already on the
+     * transaction, the Pay action updates that payment instead of creating one.
+     *
+     * Its redirect is where the shopper belongs afterwards. A finalized payment has no checkout
+     * url left, so the Pay action falls back to the return url of the transaction, which runs the
+     * regular finalize and ends on the order success or the edit order page.
+     *
+     * A failure here must not abort the checkout: the shopper already paid and the order exists.
+     *
+     * @param array<mixed> $logData
+     */
+    private function handlePayment(string $orderId, SalesChannelContext $salesChannelContext, array $logData): string
+    {
+        // Shopware turns these two into the return url of the transaction, and its own checkout
+        // controller falls back to the finish url when the handler returns no redirect of its own.
+        // Without them a finalized payment ends up with no target at all.
+        $finishUrl = $this->routeBuilder->getCheckoutFinishUrl($orderId);
+
+        $request = new Request();
+        $request->request->set('orderId', $orderId);
+        $request->request->set('finishUrl', $finishUrl);
+        $request->request->set('errorUrl', $this->routeBuilder->getEditOrderUrl($orderId));
+
+        try {
+            $handlePaymentResponse = $this->handlePaymentMethodRoute->load($request, $salesChannelContext);
+            $this->logger->debug('Express components payment handled', $logData);
+
+            $redirectResponse = $handlePaymentResponse->getRedirectResponse();
+            if ($redirectResponse instanceof RedirectResponse) {
+                return $redirectResponse->getTargetUrl();
+            }
+        } catch (\Throwable $exception) {
+            $logData['error'] = $exception->getMessage();
+            $this->logger->error('Failed to handle the express components payment', $logData);
+        }
+
+        return $finishUrl;
+    }
+
+    /**
+     * The payment already exists on Mollie's side, it is loaded once and written onto the
+     * order transaction the same way a regular payment would be, so webhooks, refunds and the
+     * ERP exports find it under the usual keys.
+     *
+     * @param array<mixed> $logData
+     */
+    private function attachPayment(Session $session, OrderEntity $order, SalesChannelContext $salesChannelContext, array $logData): void
+    {
+        $paymentId = $session->getPaymentId();
+        if ($paymentId === '') {
+            $this->logger->error('Express components session carries no payment id', $logData);
+
+            return;
+        }
+
+        $transaction = $order->getTransactions()?->last();
+        if (! $transaction instanceof OrderTransactionEntity) {
+            $this->logger->error('Express components order has no transaction', $logData);
+
+            return;
+        }
+
+        $transactionId = $transaction->getId();
+        $payment = $this->mollieGateway->getPayment($paymentId, (string) $order->getOrderNumber(), $salesChannelContext->getSalesChannelId());
+
+        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $salesChannelContext->getContext());
+    }
+
+    /**
+     * @param array<mixed> $logData
+     */
+    private function applyShippingMethod(Session $session, SalesChannelContext $salesChannelContext, array $logData): SalesChannelContext
+    {
+        $shippingOption = $session->getSelectedShippingOption();
+        if (! $shippingOption instanceof ShippingOption) {
+            $this->logger->warning('No shipping option could be resolved from the express components session', $logData);
+
+            return $salesChannelContext;
+        }
+
+        // the reference of an option is the id of the Shopware shipping method it was built from
+        $requestDataBag = new RequestDataBag();
+        $requestDataBag->set(SalesChannelContextService::SHIPPING_METHOD_ID, $shippingOption->getReference());
+
+        $logData['shippingMethodId'] = $shippingOption->getReference();
+        $this->logger->debug('Express components shipping method applied', $logData);
+
+        return $this->switchContext($requestDataBag, $salesChannelContext);
+    }
+
+    private function getPaymentMethodId(Session $session, SalesChannelContext $salesChannelContext): string
+    {
+        $method = $session->getMethod();
+        if (! $method instanceof PaymentMethod) {
+            throw ExpressComponentsException::paymentMethodNotFound('', $salesChannelContext->getSalesChannelId());
+        }
+
+        $paymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod(
+            $method,
+            $salesChannelContext->getSalesChannelId(),
+            $salesChannelContext->getContext()
+        );
+
+        if ($paymentMethodId === null) {
+            throw ExpressComponentsException::paymentMethodNotFound($method->value, $salesChannelContext->getSalesChannelId());
+        }
+
+        return $paymentMethodId;
     }
 
     private function restoreContext(string $cartToken, SalesChannelContext $salesChannelContext): SalesChannelContext
@@ -101,6 +298,19 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         return $this->salesChannelContextService->get(new SalesChannelContextServiceParameters(
             $salesChannelContext->getSalesChannelId(),
             $cartToken,
+            originalContext: $salesChannelContext->getContext(),
+            customerId: $customer?->getId(),
+        ));
+    }
+
+    private function switchContext(RequestDataBag $requestDataBag, SalesChannelContext $salesChannelContext): SalesChannelContext
+    {
+        $customer = $salesChannelContext->getCustomer();
+        $contextSwitchResponse = $this->contextSwitchRoute->switchContext($requestDataBag, $salesChannelContext);
+
+        return $this->salesChannelContextService->get(new SalesChannelContextServiceParameters(
+            $salesChannelContext->getSalesChannelId(),
+            $contextSwitchResponse->getToken(),
             originalContext: $salesChannelContext->getContext(),
             customerId: $customer?->getId(),
         ));

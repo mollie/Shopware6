@@ -46,8 +46,9 @@ final class TempAddress
             'customerId' => $this->customer->getId(),
             'firstName' => $this->customer->getFirstName(),
             'lastName' => $this->customer->getLastName(),
-            // the wallet callbacks do not provide a street, and neither field is needed by the rule builder
-            'city' => $this->city ?? self::NOT_PROVIDED,
+            // the wallet callbacks do not provide a street, and neither field is needed by the rule
+            // builder. Both are required by Shopware though, so they never may end up blank.
+            'city' => $this->city !== null && $this->city !== '' ? $this->city : self::NOT_PROVIDED,
             'street' => self::NOT_PROVIDED,
         ];
 

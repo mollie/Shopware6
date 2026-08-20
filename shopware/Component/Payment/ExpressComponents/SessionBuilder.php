@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\AbstractCartPersister;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\CartPersister;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -33,16 +34,20 @@ final class SessionBuilder implements SessionBuilderInterface
     public const CART_EXTENSION = 'mollie_express_components';
 
     /**
-     * Details Mollie has to collect from the shopper inside the express component
-     * when no logged in customer provides them.
+     * Details Mollie collects from the shopper inside the express component. They are sent for a
+     * logged in customer too: Mollie rejects a session that offers shippingOptions without asking
+     * for a shipping address, and the shopper may well pick another address inside the wallet than
+     * the one on the account.
      */
-    private const GUEST_REQUIRED_CUSTOMER_DETAILS = ['email', 'billing-address', 'shipping-address'];
+    private const REQUIRED_CUSTOMER_DETAILS = ['email', 'billing-address', 'shipping-address'];
 
     public function __construct(
         #[Autowire(service: SessionGateway::class)]
         private SessionGatewayInterface $sessionGateway,
         #[Autowire(service: SessionLineBuilder::class)]
         private SessionLineBuilderInterface $lineBuilder,
+        #[Autowire(service: ShippingOptionsResolver::class)]
+        private ShippingOptionsResolverInterface $shippingOptionsResolver,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: SettingsService::class)]
@@ -56,7 +61,7 @@ final class SessionBuilder implements SessionBuilderInterface
 
     public function buildFromCart(Cart $cart, SalesChannelContext $salesChannelContext): Session
     {
-        $amount = new Money($cart->getPrice()->getTotalPrice(), $salesChannelContext->getCurrency()->getIsoCode());
+        $amount = new Money($this->getAmountWithoutShipping($cart), $salesChannelContext->getCurrency()->getIsoCode());
 
         $existingSession = $this->loadExistingSession($cart, $amount, $salesChannelContext);
         if ($existingSession instanceof Session) {
@@ -109,6 +114,23 @@ final class SessionBuilder implements SessionBuilderInterface
         return $session;
     }
 
+    /**
+     * The shipping costs are transported as shippingOptions and added by Mollie once the
+     * shopper picks one, so neither the amount nor the lines may contain them.
+     */
+    private function getAmountWithoutShipping(Cart $cart): float
+    {
+        $shippingCosts = $cart->getDeliveries()->getShippingCosts()->sum();
+        $shipping = $shippingCosts->getTotalPrice();
+
+        // in a net cart the line prices are net while the cart total is gross
+        if ($cart->getPrice()->getTaxStatus() === CartPrice::TAX_STATE_NET) {
+            $shipping += $shippingCosts->getCalculatedTaxes()->getAmount();
+        }
+
+        return $cart->getPrice()->getTotalPrice() - $shipping;
+    }
+
     private function matchesAmount(Session $session, Money $amount): bool
     {
         $sessionAmount = $session->getAmount();
@@ -136,8 +158,26 @@ final class SessionBuilder implements SessionBuilderInterface
         $createSession->setLines($this->lineBuilder->build($cart, $amount, $salesChannelContext));
 
         $this->applyCustomer($createSession, $salesChannelContext);
+        $this->applyShippingOptions($createSession, $salesChannelContext);
 
         return $createSession;
+    }
+
+    /**
+     * The options are built for the shipping country of the current context. Once the shopper
+     * picks a different address inside the component, Mollie asks the callback url for the
+     * options of that address.
+     */
+    private function applyShippingOptions(CreateSession $createSession, SalesChannelContext $salesChannelContext): void
+    {
+        // The callback url is not sent yet: sessions reject it with "Non-existent body parameter
+        // shippingCallbackUrl" until the feature is released for the account. Everything behind it
+        // (RouteBuilder::getExpressComponentsShippingCallbackUrl and the api route) is in place, so
+        // enabling it is a one line change here.
+        $country = $salesChannelContext->getShippingLocation()->getCountry();
+        $address = new ShippingCallbackAddress((string) $country->getIso());
+
+        $createSession->setShippingOptions($this->shippingOptionsResolver->resolve($address, $salesChannelContext));
     }
 
     private function buildDescription(SalesChannelContext $salesChannelContext): string
@@ -147,10 +187,10 @@ final class SessionBuilder implements SessionBuilderInterface
 
     private function applyCustomer(CreateSession $createSession, SalesChannelContext $salesChannelContext): void
     {
+        $createSession->setRequiredCustomerDetails(self::REQUIRED_CUSTOMER_DETAILS);
+
         $customer = $salesChannelContext->getCustomer();
         if (! $customer instanceof CustomerEntity) {
-            $createSession->setRequiredCustomerDetails(self::GUEST_REQUIRED_CUSTOMER_DETAILS);
-
             return;
         }
 

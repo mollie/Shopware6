@@ -22,6 +22,8 @@ final class CreateSession implements \JsonSerializable
     private ?string $customerId = null;
     private ?string $profileId = null;
     private ?string $webhookUrl = null;
+    private ?string $shippingCallbackUrl = null;
+    private ?ShippingOptionCollection $shippingOptions = null;
 
     /**
      * @var array<mixed>
@@ -137,6 +139,26 @@ final class CreateSession implements \JsonSerializable
     public function setWebhookUrl(string $webhookUrl): void
     {
         $this->webhookUrl = $webhookUrl;
+    }
+
+    public function getShippingCallbackUrl(): ?string
+    {
+        return $this->shippingCallbackUrl;
+    }
+
+    public function setShippingCallbackUrl(string $shippingCallbackUrl): void
+    {
+        $this->shippingCallbackUrl = $shippingCallbackUrl;
+    }
+
+    public function getShippingOptions(): ?ShippingOptionCollection
+    {
+        return $this->shippingOptions;
+    }
+
+    public function setShippingOptions(ShippingOptionCollection $shippingOptions): void
+    {
+        $this->shippingOptions = $shippingOptions;
     }
 
     /**

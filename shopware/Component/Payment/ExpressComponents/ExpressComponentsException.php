@@ -11,6 +11,9 @@ class ExpressComponentsException extends HttpException
     public const FEATURE_DISABLED = 'EXPRESS_COMPONENTS_DISABLED';
     public const MISSING_CART_TOKEN = 'MISSING_CART_TOKEN';
     public const MISSING_CART_SESSION_ID = 'MISSING_CART_SESSION_ID';
+    public const SESSION_NOT_COMPLETED = 'SESSION_NOT_COMPLETED';
+    public const MISSING_ADDRESS = 'MISSING_ADDRESS';
+    public const PAYMENT_METHOD_NOT_FOUND = 'PAYMENT_METHOD_NOT_FOUND';
 
     public static function notEnabled(string $salesChannelId): self
     {
@@ -30,6 +33,44 @@ class ExpressComponentsException extends HttpException
             Response::HTTP_BAD_REQUEST,
             self::MISSING_CART_TOKEN,
             'Cart token is missing in the request'
+        );
+    }
+
+    public static function sessionNotCompleted(string $sessionId, string $status): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::SESSION_NOT_COMPLETED,
+            'Session {{sessionId}} is not completed, status is {{status}}',
+            [
+                'sessionId' => $sessionId,
+                'status' => $status,
+            ]
+        );
+    }
+
+    public static function addressMissing(string $sessionId): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::MISSING_ADDRESS,
+            'Session {{sessionId}} does not carry a billing and shipping address',
+            [
+                'sessionId' => $sessionId,
+            ]
+        );
+    }
+
+    public static function paymentMethodNotFound(string $method, string $salesChannelId): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::PAYMENT_METHOD_NOT_FOUND,
+            'No payment method found for mollie method {{method}} in SalesChannelId {{salesChannelId}}',
+            [
+                'method' => $method,
+                'salesChannelId' => $salesChannelId,
+            ]
         );
     }
 

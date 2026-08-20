@@ -120,6 +120,40 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->router->generate('frontend.mollie.express-components.cancel', [], RouterInterface::ABSOLUTE_URL);
     }
 
+    /**
+     * Mollie calls this url server to server whenever the shopper picks a different address
+     * inside the express component. It carries the sales channel and the cart, because the
+     * callback payload only holds the Mollie session id.
+     */
+    public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string
+    {
+        $url = $this->router->generate(
+            'api.mollie.express-components.shipping-options',
+            [
+                'salesChannelId' => $salesChannelId,
+                FinishCheckoutRoute::CART_TOKEN_PARAMETER => $cartToken,
+            ],
+            RouterInterface::ABSOLUTE_URL
+        );
+
+        return $this->normalizeUrl($url);
+    }
+
+    /**
+     * Where the storefront checkout sends the customer after the payment was handled. Shopware
+     * builds both urls in its own checkout controller and hands them to the payment handling,
+     * which turns them into the return url of the transaction.
+     */
+    public function getCheckoutFinishUrl(string $orderId): string
+    {
+        return $this->router->generate('frontend.checkout.finish.page', ['orderId' => $orderId], RouterInterface::ABSOLUTE_URL);
+    }
+
+    public function getEditOrderUrl(string $orderId): string
+    {
+        return $this->router->generate('frontend.account.edit-order.page', ['orderId' => $orderId], RouterInterface::ABSOLUTE_URL);
+    }
+
     public function getPosCheckoutUrl(Payment $payment,string $transactionId, string $orderNumber): string
     {
         $parameters = [

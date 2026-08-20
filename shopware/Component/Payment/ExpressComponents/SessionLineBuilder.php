@@ -20,6 +20,11 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * POST /v2/sessions rejects a payload whose lines do not add up to the amount, and it
  * validates the transmitted, rounded values. Unlike the Orders API payload the rounding
  * correction is therefore not optional here.
+ *
+ * The deliveries of the cart are deliberately left out: the session carries them as
+ * shippingOptions instead, and Mollie rejects a payload that has both
+ * ("A shipping_fee line is not allowed when shippingOptions are provided"). The amount
+ * passed in therefore has to be the cart total without shipping.
  */
 final class SessionLineBuilder implements SessionLineBuilderInterface
 {
@@ -35,7 +40,6 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
     {
         $currency = $salesChannelContext->getCurrency();
         $taxStatus = $cart->getPrice()->getTaxStatus();
-        $decimals = $amount->getDecimals();
 
         $lines = new LineItemCollection();
 
@@ -47,16 +51,6 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
             }
 
             $lines->add(LineItem::fromCartLineItem($cartLineItem, $currency, $taxStatus));
-        }
-
-        foreach ($cart->getDeliveries() as $delivery) {
-            // a free shipping promotion adds a second delivery with negative costs, so only
-            // deliveries that round to zero may be skipped
-            if (abs(round($delivery->getShippingCosts()->getTotalPrice(), $decimals)) === 0.0) {
-                continue;
-            }
-
-            $lines->add(LineItem::fromCartDelivery($delivery, $currency, $taxStatus));
         }
 
         return $this->roundingDifferenceFixer->fixAmountDiff(

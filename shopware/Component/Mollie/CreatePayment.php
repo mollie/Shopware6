@@ -40,6 +40,7 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
     private array $methods = [];
 
     private bool $storeCredentials = false;
+    private bool $omitRedirectUrl = false;
 
     public function __construct(private string $description,private string $redirectUrl,private Money $amount)
     {
@@ -170,6 +171,16 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
     }
 
     /**
+     * Mollie rejects an update that carries a redirectUrl once the payment is finalized
+     * ("The redirect URL cannot be updated when the payment is finalized"), so it has to be
+     * left out of the payload in that case.
+     */
+    public function omitRedirectUrl(): void
+    {
+        $this->omitRedirectUrl = true;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function toArray(): array
@@ -181,7 +192,11 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
         if (count($this->methods) > 0) {
             $createPaymentBody['method'] = $this->methods;
         }
-        unset($createPaymentBody['methods']);
+        unset($createPaymentBody['methods'], $createPaymentBody['omitRedirectUrl']);
+
+        if ($this->omitRedirectUrl) {
+            unset($createPaymentBody['redirectUrl']);
+        }
 
         // Remove all entries with null values
         return array_filter($createPaymentBody, function ($entry) {

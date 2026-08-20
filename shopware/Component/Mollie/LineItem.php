@@ -214,7 +214,8 @@ final class LineItem implements \JsonSerializable
         );
 
         $lineItem = new self(
-            (string) ($body['name'] ?? ''),
+            // the Orders API calls it name, the Sessions API description
+            (string) ($body['name'] ?? $body['description'] ?? ''),
             (int) ($body['quantity'] ?? 1),
             $unitPrice,
             $amount,
@@ -222,6 +223,11 @@ final class LineItem implements \JsonSerializable
 
         $lineItem->setId((string) ($body['id'] ?? ''));
         $lineItem->setSku((string) ($body['sku'] ?? ''));
+
+        $type = LineItemType::tryFrom((string) ($body['type'] ?? ''));
+        if ($type !== null) {
+            $lineItem->setType($type);
+        }
 
         $rawMetadata = $body['metadata'] ?? [];
         $metadata = is_string($rawMetadata) ? (json_decode($rawMetadata, true) ?? []) : $rawMetadata;
