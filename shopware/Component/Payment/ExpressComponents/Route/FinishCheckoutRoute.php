@@ -429,12 +429,14 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         return str_replace(self::ORDER_ID_PLACEHOLDER, $orderId, $url);
     }
 
+    /**
+     * Not every completed session names its method: a PayPal express session comes back without
+     * one, and Mollie only reports it later through the webhook. The order still needs a payment
+     * method to be created with, so the card method stands in until the webhook corrects it.
+     */
     private function getPaymentMethodId(Session $session, SalesChannelContext $salesChannelContext): string
     {
-        $method = $session->getMethod();
-        if (! $method instanceof PaymentMethod) {
-            throw ExpressComponentsException::paymentMethodNotFound('', $salesChannelContext->getSalesChannelId());
-        }
+        $method = $session->getMethod() ?? PaymentMethod::CREDIT_CARD;
 
         $paymentMethodId = $this->paymentMethodRepository->getIdByPaymentMethod(
             $method,

@@ -94,9 +94,12 @@ final class Session extends Struct implements \JsonSerializable
         }
 
         if ($billingAddress) {
-            // Mollie omits fields it has no value for instead of sending them as null, so the
-            // keys cannot be read directly - an express session has no streetAdditional at all
-            foreach (['streetAndNumber', 'streetAdditional', 'city', 'postalCode'] as $field) {
+            // Mollie omits fields it has no value for instead of sending them as null, so the keys
+            // cannot be read directly - an express session has no streetAdditional at all, and a
+            // PayPal express session reports nothing but the email as the billing address. Every
+            // field the billing address is missing is therefore taken from the shipping address.
+            $fields = ['givenName', 'familyName', 'streetAndNumber', 'streetAdditional', 'city', 'postalCode', 'country', 'phone'];
+            foreach ($fields as $field) {
                 if (($billingAddress[$field] ?? null) === null) {
                     $billingAddress[$field] = $shippingAddress[$field] ?? '';
                 }
