@@ -53,6 +53,11 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         return $this->expressComponentsRedirectUrl;
     }
 
+    public function getExpressComponentsOrderRedirectUrl(string $orderId): string
+    {
+        return $this->expressComponentsRedirectUrl;
+    }
+
     public function getExpressComponentsCancelUrl(): string
     {
         return $this->expressComponentsCancelUrl;

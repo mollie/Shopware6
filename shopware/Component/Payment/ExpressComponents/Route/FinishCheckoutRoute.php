@@ -12,6 +12,8 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Mollie\ShippingOption;
 use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsException;
+use Mollie\Shopware\Component\Payment\ExpressComponents\OrderAddressSynchronizer;
+use Mollie\Shopware\Component\Payment\ExpressComponents\OrderAddressSynchronizerInterface;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionBuilder;
 use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractAccountService;
 use Mollie\Shopware\Component\Payment\ExpressMethod\AccountService;
@@ -28,9 +30,14 @@ use Shopware\Core\Checkout\Cart\SalesChannel\AbstractCartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartOrderRoute;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderCollection;
+use Shopware\Core\Checkout\Order\SalesChannel\AbstractSetPaymentOrderRoute;
+use Shopware\Core\Checkout\Order\SalesChannel\SetPaymentOrderRoute;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\SalesChannel\AbstractHandlePaymentMethodRoute;
 use Shopware\Core\Checkout\Payment\SalesChannel\HandlePaymentMethodRoute;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
@@ -64,6 +71,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
 {
     public const CART_TOKEN_PARAMETER = 'cartToken';
+    public const ORDER_ID_PARAMETER = 'orderId';
     public const FINISH_URL_PARAMETER = 'finishUrl';
     public const ERROR_URL_PARAMETER = 'errorUrl';
 
@@ -73,6 +81,9 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
      */
     public const ORDER_ID_PLACEHOLDER = '{orderId}';
 
+    /**
+     * @param EntityRepository<OrderCollection<OrderEntity>> $orderRepository
+     */
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
@@ -82,6 +93,8 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: AccountService::class)]
         private AbstractAccountService $accountService,
+        #[Autowire(service: OrderAddressSynchronizer::class)]
+        private OrderAddressSynchronizerInterface $orderAddressSynchronizer,
         #[Autowire(service: PaymentMethodRepository::class)]
         private PaymentMethodRepositoryInterface $paymentMethodRepository,
         #[Autowire(service: TransactionService::class)]
@@ -90,8 +103,12 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         private AbstractCartOrderRoute $cartOrderRoute,
         #[Autowire(service: HandlePaymentMethodRoute::class)]
         private AbstractHandlePaymentMethodRoute $handlePaymentMethodRoute,
+        #[Autowire(service: SetPaymentOrderRoute::class)]
+        private AbstractSetPaymentOrderRoute $setPaymentOrderRoute,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
+        #[Autowire(service: 'order.repository')]
+        private EntityRepository $orderRepository,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
         #[Autowire(service: ContextSwitchRoute::class)]
@@ -117,6 +134,12 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
             throw ExpressComponentsException::notEnabled($salesChannelId);
         }
 
+        // the edit order page has no cart, there the order takes the place of the cart token
+        $orderId = (string) $request->get(self::ORDER_ID_PARAMETER, '');
+        if ($orderId !== '') {
+            return $this->finishOrderCheckout($request, $orderId, $salesChannelContext);
+        }
+
         $cartToken = (string) $request->get(self::CART_TOKEN_PARAMETER, '');
         if ($cartToken === '') {
             throw ExpressComponentsException::cartTokenIsEmpty();
@@ -133,7 +156,8 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $cartContext = $this->restoreContext($cartToken, $salesChannelContext);
         $cart = $this->cartService->getCart($cartToken, $cartContext);
 
-        $storedSession = $cart->getExtension(SessionBuilder::CART_EXTENSION);
+        $mode = $this->settingsService->getApiSettings($salesChannelId)->getMode();
+        $storedSession = $cart->getExtension(SessionBuilder::cartExtensionKey($mode));
         if (! $storedSession instanceof Session) {
             throw ExpressComponentsException::cartSessionIdIsEmpty($cartToken);
         }
@@ -172,7 +196,12 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $logData['orderNumber'] = $order->getOrderNumber();
         $this->logger->debug('Express components order created', $logData);
 
-        $this->attachPayment($session, $order, $orderContext, $logData);
+        $transaction = $this->getLatestTransaction($order);
+        if (! $transaction instanceof OrderTransactionEntity) {
+            throw ExpressComponentsException::orderTransactionMissing($order->getId());
+        }
+
+        $this->attachPayment($session, $order, $transaction, $orderContext, $logData);
         $redirectUrl = $this->handlePayment($request, $order->getId(), $orderContext, $logData);
 
         $this->logger->info('Finished - finish express components checkout', $logData);
@@ -184,6 +213,119 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
             (string) $order->getOrderNumber(),
             $redirectUrl
         );
+    }
+
+    /**
+     * The order already exists, so there is nothing to create: the payment of the completed
+     * session is attached to it and the regular payment handling patches it and moves the
+     * transaction on. The shipping method stays as it is, it is part of the order - the addresses
+     * however are taken over from the session, because the shopper picked them in the wallet.
+     */
+    private function finishOrderCheckout(Request $request, string $orderId, SalesChannelContext $salesChannelContext): FinishCheckoutResponse
+    {
+        $logData = [
+            'orderId' => $orderId,
+            'salesChannelId' => $salesChannelContext->getSalesChannelId(),
+        ];
+        $this->logger->info('Start - finish express components checkout for an existing order', $logData);
+
+        $order = $this->getOrder($orderId, $salesChannelContext);
+        $logData['orderNumber'] = $order->getOrderNumber();
+
+        $mode = $this->settingsService->getApiSettings($salesChannelContext->getSalesChannelId())->getMode();
+        $sessionId = SessionBuilder::readOrderSessionId($order->getCustomFields() ?? [], $mode);
+        if ($sessionId === null) {
+            throw ExpressComponentsException::orderSessionIdIsEmpty($orderId);
+        }
+
+        $session = $this->sessionGateway->getSession($sessionId, $salesChannelContext);
+        $logData['sessionId'] = $session->getId();
+
+        if (! $session->getStatus()->isCompleted()) {
+            $this->logger->error('Express components session is not completed', $logData);
+            throw ExpressComponentsException::sessionNotCompleted($session->getId(), $session->getStatus()->value);
+        }
+
+        $billingAddress = $session->getBillingAddress();
+        $shippingAddress = $session->getShippingAddress();
+        if (! $billingAddress instanceof Address || ! $shippingAddress instanceof Address) {
+            $this->logger->error('Express components session carries no addresses', $logData);
+            throw ExpressComponentsException::addressMissing($session->getId());
+        }
+
+        $paymentMethodId = $this->getPaymentMethodId($session, $salesChannelContext);
+        $logData['paymentMethodId'] = $paymentMethodId;
+
+        // the address the shopper picked in the wallet wins over the one on the account, so it is
+        // written onto the customer first and from there onto the order
+        $salesChannelContext = $this->accountService->loginOrCreateAccount($paymentMethodId, $billingAddress, $shippingAddress, $salesChannelContext);
+        $this->orderAddressSynchronizer->sync($order, $salesChannelContext);
+
+        // The order may already carry the transaction of a failed attempt. Shopware answers a new
+        // attempt with a new transaction instead of overwriting the old one, so the same route is
+        // used here - it keeps the history and makes the new transaction the primary one.
+        $setPaymentRequest = new Request();
+        $setPaymentRequest->request->set('orderId', $orderId);
+        $setPaymentRequest->request->set('paymentMethodId', $paymentMethodId);
+        $this->setPaymentOrderRoute->setPayment($setPaymentRequest, $salesChannelContext);
+
+        $order = $this->getOrder($orderId, $salesChannelContext);
+        $transaction = $this->getLatestTransaction($order);
+        if (! $transaction instanceof OrderTransactionEntity) {
+            throw ExpressComponentsException::orderTransactionMissing($orderId);
+        }
+
+        $logData['transactionId'] = $transaction->getId();
+
+        $this->attachPayment($session, $order, $transaction, $salesChannelContext, $logData);
+        $redirectUrl = $this->handlePayment($request, $orderId, $salesChannelContext, $logData);
+
+        $this->logger->info('Finished - finish express components checkout for an existing order', $logData);
+
+        return new FinishCheckoutResponse(
+            $session->getId(),
+            $salesChannelContext->getToken(),
+            $orderId,
+            (string) $order->getOrderNumber(),
+            $redirectUrl
+        );
+    }
+
+    /**
+     * The newest transaction is the one of the current attempt. Sorting by creation date works on
+     * every supported Shopware version, unlike primaryOrderTransactionId.
+     */
+    private function getLatestTransaction(OrderEntity $order): ?OrderTransactionEntity
+    {
+        $transactions = $order->getTransactions();
+        if ($transactions === null) {
+            return null;
+        }
+
+        $sorted = $transactions->getElements();
+        uasort($sorted, static function (OrderTransactionEntity $left, OrderTransactionEntity $right): int {
+            return ($right->getCreatedAt()?->getTimestamp() ?? 0) <=> ($left->getCreatedAt()?->getTimestamp() ?? 0);
+        });
+
+        $latest = reset($sorted);
+
+        return $latest instanceof OrderTransactionEntity ? $latest : null;
+    }
+
+    private function getOrder(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
+    {
+        $criteria = new Criteria([$orderId]);
+        $criteria->addAssociation('transactions.stateMachineState');
+        $criteria->addAssociation('deliveries.shippingMethod');
+        $criteria->addAssociation('lineItems');
+        $criteria->addAssociation('currency');
+
+        $order = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->first();
+        if (! $order instanceof OrderEntity) {
+            throw ExpressComponentsException::orderNotFound($orderId);
+        }
+
+        return $order;
     }
 
     /**
@@ -236,18 +378,11 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
      *
      * @param array<mixed> $logData
      */
-    private function attachPayment(Session $session, OrderEntity $order, SalesChannelContext $salesChannelContext, array $logData): void
+    private function attachPayment(Session $session, OrderEntity $order, OrderTransactionEntity $transaction, SalesChannelContext $salesChannelContext, array $logData): void
     {
         $paymentId = $session->getPaymentId();
         if ($paymentId === '') {
             $this->logger->error('Express components session carries no payment id', $logData);
-
-            return;
-        }
-
-        $transaction = $order->getTransactions()?->last();
-        if (! $transaction instanceof OrderTransactionEntity) {
-            $this->logger->error('Express components order has no transaction', $logData);
 
             return;
         }

@@ -11,4 +11,5 @@ enum VisibilityRestriction: string
     case OFF_CANVAS = 'offcanvas';
     case CART = 'cart';
     case REGISTER = 'register';
+    case CONFIRM = 'confirm';
 }

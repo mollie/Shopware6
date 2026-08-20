@@ -18,3 +18,12 @@
     {{ parent() }}
 {% endblock %}
 
+{% block page_checkout_aside_actions %}
+    {{ parent() }}
+
+    {# deliberately extending this block and not page_checkout_confirm_form_submit: the buy button
+       sits inside #confirmOrderForm, and the mount container has to end up outside of it #}
+    {% block page_checkout_aside_actions_mollie_express_components %}
+        {% sw_include '@MolliePayments/mollie/component/express-component.html.twig' %}
+    {% endblock %}
+{% endblock %}

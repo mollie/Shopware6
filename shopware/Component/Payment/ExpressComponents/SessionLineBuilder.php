@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -53,6 +54,33 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
             $lines->add(LineItem::fromCartLineItem($cartLineItem, $currency, $taxStatus));
         }
 
+        return $this->fixRoundingDiff($amount, $lines);
+    }
+
+    /**
+     * On the edit order page there is no cart, the lines come from the order instead. Order line
+     * items are already a flat list, so unlike the cart they need no getFlat().
+     */
+    public function buildFromOrder(OrderEntity $order, Money $amount, SalesChannelContext $salesChannelContext): LineItemCollection
+    {
+        $currency = $salesChannelContext->getCurrency();
+        $taxStatus = (string) $order->getTaxStatus();
+
+        $lines = new LineItemCollection();
+
+        foreach ($order->getLineItems() ?? [] as $orderLineItem) {
+            if (! $this->lineItemFilter->isItemAllowed($orderLineItem)) {
+                continue;
+            }
+
+            $lines->add(LineItem::fromOrderLine($orderLineItem, $currency, $taxStatus));
+        }
+
+        return $this->fixRoundingDiff($amount, $lines);
+    }
+
+    private function fixRoundingDiff(Money $amount, LineItemCollection $lines): LineItemCollection
+    {
         return $this->roundingDifferenceFixer->fixAmountDiff(
             $amount,
             $lines,

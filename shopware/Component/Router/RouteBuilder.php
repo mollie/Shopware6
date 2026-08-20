@@ -115,6 +115,21 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->normalizeUrl($url);
     }
 
+    /**
+     * On the edit order page there is no cart, so the order takes the place of the cart token.
+     */
+    public function getExpressComponentsOrderRedirectUrl(string $orderId): string
+    {
+        $routeName = 'frontend.mollie.express-components.finish';
+        if ($this->isStoreApiRequest()) {
+            $routeName = 'store-api.mollie.express-components.checkout.finish';
+        }
+
+        $url = $this->router->generate($routeName, [FinishCheckoutRoute::ORDER_ID_PARAMETER => $orderId], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
+    }
+
     public function getExpressComponentsCancelUrl(): string
     {
         return $this->router->generate('frontend.mollie.express-components.cancel', [], RouterInterface::ABSOLUTE_URL);
