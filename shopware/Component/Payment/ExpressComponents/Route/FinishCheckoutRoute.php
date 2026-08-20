@@ -64,6 +64,14 @@ use Symfony\Component\Routing\Attribute\Route;
 final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
 {
     public const CART_TOKEN_PARAMETER = 'cartToken';
+    public const FINISH_URL_PARAMETER = 'finishUrl';
+    public const ERROR_URL_PARAMETER = 'errorUrl';
+
+    /**
+     * Placeholder a client may use in its own finish and error url. The order does not exist yet
+     * when the client calls this route, so it cannot build the id into the url itself.
+     */
+    public const ORDER_ID_PLACEHOLDER = '{orderId}';
 
     public function __construct(
         #[Autowire(service: SettingsService::class)]
@@ -165,7 +173,7 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $this->logger->debug('Express components order created', $logData);
 
         $this->attachPayment($session, $order, $orderContext, $logData);
-        $redirectUrl = $this->handlePayment($order->getId(), $orderContext, $logData);
+        $redirectUrl = $this->handlePayment($request, $order->getId(), $orderContext, $logData);
 
         $this->logger->info('Finished - finish express components checkout', $logData);
 
@@ -184,28 +192,29 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
      * number, the webhook url and the metadata. Because the payment id is already on the
      * transaction, the Pay action updates that payment instead of creating one.
      *
-     * Its redirect is where the shopper belongs afterwards. A finalized payment has no checkout
-     * url left, so the Pay action falls back to the return url of the transaction, which runs the
-     * regular finalize and ends on the order success or the edit order page.
+     * finishUrl and errorUrl end up in the payment token and are where Shopware sends the shopper
+     * after the finalize. Like in Shopware's own store-api they can be passed in, so a headless
+     * client points at its own pages instead of storefront routes that do not exist there. Only
+     * when they are absent do we fall back to the storefront pages.
      *
      * A failure here must not abort the checkout: the shopper already paid and the order exists.
      *
      * @param array<mixed> $logData
      */
-    private function handlePayment(string $orderId, SalesChannelContext $salesChannelContext, array $logData): string
+    private function handlePayment(Request $request, string $orderId, SalesChannelContext $salesChannelContext, array $logData): string
     {
-        // Shopware turns these two into the return url of the transaction, and its own checkout
-        // controller falls back to the finish url when the handler returns no redirect of its own.
-        // Without them a finalized payment ends up with no target at all.
-        $finishUrl = $this->routeBuilder->getCheckoutFinishUrl($orderId);
+        $finishUrl = $this->resolveUrl($request, self::FINISH_URL_PARAMETER, $orderId)
+            ?? $this->routeBuilder->getCheckoutFinishUrl($orderId);
+        $errorUrl = $this->resolveUrl($request, self::ERROR_URL_PARAMETER, $orderId)
+            ?? $this->routeBuilder->getEditOrderUrl($orderId);
 
-        $request = new Request();
-        $request->request->set('orderId', $orderId);
-        $request->request->set('finishUrl', $finishUrl);
-        $request->request->set('errorUrl', $this->routeBuilder->getEditOrderUrl($orderId));
+        $paymentRequest = new Request();
+        $paymentRequest->request->set('orderId', $orderId);
+        $paymentRequest->request->set(self::FINISH_URL_PARAMETER, $finishUrl);
+        $paymentRequest->request->set(self::ERROR_URL_PARAMETER, $errorUrl);
 
         try {
-            $handlePaymentResponse = $this->handlePaymentMethodRoute->load($request, $salesChannelContext);
+            $handlePaymentResponse = $this->handlePaymentMethodRoute->load($paymentRequest, $salesChannelContext);
             $this->logger->debug('Express components payment handled', $logData);
 
             $redirectResponse = $handlePaymentResponse->getRedirectResponse();
@@ -269,6 +278,20 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $this->logger->debug('Express components shipping method applied', $logData);
 
         return $this->switchContext($requestDataBag, $salesChannelContext);
+    }
+
+    /**
+     * The client cannot know the order id when it calls this route, so it may leave a placeholder
+     * in its urls that is filled in here.
+     */
+    private function resolveUrl(Request $request, string $parameter, string $orderId): ?string
+    {
+        $url = (string) $request->get($parameter, '');
+        if ($url === '') {
+            return null;
+        }
+
+        return str_replace(self::ORDER_ID_PLACEHOLDER, $orderId, $url);
     }
 
     private function getPaymentMethodId(Session $session, SalesChannelContext $salesChannelContext): string
