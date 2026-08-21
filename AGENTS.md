@@ -3,6 +3,11 @@
 Read this file first; everything else in the repository is looked up on demand.
 Applies to maintainers and contributors alike; **Maintainers:** marks internal process.
 
+**This file wins.** A working copy may carry an `.ai/` directory with further rules that are
+not specific to this repository. It is optional — if it is not there, nothing is missing.
+Where it says one thing and this file says another, follow this file: it knows the plugin.
+Do not edit `.ai/`; it is not maintained here (see section 9).
+
 ## 1. State of the codebase
 
 No refactoring is in progress. 5.x is released; what exists is the current state.
@@ -43,38 +48,71 @@ implement the simple one unless told otherwise.
 
 Do not skip ahead. Each step ends with something reviewable.
 
+0. **Ask** — before you read anything. See the rules below.
 1. **Understand** — read the code that is actually involved. Report which files you read.
 2. **Implement** — production code only, following section 2. **No tests yet.**
-3. **Review** — run the reviewers from `.agents/reviews/` (see section 4) and report the
-   findings.
+3. **Review** — run the reviewers from `.agents/skills/review-*/` (see section 4) and report
+   the findings.
 4. **Stop** — get the approach confirmed by a human before going further. Fix the
    approach if it is rejected, then review again.
 5. **Tests** — only now. See `.agents/guidelines/testing.md`.
-6. **Changelog** — see section 6, then review it with `.agents/reviews/changelog.md`.
+6. **Changelog** — see section 6, then review it with `.agents/skills/review-changelog/`.
 7. **Hand over** — a human runs the checks (section 5) and reports the result back.
+
+### Step 0 — ask before you search
+
+A wrong assumption costs more than a question. The developer knows this codebase; you do
+not. Searching for something they could have named in one line is the most common way this
+goes wrong, and it produces code that is too complex because it was built around a guess.
+
+- **At most five questions, in a single message**, before you open a file. Then wait.
+- **Ask where something is** instead of grepping for it: *"which component handles the
+  refund cap?"* beats four searches and a wrong guess.
+- **Ask whether it already exists.** *"Is there already a service that does X?"* — the answer
+  is often yes, and then the change is one line instead of a new class.
+- **Ask what the expected behaviour is in the edge case** the ticket does not mention.
+- **Never ask for a value from `.env`** or a secret — see section 5.
+
+Then a budget: read the files you were pointed at and their direct callers. If that is not
+enough to be sure, **ask again rather than widen the search**. Two rounds of questions is
+cheaper than one wrong implementation.
+
+The counter-rule, so this does not turn into an interrogation: **no question whose answer is
+in a file you have to read anyway**, and no question you can answer by reading the
+neighbouring component for the pattern. If the developer answers *"find it yourself"*, do
+that and do not ask again for that thing.
 
 ## 4. Review before tests
 
-After implementing, before writing any test, review the change. The checklists live in
-`.agents/reviews/`, with the shared protocol in `.agents/reviews/README.md`:
+After implementing, before writing any test, review the change. Each reviewer is an Agent
+Skill under `.agents/skills/`, sharing the protocol in `.agents/guidelines/reviewing.md`:
 
-| Reviewer | File | Looks for |
+| Reviewer | Skill | Looks for |
 |---|---|---|
-| Minimal diff | `.agents/reviews/minimal-diff.md` | over-engineering, unnecessary files, duplication |
-| Conventions | `.agents/reviews/conventions.md` | senior PHP standard (`.agents/guidelines/php.md`) + Shopware rules |
-| Correctness | `.agents/reviews/correctness.md` | bugs, edge cases, merchant-visible regressions |
-| Tests | `.agents/reviews/tests.md` | run **after** step 5, on the tests themselves |
-| Changelog | `.agents/reviews/changelog.md` | run **after** step 6, on the entries themselves |
+| Minimal diff | `review-minimal-diff` | over-engineering, unnecessary files, duplication |
+| Conventions | `review-conventions` | senior PHP standard (`.agents/guidelines/php.md`) + Shopware rules |
+| Correctness | `review-correctness` | bugs, edge cases, merchant-visible regressions |
+| Tests | `review-tests` | run **after** step 5, on the tests themselves |
+| Changelog | `review-changelog` | run **after** step 6, on the entries themselves |
 
-The checklists are the single source of truth. Thin adapters point back at them, nothing more:
+Run the first three together, then report. Do not write a test before they have been run.
 
-- `.claude/agents/*.md` — Claude Code, startable in parallel via the Agent tool
-- `.codex/agents/*.toml` — Codex (TOML, `developer_instructions`), delegated by name
+## 4a. How the tools find all this
 
-Any other tool: read the checklist files and apply them yourself.
+`.agents/skills/<name>/SKILL.md` is the [Agent Skills](https://agentskills.io) format and the
+single source of truth for every skill in this repository — reviewers included.
 
-`.agents/skills/` holds step-by-step recipes for recurring tasks; read the matching one first.
-Adding or removing a Mollie payment method — `.agents/skills/payment-methods.md`.
+- **Codex, OpenCode, Cursor, Copilot, Gemini CLI** read `.agents/skills/` natively. Nothing
+  to configure; the skill loads when the task matches its description.
+- **Claude Code** reads `.claude/`, so it gets thin pointers: `.claude/agents/review-*.md`
+  (subagents, so the five reviews run in parallel in their own context) and
+  `.claude/skills/*/SKILL.md` for the rest. They contain a path and nothing else.
+- **Any other tool:** read the `SKILL.md` yourself and apply it.
+
+A pointer never carries content. When a rule changes, it changes in `.agents/` only.
+
+Recurring tasks live here too — adding or removing a Mollie payment method is
+`.agents/skills/payment-methods/`.
 
 ## 5. Do not run the suites — hand over instead
 
@@ -155,19 +193,24 @@ Do not commit, push or open a pull request unless asked.
 A correction is a defect in these files, not just in the change.
 
 After fixing it, ask: **which file would have caught this?** Edit it in the same breath: sharpen
-the vague line and delete it, do not append a second rule beside it.
+the vague line and delete it, do not append a second rule beside it. The step-by-step is the
+`record-correction` skill — run it every time you are corrected.
 
 | The correction was about | It belongs in |
 |---|---|
 | how you work — scope, order, what to run, how to answer | this file |
 | a PHP or test rule | `.agents/guidelines/php.md`, `.agents/guidelines/testing.md` |
-| something a reviewer should have flagged | `.agents/reviews/<the relevant one>.md` |
-| the steps of a recurring task | `.agents/skills/` |
+| something a reviewer should have flagged | `.agents/skills/review-<the relevant one>/SKILL.md` |
+| the steps of a recurring task | `.agents/skills/<the task>/SKILL.md` |
+| a rule that holds beyond this repository | `.ai/`, if present — **name it, do not edit it** |
 
 Prefer the reviewer: a guideline gets read if someone looks, a checklist line gets checked.
 
+`.ai/` is not maintained here, so an edit to it does not survive. Name the file and the line
+that should change and leave it to the developer.
+
 - **No new file for a single correction.** No running log of learnings, no `corrections.md`.
-  The four homes above are enough; if a correction fits none of them, say so and ask.
+  The five homes above are enough; if a correction fits none of them, say so and ask.
 - **A fact is not a rule.** An undocumented Mollie or Shopware quirk is not process feedback —
   mention it in your answer and ask whether to record it; do not file it somewhere.
 - **State what you changed.** One line: which file, which rule now reads differently.

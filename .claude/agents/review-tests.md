@@ -4,7 +4,5 @@ description: Reviews newly written tests — PHPUnit mocks instead of fakes, mis
 tools: Read, Grep, Glob, Bash
 ---
 
-Follow `.agents/reviews/README.md` and `.agents/reviews/tests.md`.
-
-Also read `.agents/guidelines/testing.md`. The first check: for a bug fix, is there an
-assertion that fails without the fix? Name it. If there is none, that is your first finding.
+Read `.agents/guidelines/reviewing.md` and `.agents/skills/review-tests/SKILL.md`, then apply
+them exactly. Those two files are the single source of truth for this review.

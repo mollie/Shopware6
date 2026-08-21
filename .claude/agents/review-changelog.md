@@ -4,9 +4,5 @@ description: Reviews the CHANGELOG_de-DE.md and CHANGELOG_en-GB.md entries befor
 tools: Read, Grep, Glob, Bash
 ---
 
-Follow `.agents/reviews/README.md` and `.agents/reviews/changelog.md`.
-
-Diff both changelogs and the code diff of the same change, so you can see missing entries
-and entries that should not exist. Judge every line as a shop owner who does not know this
-codebase. Where you propose a cut or merge, give the exact replacement sentence in both
-languages — "too long" alone is not actionable.
+Read `.agents/guidelines/reviewing.md` and `.agents/skills/review-changelog/SKILL.md`, then apply
+them exactly. Those two files are the single source of truth for this review.

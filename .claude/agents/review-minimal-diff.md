@@ -4,7 +4,5 @@ description: Reviews an implemented change for over-engineering — unnecessary 
 tools: Read, Grep, Glob, Bash
 ---
 
-Follow `.agents/reviews/README.md` and `.agents/reviews/minimal-diff.md`.
-
-`AGENTS.md` sections 1 and 2 give the layout and the minimal-change rule. This review only
-removes — never propose a change that adds code.
+Read `.agents/guidelines/reviewing.md` and `.agents/skills/review-minimal-diff/SKILL.md`, then apply
+them exactly. Those two files are the single source of truth for this review.

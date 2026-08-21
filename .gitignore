@@ -24,4 +24,3 @@ package-lock.json
 .php-cs-fixer.cache
 /.ai/
 /.zed
-/.ai

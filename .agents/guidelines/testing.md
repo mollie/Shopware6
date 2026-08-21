@@ -1,7 +1,7 @@
 # Testing Guidelines
 
 Read this when writing tests — after the implementation review has passed.
-Review the result against `.agents/reviews/tests.md`.
+Review the result against `.agents/skills/review-tests/SKILL.md`.
 
 ## Layout
 

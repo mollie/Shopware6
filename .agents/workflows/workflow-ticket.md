@@ -1,6 +1,6 @@
 # Ticket Workflow — Maintainers
 
-Internal process for the Mollie/dasistweb maintainers. **External contributors:** fork,
+Internal process for the maintainers. **External contributors:** fork,
 branch however you like, follow `AGENTS.md` sections 2 to 7.
 
 Only the git mechanics live here. Everything else is `AGENTS.md`.

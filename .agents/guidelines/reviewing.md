@@ -1,7 +1,7 @@
 # How to review
 
-Shared protocol for every checklist in this directory. Read this plus the one checklist you
-were pointed at.
+Shared protocol for every `review-*` skill in `.agents/skills/`. Read this plus the one
+checklist you were pointed at.
 
 - **Get the diff yourself** if it was not handed to you: `git diff`, or
   `git diff <base>...HEAD` for a branch.

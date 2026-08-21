@@ -1,4 +1,13 @@
+---
+name: review-minimal-diff
+description: Reviews an implemented change for over-engineering — unnecessary new files and classes, single-caller abstractions, duplication of existing code, unrelated edits, speculative scope. Use after the production code is written and BEFORE any test is written. Report findings only, never edit.
+---
+
 # Review: Minimal Diff
+
+Follow `.agents/guidelines/reviewing.md` for the shared protocol, then this checklist.
+`AGENTS.md` sections 1 and 2 give the layout and the minimal-change rule. This review only
+removes — never propose a change that adds code.
 
 Goal: the smallest honest solution to the problem, reviewable in a few minutes.
 

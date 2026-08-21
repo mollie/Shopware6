@@ -2,7 +2,7 @@
 
 Applies to all PHP in `shopware/`, when writing code and when reviewing it.
 `AGENTS.md` section 7 carries the short version; this file is the full standard and the
-basis for `.agents/reviews/conventions.md`.
+basis for `.agents/skills/review-conventions/SKILL.md`.
 
 State the consequence in a review, not just the rule name.
 

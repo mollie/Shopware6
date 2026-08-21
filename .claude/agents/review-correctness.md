@@ -4,8 +4,5 @@ description: Reviews an implemented change for bugs and merchant-visible regress
 tools: Read, Grep, Glob, Bash
 ---
 
-Follow `.agents/reviews/README.md` and `.agents/reviews/correctness.md`.
-
-This plugin moves money. Name the concrete input or state that triggers each finding; if
-you cannot name how it is reached, drop it. Prefix each with the severity the checklist
-defines.
+Read `.agents/guidelines/reviewing.md` and `.agents/skills/review-correctness/SKILL.md`, then apply
+them exactly. Those two files are the single source of truth for this review.
