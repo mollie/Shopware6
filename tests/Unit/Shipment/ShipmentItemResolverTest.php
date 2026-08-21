@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment;
 
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ final class ShipmentItemResolverTest extends TestCase
 
     protected function setUp(): void
     {
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $this->resolver = new ShipmentItemResolver($lineItemFilter);
         $this->orderBuilder = new OrderEntityBuilder();
     }

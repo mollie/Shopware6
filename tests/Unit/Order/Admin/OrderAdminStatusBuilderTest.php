@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Order\Admin;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminStatusBuilder;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ final class OrderAdminStatusBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $itemResolver = new ShipmentItemResolver($lineItemFilter);
         $this->builder = new OrderAdminStatusBuilder($itemResolver, $lineItemFilter);
         $this->orderBuilder = new OrderEntityBuilder();

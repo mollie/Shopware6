@@ -11,6 +11,8 @@ build:
       excludes:
         paths:
           - .ai
+          - .agent
+          - .claude
           - .phpunuhi
           - .prettierignore
           - .reports

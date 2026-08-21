@@ -8,7 +8,6 @@ use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
@@ -16,6 +15,7 @@ use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
@@ -677,7 +677,7 @@ final class PayloadBuilderTest extends TestCase
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         }
         $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId, subscriptionSettings: $subscriptionSettings);
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 
         return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, $roundingDifferenceFixer, $logger ?? new NullLogger());

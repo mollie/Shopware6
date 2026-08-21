@@ -23,7 +23,10 @@ The codebase has ~16 `else` branches across 568 files — do not add to that num
 ## Types and data
 
 **Strong typing everywhere.** Parameters, returns, properties. No `mixed`, no untyped
-`array` crossing a class boundary.
+`array` crossing a class boundary. The floor is the `composer.json` constraint, PHP 8.2:
+enums, `readonly`, union, intersection and DNF types are all available and a native union
+beats a wide type plus a `@param` docblock. Typed class constants (8.3) and property hooks
+(8.4) are not available.
 
 **Avoid `null`. Use a sensible default.**
 An empty string, an empty collection, a zero amount, a null-object. Where absence is
@@ -111,10 +114,14 @@ own version would be slightly nicer.
 **Descriptive names, no abbreviations.** `$paymentTransaction`, not `$pt`. `$index`, not
 `$i`, outside a trivial loop.
 
-**Comments only where the code cannot carry the intent.**
+**Comments only where the code cannot carry the intent, three lines at the most.**
 Delete any comment that restates the next line. Keep — and *write* — the comment that
 records a reason the code cannot show: a Mollie API constraint, a rounding rule, a
-Shopware-version workaround, a deliberate rule violation.
+Shopware-version workaround, a deliberate rule violation. The ceiling holds for a class
+docblock too, and it holds for a public extension point: a docblock that explains how to use
+the class — when to call it, what a listener may or may not do — is documentation, and
+documentation does not go in the source. Beyond that only the `@param`, `@return` and `@var`
+PHPStan cannot infer.
 
 ---
 
