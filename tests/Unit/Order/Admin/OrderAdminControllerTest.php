@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Order\Admin;
 
 use Mollie\Shopware\Component\Mollie\LineItem;
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -13,6 +12,7 @@ use Mollie\Shopware\Component\Order\Admin\OrderAdminStatusBuilder;
 use Mollie\Shopware\Component\Order\Admin\OrderPaymentRecovery;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
@@ -258,7 +258,7 @@ final class OrderAdminControllerTest extends TestCase
 
     private function buildController(FakeOrderSearchRepository $repository, FakeGateway $gateway): OrderAdminController
     {
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $itemResolver = new ShipmentItemResolver($lineItemFilter);
         $statusBuilder = new OrderAdminStatusBuilder($itemResolver, $lineItemFilter);
         $settingsService = new FakeSettingsService();

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment;
 
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
@@ -12,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -188,7 +188,7 @@ final class AuthorizationReconcilerTest extends TestCase
 
     private function createReconciler(FakeGateway $gateway): AuthorizationReconciler
     {
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $itemResolver = new ShipmentItemResolver($lineItemFilter);
         $logger = new NullLogger();
 

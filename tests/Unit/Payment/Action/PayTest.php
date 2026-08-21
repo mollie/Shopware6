@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Payment\Action;
 
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
@@ -12,6 +11,7 @@ use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -209,7 +209,7 @@ final class PayTest extends TestCase
         $logger = new NullLogger();
         $gateway = $gateway ?? new FakeGateway($checkoutUrl);
         $lineItemAnalyzer = new LineItemAnalyzer();
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
         $builder = new PayloadBuilder($fakeRouteBuilder, $settingsService,$gateway,$lineItemAnalyzer,$fakeCustomerRepository,$lineItemFilter,$roundingDifferenceFixer,$logger);
 

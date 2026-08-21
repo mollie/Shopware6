@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemType;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\VoucherCategory;
 use Mollie\Shopware\Component\Mollie\VoucherCategoryCollection;
@@ -264,7 +264,7 @@ final class OrderEntityBuilder
         $orderLineItem = new OrderLineItemEntity();
         $orderLineItem->setId($id);
         $orderLineItem->setLabel($label);
-        $orderLineItem->setType(LineItemFilter::TYPE_CUSTOM_PRODUCTS);
+        $orderLineItem->setType(LineItemType::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value);
         $orderLineItem->setQuantity(1);
         $orderLineItem->setUnitPrice($unitPrice);
         $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0, 1));

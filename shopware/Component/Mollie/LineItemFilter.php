@@ -3,73 +3,47 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Mollie;
 
+use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
-use Shopware\Core\Framework\Struct\Struct;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class LineItemFilter implements LineItemFilterInterface
 {
-    public const TYPE_CUSTOM_PRODUCTS = 'customized-products';
-    public const TYPE_CUSTOM_PRODUCTS_OPTION = 'customized-products-option';
-
-    private const EASY_COUPON_PAYLOAD_KEY = 'netiNextEasyCoupon';
-
-    private const CONTAINER_TYPES = [
-        'repertus_product_container',
-        'dreisc-set',
-        'swkweb-product-set',
-        self::TYPE_CUSTOM_PRODUCTS,
-    ];
+    public function __construct(
+        private readonly EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: 'monolog.logger.mollie')]
+        private readonly LoggerInterface $logger
+    ) {
+    }
 
     /**
-     * Decide whether a line item should be part of the Mollie API payload:
-     * - removes set-product containers (repertus, dreisc, skweb)
-     * - removes customized-products containers (their product child stays in)
-     * - removes customized-product options with price = 0
-     * - removes zeobv / NetI bundle parents and gift-configurator parents (children are already in the flat list)
-     * - removes NetiNextEasyCoupon voucher-product parents (their voucher / service-fee children carry the price)
-     *
-     * @param CartLineItem|OrderLineItemEntity $item
+     * Only Shopware's own delivery discount placeholder is decided here, everything a plugin adds
+     * on top of plain products is decided by the listeners of FilterLineItemEvent.
      */
-    public function isItemAllowed(Struct $item): bool
+    public function isItemAllowed(CartLineItem|OrderLineItemEntity $item): bool
     {
-        $type = (string) $item->getType();
-        $payload = $item->getPayload() ?? [];
-
-        if (in_array($type, self::CONTAINER_TYPES, true)) {
-            return false;
-        }
-
         if ($item instanceof OrderLineItemEntity && LineItem::isDeliveryDiscountPlaceholder($item)) {
             return false;
         }
 
-        if ($type === self::TYPE_CUSTOM_PRODUCTS_OPTION) {
-            $price = $item->getPrice();
+        $event = new FilterLineItemEvent($item);
 
-            return $price !== null && $price->getTotalPrice() > 0;
+        try {
+            $this->eventDispatcher->dispatch($event);
+        } catch (\Throwable $exception) {
+            // Breaks "do not swallow failures on a payment path" on purpose: the listeners are
+            // foreign code and a broken one must not take down the checkout or the order view in
+            // the administration. The decision of the listeners that did run still counts.
+            $this->logger->error('A line item filter listener failed, the line item decision so far is kept', [
+                'lineItemId' => $item->getId(),
+                'lineItemType' => (string) $item->getType(),
+                'error' => $exception->getMessage(),
+            ]);
         }
 
-        if ($type === CartLineItem::PRODUCT_LINE_ITEM_TYPE) {
-            return ! $this->isBundleParent($payload);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function isBundleParent(array $payload): bool
-    {
-        $bundleProducts = $payload['zeobvProductsInBundle'] ?? [];
-        $isNetIBundle = $payload['is-neti-bundle'] ?? false;
-        $isGiftConfigurator = isset($payload['configuratorToken']);
-        $isEasyCouponVoucher = isset($payload[self::EASY_COUPON_PAYLOAD_KEY]);
-
-        return (is_array($bundleProducts) && count($bundleProducts) > 0)
-            || $isNetIBundle === true
-            || $isGiftConfigurator
-            || $isEasyCouponVoucher;
+        return $event->isAllowed();
     }
 }

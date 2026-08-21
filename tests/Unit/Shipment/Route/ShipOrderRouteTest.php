@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment\Route;
 
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
@@ -14,6 +13,7 @@ use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Component\Shipment\ShipmentPersister;
 use Mollie\Shopware\Component\Shipment\ShipmentTrackingResolver;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
@@ -54,7 +54,7 @@ class ShipOrderRouteTest extends TestCase
         $orderService = new FakeOrderService();
         $logger = new NullLogger();
 
-        $lineItemFilter = new LineItemFilter();
+        $lineItemFilter = LineItemFilterBuilder::build();
         $itemResolver = new ShipmentItemResolver($lineItemFilter);
         $trackingResolver = new ShipmentTrackingResolver();
         $persister = new ShipmentPersister(

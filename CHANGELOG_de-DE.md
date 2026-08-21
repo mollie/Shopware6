@@ -1,4 +1,5 @@
 # Unreleased
+- Hinzugefügt: Plugins können eigene Positionen, etwa Container-Positionen von Set-Produkten, über das neue Event `FilterLineItemEvent` selbst vom Mollie-Payload ausschließen.
 - Hinzugefügt: Mollie Express Components (Beta) im Warenkorb, Off-Canvas und Checkout.
 - Geändert: Bancontact mit Status "open" gilt nun als fehlgeschlagen.
 - Behoben: PayPal Express ist nach der Rückkehr sofort die einzige Zahlart im Checkout.

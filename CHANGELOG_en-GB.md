@@ -1,4 +1,5 @@
 # Unreleased
+- Added: Plugins can keep their own line items, such as set product containers, out of the Mollie payload themselves, using the new `FilterLineItemEvent`.
 - Added: Mollie express components (beta) in the cart, off-canvas and checkout.
 - Changed: Bancontact with status "open" now counts as failed.
 - Fixed: PayPal Express is the only payment method in the checkout right after returning.
