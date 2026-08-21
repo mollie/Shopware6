@@ -182,7 +182,7 @@ export default class MollieApplePayDirect extends Plugin {
             container.getCurrency(),
             container.getWithPhone(),
             container.getShopSlug(),
-            container.getDataProtection(),
+            this._privacySection.getAcceptedDataProtection(clickedButton),
             clickedButton,
         );
 

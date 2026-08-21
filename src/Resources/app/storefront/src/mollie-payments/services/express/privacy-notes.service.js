@@ -66,6 +66,38 @@ export default class PrivacyNotesService {
     }
 
     /**
+     * Resolves the accepted-data-protection value that has to be sent to the backend
+     * for a given express payment button.
+     *
+     * The checkbox is never a child of the express button container itself, it is rendered
+     * in the sibling `.mollie-privacy-note` of the surrounding buy box. It therefore has to
+     * be looked up through the buy box, otherwise the value silently stays unaccepted and
+     * Shopware rejects the guest registration.
+     *
+     * A missing privacy note means the shop does not require the checkbox, or the customer
+     * is already logged in and gave the consent while registering. Neither case creates a
+     * guest account, so returning 0 never blocks a checkout and no consent is faked.
+     *
+     * @param {HTMLElement} expressButton - The express payment button element
+     * @returns {number} 1 if an accepted checkbox exists, 0 otherwise
+     */
+    getAcceptedDataProtection(expressButton) {
+        const privacyNoteElement = this._repoBuyBox.findClosestPrivacyBox(expressButton);
+
+        if (privacyNoteElement === null) {
+            return 0;
+        }
+
+        const dataProtection = this._repoBuyBox.getPrivacyBoxCheckbox(privacyNoteElement);
+
+        if (dataProtection === null) {
+            return 0;
+        }
+
+        return dataProtection.checked ? 1 : 0;
+    }
+
+    /**
      * Validates privacy note requirements for a given express payment button
      * @param {HTMLElement} expressButton - The express payment button element
      * @returns {boolean|undefined} Validation result or undefined if no privacy note found

@@ -14,6 +14,8 @@ final class FakeRegisterRoute extends AbstractRegisterRoute
 {
     private bool $called = false;
 
+    private ?RequestDataBag $registrationData = null;
+
     public function __construct(private readonly CustomerEntity $customer)
     {
     }
@@ -26,6 +28,7 @@ final class FakeRegisterRoute extends AbstractRegisterRoute
     public function register(RequestDataBag $data, SalesChannelContext $context, bool $validateStorefrontUrl = true, ?DataValidationDefinition $additionalValidationDefinitions = null): CustomerResponse
     {
         $this->called = true;
+        $this->registrationData = $data;
 
         return new CustomerResponse($this->customer);
     }
@@ -33,5 +36,10 @@ final class FakeRegisterRoute extends AbstractRegisterRoute
     public function wasRegistrationCalled(): bool
     {
         return $this->called;
+    }
+
+    public function getRegistrationData(): ?RequestDataBag
+    {
+        return $this->registrationData;
     }
 }

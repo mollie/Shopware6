@@ -61,6 +61,7 @@ final class AccountServiceTest extends TestCase
             $this->paymentMethodId,
             $address,
             $address,
+            false,
             $this->salesChannelContext,
         );
 
@@ -85,6 +86,7 @@ final class AccountServiceTest extends TestCase
             $this->paymentMethodId,
             $billing,
             $shipping,
+            false,
             $this->salesChannelContext,
         );
 
@@ -110,6 +112,7 @@ final class AccountServiceTest extends TestCase
             $this->paymentMethodId,
             $address,
             $address,
+            false,
             $this->salesChannelContext,
         );
 
@@ -137,6 +140,7 @@ final class AccountServiceTest extends TestCase
             $this->paymentMethodId,
             $address,
             $address,
+            false,
             $this->salesChannelContext,
         );
 
@@ -167,6 +171,7 @@ final class AccountServiceTest extends TestCase
             $this->paymentMethodId,
             $newBilling,
             $newShipping,
+            false,
             $this->salesChannelContext,
         );
 

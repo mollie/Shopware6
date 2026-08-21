@@ -56,6 +56,7 @@ final class AccountServiceTest extends TestCase
             'pm-id',
             $this->makeAddress(),
             $this->makeAddress(),
+            true,
             $this->makeSalesChannelContext($customer),
         );
 
@@ -83,6 +84,7 @@ final class AccountServiceTest extends TestCase
             'pm-id',
             $this->makeAddress(),
             $this->makeAddress(),
+            true,
             $this->makeSalesChannelContext(null),
         );
 
@@ -111,12 +113,69 @@ final class AccountServiceTest extends TestCase
             'pm-id',
             $this->makeAddress(),
             $this->makeAddress(),
+            true,
             $this->makeSalesChannelContext(null),
         );
 
         $this->assertTrue($registerRoute->wasRegistrationCalled(), 'RegisterRoute::register must be called for unknown guests');
         $this->assertNull($loginTracker->getLoggedInId(), 'loginById must not be called when creating a new guest');
         $this->assertSame('customer-new', $syncSpy->getLastSyncedCustomerId());
+    }
+
+    /**
+     * The accepted data protection consent must end up in the registration data,
+     * otherwise RegisterRoute rejects the guest with IS_BLANK_ERROR as soon as the
+     * shop requires the data protection checkbox.
+     */
+    public function testAcceptedDataProtectionIsForwardedToRegistration(): void
+    {
+        $registerRoute = new FakeRegisterRoute($this->makeCustomer('customer-new', guest: true));
+
+        $service = $this->buildService(
+            customersFoundByEmail: [],
+            syncSpy: new FakeAddressSynchronizer(),
+            registerRoute: $registerRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $registrationData = $registerRoute->getRegistrationData();
+
+        $this->assertNotNull($registrationData);
+        $this->assertTrue($registrationData->get('acceptedDataProtection'));
+    }
+
+    /**
+     * A missing consent must stay false instead of being silently accepted on the customer's behalf.
+     */
+    public function testMissingDataProtectionConsentIsNotFakedDuringRegistration(): void
+    {
+        $registerRoute = new FakeRegisterRoute($this->makeCustomer('customer-new', guest: true));
+
+        $service = $this->buildService(
+            customersFoundByEmail: [],
+            syncSpy: new FakeAddressSynchronizer(),
+            registerRoute: $registerRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            false,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $registrationData = $registerRoute->getRegistrationData();
+
+        $this->assertNotNull($registrationData);
+        $this->assertFalse($registrationData->get('acceptedDataProtection'));
     }
 
     /**
@@ -137,6 +196,7 @@ final class AccountServiceTest extends TestCase
             'pm-id',
             $this->makeAddress(),
             $this->makeAddress(),
+            true,
             $this->makeSalesChannelContext($customer),
         );
 
