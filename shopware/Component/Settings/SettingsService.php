@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
+use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -35,6 +36,8 @@ final class SettingsService extends AbstractSettingsService
     private int $paypalExpressStyle = 1;
     private int $paypalExpressShape = 1;
     private string $paypalExpressRestrictions = '';
+    private bool $expressComponentsEnabled = false;
+    private string $expressComponentsRestrictions = '';
 
     public function __construct(
         private SystemConfigService $systemConfigService,
@@ -49,7 +52,11 @@ final class SettingsService extends AbstractSettingsService
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE')]
         ?string $paypalExpressShape = '1',
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS')]
-        ?string $paypalExpressRestrictions = ''
+        ?string $paypalExpressRestrictions = '',
+        #[Autowire(env: 'default::MOLLIE_EXPRESS_COMPONENTS_BETA')]
+        ?string $expressComponentsEnabled = null,
+        #[Autowire(env: 'default::MOLLIE_EXPRESS_COMPONENTS_RESTRICTIONS')]
+        ?string $expressComponentsRestrictions = ''
     ) {
         if ($devMode !== null) {
             $this->devMode = (bool) $devMode;
@@ -69,6 +76,13 @@ final class SettingsService extends AbstractSettingsService
             }
             if ($paypalExpressRestrictions !== null) {
                 $this->paypalExpressRestrictions = $paypalExpressRestrictions;
+            }
+        }
+
+        if ($expressComponentsEnabled !== null) {
+            $this->expressComponentsEnabled = (bool) $expressComponentsEnabled;
+            if ($expressComponentsRestrictions !== null) {
+                $this->expressComponentsRestrictions = $expressComponentsRestrictions;
             }
         }
     }
@@ -110,6 +124,26 @@ final class SettingsService extends AbstractSettingsService
         $settings->setStyle((int) $style);
         $settings->setShape((int) $shape);
 
+        $settings->setRestrictions(VisibilityRestrictionCollection::fromArray($restrictions));
+
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getExpressComponentsSettings(?string $salesChannelId = null): ExpressComponentsSettings
+    {
+        $cacheKey = ExpressComponentsSettings::class . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+        $fallbackRestrictions = explode(' ', trim($this->expressComponentsRestrictions));
+        $restrictions = $shopwareSettings[ExpressComponentsSettings::KEY_RESTRICTIONS] ?? $fallbackRestrictions;
+
+        $settings = new ExpressComponentsSettings($this->expressComponentsEnabled);
         $settings->setRestrictions(VisibilityRestrictionCollection::fromArray($restrictions));
 
         $this->settingsCache[$cacheKey] = $settings;

@@ -20,6 +20,34 @@ enum LineItemType: string
 
     case LINE_ITEM_TYPE_CUSTOM_PRODUCTS = 'customized-products';
 
+    public static function fromCartLineItem(LineItem $cartLineItem): self
+    {
+        $type = match ((string) $cartLineItem->getType()) {
+            LineItem::PRODUCT_LINE_ITEM_TYPE, self::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value => self::PHYSICAL,
+            LineItem::CREDIT_LINE_ITEM_TYPE => self::CREDIT,
+            LineItem::PROMOTION_LINE_ITEM_TYPE => self::DISCOUNT,
+            default => self::DIGITAL,
+        };
+
+        if ($type === self::CREDIT) {
+            return $type;
+        }
+
+        // discounts added by third-party plugins have custom line item types, Mollie rejects
+        // negative amounts unless the type is discount, store_credit or gift_card
+        $price = $cartLineItem->getPrice();
+        if ($price instanceof CalculatedPrice && $price->getTotalPrice() < 0) {
+            return self::DISCOUNT;
+        }
+
+        // downloadable products carry the is-download state and must be reported as digital to Mollie
+        if ($type === self::PHYSICAL && \in_array(State::IS_DOWNLOAD, $cartLineItem->getStates(), true)) {
+            return self::DIGITAL;
+        }
+
+        return $type;
+    }
+
     public static function fromOderLineItem(OrderLineItemEntity $orderLineItem): self
     {
         $oderLineItemType = (string) $orderLineItem->getType();

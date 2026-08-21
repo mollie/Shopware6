@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
+use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -29,6 +30,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?EnvironmentSettings $environmentSettings = null,
         private ?PayPalExpressSettings $paypalExpressSettings = null,
         private ?ApplePaySettings $applePaySettings = null,
+        private ?ExpressComponentsSettings $expressComponentsSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -49,6 +51,14 @@ final class FakeSettingsService extends AbstractSettingsService
         if ($this->paypalExpressSettings === null) {
             $this->paypalExpressSettings = new PayPalExpressSettings(false);
         }
+        if ($this->expressComponentsSettings === null) {
+            $this->expressComponentsSettings = new ExpressComponentsSettings(false);
+        }
+    }
+
+    public function getExpressComponentsSettings(?string $salesChannelId = null): ExpressComponentsSettings
+    {
+        return $this->expressComponentsSettings;
     }
 
     public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings

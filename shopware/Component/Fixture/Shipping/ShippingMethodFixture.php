@@ -48,15 +48,64 @@ final class ShippingMethodFixture extends AbstractFixture
 
     public function install(Context $context): void
     {
-        $price = 4.99;
-        $taxRate = 19;
+        $shippingMethods = [
+            $this->buildShippingMethod('mollie-shipping-method', 'Mollie Test Shipment', 'mollie_fixture_shipment', 4.99),
+            // express checkouts have to be tested with a real card, so shipping costs are kept
+            // at a level where a live test does not waste money
+            $this->buildShippingMethod('mollie-cheap-shipping-method', 'Mollie Cheap Test Shipment', 'mollie_fixture_cheap_shipment', 0.01),
+        ];
+
+        $this->shippingMethodRepository->upsert($shippingMethods, $context);
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', true));
+        $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
+        $salesChannelUpsert = [];
+        foreach ($salesChannels as $salesChannel) {
+            $salesChannelUpsert[] = [
+                'id' => $salesChannel->getId(),
+                'shippingMethods' => array_map(static fn (array $shippingMethod): array => ['id' => $shippingMethod['id']], $shippingMethods),
+            ];
+        }
+        $this->salesChannelRepository->upsert($salesChannelUpsert, $context);
+    }
+
+    public function uninstall(Context $context): void
+    {
+        $shippingMethods = [
+            ['id' => Uuid::fromStringToHex('mollie-shipping-method')],
+            ['id' => Uuid::fromStringToHex('mollie-cheap-shipping-method')],
+        ];
+        $this->shippingMethodRepository->delete($shippingMethods, $context);
+
+        $rules = [
+            [
+                'id' => Uuid::fromStringToHex('mollie-always-valid-rule'),
+            ]
+        ];
+        $this->ruleRepository->delete($rules, $context);
+
+        $deliveryTimes = [
+            [
+                'id' => Uuid::fromStringToHex('mollie-delivery-time'),
+            ]
+        ];
+        $this->deliveryTimeRepository->delete($deliveryTimes, $context);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildShippingMethod(string $key, string $name, string $technicalName, float $price, int $taxRate = 19): array
+    {
         $netPrice = round($price / (1 + $taxRate / 100), 2);
-        $data = [
-            'id' => Uuid::fromStringToHex('mollie-shipping-method'),
-            'name' => 'Mollie Test Shipment',
+
+        return [
+            'id' => Uuid::fromStringToHex($key),
+            'name' => $name,
             'active' => true,
             'trackingUrl' => 'https://www.carrier.com/de/tracking/%s',
-            'technicalName' => 'mollie_fixture_shipment',
+            'technicalName' => $technicalName,
             'taxId' => Uuid::fromStringToHex('tax-' . $taxRate),
             'availabilityRule' => [
                 'id' => Uuid::fromStringToHex('mollie-always-valid-rule'),
@@ -79,56 +128,19 @@ final class ShippingMethodFixture extends AbstractFixture
             ],
             'prices' => [
                 [
-                    'id' => Uuid::fromStringToHex('price-' . $price),
+                    'id' => Uuid::fromStringToHex($key . '-price'),
                     'calculation' => 2,
                     'quantityStart' => 0,
                     'currencyPrice' => [
                         [
                             'currencyId' => Defaults::CURRENCY,
                             'net' => $netPrice,
-                            'gross' => 4.99,
+                            'gross' => $price,
                             'linked' => true
                         ]
                     ]
                 ]
             ],
         ];
-        $this->shippingMethodRepository->upsert([$data], $context);
-
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('active', true));
-        $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
-        $salesChannelUpsert = [];
-        foreach ($salesChannels as $salesChannel) {
-            $salesChannelUpsert[] = [
-                'id' => $salesChannel->getId(),
-                'shippingMethods' => [['id' => $data['id']]],
-            ];
-        }
-        $this->salesChannelRepository->upsert($salesChannelUpsert, $context);
-    }
-
-    public function uninstall(Context $context): void
-    {
-        $shippingMethods = [
-            [
-                'id' => Uuid::fromStringToHex('mollie-shipping-method'),
-            ]
-        ];
-        $this->shippingMethodRepository->delete($shippingMethods, $context);
-
-        $rules = [
-            [
-                'id' => Uuid::fromStringToHex('mollie-always-valid-rule'),
-            ]
-        ];
-        $this->ruleRepository->delete($rules, $context);
-
-        $deliveryTimes = [
-            [
-                'id' => Uuid::fromStringToHex('mollie-delivery-time'),
-            ]
-        ];
-        $this->deliveryTimeRepository->delete($deliveryTimes, $context);
     }
 }

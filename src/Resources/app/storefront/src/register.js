@@ -4,6 +4,7 @@ import MollieApplePayPaymentMethod from './mollie-payments/plugins/apple-pay-pay
 import MollieCreditCardMandateManage from './mollie-payments/plugins/creditcard-mandate-manage.plugin';
 import MolliePosTerminalPlugin from './mollie-payments/plugins/pos-terminal.plugin';
 import PayPalExpressPlugin from './mollie-payments/plugins/express/paypal-express.plugin';
+import MollieExpressComponentsPlugin from './mollie-payments/plugins/express/express-components.plugin';
 import MolliePhonePlugin from './mollie-payments/plugins/phone-plugin';
 import MollieSubscribeButtonPlugin from './mollie-payments/plugins/subscribe-button.plugin';
 
@@ -15,14 +16,15 @@ export default class MollieRegistration {
         const pluginManager = window.PluginManager;
 
         // [name, pluginClass, selector]
-        // Apple Pay Direct and PayPal Express register on 'body' so they initialize
-        // exactly once per page. The rest bind to their template markers: hide the
+        // Apple Pay Direct, PayPal Express and the express components register on 'body'
+        // so they initialize exactly once per page. The rest bind to their template markers: hide the
         // standard Apple Pay method in checkout/account, show the credit card
         // components, manage the credit card mandate, drive the POS terminal and run
         // universal phone validation.
         const registrations = [
             ['MollieApplePayDirect', MollieApplePayDirect, 'body'],
             ['PayPalExpressPlugin', PayPalExpressPlugin, 'body'],
+            ['MollieExpressComponents', MollieExpressComponentsPlugin, 'body'],
             ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-account]'],
             ['MollieApplePayPaymentMethod', MollieApplePayPaymentMethod, '[data-mollie-template-applepay-checkout]'],
             ['MollieCreditCardComponents', MollieCreditCardComponents, '[data-mollie-template-creditcard-components]'],

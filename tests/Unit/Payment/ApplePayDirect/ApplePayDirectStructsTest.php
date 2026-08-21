@@ -8,7 +8,7 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayCart;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayLineItem;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingLineItem;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMethod;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\FakeApplePayAddress;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddress;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -19,7 +19,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 #[CoversClass(ApplePayShippingLineItem::class)]
 #[CoversClass(ApplePayShippingMethod::class)]
 #[CoversClass(ApplePayCart::class)]
-#[CoversClass(FakeApplePayAddress::class)]
+#[CoversClass(TempAddress::class)]
 final class ApplePayDirectStructsTest extends TestCase
 {
     public function testApplePayAmountStoresAndReturnsValue(): void
@@ -81,19 +81,19 @@ final class ApplePayDirectStructsTest extends TestCase
         $this->assertSame(4.90, $cart->getShippingAmount()->getValue());
     }
 
-    public function testFakeApplePayAddressGeneratesConsistentId(): void
+    public function testTempAddressGeneratesConsistentId(): void
     {
         $customer = new CustomerEntity();
         $customer->setId(Uuid::randomHex());
 
-        $idA = FakeApplePayAddress::getId($customer);
-        $idB = FakeApplePayAddress::getId($customer);
+        $idA = TempAddress::getId($customer);
+        $idB = TempAddress::getId($customer);
 
         $this->assertSame($idA, $idB);
         $this->assertNotEmpty($idA);
     }
 
-    public function testFakeApplePayAddressToUpsertArrayContainsRequiredFields(): void
+    public function testTempAddressToUpsertArrayContainsRequiredFields(): void
     {
         $customer = new CustomerEntity();
         $customer->setId(Uuid::randomHex());
@@ -101,7 +101,7 @@ final class ApplePayDirectStructsTest extends TestCase
         $customer->setLastName('Doe');
         $countryId = Uuid::randomHex();
 
-        $address = new FakeApplePayAddress($customer, $countryId);
+        $address = new TempAddress($customer, $countryId);
         $result = $address->toUpsertArray();
 
         $this->assertSame($countryId, $result['countryId']);

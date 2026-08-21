@@ -11,6 +11,12 @@
 
         {% sw_include '@MolliePayments/mollie/component/express-privacy-notice.html.twig' with {visible:noticeVisible} %}
 
+        {% block component_offcanvas_cart_actions_checkout_mollie_express_components %}
+            {% sw_include '@MolliePayments/mollie/component/express-component.html.twig' with {
+                applePayVisible: applePayVisible,
+                paypalExpressVisible: paypalExpressVisible
+            } %}
+        {% endblock %}
 
         {% if applePayVisible %}
             {% block component_offcanvas_cart_actions_checkout_apple_direct_component %}

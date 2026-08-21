@@ -437,6 +437,33 @@ paths:
           description: "successful operation"
 
 
+  /store-api/mollie/express-components/finish:
+    post:
+      tags:
+        - "Express Components"
+      summary: "Finishes an express components checkout: creates the guest account and the order from the cart, or attaches the payment to an existing order, and returns where the customer has to be sent"
+      description: "Either cartToken or orderId has to be provided. cartToken is the regular flow out of the cart, orderId is used on the edit order page, where the order already exists. finishUrl and errorUrl are where Shopware sends the customer after the payment was finalized; {orderId} in them is replaced with the id of the order. Without them the storefront pages are used."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartToken:
+                  default: ""
+                orderId:
+                  default: ""
+                finishUrl:
+                  default: ""
+                errorUrl:
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+
   /store-api/mollie/subscription:
     get:
       tags:
