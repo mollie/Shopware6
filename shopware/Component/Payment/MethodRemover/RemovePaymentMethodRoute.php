@@ -41,15 +41,15 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
         // The $request handed to this route is a throwaway empty Request created by the storefront
         // page loaders (GenericPageLoader/CheckoutConfirmPageLoader/AccountEditOrderPageLoader via
         // RouteRequestEvent), so it never carries _controller/_route/orderId. We therefore read the
-        // page context from the main request instead. The payment-method route is loaded on every
+        // page context from the request stack instead. The payment-method route is loaded on every
         // page (footer), so we only run our removers on the checkout and edit-order pages.
-        $mainRequest = $this->requestStack->getMainRequest();
+        $pageRequest = $this->findPageRequest();
 
-        if ($mainRequest === null || $this->shouldRemove($mainRequest) === false) {
+        if ($pageRequest === null) {
             return $response;
         }
 
-        $orderId = (string) $mainRequest->get('orderId', '');
+        $orderId = (string) $pageRequest->get('orderId', '');
 
         $paymentMethods = $response->getPaymentMethods();
 
@@ -62,6 +62,29 @@ final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
 
         /** @var \Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult<\Shopware\Core\Checkout\Payment\PaymentMethodCollection> $responseObject */
         return new PaymentMethodRouteResponse($responseObject);
+    }
+
+    /**
+     * Our own controllers forward to the checkout pages instead of redirecting (e.g. PayPal Express
+     * finish renders frontend.checkout.confirm.page). A forward is rendered in a sub request, so the
+     * main request still points at the Mollie controller. The current request therefore has to be
+     * checked first, the main request is only the fallback.
+     */
+    private function findPageRequest(): ?Request
+    {
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
+        if ($currentRequest !== null && $this->shouldRemove($currentRequest)) {
+            return $currentRequest;
+        }
+
+        $mainRequest = $this->requestStack->getMainRequest();
+
+        if ($mainRequest !== null && $this->shouldRemove($mainRequest)) {
+            return $mainRequest;
+        }
+
+        return null;
     }
 
     private function getControllerClass(Request $request): ?string

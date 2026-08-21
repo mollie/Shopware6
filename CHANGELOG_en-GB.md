@@ -1,4 +1,5 @@
 # Unreleased
+- Fixed: PayPal Express is the only payment method in the checkout right after returning.
 - Fixed: Opening a payment link a second time works again.
 - Fixed: The shipping costs of orders from older plugin versions are refunded, returned and marked as shipped at Mollie correctly again.
 - Fixed: Express checkouts no longer fail when the data protection checkbox is required.
