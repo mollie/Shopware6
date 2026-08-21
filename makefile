@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-.PHONY: help prod dev clean build fixtures pr release validate report
+.PHONY: help prod dev clean build fixtures pr release validate report build-js
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
@@ -264,3 +264,18 @@ validate: ##4 Runs the Shopware extension verifier against a release ZIP [zip=<p
 		extension validate --full "/build/$$(basename "$$ZIP")" \
 		$(if $(filter-out all,$(VALIDATE_TOOLS)),--only "$(VALIDATE_TOOLS)",) \
 		$(if $(reporter),--reporter $(reporter),)
+
+build-js:
+	rm -rf "./src/Resources/public/administration/assets"
+	rm -rf "./src/Resources/public/administration/.vite"
+	docker run --rm \
+    -v "./..:/plugins" \
+    -v "./config/.shopware-extension.yml:/plugins/MolliePayments/.shopware-extension.yml" \
+    ghcr.io/shopware/shopware-cli:latest \
+    extension build /plugins/MolliePayments
+	@JS_DIR="./src/Resources/app/storefront/dist/storefront/js"; \
+	if [ -f "$$JS_DIR/mollie-payments.js" ]; then \
+	    mkdir -p "$$JS_DIR/mollie-payments" && \
+	    cp "$$JS_DIR/mollie-payments.js" "$$JS_DIR/mollie-payments/mollie-payments.js" && \
+	    { [ -f "$$JS_DIR/mollie-payments.js.map" ] && cp "$$JS_DIR/mollie-payments.js.map" "$$JS_DIR/mollie-payments/mollie-payments.js.map" || true; }; \
+	fi
