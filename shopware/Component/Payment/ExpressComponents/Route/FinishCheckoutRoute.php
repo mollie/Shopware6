@@ -180,7 +180,11 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
         $paymentMethodId = $this->getPaymentMethodId($session, $cartContext);
         $logData['paymentMethodId'] = $paymentMethodId;
 
-        $orderContext = $this->accountService->loginOrCreateAccount($paymentMethodId, $billingAddress, $shippingAddress, $cartContext);
+        // The data protection checkbox is never sent for this flow: the payment happens inside the
+        // Mollie component and Mollie sends the shopper back with a plain redirect, so there is no
+        // request left that could carry the consent. It is therefore not accepted, and a shop that
+        // requires the checkbox rejects the guest registration instead of consent being faked.
+        $orderContext = $this->accountService->loginOrCreateAccount($paymentMethodId, $billingAddress, $shippingAddress, false, $cartContext);
         $logData['customerId'] = $orderContext->getCustomer()?->getId();
         $this->logger->debug('Express components guest account created or logged in', $logData);
 
@@ -258,7 +262,9 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
 
         // the address the shopper picked in the wallet wins over the one on the account, so it is
         // written onto the customer first and from there onto the order
-        $salesChannelContext = $this->accountService->loginOrCreateAccount($paymentMethodId, $billingAddress, $shippingAddress, $salesChannelContext);
+        // no consent is needed here, the edit order page belongs to a customer that is logged in,
+        // so no guest account is ever registered
+        $salesChannelContext = $this->accountService->loginOrCreateAccount($paymentMethodId, $billingAddress, $shippingAddress, false, $salesChannelContext);
         $this->orderAddressSynchronizer->sync($order, $salesChannelContext);
 
         // The order may already carry the transaction of a failed attempt. Shopware answers a new

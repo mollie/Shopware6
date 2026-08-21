@@ -280,6 +280,16 @@ final class Session extends Struct implements \JsonSerializable
         return $this->shippingAddress;
     }
 
+    public function hasAcceptedDataProtection(): bool
+    {
+        return $this->acceptedDataProtection;
+    }
+
+    public function setAcceptedDataProtection(bool $acceptedDataProtection): void
+    {
+        $this->acceptedDataProtection = $acceptedDataProtection;
+    }
+
     /**
      * methodDetails carries the params below the key of the method that was used:
      * {"method": "creditcard", "params": {"creditcard": {"pspToken": "tkn_...", "wallet": "googlepay"}}}
@@ -303,15 +313,5 @@ final class Session extends Struct implements \JsonSerializable
         if (is_string($wallet) && $wallet !== '') {
             $this->wallet = $wallet;
         }
-    }
-
-    public function hasAcceptedDataProtection(): bool
-    {
-        return $this->acceptedDataProtection;
-    }
-
-    public function setAcceptedDataProtection(bool $acceptedDataProtection): void
-    {
-        $this->acceptedDataProtection = $acceptedDataProtection;
     }
 }
