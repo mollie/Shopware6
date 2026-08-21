@@ -1,15 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Payment\Method;
+namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\OpenStatusFailedAwareInterface;
-use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 
-final class BanContactPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, OpenStatusFailedAwareInterface
+final class FakeOpenStatusFailedAwarePaymentHandler extends AbstractMolliePaymentHandler implements OpenStatusFailedAwareInterface
 {
+    public function __construct()
+    {
+    }
+
     public function getPaymentMethod(): PaymentMethod
     {
         return PaymentMethod::BAN_CONTACT;
@@ -17,6 +20,6 @@ final class BanContactPayment extends AbstractMolliePaymentHandler implements Su
 
     public function getName(): string
     {
-        return 'Bancontact';
+        return 'Fake open status failed handler';
     }
 }

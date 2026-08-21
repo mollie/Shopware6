@@ -8,7 +8,10 @@ use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\Event\PaymentFinalizeEvent;
+use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\OpenStatusFailedAwareInterface;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
@@ -32,8 +35,11 @@ final class Finalize implements FinalizeInterface
     ) {
     }
 
-    public function execute(MollieTransactionStruct $transaction, Context $context): void
-    {
+    public function execute(
+        AbstractMolliePaymentHandler $paymentHandler,
+        MollieTransactionStruct $transaction,
+        Context $context
+    ): void {
         $transactionId = $transaction->getOrderTransactionId();
         $transactionData = $this->transactionDataLoader->findById($transactionId,$context);
 
@@ -78,7 +84,10 @@ final class Finalize implements FinalizeInterface
             throw PaymentException::customerCanceled($transaction->getOrderTransactionId(), $message);
         }
 
-        if ($paymentStatus->isFailed()) {
+        $openMeansFailed = $paymentStatus === PaymentStatus::OPEN
+            && $paymentHandler instanceof OpenStatusFailedAwareInterface;
+
+        if ($paymentStatus->isFailed() || $openMeansFailed) {
             $message = sprintf('Payment for order %s (%s) is failed', $orderNumber, $payment->getId());
 
             $this->logger->warning('Finalize Process - Finished. Payment is failed, FailedEvent fired', $logData);

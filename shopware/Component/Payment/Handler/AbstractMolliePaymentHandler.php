@@ -60,7 +60,7 @@ if (! interface_exists(AsynchronousPaymentHandlerInterface::class) || FeatureFla
             );
 
             try {
-                $this->finalize->execute($struct, $context);
+                $this->finalize->execute($this, $struct, $context);
             } catch (HttpException $exception) {
                 $this->logger->error('Payment is aborted or failed', [
                     'error' => $exception->getMessage(),
@@ -119,7 +119,7 @@ if (! interface_exists(AsynchronousPaymentHandlerInterface::class) || FeatureFla
             );
 
             try {
-                $this->finalize->execute($struct, $salesChannelContext->getContext());
+                $this->finalize->execute($this, $struct, $salesChannelContext->getContext());
             } catch (HttpException $exception) {
                 $this->logger->error('Payment is aborted or failed', [
                     'error' => $exception->getMessage(),
