@@ -10,6 +10,8 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 final class FakeAccountService extends AbstractAccountService
 {
+    private ?bool $lastAcceptedDataProtection = null;
+
     public function __construct(private SalesChannelContext $newContext)
     {
     }
@@ -19,8 +21,15 @@ final class FakeAccountService extends AbstractAccountService
         throw new DecorationPatternException(self::class);
     }
 
-    public function loginOrCreateAccount(string $paymentMethodId, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): SalesChannelContext
+    public function loginOrCreateAccount(string $paymentMethodId, Address $billingAddress, Address $shippingAddress, bool $acceptedDataProtection, SalesChannelContext $salesChannelContext): SalesChannelContext
     {
+        $this->lastAcceptedDataProtection = $acceptedDataProtection;
+
         return $this->newContext;
+    }
+
+    public function getLastAcceptedDataProtection(): ?bool
+    {
+        return $this->lastAcceptedDataProtection;
     }
 }

@@ -76,7 +76,9 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
             throw PaypalExpressException::shippingAddressMissing();
         }
 
-        $newContext = $this->accountService->loginOrCreateAccount($payPalExpressId, $billingAddress, $shippingAddress, $salesChannelContext);
+        // the consent is read from the cart session, the freshly loaded one is rebuilt
+        // from the Mollie response and does not carry it
+        $newContext = $this->accountService->loginOrCreateAccount($payPalExpressId, $billingAddress, $shippingAddress, $cartExtension->hasAcceptedDataProtection(), $salesChannelContext);
         $cart = $this->cartService->getCart($newContext->getToken(), $newContext);
         $cart->addExtension(Mollie::EXTENSION, $session);
         $this->cartService->recalculate($cart, $salesChannelContext);

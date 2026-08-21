@@ -14,6 +14,7 @@ final class Session extends Struct implements \JsonSerializable
     private string $redirectUrl;
     private ?Address $billingAddress = null;
     private ?Address $shippingAddress = null;
+    private bool $acceptedDataProtection = false;
 
     public function __construct(private string $id)
     {
@@ -100,5 +101,15 @@ final class Session extends Struct implements \JsonSerializable
     public function getShippingAddress(): ?Address
     {
         return $this->shippingAddress;
+    }
+
+    public function hasAcceptedDataProtection(): bool
+    {
+        return $this->acceptedDataProtection;
+    }
+
+    public function setAcceptedDataProtection(bool $acceptedDataProtection): void
+    {
+        $this->acceptedDataProtection = $acceptedDataProtection;
     }
 }

@@ -87,6 +87,14 @@ export default class PayPalExpressPlugin extends Plugin {
         form.setAttribute('action', submitUrl);
         form.setAttribute('method', 'POST');
 
+        // the consent has to travel to the start route, because the guest account is only
+        // created after the customer returns from PayPal and the checkbox is gone by then
+        const dataProtection = document.createElement('input');
+        dataProtection.type = 'hidden';
+        dataProtection.name = 'acceptedDataProtection';
+        dataProtection.value = this._privacySection.getAcceptedDataProtection(clickedButton);
+        form.insertAdjacentElement('beforeend', dataProtection);
+
         document.body.insertAdjacentElement('beforeend', form);
 
         form.submit();

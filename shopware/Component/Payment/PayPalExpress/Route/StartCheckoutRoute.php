@@ -53,6 +53,10 @@ final class StartCheckoutRoute extends AbstractStartCheckoutRoute
 
         $session = $this->sessionGateway->createPaypalExpressSession($cart, $salesChannelContext);
 
+        // the guest account is created in the finish route after returning from PayPal,
+        // where the storefront checkbox no longer exists - so keep the consent on the session
+        $session->setAcceptedDataProtection((int) $request->get('acceptedDataProtection', '0') === 1);
+
         $cart->addExtension(Mollie::EXTENSION, $session);
 
         $this->cartService->recalculate($cart, $salesChannelContext);

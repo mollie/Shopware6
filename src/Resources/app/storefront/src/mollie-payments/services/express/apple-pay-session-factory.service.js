@@ -18,20 +18,16 @@ export default class ApplePaySessionFactoryService {
      * @param currency
      * @param shopSlug
      * @param withPhone
-     * @param dataProtection
+     * @param acceptedDataProtection 1 if the customer accepted the data protection, otherwise 0
      * @param clickedButton
      * @returns ApplePaySession
      */
-    create(isProductMode, country, currency, withPhone, shopSlug, dataProtection, clickedButton) {
+    create(isProductMode, country, currency, withPhone, shopSlug, acceptedDataProtection, clickedButton) {
         const me = this;
         var shippingFields = ['name', 'email', 'postalAddress'];
 
         if (withPhone === 1) {
             shippingFields.push('phone');
-        }
-        let dataProtectionValue = false;
-        if (dataProtection !== null) {
-            dataProtectionValue = dataProtection.value;
         }
 
         var request = {
@@ -157,7 +153,7 @@ export default class ApplePaySessionFactoryService {
                 shopSlug + '/mollie/apple-pay/start-payment',
                 paymentToken,
                 event.payment,
-                dataProtectionValue,
+                acceptedDataProtection,
             );
             clickedButton.classList.remove('processed');
         };
@@ -179,8 +175,9 @@ export default class ApplePaySessionFactoryService {
      * @param checkoutURL
      * @param paymentToken
      * @param payment
+     * @param acceptedDataProtection
      */
-    finishPayment(checkoutURL, paymentToken, payment, dataProtectionValue) {
+    finishPayment(checkoutURL, paymentToken, payment, acceptedDataProtection) {
         const createInput = function (name, val) {
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -207,7 +204,7 @@ export default class ApplePaySessionFactoryService {
         form.insertAdjacentElement('beforeend', createInput('street', street));
         form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
         form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
-        form.insertAdjacentElement('beforeend', createInput('acceptedDataProtection', dataProtectionValue));
+        form.insertAdjacentElement('beforeend', createInput('acceptedDataProtection', acceptedDataProtection));
 
         if (payment.shippingContact.phoneNumber !== undefined && payment.shippingContact.phoneNumber.length > 0) {
             form.insertAdjacentElement('beforeend', createInput('phone', payment.shippingContact.phoneNumber));

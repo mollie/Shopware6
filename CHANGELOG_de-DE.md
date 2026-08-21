@@ -1,6 +1,7 @@
 # Unreleased
 - Behoben: Das erneute Öffnen eines Payment-Links funktioniert wieder.
 - Behoben: Die Versandkosten von Bestellungen aus älteren Plugin-Versionen werden bei Mollie nun wieder korrekt erstattet, retourniert und als versendet markiert.
+- Behoben: Express-Checkouts schlagen bei erforderlicher Datenschutz-Checkbox nicht mehr fehl.
 
 # 5.4.0
 - Hinzugefügt: Das minimale Log-Level der Mollie-Log-Handler ist nun über den Container-Parameter `mollie.logger.level` konfigurierbar; der Debug-Modus übersteuert es und erzwingt das Debug-Level.

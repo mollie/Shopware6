@@ -79,7 +79,7 @@ final class PayRoute extends AbstractPayRoute
         $city = (string) $request->get('city', '');
         $countryCode = (string) $request->get('countryCode', '');
         $phone = (string) $request->get('phone', '');
-        $acceptedDataProtection = (int) $request->get('acceptedDataProtection', '0');
+        $acceptedDataProtection = (int) $request->get('acceptedDataProtection', '0') === 1;
 
         $billingAddress = new Address($email, '', $firstname, $lastname, $street, $zipcode, $city, $countryCode);
         if (mb_strlen($phone) > 0) {
@@ -88,7 +88,7 @@ final class PayRoute extends AbstractPayRoute
         $shippingAddress = $billingAddress;
 
         try {
-            $salesChannelContext = $this->accountService->loginOrCreateAccount((string) $applePayPaymentMethodId, $billingAddress, $shippingAddress, $salesChannelContext);
+            $salesChannelContext = $this->accountService->loginOrCreateAccount((string) $applePayPaymentMethodId, $billingAddress, $shippingAddress, $acceptedDataProtection, $salesChannelContext);
             $customer = $salesChannelContext->getCustomer();
             if ($customer instanceof CustomerEntity) {
                 $logData['customerNumber'] = $customer->getCustomerNumber();
