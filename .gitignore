@@ -14,6 +14,7 @@ config-*
 /src/Resources/app/administration/.stryker-tmp
 /.phpunuhi/
 /dev/node_modules/
+/node_modules/
 /src/Resources/public/administration/assets/
 composer.lock
 package-lock.json
@@ -23,3 +24,4 @@ package-lock.json
 .php-cs-fixer.cache
 /.ai/
 /.zed
+/.ai
