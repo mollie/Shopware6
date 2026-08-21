@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Payment\Handler\OpenStatusFailedAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\AlmaPayment;
 use Mollie\Shopware\Component\Payment\Method\ApplePayPayment;
 use Mollie\Shopware\Component\Payment\Method\BancomatPayPayment;
@@ -102,6 +103,18 @@ final class PaymentMethodsTest extends TestCase
 
         $this->assertSame($expectedMethod, $handler->getPaymentMethod());
         $this->assertSame($expectedName, $handler->getName());
+    }
+
+    #[DataProvider('providePaymentMethods')]
+    public function testOnlyBancontactTreatsOpenStatusAsFailed(string $handlerClass, PaymentMethod $expectedMethod): void
+    {
+        $handler = new $handlerClass(new FakePay(), new FakeFinalize(), new NullLogger());
+
+        $this->assertSame(
+            $expectedMethod === PaymentMethod::BAN_CONTACT,
+            $handler instanceof OpenStatusFailedAwareInterface,
+            sprintf('Unexpected open status handling for "%s"', $expectedMethod->value)
+        );
     }
 
     public static function providePaymentMethods(): array
