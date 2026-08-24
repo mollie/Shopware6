@@ -2,6 +2,7 @@
 - Added: Plugins can keep their own line items, such as set product containers, out of the Mollie payload themselves, using the new `FilterLineItemEvent`.
 - Added: Mollie express components (beta) in the cart, off-canvas and checkout.
 - Added: The Mollie refund, capture and shipment ids are available on the order for accounting exports, in the DATEV-compatible format with a hyphen.
+- Added: New "Disable Return Management integration" setting in the Refund Manager, so returns from the Shopware Return Management no longer trigger a refund at Mollie.
 - Changed: Bancontact with status "open" now counts as failed.
 - Fixed: PayPal Express is the only payment method in the checkout right after returning.
 - Fixed: Opening a payment link a second time works again.

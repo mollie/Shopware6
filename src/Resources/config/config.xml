@@ -1837,6 +1837,56 @@
             <helpText lang="ro-RO">Sufix pentru numărul notei de credit. Nota de credit constă din prefix, numele original al liniei și sufix</helpText>
             <helpText lang="sk-SK">Prípona pre číslo dobropisu. Dobropis sa skladá z predpony, pôvodného názvu položky a prípony</helpText><helpText lang="bg-BG">Представка за номера на кредитното известие. Кредитното известие се състои от представка, оригинално име на артикула и надставка</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>refundManagerReturnManagementDisabled</name>
+            <defaultValue>false</defaultValue>
+            <label>Disable Return Management integration</label>
+            <label lang="de-DE">Retouren-Integration deaktivieren</label>
+            <label lang="nl-NL">Retourintegratie uitschakelen</label>
+            <label lang="it-IT">Disattiva l'integrazione con la gestione dei resi</label>
+            <label lang="pt-PT">Desativar a integração da gestão de devoluções</label>
+            <label lang="es-ES">Desactivar la integración con la gestión de devoluciones</label>
+            <label lang="sv-SE">Inaktivera integrationen med returhantering</label>
+            <label lang="nb-NO">Deaktiver integrasjon med returhåndtering</label>
+            <label lang="pl-PL">Wyłącz integrację z menedżerem zwrotów</label>
+            <label lang="cs-CZ">Zakázat integraci se správou vratek</label>
+            <label lang="sl-SI">Onemogoči integracijo z upravljanjem vračil</label>
+            <label lang="hu-HU">Visszaküldés-integráció letiltása</label>
+            <label lang="fi-FI">Poista palautusten hallinnan integraatio käytöstä</label>
+            <label lang="da-DK">Deaktiver integration med returhåndtering</label>
+            <label lang="el-GR">Απενεργοποίηση ενσωμάτωσης με τη διαχείριση επιστροφών</label>
+            <label lang="hr-HR">Onemogući integraciju s upravljanjem povratima</label>
+            <label lang="et-EE">Keela tagastuste halduse integratsioon</label>
+            <label lang="is-IS">Slökkva á samþættingu við skilastjórnun</label>
+            <label lang="lt-LT">Išjungti grąžinimų valdymo integraciją</label>
+            <label lang="lv-LV">Atspējot atgriešanas pārvaldības integrāciju</label>
+            <label lang="ro-RO">Dezactivează integrarea cu gestionarea retururilor</label>
+            <label lang="sk-SK">Zakázať integráciu so správou vrátení tovaru</label>
+            <label lang="bg-BG">Деактивиране на интеграцията с управлението на връщания</label>
+            <helpText>If enabled, Mollie no longer creates or cancels a refund when a return is processed in the Shopware Return Management. Refunds then have to be created manually in the Mollie Refund Manager.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, erstellt und storniert Mollie keine Rückerstattung mehr, wenn eine Retoure im Shopware Return Management bearbeitet wird. Rückerstattungen müssen dann manuell im Mollie Refund Manager erstellt werden.</helpText>
+            <helpText lang="nl-NL">Als dit is ingeschakeld, maakt of annuleert Mollie geen terugbetaling meer wanneer een retour in het Shopware Return Management wordt verwerkt. Terugbetalingen moeten dan handmatig in de Mollie Refund Manager worden aangemaakt.</helpText>
+            <helpText lang="it-IT">Se attivato, Mollie non crea né annulla più un rimborso quando un reso viene elaborato nella gestione dei resi di Shopware. I rimborsi devono quindi essere creati manualmente nel Refund Manager di Mollie.</helpText>
+            <helpText lang="pt-PT">Se ativado, a Mollie deixa de criar ou cancelar um reembolso quando uma devolução é processada na gestão de devoluções do Shopware. Os reembolsos têm então de ser criados manualmente no Refund Manager da Mollie.</helpText>
+            <helpText lang="es-ES">Si se activa, Mollie ya no crea ni cancela un reembolso cuando se procesa una devolución en la gestión de devoluciones de Shopware. Los reembolsos deben crearse manualmente en el Refund Manager de Mollie.</helpText>
+            <helpText lang="sv-SE">Om det är aktiverat skapar eller avbryter Mollie inte längre en återbetalning när en retur behandlas i Shopwares returhantering. Återbetalningar måste då skapas manuellt i Mollie Refund Manager.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, oppretter eller kansellerer ikke Mollie lenger en refusjon når en retur behandles i Shopware returhåndtering. Refusjoner må da opprettes manuelt i Mollie Refund Manager.</helpText>
+            <helpText lang="pl-PL">Po włączeniu Mollie nie tworzy ani nie anuluje już zwrotu płatności, gdy zwrot towaru jest przetwarzany w menedżerze zwrotów Shopware. Zwroty płatności trzeba wtedy utworzyć ręcznie w Mollie Refund Manager.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, Mollie již nevytváří ani neruší refundaci, když je vratka zpracována ve správě vratek Shopware. Refundace je pak nutné vytvořit ručně ve správci vrácení peněz Mollie.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, Mollie ne ustvari ali prekliče več vračila, ko je vrnitev obdelana v Shopwareovem upravljanju vračil. Vračila je nato treba ročno ustvariti v upravljalniku vračil Mollie.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a Mollie már nem hoz létre és nem von vissza visszatérítést, amikor egy visszaküldést feldolgoznak a Shopware visszaküldéskezelőjében. A visszatérítéseket ilyenkor kézzel kell létrehozni a Mollie visszatérítés kezelőben.</helpText>
+            <helpText lang="fi-FI">Jos tämä on käytössä, Mollie ei enää luo tai peruuta hyvitystä, kun palautus käsitellään Shopwaren palautusten hallinnassa. Hyvitykset on tällöin luotava manuaalisesti Mollien hyvityshallinnassa.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, opretter eller annullerer Mollie ikke længere en refusion, når en returnering behandles i Shopwares returhåndtering. Refusioner skal så oprettes manuelt i Mollie Refusion Manager.</helpText>
+            <helpText lang="el-GR">Εάν ενεργοποιηθεί, η Mollie δεν δημιουργεί ούτε ακυρώνει πλέον επιστροφή χρημάτων όταν μια επιστροφή προϊόντος επεξεργάζεται στη διαχείριση επιστροφών του Shopware. Οι επιστροφές χρημάτων πρέπει τότε να δημιουργούνται χειροκίνητα στον Διαχειριστή Επιστροφών Χρημάτων της Mollie.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, Mollie više ne izrađuje niti otkazuje povrat novca kada se povrat robe obradi u Shopware upravljanju povratima. Povrate novca tada je potrebno ručno izraditi u Mollie upravitelju povrata.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, ei loo ega tühista Mollie enam tagasimakset, kui tagastust töödeldakse Shopware'i tagastuste halduses. Tagasimaksed tuleb siis luua käsitsi Mollie tagasimakse halduris.</helpText>
+            <helpText lang="is-IS">Ef þetta er virkjað býr Mollie hvorki til né afturkallar endurgreiðslu þegar skil eru afgreidd í skilastjórnun Shopware. Þá þarf að búa endurgreiðslur til handvirkt í endurgreiðslustjórnun Mollie.</helpText>
+            <helpText lang="lt-LT">Jei įjungta, Mollie nebekuria ir nebeatšaukia grąžinamosios išmokos, kai prekių grąžinimas apdorojamas Shopware grąžinimų valdyme. Tuomet grąžinamąsias išmokas reikia sukurti rankiniu būdu Mollie grąžinimų valdiklyje.</helpText>
+            <helpText lang="lv-LV">Ja iespējots, Mollie vairs neizveido un neatceļ atmaksu, kad atgriešana tiek apstrādāta Shopware atgriešanas pārvaldībā. Atmaksas tad ir jāizveido manuāli Mollie Refund Manager.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, Mollie nu mai creează și nu mai anulează o rambursare atunci când un retur este procesat în gestionarea retururilor din Shopware. Rambursările trebuie apoi create manual în Managerul de rambursare Mollie.</helpText>
+            <helpText lang="sk-SK">Ak je táto možnosť povolená, Mollie už nevytvára ani neruší vrátenie peňazí, keď sa vrátenie tovaru spracuje v správe vrátení tovaru Shopware. Vrátenia peňazí je potom potrebné vytvoriť ručne v Správcovi vrátení peňazí Mollie.</helpText>
+            <helpText lang="bg-BG">Ако е активирано, Mollie вече не създава и не отменя възстановяване на сума, когато връщане се обработва в управлението на връщания на Shopware. Възстановяванията трябва тогава да се създават ръчно в Управлението на възстановявания на суми на Mollie.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Order State Automation</title>
