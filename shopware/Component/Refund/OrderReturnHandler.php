@@ -7,6 +7,8 @@ use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Refund\Controller\RefundController;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
@@ -35,6 +37,8 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
         private readonly RefundGatewayInterface $refundGateway,
         #[Autowire(service: 'order_return.repository')]
         private readonly ?EntityRepository $orderReturnRepository,
+        #[Autowire(service: SettingsService::class)]
+        private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -44,7 +48,6 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
     public function return(string $returnId, Context $context): void
     {
         $logData = ['returnId' => $returnId];
-        $this->logger->info('OrderReturn - Refund creation triggered', $logData);
 
         if ($this->featureDisabled) {
             $this->logger->warning('OrderReturn - Feature disabled (SwagCommercial not installed)', $logData);
@@ -66,6 +69,12 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
 
         $logData['orderNumber'] = $order->getOrderNumber();
         $logData['orderId'] = $order->getId();
+
+        if ($this->isReturnManagementDisabled($order, $logData)) {
+            return;
+        }
+
+        $this->logger->info('OrderReturn - Refund creation triggered', $logData);
 
         $this->triggerRefund($returnId, $orderReturn, $order, $context, $logData);
     }
@@ -73,7 +82,6 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
     public function cancel(string $returnId, Context $context): void
     {
         $logData = ['returnId' => $returnId];
-        $this->logger->info('OrderReturn - Refund cancellation triggered', $logData);
 
         if ($this->featureDisabled) {
             $this->logger->warning('OrderReturn - Feature disabled (SwagCommercial not installed)', $logData);
@@ -95,6 +103,12 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
 
         $logData['orderNumber'] = $order->getOrderNumber();
         $logData['orderId'] = $order->getId();
+
+        if ($this->isReturnManagementDisabled($order, $logData)) {
+            return;
+        }
+
+        $this->logger->info('OrderReturn - Refund cancellation triggered', $logData);
 
         $payment = $this->extractMolliePayment($order);
         if ($payment === null) {
@@ -140,7 +154,6 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
     public function returnOnCreatedAsDone(string $returnId, Context $context): void
     {
         $logData = ['returnId' => $returnId];
-        $this->logger->info('OrderReturn - Return created, checking state', $logData);
 
         if ($this->featureDisabled) {
             $this->logger->warning('OrderReturn - Feature disabled (SwagCommercial not installed)', $logData);
@@ -170,6 +183,12 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
 
         $logData['orderNumber'] = $order->getOrderNumber();
         $logData['orderId'] = $order->getId();
+
+        if ($this->isReturnManagementDisabled($order, $logData)) {
+            return;
+        }
+
+        $this->logger->info('OrderReturn - Return created as done, refund creation triggered', $logData);
 
         $this->triggerRefund($returnId, $orderReturn, $order, $context, $logData);
     }
@@ -201,6 +220,22 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
             $logData['error'] = $e->getMessage();
             $this->logger->error('OrderReturn - Refund creation failed', $logData);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $logData
+     */
+    private function isReturnManagementDisabled(OrderEntity $order, array $logData): bool
+    {
+        $refundSettings = $this->settingsService->getRefundSettings($order->getSalesChannelId());
+
+        if (! $refundSettings->isReturnManagementDisabled()) {
+            return false;
+        }
+
+        $this->logger->debug('OrderReturn - Return Management integration is disabled in the plugin configuration, skipping', $logData);
+
+        return true;
     }
 
     /**
