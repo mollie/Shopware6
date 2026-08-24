@@ -28,6 +28,8 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
 use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -70,6 +72,8 @@ final class RefundController extends AbstractController
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
         private readonly CreditNoteService $creditNoteService,
+        #[Autowire(service: TransactionService::class)]
+        private readonly TransactionServiceInterface $transactionService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -207,6 +211,12 @@ final class RefundController extends AbstractController
         // reload so the refund extension contains the just-persisted refund
         $order = $this->loadOrder($orderId, $context);
 
+        // Mollie answered with the id of the refund. Record it on the payment and save it, so an
+        // accounting export finds it in the custom fields of the order.
+        $payment->addRefundId($refund->getId());
+        $transactionId = $payment->getShopwareTransaction()->getId();
+        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
+
         $freshPayment = $this->loadFreshPayment($payment, $order);
         $refunds = $freshPayment->getRefunds();
         $totals = $this->buildTotals($order, $payment, $freshPayment);
@@ -242,6 +252,11 @@ final class RefundController extends AbstractController
         $this->refundGateway->cancelRefund($payment->getId(), $refundId, $orderNumber, (string) $order->getSalesChannelId());
 
         $this->creditNoteService->cancelCreditNote($orderId, $refundId, $context);
+
+        // The refund is gone at Mollie, so its id must not stay in the export data of the order.
+        $payment->removeRefundId($refundId);
+        $transactionId = $payment->getShopwareTransaction()->getId();
+        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
 
         $freshPayment = $this->loadFreshPayment($payment, $order);
         $refunds = $freshPayment->getRefunds();

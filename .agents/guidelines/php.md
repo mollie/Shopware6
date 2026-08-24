@@ -18,6 +18,12 @@ Use guard clauses, `continue` inside loops, or extract a private method.
 
 The codebase has ~16 `else` branches across 568 files — do not add to that number.
 
+**No arrow functions.**
+Write a normal closure with a body and an explicit `return`, never `fn () =>` or
+`static fn () =>`.
+*Why:* an arrow function captures the whole scope implicitly and has to be rewritten as soon
+as it needs a second statement.
+
 ---
 
 ## Types and data

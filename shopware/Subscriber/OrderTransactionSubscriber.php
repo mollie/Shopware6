@@ -127,7 +127,36 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 $transactionExtension->setRoundingDiff((float) $roundingDiff);
             }
 
+            // Keep the ids of the previous refunds, captures and shipments, so saving the payment
+            // again does not drop what an accounting export reads from the order.
+            $transactionExtension->setRefundIds($this->splitIds($mollieCustomFields['refundIds'] ?? ''));
+            $transactionExtension->setCaptureIds($this->splitIds($mollieCustomFields['captureIds'] ?? ''));
+            $transactionExtension->setShipmentIds($this->splitIds($mollieCustomFields['shipmentIds'] ?? ''));
+
+            // Carry the transaction on the payment, so everyone holding the payment can reach it
+            // instead of resolving the current transaction from the order again.
+            $transactionExtension->setShopwareTransaction($orderTransaction);
+
             $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
         }
+    }
+
+    /**
+     * The ids are stored as one merged string per type, already in the export format. They stay in
+     * that format here, the payment only ever adds new ids to the list.
+     *
+     * @return list<string>
+     */
+    private function splitIds(mixed $storedIds): array
+    {
+        if (! is_string($storedIds)) {
+            return [];
+        }
+
+        $ids = array_map('trim', explode(',', $storedIds));
+
+        return array_values(array_filter($ids, function (string $id): bool {
+            return strlen($id) > 0;
+        }));
     }
 }

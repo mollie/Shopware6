@@ -20,6 +20,7 @@ use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -74,6 +75,7 @@ class ShipOrderRouteTest extends TestCase
             $trackingResolver,
             $reconciler,
             $persister,
+            new FakeTransactionService(),
             $logger,
         );
     }
