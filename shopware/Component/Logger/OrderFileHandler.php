@@ -27,6 +27,10 @@ final class OrderFileHandler extends AbstractSettingsLogHandler
 
     public function handle(LogRecord $record): bool
     {
+        if ($this->isMollieChannel($record) === false) {
+            return false;
+        }
+
         $orderNumber = $record->context['orderNumber'] ?? null;
 
         if ($orderNumber === null) {
