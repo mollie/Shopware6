@@ -16,6 +16,10 @@ final class Payment extends Struct implements \JsonSerializable
     // serialized key up in getVars() and warns about undefined array keys otherwise.
     use VariablesAccessTrait;
 
+    private const MOLLIE_ID_SEPARATOR = '_';
+    private const EXPORT_ID_SEPARATOR = '-';
+    private const EXPORT_ID_DELIMITER = ', ';
+
     private PaymentStatus $status;
     private OrderTransactionEntity $shopwareTransaction;
 
@@ -66,6 +70,26 @@ final class Payment extends Struct implements \JsonSerializable
     private float $roundingDiff = 0.0;
 
     private RefundCollection $refunds;
+
+    /**
+     * The refund, capture and shipment ids of this payment. toArray() merges each list into a single
+     * string in the format an accounting export (DATEV) needs - a hyphen instead of the Mollie
+     * underscore - so they end up in the mollie_payments custom fields of the order and the
+     * transaction whenever the payment is saved.
+     *
+     * @var list<string>
+     */
+    private array $refundIds = [];
+
+    /**
+     * @var list<string>
+     */
+    private array $captureIds = [];
+
+    /**
+     * @var list<string>
+     */
+    private array $shipmentIds = [];
 
     private bool $cancelable = false;
 
@@ -397,12 +421,32 @@ final class Payment extends Struct implements \JsonSerializable
     }
 
     /**
+     * The Shopware transaction is left out: it carries this payment as its own extension, so keeping it
+     * would make the structure recursive, and no consumer of the payment data needs it.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['shopwareTransaction']);
+        $this->convertDateTimePropertiesToJsonStringRepresentation($vars);
+
+        return $vars;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function toArray(): array
     {
         $data = json_decode((string) json_encode($this), true);
-        unset($data['shopwareTransaction']);
+
+        // An accounting export reads a single value per column, so the lists are merged here instead
+        // of being written as arrays.
+        $data['refundIds'] = self::toExportIds($this->refundIds);
+        $data['captureIds'] = self::toExportIds($this->captureIds);
+        $data['shipmentIds'] = self::toExportIds($this->shipmentIds);
 
         return array_filter($data);
     }
@@ -492,6 +536,81 @@ final class Payment extends Struct implements \JsonSerializable
         return $this->refunds;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getRefundIds(): array
+    {
+        return $this->refundIds;
+    }
+
+    /**
+     * @param list<string> $refundIds
+     */
+    public function setRefundIds(array $refundIds): void
+    {
+        $this->refundIds = $refundIds;
+    }
+
+    public function addRefundId(string $mollieRefundId): void
+    {
+        $this->refundIds[] = $mollieRefundId;
+    }
+
+    public function removeRefundId(string $mollieRefundId): void
+    {
+        $exportId = self::toExportId($mollieRefundId);
+
+        $this->refundIds = array_values(array_filter(
+            $this->refundIds,
+            function (string $id) use ($exportId): bool {
+                return self::toExportId($id) !== $exportId;
+            }
+        ));
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getCaptureIds(): array
+    {
+        return $this->captureIds;
+    }
+
+    /**
+     * @param list<string> $captureIds
+     */
+    public function setCaptureIds(array $captureIds): void
+    {
+        $this->captureIds = $captureIds;
+    }
+
+    public function addCaptureId(string $mollieCaptureId): void
+    {
+        $this->captureIds[] = $mollieCaptureId;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getShipmentIds(): array
+    {
+        return $this->shipmentIds;
+    }
+
+    /**
+     * @param list<string> $shipmentIds
+     */
+    public function setShipmentIds(array $shipmentIds): void
+    {
+        $this->shipmentIds = $shipmentIds;
+    }
+
+    public function addShipmentId(string $mollieShipmentId): void
+    {
+        $this->shipmentIds[] = $mollieShipmentId;
+    }
+
     public function getAmountChargedBack(): ?Money
     {
         return $this->amountChargedBack;
@@ -568,5 +687,18 @@ final class Payment extends Struct implements \JsonSerializable
         $refunded = isset($this->amountRefunded) ? $this->amountRefunded->getValue() : 0.0;
 
         return $this->capturedAmount->getValue() - $refunded;
+    }
+
+    /**
+     * @param list<string> $mollieIds
+     */
+    private static function toExportIds(array $mollieIds): string
+    {
+        return implode(self::EXPORT_ID_DELIMITER, array_map(self::toExportId(...), $mollieIds));
+    }
+
+    private static function toExportId(string $mollieId): string
+    {
+        return str_replace(self::MOLLIE_ID_SEPARATOR, self::EXPORT_ID_SEPARATOR, $mollieId);
     }
 }

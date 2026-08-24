@@ -45,6 +45,15 @@ final class CheckoutContext extends ShopwareContext
     public const STORAGE_RETURN_URL = 'shopwareReturnUrl';
     public const STORAGE_REMEMBERED_PAYMENT_ID = 'rememberedMolliePaymentId';
 
+    /**
+     * Custom field and Mollie prefix per id type, as an accounting export reads them from the order.
+     */
+    private const EXPORT_IDS = [
+        'refund' => ['customField' => 'refundIds', 'prefix' => 're-'],
+        'capture' => ['customField' => 'captureIds', 'prefix' => 'cpt-'],
+        'shipment' => ['customField' => 'shipmentIds', 'prefix' => 'shp-'],
+    ];
+
     #[BeforeScenario]
     public function setUp(): void
     {
@@ -518,6 +527,31 @@ final class CheckoutContext extends ShopwareContext
         $actualDeliveryStatus = $orderDelivery->getStateMachineState()->getTechnicalName();
 
         Assert::assertSame($expectedDeliveryStatus, $actualDeliveryStatus);
+    }
+
+    #[Then('the order has :count :idType ids')]
+    public function theOrderHasIds(int $count, string $idType): void
+    {
+        $customField = self::EXPORT_IDS[$idType]['customField'];
+        $prefix = self::EXPORT_IDS[$idType]['prefix'];
+
+        $orderId = Storage::get(self::STORAGE_ORDER_ID);
+        $order = $this->getOrderById($orderId, $this->getCurrentSalesChannelContext());
+
+        $mollieCustomFields = ($order->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
+        $storedIds = (string) ($mollieCustomFields[$customField] ?? '');
+
+        $ids = array_values(array_filter(array_map('trim', explode(',', $storedIds)), function (string $id): bool {
+            return strlen($id) > 0;
+        }));
+
+        Assert::assertCount($count, $ids, sprintf('Order %s has the %s ids "%s"', $orderId, $idType, $storedIds));
+
+        foreach ($ids as $id) {
+            // The accounting export needs the Mollie underscore replaced by a hyphen.
+            Assert::assertStringStartsWith($prefix, $id, sprintf('Id "%s" is not a %s id in export format', $id, $idType));
+            Assert::assertStringNotContainsString('_', $id, sprintf('Id "%s" still carries the Mollie underscore', $id));
+        }
     }
 
     /**

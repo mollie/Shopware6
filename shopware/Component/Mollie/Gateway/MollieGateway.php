@@ -345,7 +345,7 @@ final class MollieGateway implements MollieGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId);
             $response = $client->get('payments/' . $molliePaymentId, [
-                'query' => ['embed' => 'refunds'],
+                'query' => ['embed' => 'refunds,captures'],
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
             $this->logger->debug('Additional data from mollie loaded', [

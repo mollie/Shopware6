@@ -32,6 +32,7 @@ final class PaymentHydrator
         $this->hydrateRoundingDiff($payment, $body, $salesChannelId);
         $this->hydratePaymentDetails($payment, $body);
         $this->hydrateRefunds($payment, $body);
+        $this->hydrateCaptures($payment, $body);
         $this->hydrateStatus($payment, $body);
 
         return $payment;
@@ -199,6 +200,24 @@ final class PaymentHydrator
         foreach ($body['_embedded']['refunds'] ?? [] as $refundData) {
             $refund = Refund::createFromClientResponse($refundData);
             $payment->getRefunds()->add($refund);
+
+            // A cancelled refund never reached the customer, so it is no part of the export data.
+            if ($refund->getStatus() !== RefundStatus::Canceled) {
+                $payment->addRefundId($refund->getId());
+            }
+        }
+    }
+
+    /**
+     * Only the ids are kept: they are what an accounting export needs to reconcile the Shopware
+     * order with the Mollie report, the amounts of a capture are already covered by the payment.
+     *
+     * @param array<mixed> $body
+     */
+    private function hydrateCaptures(Payment $payment, array $body): void
+    {
+        foreach ($body['_embedded']['captures'] ?? [] as $captureData) {
+            $payment->addCaptureId((string) ($captureData['id'] ?? ''));
         }
     }
 

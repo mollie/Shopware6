@@ -18,6 +18,8 @@ use Mollie\Shopware\Component\Shipment\ShipmentPersister;
 use Mollie\Shopware\Component\Shipment\ShipmentTrackingResolver;
 use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
 use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -40,6 +42,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true])]
 final class ShipOrderRoute extends AbstractShipOrderRoute
 {
+    private const MOLLIE_ID_KEY_SHIPMENT = 'shipmentId';
+    private const MOLLIE_ID_KEY_CAPTURE = 'captureId';
+
     /**
      * @param EntityRepository<OrderCollection> $orderRepository
      */
@@ -58,6 +63,8 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         private readonly AuthorizationReconciler $reconciler,
         #[Autowire(service: ShipmentPersister::class)]
         private readonly ShipmentPersister $persister,
+        #[Autowire(service: TransactionService::class)]
+        private readonly TransactionServiceInterface $transactionService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -190,16 +197,29 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             $orderShippedEvent->setTracking($tracking);
 
             $mollieId = $this->shipViaOrdersApi($shippingItems, $tracking, $mollieOrderId, (string) $orderNumber, $salesChannelId, $logContext);
-            $mollieIdKey = 'shipmentId';
+            $mollieIdKey = self::MOLLIE_ID_KEY_SHIPMENT;
         } else {
             $mollieId = $this->reconciler->captureViaPaymentsApi($payment, $shippingItems, $order, $lineItems, $currency, (string) $orderNumber, $salesChannelId, $fullyShipped, $logContext);
-            $mollieIdKey = 'captureId';
+            $mollieIdKey = self::MOLLIE_ID_KEY_CAPTURE;
         }
 
         // The Mollie call failed and was swallowed (best-effort); do not touch the delivery state.
         if ($mollieId === null) {
             return new ShipOrderResponse('', $orderId, []);
         }
+
+        // The Mollie call answered with the id of the capture (Payments API) or of the shipment
+        // (Orders API). Record it on the payment and save it, so an accounting export finds it in the
+        // custom fields of the order.
+        if ($mollieIdKey === self::MOLLIE_ID_KEY_CAPTURE) {
+            $payment->addCaptureId($mollieId);
+        }
+
+        if ($mollieIdKey === self::MOLLIE_ID_KEY_SHIPMENT) {
+            $payment->addShipmentId($mollieId);
+        }
+
+        $this->transactionService->savePaymentExtension($currentTransaction->getId(), $order, $payment, $context);
 
         return $this->persister->persist($lineUpserts, $deliveryUpserts, $mollieId, $mollieIdKey, $orderId, $orderShippedEvent, $fullyShipped, $context);
     }
