@@ -7,10 +7,13 @@ use Doctrine\DBAL\Connection;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Level;
+use Monolog\LogRecord;
 use Psr\Log\LogLevel;
 
 abstract class AbstractSettingsLogHandler extends AbstractHandler
 {
+    private const LOG_CHANNEL = 'mollie';
+
     private ?bool $connectedCache = null;
     private ?Level $resolvedLogLevel = null;
 
@@ -21,6 +24,15 @@ abstract class AbstractSettingsLogHandler extends AbstractHandler
         bool $bubble
     ) {
         parent::__construct(LogLevel::DEBUG, $bubble);
+    }
+
+    /**
+     * Other plugins may use the same context keys, so a record only belongs to us
+     * if it was written through our own channel.
+     */
+    protected function isMollieChannel(LogRecord $record): bool
+    {
+        return $record->channel === self::LOG_CHANNEL;
     }
 
     protected function isConnected(): bool

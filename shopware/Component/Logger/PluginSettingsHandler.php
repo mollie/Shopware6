@@ -14,7 +14,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class PluginSettingsHandler extends AbstractSettingsLogHandler
 {
-    private const LOG_CHANNEL = 'mollie';
     private ?AbstractHandler $fileHandler = null;
 
     public function __construct(
@@ -36,8 +35,7 @@ final class PluginSettingsHandler extends AbstractSettingsLogHandler
             return false;
         }
 
-        $channel = $record['channel'] ?? null;
-        if ($channel !== self::LOG_CHANNEL) {
+        if ($this->isMollieChannel($record) === false) {
             return false;
         }
 

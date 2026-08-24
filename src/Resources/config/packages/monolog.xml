@@ -11,18 +11,25 @@
         <monolog:channel>mollie</monolog:channel>
 
         <!-- type="service" handlers configure their own level and bubble in the constructor; the level/bubble attributes are ignored here by Symfony. -->
+        <!-- The channels element restricts the handler to our own channel. Without it Monolog attaches the handler to every channel, so records of other plugins would end up in our log files. -->
         <monolog:handler
                 name="mollie_order_file"
-                channel="mollie"
                 type="service"
                 id="Mollie\Shopware\Component\Logger\OrderFileHandler"
-        />
+        >
+            <monolog:channels>
+                <monolog:channel>mollie</monolog:channel>
+            </monolog:channels>
+        </monolog:handler>
 
         <monolog:handler
                 name="mollie_rotation_file"
-                channel="mollie"
                 type="service"
                 id="Mollie\Shopware\Component\Logger\PluginSettingsHandler"
-        />
+        >
+            <monolog:channels>
+                <monolog:channel>mollie</monolog:channel>
+            </monolog:channels>
+        </monolog:handler>
     </monolog:config>
 </container>
