@@ -60,6 +60,15 @@ final class SubscriptionTest extends TestCase
         Subscription::createFromClientResponse($body);
     }
 
+    #[DataProvider('stateChangeWindows')]
+    public function testTheCustomerMayOnlyChangeTheStateUntilTheNoticePeriodStarts(string $now, int $daysBeforeRenewal, bool $expectedOpen): void
+    {
+        $subscription = $this->subscription();
+        $subscription->setNextPaymentDate(new \DateTimeImmutable('2026-09-01 00:00:00'));
+
+        $this->assertSame($expectedOpen, $subscription->isStateChangeWindowOpen(new \DateTimeImmutable($now), $daysBeforeRenewal));
+    }
+
     /**
      * @return \Generator<string, array{string, int, bool}>
      */
@@ -70,15 +79,6 @@ final class SubscriptionTest extends TestCase
         yield 'one second past the deadline' => ['2026-08-29 00:00:01', 3, false];
         yield 'on the renewal day itself with no notice period' => ['2026-09-01 00:00:00', 0, true];
         yield 'after the renewal' => ['2026-09-02 10:00:00', 3, false];
-    }
-
-    #[DataProvider('stateChangeWindows')]
-    public function testTheCustomerMayOnlyChangeTheStateUntilTheNoticePeriodStarts(string $now, int $daysBeforeRenewal, bool $expectedOpen): void
-    {
-        $subscription = $this->subscription();
-        $subscription->setNextPaymentDate(new \DateTimeImmutable('2026-09-01 00:00:00'));
-
-        $this->assertSame($expectedOpen, $subscription->isStateChangeWindowOpen(new \DateTimeImmutable($now), $daysBeforeRenewal));
     }
 
     public function testASubscriptionWithoutANextPaymentDateCanAlwaysBeChanged(): void

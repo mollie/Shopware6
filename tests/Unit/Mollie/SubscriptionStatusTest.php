@@ -14,6 +14,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SubscriptionStatus::class)]
 final class SubscriptionStatusTest extends TestCase
 {
+    #[DataProvider('activeStates')]
+    public function testOnlyRunningAndResumedSubscriptionsAreActive(SubscriptionStatus $status, bool $expected): void
+    {
+        $this->assertSame($expected, $status->isActive());
+    }
+
     /**
      * @return \Generator<string, array{SubscriptionStatus, bool}>
      */
@@ -29,10 +35,10 @@ final class SubscriptionStatusTest extends TestCase
         yield 'cancelled for good' => [SubscriptionStatus::CANCELED, false];
     }
 
-    #[DataProvider('activeStates')]
-    public function testOnlyRunningAndResumedSubscriptionsAreActive(SubscriptionStatus $status, bool $expected): void
+    #[DataProvider('interruptedStates')]
+    public function testOnlyPausedAndSkippedSubscriptionsAreInterrupted(SubscriptionStatus $status, bool $expected): void
     {
-        $this->assertSame($expected, $status->isActive());
+        $this->assertSame($expected, $status->isInterrupted());
     }
 
     /**
@@ -47,10 +53,10 @@ final class SubscriptionStatusTest extends TestCase
         yield 'pause takes effect after the renewal' => [SubscriptionStatus::PAUSED_AFTER_RENEWAL, false];
     }
 
-    #[DataProvider('interruptedStates')]
-    public function testOnlyPausedAndSkippedSubscriptionsAreInterrupted(SubscriptionStatus $status, bool $expected): void
+    #[DataProvider('statesWithPendingAction')]
+    public function testOnlyAfterRenewalStatesCarryAnActionToRunLater(SubscriptionStatus $status, ?string $expectedAction): void
     {
-        $this->assertSame($expected, $status->isInterrupted());
+        $this->assertSame($expectedAction, $status->getAction());
     }
 
     /**
@@ -63,11 +69,5 @@ final class SubscriptionStatusTest extends TestCase
         yield 'cancel is due after the renewal' => [SubscriptionStatus::CANCELED_AFTER_RENEWAL, CancelAction::getActioName()];
         yield 'a running subscription has nothing pending' => [SubscriptionStatus::ACTIVE, null];
         yield 'an already skipped subscription has nothing pending' => [SubscriptionStatus::SKIPPED, null];
-    }
-
-    #[DataProvider('statesWithPendingAction')]
-    public function testOnlyAfterRenewalStatesCarryAnActionToRunLater(SubscriptionStatus $status, ?string $expectedAction): void
-    {
-        $this->assertSame($expectedAction, $status->getAction());
     }
 }

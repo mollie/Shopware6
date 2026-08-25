@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(CancelItemRoute::class)]
-class CancelItemRouteTest extends TestCase
+final class CancelItemRouteTest extends TestCase
 {
     private FakeOrderLineItemRepository $lineItemRepository;
 
@@ -63,8 +63,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($request, Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('Missing shopwareLineId', $this->decode($response)['message']);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('Missing shopwareLineId', $this->decode($response)['message']);
     }
 
     public function testCancelFailsWhenQuantityIsZero(): void
@@ -73,8 +73,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($request, Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('quantityZero', $this->decode($response)['message']);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('quantityZero', $this->decode($response)['message']);
     }
 
     public function testCancelFailsWhenLineItemDoesNotExist(): void
@@ -83,8 +83,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($request, Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('invalidShopwareLineId', $this->decode($response)['message']);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('invalidShopwareLineId', $this->decode($response)['message']);
     }
 
     public function testCancelFailsWhenLineItemHasNoOrder(): void
@@ -94,8 +94,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('invalidShopwareLineId', $this->decode($response)['message']);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('invalidShopwareLineId', $this->decode($response)['message']);
     }
 
     public function testCancelFailsWhenPaymentIsAlreadyPaid(): void
@@ -106,8 +106,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('notAuthorized', $this->decode($response)['message']);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('notAuthorized', $this->decode($response)['message']);
     }
 
     public function testCancelFailsWhenTransactionCarriesNoMolliePayment(): void
@@ -118,22 +118,25 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('notMollieOrder', $this->decode($response)['message']);
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('notMollieOrder', $this->decode($response)['message']);
     }
 
     public function testLegacyTransactionIsRepairedBeforeThePaymentIsRead(): void
     {
-        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0);
-        $order = $this->orderBuilder->getOrderWithoutMolliePayment(new OrderLineItemCollection([$lineItem]));
+        // Legacy orders only carry the Mollie data on the order; a subscriber copies it onto the
+        // transaction, so the repair has to run before the extension is read and the item cancelled.
+        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0, ['order_line_id' => 'odl_123']);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->paymentWithOrderId('ord_123'));
         $this->register($lineItem, $order);
 
         $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        $event = $this->eventDispatcher->getEvent();
-        static::assertInstanceOf(RepairLegacyTransactionEvent::class, $event);
-        static::assertSame('fake-transaction-id', $event->getTransaction()->getId());
-        static::assertSame($order, $event->getOrder());
+        $events = $this->eventDispatcher->getEvents();
+        self::assertInstanceOf(RepairLegacyTransactionEvent::class, $events[0]);
+        self::assertSame('fake-transaction-id', $events[0]->getTransaction()->getId());
+        self::assertSame($order, $events[0]->getOrder());
+        self::assertInstanceOf(CancelItemEvent::class, $events[1]);
     }
 
     public function testCancelViaOrdersApiCancelsTheMollieOrderLine(): void
@@ -144,8 +147,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 2), Context::createDefaultContext());
 
-        static::assertSame(200, $response->getStatusCode());
-        static::assertSame([[
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame([[
             'mollieOrderId' => 'ord_123',
             'mollieLineId' => 'odl_123',
             'quantity' => 2,
@@ -162,7 +165,7 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame([
+        self::assertSame([
             'success' => true,
             'message' => '',
             'data' => ['id' => 'odl_123', 'quantity' => 1],
@@ -177,9 +180,9 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('invalidLine', $this->decode($response)['message']);
-        static::assertSame([], $this->gateway->getCancelledOrderLines());
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('invalidLine', $this->decode($response)['message']);
+        self::assertSame([], $this->gateway->getCancelledOrderLines());
     }
 
     public function testCancelledItemEventIsDispatchedForTheCurrentTransaction(): void
@@ -191,8 +194,8 @@ class CancelItemRouteTest extends TestCase
         $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
         $event = $this->eventDispatcher->getEvent();
-        static::assertInstanceOf(CancelItemEvent::class, $event);
-        static::assertSame('fake-transaction-id', $event->getTransactionId());
+        self::assertInstanceOf(CancelItemEvent::class, $event);
+        self::assertSame('fake-transaction-id', $event->getTransactionId());
     }
 
     public function testStockIsReturnedWhenRequested(): void
@@ -204,10 +207,10 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 2, true), Context::createDefaultContext());
 
-        static::assertCount(1, $this->stockStorage->alterations);
-        static::assertSame('productid', $this->stockStorage->alterations[0]->productId);
-        static::assertSame(2, $this->stockStorage->alterations[0]->quantityBefore);
-        static::assertSame(0, $this->stockStorage->alterations[0]->newQuantity);
+        self::assertCount(1, $this->stockStorage->alterations);
+        self::assertSame('productid', $this->stockStorage->alterations[0]->productId);
+        self::assertSame(2, $this->stockStorage->alterations[0]->quantityBefore);
+        self::assertSame(0, $this->stockStorage->alterations[0]->newQuantity);
     }
 
     public function testStockIsKeptWhenNotRequested(): void
@@ -219,7 +222,7 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 2), Context::createDefaultContext());
 
-        static::assertCount(0, $this->stockStorage->alterations);
+        self::assertCount(0, $this->stockStorage->alterations);
     }
 
     public function testStockIsKeptForALineItemWithoutProduct(): void
@@ -230,7 +233,7 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 2, true), Context::createDefaultContext());
 
-        static::assertCount(0, $this->stockStorage->alterations);
+        self::assertCount(0, $this->stockStorage->alterations);
     }
 
     public function testCancelViaPaymentsApiRecordsTheCancelledQuantity(): void
@@ -241,8 +244,8 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame(200, $response->getStatusCode());
-        static::assertSame([
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame([
             'id' => 'lineitemid',
             'customFields' => [Mollie::EXTENSION => ['cancelled_quantity' => 1]],
         ], $this->lineItemRepository->getLastUpsert());
@@ -256,7 +259,7 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame([
+        self::assertSame([
             'id' => 'lineitemid',
             'customFields' => [Mollie::EXTENSION => ['quantity' => 1, 'cancelled_quantity' => 2]],
         ], $this->lineItemRepository->getLastUpsert());
@@ -270,9 +273,9 @@ class CancelItemRouteTest extends TestCase
 
         $response = $this->route->cancel($this->cancelRequest('lineitemid', 2), Context::createDefaultContext());
 
-        static::assertSame(400, $response->getStatusCode());
-        static::assertSame('quantityTooHigh', $this->decode($response)['message']);
-        static::assertSame([], $this->lineItemRepository->getUpserts());
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('quantityTooHigh', $this->decode($response)['message']);
+        self::assertSame([], $this->lineItemRepository->getUpserts());
     }
 
     public function testAuthorizationIsReleasedWhenEveryItemIsShippedOrCancelled(): void
@@ -283,7 +286,7 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 1), Context::createDefaultContext());
 
-        static::assertSame([[
+        self::assertSame([[
             'paymentId' => 'tr_123',
             'orderNumber' => '10000',
             'salesChannelId' => TestDefaults::SALES_CHANNEL,
@@ -299,7 +302,7 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 2), Context::createDefaultContext());
 
-        static::assertSame([], $this->gateway->getReleasedAuthorizations());
+        self::assertSame([], $this->gateway->getReleasedAuthorizations());
     }
 
     public function testAuthorizationIsReleasedWhileAContainerLineItemHasNoQuantityOfItsOwn(): void
@@ -311,7 +314,7 @@ class CancelItemRouteTest extends TestCase
 
         $this->route->cancel($this->cancelRequest('lineitemid', 2), Context::createDefaultContext());
 
-        static::assertCount(1, $this->gateway->getReleasedAuthorizations());
+        self::assertCount(1, $this->gateway->getReleasedAuthorizations());
     }
 
     private function paymentWithOrderId(string $mollieOrderId): Payment

@@ -71,7 +71,7 @@ final class RefundGatewayTest extends TestCase
     {
         $client = new FakeClient(body: $this->refundResponse());
 
-        $unknownRefundType = new class() extends CreateRefund {
+        $unknownRefundType = new class extends CreateRefund {
             public function toArray(): array
             {
                 return [];

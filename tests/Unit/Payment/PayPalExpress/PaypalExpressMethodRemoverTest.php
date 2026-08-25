@@ -43,7 +43,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
     public function testPaypalExpressIsRemovedWhileTheFeatureIsDisabled(): void
     {
         $result = $this->makeRemover($this->cartWithSession(), enabled: false)
-            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('paypal-express-id'));
         $this->assertNotNull($result->get('paypal-id'));
@@ -52,7 +53,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
     public function testPaypalExpressIsRemovedForACartWithoutAMollieSession(): void
     {
         $result = $this->makeRemover(CartBuilder::create()->build())
-            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('paypal-express-id'));
     }
@@ -60,7 +62,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
     public function testCartWithAMollieSessionLeavesOnlyPaypalExpress(): void
     {
         $result = $this->makeRemover($this->cartWithSession())
-            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext())
+        ;
 
         $this->assertCount(1, $result);
         $this->assertNotNull($result->get('paypal-express-id'));
@@ -69,7 +72,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
     public function testAuthenticationIdOfTheSessionIsHandedToTheStorefront(): void
     {
         $result = $this->makeRemover($this->cartWithSession())
-            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), '', new FakeSalesChannelContext())
+        ;
 
         $customFields = $result->get('paypal-express-id')->getCustomFields();
 
@@ -79,7 +83,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
     public function testPaypalExpressIsRemovedWhenTheOrderCannotBeLoaded(): void
     {
         $result = $this->makeRemover(CartBuilder::create()->build(), orderRepository: new FakeOrderSearchRepository())
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('paypal-express-id'));
     }
@@ -90,7 +95,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
         $order->setId(self::ORDER_ID);
 
         $result = $this->makeRemover(CartBuilder::create()->build(), orderRepository: $this->orderRepositoryWith($order))
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('paypal-express-id'));
     }
@@ -100,7 +106,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
         $order = $this->orderWithTransaction(new OrderTransactionEntity());
 
         $result = $this->makeRemover(CartBuilder::create()->build(), orderRepository: $this->orderRepositoryWith($order))
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('paypal-express-id'));
     }
@@ -111,7 +118,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
         $transaction->addExtension(Mollie::EXTENSION, new Payment('tr_test'));
 
         $result = $this->makeRemover(CartBuilder::create()->build(), orderRepository: $this->orderRepositoryWith($this->orderWithTransaction($transaction)))
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('paypal-express-id'));
     }
@@ -124,7 +132,8 @@ final class PaypalExpressMethodRemoverTest extends TestCase
         $transaction->addExtension(Mollie::EXTENSION, $payment);
 
         $result = $this->makeRemover(CartBuilder::create()->build(), orderRepository: $this->orderRepositoryWith($this->orderWithTransaction($transaction)))
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $customFields = $result->get('paypal-express-id')->getCustomFields();
 

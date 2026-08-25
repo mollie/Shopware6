@@ -11,6 +11,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SessionStatus::class)]
 final class SessionStatusTest extends TestCase
 {
+    #[DataProvider('completedStates')]
+    public function testOnlyACompletedSessionMayBeTurnedIntoAnOrder(SessionStatus $status, bool $expected): void
+    {
+        $this->assertSame($expected, $status->isCompleted());
+    }
+
     /**
      * @return \Generator<string, array{SessionStatus, bool}>
      */
@@ -21,10 +27,10 @@ final class SessionStatusTest extends TestCase
         yield 'shopper abandoned the express flow' => [SessionStatus::EXPIRED, false];
     }
 
-    #[DataProvider('completedStates')]
-    public function testOnlyACompletedSessionMayBeTurnedIntoAnOrder(SessionStatus $status, bool $expected): void
+    #[DataProvider('openStates')]
+    public function testOnlyAnOpenSessionIsStillWaitingForTheShopper(SessionStatus $status, bool $expected): void
     {
-        $this->assertSame($expected, $status->isCompleted());
+        $this->assertSame($expected, $status->isOpen());
     }
 
     /**
@@ -35,11 +41,5 @@ final class SessionStatusTest extends TestCase
         yield 'shopper still in the express flow' => [SessionStatus::OPEN, true];
         yield 'shopper finished the express flow' => [SessionStatus::COMPLETED, false];
         yield 'shopper abandoned the express flow' => [SessionStatus::EXPIRED, false];
-    }
-
-    #[DataProvider('openStates')]
-    public function testOnlyAnOpenSessionIsStillWaitingForTheShopper(SessionStatus $status, bool $expected): void
-    {
-        $this->assertSame($expected, $status->isOpen());
     }
 }

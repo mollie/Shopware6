@@ -265,19 +265,41 @@ final class OrderEntityBuilder
      */
     public function createShippableDelivery(string $id, string $orderLineItemId, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
     {
-        $shippingMethod = new ShippingMethodEntity();
-        $shippingMethod->setId('fake-shipping-method-id');
-        $shippingMethod->setName('DHL');
+        $delivery = $this->createDeliveryWithoutShippingMethod($id, $orderLineItemId, $shippingCosts, $mollieCustomFields);
+        $delivery->setShippingMethod($this->createShippingMethod());
 
+        return $delivery;
+    }
+
+    /**
+     * A delivery whose shipping method was not loaded, so its shipping costs cannot be described to
+     * Mollie. The Shopware setter is not nullable, so the association is left unset instead.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createDeliveryWithoutShippingMethod(string $id, string $orderLineItemId, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
+    {
         $position = new OrderDeliveryPositionEntity();
         $position->setId('fake-delivery-position-' . $orderLineItemId);
         $position->setOrderLineItemId($orderLineItemId);
 
+        $delivery = $this->createDeliveryWithoutPositions($id, $shippingCosts, $mollieCustomFields);
+        $delivery->setPositions(new OrderDeliveryPositionCollection([$position]));
+
+        return $delivery;
+    }
+
+    /**
+     * A delivery whose positions were not loaded, so it cannot be matched to the shipped line items.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createDeliveryWithoutPositions(string $id, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
+    {
         $delivery = new OrderDeliveryEntity();
         $delivery->setId($id);
         $delivery->setShippingCosts($this->getPrice($shippingCosts, 19.0));
-        $delivery->setShippingMethod($shippingMethod);
-        $delivery->setPositions(new OrderDeliveryPositionCollection([$position]));
+        $delivery->setTrackingCodes([]);
         $delivery->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
 
         return $delivery;
@@ -434,6 +456,15 @@ final class OrderEntityBuilder
         $orderLineItem->setProduct($product);
 
         return $orderLineItem;
+    }
+
+    private function createShippingMethod(): ShippingMethodEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('DHL');
+
+        return $shippingMethod;
     }
 
     private function getPrice(float $unitPrice, float $taxRate, int $quantity = 1): CalculatedPrice

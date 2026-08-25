@@ -5,11 +5,18 @@ namespace Mollie\Shopware\Unit\Settings;
 
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
+use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
+use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
+use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\PayPalExpressSettings;
 use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
+use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Test\Stub\SystemConfigService\StaticSystemConfigService;
 
@@ -214,6 +221,99 @@ final class SettingsServiceTest extends TestCase
         $this->expectException(DecorationPatternException::class);
 
         $this->settingsService()->getDecorated();
+    }
+
+    public function testLoggerSettingsAreReadFromTheMollieDomain(): void
+    {
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_DEBUG_MODE, true);
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . LoggerSettings::KEY_LOG_FILE_DAYS, 14);
+
+        $settings = $this->settingsService()->getLoggerSettings();
+
+        $this->assertTrue($settings->isDebugMode());
+        $this->assertSame(14, $settings->getLogFileDays());
+    }
+
+    public function testApiSettingsAreReadFromTheMollieDomain(): void
+    {
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_TEST_API_KEY, 'test_configured');
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_LIVE_API_KEY, 'live_configured');
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_TEST_MODE, true);
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApiSettings::KEY_PROFILE_ID, 'pfl_123');
+
+        $settings = $this->settingsService()->getApiSettings();
+
+        $this->assertTrue($settings->isTestMode());
+        $this->assertSame('test_configured', $settings->getApiKey());
+        $this->assertSame('pfl_123', $settings->getProfileId());
+    }
+
+    public function testSubscriptionSettingsAreReadFromTheMollieDomain(): void
+    {
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . SubscriptionSettings::KEY_ENABLED, true);
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . SubscriptionSettings::KEY_REMINDER_DAYS, 5);
+
+        $settings = $this->settingsService()->getSubscriptionSettings();
+
+        $this->assertTrue($settings->isEnabled());
+        $this->assertSame(5, $settings->getReminderDays());
+    }
+
+    public function testPaymentSettingsAreReadFromTheMollieDomain(): void
+    {
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT, 'SW-{orderNumber}');
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_DUE_DATE_DAYS, 20);
+
+        $settings = $this->settingsService()->getPaymentSettings();
+
+        $this->assertSame('SW-{orderNumber}', $settings->getOrderNumberFormat());
+        $this->assertSame(20, $settings->getDueDateDays());
+    }
+
+    public function testApplePaySettingsAreReadFromTheMollieDomain(): void
+    {
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . ApplePaySettings::KEY_APPLE_PAY_DIRECT_ENABLED, true);
+
+        $settings = $this->settingsService()->getApplePaySettings();
+
+        $this->assertTrue($settings->isApplePayDirectEnabled());
+    }
+
+    public function testOrderStateSettingsAreReadFromTheMollieDomain(): void
+    {
+        $this->systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . OrderStateSettings::KEY_STATE_PAID, 'process');
+
+        $settings = $this->settingsService()->getOrderStateSettings();
+
+        $this->assertSame('process', $settings->getStatus(OrderTransactionStates::STATE_PAID));
+    }
+
+    #[DataProvider('settingsGetters')]
+    public function testSettingsAreAnsweredFromTheCacheOnASecondRead(string $getter): void
+    {
+        $settingsService = $this->settingsService();
+
+        $this->assertSame($settingsService->{$getter}(), $settingsService->{$getter}());
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function settingsGetters(): array
+    {
+        return [
+            'logger' => ['getLoggerSettings'],
+            'api' => ['getApiSettings'],
+            'subscription' => ['getSubscriptionSettings'],
+            'payment' => ['getPaymentSettings'],
+            'credit card' => ['getCreditCardSettings'],
+            'apple pay' => ['getApplePaySettings'],
+            'order state' => ['getOrderStateSettings'],
+            'refund' => ['getRefundSettings'],
+            'account' => ['getAccountSettings'],
+            'paypal express' => ['getPaypalExpressSettings'],
+            'express components' => ['getExpressComponentsSettings'],
+        ];
     }
 
     private function settingsService(

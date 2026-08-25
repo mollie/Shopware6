@@ -671,6 +671,100 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('10000', $array['metadata']['shopwareOrderNumber']);
     }
 
+    public function testSubscriptionOrderFallsBackToAOneOffPaymentForAMethodWithoutSubscriptionSupport(): void
+    {
+        $builder = $this->createBuilder(profileId: 'pfl_test_profile', subscriptionSettings: new SubscriptionSettings(enabled: true));
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withSubscriptionLineItem();
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+    }
+
+    public function testRoundingDifferenceLineIsAddedWhenTheMerchantEnabledIt(): void
+    {
+        // The fake order's total deliberately differs from the sum of its lines, so the fixer has a
+        // difference to add under the configured name and SKU.
+        $builder = $this->createBuilder($this->roundingDiffSettings(true));
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertContains('ROUND-1', $this->skusOf($actual));
+    }
+
+    public function testRoundingDifferenceLineIsNotAddedWhenTheMerchantDidNotEnableIt(): void
+    {
+        $builder = $this->createBuilder($this->roundingDiffSettings(false));
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertNotContains('ROUND-1', $this->skusOf($actual));
+    }
+
+    public function testPaymentLinkPayloadCarriesTheAllowedMethods(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPaymentLink($transactionData, ['ideal', 'creditcard'], null, $this->context);
+
+        $this->assertSame(['ideal', 'creditcard'], $actual->toArray()['allowedMethods']);
+    }
+
+    public function testPaymentLinkReusesTheRegularPaymentPayload(): void
+    {
+        // A link is paid like a regular checkout, so description, amount and lines have to be the
+        // same ones a payment for that order would carry.
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $payment = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $link = $builder->buildPaymentLink($transactionData, ['paypal'], new FakePaymentMethodHandler(), $this->context);
+
+        $linkPayload = $link->toArray();
+        $paymentPayload = $payment->toArray();
+        $this->assertSame($paymentPayload['description'], $linkPayload['description']);
+        $this->assertSame($paymentPayload['amount'], $linkPayload['amount']);
+        $this->assertSame($paymentPayload['lines'], $linkPayload['lines']);
+    }
+
+    public function testPaymentLinkCarriesTheMollieCustomerId(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(profileId: $profileId);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cst_test_mollie_id');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPaymentLink($transactionData, ['ideal'], null, $this->context);
+
+        $this->assertSame('cst_test_mollie_id', $actual->toArray()['customerId']);
+    }
+
+    private function roundingDiffSettings(bool $enabled): PaymentSettings
+    {
+        return new PaymentSettings('', 0, fixRoundingDiffEnabled: $enabled, fixRoundingDiffName: 'Rounding', fixRoundingDiffSku: 'ROUND-1');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function skusOf(CreatePayment $createPayment): array
+    {
+        $skus = [];
+        foreach ($createPayment->getLines() as $line) {
+            $skus[] = $line->getSku();
+        }
+
+        return $skus;
+    }
+
     private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null, ?LoggerInterface $logger = null): PayloadBuilder
     {
         if ($paymentSettings === null) {

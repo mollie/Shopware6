@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Transaction;
 
+use Mollie\Shopware\Component\Mollie\LineItem as MollieLineItem;
+use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\Order as MollieOrder;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
@@ -18,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
@@ -176,6 +180,74 @@ final class TransactionServiceTest extends TestCase
         $this->assertSame('Billing City', $data->getShippingOrderAddress()->getCity());
     }
 
+    public function testMollieLineIdsArePersistedOnTheOrderLineItems(): void
+    {
+        // The shipment flow needs the Mollie line id per Shopware line item; without it a shipment
+        // cannot tell Mollie which line was shipped.
+        $repository = new FakeOrderTransactionRepository();
+        $service = new TransactionService($repository, new FakeLogger());
+
+        $lineItem = (new OrderEntityBuilder())->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
+        $order = $this->buildOrder();
+        $order->setLineItems(new OrderLineItemCollection([$lineItem]));
+
+        $service->savePaymentExtension(
+            'transactionId',
+            $order,
+            $this->buildPayment(),
+            new Context(new SystemSource()),
+            new MollieOrder('ord_orderId', '', null, [$this->mollieLine('odl_1', 'lineitemid')]),
+        );
+
+        $upsert = $repository->getUpserts()[0];
+        $this->assertSame([[
+            'id' => 'lineitemid',
+            'customFields' => [Mollie::EXTENSION => ['order_line_id' => 'odl_1']],
+        ]], $upsert['order']['lineItems']);
+    }
+
+    public function testMollieLineIdsArePersistedOnTheDeliveries(): void
+    {
+        $repository = new FakeOrderTransactionRepository();
+        $service = new TransactionService($repository, new FakeLogger());
+
+        $delivery = (new OrderEntityBuilder())->createShippableDelivery('deliveryid', 'lineitemid');
+        $order = $this->buildOrder();
+        $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
+
+        $service->savePaymentExtension(
+            'transactionId',
+            $order,
+            $this->buildPayment(),
+            new Context(new SystemSource()),
+            new MollieOrder('ord_orderId', '', null, [$this->mollieLine('odl_delivery', 'deliveryid')]),
+        );
+
+        $upsert = $repository->getUpserts()[0];
+        $this->assertSame([[
+            'id' => 'deliveryid',
+            'customFields' => [Mollie::EXTENSION => ['order_line_id' => 'odl_delivery']],
+        ]], $upsert['order']['deliveries']);
+    }
+
+    public function testMollieLinesThatBelongToNoShopwareLineAreIgnored(): void
+    {
+        $repository = new FakeOrderTransactionRepository();
+        $service = new TransactionService($repository, new FakeLogger());
+
+        $service->savePaymentExtension(
+            'transactionId',
+            $this->buildOrder(),
+            $this->buildPayment(),
+            new Context(new SystemSource()),
+            new MollieOrder('ord_orderId', '', null, [$this->mollieLine('odl_1', 'unknownlineitemid')]),
+        );
+
+        $upsert = $repository->getUpserts()[0];
+        $this->assertArrayNotHasKey('lineItems', $upsert['order']);
+        $this->assertArrayNotHasKey('deliveries', $upsert['order']);
+    }
+
     private function makeService(OrderTransactionEntity $transaction): TransactionService
     {
         $repository = new FakeOrderTransactionRepository();
@@ -268,5 +340,14 @@ final class TransactionServiceTest extends TestCase
         $order->setSalesChannelId('salesChannelId');
 
         return $order;
+    }
+
+    private function mollieLine(string $mollieLineId, string $shopwareLineItemId): MollieLineItem
+    {
+        $line = new MollieLineItem('Product', 1, new Money(10.0, 'EUR'), new Money(10.0, 'EUR'));
+        $line->setId($mollieLineId);
+        $line->setShopwareLineItemId($shopwareLineItemId);
+
+        return $line;
     }
 }

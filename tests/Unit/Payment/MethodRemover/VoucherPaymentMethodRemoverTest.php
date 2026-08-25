@@ -75,7 +75,8 @@ final class VoucherPaymentMethodRemoverTest extends TestCase
         $orderRepository->add($this->makeOrder($this->makeOrderLineItem('line-1')));
 
         $result = $this->makeRemover(CartBuilder::create()->build(), $orderRepository)
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('voucher-id'));
     }
@@ -86,7 +87,8 @@ final class VoucherPaymentMethodRemoverTest extends TestCase
         $orderRepository->add($this->makeOrder($this->makeOrderLineItem('line-1', VoucherCategory::MEAL)));
 
         $result = $this->makeRemover(CartBuilder::create()->build(), $orderRepository)
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNotNull($result->get('voucher-id'));
     }
@@ -99,7 +101,8 @@ final class VoucherPaymentMethodRemoverTest extends TestCase
         $orderRepository->add($order);
 
         $result = $this->makeRemover(CartBuilder::create()->build(), $orderRepository)
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('voucher-id'));
     }
@@ -107,7 +110,8 @@ final class VoucherPaymentMethodRemoverTest extends TestCase
     public function testVoucherIsRemovedWhenTheOrderCannotBeLoaded(): void
     {
         $result = $this->makeRemover(CartBuilder::create()->build(), new FakeOrderSearchRepository())
-            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext());
+            ->remove($this->makePaymentMethods(), self::ORDER_ID, new FakeSalesChannelContext())
+        ;
 
         $this->assertNull($result->get('voucher-id'));
     }

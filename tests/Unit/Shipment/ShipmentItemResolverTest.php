@@ -12,6 +12,8 @@ use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -231,5 +233,179 @@ final class ShipmentItemResolverTest extends TestCase
 
             throw $exception;
         }
+    }
+
+    public function testCollectLineItemUpsertsCarriesThePersistedMollieLineId(): void
+    {
+        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0, ['order_line_id' => 'odl_123']);
+        $lineItems = new OrderLineItemCollection([$lineItem]);
+        $shippingItems = new ShippingItemCollection();
+
+        $this->resolver->collectLineItemUpserts(
+            [['id' => 'lineitemid', 'quantity' => 1]],
+            $lineItems,
+            'order-id',
+            $shippingItems,
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertSame('odl_123', $shippingItems->all()[0]->getMollieLineId());
+    }
+
+    public function testCollectDeliveryUpsertsMarksTheShippingCostsOfTheShippedItems(): void
+    {
+        $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'lineitemid');
+        $shippingItems = new ShippingItemCollection();
+
+        $upserts = $this->resolver->collectDeliveryUpserts(
+            [['id' => 'lineitemid', 'customFields' => []]],
+            $shippingItems,
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertCount(1, $upserts);
+        self::assertSame('deliveryid', $upserts[0]['id']);
+        self::assertSame(1, $upserts[0]['customFields'][Mollie::EXTENSION]['quantity']);
+        self::assertSame(4.99, $shippingItems->getTotalAmount());
+    }
+
+    public function testDeliveryOfAnotherShipmentIsNotMarkedAsShipped(): void
+    {
+        $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'otherlineitemid');
+
+        $upserts = $this->resolver->collectDeliveryUpserts(
+            [['id' => 'lineitemid', 'customFields' => []]],
+            new ShippingItemCollection(),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertCount(0, $upserts);
+    }
+
+    public function testAlreadyShippedDeliveryIsNotMarkedAgain(): void
+    {
+        $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'lineitemid', 4.99, ['quantity' => 1]);
+
+        $upserts = $this->resolver->collectDeliveryUpserts(
+            [['id' => 'lineitemid', 'customFields' => []]],
+            new ShippingItemCollection(),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertCount(0, $upserts);
+    }
+
+    public function testDeliveryWithoutPositionsIsSkipped(): void
+    {
+        $delivery = $this->orderBuilder->createDeliveryWithoutPositions('deliveryid');
+
+        $upserts = $this->resolver->collectDeliveryUpserts(
+            [['id' => 'lineitemid', 'customFields' => []]],
+            new ShippingItemCollection(),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertCount(0, $upserts);
+    }
+
+    public function testDeliveryWithoutShippingMethodIsSkipped(): void
+    {
+        $delivery = $this->orderBuilder->createDeliveryWithoutShippingMethod('deliveryid', 'lineitemid');
+
+        $upserts = $this->resolver->collectDeliveryUpserts(
+            [['id' => 'lineitemid', 'customFields' => []]],
+            new ShippingItemCollection(),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertCount(0, $upserts);
+    }
+
+    public function testShippedGrossSumsShippedItemsAndShippingCosts(): void
+    {
+        $shipped = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0, ['quantity' => 2]);
+        $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'lineitemid', 5.0, ['quantity' => 1]);
+
+        $total = $this->resolver->sumShippedGross(
+            new OrderLineItemCollection([$shipped]),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertSame(25.0, $total);
+    }
+
+    public function testShippedGrossIgnoresItemsThatWereNeverShipped(): void
+    {
+        $unshipped = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0);
+        $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'lineitemid');
+
+        $total = $this->resolver->sumShippedGross(
+            new OrderLineItemCollection([$unshipped]),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertSame(0.0, $total);
+    }
+
+    public function testShippedGrossIgnoresContainerLineItems(): void
+    {
+        // A container duplicates the price of its children and was never sent to Mollie, so counting it
+        // would report more as shipped than was ever authorized.
+        $container = $this->orderBuilder->createContainerLineItem('containerlineitemid', 'Configured product', 25.0);
+        $container->setCustomFields([Mollie::EXTENSION => ['quantity' => 1]]);
+
+        $total = $this->resolver->sumShippedGross(
+            new OrderLineItemCollection([$container]),
+            new OrderDeliveryCollection(),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertSame(0.0, $total);
+    }
+
+    public function testShippedGrossIgnoresDeliveriesWithoutShippingMethod(): void
+    {
+        $delivery = $this->orderBuilder->createDeliveryWithoutShippingMethod('deliveryid', 'lineitemid', 4.99, ['quantity' => 1]);
+
+        $total = $this->resolver->sumShippedGross(
+            new OrderLineItemCollection(),
+            new OrderDeliveryCollection([$delivery]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertSame(0.0, $total);
+    }
+
+    public function testHasPriorShipmentsIgnoresContainerLineItems(): void
+    {
+        $container = $this->orderBuilder->createContainerLineItem('containerlineitemid', 'Configured product', 25.0);
+        $container->setCustomFields([Mollie::EXTENSION => ['quantity' => 1]]);
+
+        self::assertFalse($this->resolver->hasPriorShipments(new OrderLineItemCollection([$container])));
+    }
+
+    private function currency(): CurrencyEntity
+    {
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('EUR');
+
+        return $currency;
     }
 }

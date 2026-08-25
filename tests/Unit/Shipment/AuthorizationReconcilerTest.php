@@ -462,6 +462,8 @@ final class AuthorizationReconcilerTest extends TestCase
 
     public function testReconcileReportsNothingWhenTheAuthorizedAmountIsAlreadyCaptured(): void
     {
+        // amountRemaining and amount/capturedAmount deliberately disagree: it takes an open remainder
+        // to get past the early return, and an already fully captured amount to have nothing to do.
         $freshPayment = new Payment('tr_1');
         $freshPayment->setAmount(new Money(90.0, 'EUR'));
         $freshPayment->setCapturedAmount(new Money(90.0, 'EUR'));

@@ -248,7 +248,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('de_DE', $formParams['locale']);
     }
 
-
     public function testCreateOrderPostsThePayloadAndEmbedsThePayments(): void
     {
         $fakeClient = new FakeClient('ord_test', 'paid', embed: true);
@@ -263,7 +262,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('SW10001', $fakeClient->getLastPostOptions()['form_params']['orderNumber']);
     }
 
-
     public function testGetOrderEmbedsPaymentsAndRefunds(): void
     {
         $fakeClient = new FakeClient('ord_test', 'paid', embed: true);
@@ -275,7 +273,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('orders/ord_test', $fakeClient->getLastUri());
         $this->assertSame(['embed' => 'payments,refunds'], $fakeClient->getLastGetOptions()['query']);
     }
-
 
     public function testCurrentProfileIsLoadedFromMollie(): void
     {
@@ -290,7 +287,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('profiles/me', $fakeClient->getLastUri());
     }
 
-
     public function testProfileIsLoadedForAGivenApiKey(): void
     {
         $fakeClient = new FakeClient(body: ['id' => 'pfl_1', 'name' => 'Test shop', 'email' => 'shop@example.com']);
@@ -300,7 +296,6 @@ final class MollieGatewayTest extends TestCase
 
         $this->assertSame('pfl_1', $profile->getId());
     }
-
 
     public function testCustomerIsCreatedWithTheShopwareCustomerNumberAsMetadata(): void
     {
@@ -336,7 +331,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('de_DE', $fakeClient->getLastPostOptions()['form_params']['locale']);
     }
 
-
     public function testMandatesAreListedForACustomerPresentScope(): void
     {
         $fakeClient = new FakeClient(body: ['_embedded' => ['mandates' => [
@@ -352,7 +346,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('customers/cst_1/mandates', $fakeClient->getLastUri());
         $this->assertSame(['scopes' => ['customer-present']], $fakeClient->getLastGetOptions()['query']);
     }
-
 
     public function testTerminalsAreListed(): void
     {
@@ -373,7 +366,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('terminals', $fakeClient->getLastUri());
     }
 
-
     public function testMandateIsRevoked(): void
     {
         $fakeClient = new FakeClient(body: []);
@@ -385,7 +377,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('DELETE', $fakeClient->getLastMethod());
         $this->assertSame('customers/cst_1/mandates/mdt_1', $fakeClient->getLastUri());
     }
-
 
     public function testPaymentIsLoadedWithItsRefundsAndCaptures(): void
     {
@@ -411,7 +402,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('payments/tr_test', $fakeClient->getLastUri());
     }
 
-
     public function testOrderIsCancelled(): void
     {
         $fakeClient = new FakeClient('ord_test', 'canceled', embed: true);
@@ -423,7 +413,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('DELETE', $fakeClient->getLastMethod());
         $this->assertSame('orders/ord_test', $fakeClient->getLastUri());
     }
-
 
     public function testSubscriptionPaymentsAreListed(): void
     {
@@ -449,7 +438,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertCount(0, $payments);
     }
 
-
     public function testCaptureIsCreatedForAPayment(): void
     {
         $fakeClient = new FakeClient(body: ['id' => 'cpt_1', 'status' => 'pending', 'amount' => ['value' => '20.00', 'currency' => 'EUR']]);
@@ -461,7 +449,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('payments/tr_test/captures', $fakeClient->getLastUri());
         $this->assertSame(['value' => '20.00', 'currency' => 'EUR'], $fakeClient->getLastPostOptions()['form_params']['amount']);
     }
-
 
     public function testShipmentIsCreatedForAnOrder(): void
     {
@@ -478,7 +465,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame([['id' => 'odl_1', 'quantity' => 2]], $fakeClient->getLastPostOptions()['form_params']['lines']);
     }
 
-
     public function testOrderLinesAreCancelled(): void
     {
         $fakeClient = new FakeClient(body: []);
@@ -491,7 +477,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame(['lines' => [['id' => 'odl_1', 'quantity' => 2]]], $fakeClient->getLastDeleteOptions()['json']);
     }
 
-
     public function testAuthorizationIsReleased(): void
     {
         $fakeClient = new FakeClient(body: []);
@@ -502,7 +487,6 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('POST', $fakeClient->getLastMethod());
         $this->assertSame('payments/tr_test/release-authorization', $fakeClient->getLastUri());
     }
-
 
     public function testLegacyTransactionIsRepairedFromTheTransactionCustomFields(): void
     {
@@ -531,19 +515,6 @@ final class MollieGatewayTest extends TestCase
         $gateway->getPaymentByTransactionId('test', new Context(new SystemSource()));
 
         $this->assertCount(1, $transactionService->getSavedPaymentExtensions());
-    }
-
-    private function makeGateway(FakeClient $client, ?FakeTransactionService $transactionService = null): MollieGateway
-    {
-        $clientFactory = new FakeClientFactory($client);
-
-        return new MollieGateway(
-            $clientFactory,
-            $transactionService ?? new FakeTransactionService(),
-            new PaymentLinkGateway($clientFactory, new PaymentHydrator(), new NullLogger()),
-            new PaymentHydrator(),
-            new NullLogger()
-        );
     }
 
     /**
@@ -592,6 +563,19 @@ final class MollieGatewayTest extends TestCase
         yield 'createShipment' => [fn (MollieGateway $gateway) => $gateway->createShipment(new CreateShipment(new ShippingItemCollection()), 'ord_test', '10000', $salesChannelId)];
         yield 'cancelOrderLines' => [fn (MollieGateway $gateway) => $gateway->cancelOrderLines('ord_test', 'odl_1', 2, '10000', $salesChannelId)];
         yield 'releaseAuthorization' => [fn (MollieGateway $gateway) => $gateway->releaseAuthorization('tr_test', '10000', $salesChannelId)];
+    }
+
+    private function makeGateway(FakeClient $client, ?FakeTransactionService $transactionService = null): MollieGateway
+    {
+        $clientFactory = new FakeClientFactory($client);
+
+        return new MollieGateway(
+            $clientFactory,
+            $transactionService ?? new FakeTransactionService(),
+            new PaymentLinkGateway($clientFactory, new PaymentHydrator(), new NullLogger()),
+            new PaymentHydrator(),
+            new NullLogger()
+        );
     }
 
     private static function createOrderPayload(): CreateOrder

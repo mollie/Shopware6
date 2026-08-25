@@ -12,6 +12,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Interval::class)]
 final class IntervalTest extends TestCase
 {
+    #[DataProvider('intervals')]
+    public function testTheIntervalIsWrittenTheWayMollieExpectsIt(int $value, IntervalUnit $unit, string $expected): void
+    {
+        $this->assertSame($expected, (string) new Interval($value, $unit));
+    }
+
     /**
      * @return \Generator<string, array{int, IntervalUnit, string}>
      */
@@ -23,23 +29,6 @@ final class IntervalTest extends TestCase
         yield 'several months are written in the plural' => [3, IntervalUnit::MONTHS, '3 months'];
         yield 'several weeks are written in the plural' => [2, IntervalUnit::WEEKS, '2 weeks'];
         yield 'several days are written in the plural' => [14, IntervalUnit::DAYS, '14 days'];
-    }
-
-    #[DataProvider('intervals')]
-    public function testTheIntervalIsWrittenTheWayMollieExpectsIt(int $value, IntervalUnit $unit, string $expected): void
-    {
-        $this->assertSame($expected, (string) new Interval($value, $unit));
-    }
-
-    /**
-     * @return \Generator<string, array{string, int, IntervalUnit}>
-     */
-    public static function mollieAnswers(): \Generator
-    {
-        yield 'singular month as Mollie sends it' => ['1 month', 1, IntervalUnit::MONTHS];
-        yield 'plural months as Mollie sends it' => ['3 months', 3, IntervalUnit::MONTHS];
-        yield 'singular week as Mollie sends it' => ['1 week', 1, IntervalUnit::WEEKS];
-        yield 'plural days as Mollie sends it' => ['14 days', 14, IntervalUnit::DAYS];
     }
 
     #[DataProvider('mollieAnswers')]
@@ -55,5 +44,16 @@ final class IntervalTest extends TestCase
     public function testAnIntervalSurvivesTheRoundTripThroughMollie(string $answer): void
     {
         $this->assertSame($answer, (string) Interval::fromString($answer));
+    }
+
+    /**
+     * @return \Generator<string, array{string, int, IntervalUnit}>
+     */
+    public static function mollieAnswers(): \Generator
+    {
+        yield 'singular month as Mollie sends it' => ['1 month', 1, IntervalUnit::MONTHS];
+        yield 'plural months as Mollie sends it' => ['3 months', 3, IntervalUnit::MONTHS];
+        yield 'singular week as Mollie sends it' => ['1 week', 1, IntervalUnit::WEEKS];
+        yield 'plural days as Mollie sends it' => ['14 days', 14, IntervalUnit::DAYS];
     }
 }

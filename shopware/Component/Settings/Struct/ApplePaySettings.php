@@ -35,6 +35,24 @@ final class ApplePaySettings extends Struct
         return new self($applePayDirectEnabled, $visibilityRestrictions, self::parseDomainList($allowedDomainList));
     }
 
+    public function isApplePayDirectEnabled(): bool
+    {
+        return $this->applePayDirectEnabled;
+    }
+
+    public function getVisibilityRestrictions(): VisibilityRestrictionCollection
+    {
+        return $this->visibilityRestrictions;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllowDomainList(): array
+    {
+        return $this->allowDomainList;
+    }
+
     /**
      * Merchants separate the domains with commas and usually put a space behind each one.
      * Without trimming, the untrimmed entry never matches the requested domain and Apple Pay
@@ -56,23 +74,5 @@ final class ApplePaySettings extends Struct
         }
 
         return $domains;
-    }
-
-    public function isApplePayDirectEnabled(): bool
-    {
-        return $this->applePayDirectEnabled;
-    }
-
-    public function getVisibilityRestrictions(): VisibilityRestrictionCollection
-    {
-        return $this->visibilityRestrictions;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAllowDomainList(): array
-    {
-        return $this->allowDomainList;
     }
 }

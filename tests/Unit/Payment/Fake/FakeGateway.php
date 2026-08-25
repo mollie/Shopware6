@@ -62,6 +62,10 @@ final class FakeGateway implements MollieGatewayInterface
 
     private bool $throwOnGetPayment = false;
 
+    private ?\Throwable $cancelFailure = null;
+
+    private ?\Throwable $profileFailure = null;
+
     private bool $throwOnReleaseAuthorization = false;
 
     private ?Order $order = null;
@@ -181,11 +185,6 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->callCounts[$method] ?? 0;
     }
 
-    private function countCall(string $method): void
-    {
-        $this->callCounts[$method] = ($this->callCounts[$method] ?? 0) + 1;
-    }
-
     public function getRepairCallCount(): int
     {
         return $this->getCallCount('repairLegacyTransaction');
@@ -207,9 +206,21 @@ final class FakeGateway implements MollieGatewayInterface
         $this->validApiKeys[] = $key;
     }
 
+    /**
+     * The error Mollie answers the profile lookup with, e.g. when the API key is invalid.
+     */
+    public function withProfileFailure(\Throwable $failure): void
+    {
+        $this->profileFailure = $failure;
+    }
+
     public function getCurrentProfile(?string $salesChannelId = null): Profile
     {
         $this->countCall('getCurrentProfile');
+
+        if ($this->profileFailure !== null) {
+            throw $this->profileFailure;
+        }
 
         return new Profile('fake_profile', 'fake', 'fake@mollie.test');
     }
@@ -280,8 +291,20 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->payment;
     }
 
+    /**
+     * The error Mollie answers a cancel call with, e.g. when the payment can no longer be cancelled.
+     */
+    public function withCancelFailure(\Throwable $failure): void
+    {
+        $this->cancelFailure = $failure;
+    }
+
     public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
     {
+        if ($this->cancelFailure !== null) {
+            throw $this->cancelFailure;
+        }
+
         $this->cancelledPaymentIds[] = $molliePaymentId;
 
         return $this->payment;
@@ -289,6 +312,10 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function cancelOrder(string $mollieOrderId, string $orderNumber, string $salesChannelId): Order
     {
+        if ($this->cancelFailure !== null) {
+            throw $this->cancelFailure;
+        }
+
         $this->cancelledOrderIds[] = $mollieOrderId;
 
         return $this->order ?? new Order($mollieOrderId, '');
@@ -406,5 +433,10 @@ final class FakeGateway implements MollieGatewayInterface
     public function getReleasedAuthorizations(): array
     {
         return $this->releasedAuthorizations;
+    }
+
+    private function countCall(string $method): void
+    {
+        $this->callCounts[$method] = ($this->callCounts[$method] ?? 0) + 1;
     }
 }

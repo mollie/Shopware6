@@ -63,7 +63,7 @@ final class SubscriptionsListResponseTest extends TestCase
         }
 
         /** @var EntitySearchResult<SubscriptionCollection<SubscriptionEntity>> $searchResult */
-        $searchResult = new EntitySearchResult(
+        return new EntitySearchResult(
             'mollie_subscription',
             $entities->count(),
             $entities,
@@ -71,7 +71,5 @@ final class SubscriptionsListResponseTest extends TestCase
             new Criteria(),
             Context::createDefaultContext()
         );
-
-        return $searchResult;
     }
 }

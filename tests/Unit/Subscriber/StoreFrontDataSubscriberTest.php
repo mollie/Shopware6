@@ -40,6 +40,11 @@ final class StoreFrontDataSubscriberTest extends TestCase
 {
     private FakeLogger $logger;
 
+    protected function setUp(): void
+    {
+        $this->logger = new FakeLogger();
+    }
+
     public function testSubscribedEvents(): void
     {
         $events = StoreFrontDataSubscriber::getSubscribedEvents();
@@ -55,7 +60,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent($page, new PaymentMethodEntity()));
 
-        static::assertArrayNotHasKey('mollie_locale', $page->getVars());
+        self::assertArrayNotHasKey('mollie_locale', $page->getVars());
     }
 
     public function testMollieLocaleIsAssignedFromTheSalesChannelLanguage(): void
@@ -65,7 +70,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::IDEAL)));
 
-        static::assertSame('de_DE', $page->getVars()['mollie_locale']);
+        self::assertSame('de_DE', $page->getVars()['mollie_locale']);
     }
 
     public function testMollieLocaleFallsBackToEnglishWithoutALanguage(): void
@@ -75,7 +80,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::IDEAL)));
 
-        static::assertSame('en_GB', $page->getVars()['mollie_locale']);
+        self::assertSame('en_GB', $page->getVars()['mollie_locale']);
     }
 
     public function testConfiguredProfileIdIsAssignedWithoutAskingMollie(): void
@@ -89,8 +94,8 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::IDEAL)));
 
-        static::assertSame('pfl_configured', $page->getVars()['mollie_profile_id']);
-        static::assertSame(0, $gateway->getCallCount('getCurrentProfile'));
+        self::assertSame('pfl_configured', $page->getVars()['mollie_profile_id']);
+        self::assertSame(0, $gateway->getCallCount('getCurrentProfile'));
     }
 
     public function testProfileIdIsReadFromMollieAndStoredWhenItIsNotConfigured(): void
@@ -101,8 +106,8 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::IDEAL)));
 
-        static::assertSame('fake_profile', $page->getVars()['mollie_profile_id']);
-        static::assertSame('fake_profile', $settings->getApiSettings()->getProfileId());
+        self::assertSame('fake_profile', $page->getVars()['mollie_profile_id']);
+        self::assertSame('fake_profile', $settings->getApiSettings()->getProfileId());
     }
 
     public function testOnlyCreditCardMandatesAreAssignedToThePage(): void
@@ -117,16 +122,16 @@ final class StoreFrontDataSubscriberTest extends TestCase
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::CREDIT_CARD)));
 
         $assigned = $page->getExtension('MollieCreditCardMandateCollection');
-        static::assertInstanceOf(MandateCollection::class, $assigned);
-        static::assertCount(1, $assigned);
-        static::assertSame('mdt_creditcard', $assigned->first()?->getId());
+        self::assertInstanceOf(MandateCollection::class, $assigned);
+        self::assertCount(1, $assigned);
+        self::assertSame('mdt_creditcard', $assigned->first()?->getId());
     }
 
     public function testCreditCardComponentAndOneClickSettingsAreAssignedToThePage(): void
     {
         $subscriber = $this->createSubscriber(
             settings: new FakeSettingsService(
-                paymentSettings: new PaymentSettings('', 0, true, true),
+                paymentSettings: new PaymentSettings('', 0, oneClickPayment: true, oneClickCompactView: true),
                 creditCardSettings: new CreditCardSettings(true),
             ),
         );
@@ -135,9 +140,9 @@ final class StoreFrontDataSubscriberTest extends TestCase
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::CREDIT_CARD)));
 
         $vars = $page->getVars();
-        static::assertTrue($vars['enable_credit_card_components']);
-        static::assertTrue($vars['enable_one_click_payments']);
-        static::assertTrue($vars['enable_one_click_payments_compact_view']);
+        self::assertTrue($vars['enable_credit_card_components']);
+        self::assertTrue($vars['enable_one_click_payments']);
+        self::assertTrue($vars['enable_one_click_payments_compact_view']);
     }
 
     public function testMandatesAreNotLoadedForAnotherPaymentMethod(): void
@@ -147,7 +152,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent(new CheckoutConfirmPage(), $this->molliePaymentMethod(PaymentMethod::IDEAL)));
 
-        static::assertSame(0, $mandatesRoute->getCallCount());
+        self::assertSame(0, $mandatesRoute->getCallCount());
     }
 
     public function testTerminalsAreAssignedForPointOfSale(): void
@@ -160,7 +165,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::POS)));
 
-        static::assertSame($terminals, $page->getVars()['mollie_terminals']);
+        self::assertSame($terminals, $page->getVars()['mollie_terminals']);
     }
 
     public function testTerminalsAreNotLoadedForAnotherPaymentMethod(): void
@@ -170,7 +175,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent(new CheckoutConfirmPage(), $this->molliePaymentMethod(PaymentMethod::CREDIT_CARD)));
 
-        static::assertSame(0, $terminalsRoute->getCallCount());
+        self::assertSame(0, $terminalsRoute->getCallCount());
     }
 
     public function testAFailingMandateLookupIsLoggedInsteadOfBreakingTheCheckout(): void
@@ -181,7 +186,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage($this->confirmEvent(new CheckoutConfirmPage(), $this->molliePaymentMethod(PaymentMethod::CREDIT_CARD)));
 
-        static::assertTrue($this->logger->hasRecordThatContains('error', 'Failed to assign custom template data to pages'));
+        self::assertTrue($this->logger->hasRecordThatContains('error', 'Failed to assign custom template data to pages'));
     }
 
     public function testDataIsAlsoAssignedWhenAnExistingOrderIsEdited(): void
@@ -194,7 +199,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
 
         $subscriber->addDataToPage(new AccountEditOrderPageLoadedEvent($page, $salesChannelContext, new Request()));
 
-        static::assertSame('nl_NL', $page->getVars()['mollie_locale']);
+        self::assertSame('nl_NL', $page->getVars()['mollie_locale']);
     }
 
     private function createSubscriber(
@@ -204,8 +209,6 @@ final class StoreFrontDataSubscriberTest extends TestCase
         ?FakeGateway $gateway = null,
         ?FakeLanguageRepository $languageRepository = null,
     ): StoreFrontDataSubscriber {
-        $this->logger = new FakeLogger();
-
         return new StoreFrontDataSubscriber(
             $settings ?? new FakeSettingsService(),
             $mandatesRoute ?? new FakeListMandatesRoute(),
