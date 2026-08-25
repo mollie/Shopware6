@@ -18,6 +18,8 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDeliveryPosition\OrderDeliveryPositionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDeliveryPosition\OrderDeliveryPositionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -253,6 +255,32 @@ final class OrderEntityBuilder
         $orderLineItem->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
 
         return $orderLineItem;
+    }
+
+    /**
+     * Builds an order delivery as the shipment flow needs it: shipping costs, a shipping method and a
+     * position that points at the line item the delivery belongs to.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createShippableDelivery(string $id, string $orderLineItemId, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('DHL');
+
+        $position = new OrderDeliveryPositionEntity();
+        $position->setId('fake-delivery-position-' . $orderLineItemId);
+        $position->setOrderLineItemId($orderLineItemId);
+
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId($id);
+        $delivery->setShippingCosts($this->getPrice($shippingCosts, 19.0));
+        $delivery->setShippingMethod($shippingMethod);
+        $delivery->setPositions(new OrderDeliveryPositionCollection([$position]));
+        $delivery->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
+
+        return $delivery;
     }
 
     /**

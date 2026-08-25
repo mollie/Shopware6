@@ -85,8 +85,8 @@ final class LineItemAnalyzerTest extends TestCase
             new LineItemCollection([$sub1month, $sub2months, $subWeekly, $regular])
         );
 
-        $this->assertSame(['1 months', '2 weeks'], array_keys($groups));
-        $this->assertSame([$sub1month, $sub2months], $groups['1 months']);
+        $this->assertSame(['1 month', '2 weeks'], array_keys($groups));
+        $this->assertSame([$sub1month, $sub2months], $groups['1 month']);
         $this->assertSame([$subWeekly], $groups['2 weeks']);
     }
 

@@ -51,7 +51,9 @@ final class PauseActionTest extends TestCase
             $context
         );
 
-        $this->assertSame($mollieSubscription, $result);
+        // Not the same instance: the gateway answers with a fresh object built from Mollie's
+        // response, so only the subscription it refers to can be asserted.
+        $this->assertSame($mollieSubscription->getId(), $result->getId());
         $this->assertSame(1, $gateway->getCallCount('cancelSubscription'));
         $this->assertSame(1, $repository->getUpsertCount());
         $payload = $repository->getLastUpsert();

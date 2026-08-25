@@ -11,6 +11,10 @@ final class Interval implements \Stringable
 
     public function __toString(): string
     {
+        if ($this->intervalValue === 1) {
+            return $this->intervalValue . ' ' . $this->intervalUnit->singular();
+        }
+
         return $this->intervalValue . ' ' . $this->intervalUnit->value;
     }
 

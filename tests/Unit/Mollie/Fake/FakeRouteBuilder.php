@@ -19,6 +19,8 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         private string $expressComponentsShippingCallbackUrl = '',
         private string $checkoutFinishUrl = '',
         private string $editOrderUrl = '',
+        private string $paypalExpressRedirectUrl = '',
+        private string $paypalExpressCancelUrl = '',
     ) {
     }
 
@@ -39,12 +41,12 @@ final class FakeRouteBuilder implements RouteBuilderInterface
 
     public function getPaypalExpressRedirectUrl(): string
     {
-        // TODO: Implement getPaypalExpressRedirectUrl() method.
+        return $this->paypalExpressRedirectUrl;
     }
 
     public function getPaypalExpressCancelUrl(): string
     {
-        // TODO: Implement getPaypalExpressCancelUrl() method.
+        return $this->paypalExpressCancelUrl;
     }
 
     public function getExpressComponentsRedirectUrl(string $cartToken): string

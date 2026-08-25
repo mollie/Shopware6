@@ -12,12 +12,37 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class FakePay implements PayInterface
 {
+    private int $callCount = 0;
+
+    private ?MollieTransactionStruct $lastTransaction = null;
+
+    public function __construct(private readonly ?\Throwable $failure = null)
+    {
+    }
+
     public function execute(
         AbstractMolliePaymentHandler $paymentHandler,
         MollieTransactionStruct $transaction,
         RequestDataBag $dataBag,
         Context $context
     ): RedirectResponse {
+        ++$this->callCount;
+        $this->lastTransaction = $transaction;
+
+        if ($this->failure !== null) {
+            throw $this->failure;
+        }
+
         return new RedirectResponse('https://mollie.com/checkout');
+    }
+
+    public function getCallCount(): int
+    {
+        return $this->callCount;
+    }
+
+    public function getLastTransaction(): ?MollieTransactionStruct
+    {
+        return $this->lastTransaction;
     }
 }

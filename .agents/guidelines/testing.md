@@ -73,6 +73,13 @@ keys off its presence:
 So an untagged API-free test silently never runs on a PR, and a tagged API test fails there.
 Cypress is not gated this way — it always runs `@core` on PRs; the full suite is too slow.
 
+**Code that needs SwagCommercial cannot be unit tested.** SwagCommercial is a paid plugin; a
+developer can install it locally, but the pipeline has no licence for it. Its classes are not
+in the plugin's own `vendor/`, which is what unit tests bootstrap from, so
+`class_exists(Shopware\Commercial\...)` is `false` there. Anything built on it — the Return
+Management integration in `Component/Refund/OrderReturnHandler` is the current case — belongs
+in an integration test, not in `tests/Unit/`.
+
 **For a bug fix, write the failing test first** — or at least confirm the new test fails
 without the fix. State which assertion carries the regression.
 

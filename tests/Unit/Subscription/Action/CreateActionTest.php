@@ -46,7 +46,7 @@ final class CreateActionTest extends TestCase
         $this->assertSame(99.99, $payload['amount']);
         $this->assertSame('order-id', $payload['orderId']);
         $this->assertStringStartsWith('Order #10000', $payload['description']);
-        $this->assertStringContainsString('1 months', $payload['description']);
+        $this->assertStringContainsString('1 month', $payload['description']);
         $this->assertSame('created', $payload['historyEntries'][0]['comment']);
         $this->assertSame(SubscriptionStatus::PENDING->value, $payload['historyEntries'][0]['statusTo']);
         $this->assertSame(SubscriptionTag::ID, $payload['order']['tags'][0]['id']);

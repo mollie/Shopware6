@@ -4,10 +4,15 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Fake;
 
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Event\NestedEventCollection;
 
@@ -19,6 +24,11 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
     /** @var list<array<string,mixed>> */
     private array $upsertedPayloads = [];
 
+    private ?OrderTransactionEntity $searchResult = null;
+
+    /** @var list<Criteria> */
+    private array $searchCriteria = [];
+
     /** @var list<string> */
     private array $requestedSalesChannelIds = [];
 
@@ -27,6 +37,42 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
 
     public function __construct()
     {
+    }
+
+    /**
+     * The transaction a findById() lookup answers with. Without it the repository behaves like a
+     * lookup that found nothing.
+     */
+    public function withTransaction(OrderTransactionEntity $transaction): void
+    {
+        $this->searchResult = $transaction;
+    }
+
+    public function search(Criteria $criteria, Context $context): EntitySearchResult
+    {
+        $this->searchCriteria[] = $criteria;
+
+        $entities = new OrderTransactionCollection();
+        if ($this->searchResult instanceof OrderTransactionEntity) {
+            $entities->add($this->searchResult);
+        }
+
+        return new EntitySearchResult(
+            OrderTransactionDefinition::ENTITY_NAME,
+            $entities->count(),
+            $entities,
+            null,
+            $criteria,
+            $context
+        );
+    }
+
+    /**
+     * @return list<Criteria>
+     */
+    public function getSearchCriteria(): array
+    {
+        return $this->searchCriteria;
     }
 
     public function setMatchingIds(string ...$ids): void

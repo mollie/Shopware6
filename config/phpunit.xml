@@ -19,5 +19,13 @@
            <directory>./../src</directory>
            <directory>./../shopware</directory>
        </include>
+       <exclude>
+           <!-- Migrations only run against a live database, and the fixtures are a dev-only
+                console command that no merchant ever runs. Everything else stays measured:
+                the plugin's events are extension points with setters that decide what
+                reaches the Mollie payload, not value carriers. -->
+           <directory>./../src/Migration</directory>
+           <directory>./../shopware/Component/Fixture</directory>
+       </exclude>
    </source>
 </phpunit>

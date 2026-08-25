@@ -18,6 +18,13 @@ Use guard clauses, `continue` inside loops, or extract a private method.
 
 The codebase has ~16 `else` branches across 568 files — do not add to that number.
 
+**No computed list in a loop header.** A call that *builds* the list — `explode()`,
+`array_merge()`, `array_filter()`, `json_decode()` — is assigned to a named variable first:
+`$parts = explode(',', $list);` before `foreach ($parts as $part)`. A plain accessor stays
+where it is; the codebase has ~55 headers of the form `foreach ($order->getLineItems() as
+$lineItem)` and they are fine.
+*Why:* the header should name what is being iterated, not compute it.
+
 **No arrow functions.**
 Write a normal closure with a body and an explicit `return`, never `fn () =>` or
 `static fn () =>`.

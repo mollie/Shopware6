@@ -14,6 +14,17 @@ final class FakeClient extends Client
 {
     private ResponseInterface $response;
 
+    /** @var list<string> */
+    private array $requestedUris = [];
+
+    /** @var list<string> */
+    private array $requestedMethods = [];
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $lastGetOptions = [];
+
     /**
      * @var array<string, mixed>
      */
@@ -24,6 +35,11 @@ final class FakeClient extends Client
      */
     private array $lastPatchOptions = [];
 
+    /**
+     * @var array<string, mixed>
+     */
+    private array $lastDeleteOptions = [];
+
     public function __construct(private ?string $id = null,
         private ?string $status = 'failed',
         private ?PaymentMethod $method = PaymentMethod::PAYPAL,
@@ -32,7 +48,13 @@ final class FakeClient extends Client
         private ?array $amountCaptured = null,
         private ?array $amount = null,
         private ?array $amountRefunded = null,
+        ?array $body = null,
     ) {
+        if ($body !== null) {
+            $this->response = new Response(body: (string) json_encode($body));
+
+            return;
+        }
         if ($id === null) {
             $this->response = new Response(status: 500, body: json_encode([
                 'title' => 'Failed Response',
@@ -66,6 +88,9 @@ final class FakeClient extends Client
 
     public function get($uri, array $options = []): ResponseInterface
     {
+        $this->requestedUris[] = (string) $uri;
+        $this->requestedMethods[] = 'GET';
+        $this->lastGetOptions = $options;
         if ($this->response->getStatusCode() === 500) {
             $request = new Request('GET', $uri);
             throw new ClientException('Exception was triggered', $request, $this->response);
@@ -76,6 +101,8 @@ final class FakeClient extends Client
 
     public function post($uri, array $options = []): ResponseInterface
     {
+        $this->requestedUris[] = (string) $uri;
+        $this->requestedMethods[] = 'POST';
         $this->lastPostOptions = $options;
         if ($this->response->getStatusCode() === 500) {
             $request = new Request('POST', $uri);
@@ -87,6 +114,8 @@ final class FakeClient extends Client
 
     public function patch($uri, array $options = []): ResponseInterface
     {
+        $this->requestedUris[] = (string) $uri;
+        $this->requestedMethods[] = 'PATCH';
         $this->lastPatchOptions = $options;
         if ($this->response->getStatusCode() === 500) {
             $request = new Request('PATCH', $uri);
@@ -94,6 +123,42 @@ final class FakeClient extends Client
         }
 
         return $this->response;
+    }
+
+    public function delete($uri, array $options = []): ResponseInterface
+    {
+        $this->requestedUris[] = (string) $uri;
+        $this->requestedMethods[] = 'DELETE';
+        $this->lastDeleteOptions = $options;
+        if ($this->response->getStatusCode() === 500) {
+            $request = new Request('DELETE', $uri);
+
+            throw new ClientException('Exception was triggered', $request, $this->response);
+        }
+
+        return $this->response;
+    }
+
+    public function getLastMethod(): string
+    {
+        $lastMethod = end($this->requestedMethods);
+
+        return $lastMethod === false ? '' : $lastMethod;
+    }
+
+    public function getLastUri(): string
+    {
+        $lastUri = end($this->requestedUris);
+
+        return $lastUri === false ? '' : $lastUri;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getLastGetOptions(): array
+    {
+        return $this->lastGetOptions;
     }
 
     /**
@@ -110,5 +175,13 @@ final class FakeClient extends Client
     public function getLastPatchOptions(): array
     {
         return $this->lastPatchOptions;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getLastDeleteOptions(): array
+    {
+        return $this->lastDeleteOptions;
     }
 }

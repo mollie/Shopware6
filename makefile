@@ -126,37 +126,34 @@ stan: ##3 Starts the PHPStan Analyser
 	cd ../../.. && php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon
 
 phpunit: ##3 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
+	@php vendor/bin/phpunit --configuration=./config/phpunit.xml
 
 phpintegration: ##3 Starts all PHPUnit Tests [groups=core to limit to a group]
+	@cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),)
 
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),)
-
-report: ##3 Runs unit + integration tests, merges the JUnit reports and builds a PHPMetrics report at <shop-url>/phpmetrics
+report: ##3 Runs the unit tests with coverage and prints the line coverage of shopware/ and src/
 	# ----------------------------------------------------------------
 	# reset previous report output
-	rm -rf ./.reports/phpunit/junit ./.reports/phpunit/combined.junit.xml ./.reports/phpmetrics ../../../public/phpmetrics
-	mkdir -p ./.reports/phpunit/junit ./.reports/phpmetrics
+	rm -rf ./.reports/phpunit/coverage ./.reports/phpunit/clover.xml
+	mkdir -p ./.reports/phpunit
 	# ----------------------------------------------------------------
-	# 1) Unit tests -> local plugin vendor + plain autoloader bootstrap
-	php vendor/bin/phpunit --configuration=./config/phpunit.xml --log-junit ./.reports/phpunit/junit/unit.junit.xml
-	# ----------------------------------------------------------------
-	# 2) Integration tests -> Shopware vendor + kernel bootstrap (run from Shopware root)
-	cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),) --log-junit ./custom/plugins/MolliePayments/.reports/phpunit/junit/integration.junit.xml
-	# ----------------------------------------------------------------
-	# 3) Merge both JUnit reports into one combined report
-	php vendor/bin/phpunit-merger log ./.reports/phpunit/junit ./.reports/phpunit/combined.junit.xml
-	# phpunit-merger writes a bogus file="0" on the <testsuite> nodes; strip it so
-	# PHPMetrics falls back to the real per-<testcase> file paths instead of aborting.
-	sed -i 's/ file="0"//g' ./.reports/phpunit/combined.junit.xml
-	# ----------------------------------------------------------------
-	# 4) PHPMetrics report using the combined JUnit (shows which classes are covered by tests)
-	#    --composer  points the dependency analysis at the plugin manifest (removes the "no composer.json" warning)
-	#    --report-json  emits machine-readable per-class metrics (ccn, mi, loc, ...) for tooling / analysis
-	php vendor/bin/phpmetrics --junit=./.reports/phpunit/combined.junit.xml --composer=./composer.json --report-html=../../../public/phpmetrics --report-json=./.reports/phpmetrics/metrics.json ./src ./shopware
+	# pcov records nothing outside pcov.directory, and the dockware image points that
+	# at the Shopware core - which is why every plugin file used to come back as 0%.
+	# Overriding XDEBUG_MODE instead would not help: php-code-coverage picks pcov
+	# over Xdebug whenever pcov is loaded (see Driver/Selector.php).
+	# XDEBUG_MODE is the fallback for an image without pcov: php-code-coverage picks pcov
+	# whenever it is loaded, so this has no effect on dockware, but without it a
+	# pcov-less environment would produce no report at all.
+	@XDEBUG_MODE=coverage php -d pcov.enabled=1 -d pcov.directory=$(CURDIR) \
+		vendor/bin/phpunit --configuration=./config/phpunit.xml \
+		--coverage-html ./.reports/phpunit/coverage \
+		--coverage-clover ./.reports/phpunit/clover.xml
+	# PHPUnit only warns when no coverage driver is available and still exits 0, which
+	# would leave the summary below reporting a truthful-looking 0.00%. Fail loudly instead.
+	@test -f ./.reports/phpunit/clover.xml || { echo ""; echo "  No coverage was recorded - is pcov or Xdebug available?"; exit 1; }
+	@php -r '$$m = simplexml_load_file("./.reports/phpunit/clover.xml")->project->metrics; $$s = (int) $$m["statements"]; $$c = (int) $$m["coveredstatements"]; printf("%s  Line coverage: %.2f%% (%d/%d statements)%s%s", PHP_EOL, $$s > 0 ? $$c / $$s * 100 : 0, $$c, $$s, PHP_EOL, PHP_EOL);'
+	@echo "  HTML report at .reports/phpunit/coverage/index.html"
 	@echo ""
-	@echo "PHPMetrics HTML report available at <shop-url>/phpmetrics"
-	@echo "PHPMetrics JSON metrics at .reports/phpmetrics/metrics.json"
 
 behat:
 	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml --format progress --colors

@@ -86,6 +86,11 @@ final class FakeSalesChannelContext extends SalesChannelContext
         return $this->fakeCustomer;
     }
 
+    public function getLanguageId(): string
+    {
+        return $this->fakeContext->getLanguageId();
+    }
+
     public function getPaymentMethod(): PaymentMethodEntity
     {
         if ($this->fakePaymentMethod === null) {

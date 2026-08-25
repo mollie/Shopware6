@@ -34,6 +34,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?PayPalExpressSettings $paypalExpressSettings = null,
         private ?ApplePaySettings $applePaySettings = null,
         private ?ExpressComponentsSettings $expressComponentsSettings = null,
+        private ?CreditCardSettings $creditCardSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -81,7 +82,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings
     {
-        // TODO: Implement getCreditCardSettings() method.
+        return $this->creditCardSettings ?? new CreditCardSettings();
     }
 
     public function getApiSettings(?string $salesChannelId = null): ApiSettings
