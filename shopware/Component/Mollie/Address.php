@@ -19,6 +19,48 @@ final class Address implements \JsonSerializable
      */
     private const MAX_TITLE_LENGTH = 20;
 
+    /**
+     * Characters Mollie accepts in an address: the letters and digits of the Unicode blocks
+     * Basic Latin, Latin-1 Supplement, Latin Extended-A and Phonetic Extensions, without the
+     * two mathematical signs that sit between the Latin-1 letters.
+     */
+    private const ACCEPTED_CHARACTERS = 'A-Za-z0-9\x{00AA}\x{00BA}\x{00C0}-\x{00D6}\x{00D8}-\x{00F6}\x{00F8}-\x{017F}\x{1D00}-\x{1D7F}';
+
+    /**
+     * A name may carry only the accepted characters, a space and the three punctuation marks
+     * that appear in real names. An underscore or an emoji from a wallet is rejected by Mollie
+     * with "Unprocessable Entity" and aborts the payment.
+     */
+    private const UNSUPPORTED_NAME_CHARACTERS = '~[^' . self::ACCEPTED_CHARACTERS . ' .\'-]~u';
+
+    /**
+     * Street, city and company name accept a far wider set of punctuation than a name does,
+     * so they are cleaned with their own pattern instead of losing a legitimate "&", "/" or
+     * the "°" and "·" that belong to a Spanish or Catalan address.
+     */
+    private const UNSUPPORTED_ADDRESS_CHARACTERS = '~[^' . self::ACCEPTED_CHARACTERS . ' .,:;#&/()+@_"\x{00B0}\x{00B7}\'-]~u';
+
+    private const COMBINING_MARKS = '~\p{Mn}~u';
+
+    private const LETTER = '~\p{L}~u';
+
+    private const WHITESPACES = '~\s+~u';
+
+    /**
+     * Characters that have an accepted counterpart and are therefore mapped rather than folded:
+     * the typographic apostrophes and dashes an Apple Pay or Google Pay wallet delivers.
+     */
+    private const CHARACTER_REPLACEMENTS = [
+        '’' => "'",
+        '‘' => "'",
+        '´' => "'",
+        '`' => "'",
+        '–' => '-',
+        '—' => '-',
+        '‑' => '-',
+        '−' => '-',
+    ];
+
     private string $title;
     private string $givenName;
     private string $familyName;
@@ -35,11 +77,11 @@ final class Address implements \JsonSerializable
     {
         $this->email = $email;
         $this->title = $title;
-        $this->givenName = $givenName;
-        $this->familyName = $familyName;
-        $this->streetAndNumber = $streetAndNumber;
+        $this->givenName = $this->sanitize($givenName, self::UNSUPPORTED_NAME_CHARACTERS);
+        $this->familyName = $this->sanitize($familyName, self::UNSUPPORTED_NAME_CHARACTERS);
+        $this->streetAndNumber = $this->sanitize($streetAndNumber, self::UNSUPPORTED_ADDRESS_CHARACTERS);
         $this->postalCode = $postalCode;
-        $this->city = $city;
+        $this->city = $this->sanitize($city, self::UNSUPPORTED_ADDRESS_CHARACTERS);
         $this->country = $country;
     }
 
@@ -149,22 +191,20 @@ final class Address implements \JsonSerializable
     {
         $data = [
             'title' => $this->limitTitle(trim($this->title)),
-            'givenName' => trim($this->givenName),
-            'familyName' => trim($this->familyName),
-            'streetAndNumber' => trim($this->streetAndNumber),
+            'givenName' => $this->givenName,
+            'familyName' => $this->familyName,
+            'streetAndNumber' => $this->streetAndNumber,
             'postalCode' => trim($this->postalCode),
             'email' => trim($this->email),
-            'city' => trim($this->city),
+            'city' => $this->city,
             'country' => trim($this->country),
         ];
 
-        $streetAdditional = trim($this->streetAdditional);
-        if ($streetAdditional !== '') {
-            $data['streetAdditional'] = $streetAdditional;
+        if ($this->streetAdditional !== '') {
+            $data['streetAdditional'] = $this->streetAdditional;
         }
-        $organizationName = trim($this->organizationName);
-        if ($organizationName !== '') {
-            $data['organizationName'] = $organizationName;
+        if ($this->organizationName !== '') {
+            $data['organizationName'] = $this->organizationName;
         }
         $phone = trim($this->phone);
         if ($phone !== '') {
@@ -191,16 +231,12 @@ final class Address implements \JsonSerializable
 
     public function setOrganizationName(string $organizationName): void
     {
-        $this->organizationName = trim($organizationName);
+        $this->organizationName = $this->sanitize($organizationName, self::UNSUPPORTED_ADDRESS_CHARACTERS);
     }
 
-    /**
-     * Mollie rejects a "streetAdditional" that holds nothing but whitespaces, so the value is
-     * normalized on assignment and stays empty when there is no real content behind it.
-     */
     public function setStreetAdditional(string $streetAdditional): void
     {
-        $this->streetAdditional = trim($streetAdditional);
+        $this->streetAdditional = $this->sanitize($streetAdditional, self::UNSUPPORTED_ADDRESS_CHARACTERS);
     }
 
     /**
@@ -312,6 +348,72 @@ final class Address implements \JsonSerializable
         }
 
         return implode(' ', $lines);
+    }
+
+    /**
+     * Mollie rejects an address field that carries characters outside the Latin blocks - an
+     * emoji from an Apple Pay wallet, an underscore in a last name - with an "Unprocessable
+     * Entity" and aborts the payment after the order already exists in the shop. The value is
+     * therefore cleaned on assignment, not on serialization: the express checkout reads the
+     * address back out of the Mollie session and writes it into the shop, so every reader of
+     * this struct has to see the same value.
+     *
+     * A field that survives nothing at all keeps its original value, because an empty name
+     * would fail the Shopware address validation before Mollie is ever reached.
+     */
+    private function sanitize(string $value, string $unsupportedCharacters): string
+    {
+        $normalized = \Normalizer::normalize($value, \Normalizer::FORM_C);
+        if ($normalized === false) {
+            return trim($value);
+        }
+
+        $normalized = strtr((string) preg_replace(self::WHITESPACES, ' ', $normalized), self::CHARACTER_REPLACEMENTS);
+        $accepted = preg_replace_callback(
+            $unsupportedCharacters,
+            fn (array $match): string => $this->toAcceptedCharacters($match[0], $unsupportedCharacters),
+            $normalized
+        );
+        if ($accepted === null) {
+            return trim($value);
+        }
+
+        $accepted = trim((string) preg_replace(self::WHITESPACES, ' ', $accepted));
+        if ($accepted === '') {
+            return trim($value);
+        }
+
+        return $accepted;
+    }
+
+    /**
+     * Replacement for a single character Mollie does not accept. Dropping it outright would
+     * turn "Nguyễn" into "Nguyn", so the character is first folded onto its base letter, which
+     * yields "Nguyen" and keeps the name readable and comparable for Klarna.
+     *
+     * A letter that has no accepted base, a Cyrillic or Greek one, is kept as it is: it is
+     * accepted by every method except Klarna today, and mangling it would corrupt the address
+     * the merchant ships to. Everything that is not a letter - emoji, symbols, control
+     * characters - has no place in an address and is dropped.
+     */
+    private function toAcceptedCharacters(string $character, string $unsupportedCharacters): string
+    {
+        $decomposed = \Normalizer::normalize($character, \Normalizer::FORM_KD);
+        if ($decomposed === false) {
+            $decomposed = $character;
+        }
+
+        $withoutMarks = (string) preg_replace(self::COMBINING_MARKS, '', $decomposed);
+        $base = (string) preg_replace($unsupportedCharacters, '', $withoutMarks);
+        if ($base !== '') {
+            return $base;
+        }
+
+        if (preg_match(self::LETTER, $character) === 1) {
+            return $character;
+        }
+
+        return '';
     }
 
     /**
