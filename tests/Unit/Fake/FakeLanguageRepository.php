@@ -16,6 +16,9 @@ final class FakeLanguageRepository extends EntityRepository
 {
     private LanguageCollection $collection;
 
+    /** @var list<mixed> */
+    private array $requestedIds = [];
+
     /**
      * Without a locale code the repository behaves like a lookup that found no language, which is
      * what LocaleProvider falls back to en-GB for.
@@ -41,6 +44,16 @@ final class FakeLanguageRepository extends EntityRepository
 
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
+        $this->requestedIds = array_values(array_merge($this->requestedIds, $criteria->getIds()));
+
         return new EntitySearchResult(LanguageDefinition::ENTITY_NAME, $this->collection->count(), $this->collection, null, $criteria, $context);
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    public function getRequestedIds(): array
+    {
+        return $this->requestedIds;
     }
 }

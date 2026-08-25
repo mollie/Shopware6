@@ -30,6 +30,7 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 
 #[CoversClass(WebhookRoute::class)]
 final class WebhookRouteTest extends TestCase
@@ -407,6 +408,137 @@ final class WebhookRouteTest extends TestCase
         $this->assertInstanceOf(WebhookResponse::class, $response);
         $this->assertTrue($transactionStateHandler->wasCalled(), 'Refund must still change the payment status of a paid order');
         $this->assertTrue($orderStateHandler->wasCalled(), 'Refund must still change the order status of a paid order');
+    }
+
+    public function testTheRouteCannotBeDecorated(): void
+    {
+        $this->expectException(DecorationPatternException::class);
+
+        $this->getRoute()->getDecorated();
+    }
+
+    public function testOrderWithoutAStateIsRejected(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withoutOrderState();
+
+        $route = $this->getRoute($transactionService);
+
+        try {
+            $route->notify('test', $this->context);
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::ORDER_WITHOUT_STATE, $exception->getErrorCode());
+
+            return;
+        }
+
+        $this->fail('Expected the webhook to reject an order without a state');
+    }
+
+    public function testAPartialCaptureDoesNotShipTheOrder(): void
+    {
+        // A partial capture is the shipment of a single item; ShipOrderRoute already transitions the
+        // delivery for it, so the webhook must not mark the whole order as shipped.
+        $orderService = new FakeOrderService();
+        $route = $this->getRoute(
+            fakeClient: $this->paidClient(captured: '40.00', amount: '100.00'),
+            orderService: $orderService,
+        );
+
+        $route->notify('test', $this->context);
+
+        $this->assertSame([], $orderService->getDeliveryTransitions());
+    }
+
+    public function testAnOrderWithoutDeliveriesIsNotShipped(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withoutDeliveries();
+
+        $orderService = new FakeOrderService();
+        $route = $this->getRoute(
+            $transactionService,
+            $this->paidClient(captured: '100.00', amount: '100.00'),
+            orderService: $orderService,
+        );
+
+        $route->notify('test', $this->context);
+
+        $this->assertSame([], $orderService->getDeliveryTransitions());
+    }
+
+    public function testAuthorizedDigitalItemsAreCapturedRightAway(): void
+    {
+        // Digital items are never shipped, so an authorized pay-later payment would stay uncaptured
+        // forever; the webhook captures them as soon as the payment is authorized.
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withDigitalLineItem();
+
+        $shipOrderRoute = new FakeShipOrderRoute();
+        $route = $this->getRoute($transactionService, new FakeClient('mollieTestId', 'authorized'), shipOrderRoute: $shipOrderRoute);
+
+        $route->notify('test', $this->context);
+
+        $this->assertTrue($shipOrderRoute->wasCalled());
+        $this->assertSame([['id' => 'digitallineitemid', 'quantity' => 2]], $shipOrderRoute->getLastRequest()->get('items'));
+    }
+
+    public function testAPaidOrderWithDigitalItemsIsNotCapturedAgain(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withDigitalLineItem();
+
+        $shipOrderRoute = new FakeShipOrderRoute();
+        $route = $this->getRoute($transactionService, new FakeClient('mollieTestId', 'paid'), shipOrderRoute: $shipOrderRoute);
+
+        $route->notify('test', $this->context);
+
+        $this->assertFalse($shipOrderRoute->wasCalled());
+    }
+
+    public function testAnAuthorizedOrderWithoutDigitalItemsIsNotCaptured(): void
+    {
+        $shipOrderRoute = new FakeShipOrderRoute();
+        $route = $this->getRoute(fakeClient: new FakeClient('mollieTestId', 'authorized'), shipOrderRoute: $shipOrderRoute);
+
+        $route->notify('test', $this->context);
+
+        $this->assertFalse($shipOrderRoute->wasCalled());
+    }
+
+    public function testAFailingDigitalCaptureIsLoggedAndTheWebhookStillSucceeds(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+        $transactionService->withDigitalLineItem();
+
+        $shipOrderRoute = new FakeShipOrderRoute();
+        $shipOrderRoute->setShouldThrow(true);
+        $logger = new FakeLogger();
+
+        $route = $this->getRoute($transactionService, new FakeClient('mollieTestId', 'authorized'), shipOrderRoute: $shipOrderRoute, logger: $logger);
+
+        $response = $route->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertTrue($logger->hasRecordThatContains(LogLevel::ERROR, 'Auto-capture of digital line items failed'));
+    }
+
+    private function paidClient(string $captured, string $amount): FakeClient
+    {
+        return new FakeClient(
+            'mollieTestId',
+            'paid',
+            PaymentMethod::PAYPAL,
+            false,
+            null,
+            ['value' => $captured, 'currency' => 'EUR'],
+            ['value' => $amount, 'currency' => 'EUR'],
+        );
     }
 
     private function getRoute(

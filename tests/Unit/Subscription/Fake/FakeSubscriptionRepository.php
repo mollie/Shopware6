@@ -17,6 +17,9 @@ final class FakeSubscriptionRepository extends EntityRepository
     /** @var list<array<string,mixed>> */
     private array $upsertedPayloads = [];
 
+    /** @var list<Criteria> */
+    private array $searchCriteria = [];
+
     public function __construct(private SubscriptionCollection $collection = new SubscriptionCollection())
     {
     }
@@ -51,8 +54,18 @@ final class FakeSubscriptionRepository extends EntityRepository
         return $this->upsertedPayloads;
     }
 
+    /**
+     * @return list<Criteria>
+     */
+    public function getSearchCriteria(): array
+    {
+        return $this->searchCriteria;
+    }
+
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
+        $this->searchCriteria[] = $criteria;
+
         $ids = $criteria->getIds();
         $filtered = new SubscriptionCollection();
 

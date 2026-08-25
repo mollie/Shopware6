@@ -28,6 +28,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStat
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Content\Product\State;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;
@@ -38,28 +39,40 @@ final class OrderEntityBuilder
 {
     public function getDefaultOrder($customer): OrderEntity
     {
-        $order = new OrderEntity();
-        $order->setId('fakeShopwareOrderId');
-        $order->setOrderNumber('10000');
-        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
-        $order->setBillingAddress($this->getOrderAddress($customer));
+        return $this->buildDefaultOrder($customer, true, true);
+    }
 
-        $order->setDeliveries($this->getOrderDeliveries($customer));
-        $order->setAmountTotal(100.00);
-        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
-        $order->setLineItems($this->getLineItems());
-        if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
-            $order->setPrimaryOrderDeliveryId('fake-delivery-id');
-        }
+    /**
+     * The same order without its state machine state, e.g. because the criteria did not associate it.
+     * The Shopware setter is not nullable, so the association is left unset instead.
+     *
+     * @param mixed $customer
+     */
+    public function getOrderWithoutState($customer): OrderEntity
+    {
+        return $this->buildDefaultOrder($customer, false, true);
+    }
 
-        $stateMachineState = new StateMachineStateEntity();
-        $stateMachineState->setTechnicalName('open');
-        $stateMachineState->setId('openFakeStateId');
+    /**
+     * The same order without deliveries, as a digital-only order has none.
+     *
+     * @param mixed $customer
+     */
+    public function getOrderWithoutDeliveries($customer): OrderEntity
+    {
+        return $this->buildDefaultOrder($customer, true, false);
+    }
 
-        $order->setStateId($stateMachineState->getId());
-        $order->setStateMachineState($stateMachineState);
+    /**
+     * A downloadable line item: Shopware marks it with the is-download state and it is not part of
+     * any delivery.
+     */
+    public function createDigitalLineItem(string $id, string $productNumber, int $quantity, float $unitPrice): OrderLineItemEntity
+    {
+        $orderLineItem = $this->createShippableLineItem($id, $productNumber, $quantity, $unitPrice);
+        $orderLineItem->setStates([State::IS_DOWNLOAD]);
 
-        return $order;
+        return $orderLineItem;
     }
 
     public function getOrderAddress(CustomerEntity $customerEntity): OrderAddressEntity
@@ -402,6 +415,40 @@ final class OrderEntityBuilder
         $orderLineItem->setPrice($price);
 
         return $orderLineItem;
+    }
+
+    private function buildDefaultOrder($customer, bool $withState, bool $withDeliveries): OrderEntity
+    {
+        $order = new OrderEntity();
+        $order->setId('fakeShopwareOrderId');
+        $order->setOrderNumber('10000');
+        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
+        $order->setBillingAddress($this->getOrderAddress($customer));
+
+        if ($withDeliveries) {
+            $order->setDeliveries($this->getOrderDeliveries($customer));
+        }
+        $order->setAmountTotal(100.00);
+        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
+        $order->setLineItems($this->getLineItems());
+        if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
+            $order->setPrimaryOrderDeliveryId('fake-delivery-id');
+        }
+
+        // The state id is a column and therefore always present; only the association can be missing.
+        $order->setStateId('openFakeStateId');
+
+        if ($withState === false) {
+            return $order;
+        }
+
+        $stateMachineState = new StateMachineStateEntity();
+        $stateMachineState->setTechnicalName('open');
+        $stateMachineState->setId('openFakeStateId');
+
+        $order->setStateMachineState($stateMachineState);
+
+        return $order;
     }
 
     private function buildOrderWithTransaction(OrderLineItemCollection $lineItems, ?Payment $payment, string $transactionState): OrderEntity

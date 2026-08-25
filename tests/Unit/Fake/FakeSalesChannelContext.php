@@ -67,6 +67,7 @@ final class FakeSalesChannelContext extends SalesChannelContext
         $salesChannel = new SalesChannelEntity();
         $salesChannel->setId($this->fakeSalesChannelId);
         $salesChannel->setName('Fake Sales Channel');
+        $salesChannel->setLanguageId($this->fakeContext->getLanguageId());
 
         return $salesChannel;
     }

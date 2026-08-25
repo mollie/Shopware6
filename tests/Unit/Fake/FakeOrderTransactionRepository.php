@@ -29,6 +29,9 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
     /** @var list<Criteria> */
     private array $searchCriteria = [];
 
+    /** @var list<Criteria> */
+    private array $searchIdsCriteria = [];
+
     /** @var list<string> */
     private array $requestedSalesChannelIds = [];
 
@@ -110,7 +113,17 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
 
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
+        $this->searchIdsCriteria[] = $criteria;
+
         return $this->buildIdSearchResult($this->matchingIds, $context);
+    }
+
+    /**
+     * @return list<Criteria>
+     */
+    public function getSearchIdsCriteria(): array
+    {
+        return $this->searchIdsCriteria;
     }
 
     /**
