@@ -4,6 +4,7 @@
 - Added: The Mollie refund, capture and shipment ids are available on the order for accounting exports, in the DATEV-compatible format with a hyphen.
 - Added: New "Disable Return Management integration" setting in the Refund Manager, so returns from the Shopware Return Management no longer trigger a refund at Mollie.
 - Changed: Bancontact with status "open" now counts as failed.
+- Changed: Special characters in addresses are removed before the payment.
 - Fixed: PayPal Express is the only payment method in the checkout right after returning.
 - Fixed: Opening a payment link a second time works again.
 - Fixed: The shipping costs of orders from older plugin versions are refunded, returned and marked as shipped at Mollie correctly again.
