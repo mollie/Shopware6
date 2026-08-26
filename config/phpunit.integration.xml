@@ -21,6 +21,14 @@
         </testsuite>
     </testsuites>
 
+    <!-- Same extension as the unit suite, but this one runs from the Shopware root,
+         so the config path has to start there. -->
+    <extensions>
+        <bootstrap class="Qameta\Allure\PHPUnit\AllureExtension">
+            <parameter name="config" value="custom/plugins/MolliePayments/config/allure.config.php"/>
+        </bootstrap>
+    </extensions>
+
     <source>
         <include>
             <directory>./../src</directory>

@@ -1,6 +1,10 @@
 default:
+  # Registers the Allure formatter without enabling it - `make behat allure=<dir>` selects it.
+  extensions:
+    Allure\Behat\AllureFormatterExtension: ~
   suites:
-    default:
+    # Names the suite in the Allure report, next to Unit, Integration and Cypress.
+    Behat:
       paths:
         features: '%paths.base%/../tests/Behat/Features'
       contexts:

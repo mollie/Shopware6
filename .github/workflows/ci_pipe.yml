@@ -125,3 +125,15 @@ jobs:
           TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  report:
+    name: Test Report
+    needs: [ review, e2e ]
+    if: ${{ always() }}
+    uses: ./.github/workflows/step_report.yml
+    with:
+      DESTINATION: run-${{ github.run_number }}
+      # Only master decides what the README badge and reports/latest show.
+      PUBLISH_LATEST: true

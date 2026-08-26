@@ -1,0 +1,130 @@
+name: Step Report
+
+on:
+  workflow_call:
+    inputs:
+      DESTINATION:
+        description: "Folder below reports/ on the gh-pages branch that receives this report."
+        required: true
+        type: string
+      PUBLISH_LATEST:
+        description: "Also update reports/latest, the trend history and the README badge. Only the master pipeline may do this - a pull request is not the state of the plugin."
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+
+  report:
+    name: Allure Report
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v6
+
+      # Every test job uploads under this prefix. A missing one is not an error: a job that
+      # was skipped simply leaves its environment out of the report.
+      - name: Download Allure Results
+        uses: actions/download-artifact@v7
+        with:
+          pattern: allure-results-*
+          path: .reports/allure/stages
+
+      - name: Clone Report Branch
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build Report
+        run: |
+          npm install -g allure@^3
+
+          mkdir -p .reports/allure/dumps
+
+          # The trend chart is the reason to publish at all, so continue the history the
+          # last master run left behind instead of starting over.
+          cp gh-pages/reports/history.jsonl .reports/allure/history.jsonl || true
+
+          environments=""
+
+          for stage in .reports/allure/stages/*/; do
+            [ -d "$stage" ] || continue
+
+            suffix=$(basename "$stage" | sed 's/^allure-results-//')
+            id=$(printf '%s' "$suffix" | tr -c 'A-Za-z0-9_-' '_')
+            environments="${environments}${id}=$(printf '%s' "$suffix" | tr '_' ' ');"
+
+            # `allure run` records the results that appear while the wrapped command runs,
+            # so unpacking the artifact has to BE that command.
+            rm -rf .reports/allure/stage
+            mkdir -p .reports/allure/stage
+
+            allure run -c config/allurerc.mjs \
+              --environment "$id" \
+              --dump ".reports/allure/dumps/$id" \
+              --results-dir .reports/allure/stage \
+              -- cp -r "$stage." .reports/allure/stage/
+          done
+
+          ALLURE_ENVIRONMENTS="$environments" allure generate -c config/allurerc.mjs \
+            --dump '.reports/allure/dumps/*.zip' \
+            --history-limit 30
+
+      - name: Publish Report
+        run: |
+          destination="gh-pages/reports/${{ inputs.DESTINATION }}"
+          rm -rf "$destination"
+          mkdir -p "$destination"
+          cp -r .reports/allure/report/. "$destination/"
+
+          if [ "${{ inputs.PUBLISH_LATEST }}" = "true" ]; then
+            rm -rf gh-pages/reports/latest
+            cp -r .reports/allure/report gh-pages/reports/latest
+            cp .reports/allure/history.jsonl gh-pages/reports/history.jsonl
+
+            # Shields.io has no idea what Allure is, so hand it a finished endpoint.
+            node -e '
+              const {stats = {}} = require("./.reports/allure/report/summary.json");
+              const passed = stats.passed ?? 0;
+              const failed = (stats.failed ?? 0) + (stats.broken ?? 0);
+
+              require("fs").writeFileSync("gh-pages/reports/badge.json", JSON.stringify({
+                schemaVersion: 1,
+                label: "tests",
+                message: failed > 0 ? passed + " passed, " + failed + " failed" : passed + " passed",
+                color: failed > 0 ? "critical" : "success",
+              }));
+            '
+          fi
+
+          # A report is a few MB, so without a cap the branch grows out of hand.
+          ls -1d gh-pages/reports/run-* 2>/dev/null | sort -V | head -n -20 | xargs -r rm -rf
+
+          cd gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports
+
+          if git diff --quiet --cached; then
+            echo "Nothing to publish."
+            exit 0
+          fi
+
+          git commit -m "Test report for ${{ github.sha }}"
+
+          # Two pipelines can finish at the same moment and both push to this branch.
+          for attempt in 1 2 3; do
+            git push && exit 0
+            git pull --rebase
+          done
+
+          exit 1
+
+      - name: Link Report
+        run: |
+          url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ inputs.DESTINATION }}/"
+          echo "[Test report for this run]($url)" >> "$GITHUB_STEP_SUMMARY"

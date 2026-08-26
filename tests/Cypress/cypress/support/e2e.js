@@ -19,6 +19,9 @@ import axios from "axios";
 
 import 'cypress-axe'
 
+// Reports every test, command and screenshot to the Allure results of this run.
+import 'allure-cypress'
+
 const CypressFilters = require('cypress-filters');
 new CypressFilters().register();
 
