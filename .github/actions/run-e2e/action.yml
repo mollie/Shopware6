@@ -308,6 +308,21 @@ runs:
         docker cp shop:${{ inputs._ALLURE_DIR }}/behat/. allure-results/ || true
         cp -r tests/Cypress/allure-results/. allure-results/ || true
 
+        # Behat writes every feature into a single all.json, but Allure's Cucumber reader
+        # only ever reads the first entry of such an array - the other features would be
+        # dropped without a word. Give it one file per feature instead.
+        node -e '
+          const fs = require("fs");
+
+          if (fs.existsSync("allure-results/all.json")) {
+            JSON.parse(fs.readFileSync("allure-results/all.json")).forEach((feature, index) => {
+              fs.writeFileSync(`allure-results/behat-${index}.json`, JSON.stringify([feature]));
+            });
+
+            fs.unlinkSync("allure-results/all.json");
+          }
+        '
+
     - name: Store Allure Results
       if: always()
       uses: actions/upload-artifact@v7
