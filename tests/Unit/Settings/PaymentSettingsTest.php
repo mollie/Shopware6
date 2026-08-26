@@ -59,4 +59,75 @@ final class PaymentSettingsTest extends TestCase
         $this->assertSame('Rounding', $settings->getFixRoundingDiffName());
         $this->assertSame('ROUND-1', $settings->getFixRoundingDiffSku());
     }
+
+    /**
+     * The keys are the ones from config.xml. A renamed key silently turns the merchant's setting
+     * off, so every one of them is pinned here.
+     */
+    public function testEverySettingIsReadFromItsConfigurationKey(): void
+    {
+        $settings = PaymentSettings::createFromShopwareArray([
+            'oneClickPaymentsEnabled' => true,
+            'oneClickPaymentsCompactView' => true,
+            'shopwareFailedPayment' => true,
+            'createCustomersAtMollie' => true,
+            'useMolliePaymentMethodLimits' => true,
+            'automaticShipping' => true,
+            'automaticCancellation' => true,
+            'paymentLinkAllowMethodSelection' => true,
+        ]);
+
+        $this->assertTrue($settings->isOneClickPayment());
+        $this->assertTrue($settings->isOneClickCompactView());
+        $this->assertTrue($settings->isShopwareFailedPayment());
+        $this->assertTrue($settings->forceCustomerCreation());
+        $this->assertTrue($settings->useMollieLimits());
+        $this->assertTrue($settings->isAutomaticShipment());
+        $this->assertTrue($settings->isAutomaticCancellation());
+        $this->assertTrue($settings->isPaymentLinkMethodSelectionAllowed());
+    }
+
+    public function testAnUnconfiguredShopHasEverythingSwitchedOff(): void
+    {
+        $settings = PaymentSettings::createFromShopwareArray([]);
+
+        $this->assertFalse($settings->isOneClickPayment());
+        $this->assertFalse($settings->isOneClickCompactView());
+        $this->assertFalse($settings->isShopwareFailedPayment());
+        $this->assertFalse($settings->forceCustomerCreation());
+        $this->assertFalse($settings->useMollieLimits());
+        $this->assertFalse($settings->isAutomaticShipment());
+        $this->assertFalse($settings->isAutomaticCancellation());
+        $this->assertFalse($settings->isPaymentLinkMethodSelectionAllowed());
+    }
+
+    /**
+     * Mollie rejects a bank transfer due date outside 1..100 days, so a merchant typo is clamped
+     * instead of failing the payment.
+     */
+    public function testADueDateBeyondWhatMollieAcceptsIsClamped(): void
+    {
+        $tooHigh = PaymentSettings::createFromShopwareArray([PaymentSettings::KEY_DUE_DATE_DAYS => 365]);
+        $tooLow = PaymentSettings::createFromShopwareArray([PaymentSettings::KEY_DUE_DATE_DAYS => -5]);
+
+        $this->assertSame(100, $tooHigh->getDueDateDays());
+        $this->assertSame(1, $tooLow->getDueDateDays());
+    }
+
+    /**
+     * Zero is not a typo but "no due date", so it must survive the clamping.
+     */
+    public function testNoDueDateStaysNoDueDate(): void
+    {
+        $settings = PaymentSettings::createFromShopwareArray([]);
+
+        $this->assertSame(0, $settings->getDueDateDays());
+    }
+
+    public function testADueDateWithinTheAllowedRangeIsKept(): void
+    {
+        $settings = PaymentSettings::createFromShopwareArray([PaymentSettings::KEY_DUE_DATE_DAYS => 14]);
+
+        $this->assertSame(14, $settings->getDueDateDays());
+    }
 }

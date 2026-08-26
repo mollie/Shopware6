@@ -14,12 +14,23 @@ Run this **after** the tests are written.
 - **No PHPUnit mocks.** `createMock()`, `getMockBuilder()`, `prophesize()` are findings.
   Use a Fake from the neighbouring `Fake/` folder, or add one. When the assertion is about
   *what was sent*, use a Spy — a Fake that records its calls — not a mock.
-- **Every new Fake is a duplicate until proven otherwise.** For each added `Fake*` file, grep
-  the contract it satisfies (`implements <Interface>`, `extends <Class>`) across `tests/Unit`
-  before accepting it: a second Fake for a contract that already has one is a finding, and an
-  existing Fake that was *replaced* rather than extended is a worse one — check `git status`
-  for a `Fake*` file that shows as modified with methods removed. Existing callers break at
-  runtime, not at review time.
+- **Every new Fake is a duplicate until proven otherwise.** For each added `Fake*` file run
+  **both** checks before accepting it: `find tests -name '<the exact file name>'` — a Fake whose
+  name already exists was overwritten, not added, and the contract grep will not show it because
+  the old one may satisfy the contract differently (a `TranslatorInterface` fake is invisible to a
+  grep for `extends AbstractTranslator`); and a grep for the contract itself (`implements
+  <Interface>`, `extends <Class>`) across `tests/Unit` — a second Fake for a contract that already
+  has one is a finding. An existing Fake that was *replaced* rather than extended is the worst
+  case: check `git status` for a `Fake*` file that shows as modified. Existing callers break at
+  runtime, not at review time. Two fakes for the same name but different contracts is fine — give
+  the new one a distinguishing name (`FakeShopwareTranslator` next to `FakeTranslator`).
+- **A Fake that extends a Shopware `Abstract*` class must not return `$this` from
+  `getDecorated()` without checking the base.** Shopware's decorator bases often implement their
+  non-abstract methods as `$this->getDecorated()->sameMethod(...)`; a fake that inherits one of
+  them and points `getDecorated()` at itself recurses until the PHP process **segfaults** - the
+  suite dies mid-run with no failure message and no stack trace. Check with
+  `grep -n 'getDecorated()->' <the abstract class>`: if there are hits, override every one of
+  those methods in the fake and let `getDecorated()` throw instead.
 - **`#[CoversClass(...)]`** declared on every unit test class.
 - **Builders** for complex fixtures instead of long inline object setup — reuse
   `tests/Unit/Builder/` and the per-component `Builder/` folders.

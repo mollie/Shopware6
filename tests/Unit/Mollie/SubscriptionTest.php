@@ -149,6 +149,67 @@ final class SubscriptionTest extends TestCase
         $this->assertArrayNotHasKey('webhookUrl', $body);
     }
 
+    /**
+     * The renewal schedule is what the customer's subscription overview shows and what the price
+     * update task decides on, so every field of it has to survive the read.
+     */
+    public function testTheRenewalScheduleIsReadFromWhatMollieSends(): void
+    {
+        $subscription = Subscription::createFromClientResponse($this->mollieBody([
+            'nextPaymentDate' => '2026-10-01',
+            'timesRemaining' => 5,
+        ]));
+
+        $this->assertSame('2026-10-01', $subscription->getNextPaymentDate()?->format('Y-m-d'));
+        $this->assertSame(5, $subscription->getTimesRemaining());
+        $this->assertSame('2026-08-01', $subscription->getCreatedAt()?->format('Y-m-d'));
+        $this->assertSame('1 month', (string) $subscription->getInterval());
+        $this->assertSame('https://shop.test/webhook', $subscription->getWebhookUrl());
+    }
+
+    /**
+     * An ongoing subscription has no end, so Mollie sends no remaining count.
+     */
+    public function testAnOngoingSubscriptionHasNoRemainingCharges(): void
+    {
+        $subscription = Subscription::createFromClientResponse($this->mollieBody());
+
+        $this->assertNull($subscription->getTimesRemaining());
+        $this->assertNull($subscription->getNextPaymentDate());
+    }
+
+    /**
+     * The order the subscription came from is carried in the metadata; the renewal reads it back
+     * from there.
+     */
+    public function testTheMetadataMollieStoredIsReadBack(): void
+    {
+        $subscription = Subscription::createFromClientResponse($this->mollieBody([
+            'metadata' => ['swSubscriptionId' => 'subscription-1'],
+        ]));
+
+        $this->assertSame(['swSubscriptionId' => 'subscription-1'], $subscription->getMetadata());
+    }
+
+    /**
+     * A subscription whose customer changed their card gets a new mandate, and a price migration
+     * changes amount and start date. All of that is applied to the object before it is sent back.
+     */
+    public function testAnUpdatedSubscriptionCarriesTheNewValues(): void
+    {
+        $subscription = $this->subscription();
+
+        $subscription->setStatus(SubscriptionStatus::SUSPENDED);
+        $subscription->setMandateId('mdt_2');
+        $subscription->setAmount(new Money(24.99, 'EUR'));
+        $subscription->setStartDate(new \DateTimeImmutable('2026-11-01'));
+
+        $this->assertSame(SubscriptionStatus::SUSPENDED, $subscription->getStatus());
+        $this->assertSame('mdt_2', $subscription->getMandateId());
+        $this->assertSame(24.99, $subscription->getAmount()->getValue());
+        $this->assertSame('2026-11-01', $subscription->getStartDate()->format('Y-m-d'));
+    }
+
     private function subscription(): Subscription
     {
         return new Subscription(

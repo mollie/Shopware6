@@ -20,6 +20,8 @@ final class FakeSubscriptionRepository extends EntityRepository
     /** @var list<Criteria> */
     private array $searchCriteria = [];
 
+    private ?\Throwable $searchFailure = null;
+
     public function __construct(private SubscriptionCollection $collection = new SubscriptionCollection())
     {
     }
@@ -62,8 +64,21 @@ final class FakeSubscriptionRepository extends EntityRepository
         return $this->searchCriteria;
     }
 
+    /**
+     * The error the DAL raises when the subscription table cannot be read, e.g. a broken database
+     * connection during a scheduled task.
+     */
+    public function withSearchFailure(\Throwable $failure): void
+    {
+        $this->searchFailure = $failure;
+    }
+
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
+        if ($this->searchFailure !== null) {
+            throw $this->searchFailure;
+        }
+
         $this->searchCriteria[] = $criteria;
 
         $ids = $criteria->getIds();

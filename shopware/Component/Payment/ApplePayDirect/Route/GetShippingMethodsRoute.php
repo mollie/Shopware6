@@ -207,6 +207,13 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
      */
     private function setSelectedMethodToFirstElement(array $applePayMethods, string $selectedShippingMethodId): array
     {
+        // The method the customer chose in the shop does not have to be available for the country
+        // they pick in the Apple Pay sheet. Apple preselects the first entry, so the remaining
+        // methods keep their order and the first available one is preselected instead.
+        if (! isset($applePayMethods[$selectedShippingMethodId])) {
+            return array_values($applePayMethods);
+        }
+
         $selectedShippingMethod = $applePayMethods[$selectedShippingMethodId];
 
         unset($applePayMethods[$selectedShippingMethodId]);

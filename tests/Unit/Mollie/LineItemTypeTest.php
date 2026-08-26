@@ -28,6 +28,95 @@ final class LineItemTypeTest extends TestCase
         $this->assertSame('customized-products', LineItemType::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value);
     }
 
+    public function testFromCartLineItemWithProductType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::PRODUCT_LINE_ITEM_TYPE);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::PHYSICAL, $result);
+    }
+
+    public function testFromCartLineItemWithCustomProductsType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItemType::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::PHYSICAL, $result);
+    }
+
+    public function testFromCartLineItemWithCreditType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::CREDIT_LINE_ITEM_TYPE);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::CREDIT, $result);
+    }
+
+    public function testFromCartLineItemWithPromotionType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::PROMOTION_LINE_ITEM_TYPE);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DISCOUNT, $result);
+    }
+
+    public function testFromCartLineItemWithUnknownTypeDefaultsToDigital(): void
+    {
+        $cartLineItem = new LineItem('line-1', 'unknown_type');
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
+    public function testFromCartLineItemWithDownloadStateBecomesDigital(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::PRODUCT_LINE_ITEM_TYPE);
+        $cartLineItem->setStates([State::IS_DOWNLOAD]);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
+    /**
+     * Mollie rejects a negative amount unless the line is typed as a discount, so a third-party
+     * plugin's own line type must not survive.
+     */
+    public function testFromCartLineItemWithNegativePriceBecomesDiscount(): void
+    {
+        $cartLineItem = new LineItem('line-1', 'custom-discount');
+        $cartLineItem->setPrice(new CalculatedPrice(-10.0, -10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DISCOUNT, $result);
+    }
+
+    public function testFromCartLineItemKeepsCreditEvenWithANegativePrice(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::CREDIT_LINE_ITEM_TYPE);
+        $cartLineItem->setPrice(new CalculatedPrice(-10.0, -10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::CREDIT, $result);
+    }
+
+    public function testFromCartLineItemWithPositivePriceKeepsType(): void
+    {
+        $cartLineItem = new LineItem('line-1', 'custom-surcharge');
+        $cartLineItem->setPrice(new CalculatedPrice(10.0, 10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
     public function testFromOrderLineItemWithProductType(): void
     {
         $orderLineItem = new OrderLineItemEntity();

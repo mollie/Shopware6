@@ -39,4 +39,61 @@ final class SubscriptionSettingsTest extends TestCase
 
         $this->assertSame(7, $settings->getPriceUpdateNoticeDays());
     }
+
+    /**
+     * These flags decide which buttons a customer sees on their subscription. A renamed key would
+     * silently take a feature away from every shop.
+     */
+    public function testEverySettingIsReadFromItsConfigurationKey(): void
+    {
+        $settings = SubscriptionSettings::createFromShopwareArray([
+            SubscriptionSettings::KEY_ENABLED => true,
+            SubscriptionSettings::KEY_SHOW_INDICATOR => true,
+            SubscriptionSettings::KEY_ALLOW_EDIT_ADDRESS => true,
+            SubscriptionSettings::KEY_ALLOW_PAUSE_RESUME => true,
+            SubscriptionSettings::KEY_ALLOW_SKIP => true,
+            SubscriptionSettings::KEY_ALLOW_REORDER => false,
+            SubscriptionSettings::KEY_ALLOW_UPDATE_PAYMENT => false,
+            SubscriptionSettings::KEY_SKIP_IF_FAILED => true,
+            SubscriptionSettings::KEY_REMINDER_DAYS => 5,
+            SubscriptionSettings::KEY_CANCEL_DAYS => 3,
+        ]);
+
+        $this->assertTrue($settings->isEnabled());
+        $this->assertTrue($settings->isShowIndicator());
+        $this->assertTrue($settings->isAllowEditAddress());
+        $this->assertTrue($settings->isAllowPauseAndResume());
+        $this->assertTrue($settings->isAllowSkip());
+        $this->assertFalse($settings->isAllowReorder());
+        $this->assertFalse($settings->isAllowUpdatePayment());
+        $this->assertTrue($settings->isSkipIfFailed());
+        $this->assertSame(5, $settings->getReminderDays());
+        $this->assertSame(3, $settings->getCancelDays());
+    }
+
+    /**
+     * Reorder and payment update are on unless the merchant switches them off - taking them away
+     * from every shop that never opened the subscription settings would be a regression.
+     */
+    public function testReorderAndPaymentUpdateAreOnByDefault(): void
+    {
+        $settings = SubscriptionSettings::createFromShopwareArray([]);
+
+        $this->assertTrue($settings->isAllowReorder());
+        $this->assertTrue($settings->isAllowUpdatePayment());
+    }
+
+    public function testSubscriptionsAreOffUntilTheMerchantSwitchesThemOn(): void
+    {
+        $settings = SubscriptionSettings::createFromShopwareArray([]);
+
+        $this->assertFalse($settings->isEnabled());
+        $this->assertFalse($settings->isShowIndicator());
+        $this->assertFalse($settings->isAllowEditAddress());
+        $this->assertFalse($settings->isAllowPauseAndResume());
+        $this->assertFalse($settings->isAllowSkip());
+        $this->assertFalse($settings->isSkipIfFailed());
+        $this->assertSame(0, $settings->getReminderDays());
+        $this->assertSame(0, $settings->getCancelDays());
+    }
 }

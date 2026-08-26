@@ -36,6 +36,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?ExpressComponentsSettings $expressComponentsSettings = null,
         private ?CreditCardSettings $creditCardSettings = null,
         private ?RefundSettings $refundSettings = null,
+        private ?AccountSettings $accountSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -120,7 +121,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getAccountSettings(?string $salesChannelId = null): AccountSettings
     {
-        // TODO: Implement getAccountSettings() method.
+        return $this->accountSettings ?? new AccountSettings(false, false, false, false, false, false);
     }
 
     public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings

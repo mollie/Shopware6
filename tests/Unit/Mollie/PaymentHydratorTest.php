@@ -102,6 +102,29 @@ final class PaymentHydratorTest extends TestCase
         $this->assertSame(0.01, $payment->getRoundingDiff());
     }
 
+    /**
+     * Mollie returns line metadata json-encoded when it was sent as a string, so the rounding line
+     * has to be recognized in that shape too.
+     */
+    public function testRoundingDiffIsReadFromJsonEncodedMetadata(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            'lines' => [
+                [
+                    'name' => RoundingDifferenceFixer::DEFAULT_TITLE,
+                    'totalAmount' => ['value' => '0.01', 'currency' => 'EUR'],
+                    'metadata' => (string) json_encode(['type' => RoundingDifferenceFixer::METADATA_TYPE]),
+                ],
+            ],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame(0.01, $payment->getRoundingDiff());
+    }
+
     public function testRoundingDiffIsReadFromSku(): void
     {
         $body = [
@@ -228,6 +251,103 @@ final class PaymentHydratorTest extends TestCase
 
         $this->assertTrue($payment->isFullyRefunded());
         $this->assertSame(PaymentStatus::REFUNDED, $payment->getStatus());
+    }
+
+    public function testTheCapturedAmountIsHydratedForManualCapture(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::AUTHORIZED->value,
+            'amount' => ['value' => '10.00', 'currency' => 'EUR'],
+            'amountCaptured' => ['value' => '4.00', 'currency' => 'EUR'],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame(4.0, $payment->getCapturedAmount()?->getValue());
+    }
+
+    /**
+     * The capture ids are what an accounting export reconciles the Shopware order against.
+     */
+    public function testEmbeddedCaptureIdsAreHydrated(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            '_embedded' => [
+                'captures' => [
+                    ['id' => 'cpt_1'],
+                    ['id' => 'cpt_2'],
+                ],
+            ],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame(['cpt_1', 'cpt_2'], $payment->getCaptureIds());
+    }
+
+    public function testCreditCardDetailsAreHydrated(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            'details' => [
+                'cardLabel' => 'Mastercard',
+                'cardNumber' => '6787',
+                'cardHolder' => 'Jane Doe',
+            ],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame('Mastercard', $payment->getCreditCardLabel());
+        $this->assertSame('6787', $payment->getCreditCardNumber());
+        $this->assertSame('Jane Doe', $payment->getCreditCardHolder());
+    }
+
+    public function testThePaypalPayerIdIsHydrated(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::PAID->value,
+            'details' => ['paypalPayerId' => 'WDJHDS'],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame('WDJHDS', $payment->getPaypalPayerId());
+    }
+
+    /**
+     * The bank transfer details are what the merchant shows the customer to pay the order.
+     */
+    public function testBankTransferDetailsAreHydrated(): void
+    {
+        $body = [
+            'id' => 'tr_test',
+            'status' => PaymentStatus::OPEN->value,
+            'details' => [
+                'bankName' => 'Stichting Mollie Payments',
+                'bankAccount' => 'NL53ABNA0627535577',
+                'bankBic' => 'ABNANL2A',
+                'transferReference' => 'RF12-3456-7890',
+                'consumerName' => 'Jane Doe',
+                'consumerAccount' => 'NL02ABNA0123456789',
+                'consumerBic' => 'ABNANL2A',
+            ],
+        ];
+
+        $payment = (new PaymentHydrator())->hydrate($body);
+
+        $this->assertSame('Stichting Mollie Payments', $payment->getBankName());
+        $this->assertSame('NL53ABNA0627535577', $payment->getBankAccount());
+        $this->assertSame('ABNANL2A', $payment->getBankBic());
+        $this->assertSame('RF12-3456-7890', $payment->getTransferReference());
+        $this->assertSame('Jane Doe', $payment->getConsumerName());
+        $this->assertSame('NL02ABNA0123456789', $payment->getConsumerAccount());
+        $this->assertSame('ABNANL2A', $payment->getConsumerBic());
     }
 
     public function testEmbeddedRefundsAreHydrated(): void

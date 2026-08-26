@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Payment\Fake;
 
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
@@ -30,6 +31,24 @@ final class FakeCartService extends CartService
 
     public function recalculate(Cart $cart, SalesChannelContext $context): Cart
     {
+        return $cart;
+    }
+
+    public function createNew(string $token): Cart
+    {
+        return new Cart($token);
+    }
+
+    /**
+     * Puts the items into the cart without running Shopware's cart processors, which would need
+     * the whole pricing stack. The cart the caller gets back is the one they handed in.
+     */
+    public function add(Cart $cart, LineItem|array $items, SalesChannelContext $context): Cart
+    {
+        foreach (is_array($items) ? $items : [$items] as $item) {
+            $cart->add($item);
+        }
+
         return $cart;
     }
 }

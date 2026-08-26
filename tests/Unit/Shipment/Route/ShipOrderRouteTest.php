@@ -26,8 +26,10 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ShipOrderRouteTest extends TestCase
@@ -448,6 +450,44 @@ class ShipOrderRouteTest extends TestCase
 
             throw $exception;
         }
+    }
+
+    /**
+     * The route is the extension point other plugins decorate; it is the innermost one itself.
+     */
+    public function testTheRouteIsTheInnermostOneAndHasNothingToDelegateTo(): void
+    {
+        $this->expectException(DecorationPatternException::class);
+
+        $this->route->getDecorated();
+    }
+
+    /**
+     * A guest order that was paid outside Shopware can end up without a transaction; there is no
+     * Mollie payment to ship then.
+     */
+    public function testAnOrderWithoutAnyTransactionIsNotShipped(): void
+    {
+        $order = $this->ordersApiOrder();
+        $order->setTransactions(new OrderTransactionCollection());
+
+        $this->expectException(ShippingException::class);
+
+        $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+    }
+
+    /**
+     * The Mollie line ids are only needed to fill in what the order does not know. An unreachable
+     * Mollie must not stop the shipment - the delivery state change still has to happen.
+     */
+    public function testAnUnreachableMollieOrderDoesNotStopTheShipment(): void
+    {
+        $order = $this->ordersApiOrder();
+        $this->gateway->withGetOrderException();
+
+        $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+
+        static::assertCount(1, $this->gateway->getShipmentPayloads());
     }
 
     private function buildRoute(FakeTransactionService $transactionService): ShipOrderRoute

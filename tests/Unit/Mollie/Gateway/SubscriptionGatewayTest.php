@@ -15,6 +15,7 @@ use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SubscriptionGateway::class)]
@@ -180,6 +181,66 @@ final class SubscriptionGatewayTest extends TestCase
         $this->expectException(ApiException::class);
 
         $this->gateway(new FakeClient())->listSubscriptions(null, 50, self::SALES_CHANNEL);
+    }
+
+    /**
+     * A subscription with a fixed number of charges must not become an endless one when it is
+     * copied for a price change - the remaining charges travel with it.
+     */
+    public function testACopiedSubscriptionKeepsTheRemainingCharges(): void
+    {
+        $client = new FakeClient(body: $this->subscriptionResponse());
+        $original = $this->subscription();
+        $original->setTimesRemaining(4);
+
+        $this->gateway($client)->copySubscription($original, self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
+
+        $this->assertSame(4, $client->getLastPostOptions()['form_params']['times']);
+    }
+
+    /**
+     * @param \Closure(SubscriptionGateway): void $call
+     */
+    #[DataProvider('failingCallProvider')]
+    public function testAMollieErrorAlwaysBecomesAnApiException(\Closure $call): void
+    {
+        $this->expectException(ApiException::class);
+
+        $call($this->gateway(new FakeClient()));
+    }
+
+    /**
+     * Every call has to surface a Mollie error as the plugin's own exception; a raw Guzzle
+     * ClientException would reach the merchant as a 500 without the order number.
+     *
+     * @return array<string, array{\Closure(SubscriptionGateway): void}>
+     */
+    public static function failingCallProvider(): array
+    {
+        return [
+            'creating a subscription' => [fn (SubscriptionGateway $gateway) => $gateway->createSubscription(
+                new CreateSubscription('Monthly box', new Interval(1, IntervalUnit::MONTHS), new Money(19.99, 'EUR')),
+                self::CUSTOMER,
+                self::ORDER_NUMBER,
+                self::SALES_CHANNEL
+            )],
+            'cancelling a subscription' => [fn (SubscriptionGateway $gateway) => $gateway->cancelSubscription('sub_1', self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL)],
+            'listing a customer\'s subscriptions' => [fn (SubscriptionGateway $gateway) => $gateway->listSubscriptionsForCustomer(self::CUSTOMER, self::SALES_CHANNEL)],
+        ];
+    }
+
+    public function testAFailedUpdateBecomesAnApiException(): void
+    {
+        $this->expectException(ApiException::class);
+
+        $this->gateway(new FakeClient())->updateSubscription($this->subscription(), self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
+    }
+
+    public function testAFailedCopyBecomesAnApiException(): void
+    {
+        $this->expectException(ApiException::class);
+
+        $this->gateway(new FakeClient())->copySubscription($this->subscription(), self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
     }
 
     private function gateway(FakeClient $client): SubscriptionGateway

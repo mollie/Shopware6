@@ -16,6 +16,8 @@ final class FakeOrderSearchRepository extends EntityRepository
 {
     private OrderCollection $collection;
 
+    private ?\Throwable $searchFailure = null;
+
     public function __construct()
     {
         $this->collection = new OrderCollection();
@@ -26,8 +28,21 @@ final class FakeOrderSearchRepository extends EntityRepository
         $this->collection->add($order);
     }
 
+    /**
+     * The error the DAL raises when the order table cannot be read, e.g. a lost database
+     * connection while a scheduled task is running.
+     */
+    public function withSearchFailure(\Throwable $failure): void
+    {
+        $this->searchFailure = $failure;
+    }
+
     public function search(Criteria $criteria, Context $context): EntitySearchResult
     {
+        if ($this->searchFailure !== null) {
+            throw $this->searchFailure;
+        }
+
         $ids = $criteria->getIds();
         $orderNumbers = $this->extractOrderNumbers($criteria);
 
