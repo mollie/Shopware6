@@ -38,10 +38,10 @@ final class Subscription
         $description = (string) ($body['description'] ?? '');
         $webhookUrl = (string) ($body['webhookUrl'] ?? '');
         $amount = new Money((float) $body['amount']['value'], $body['amount']['currency']);
-        $startDateValue = $body['startDate'] ?? '';
+        $startDateValue = (string) ($body['startDate'] ?? '');
         $startDate = \DateTime::createFromFormat('Y-m-d', $startDateValue);
         if (! $startDate instanceof \DateTimeInterface) {
-            throw new \RuntimeException('Startdate "%s" of Subscription is missing or invalid', $startDateValue);
+            throw new \RuntimeException(sprintf('Startdate "%s" of Subscription is missing or invalid', $startDateValue));
         }
         $cancelledAt = \DateTime::createFromFormat(\DateTime::ATOM, $body['canceledAt'] ?? '');
         $createdAt = \DateTime::createFromFormat(\DateTime::ATOM, $body['createdAt'] ?? '');

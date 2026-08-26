@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Unit\Refund;
 
 use Mollie\Shopware\Component\Mollie\CreateOrderRefund;
 use Mollie\Shopware\Component\Mollie\CreatePaymentRefund;
+use Mollie\Shopware\Component\Mollie\CreateRefund;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
@@ -37,7 +38,7 @@ final class RefundBuilderTest extends TestCase
      * Without it Mollie rejects the whole refund with "Line 1 contains invalid data. The 'id' field
      * is missing" and nothing at all is refunded.
      */
-    public function testDeliveryWithoutCustomFieldTakesTheMollieLineIdFromTheMollieOrder(): void
+    public function testDeliveryWithoutCustomFieldTakesTheMollieLineIdFromTheOrder(): void
     {
         $order = $this->buildNetOrder();
 
@@ -128,6 +129,138 @@ final class RefundBuilderTest extends TestCase
         $createRefund = $this->buildRefund($molliePayment, 10.0);
 
         $this->assertSame(10.0, $createRefund->getAmount()->getValue());
+    }
+
+    public function testAnOrderWithoutALoadedCurrencyIsRejected(): void
+    {
+        $order = new OrderEntity();
+        $order->setId('order-id');
+        $order->setOrderNumber('10047');
+        $order->setSalesChannelId('sales-channel-id');
+
+        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());
+
+        $this->expectException(\RuntimeException::class);
+
+        $builder->build(new Payment('tr_test'), $order, [], '');
+    }
+
+    public function testAnOrdersApiRefundIsBuiltFromTheRefundableMollieLines(): void
+    {
+        // The Orders API refunds by line, so only what Mollie still reports as refundable may be sent.
+        $mollieOrder = $this->buildOrder([
+            'line-1' => ['id' => 'odl_1', 'refundableQuantity' => 2],
+            'line-2' => ['id' => 'odl_2', 'refundableQuantity' => 0],
+            'delivery-1' => ['id' => 'odl_delivery', 'refundableQuantity' => 1],
+        ]);
+
+        $createRefund = $this->buildOrderRefund($mollieOrder);
+
+        $this->assertInstanceOf(CreateOrderRefund::class, $createRefund);
+        $this->assertSame(['odl_1', 'odl_delivery'], array_column($createRefund->toArray()['lines'], 'id'));
+    }
+
+    public function testOnlyTheStillRefundableQuantityOfALineIsSent(): void
+    {
+        // One of the two items was already refunded, so only the remaining one may be sent again.
+        $mollieOrder = $this->buildOrder([
+            'line-1' => ['id' => 'odl_1', 'refundableQuantity' => 1],
+        ]);
+
+        $createRefund = $this->buildOrderRefund($mollieOrder);
+
+        $this->assertInstanceOf(CreateOrderRefund::class, $createRefund);
+        $this->assertSame([['id' => 'odl_1', 'quantity' => 1]], $createRefund->toArray()['lines']);
+    }
+
+    public function testALineMollieDoesNotKnowIsSkippedAndLogged(): void
+    {
+        // Older orders have no Mollie line id on the delivery; without the id Mollie rejects the whole
+        // refund, so the line is dropped and the merchant sees why in the log.
+        $logger = new FakeLogger();
+        $mollieOrder = $this->buildOrder([
+            'line-1' => ['id' => 'odl_1', 'refundableQuantity' => 2],
+            'delivery-1' => ['id' => '', 'refundableQuantity' => 1],
+        ]);
+
+        $createRefund = $this->buildOrderRefund($mollieOrder, $logger);
+
+        $this->assertInstanceOf(CreateOrderRefund::class, $createRefund);
+        $this->assertSame(['odl_1'], array_column($createRefund->toArray()['lines'], 'id'));
+        $this->assertTrue($logger->hasRecordThatContains('warning', 'Refund lines without a Mollie line id are skipped'));
+    }
+
+    public function testAnOrdersApiRefundWithAnExplicitAmountFallsBackToAPaymentRefund(): void
+    {
+        // Mollie only honours an amount on a payment refund, so a corrected amount cannot be sent
+        // as a line-based order refund.
+        $mollieOrder = $this->buildOrder([
+            'line-1' => ['id' => 'odl_1', 'refundableQuantity' => 2],
+        ]);
+
+        $createRefund = $this->buildOrderRefund($mollieOrder, requestAmount: 10.0);
+
+        $this->assertInstanceOf(CreatePaymentRefund::class, $createRefund);
+        $this->assertSame('10.00', $createRefund->toArray()['amount']['value']);
+    }
+
+    public function testRefundingTheShippingCostsAloneUsesTheDeliveryAmount(): void
+    {
+        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());
+
+        $createRefund = $builder->build(
+            new Payment('tr_test'),
+            $this->buildNetOrder(),
+            [['id' => 'delivery-1', 'quantity' => 1, 'amount' => 0.0, 'resetStock' => 0]],
+            ''
+        );
+
+        $this->assertInstanceOf(CreatePaymentRefund::class, $createRefund);
+        $this->assertSame('4.19', $createRefund->toArray()['amount']['value']);
+    }
+
+    public function testAnUnknownRequestedItemIsRejected(): void
+    {
+        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());
+
+        $this->expectException(\RuntimeException::class);
+
+        $builder->build(
+            new Payment('tr_test'),
+            $this->buildNetOrder(),
+            [['id' => 'unknown-line', 'quantity' => 1, 'amount' => 1.0, 'resetStock' => 0]],
+            ''
+        );
+    }
+
+    /**
+     * @param array<string, array{id: string, refundableQuantity: int}> $lines keyed by Shopware line id
+     */
+    private function buildOrder(array $lines): Order
+    {
+        $mollieLines = [];
+        foreach ($lines as $shopwareLineId => $line) {
+            $mollieLine = new LineItem('Line ' . $shopwareLineId, 1, new Money(1.0, 'EUR'), new Money(1.0, 'EUR'));
+            $mollieLine->setId($line['id']);
+            $mollieLine->setShopwareLineItemId($shopwareLineId);
+            $mollieLine->setRefundableQuantity($line['refundableQuantity']);
+            $mollieLines[] = $mollieLine;
+        }
+
+        return new Order('ord_test', '', null, $mollieLines);
+    }
+
+    private function buildOrderRefund(Order $mollieOrder, ?FakeLogger $logger = null, ?float $requestAmount = null): CreateRefund
+    {
+        $payment = new Payment('tr_test');
+        $payment->setOrderId('ord_test');
+
+        $gateway = new FakeGateway('', $payment);
+        $gateway->withOrder($mollieOrder);
+
+        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), $logger ?? new FakeLogger());
+
+        return $builder->build($payment, $this->buildNetOrder(), [], '', $requestAmount);
     }
 
     private function buildRefund(Payment $molliePayment, ?float $requestAmount): CreatePaymentRefund

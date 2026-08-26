@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 final class FakeOrderService extends OrderService
 {
+    /** @var list<array{orderDeliveryId: string, transition: string}> */
+    private array $deliveryTransitions = [];
+
     private bool $shouldThrowIllegalTransition = false;
 
     public function __construct()
@@ -39,11 +42,21 @@ final class FakeOrderService extends OrderService
 
     public function orderDeliveryStateTransition(string $orderDeliveryId, string $transition, ParameterBag $data, Context $context): StateMachineStateEntity
     {
+        $this->deliveryTransitions[] = ['orderDeliveryId' => $orderDeliveryId, 'transition' => $transition];
+
         if ($this->shouldThrowIllegalTransition) {
             throw new IllegalTransitionException('shipped', $transition, ['ship_partially']);
         }
 
         return new StateMachineStateEntity();
+    }
+
+    /**
+     * @return list<array{orderDeliveryId: string, transition: string}>
+     */
+    public function getDeliveryTransitions(): array
+    {
+        return $this->deliveryTransitions;
     }
 
     public function isPaymentChangeableByTransactionState(OrderEntity $order): bool

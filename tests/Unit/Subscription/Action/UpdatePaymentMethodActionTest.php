@@ -173,7 +173,7 @@ final class UpdatePaymentMethodActionTest extends TestCase
         $action->confirm($subscription, '10000', Context::createDefaultContext());
 
         $this->assertSame(1, $subscriptionGateway->getCallCount('updateSubscription'));
-        $this->assertSame('mdt_new', $mollieSubscription->getMandateId());
+        $this->assertSame('mdt_new', $subscriptionGateway->getCalls('updateSubscription')[0]['mandateId']);
 
         $upsert = $repository->getLastUpsert();
         $this->assertSame('mdt_new', $upsert['mandateId']);

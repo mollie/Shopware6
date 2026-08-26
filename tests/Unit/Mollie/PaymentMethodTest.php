@@ -47,4 +47,19 @@ final class PaymentMethodTest extends TestCase
             );
         }
     }
+
+    public function testPaypalIsAllowedInAPaymentLink(): void
+    {
+        $this->assertTrue(PaymentMethod::PAYPAL->isSupportedForPaymentLink());
+    }
+
+    public function testWeroIsNotAllowedInAPaymentLink(): void
+    {
+        $this->assertFalse(PaymentMethod::WERO->isSupportedForPaymentLink());
+    }
+
+    public function testVippsIsNotAllowedInAPaymentLink(): void
+    {
+        $this->assertFalse(PaymentMethod::VIPPS->isSupportedForPaymentLink());
+    }
 }

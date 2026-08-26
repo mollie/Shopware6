@@ -358,4 +358,208 @@ final class PaymentTest extends TestCase
 
         $this->assertNull($payment->getRefundableAmount());
     }
+
+    public function testCreditCardDetailsAreUnknownWithoutALabel(): void
+    {
+        $this->assertNull((new Payment('tr_test'))->getCreditCardDetails());
+    }
+
+    public function testCreditCardDetailsAreExposedAsOneStructure(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setCreditCardLabel('Visa');
+        $payment->setCreditCardNumber('************1234');
+        $payment->setCreditCardHolder('John Doe');
+
+        $this->assertSame([
+            'label' => 'Visa',
+            'number' => '************1234',
+            'holder' => 'John Doe',
+        ], $payment->getCreditCardDetails());
+        $this->assertSame('Visa', $payment->getCreditCardLabel());
+        $this->assertSame('************1234', $payment->getCreditCardNumber());
+        $this->assertSame('John Doe', $payment->getCreditCardHolder());
+    }
+
+    public function testPaypalDetailsAreUnknownWithoutAPayerId(): void
+    {
+        $this->assertNull((new Payment('tr_test'))->getPaypalDetails());
+    }
+
+    public function testPaypalDetailsExposeThePayerId(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setPaypalPayerId('PAYER-1');
+
+        $this->assertSame(['payerId' => 'PAYER-1'], $payment->getPaypalDetails());
+        $this->assertSame('PAYER-1', $payment->getPaypalPayerId());
+    }
+
+    public function testBankTransferDetailsAreUnknownWithoutABankAccount(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setBankName('Test Bank');
+
+        $this->assertNull($payment->getBankTransferDetails());
+    }
+
+    public function testBankTransferDetailsAreExposedAsOneStructure(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setBankName('Test Bank');
+        $payment->setBankAccount('NL55INGB0000000000');
+        $payment->setBankBic('INGBNL2A');
+        $payment->setTransferReference('RF12-3456');
+        $payment->setConsumerName('John Doe');
+        $payment->setConsumerAccount('NL02ABNA0123456789');
+        $payment->setConsumerBic('ABNANL2A');
+
+        $this->assertSame([
+            'bankName' => 'Test Bank',
+            'bankAccount' => 'NL55INGB0000000000',
+            'bankBic' => 'INGBNL2A',
+            'transferReference' => 'RF12-3456',
+            'consumerName' => 'John Doe',
+            'consumerAccount' => 'NL02ABNA0123456789',
+            'consumerBic' => 'ABNANL2A',
+        ], $payment->getBankTransferDetails());
+    }
+
+    public function testRefundCaptureAndShipmentIdsAreCollected(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->addRefundId('re_1');
+        $payment->addCaptureId('cpt_1');
+        $payment->addShipmentId('shp_1');
+
+        $this->assertSame(['re_1'], $payment->getRefundIds());
+        $this->assertSame(['cpt_1'], $payment->getCaptureIds());
+        $this->assertSame(['shp_1'], $payment->getShipmentIds());
+    }
+
+    public function testRemovingARefundIdKeepsTheOtherIds(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setRefundIds(['re_1', 're_2']);
+
+        $payment->removeRefundId('re_1');
+
+        $this->assertSame(['re_2'], $payment->getRefundIds());
+    }
+
+    public function testARefundIdIsAlsoRemovedInItsExportedHyphenForm(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setRefundIds(['re_1', 're_2']);
+
+        $payment->removeRefundId('re-1');
+
+        $this->assertSame(['re_2'], $payment->getRefundIds());
+    }
+
+    public function testExportedIdsUseHyphensAndAreMergedIntoOneValue(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setStatus(PaymentStatus::PAID);
+        $payment->setRefundIds(['re_1', 're_2']);
+        $payment->setCaptureIds(['cpt_1']);
+        $payment->setShipmentIds(['shp_1', 'shp_2']);
+
+        $data = $payment->toArray();
+
+        $this->assertSame('re-1, re-2', $data['refundIds']);
+        $this->assertSame('cpt-1', $data['captureIds']);
+        $this->assertSame('shp-1, shp-2', $data['shipmentIds']);
+    }
+
+    public function testEmptyIdListsAreNotExported(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setStatus(PaymentStatus::PAID);
+
+        $data = $payment->toArray();
+
+        $this->assertArrayNotHasKey('refundIds', $data);
+        $this->assertArrayNotHasKey('captureIds', $data);
+        $this->assertArrayNotHasKey('shipmentIds', $data);
+    }
+
+    public function testPaymentIsNotCancelableByDefault(): void
+    {
+        $this->assertFalse((new Payment('tr_test'))->isCancelable());
+    }
+
+    public function testCancelableFlagIsKept(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setCancelable(true);
+
+        $this->assertTrue($payment->isCancelable());
+    }
+
+    public function testPaymentIsNotReconciledByDefault(): void
+    {
+        $this->assertFalse((new Payment('tr_test'))->isReconciled());
+    }
+
+    public function testReconciledFlagIsKept(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setReconciled(true);
+
+        $this->assertTrue($payment->isReconciled());
+    }
+
+    public function testMollieReferencesAreKept(): void
+    {
+        $createdAt = new \DateTimeImmutable('2026-01-15 10:00:00');
+
+        $payment = new Payment('tr_test');
+        $payment->setOrderId('ord_1');
+        $payment->setPaymentLinkId('pl_1');
+        $payment->setAuthenticationId('auth_1');
+        $payment->setSubscriptionId('sub_1');
+        $payment->setProfileId('pfl_1');
+        $payment->setCustomerId('cst_1');
+        $payment->setMandateId('mdt_1');
+        $payment->setCreatedAt($createdAt);
+
+        $this->assertSame('ord_1', $payment->getOrderId());
+        $this->assertSame('pl_1', $payment->getPaymentLinkId());
+        $this->assertSame('auth_1', $payment->getAuthenticationId());
+        $this->assertSame('sub_1', $payment->getSubscriptionId());
+        $this->assertSame('pfl_1', $payment->getProfileId());
+        $this->assertSame('cst_1', $payment->getCustomerId());
+        $this->assertSame('mdt_1', $payment->getMandateId());
+        $this->assertSame($createdAt, $payment->getCreatedAt());
+    }
+
+    public function testMollieReferencesAreUnknownOnAFreshPayment(): void
+    {
+        $payment = new Payment('tr_test');
+
+        $this->assertNull($payment->getOrderId());
+        $this->assertNull($payment->getPaymentLinkId());
+        $this->assertNull($payment->getAuthenticationId());
+        $this->assertNull($payment->getSubscriptionId());
+        $this->assertNull($payment->getProfileId());
+        $this->assertNull($payment->getCustomerId());
+        $this->assertNull($payment->getMandateId());
+        $this->assertNull($payment->getCreatedAt());
+        $this->assertNull($payment->getAmount());
+        $this->assertNull($payment->getCapturedAmount());
+        $this->assertNull($payment->getAmountRemaining());
+        $this->assertNull($payment->getAmountChargedBack());
+        $this->assertCount(0, $payment->getRefunds());
+    }
+
+    public function testVoucherAmountAndRoundingDifferenceAreKept(): void
+    {
+        $payment = new Payment('tr_test');
+        $payment->setVoucherAmount(12.50);
+        $payment->setRoundingDiff(-0.02);
+
+        $this->assertSame(12.50, $payment->getVoucherAmount());
+        $this->assertSame(-0.02, $payment->getRoundingDiff());
+    }
 }

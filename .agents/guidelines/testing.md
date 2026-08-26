@@ -20,6 +20,14 @@ Mirror the production path: `shopware/Component/Refund/RefundBuilder.php` →
 **No mocking framework.** No `createMock()`, no `getMockBuilder()`. Write or reuse a fake in
 the component's `Fake/` folder (`tests/Unit/Refund/Fake/`, `tests/Unit/Payment/Fake/`, …).
 
+**A dependency without an interface is still fakeable.** When a service is injected by its
+concrete type and that class is not `final` — most Shopware core services, e.g. `AccountService`,
+`SalesChannelContextPersister`, `RecalculationService` — extend it, declare an empty
+`__construct()` and override the methods the code under test calls. Its own constructor
+arguments never have to be built. `tests/Unit/Fake/FakeRecalculationService` is the pattern.
+Do not call a class untestable because it has no interface, and do not propose a production
+change to add one before trying this.
+
 **`#[CoversClass]` is mandatory** on unit tests, so coverage stays precise.
 
 **Arrange / Act / Assert**, in that order, visibly separated. One behaviour per test.
@@ -72,6 +80,13 @@ keys off its presence:
 
 So an untagged API-free test silently never runs on a PR, and a tagged API test fails there.
 Cypress is not gated this way — it always runs `@core` on PRs; the full suite is too slow.
+
+**Code that needs SwagCommercial cannot be unit tested.** SwagCommercial is a paid plugin; a
+developer can install it locally, but the pipeline has no licence for it. Its classes are not
+in the plugin's own `vendor/`, which is what unit tests bootstrap from, so
+`class_exists(Shopware\Commercial\...)` is `false` there. Anything built on it — the Return
+Management integration in `Component/Refund/OrderReturnHandler` is the current case — belongs
+in an integration test, not in `tests/Unit/`.
 
 **For a bug fix, write the failing test first** — or at least confirm the new test fails
 without the fix. State which assertion carries the regression.

@@ -18,6 +18,8 @@ use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDeliveryPosition\OrderDeliveryPositionCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDeliveryPosition\OrderDeliveryPositionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
@@ -26,6 +28,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStat
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Content\Product\State;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Salutation\SalutationEntity;
@@ -36,28 +39,40 @@ final class OrderEntityBuilder
 {
     public function getDefaultOrder($customer): OrderEntity
     {
-        $order = new OrderEntity();
-        $order->setId('fakeShopwareOrderId');
-        $order->setOrderNumber('10000');
-        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
-        $order->setBillingAddress($this->getOrderAddress($customer));
+        return $this->buildDefaultOrder($customer, true, true);
+    }
 
-        $order->setDeliveries($this->getOrderDeliveries($customer));
-        $order->setAmountTotal(100.00);
-        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
-        $order->setLineItems($this->getLineItems());
-        if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
-            $order->setPrimaryOrderDeliveryId('fake-delivery-id');
-        }
+    /**
+     * The same order without its state machine state, e.g. because the criteria did not associate it.
+     * The Shopware setter is not nullable, so the association is left unset instead.
+     *
+     * @param mixed $customer
+     */
+    public function getOrderWithoutState($customer): OrderEntity
+    {
+        return $this->buildDefaultOrder($customer, false, true);
+    }
 
-        $stateMachineState = new StateMachineStateEntity();
-        $stateMachineState->setTechnicalName('open');
-        $stateMachineState->setId('openFakeStateId');
+    /**
+     * The same order without deliveries, as a digital-only order has none.
+     *
+     * @param mixed $customer
+     */
+    public function getOrderWithoutDeliveries($customer): OrderEntity
+    {
+        return $this->buildDefaultOrder($customer, true, false);
+    }
 
-        $order->setStateId($stateMachineState->getId());
-        $order->setStateMachineState($stateMachineState);
+    /**
+     * A downloadable line item: Shopware marks it with the is-download state and it is not part of
+     * any delivery.
+     */
+    public function createDigitalLineItem(string $id, string $productNumber, int $quantity, float $unitPrice): OrderLineItemEntity
+    {
+        $orderLineItem = $this->createShippableLineItem($id, $productNumber, $quantity, $unitPrice);
+        $orderLineItem->setStates([State::IS_DOWNLOAD]);
 
-        return $order;
+        return $orderLineItem;
     }
 
     public function getOrderAddress(CustomerEntity $customerEntity): OrderAddressEntity
@@ -248,11 +263,62 @@ final class OrderEntityBuilder
         $orderLineItem->setLabel('Product ' . $productNumber);
         $orderLineItem->setQuantity($quantity);
         $orderLineItem->setUnitPrice($unitPrice);
+        // Shopware always writes the total alongside the unit price; without it every reader of
+        // getTotalPrice() hits an uninitialized property instead of the missing-data branch.
+        $orderLineItem->setTotalPrice($unitPrice * $quantity);
         $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0, $quantity));
         $orderLineItem->setProduct($product);
         $orderLineItem->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
 
         return $orderLineItem;
+    }
+
+    /**
+     * Builds an order delivery as the shipment flow needs it: shipping costs, a shipping method and a
+     * position that points at the line item the delivery belongs to.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createShippableDelivery(string $id, string $orderLineItemId, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
+    {
+        $delivery = $this->createDeliveryWithoutShippingMethod($id, $orderLineItemId, $shippingCosts, $mollieCustomFields);
+        $delivery->setShippingMethod($this->createShippingMethod());
+
+        return $delivery;
+    }
+
+    /**
+     * A delivery whose shipping method was not loaded, so its shipping costs cannot be described to
+     * Mollie. The Shopware setter is not nullable, so the association is left unset instead.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createDeliveryWithoutShippingMethod(string $id, string $orderLineItemId, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
+    {
+        $position = new OrderDeliveryPositionEntity();
+        $position->setId('fake-delivery-position-' . $orderLineItemId);
+        $position->setOrderLineItemId($orderLineItemId);
+
+        $delivery = $this->createDeliveryWithoutPositions($id, $shippingCosts, $mollieCustomFields);
+        $delivery->setPositions(new OrderDeliveryPositionCollection([$position]));
+
+        return $delivery;
+    }
+
+    /**
+     * A delivery whose positions were not loaded, so it cannot be matched to the shipped line items.
+     *
+     * @param array<string, mixed> $mollieCustomFields
+     */
+    public function createDeliveryWithoutPositions(string $id, float $shippingCosts = 4.99, array $mollieCustomFields = []): OrderDeliveryEntity
+    {
+        $delivery = new OrderDeliveryEntity();
+        $delivery->setId($id);
+        $delivery->setShippingCosts($this->getPrice($shippingCosts, 19.0));
+        $delivery->setTrackingCodes([]);
+        $delivery->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);
+
+        return $delivery;
     }
 
     /**
@@ -354,6 +420,40 @@ final class OrderEntityBuilder
         return $orderLineItem;
     }
 
+    private function buildDefaultOrder($customer, bool $withState, bool $withDeliveries): OrderEntity
+    {
+        $order = new OrderEntity();
+        $order->setId('fakeShopwareOrderId');
+        $order->setOrderNumber('10000');
+        $order->setSalesChannelId(TestDefaults::SALES_CHANNEL);
+        $order->setBillingAddress($this->getOrderAddress($customer));
+
+        if ($withDeliveries) {
+            $order->setDeliveries($this->getOrderDeliveries($customer));
+        }
+        $order->setAmountTotal(100.00);
+        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
+        $order->setLineItems($this->getLineItems());
+        if (method_exists($order, 'setPrimaryOrderDeliveryId')) {
+            $order->setPrimaryOrderDeliveryId('fake-delivery-id');
+        }
+
+        // The state id is a column and therefore always present; only the association can be missing.
+        $order->setStateId('openFakeStateId');
+
+        if ($withState === false) {
+            return $order;
+        }
+
+        $stateMachineState = new StateMachineStateEntity();
+        $stateMachineState->setTechnicalName('open');
+        $stateMachineState->setId('openFakeStateId');
+
+        $order->setStateMachineState($stateMachineState);
+
+        return $order;
+    }
+
     private function buildOrderWithTransaction(OrderLineItemCollection $lineItems, ?Payment $payment, string $transactionState): OrderEntity
     {
         $transaction = new OrderTransactionEntity();
@@ -406,6 +506,15 @@ final class OrderEntityBuilder
         $orderLineItem->setProduct($product);
 
         return $orderLineItem;
+    }
+
+    private function createShippingMethod(): ShippingMethodEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('fake-shipping-method-id');
+        $shippingMethod->setName('DHL');
+
+        return $shippingMethod;
     }
 
     private function getPrice(float $unitPrice, float $taxRate, int $quantity = 1): CalculatedPrice

@@ -11,6 +11,8 @@ use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\System\Country\CountryEntity;
 
 #[CoversClass(Address::class)]
 final class AddressTest extends TestCase
@@ -170,6 +172,155 @@ final class AddressTest extends TestCase
         $orderAddress = $this->orderRepository->getOrderAddressWithoutCountry($customer);
         $this->expectException(MissingCountryException::class);
         Address::fromAddress($customer, $orderAddress);
+    }
+
+    public function testCanCreateFromCustomerAddress(): void
+    {
+        $customerAddress = $this->makeCustomerAddress();
+        $customerAddress->setCustomer($this->customerRepository->getDefaultCustomer());
+
+        $address = Address::fromCustomerAddress($customerAddress);
+
+        $this->assertSame('fake@unit.test', $address->getEmail());
+        $this->assertSame('', $address->getTitle());
+        $this->assertSame('Tester', $address->getGivenName());
+        $this->assertSame('Test', $address->getFamilyName());
+        $this->assertSame('Main Street 1', $address->getStreetAndNumber());
+        $this->assertSame('12345', $address->getPostalCode());
+        $this->assertSame('Berlin', $address->getCity());
+        $this->assertSame('DE', $address->getCountry());
+    }
+
+    public function testCustomerAddressWithoutCustomerUsesTheFallbackEmail(): void
+    {
+        $address = Address::fromCustomerAddress($this->makeCustomerAddress(), 'fallback@unit.test');
+
+        $this->assertSame('fallback@unit.test', $address->getEmail());
+    }
+
+    public function testCustomerAddressWithoutCountryProducesAnEmptyCountry(): void
+    {
+        $address = Address::fromCustomerAddress($this->makeCustomerAddress(withCountry: false));
+
+        $this->assertSame('', $address->getCountry());
+    }
+
+    public function testCustomerAddressJoinsBothAdditionalLines(): void
+    {
+        $customerAddress = $this->makeCustomerAddress();
+        $customerAddress->setAdditionalAddressLine1('Building A');
+        $customerAddress->setAdditionalAddressLine2('Floor 3');
+
+        $address = Address::fromCustomerAddress($customerAddress);
+
+        $this->assertSame('Building A Floor 3', $address->getStreetAdditional());
+    }
+
+    public function testCustomerAddressKeepsPhoneAndCompany(): void
+    {
+        $customerAddress = $this->makeCustomerAddress();
+        $customerAddress->setPhoneNumber('+4915112345678');
+        $customerAddress->setCompany('ACME GmbH');
+
+        $address = Address::fromCustomerAddress($customerAddress);
+
+        $this->assertSame('+4915112345678', $address->getPhone());
+        $this->assertSame('ACME GmbH', $address->getOrganizationName());
+    }
+
+    public function testCustomerAddressWithEmptyPhoneAndCompanyStaysEmpty(): void
+    {
+        $customerAddress = $this->makeCustomerAddress();
+        $customerAddress->setPhoneNumber('');
+        $customerAddress->setCompany('');
+
+        $address = Address::fromCustomerAddress($customerAddress);
+
+        $this->assertSame('', $address->getPhone());
+        $this->assertSame('', $address->getOrganizationName());
+    }
+
+    public function testCanCreateFromResponseBody(): void
+    {
+        $address = Address::fromResponseBody([
+            'email' => 'john@example.com',
+            'givenName' => 'John',
+            'familyName' => 'Doe',
+            'streetAndNumber' => 'Main Street 1',
+            'streetAdditional' => 'Floor 3',
+            'postalCode' => '12345',
+            'city' => 'Berlin',
+            'country' => 'DE',
+            'phone' => '+4915112345678',
+        ]);
+
+        $this->assertSame('john@example.com', $address->getEmail());
+        $this->assertSame('John', $address->getGivenName());
+        $this->assertSame('Doe', $address->getFamilyName());
+        $this->assertSame('Main Street 1', $address->getStreetAndNumber());
+        $this->assertSame('Floor 3', $address->getStreetAdditional());
+        $this->assertSame('12345', $address->getPostalCode());
+        $this->assertSame('Berlin', $address->getCity());
+        $this->assertSame('DE', $address->getCountry());
+        $this->assertSame('+4915112345678', $address->getPhone());
+    }
+
+    public function testResponseBodyWithoutAnyFieldProducesEmptyValues(): void
+    {
+        $address = Address::fromResponseBody([]);
+
+        $this->assertSame('', $address->getEmail());
+        $this->assertSame('', $address->getGivenName());
+        $this->assertSame('', $address->getStreetAdditional());
+        $this->assertSame('', $address->getPhone());
+    }
+
+    public function testRegisterFormArrayUsesShopwareFieldNames(): void
+    {
+        $address = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+
+        $this->assertSame([
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'email' => 'john@example.com',
+            'street' => 'Main Street 1',
+            'zipcode' => '12345',
+            'city' => 'Berlin',
+        ], $address->toRegisterFormArray());
+    }
+
+    public function testIdIsEqualForTwoIdenticalAddresses(): void
+    {
+        $first = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+        $second = new Address('john@example.com', 'Mrs.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+
+        $this->assertSame($first->getId(), $second->getId());
+    }
+
+    public function testIdChangesWithTheStreet(): void
+    {
+        $first = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+        $second = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 2', '12345', 'Berlin', 'DE');
+
+        $this->assertNotSame($first->getId(), $second->getId());
+    }
+
+    public function testIdChangesWithTheCompany(): void
+    {
+        $private = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+        $business = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+        $business->setOrganizationName('ACME GmbH');
+
+        $this->assertNotSame($private->getId(), $business->getId());
+    }
+
+    public function testIdChangesWithThePhoneNumber(): void
+    {
+        $without = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+        $with = new Address('john@example.com', 'Mr.', 'John', 'Doe', 'Main Street 1', '12345', 'Berlin', 'DE');
+        $with->setPhone('+4915112345678');
+
+        $this->assertNotSame($without->getId(), $with->getId());
     }
 
     #[DataProvider('nameProvider')]
@@ -344,5 +495,27 @@ final class AddressTest extends TestCase
         $this->assertSame('AnnaMaria', $actual->getGivenName());
         $this->assertSame('Nguyen', $actual->getFamilyName());
         $this->assertSame('Müller & Söhne GmbH', $actual->getOrganizationName());
+    }
+
+    /**
+     * Shopware's setCountry() is not nullable, so a missing country is modelled by never assigning
+     * one - not by assigning null.
+     */
+    private function makeCustomerAddress(bool $withCountry = true): CustomerAddressEntity
+    {
+        $customerAddress = new CustomerAddressEntity();
+        $customerAddress->setFirstName('Tester');
+        $customerAddress->setLastName('Test');
+        $customerAddress->setStreet('Main Street 1');
+        $customerAddress->setZipcode('12345');
+        $customerAddress->setCity('Berlin');
+
+        if ($withCountry) {
+            $country = new CountryEntity();
+            $country->setIso('DE');
+            $customerAddress->setCountry($country);
+        }
+
+        return $customerAddress;
     }
 }

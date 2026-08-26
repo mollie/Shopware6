@@ -17,6 +17,7 @@ use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
@@ -37,6 +38,7 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 final class FakeTransactionService implements TransactionServiceInterface
 {
     private bool $withPayment = false;
+    private ?string $paymentLinkId = null;
     private ?TransactionDataStruct $transaction = null;
 
     private CustomerEntityBuilder $customerRepository;
@@ -51,6 +53,9 @@ final class FakeTransactionService implements TransactionServiceInterface
     private ?string $phoneNumber = null;
 
     private bool $withoutOrder = false;
+    private bool $withoutOrderState = false;
+    private bool $withoutDeliveries = false;
+    private bool $withDigitalLineItem = false;
     private bool $withoutPaymentMethod = false;
     private bool $withoutMollieExtensionOnPaymentMethod = false;
     /** @var list<string> */
@@ -108,9 +113,43 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withPayment = true;
     }
 
+    /**
+     * A transaction whose payment link was created but never paid: the Mollie extension is there,
+     * yet it only knows the link, not a payment.
+     */
+    public function withPaymentLinkOnly(string $paymentLinkId): void
+    {
+        $this->withPayment = true;
+        $this->paymentLinkId = $paymentLinkId;
+    }
+
     public function withoutOrder(): void
     {
         $this->withoutOrder = true;
+    }
+
+    /**
+     * An order whose state machine state was not loaded, e.g. because the criteria did not associate it.
+     */
+    public function withoutOrderState(): void
+    {
+        $this->withoutOrderState = true;
+    }
+
+    /**
+     * An order without loaded deliveries - a digital-only order has none at all.
+     */
+    public function withoutDeliveries(): void
+    {
+        $this->withoutDeliveries = true;
+    }
+
+    /**
+     * A downloadable line item, the kind the webhook auto-captures for an authorized payment.
+     */
+    public function withDigitalLineItem(): void
+    {
+        $this->withDigitalLineItem = true;
     }
 
     public function withoutPaymentMethod(): void
@@ -212,9 +251,14 @@ final class FakeTransactionService implements TransactionServiceInterface
         }
 
         if ($this->withPayment) {
-            $payment = new Payment('testMollieId');
+            // A payment link carries no Mollie payment id until the customer actually pays, so
+            // the extension exists with an empty id and only the link id on it.
+            $payment = new Payment($this->paymentLinkId === null ? 'testMollieId' : '');
             $payment->setMethod(PaymentMethod::CREDIT_CARD);
             $payment->setFinalizeUrl('payment/finalize');
+            if ($this->paymentLinkId !== null) {
+                $payment->setPaymentLinkId($this->paymentLinkId);
+            }
             $payment->setShopwareTransaction($transaction);
             $transaction->addExtension(Mollie::EXTENSION, $payment);
 
@@ -230,7 +274,7 @@ final class FakeTransactionService implements TransactionServiceInterface
                 $transaction->setPaymentMethod($paymentMethod);
             }
         }
-        $order = $this->orderRepository->getDefaultOrder($customer);
+        $order = $this->buildOrderEntity($customer);
         $order->setCurrency($currency);
         $order->setLanguage($language);
         if (count($this->orderCustomFields) > 0) {
@@ -245,6 +289,10 @@ final class FakeTransactionService implements TransactionServiceInterface
 
         if ($this->withSubscriptionLineItem === true) {
             $order->setLineItems($this->orderRepository->getSubscriptionLineItems());
+        }
+
+        if ($this->withDigitalLineItem === true) {
+            $order->setLineItems(new OrderLineItemCollection([$this->orderRepository->createDigitalLineItem('digitallineitemid', 'SW-DIGITAL', 2, 10.0)]));
         }
 
         if ($this->withoutOrder === false) {
@@ -313,6 +361,19 @@ final class FakeTransactionService implements TransactionServiceInterface
             $language,
             $deliveries
         );
+    }
+
+    private function buildOrderEntity(CustomerEntity $customer): OrderEntity
+    {
+        if ($this->withoutOrderState === true) {
+            return $this->orderRepository->getOrderWithoutState($customer);
+        }
+
+        if ($this->withoutDeliveries === true) {
+            return $this->orderRepository->getOrderWithoutDeliveries($customer);
+        }
+
+        return $this->orderRepository->getDefaultOrder($customer);
     }
 
     private function getDefaultCurrency(): CurrencyEntity

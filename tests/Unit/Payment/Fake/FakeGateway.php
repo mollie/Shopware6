@@ -43,6 +43,12 @@ final class FakeGateway implements MollieGatewayInterface
     /** @var list<string> */
     private array $cancelledOrderIds = [];
 
+    /** @var list<array{mollieOrderId: string, mollieLineId: string, quantity: int, orderNumber: string, salesChannelId: string}> */
+    private array $cancelledOrderLines = [];
+
+    /** @var list<array{paymentId: string, orderNumber: string, salesChannelId: string}> */
+    private array $releasedAuthorizations = [];
+
     /** @var array<string,PaymentCollection> */
     private array $subscriptionPayments = [];
 
@@ -54,13 +60,33 @@ final class FakeGateway implements MollieGatewayInterface
 
     private bool $throwOnCapture = false;
 
+    private bool $throwOnCreateShipment = false;
+
+    private ?Shipment $shipment = null;
+
+    private bool $throwOnGetPayment = false;
+
+    private ?\Throwable $cancelFailure = null;
+
+    private ?\Throwable $profileFailure = null;
+
+    private bool $throwOnReleaseAuthorization = false;
+
     private ?Order $order = null;
     private bool $throwOnGetOrder = false;
+
+    /** @var array<string, int> */
+    private array $callCounts = [];
+
+    /** @var list<string> */
+    private array $requestedTransactionIds = [];
+
+    /** @var list<array{mollieCustomerId: string, mandateId: string}> */
+    private array $revokedMandates = [];
 
     private ?Payment $repairPayment = null;
     private bool $repairResultConfigured = false;
     private bool $throwOnRepair = false;
-    private int $repairCallCount = 0;
 
     /** @var list<string> */
     private array $validApiKeys = [];
@@ -148,7 +174,29 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
+        $this->countCall('getPaymentByTransactionId');
+        $this->requestedTransactionIds[] = $transactionId;
+
         return $this->payment;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getRequestedTransactionIds(): array
+    {
+        return $this->requestedTransactionIds;
+    }
+
+    public function getLastTransactionId(): string
+    {
+        $last = end($this->requestedTransactionIds);
+
+        if ($last === false) {
+            throw new \RuntimeException('No payment was looked up by transaction id.');
+        }
+
+        return $last;
     }
 
     public function withRepairResult(?Payment $payment): void
@@ -162,14 +210,19 @@ final class FakeGateway implements MollieGatewayInterface
         $this->throwOnRepair = true;
     }
 
+    public function getCallCount(string $method): int
+    {
+        return $this->callCounts[$method] ?? 0;
+    }
+
     public function getRepairCallCount(): int
     {
-        return $this->repairCallCount;
+        return $this->getCallCount('repairLegacyTransaction');
     }
 
     public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
     {
-        ++$this->repairCallCount;
+        $this->countCall('repairLegacyTransaction');
 
         if ($this->throwOnRepair) {
             throw new \RuntimeException('Mollie API not reachable');
@@ -183,8 +236,22 @@ final class FakeGateway implements MollieGatewayInterface
         $this->validApiKeys[] = $key;
     }
 
+    /**
+     * The error Mollie answers the profile lookup with, e.g. when the API key is invalid.
+     */
+    public function withProfileFailure(\Throwable $failure): void
+    {
+        $this->profileFailure = $failure;
+    }
+
     public function getCurrentProfile(?string $salesChannelId = null): Profile
     {
+        $this->countCall('getCurrentProfile');
+
+        if ($this->profileFailure !== null) {
+            throw $this->profileFailure;
+        }
+
         return new Profile('fake_profile', 'fake', 'fake@mollie.test');
     }
 
@@ -204,6 +271,8 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function listMandates(string $mollieCustomerId, string $salesChannelId): MandateCollection
     {
+        $this->countCall('listMandates');
+
         $collection = new MandateCollection();
         $mandate = new Mandate('tr_test_mandate_id', PaymentMethod::CREDIT_CARD, []);
         $collection->set('tr_test_mandate_id', $mandate);
@@ -213,7 +282,17 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool
     {
+        $this->revokedMandates[] = ['mollieCustomerId' => $mollieCustomerId, 'mandateId' => $mandateId];
+
         return true;
+    }
+
+    /**
+     * @return list<array{mollieCustomerId: string, mandateId: string}>
+     */
+    public function getRevokedMandates(): array
+    {
+        return $this->revokedMandates;
     }
 
     public function listTerminals(string $salesChannelId): TerminalCollection
@@ -231,16 +310,41 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function getActivePaymentMethods(Money $amount, string $billingCountry, string $salesChannelId): array
     {
+        $this->countCall('getActivePaymentMethods');
+
         return $this->activePaymentMethods;
+    }
+
+    public function withGetPaymentThrowing(): void
+    {
+        $this->throwOnGetPayment = true;
     }
 
     public function getPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
     {
+        $this->countCall('getPayment');
+
+        if ($this->throwOnGetPayment) {
+            throw new \RuntimeException('Mollie API not reachable');
+        }
+
         return $this->payment;
+    }
+
+    /**
+     * The error Mollie answers a cancel call with, e.g. when the payment can no longer be cancelled.
+     */
+    public function withCancelFailure(\Throwable $failure): void
+    {
+        $this->cancelFailure = $failure;
     }
 
     public function cancelPayment(string $molliePaymentId, string $orderNumber, string $salesChannelId): Payment
     {
+        if ($this->cancelFailure !== null) {
+            throw $this->cancelFailure;
+        }
+
         $this->cancelledPaymentIds[] = $molliePaymentId;
 
         return $this->payment;
@@ -248,6 +352,10 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function cancelOrder(string $mollieOrderId, string $orderNumber, string $salesChannelId): Order
     {
+        if ($this->cancelFailure !== null) {
+            throw $this->cancelFailure;
+        }
+
         $this->cancelledOrderIds[] = $mollieOrderId;
 
         return $this->order ?? new Order($mollieOrderId, '');
@@ -282,11 +390,33 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->capturePayloads;
     }
 
+    /**
+     * The shipment Mollie answers with. Set it when the test asserts on the shipment id, so it
+     * does not depend on the generated fallback.
+     */
+    public function withShipment(Shipment $shipment): void
+    {
+        $this->shipment = $shipment;
+    }
+
+    /**
+     * Shipping at Mollie can fail, e.g. when the payment was already captured because the merchant
+     * set the order to paid by hand.
+     */
+    public function withCreateShipmentThrowing(): void
+    {
+        $this->throwOnCreateShipment = true;
+    }
+
     public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment
     {
         $this->shipmentPayloads[] = $createShipment;
 
-        return new Shipment('shp_fake_' . uniqid());
+        if ($this->throwOnCreateShipment) {
+            throw new \RuntimeException('Payment was already captured');
+        }
+
+        return $this->shipment ?? new Shipment('shp_fake_' . uniqid());
     }
 
     /**
@@ -309,6 +439,8 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function getOrder(string $mollieOrderId, string $salesChannelId): Order
     {
+        $this->countCall('getOrder');
+
         if ($this->throwOnGetOrder) {
             throw new \RuntimeException('Mollie API unavailable');
         }
@@ -322,9 +454,51 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function cancelOrderLines(string $mollieOrderId, string $mollieLineId, int $quantity, string $orderNumber, string $salesChannelId): void
     {
+        $this->cancelledOrderLines[] = [
+            'mollieOrderId' => $mollieOrderId,
+            'mollieLineId' => $mollieLineId,
+            'quantity' => $quantity,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+    }
+
+    /**
+     * @return list<array{mollieOrderId: string, mollieLineId: string, quantity: int, orderNumber: string, salesChannelId: string}>
+     */
+    public function getCancelledOrderLines(): array
+    {
+        return $this->cancelledOrderLines;
+    }
+
+    public function withReleaseAuthorizationThrowing(): void
+    {
+        $this->throwOnReleaseAuthorization = true;
     }
 
     public function releaseAuthorization(string $paymentId, string $orderNumber, string $salesChannelId): void
     {
+        if ($this->throwOnReleaseAuthorization) {
+            throw new \RuntimeException('Mollie API not reachable');
+        }
+
+        $this->releasedAuthorizations[] = [
+            'paymentId' => $paymentId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+    }
+
+    /**
+     * @return list<array{paymentId: string, orderNumber: string, salesChannelId: string}>
+     */
+    public function getReleasedAuthorizations(): array
+    {
+        return $this->releasedAuthorizations;
+    }
+
+    private function countCall(string $method): void
+    {
+        $this->callCounts[$method] = ($this->callCounts[$method] ?? 0) + 1;
     }
 }

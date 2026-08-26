@@ -11,7 +11,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 #[CoversClass(SupportController::class)]
 final class SupportControllerTest extends TestCase
@@ -87,5 +89,34 @@ final class SupportControllerTest extends TestCase
 
         $this->assertFalse($body['success']);
         $this->assertSame('Mail server down', $body['error']);
+    }
+
+    /**
+     * A rejected form (e.g. a malformed mail address) has to come back as a readable message in
+     * the admin, not as a 500 that leaves the merchant guessing.
+     */
+    public function testARejectedSupportFormComesBackAsAReadableError(): void
+    {
+        $mailer = new FakeSupportMailer();
+        $mailer->throwOnSend(new ConstraintViolationException(new ConstraintViolationList(), []));
+
+        $controller = new SupportController($mailer, new NullLogger());
+
+        $response = $controller->requestSupport($this->supportRequest(), $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $this->assertFalse($body['success']);
+        $this->assertSame('Caught 0 violation errors.', $body['error']);
+    }
+
+    private function supportRequest(): Request
+    {
+        return new Request([], [
+            'name' => 'John',
+            'email' => 'john@example.com',
+            'recipientLocale' => 'de-DE',
+            'subject' => 'Issue',
+            'message' => 'Help!',
+        ]);
     }
 }

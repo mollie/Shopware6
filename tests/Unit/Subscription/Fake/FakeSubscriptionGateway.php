@@ -26,8 +26,15 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
     /** @var array<string,\Throwable> */
     private array $exceptionsByMethod = [];
 
+    /**
+     * Stores a snapshot, not the caller's instance: Mollie keeps its own copy of the
+     * subscription, and a local mutation on our object must not silently change what the
+     * next API call answers - otherwise a test cannot see that a change was lost.
+     */
     public function register(Subscription $subscription): void
     {
+        $subscription = clone $subscription;
+
         $this->subscriptions[$subscription->getId()] = $subscription;
     }
 
@@ -199,6 +206,7 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
         $this->calls[] = [
             'method' => 'copySubscription',
             'subscriptionId' => $mollieSubscription->getId(),
+            'startDate' => $mollieSubscription->getStartDate()->format('Y-m-d'),
             'customerId' => $customerId,
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannelId,
@@ -225,7 +233,7 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
             throw new \RuntimeException(sprintf('FakeSubscriptionGateway has no subscription registered for id "%s"', $mollieSubscriptionId));
         }
 
-        return $this->subscriptions[$mollieSubscriptionId];
+        return clone $this->subscriptions[$mollieSubscriptionId];
     }
 
     public function updateSubscription(Subscription $mollieSubscription, string $customerId, string $orderNumber, string $salesChannelId): Subscription
@@ -233,6 +241,7 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
         $this->calls[] = [
             'method' => 'updateSubscription',
             'subscriptionId' => $mollieSubscription->getId(),
+            'mandateId' => $mollieSubscription->getMandateId(),
             'customerId' => $customerId,
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannelId,
@@ -242,7 +251,7 @@ final class FakeSubscriptionGateway implements SubscriptionGatewayInterface
             throw $this->exceptionsByMethod['updateSubscription'];
         }
 
-        $this->subscriptions[$mollieSubscription->getId()] = $mollieSubscription;
+        $this->subscriptions[$mollieSubscription->getId()] = clone $mollieSubscription;
 
         return $mollieSubscription;
     }

@@ -180,6 +180,88 @@ final class PriceDriftDetectorTest extends TestCase
         $this->assertStringStartsWith('price_check_skipped', (string) $upsert['historyEntries'][0]['comment']);
     }
 
+    /**
+     * A shop that never switched subscriptions on must not have its subscription prices touched.
+     */
+    public function testASalesChannelWithSubscriptionsSwitchedOffIsSkipped(): void
+    {
+        $repository = new FakeSubscriptionRepository();
+        $repository->add($this->buildSubscription('subscription-id'));
+
+        $eventSpy = new EventSpy();
+        $detector = $this->buildDetector(
+            settings: new SubscriptionSettings(enabled: false, priceUpdateMode: SubscriptionSettings::PRICE_UPDATE_MODE_AUTO),
+            subscriptionRepository: $repository,
+            cartBuilder: new FakeSubscriptionGroupCartBuilder($this->buildGroupCart(75.00)),
+            eventDispatcher: $eventSpy
+        );
+
+        $count = $detector->detect(Context::createDefaultContext());
+
+        $this->assertSame(0, $count);
+        $this->assertSame(0, $eventSpy->getEventCount());
+    }
+
+    /**
+     * Without the order there is no cart to price the renewal from, so the subscription is passed
+     * over instead of being notified about a price that was never calculated.
+     */
+    public function testASubscriptionWhoseOrderIsGoneIsPassedOver(): void
+    {
+        $subscription = SubscriptionEntityBuilder::create()
+            ->withId('subscription-id')
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withoutOrder()
+            ->build()
+        ;
+
+        $repository = new FakeSubscriptionRepository();
+        $repository->add($subscription);
+
+        $eventSpy = new EventSpy();
+        $detector = $this->buildDetector(
+            settings: $this->autoSettings(),
+            subscriptionRepository: $repository,
+            cartBuilder: new FakeSubscriptionGroupCartBuilder($this->buildGroupCart(75.00)),
+            eventDispatcher: $eventSpy
+        );
+
+        $count = $detector->detect(Context::createDefaultContext());
+
+        $this->assertSame(0, $count);
+        $this->assertSame(0, $eventSpy->getEventCount());
+    }
+
+    /**
+     * The price change notice is a mail to the customer - without a customer there is nobody to
+     * send it to, so the subscription is passed over rather than notified into the void.
+     */
+    public function testASubscriptionWithoutAShopwareCustomerIsPassedOver(): void
+    {
+        $subscription = SubscriptionEntityBuilder::create()
+            ->withId('subscription-id')
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withoutCustomer()
+            ->build()
+        ;
+
+        $repository = new FakeSubscriptionRepository();
+        $repository->add($subscription);
+
+        $eventSpy = new EventSpy();
+        $detector = $this->buildDetector(
+            settings: $this->autoSettings(),
+            subscriptionRepository: $repository,
+            cartBuilder: new FakeSubscriptionGroupCartBuilder($this->buildGroupCart(75.00)),
+            eventDispatcher: $eventSpy
+        );
+
+        $count = $detector->detect(Context::createDefaultContext());
+
+        $this->assertSame(0, $count);
+        $this->assertSame(0, $eventSpy->getEventCount());
+    }
+
     private function buildDetector(
         SubscriptionSettings $settings,
         FakeSubscriptionRepository $subscriptionRepository,

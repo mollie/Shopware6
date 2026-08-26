@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Unit\Fake;
 
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -17,6 +18,8 @@ final class FakeSalesChannelContext extends SalesChannelContext
     private Context $fakeContext;
     private ?CustomerEntity $fakeCustomer = null;
     private ?PaymentMethodEntity $fakePaymentMethod = null;
+
+    private ?ShippingMethodEntity $fakeShippingMethod = null;
     private ?CurrencyEntity $fakeCurrency = null;
 
     public function __construct(
@@ -67,6 +70,7 @@ final class FakeSalesChannelContext extends SalesChannelContext
         $salesChannel = new SalesChannelEntity();
         $salesChannel->setId($this->fakeSalesChannelId);
         $salesChannel->setName('Fake Sales Channel');
+        $salesChannel->setLanguageId($this->fakeContext->getLanguageId());
 
         return $salesChannel;
     }
@@ -81,9 +85,56 @@ final class FakeSalesChannelContext extends SalesChannelContext
         return $this->fakeContext;
     }
 
+    /**
+     * The parent delegates the rule ids to its inner Context, which the fake never builds - so
+     * both accessors go to the fake context instead.
+     *
+     * @return array<string>
+     */
+    public function getRuleIds(): array
+    {
+        return $this->fakeContext->getRuleIds();
+    }
+
+    /**
+     * @param array<string> $ruleIds
+     */
+    public function setRuleIds(array $ruleIds): void
+    {
+        $this->fakeContext->setRuleIds($ruleIds);
+    }
+
     public function getCustomer(): ?CustomerEntity
     {
         return $this->fakeCustomer;
+    }
+
+    public function getLanguageId(): string
+    {
+        return $this->fakeContext->getLanguageId();
+    }
+
+    /**
+     * The parent reads its own promoted constructor property, which the fake never fills - so both
+     * the customer id and the shipping method come from what the test set here.
+     */
+    public function getCustomerId(): ?string
+    {
+        return $this->fakeCustomer?->getId();
+    }
+
+    public function setShippingMethod(ShippingMethodEntity $shippingMethod): void
+    {
+        $this->fakeShippingMethod = $shippingMethod;
+    }
+
+    public function getShippingMethod(): ShippingMethodEntity
+    {
+        if ($this->fakeShippingMethod === null) {
+            throw new \LogicException('FakeSalesChannelContext::getShippingMethod() called without configured shipping method. Use setShippingMethod() in the test.');
+        }
+
+        return $this->fakeShippingMethod;
     }
 
     public function getPaymentMethod(): PaymentMethodEntity

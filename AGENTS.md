@@ -50,6 +50,8 @@ Do not skip ahead. Each step ends with something reviewable.
 
 0. **Ask** — before you read anything. See the rules below.
 1. **Understand** — read the code that is actually involved. Report which files you read.
+   For subscriptions or vouchers, read `.agents/guidelines/domain.md` first: it holds the
+   Mollie behaviour the code depends on but cannot state itself.
 2. **Implement** — production code only, following section 2. **No tests yet.**
 3. **Review** — run the reviewers from `.agents/skills/review-*/` (see section 4) and report
    the findings.
@@ -146,7 +148,10 @@ Every user-visible change gets an entry under `# Unreleased` in **both**
   order within a section.
 - Avoid a wall of `Behoben` / `Fixed`. Where new or changed behaviour honestly fits, label it
   that way — but "wieder" / "correctly again" wording stays `Behoben` / `Fixed`.
-- Purely internal changes (refactoring, tests, tooling, CI) get **no** entry.
+- **No entry for anything nobody was waiting for:** refactoring, tests, tooling, CI — and a
+  fix that only surfaced while writing tests and was never reported by anyone. The changelog
+  answers what changed for the merchant since the last version, not what we touched. This
+  overrides the first rule above: "user-visible" alone is not enough.
 
 ## 7. Code rules
 
@@ -200,6 +205,7 @@ the vague line and delete it, do not append a second rule beside it. The step-by
 |---|---|
 | how you work — scope, order, what to run, how to answer | this file |
 | a PHP or test rule | `.agents/guidelines/php.md`, `.agents/guidelines/testing.md` |
+| how Mollie or Shopware actually behaves | `.agents/guidelines/domain.md` |
 | something a reviewer should have flagged | `.agents/skills/review-<the relevant one>/SKILL.md` |
 | the steps of a recurring task | `.agents/skills/<the task>/SKILL.md` |
 | a rule that holds beyond this repository | `.ai/`, if present — **name it, do not edit it** |
@@ -211,8 +217,9 @@ that should change and leave it to the developer.
 
 - **No new file for a single correction.** No running log of learnings, no `corrections.md`.
   The five homes above are enough; if a correction fits none of them, say so and ask.
-- **A fact is not a rule.** An undocumented Mollie or Shopware quirk is not process feedback —
-  mention it in your answer and ask whether to record it; do not file it somewhere.
+- **A fact is not a rule.** An undocumented Mollie or Shopware behaviour is not process
+  feedback. It belongs in `.agents/guidelines/domain.md`, not in the rule files above — ask
+  before writing it there, and only write what a maintainer confirmed.
 - **State what you changed.** One line: which file, which rule now reads differently.
 - **The test:** would this correction now be caught without the human saying anything? If
   not, it went in the wrong place.

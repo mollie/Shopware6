@@ -34,6 +34,9 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?PayPalExpressSettings $paypalExpressSettings = null,
         private ?ApplePaySettings $applePaySettings = null,
         private ?ExpressComponentsSettings $expressComponentsSettings = null,
+        private ?CreditCardSettings $creditCardSettings = null,
+        private ?RefundSettings $refundSettings = null,
+        private ?AccountSettings $accountSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -81,7 +84,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings
     {
-        // TODO: Implement getCreditCardSettings() method.
+        return $this->creditCardSettings ?? new CreditCardSettings();
     }
 
     public function getApiSettings(?string $salesChannelId = null): ApiSettings
@@ -118,7 +121,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getAccountSettings(?string $salesChannelId = null): AccountSettings
     {
-        // TODO: Implement getAccountSettings() method.
+        return $this->accountSettings ?? new AccountSettings(false, false, false, false, false, false);
     }
 
     public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings
@@ -138,6 +141,6 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getRefundSettings(?string $salesChannelId = null): RefundSettings
     {
-        return new RefundSettings();
+        return $this->refundSettings ?? new RefundSettings();
     }
 }

@@ -10,6 +10,10 @@ use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityWriteResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
+use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
+use Shopware\Core\System\StateMachine\StateMachineEntity;
+use Shopware\Core\System\StateMachine\Transition;
 
 #[CoversClass(OrderReturnSubscriber::class)]
 final class OrderReturnSubscriberTest extends TestCase
@@ -57,6 +61,113 @@ final class OrderReturnSubscriberTest extends TestCase
         $subscriber->onOrderReturnWritten($this->insertEvent('return-id', $context));
 
         $this->assertSame([], $handler->returnOnCreatedAsDoneCalls);
+    }
+
+    /**
+     * Only a newly created return can already be done. An update would otherwise refund a second
+     * time on every edit of the return.
+     */
+    public function testAnUpdatedReturnDoesNotTriggerAnotherRefund(): void
+    {
+        $handler = new FakeOrderReturnHandler();
+        $subscriber = new OrderReturnSubscriber($handler);
+
+        $writeResult = new EntityWriteResult('return-id', [], 'order_return', EntityWriteResult::OPERATION_UPDATE);
+
+        $subscriber->onOrderReturnWritten(new EntityWrittenEvent('order_return', [$writeResult], Context::createDefaultContext()));
+
+        $this->assertSame([], $handler->returnOnCreatedAsDoneCalls);
+    }
+
+    public function testAReturnSetToDoneIsRefunded(): void
+    {
+        $handler = new FakeOrderReturnHandler();
+        $subscriber = new OrderReturnSubscriber($handler);
+
+        $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done'));
+
+        $this->assertSame(['return-id'], $handler->returnCalls);
+    }
+
+    public function testACancelledReturnIsCancelled(): void
+    {
+        $handler = new FakeOrderReturnHandler();
+        $subscriber = new OrderReturnSubscriber($handler);
+
+        $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('cancelled'));
+
+        $this->assertSame(['return-id'], $handler->cancelCalls);
+    }
+
+    /**
+     * A return that only moves to "in progress" has nothing to refund yet.
+     */
+    public function testAnyOtherReturnStateIsIgnored(): void
+    {
+        $handler = new FakeOrderReturnHandler();
+        $subscriber = new OrderReturnSubscriber($handler);
+
+        $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('in_progress'));
+
+        $this->assertSame([], $handler->returnCalls);
+        $this->assertSame([], $handler->cancelCalls);
+    }
+
+    /**
+     * Shopware fires the change twice, once for leaving the old state and once for entering the
+     * new one. Acting on both would refund twice.
+     */
+    public function testLeavingAStateDoesNotRefund(): void
+    {
+        $handler = new FakeOrderReturnHandler();
+        $subscriber = new OrderReturnSubscriber($handler);
+
+        $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done', StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_LEAVE));
+
+        $this->assertSame([], $handler->returnCalls);
+    }
+
+    /**
+     * Opening an order in the admin replays the state change on a non-live order version; refunding
+     * from that clone would refund a second time (issue #1421).
+     */
+    public function testAStateChangeOnANonLiveVersionDoesNotRefund(): void
+    {
+        $handler = new FakeOrderReturnHandler();
+        $subscriber = new OrderReturnSubscriber($handler);
+
+        $context = Context::createDefaultContext()->createWithVersionId('0198a1b2c3d4e5f60718293a4b5c6d7e');
+
+        $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done', context: $context));
+
+        $this->assertSame([], $handler->returnCalls);
+    }
+
+    private function stateChangeEvent(
+        string $stateName,
+        string $transitionSide = StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER,
+        ?Context $context = null,
+    ): StateMachineStateChangeEvent {
+        $stateMachine = new StateMachineEntity();
+        $stateMachine->setId('state-machine-id');
+        $stateMachine->setTechnicalName('order_return.state');
+
+        $previousState = new StateMachineStateEntity();
+        $previousState->setId('previous-state-id');
+        $previousState->setTechnicalName('open');
+
+        $nextState = new StateMachineStateEntity();
+        $nextState->setId('next-state-id');
+        $nextState->setTechnicalName($stateName);
+
+        return new StateMachineStateChangeEvent(
+            $context ?? Context::createDefaultContext(),
+            $transitionSide,
+            new Transition('order_return', 'return-id', $stateName, 'stateId'),
+            $stateMachine,
+            $previousState,
+            $nextState
+        );
     }
 
     private function insertEvent(string $returnId, Context $context): EntityWrittenEvent

@@ -16,20 +16,32 @@ final class FakeWebhookRoute extends AbstractWebhookRoute
     /** @var list<string> */
     private array $failingTransactionIds = [];
 
+    /** @var array<string, \Throwable> */
+    private array $failures = [];
+
     public function getDecorated(): self
     {
         throw new \RuntimeException('Not decorated');
     }
 
-    public function addFailingTransactionId(string $transactionId): void
+    /**
+     * Without an explicit failure the route fails the way an unreachable API does. Pass one to
+     * cover a caller that distinguishes exception types, e.g. a Shopware HTTP exception with a
+     * status code of its own.
+     */
+    public function addFailingTransactionId(string $transactionId, ?\Throwable $failure = null): void
     {
         $this->failingTransactionIds[] = $transactionId;
+
+        if ($failure !== null) {
+            $this->failures[$transactionId] = $failure;
+        }
     }
 
     public function notify(string $transactionId, Context $context): WebhookResponse
     {
         if (in_array($transactionId, $this->failingTransactionIds, true)) {
-            throw new \RuntimeException('Mollie API unavailable');
+            throw $this->failures[$transactionId] ?? new \RuntimeException('Mollie API unavailable');
         }
 
         $this->notifiedTransactionIds[] = $transactionId;

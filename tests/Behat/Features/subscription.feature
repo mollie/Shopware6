@@ -95,7 +95,7 @@ Feature: Subscription checkout
     And select payment status "paid"
     Then i see success page
     And order payment status is "paid"
-    And i remember the subscription with interval "1 days" for renewal
+    And i remember the subscription with interval "1 day" for renewal
     Given product "MOL_REGULAR" with quantity "1" is in cart
     When i start checkout with payment method "belfius"
     And select payment status "paid"
