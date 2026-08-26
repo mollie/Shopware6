@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie\Gateway;
 
+use Mollie\Shopware\Component\Mollie\CreateSession;
 use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
+use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\SessionStatus;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
@@ -158,6 +160,46 @@ final class SessionGatewayTest extends TestCase
         $this->gateway(new FakeClient())->cancelSession('ses_1', new FakeSalesChannelContext());
     }
 
+    public function testASessionIsCreatedAtTheSessionEndpoint(): void
+    {
+        $client = new FakeClient(body: $this->sessionResponse());
+
+        $this->gateway($client)->createSession($this->createSessionPayload(), new FakeSalesChannelContext());
+
+        $this->assertSame('sessions', $client->getLastUri());
+        $this->assertSame('POST', $client->getLastMethod());
+    }
+
+    public function testACreatedSessionIsSentAsTheBuiltPayload(): void
+    {
+        $client = new FakeClient(body: $this->sessionResponse());
+
+        $this->gateway($client)->createSession($this->createSessionPayload(), new FakeSalesChannelContext());
+
+        $formParams = $client->getLastPostOptions()['form_params'];
+
+        $this->assertSame('Order 10000', $formParams['description']);
+        $this->assertSame(['value' => '25.00', 'currency' => 'EUR'], $formParams['amount']);
+        $this->assertSame('https://shop.test/return', $formParams['redirectUrl']);
+    }
+
+    public function testACreatedSessionCarriesTheIdAndStatusMollieAnswered(): void
+    {
+        $client = new FakeClient(body: $this->sessionResponse(['id' => 'ses_new']));
+
+        $session = $this->gateway($client)->createSession($this->createSessionPayload(), new FakeSalesChannelContext());
+
+        $this->assertSame('ses_new', $session->getId());
+        $this->assertSame(SessionStatus::OPEN, $session->getStatus());
+    }
+
+    public function testAMollieErrorWhileCreatingASessionBecomesAnApiException(): void
+    {
+        $this->expectException(ApiException::class);
+
+        $this->gateway(new FakeClient())->createSession($this->createSessionPayload(), new FakeSalesChannelContext());
+    }
+
     private function gateway(FakeClient $client, ?FakeRouteBuilder $routeBuilder = null): SessionGateway
     {
         return new SessionGateway(
@@ -165,6 +207,11 @@ final class SessionGatewayTest extends TestCase
             $routeBuilder ?? new FakeRouteBuilder(),
             new FakeLogger()
         );
+    }
+
+    private function createSessionPayload(): CreateSession
+    {
+        return new CreateSession('Order 10000', 'https://shop.test/return', new Money(25.0, 'EUR'));
     }
 
     private function cart(float $totalPrice): Cart

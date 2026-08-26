@@ -16,8 +16,15 @@ final class FakeCartService extends CartService
         $this->storedCart = $cart;
     }
 
+    /**
+     * The real service recalculates the cart and thereby overwrites the rule ids of the context -
+     * on the edit-order page the cart is empty, so they get reset. Callers that need them have to
+     * restore them, which they can only be tested for if the fake does the same.
+     */
     public function getCart(string $token, SalesChannelContext $context, bool $caching = true, bool $taxed = false): Cart
     {
+        $context->setRuleIds([]);
+
         return $this->storedCart;
     }
 

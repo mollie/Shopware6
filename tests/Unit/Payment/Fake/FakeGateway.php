@@ -60,6 +60,10 @@ final class FakeGateway implements MollieGatewayInterface
 
     private bool $throwOnCapture = false;
 
+    private bool $throwOnCreateShipment = false;
+
+    private ?Shipment $shipment = null;
+
     private bool $throwOnGetPayment = false;
 
     private ?\Throwable $cancelFailure = null;
@@ -386,11 +390,33 @@ final class FakeGateway implements MollieGatewayInterface
         return $this->capturePayloads;
     }
 
+    /**
+     * The shipment Mollie answers with. Set it when the test asserts on the shipment id, so it
+     * does not depend on the generated fallback.
+     */
+    public function withShipment(Shipment $shipment): void
+    {
+        $this->shipment = $shipment;
+    }
+
+    /**
+     * Shipping at Mollie can fail, e.g. when the payment was already captured because the merchant
+     * set the order to paid by hand.
+     */
+    public function withCreateShipmentThrowing(): void
+    {
+        $this->throwOnCreateShipment = true;
+    }
+
     public function createShipment(CreateShipment $createShipment, string $mollieOrderId, string $orderNumber, string $salesChannelId): Shipment
     {
         $this->shipmentPayloads[] = $createShipment;
 
-        return new Shipment('shp_fake_' . uniqid());
+        if ($this->throwOnCreateShipment) {
+            throw new \RuntimeException('Payment was already captured');
+        }
+
+        return $this->shipment ?? new Shipment('shp_fake_' . uniqid());
     }
 
     /**

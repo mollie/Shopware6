@@ -565,6 +565,102 @@ final class MollieGatewayTest extends TestCase
         yield 'releaseAuthorization' => [fn (MollieGateway $gateway) => $gateway->releaseAuthorization('tr_test', '10000', $salesChannelId)];
     }
 
+    // ------------------------------------------------------- payment link orders
+
+    /**
+     * A payment link produces the Mollie payment only when the customer pays, so the transaction
+     * starts out with the link id and no payment id. From the first payment on, the order has to
+     * look like any regularly placed Mollie order.
+     */
+    public function testAPaymentLinkTransactionResolvesThePaymentOfTheLink(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPaymentLinkOnly('pl_1');
+
+        $payment = $this->gatewayWithLinkPayments($transactionService, [
+            ['id' => 'tr_paid', 'status' => 'paid', 'createdAt' => '2026-01-02T10:00:00+00:00'],
+        ])->getPaymentByTransactionId('test', new Context(new SystemSource()));
+
+        $this->assertSame('tr_paid', $payment->getId());
+    }
+
+    /**
+     * A customer can start the link more than once, so the link may hold several payments. The
+     * newest one is the attempt that counts.
+     */
+    public function testTheNewestPaymentOfALinkWins(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPaymentLinkOnly('pl_1');
+
+        $payment = $this->gatewayWithLinkPayments($transactionService, [
+            ['id' => 'tr_old', 'status' => 'failed', 'createdAt' => '2026-01-01T10:00:00+00:00'],
+            ['id' => 'tr_new', 'status' => 'paid', 'createdAt' => '2026-01-03T10:00:00+00:00'],
+            ['id' => 'tr_middle', 'status' => 'failed', 'createdAt' => '2026-01-02T10:00:00+00:00'],
+        ])->getPaymentByTransactionId('test', new Context(new SystemSource()));
+
+        $this->assertSame('tr_new', $payment->getId());
+    }
+
+    public function testTheFirstPaymentOfALinkIsUsedWhenNoneCarriesACreationDate(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPaymentLinkOnly('pl_1');
+
+        $payment = $this->gatewayWithLinkPayments($transactionService, [
+            ['id' => 'tr_first', 'status' => 'paid'],
+            ['id' => 'tr_second', 'status' => 'paid'],
+        ])->getPaymentByTransactionId('test', new Context(new SystemSource()));
+
+        $this->assertSame('tr_first', $payment->getId());
+    }
+
+    /**
+     * The finalize URL was stored with the link, including the token Mollie never received, so the
+     * return route can run the regular Shopware finalize.
+     */
+    public function testTheResolvedLinkPaymentCarriesTheStoredFinalizeUrl(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPaymentLinkOnly('pl_1');
+
+        $payment = $this->gatewayWithLinkPayments($transactionService, [
+            ['id' => 'tr_paid', 'status' => 'paid'],
+        ])->getPaymentByTransactionId('test', new Context(new SystemSource()));
+
+        $this->assertSame('payment/finalize', $payment->getFinalizeUrl());
+    }
+
+    public function testTheResolvedLinkPaymentIsPersistedOnTheTransaction(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPaymentLinkOnly('pl_1');
+
+        $this->gatewayWithLinkPayments($transactionService, [
+            ['id' => 'tr_paid', 'status' => 'paid'],
+        ])->getPaymentByTransactionId('test', new Context(new SystemSource()));
+
+        $saved = $transactionService->getSavedPaymentExtensions();
+        $this->assertCount(1, $saved);
+        $this->assertSame('tr_paid', $saved[0]['payment']->getId());
+    }
+
+    /**
+     * Nobody has paid the link yet, so there is nothing to resolve and no legacy data to fall
+     * back on either.
+     */
+    public function testAPaymentLinkWithoutAnyPaymentLeavesTheTransactionWithoutMollieData(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPaymentLinkOnly('pl_1');
+
+        $this->expectException(TransactionWithoutMollieDataException::class);
+
+        $this->gatewayWithLinkPayments($transactionService, [])
+            ->getPaymentByTransactionId('test', new Context(new SystemSource()))
+        ;
+    }
+
     private function makeGateway(FakeClient $client, ?FakeTransactionService $transactionService = null): MollieGateway
     {
         $clientFactory = new FakeClientFactory($client);
@@ -573,6 +669,25 @@ final class MollieGatewayTest extends TestCase
             $clientFactory,
             $transactionService ?? new FakeTransactionService(),
             new PaymentLinkGateway($clientFactory, new PaymentHydrator(), new NullLogger()),
+            new PaymentHydrator(),
+            new NullLogger()
+        );
+    }
+
+    /**
+     * @param list<array<string, mixed>> $linkPayments
+     */
+    private function gatewayWithLinkPayments(FakeTransactionService $transactionService, array $linkPayments): MollieGateway
+    {
+        // Two clients: the link payments come from the payment-link endpoint, everything the
+        // gateway itself would ask for must not be served by the same canned response.
+        $linkFactory = new FakeClientFactory(new FakeClient(body: ['_embedded' => ['payments' => $linkPayments]]));
+        $mainFactory = new FakeClientFactory(new FakeClient());
+
+        return new MollieGateway(
+            $mainFactory,
+            $transactionService,
+            new PaymentLinkGateway($linkFactory, new PaymentHydrator(), new NullLogger()),
             new PaymentHydrator(),
             new NullLogger()
         );

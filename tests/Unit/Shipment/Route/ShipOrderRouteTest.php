@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Shipment\Route;
 
+use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
@@ -24,6 +26,7 @@ use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -42,6 +45,14 @@ class ShipOrderRouteTest extends TestCase
     private OrderEntityBuilder $orderBuilder;
 
     private ShipOrderRoute $route;
+
+    private ShipmentItemResolver $itemResolver;
+
+    private ShipmentTrackingResolver $trackingResolver;
+
+    private AuthorizationReconciler $reconciler;
+
+    private ShipmentPersister $persister;
 
     protected function setUp(): void
     {
@@ -67,17 +78,105 @@ class ShipOrderRouteTest extends TestCase
         );
         $reconciler = new AuthorizationReconciler($this->gateway, $itemResolver, $logger);
 
-        $this->route = new ShipOrderRoute(
-            $this->orderRepository,
-            $this->gateway,
-            $this->eventDispatcher,
-            $itemResolver,
-            $trackingResolver,
-            $reconciler,
-            $persister,
-            new FakeTransactionService(),
-            $logger,
-        );
+        $this->itemResolver = $itemResolver;
+        $this->trackingResolver = $trackingResolver;
+        $this->reconciler = $reconciler;
+        $this->persister = $persister;
+
+        $this->route = $this->buildRoute(new FakeTransactionService());
+    }
+
+    // ----------------------------------------------------------- Orders API path
+
+    /**
+     * The Orders API is line item based and captures on shipment, so an order that was created
+     * through it gets a createShipment call instead of an explicit capture.
+     */
+    public function testAnOrdersApiOrderIsShippedInsteadOfCaptured(): void
+    {
+        $order = $this->ordersApiOrder();
+
+        $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+
+        static::assertCount(1, $this->gateway->getShipmentPayloads());
+        static::assertCount(0, $this->gateway->getCapturePayloads());
+    }
+
+    public function testTheShipmentCarriesTheRequestedItems(): void
+    {
+        $order = $this->ordersApiOrder();
+
+        $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+
+        $payload = $this->gateway->getShipmentPayloads()[0]->toArray();
+        static::assertCount(1, $payload['lines']);
+        static::assertSame('odl_1', $payload['lines'][0]['id']);
+    }
+
+    /**
+     * The tracking data from the request wins over anything derived from the deliveries, because
+     * the merchant typed it in for this shipment.
+     */
+    public function testTrackingFromTheRequestIsSentToMollie(): void
+    {
+        $order = $this->ordersApiOrder();
+
+        $request = new Request([], [
+            'orderId' => $order->getId(),
+            'items' => [['id' => 'lineitemid', 'quantity' => 1]],
+            'trackingCarrier' => 'DHL',
+            'trackingCode' => 'CODE-1',
+            'trackingUrl' => 'https://dhl.test/CODE-1',
+        ]);
+
+        $this->route->ship($request, Context::createDefaultContext());
+
+        $tracking = $this->gateway->getShipmentPayloads()[0]->toArray()['tracking'];
+        static::assertSame('DHL', $tracking['carrier']);
+        static::assertSame('CODE-1', $tracking['code']);
+    }
+
+    /**
+     * Mollie answers with the shipment id. It has to land in the payment extension so an
+     * accounting export finds it in the custom fields of the order.
+     */
+    public function testTheMollieShipmentIdIsRecordedOnThePaymentExtension(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $this->route = $this->buildRoute($transactionService);
+        $this->gateway->withShipment(new Shipment('shp_1'));
+        $order = $this->ordersApiOrder();
+
+        $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+
+        $saved = $transactionService->getSavedPaymentExtensions();
+        static::assertSame(['shp_1'], $saved[0]['payment']->getShipmentIds());
+    }
+
+    public function testTheShipmentIdIsPersistedOnTheShippedLineItem(): void
+    {
+        $this->gateway->withShipment(new Shipment('shp_1'));
+        $order = $this->ordersApiOrder();
+
+        $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+
+        $upserts = $this->lineItemRepository->getUpserts();
+        static::assertSame('shp_1', $upserts[0]['customFields'][Mollie::EXTENSION]['shipmentId']);
+    }
+
+    /**
+     * Shipping at Mollie may fail because the payment was already captured. That must not
+     * interrupt the delivery state change, so nothing is persisted and the response stays empty.
+     */
+    public function testAFailingShipmentLeavesTheDeliveryStateAlone(): void
+    {
+        $this->gateway->withCreateShipmentThrowing();
+        $order = $this->ordersApiOrder();
+
+        $response = $this->route->ship($this->shipRequest($order->getId()), Context::createDefaultContext());
+
+        static::assertSame('', $response->getMollieId());
+        static::assertCount(0, $this->lineItemRepository->getUpserts());
     }
 
     public function testShipByOrderIdCapturesAndPersistsRequestedItems(): void
@@ -349,5 +448,44 @@ class ShipOrderRouteTest extends TestCase
 
             throw $exception;
         }
+    }
+
+    private function buildRoute(FakeTransactionService $transactionService): ShipOrderRoute
+    {
+        return new ShipOrderRoute(
+            $this->orderRepository,
+            $this->gateway,
+            $this->eventDispatcher,
+            $this->itemResolver,
+            $this->trackingResolver,
+            $this->reconciler,
+            $this->persister,
+            $transactionService,
+            new NullLogger(),
+        );
+    }
+
+    // ----------------------------------------------------------------- helpers
+
+    private function ordersApiOrder(): OrderEntity
+    {
+        $payment = new Payment('tr_1');
+        $payment->setOrderId('ord_1');
+
+        $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0, [
+            'order_line_id' => 'odl_1',
+        ]);
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $payment);
+        $this->orderRepository->add($order);
+
+        return $order;
+    }
+
+    private function shipRequest(string $orderId): Request
+    {
+        return new Request([], [
+            'orderId' => $orderId,
+            'items' => [['id' => 'lineitemid', 'quantity' => 1]],
+        ]);
     }
 }

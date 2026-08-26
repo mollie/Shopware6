@@ -38,6 +38,7 @@ use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachine
 final class FakeTransactionService implements TransactionServiceInterface
 {
     private bool $withPayment = false;
+    private ?string $paymentLinkId = null;
     private ?TransactionDataStruct $transaction = null;
 
     private CustomerEntityBuilder $customerRepository;
@@ -110,6 +111,16 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function createValidStruct(): void
     {
         $this->withPayment = true;
+    }
+
+    /**
+     * A transaction whose payment link was created but never paid: the Mollie extension is there,
+     * yet it only knows the link, not a payment.
+     */
+    public function withPaymentLinkOnly(string $paymentLinkId): void
+    {
+        $this->withPayment = true;
+        $this->paymentLinkId = $paymentLinkId;
     }
 
     public function withoutOrder(): void
@@ -240,9 +251,14 @@ final class FakeTransactionService implements TransactionServiceInterface
         }
 
         if ($this->withPayment) {
-            $payment = new Payment('testMollieId');
+            // A payment link carries no Mollie payment id until the customer actually pays, so
+            // the extension exists with an empty id and only the link id on it.
+            $payment = new Payment($this->paymentLinkId === null ? 'testMollieId' : '');
             $payment->setMethod(PaymentMethod::CREDIT_CARD);
             $payment->setFinalizeUrl('payment/finalize');
+            if ($this->paymentLinkId !== null) {
+                $payment->setPaymentLinkId($this->paymentLinkId);
+            }
             $payment->setShopwareTransaction($transaction);
             $transaction->addExtension(Mollie::EXTENSION, $payment);
 

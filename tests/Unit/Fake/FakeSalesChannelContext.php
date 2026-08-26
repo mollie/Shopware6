@@ -82,6 +82,25 @@ final class FakeSalesChannelContext extends SalesChannelContext
         return $this->fakeContext;
     }
 
+    /**
+     * The parent delegates the rule ids to its inner Context, which the fake never builds - so
+     * both accessors go to the fake context instead.
+     *
+     * @return array<string>
+     */
+    public function getRuleIds(): array
+    {
+        return $this->fakeContext->getRuleIds();
+    }
+
+    /**
+     * @param array<string> $ruleIds
+     */
+    public function setRuleIds(array $ruleIds): void
+    {
+        $this->fakeContext->setRuleIds($ruleIds);
+    }
+
     public function getCustomer(): ?CustomerEntity
     {
         return $this->fakeCustomer;
