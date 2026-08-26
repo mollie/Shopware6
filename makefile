@@ -160,14 +160,15 @@ report: ##3 Runs the unit tests with coverage and prints the line coverage of sh
 	@echo "  HTML report in the browser at <shop-url>/coverage"
 	@echo ""
 
-# Behat prints progress to stdout. CI passes allure=<dir> to additionally write Allure
-# results; --out maps to --format by position, and `std` is Behat's word for stdout.
+# Behat prints progress to stdout. CI passes allure=<dir> to additionally write Cucumber
+# JSON, which Allure reads as-is; --out maps to --format by position, and `std` is Behat's
+# word for stdout.
 BEHAT_OUTPUT := --format=progress
 ifdef allure
-BEHAT_OUTPUT := --format=progress --format=allure --out=std --out=$(allure)
+BEHAT_OUTPUT := --format=progress --format=cucumber_json --out=std --out=$(allure)
 endif
 
-behat: ##3 Starts all Behat Tests [allure=<dir> also writes Allure results]
+behat: ##3 Starts all Behat Tests [allure=<dir> also writes results for the report]
 	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml $(BEHAT_OUTPUT) --colors
 
 insights: ##3 Starts the PHPInsights Analyser
