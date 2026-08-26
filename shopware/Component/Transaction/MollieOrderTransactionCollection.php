@@ -36,6 +36,32 @@ final class MollieOrderTransactionCollection
     }
 
     /**
+     * Whether the order has a transaction that was created after the given one - the given transaction
+     * has then been superseded by a later payment attempt and no longer represents the order's current
+     * payment. Returns false when it cannot be decided, so nothing is skipped on incomplete data.
+     */
+    public function hasNewerTransactionThan(OrderTransactionEntity $transaction): bool
+    {
+        $createdAt = $transaction->getCreatedAt();
+        if ($this->transactions === null || $createdAt === null) {
+            return false;
+        }
+
+        foreach ($this->transactions as $candidate) {
+            $candidateCreatedAt = $candidate->getCreatedAt();
+            if ($candidate->getId() === $transaction->getId() || $candidateCreatedAt === null) {
+                continue;
+            }
+
+            if ($candidateCreatedAt > $createdAt) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * The newest transaction (by createdAt) that still awaits payment (state open or reminded) -
      * i.e. the one a payment link should be paid for. Returns null when there is none.
      */
