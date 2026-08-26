@@ -21,6 +21,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 #[CoversClass(OrderTransactionRepository::class)]
 final class OrderTransactionRepositoryTest extends TestCase
 {
+    private const SALES_CHANNEL_ID = 'sales-channel-1';
+
     private FakeOrderTransactionRepository $dalRepository;
 
     private OrderTransactionRepository $repository;
@@ -35,24 +37,22 @@ final class OrderTransactionRepositoryTest extends TestCase
     {
         $this->dalRepository->setMatchingIds('transaction-1', 'transaction-2');
 
-        $result = $this->repository->findOpenTransactions(Context::createDefaultContext());
+        $result = $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
         self::assertSame(['transaction-1', 'transaction-2'], $result->getIds());
     }
 
-    public function testTheLookupWorksWithoutAGivenContext(): void
+    public function testOnlyOrdersOfTheGivenSalesChannelAreLookedUp(): void
     {
-        // The scheduled task that polls unfinished payments has no context of its own.
-        $this->dalRepository->setMatchingIds('transaction-1');
+        // Each sales channel has its own Mollie profile, so a poll must not pick up foreign orders.
+        $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
-        $result = $this->repository->findOpenTransactions();
-
-        self::assertSame(['transaction-1'], $result->getIds());
+        self::assertSame(self::SALES_CHANNEL_ID, $this->salesChannelFilter()->getValue());
     }
 
     public function testOnlyUnfinishedPaymentsAreLookedUp(): void
     {
-        $this->repository->findOpenTransactions(Context::createDefaultContext());
+        $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
         $stateNames = [];
         foreach ($this->stateFilter()->getQueries() as $query) {
@@ -67,7 +67,7 @@ final class OrderTransactionRepositoryTest extends TestCase
     {
         // The Mollie data sits on the order for legacy orders and on the transaction for current ones,
         // so either side counts.
-        $this->repository->findOpenTransactions(Context::createDefaultContext());
+        $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
         $fields = [];
         foreach ($this->mollieFilter()->getQueries() as $query) {
@@ -85,7 +85,7 @@ final class OrderTransactionRepositoryTest extends TestCase
     {
         // A payment that was just started is still being paid, and one older than the longest Mollie
         // expiry can no longer change.
-        $this->repository->findOpenTransactions(Context::createDefaultContext());
+        $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
         $range = $this->rangeFilter();
         $from = new \DateTimeImmutable((string) $range->getParameter(RangeFilter::GTE));
@@ -101,7 +101,7 @@ final class OrderTransactionRepositoryTest extends TestCase
 
     public function testTheNewestOrdersAreHandledFirstAndInBatchesOfTen(): void
     {
-        $this->repository->findOpenTransactions(Context::createDefaultContext());
+        $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
         $criteria = $this->criteria();
         self::assertSame(10, $criteria->getLimit());
@@ -111,7 +111,7 @@ final class OrderTransactionRepositoryTest extends TestCase
 
     public function testTheAssociationsTheCallerReadsAreLoaded(): void
     {
-        $this->repository->findOpenTransactions(Context::createDefaultContext());
+        $this->repository->findOpenTransactions(self::SALES_CHANNEL_ID, Context::createDefaultContext());
 
         $associations = array_keys($this->criteria()->getAssociations());
 
@@ -136,6 +136,17 @@ final class OrderTransactionRepositoryTest extends TestCase
     private function mollieFilter(): OrFilter
     {
         return $this->orFilterWith(ContainsFilter::class);
+    }
+
+    private function salesChannelFilter(): EqualsFilter
+    {
+        foreach ($this->criteria()->getFilters() as $filter) {
+            if ($filter instanceof EqualsFilter && $filter->getField() === 'order.salesChannelId') {
+                return $filter;
+            }
+        }
+
+        self::fail('The lookup does not restrict the sales channel.');
     }
 
     private function rangeFilter(): RangeFilter

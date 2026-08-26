@@ -7,8 +7,8 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
@@ -27,7 +27,6 @@ final class FakeSalesChannelRepository extends EntityRepository
     {
         return new EntitySearchResult(SalesChannelEntity::class, $this->collection->count(), $this->collection, null, $criteria, $context);
     }
-
 
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
