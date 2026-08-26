@@ -5,6 +5,7 @@
 - Added: New "Disable Return Management integration" setting in the Refund Manager, so returns from the Shopware Return Management no longer trigger a refund at Mollie.
 - Changed: Bancontact with status "open" now counts as failed.
 - Changed: Special characters in addresses are removed before the payment.
+- Changed: Synchronising open payments with Mollie is now switched off and can be enabled per sales channel in the Order Management.
 - Fixed: PayPal Express is the only payment method in the checkout right after returning.
 - Fixed: Opening a payment link a second time works again.
 - Fixed: The shipping costs of orders from older plugin versions are refunded, returned and marked as shipped at Mollie correctly again.

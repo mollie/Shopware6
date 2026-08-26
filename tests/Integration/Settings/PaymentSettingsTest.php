@@ -37,6 +37,29 @@ final class PaymentSettingsTest extends TestCase
         $this->assertSame('test_{ordernumber}_{customernumber}', $paymentSettings->getOrderNumberFormat());
     }
 
+    public function testSettingsAreReloadedAfterTheCacheIsCleared(): void
+    {
+        /**
+         * @var SystemConfigService $systemConfigService
+         */
+        $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
+        $configKey = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_AUTOMATIC_STATUS_UPDATE;
+        $oldValue = $systemConfigService->get($configKey);
+        $settingsService = new SettingsService($systemConfigService);
+
+        $systemConfigService->set($configKey, false);
+        $cachedSettings = $settingsService->getPaymentSettings();
+
+        $systemConfigService->set($configKey, true);
+        $settingsService->clearCache();
+        $reloadedSettings = $settingsService->getPaymentSettings();
+
+        $systemConfigService->set($configKey, $oldValue);
+
+        $this->assertFalse($cachedSettings->isAutomaticStatusUpdate());
+        $this->assertTrue($reloadedSettings->isAutomaticStatusUpdate());
+    }
+
     public function testSettingsAreCachedPerSalesChannel(): void
     {
         $settingsService = $this->getContainer()->get(SettingsService::class);

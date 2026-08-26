@@ -29,6 +29,23 @@ final class PaymentSettingsTest extends TestCase
         $this->assertSame('', $settings->getFixRoundingDiffSku());
     }
 
+    public function testAutomaticStatusUpdateIsDisabledByDefault(): void
+    {
+        $settings = PaymentSettings::createFromShopwareArray([]);
+
+        $this->assertFalse($settings->isAutomaticStatusUpdate());
+    }
+
+    public function testAutomaticStatusUpdateFromArray(): void
+    {
+        $data = [
+            PaymentSettings::KEY_AUTOMATIC_STATUS_UPDATE => true,
+        ];
+        $settings = PaymentSettings::createFromShopwareArray($data);
+
+        $this->assertTrue($settings->isAutomaticStatusUpdate());
+    }
+
     public function testRoundingDiffFromArray(): void
     {
         $data = [

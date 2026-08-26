@@ -18,8 +18,10 @@ use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+#[Autoconfigure(tags: [['name' => 'kernel.reset', 'method' => 'clearCache']])]
 final class SettingsService extends AbstractSettingsService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';

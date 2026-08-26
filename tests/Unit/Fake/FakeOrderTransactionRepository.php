@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Fake;
 
 use Mollie\Shopware\Repository\OrderTransactionRepositoryInterface;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -20,6 +19,12 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
     /** @var list<array<string,mixed>> */
     private array $upsertedPayloads = [];
 
+    /** @var list<string> */
+    private array $requestedSalesChannelIds = [];
+
+    /** @var array<string, list<string>> */
+    private array $matchingIdsPerSalesChannel = [];
+
     public function __construct()
     {
     }
@@ -27,6 +32,11 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
     public function setMatchingIds(string ...$ids): void
     {
         $this->matchingIds = array_values($ids);
+    }
+
+    public function setMatchingIdsForSalesChannel(string $salesChannelId, string ...$ids): void
+    {
+        $this->matchingIdsPerSalesChannel[$salesChannelId] = array_values($ids);
     }
 
     /**
@@ -37,14 +47,24 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
         return $this->upsertedPayloads;
     }
 
-    public function findOpenTransactions(?Context $context = null): IdSearchResult
+    public function findOpenTransactions(string $salesChannelId, Context $context): IdSearchResult
     {
-        return $this->buildIdSearchResult($context ?? new Context(new SystemSource()));
+        $this->requestedSalesChannelIds[] = $salesChannelId;
+
+        return $this->buildIdSearchResult($this->matchingIdsPerSalesChannel[$salesChannelId] ?? $this->matchingIds, $context);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getRequestedSalesChannelIds(): array
+    {
+        return $this->requestedSalesChannelIds;
     }
 
     public function searchIds(Criteria $criteria, Context $context): IdSearchResult
     {
-        return $this->buildIdSearchResult($context);
+        return $this->buildIdSearchResult($this->matchingIds, $context);
     }
 
     /**
@@ -59,10 +79,13 @@ final class FakeOrderTransactionRepository extends EntityRepository implements O
         return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
     }
 
-    private function buildIdSearchResult(Context $context): IdSearchResult
+    /**
+     * @param list<string> $ids
+     */
+    private function buildIdSearchResult(array $ids, Context $context): IdSearchResult
     {
         $data = [];
-        foreach ($this->matchingIds as $id) {
+        foreach ($ids as $id) {
             $data[] = ['data' => ['id' => $id], 'primaryKey' => $id];
         }
 

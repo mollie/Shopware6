@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Defaults;
-use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -40,12 +39,8 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
         $this->logger = $logger;
     }
 
-    public function findOpenTransactions(?Context $context = null): IdSearchResult
+    public function findOpenTransactions(string $salesChannelId, Context $context): IdSearchResult
     {
-        if ($context === null) {
-            $context = new Context(new SystemSource());
-        }
-
         $date = new \DateTimeImmutable();
         $start = $date->modify(sprintf('-%d days', 101));
         $end = $date->modify('-5 minutes');
@@ -68,6 +63,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
         ];
 
         $criteria->addFilter(new OrFilter($customFieldsFilter));
+        $criteria->addFilter(new EqualsFilter('order.salesChannelId', $salesChannelId));
         $criteria->addFilter(new RangeFilter('order.orderDateTime', [
             RangeFilter::GTE => $start->format(Defaults::STORAGE_DATE_TIME_FORMAT),
             RangeFilter::LTE => $end->format(Defaults::STORAGE_DATE_TIME_FORMAT)]));
@@ -76,6 +72,7 @@ final class OrderTransactionRepository implements OrderTransactionRepositoryInte
 
         $this->logger->debug('Search for orders with payment status in progress older than date', [
             'date' => $date->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+            'salesChannelId' => $salesChannelId,
         ]);
 
         return $this->orderTransactionRepository->searchIds($criteria, $context);

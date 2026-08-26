@@ -1476,6 +1476,54 @@
             <helpText lang="ro-RO">Dacă este activat, pluginul va anula automat comenzile Mollie atunci când sunt anulate în Shopware. Numai comenzile care sunt create, autorizate sau parțial expediate vor fi anulate. Dacă sunt expediate parțial, vor fi anulate doar articolele care nu au fost expediate.</helpText>
             <helpText lang="sk-SK">Ak je táto možnosť povolená, doplnok automaticky zruší objednávky v Mollie, keď budú zrušené v Shopware. Zrušené budú iba objednávky, ktoré sú vytvorené, autorizované alebo čiastočne odoslané. V prípade čiastočného odoslania budú zrušené iba tie položky, ktoré neboli odoslané.</helpText><helpText lang="bg-BG">Ако е активирано, плъгинът автоматично ще отмени Mollie поръчките, когато те са отказани в Shopware. Само поръчки, които са създадени, авторизирани или частично изпратени, ще бъдат отказани. Ако са частично изпратени, само артикулите, които не са изпратени, ще бъдат отказани.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>automaticStatusUpdate</name>
+            <defaultValue>false</defaultValue>
+            <label>Synchronise open payments with Mollie</label>
+            <label lang="de-DE">Offene Zahlungen mit Mollie abgleichen</label>
+            <label lang="nl-NL">Openstaande betalingen synchroniseren met Mollie</label>
+            <label lang="it-IT">Sincronizza i pagamenti aperti con Mollie</label>
+            <label lang="pt-PT">Sincronizar pagamentos em aberto com a Mollie</label>
+            <label lang="es-ES">Sincronizar los pagos pendientes con Mollie</label>
+            <label lang="sv-SE">Synkronisera obetalda betalningar med Mollie</label>
+            <label lang="nb-NO">Synkroniser åpne betalinger med Mollie</label>
+            <label lang="pl-PL">Synchronizuj otwarte płatności z Mollie</label>
+            <label lang="cs-CZ">Synchronizovat otevřené platby s Mollie</label>
+            <label lang="sl-SI">Sinhroniziraj odprta plačila z Mollie</label>
+            <label lang="hu-HU">Nyitott fizetések szinkronizálása a Mollie-val</label>
+            <label lang="fi-FI">Synkronoi avoimet maksut Mollien kanssa</label>
+            <label lang="da-DK">Synkroniser åbne betalinger med Mollie</label>
+            <label lang="el-GR">Συγχρονισμός εκκρεμών πληρωμών με τη Mollie</label>
+            <label lang="hr-HR">Sinkroniziraj otvorena plaćanja s Mollie</label>
+            <label lang="et-EE">Sünkrooni avatud maksed Molliega</label>
+            <label lang="is-IS">Samstilla ólokaðar greiðslur við Mollie</label>
+            <label lang="lt-LT">Sinchronizuoti neuždarytus mokėjimus su Mollie</label>
+            <label lang="lv-LV">Sinhronizēt neapmaksātos maksājumus ar Mollie</label>
+            <label lang="ro-RO">Sincronizează plățile deschise cu Mollie</label>
+            <label lang="sk-SK">Synchronizovať otvorené platby s Mollie</label><label lang="bg-BG">Синхронизиране на откритите плащания с Mollie</label>
+            <helpText>If enabled, the plugin regularly checks open payments against the Mollie API and updates their status. Only needed as a fallback if webhooks cannot reach this shop, because it consumes additional resources.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, prüft das Plugin offene Zahlungen regelmäßig über die Mollie-API und aktualisiert deren Status. Nur als Fallback nötig, wenn Webhooks diesen Shop nicht erreichen können, da es zusätzliche Ressourcen verbraucht.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld controleert de plug-in openstaande betalingen regelmatig via de Mollie API en werkt de status bij. Alleen nodig als terugval wanneer webhooks deze shop niet kunnen bereiken, omdat het extra bronnen verbruikt.</helpText>
+            <helpText lang="it-IT">Se attivato, il plugin verifica regolarmente i pagamenti aperti tramite l'API di Mollie e ne aggiorna lo stato. Serve solo come soluzione di riserva se i webhook non riescono a raggiungere questo negozio, perché consuma risorse aggiuntive.</helpText>
+            <helpText lang="pt-PT">Se ativado, o plugin verifica regularmente os pagamentos em aberto através da API da Mollie e atualiza o respetivo estado. Só é necessário como alternativa se os webhooks não conseguirem alcançar esta loja, pois consome recursos adicionais.</helpText>
+            <helpText lang="es-ES">Si se activa, el plugin comprueba periódicamente los pagos pendientes a través de la API de Mollie y actualiza su estado. Solo es necesario como alternativa si los webhooks no pueden llegar a esta tienda, ya que consume recursos adicionales.</helpText>
+            <helpText lang="sv-SE">Om det är aktiverat kontrollerar pluginet regelbundet obetalda betalningar via Mollies API och uppdaterar deras status. Behövs endast som reservlösning om webhooks inte når den här butiken, eftersom det förbrukar extra resurser.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, kontrollerer pluginen åpne betalinger jevnlig via Mollie-API-et og oppdaterer statusen deres. Behøves bare som reserveløsning hvis webhooks ikke når frem til denne butikken, siden det bruker ekstra ressurser.</helpText>
+            <helpText lang="pl-PL">Po włączeniu wtyczka regularnie sprawdza otwarte płatności przez API Mollie i aktualizuje ich status. Potrzebne tylko jako rozwiązanie awaryjne, gdy webhooki nie mogą dotrzeć do tego sklepu, ponieważ zużywa dodatkowe zasoby.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin pravidelně kontroluje otevřené platby přes Mollie API a aktualizuje jejich stav. Je potřeba pouze jako záložní řešení, pokud se webhooky nedostanou do tohoto obchodu, protože spotřebovává další prostředky.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, vtičnik redno preverja odprta plačila prek API-ja Mollie in posodablja njihov status. Potrebno je le kot rezervna možnost, če spletni zahtevki ne morejo doseči te trgovine, saj porablja dodatne vire.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a bővítmény rendszeresen ellenőrzi a nyitott fizetéseket a Mollie API-n keresztül, és frissíti az állapotukat. Csak tartalék megoldásként szükséges, ha a webhookok nem érik el ezt az üzletet, mivel további erőforrásokat igényel.</helpText>
+            <helpText lang="fi-FI">Jos tämä on käytössä, laajennus tarkistaa avoimet maksut säännöllisesti Mollien API:n kautta ja päivittää niiden tilan. Tarvitaan vain varajärjestelynä, jos webhookit eivät tavoita tätä kauppaa, koska se kuluttaa lisäresursseja.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, kontrollerer plugin'et regelmæssigt åbne betalinger via Mollie-API'et og opdaterer deres status. Er kun nødvendigt som reserve, hvis webhooks ikke kan nå denne shop, da det bruger yderligere ressourcer.</helpText>
+            <helpText lang="el-GR">Αν είναι ενεργοποιημένο, το πρόσθετο ελέγχει τακτικά τις εκκρεμείς πληρωμές μέσω του API της Mollie και ενημερώνει την κατάστασή τους. Χρειάζεται μόνο ως εφεδρική λύση αν τα webhooks δεν μπορούν να φτάσουν σε αυτό το κατάστημα, καθώς καταναλώνει επιπλέον πόρους.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, dodatak redovito provjerava otvorena plaćanja putem Mollie API-ja i ažurira njihov status. Potrebno je samo kao rezervno rješenje ako webhookovi ne mogu doći do ove trgovine jer troši dodatne resurse.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, kontrollib plugin regulaarselt avatud makseid Mollie API kaudu ja uuendab nende olekut. Vajalik ainult varulahendusena, kui veebikonksud ei jõua selle poeni, sest see kulutab lisaressursse.</helpText>
+            <helpText lang="is-IS">Ef þetta er virkjað athugar viðbótin reglulega ólokaðar greiðslur í gegnum Mollie API og uppfærir stöðu þeirra. Aðeins nauðsynlegt sem varaleið ef webhooks ná ekki til þessarar verslunar, því það notar aukauðlindir.</helpText>
+            <helpText lang="lt-LT">Jei įjungta, įskiepis reguliariai tikrina neuždarytus mokėjimus per Mollie API ir atnaujina jų būseną. Reikalinga tik kaip atsarginė priemonė, jei žinutės (webhooks) nepasiekia šios parduotuvės, nes tai naudoja papildomus išteklius.</helpText>
+            <helpText lang="lv-LV">Ja iespējots, spraudnis regulāri pārbauda neapmaksātos maksājumus, izmantojot Mollie API, un atjaunina to statusu. Nepieciešams tikai kā rezerves risinājums, ja tīmekļa āķi nevar sasniegt šo veikalu, jo tas patērē papildu resursus.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, pluginul verifică periodic plățile deschise prin API-ul Mollie și le actualizează starea. Este necesar doar ca soluție de rezervă dacă webhook-urile nu pot ajunge la acest magazin, deoarece consumă resurse suplimentare.</helpText>
+            <helpText lang="sk-SK">Ak je táto možnosť povolená, doplnok pravidelne kontroluje otvorené platby cez Mollie API a aktualizuje ich stav. Je potrebné len ako záložné riešenie, ak webhooky nedokážu dosiahnuť tento obchod, pretože to spotrebováva dodatočné zdroje.</helpText><helpText lang="bg-BG">Ако е активирано, плъгинът редовно проверява откритите плащания чрез Mollie API и актуализира техния статус. Необходимо е само като резервен вариант, ако уебхуковете не могат да достигнат до този магазин, тъй като това консумира допълнителни ресурси.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Refund Manager</title>

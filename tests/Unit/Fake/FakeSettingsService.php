@@ -21,6 +21,9 @@ use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
 {
+    /** @var array<string, PaymentSettings> */
+    private array $paymentSettingsPerSalesChannel = [];
+
     public function __construct(private ?LoggerSettings $loggerSettings = null,
         private ?PaymentSettings $paymentSettings = null,
         private ?ApiSettings $apiSettings = null,
@@ -94,9 +97,18 @@ final class FakeSettingsService extends AbstractSettingsService
         return $apiSettings;
     }
 
+    public function setPaymentSettingsForSalesChannel(string $salesChannelId, PaymentSettings $paymentSettings): void
+    {
+        $this->paymentSettingsPerSalesChannel[$salesChannelId] = $paymentSettings;
+    }
+
     public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings
     {
-        return $this->paymentSettings;
+        if ($salesChannelId === null) {
+            return $this->paymentSettings;
+        }
+
+        return $this->paymentSettingsPerSalesChannel[$salesChannelId] ?? $this->paymentSettings;
     }
 
     public function getLoggerSettings(?string $salesChannelId = null): LoggerSettings
