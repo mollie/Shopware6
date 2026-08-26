@@ -14,6 +14,7 @@ use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandler;
 use Mollie\Shopware\Component\StateHandler\OrderStateHandlerInterface;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -227,6 +228,17 @@ final class WebhookRoute extends AbstractWebhookRoute
             'currentOrderStateId' => $orderStateId,
             'currentState' => $currentState,
         ];
+
+        // A retry with another payment method adds a new transaction to the order, but Mollie keeps
+        // sending webhooks for the superseded one (it fails or expires later on). Only the newest
+        // transaction represents the order's current payment attempt, so a webhook for an older one
+        // must not drag the order state back - e.g. cancel an order that the retry has already paid.
+        $orderTransactions = new MollieOrderTransactionCollection($shopwareOrder->getTransactions());
+        if ($orderTransactions->hasNewerTransactionThan($transaction)) {
+            $this->logger->info('Order status change skipped, the transaction has been superseded by a newer one', $logData);
+
+            return;
+        }
 
         try {
             $this->logger->info('Start - Change order status', $logData);
