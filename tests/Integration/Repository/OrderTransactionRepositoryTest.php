@@ -19,6 +19,7 @@ use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -43,9 +44,23 @@ class OrderTransactionRepositoryTest extends TestCase
         $salesChannelContext = $this->getDefaultSalesChannelContext();
 
         $orderTransactionRepository = $this->getContainer()->get(OrderTransactionRepository::class);
-        $searchResult = $orderTransactionRepository->findOpenTransactions($salesChannelContext->getContext());
+        $searchResult = $orderTransactionRepository->findOpenTransactions($salesChannelContext->getSalesChannelId(), $salesChannelContext->getContext());
 
         $this->assertGreaterThanOrEqual(1, $searchResult->getTotal());
+        $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
+    }
+
+    /** This test makes sure that transactions of a foreign sales channel are not found */
+    public function testMollieTransactionsOfAnotherSalesChannelAreNotLoaded(): void
+    {
+        $this->createdOrders = [];
+        $this->createTestOrders();
+        $salesChannelContext = $this->getDefaultSalesChannelContext();
+
+        $orderTransactionRepository = $this->getContainer()->get(OrderTransactionRepository::class);
+        $searchResult = $orderTransactionRepository->findOpenTransactions(Uuid::randomHex(), $salesChannelContext->getContext());
+
+        $this->assertSame(0, $searchResult->getTotal());
         $this->deleteAllOrders($this->createdOrders, new Context(new SystemSource()));
     }
 

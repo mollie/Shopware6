@@ -8,5 +8,5 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 
 interface OrderTransactionRepositoryInterface
 {
-    public function findOpenTransactions(?Context $context = null): IdSearchResult;
+    public function findOpenTransactions(string $salesChannelId, Context $context): IdSearchResult;
 }

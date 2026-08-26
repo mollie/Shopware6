@@ -5,6 +5,7 @@
 - Hinzugefügt: Neue Einstellung "Retouren-Integration deaktivieren" im Refund Manager, mit der Retouren aus dem Shopware Return Management keine Rückerstattung bei Mollie mehr auslösen.
 - Geändert: Bancontact mit Status "open" gilt nun als fehlgeschlagen.
 - Geändert: Sonderzeichen in Adressen werden vor der Zahlung entfernt.
+- Geändert: Der Abgleich offener Zahlungen mit Mollie ist nun abgeschaltet und in der Auftragsverwaltung pro Verkaufskanal aktivierbar.
 - Behoben: PayPal Express ist nach der Rückkehr sofort die einzige Zahlart im Checkout.
 - Behoben: Das erneute Öffnen eines Payment-Links funktioniert wieder.
 - Behoben: Die Versandkosten von Bestellungen aus älteren Plugin-Versionen werden bei Mollie nun wieder korrekt erstattet, retourniert und als versendet markiert.
