@@ -14,6 +14,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -40,10 +41,10 @@ final class UpdateStatusAction
         $result = new UpdateStatusResult();
         $context = new Context(new SystemSource());
 
-        $salesChannelIds = $this->findActiveSalesChannelIds($context);
+        /** @var array<string> $salesChannelIds */
+        $salesChannelIds = $this->findActiveSalesChannels($context)->getIds();
         $enabledSalesChannels = 0;
 
-        /** @var string $salesChannelId */
         foreach ($salesChannelIds as $salesChannelId) {
             if (! $this->settingsService->getPaymentSettings($salesChannelId)->isAutomaticStatusUpdate()) {
                 continue;
@@ -70,15 +71,12 @@ final class UpdateStatusAction
         return $result;
     }
 
-    /**
-     * @return array<string>
-     */
-    private function findActiveSalesChannelIds(Context $context): array
+    private function findActiveSalesChannels(Context $context): IdSearchResult
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', true));
 
-        return $this->salesChannelRepository->searchIds($criteria, $context)->getIds();
+        return $this->salesChannelRepository->searchIds($criteria, $context);
     }
 
     private function notify(string $transactionId, Context $context): bool
