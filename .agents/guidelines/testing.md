@@ -20,6 +20,14 @@ Mirror the production path: `shopware/Component/Refund/RefundBuilder.php` →
 **No mocking framework.** No `createMock()`, no `getMockBuilder()`. Write or reuse a fake in
 the component's `Fake/` folder (`tests/Unit/Refund/Fake/`, `tests/Unit/Payment/Fake/`, …).
 
+**A dependency without an interface is still fakeable.** When a service is injected by its
+concrete type and that class is not `final` — most Shopware core services, e.g. `AccountService`,
+`SalesChannelContextPersister`, `RecalculationService` — extend it, declare an empty
+`__construct()` and override the methods the code under test calls. Its own constructor
+arguments never have to be built. `tests/Unit/Fake/FakeRecalculationService` is the pattern.
+Do not call a class untestable because it has no interface, and do not propose a production
+change to add one before trying this.
+
 **`#[CoversClass]` is mandatory** on unit tests, so coverage stays precise.
 
 **Arrange / Act / Assert**, in that order, visibly separated. One behaviour per test.

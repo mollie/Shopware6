@@ -40,8 +40,8 @@ final class SubscriptionAdminSearchIndexerTest extends TestCase
     {
         $indexer = $this->buildIndexer();
 
-        static::assertSame('mollie_subscription', $indexer->getName());
-        static::assertSame(SubscriptionDefinition::ENTITY_NAME, $indexer->getEntity());
+        self::assertSame('mollie_subscription', $indexer->getName());
+        self::assertSame(SubscriptionDefinition::ENTITY_NAME, $indexer->getEntity());
     }
 
     public function testASubscriptionIsSearchableByItsMollieIdsAndDescription(): void
@@ -63,7 +63,7 @@ final class SubscriptionAdminSearchIndexerTest extends TestCase
 
         $fetched = $this->buildIndexer()->fetch([self::SUBSCRIPTION_ID]);
 
-        static::assertSame([
+        self::assertSame([
             self::SUBSCRIPTION_ID => [
                 'id' => self::SUBSCRIPTION_ID,
                 'text' => self::SUBSCRIPTION_ID . ' sub_abc123 cst_def456 coffee subscription mdt_ghi789 active',
@@ -73,7 +73,7 @@ final class SubscriptionAdminSearchIndexerTest extends TestCase
 
     public function testNothingIsIndexedForSubscriptionsThatNoLongerExist(): void
     {
-        static::assertSame([], $this->buildIndexer()->fetch([self::SUBSCRIPTION_ID]));
+        self::assertSame([], $this->buildIndexer()->fetch([self::SUBSCRIPTION_ID]));
     }
 
     public function testTheSubscriptionsAreIteratedInTheConfiguredBatchSize(): void
@@ -82,7 +82,7 @@ final class SubscriptionAdminSearchIndexerTest extends TestCase
 
         (new SubscriptionAdminSearchIndexer($this->connection, $factory, $this->repository, 250))->getIterator();
 
-        static::assertSame([['definition' => SubscriptionDefinition::ENTITY_NAME, 'limit' => 250]], $factory->getCreatedIterators());
+        self::assertSame([['definition' => SubscriptionDefinition::ENTITY_NAME, 'limit' => 250]], $factory->getCreatedIterators());
     }
 
     public function testTheSearchResultIsResolvedIntoSubscriptionEntities(): void
@@ -94,9 +94,9 @@ final class SubscriptionAdminSearchIndexerTest extends TestCase
             Context::createDefaultContext()
         );
 
-        static::assertSame(1, $globalData['total']);
-        static::assertCount(1, $globalData['data']);
-        static::assertSame('subscription-id', $globalData['data']->first()?->getId());
+        self::assertSame(1, $globalData['total']);
+        self::assertCount(1, $globalData['data']);
+        self::assertSame('subscription-id', $globalData['data']->first()?->getId());
     }
 
     private function buildIndexer(): SubscriptionAdminSearchIndexer

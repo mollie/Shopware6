@@ -16,16 +16,16 @@ final class RefundItemEntityTest extends TestCase
     {
         $item = new RefundItemEntity();
 
-        static::assertSame('', $item->getRefundId());
-        static::assertNull($item->getRefund());
-        static::assertSame('', $item->getMollieLineId());
-        static::assertSame('', $item->getLabel());
-        static::assertSame(0, $item->getQuantity());
-        static::assertSame(0.0, $item->getAmount());
-        static::assertNull($item->getOrderLineItemId());
-        static::assertNull($item->getOrderLineItemVersionId());
-        static::assertNull($item->getOrderDeliveryId());
-        static::assertNull($item->getOrderLineItem());
+        self::assertSame('', $item->getRefundId());
+        self::assertNull($item->getRefund());
+        self::assertSame('', $item->getMollieLineId());
+        self::assertSame('', $item->getLabel());
+        self::assertSame(0, $item->getQuantity());
+        self::assertSame(0.0, $item->getAmount());
+        self::assertNull($item->getOrderLineItemId());
+        self::assertNull($item->getOrderLineItemVersionId());
+        self::assertNull($item->getOrderDeliveryId());
+        self::assertNull($item->getOrderLineItem());
     }
 
     public function testARefundItemCarriesWhatWasRefunded(): void
@@ -48,16 +48,16 @@ final class RefundItemEntityTest extends TestCase
         $item->setOrderDeliveryId('order-delivery-id');
         $item->setOrderLineItem($orderLineItem);
 
-        static::assertSame('refund-id', $item->getRefundId());
-        static::assertSame($refund, $item->getRefund());
-        static::assertSame('odl_123', $item->getMollieLineId());
-        static::assertSame('Product SW100', $item->getLabel());
-        static::assertSame(2, $item->getQuantity());
-        static::assertSame(24.98, $item->getAmount());
-        static::assertSame('order-line-item-id', $item->getOrderLineItemId());
-        static::assertSame('order-version-id', $item->getOrderLineItemVersionId());
-        static::assertSame('order-delivery-id', $item->getOrderDeliveryId());
-        static::assertSame($orderLineItem, $item->getOrderLineItem());
+        self::assertSame('refund-id', $item->getRefundId());
+        self::assertSame($refund, $item->getRefund());
+        self::assertSame('odl_123', $item->getMollieLineId());
+        self::assertSame('Product SW100', $item->getLabel());
+        self::assertSame(2, $item->getQuantity());
+        self::assertSame(24.98, $item->getAmount());
+        self::assertSame('order-line-item-id', $item->getOrderLineItemId());
+        self::assertSame('order-version-id', $item->getOrderLineItemVersionId());
+        self::assertSame('order-delivery-id', $item->getOrderDeliveryId());
+        self::assertSame($orderLineItem, $item->getOrderLineItem());
     }
 
     public function testTheAdministrationSeesTheRefundedLineWithoutTheMollieInternals(): void
@@ -70,7 +70,7 @@ final class RefundItemEntityTest extends TestCase
         $item->setOrderLineItemId('order-line-item-id');
         $item->setOrderDeliveryId('order-delivery-id');
 
-        static::assertSame([
+        self::assertSame([
             'swReference' => 'Product SW100',
             'label' => 'Product SW100',
             'quantity' => 2,
@@ -85,7 +85,7 @@ final class RefundItemEntityTest extends TestCase
         // Shipping costs are refunded through the delivery, not through an order line item.
         $row = RefundItemEntity::createArray('odl_delivery', 'Shipping', 1, 4.99, null, null, 'refund-id', 'order-delivery-id');
 
-        static::assertSame([
+        self::assertSame([
             'mollieLineId' => 'odl_delivery',
             'label' => 'Shipping',
             'quantity' => 1,
@@ -102,13 +102,13 @@ final class RefundItemEntityTest extends TestCase
         // Written as a nested association of the refund, so the refund id does not exist yet.
         $row = RefundItemEntity::createArray('odl_123', 'Product SW100', 2, 24.98, 'order-line-item-id', 'order-version-id');
 
-        static::assertArrayNotHasKey('refundId', $row);
+        self::assertArrayNotHasKey('refundId', $row);
     }
 
     public function testAnEmptyRefundIdIsTreatedLikeAMissingOne(): void
     {
         $row = RefundItemEntity::createArray('odl_123', 'Product SW100', 2, 24.98, 'order-line-item-id', 'order-version-id', '');
 
-        static::assertArrayNotHasKey('refundId', $row);
+        self::assertArrayNotHasKey('refundId', $row);
     }
 }

@@ -54,8 +54,8 @@ final class ListSubscriptionsRouteTest extends TestCase
         $response = $this->route->list(new Request(), $this->authenticatedContext());
 
         $subscriptions = $response->getObject()->all()['subscriptions'];
-        static::assertCount(1, $subscriptions);
-        static::assertSame('subscription-id', array_values($subscriptions)[0]->getId());
+        self::assertCount(1, $subscriptions);
+        self::assertSame('subscription-id', array_values($subscriptions)[0]->getId());
     }
 
     public function testOnlyTheSubscriptionsOfTheSignedInCustomerAreLookedUp(): void
@@ -63,10 +63,10 @@ final class ListSubscriptionsRouteTest extends TestCase
         $this->route->list(new Request(), $this->authenticatedContext());
 
         $filters = $this->criteria()->getFilters();
-        static::assertCount(1, $filters);
-        static::assertInstanceOf(EqualsFilter::class, $filters[0]);
-        static::assertSame('customerId', $filters[0]->getField());
-        static::assertSame(self::CUSTOMER_ID, $filters[0]->getValue());
+        self::assertCount(1, $filters);
+        self::assertInstanceOf(EqualsFilter::class, $filters[0]);
+        self::assertSame('customerId', $filters[0]->getField());
+        self::assertSame(self::CUSTOMER_ID, $filters[0]->getValue());
     }
 
     public function testTheNewestSubscriptionIsListedFirst(): void
@@ -74,39 +74,39 @@ final class ListSubscriptionsRouteTest extends TestCase
         $this->route->list(new Request(), $this->authenticatedContext());
 
         $sorting = $this->criteria()->getSorting();
-        static::assertSame('createdAt', $sorting[0]->getField());
-        static::assertSame(FieldSorting::DESCENDING, $sorting[0]->getDirection());
+        self::assertSame('createdAt', $sorting[0]->getField());
+        self::assertSame(FieldSorting::DESCENDING, $sorting[0]->getDirection());
     }
 
     public function testTenSubscriptionsPerPageAreListedByDefault(): void
     {
         $this->route->list(new Request(), $this->authenticatedContext());
 
-        static::assertSame(10, $this->criteria()->getLimit());
-        static::assertSame(0, $this->criteria()->getOffset());
+        self::assertSame(10, $this->criteria()->getLimit());
+        self::assertSame(0, $this->criteria()->getOffset());
     }
 
     public function testTheRequestedPageIsTranslatedIntoAnOffset(): void
     {
         $this->route->list(new Request(['limit' => 5, 'p' => 3]), $this->authenticatedContext());
 
-        static::assertSame(5, $this->criteria()->getLimit());
-        static::assertSame(10, $this->criteria()->getOffset());
+        self::assertSame(5, $this->criteria()->getLimit());
+        self::assertSame(10, $this->criteria()->getOffset());
     }
 
     public function testANonsensicalPageOrLimitFallsBackToTheFirstPage(): void
     {
         $this->route->list(new Request(['limit' => 0, 'p' => -2]), $this->authenticatedContext());
 
-        static::assertSame(1, $this->criteria()->getLimit());
-        static::assertSame(0, $this->criteria()->getOffset());
+        self::assertSame(1, $this->criteria()->getLimit());
+        self::assertSame(0, $this->criteria()->getOffset());
     }
 
     public function testTheTotalIsCountedSoTheAccountPageCanPaginate(): void
     {
         $this->route->list(new Request(), $this->authenticatedContext());
 
-        static::assertSame(Criteria::TOTAL_COUNT_MODE_EXACT, $this->criteria()->getTotalCountMode());
+        self::assertSame(Criteria::TOTAL_COUNT_MODE_EXACT, $this->criteria()->getTotalCountMode());
     }
 
     public function testTheAssociationsTheAccountPageRendersAreLoaded(): void
@@ -115,15 +115,15 @@ final class ListSubscriptionsRouteTest extends TestCase
 
         $associations = array_keys($this->criteria()->getAssociations());
 
-        static::assertContains('historyEntries', $associations);
-        static::assertContains('currency', $associations);
-        static::assertContains('order', $associations);
+        self::assertContains('historyEntries', $associations);
+        self::assertContains('currency', $associations);
+        self::assertContains('order', $associations);
     }
 
     private function criteria(): Criteria
     {
         $criteria = $this->subscriptionRepository->getSearchCriteria();
-        static::assertCount(1, $criteria);
+        self::assertCount(1, $criteria);
 
         return $criteria[0];
     }

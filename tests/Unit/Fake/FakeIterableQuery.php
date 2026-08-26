@@ -9,7 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Dbal\QueryBuilder;
 final class FakeIterableQuery implements IterableQuery
 {
     /**
-     * @param array<string|int, mixed> $ids
+     * @param array<int|string, mixed> $ids
      */
     public function __construct(private readonly array $ids = [])
     {

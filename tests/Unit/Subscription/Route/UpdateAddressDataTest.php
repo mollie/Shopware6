@@ -31,20 +31,20 @@ final class UpdateAddressDataTest extends TestCase
             'additionalField2' => 'Backyard',
         ]));
 
-        static::assertSame('salutation-id', $data->salutationId);
-        static::assertSame('Dr.', $data->title);
-        static::assertSame('Jane', $data->firstName);
-        static::assertSame('Doe', $data->lastName);
-        static::assertSame('ACME', $data->company);
-        static::assertSame('Purchasing', $data->department);
-        static::assertSame('+4915112345678', $data->phoneNumber);
-        static::assertSame('Main 1', $data->street);
-        static::assertSame('12345', $data->zipcode);
-        static::assertSame('Berlin', $data->city);
-        static::assertSame('country-id', $data->countryId);
-        static::assertSame('state-id', $data->countryStateId);
-        static::assertSame('c/o Doe', $data->additionalAddressLine1);
-        static::assertSame('Backyard', $data->additionalAddressLine2);
+        self::assertSame('salutation-id', $data->salutationId);
+        self::assertSame('Dr.', $data->title);
+        self::assertSame('Jane', $data->firstName);
+        self::assertSame('Doe', $data->lastName);
+        self::assertSame('ACME', $data->company);
+        self::assertSame('Purchasing', $data->department);
+        self::assertSame('+4915112345678', $data->phoneNumber);
+        self::assertSame('Main 1', $data->street);
+        self::assertSame('12345', $data->zipcode);
+        self::assertSame('Berlin', $data->city);
+        self::assertSame('country-id', $data->countryId);
+        self::assertSame('state-id', $data->countryStateId);
+        self::assertSame('c/o Doe', $data->additionalAddressLine1);
+        self::assertSame('Backyard', $data->additionalAddressLine2);
     }
 
     public function testTheStorefrontFormMayNestTheFieldsUnderAddress(): void
@@ -53,17 +53,17 @@ final class UpdateAddressDataTest extends TestCase
             'address' => new RequestDataBag(['firstName' => 'Jane', 'city' => 'Berlin']),
         ]));
 
-        static::assertSame('Jane', $data->firstName);
-        static::assertSame('Berlin', $data->city);
+        self::assertSame('Jane', $data->firstName);
+        self::assertSame('Berlin', $data->city);
     }
 
     public function testAnEmptyRequestProducesAnEmptyAddress(): void
     {
         $data = UpdateAddressData::fromRequestData(new RequestDataBag());
 
-        static::assertSame('', $data->salutationId);
-        static::assertSame('', $data->firstName);
-        static::assertSame('', $data->countryId);
+        self::assertSame('', $data->salutationId);
+        self::assertSame('', $data->firstName);
+        self::assertSame('', $data->countryId);
     }
 
     #[DataProvider('optionalFields')]
@@ -71,7 +71,7 @@ final class UpdateAddressDataTest extends TestCase
     {
         $data = UpdateAddressData::fromRequestData(new RequestDataBag());
 
-        static::assertNull($data->{$property}, sprintf('%s should not be sent to Shopware', $field));
+        self::assertNull($data->{$property}, sprintf('%s should not be sent to Shopware', $field));
     }
 
     #[DataProvider('optionalFields')]
@@ -80,7 +80,7 @@ final class UpdateAddressDataTest extends TestCase
         // Shopware would store an empty string as a real value, so an emptied input has to become null.
         $data = UpdateAddressData::fromRequestData(new RequestDataBag([$field => '']));
 
-        static::assertNull($data->{$property});
+        self::assertNull($data->{$property});
     }
 
     /**
@@ -107,8 +107,8 @@ final class UpdateAddressDataTest extends TestCase
             'countryStateId' => '112233AA',
         ]));
 
-        static::assertSame('aabbcc', $data->salutationId);
-        static::assertSame('ddeeff', $data->countryId);
-        static::assertSame('112233aa', $data->countryStateId);
+        self::assertSame('aabbcc', $data->salutationId);
+        self::assertSame('ddeeff', $data->countryId);
+        self::assertSame('112233aa', $data->countryStateId);
     }
 }

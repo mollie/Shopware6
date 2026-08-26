@@ -6,6 +6,7 @@
          colors="true"
          executionOrder="random"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
 >
 
     <testsuites>

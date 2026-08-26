@@ -31,8 +31,8 @@ final class ConfigRouteTest extends TestCase
 
         $response = $route->getConfig(new FakeSalesChannelContext());
 
-        static::assertSame('pfl_configured', $response->getObject()->all()['profileId']);
-        static::assertSame(0, $this->gateway->getCallCount('getCurrentProfile'));
+        self::assertSame('pfl_configured', $response->getObject()->all()['profileId']);
+        self::assertSame(0, $this->gateway->getCallCount('getCurrentProfile'));
     }
 
     public function testTheProfileIdIsReadFromMollieWhenItIsNotConfigured(): void
@@ -41,7 +41,7 @@ final class ConfigRouteTest extends TestCase
 
         $response = $route->getConfig(new FakeSalesChannelContext());
 
-        static::assertSame('fake_profile', $response->getObject()->all()['profileId']);
+        self::assertSame('fake_profile', $response->getObject()->all()['profileId']);
     }
 
     public function testTheTestModeAndOneClickFlagAreAnswered(): void
@@ -53,8 +53,8 @@ final class ConfigRouteTest extends TestCase
 
         $payload = $route->getConfig(new FakeSalesChannelContext())->getObject()->all();
 
-        static::assertTrue($payload['testMode']);
-        static::assertTrue($payload['oneClickPayments']);
+        self::assertTrue($payload['testMode']);
+        self::assertTrue($payload['oneClickPayments']);
     }
 
     public function testTheLocaleComesFromTheSalesChannelLanguage(): void
@@ -63,7 +63,7 @@ final class ConfigRouteTest extends TestCase
 
         $payload = $route->getConfig(new FakeSalesChannelContext())->getObject()->all();
 
-        static::assertSame('nl_NL', $payload['locale']);
+        self::assertSame('nl_NL', $payload['locale']);
     }
 
     public function testTheLanguageOfTheSignedInCustomerWins(): void
@@ -81,8 +81,8 @@ final class ConfigRouteTest extends TestCase
 
         $payload = $route->getConfig($context)->getObject()->all();
 
-        static::assertSame('de_DE', $payload['locale']);
-        static::assertSame(['customer-language-id'], $languageRepository->getRequestedIds());
+        self::assertSame('de_DE', $payload['locale']);
+        self::assertSame(['customer-language-id'], $languageRepository->getRequestedIds());
     }
 
     public function testAnUnknownLanguageFallsBackToEnglish(): void
@@ -91,7 +91,7 @@ final class ConfigRouteTest extends TestCase
 
         $payload = $route->getConfig(new FakeSalesChannelContext())->getObject()->all();
 
-        static::assertSame('en_GB', $payload['locale']);
+        self::assertSame('en_GB', $payload['locale']);
     }
 
     public function testALocaleMollieDoesNotKnowFallsBackToTheSameRegion(): void
@@ -100,7 +100,7 @@ final class ConfigRouteTest extends TestCase
 
         $payload = $route->getConfig(new FakeSalesChannelContext())->getObject()->all();
 
-        static::assertSame('de_CH', $payload['locale']);
+        self::assertSame('de_CH', $payload['locale']);
     }
 
     private function buildRoute(

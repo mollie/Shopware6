@@ -263,6 +263,9 @@ final class OrderEntityBuilder
         $orderLineItem->setLabel('Product ' . $productNumber);
         $orderLineItem->setQuantity($quantity);
         $orderLineItem->setUnitPrice($unitPrice);
+        // Shopware always writes the total alongside the unit price; without it every reader of
+        // getTotalPrice() hits an uninitialized property instead of the missing-data branch.
+        $orderLineItem->setTotalPrice($unitPrice * $quantity);
         $orderLineItem->setPrice($this->getPrice($unitPrice, 19.0, $quantity));
         $orderLineItem->setProduct($product);
         $orderLineItem->setCustomFields($mollieCustomFields === [] ? [] : [Mollie::EXTENSION => $mollieCustomFields]);

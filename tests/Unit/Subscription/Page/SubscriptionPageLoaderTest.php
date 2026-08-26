@@ -41,7 +41,7 @@ final class SubscriptionPageLoaderTest extends TestCase
 
         $page = $loader->load(new Request(), new FakeSalesChannelContext());
 
-        static::assertSame('noindex,follow', $page->getMetaInformation()?->getRobots());
+        self::assertSame('noindex,follow', $page->getMetaInformation()?->getRobots());
     }
 
     public function testAPageWithoutMetaInformationStillLoads(): void
@@ -50,8 +50,8 @@ final class SubscriptionPageLoaderTest extends TestCase
 
         $page = $loader->load(new Request(), new FakeSalesChannelContext());
 
-        static::assertInstanceOf(SubscriptionPage::class, $page);
-        static::assertNull($page->getMetaInformation());
+        self::assertInstanceOf(SubscriptionPage::class, $page);
+        self::assertNull($page->getMetaInformation());
     }
 
     public function testTheSubscriptionsOfTheCustomerAreOnThePage(): void
@@ -61,7 +61,7 @@ final class SubscriptionPageLoaderTest extends TestCase
 
         $page = $loader->load(new Request(), new FakeSalesChannelContext());
 
-        static::assertSame(1, $page->getSubscriptions()->getTotal());
+        self::assertSame(1, $page->getSubscriptions()->getTotal());
     }
 
     public function testCountriesAndSalutationsForTheAddressFormAreOnThePage(): void
@@ -70,8 +70,8 @@ final class SubscriptionPageLoaderTest extends TestCase
 
         $page = $loader->load(new Request(), new FakeSalesChannelContext());
 
-        static::assertCount(1, $page->getCountries());
-        static::assertCount(1, $page->getSalutations());
+        self::assertCount(1, $page->getCountries());
+        self::assertCount(1, $page->getSalutations());
     }
 
     public function testCountriesAreLoadedWithTheirStatesAndInDisplayOrder(): void
@@ -81,9 +81,9 @@ final class SubscriptionPageLoaderTest extends TestCase
         $loader->load(new Request(), new FakeSalesChannelContext());
 
         $criteria = $this->countryRoute->getCriteria();
-        static::assertCount(1, $criteria);
-        static::assertArrayHasKey('states', $criteria[0]->getAssociations());
-        static::assertSame(
+        self::assertCount(1, $criteria);
+        self::assertArrayHasKey('states', $criteria[0]->getAssociations());
+        self::assertSame(
             ['position', 'name', 'states.position', 'states.name'],
             array_map(static fn (FieldSorting $sorting): string => $sorting->getField(), $criteria[0]->getSorting())
         );
@@ -103,11 +103,11 @@ final class SubscriptionPageLoaderTest extends TestCase
 
         $page = $loader->load(new Request(), new FakeSalesChannelContext());
 
-        static::assertTrue($page->isAllowAddressEditing());
-        static::assertTrue($page->isAllowPauseResume());
-        static::assertTrue($page->isAllowSkip());
-        static::assertFalse($page->isAllowReorder());
-        static::assertFalse($page->isAllowUpdatePayment());
+        self::assertTrue($page->isAllowAddressEditing());
+        self::assertTrue($page->isAllowPauseResume());
+        self::assertTrue($page->isAllowSkip());
+        self::assertFalse($page->isAllowReorder());
+        self::assertFalse($page->isAllowUpdatePayment());
     }
 
     public function testTheStorefrontSeesThePriceUpdateNotice(): void
@@ -117,8 +117,8 @@ final class SubscriptionPageLoaderTest extends TestCase
 
         $page = $loader->load(new Request(), new FakeSalesChannelContext());
 
-        static::assertSame(14, $page->getPriceUpdateNoticeDays());
-        static::assertTrue($page->isAutoPriceUpdate());
+        self::assertSame(14, $page->getPriceUpdateNoticeDays());
+        self::assertTrue($page->isAutoPriceUpdate());
     }
 
     private function buildLoader(

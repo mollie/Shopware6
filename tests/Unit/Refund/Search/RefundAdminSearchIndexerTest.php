@@ -40,8 +40,8 @@ final class RefundAdminSearchIndexerTest extends TestCase
     {
         $indexer = $this->buildIndexer();
 
-        static::assertSame('mollie_refund', $indexer->getName());
-        static::assertSame(RefundDefinition::ENTITY_NAME, $indexer->getEntity());
+        self::assertSame('mollie_refund', $indexer->getName());
+        self::assertSame(RefundDefinition::ENTITY_NAME, $indexer->getEntity());
     }
 
     public function testARefundIsSearchableByEveryDescriptionItCarries(): void
@@ -52,7 +52,7 @@ final class RefundAdminSearchIndexerTest extends TestCase
 
         $fetched = $this->buildIndexer()->fetch([self::REFUND_ID]);
 
-        static::assertSame([
+        self::assertSame([
             self::REFUND_ID => [
                 'id' => self::REFUND_ID,
                 'text' => self::REFUND_ID . ' full wrong size customer complaint',
@@ -68,12 +68,12 @@ final class RefundAdminSearchIndexerTest extends TestCase
 
         $fetched = $this->buildIndexer()->fetch([self::REFUND_ID]);
 
-        static::assertSame([self::REFUND_ID => ['id' => self::REFUND_ID, 'text' => self::REFUND_ID . ' partial']], $fetched);
+        self::assertSame([self::REFUND_ID => ['id' => self::REFUND_ID, 'text' => self::REFUND_ID . ' partial']], $fetched);
     }
 
     public function testNothingIsIndexedForRefundsThatNoLongerExist(): void
     {
-        static::assertSame([], $this->buildIndexer()->fetch([self::REFUND_ID]));
+        self::assertSame([], $this->buildIndexer()->fetch([self::REFUND_ID]));
     }
 
     public function testTheRefundsAreIteratedInTheConfiguredBatchSize(): void
@@ -82,7 +82,7 @@ final class RefundAdminSearchIndexerTest extends TestCase
 
         (new RefundAdminSearchIndexer($this->connection, $factory, $this->repository, 100))->getIterator();
 
-        static::assertSame([['definition' => RefundDefinition::ENTITY_NAME, 'limit' => 100]], $factory->getCreatedIterators());
+        self::assertSame([['definition' => RefundDefinition::ENTITY_NAME, 'limit' => 100]], $factory->getCreatedIterators());
     }
 
     public function testTheSearchResultIsResolvedIntoRefundEntities(): void
@@ -96,9 +96,9 @@ final class RefundAdminSearchIndexerTest extends TestCase
             Context::createDefaultContext()
         );
 
-        static::assertSame(1, $globalData['total']);
-        static::assertCount(1, $globalData['data']);
-        static::assertSame('refund-id', $globalData['data']->first()?->getId());
+        self::assertSame(1, $globalData['total']);
+        self::assertCount(1, $globalData['data']);
+        self::assertSame('refund-id', $globalData['data']->first()?->getId());
     }
 
     private function buildIndexer(): RefundAdminSearchIndexer

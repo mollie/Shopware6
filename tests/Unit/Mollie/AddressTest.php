@@ -323,28 +323,6 @@ final class AddressTest extends TestCase
         $this->assertNotSame($without->getId(), $with->getId());
     }
 
-    /**
-     * Shopware's setCountry() is not nullable, so a missing country is modelled by never assigning
-     * one - not by assigning null.
-     */
-    private function makeCustomerAddress(bool $withCountry = true): CustomerAddressEntity
-    {
-        $customerAddress = new CustomerAddressEntity();
-        $customerAddress->setFirstName('Tester');
-        $customerAddress->setLastName('Test');
-        $customerAddress->setStreet('Main Street 1');
-        $customerAddress->setZipcode('12345');
-        $customerAddress->setCity('Berlin');
-
-        if ($withCountry) {
-            $country = new CountryEntity();
-            $country->setIso('DE');
-            $customerAddress->setCountry($country);
-        }
-
-        return $customerAddress;
-    }
-
     #[DataProvider('nameProvider')]
     public function testNameIsCleanedForMollie(string $name, string $expected): void
     {
@@ -517,5 +495,27 @@ final class AddressTest extends TestCase
         $this->assertSame('AnnaMaria', $actual->getGivenName());
         $this->assertSame('Nguyen', $actual->getFamilyName());
         $this->assertSame('Müller & Söhne GmbH', $actual->getOrganizationName());
+    }
+
+    /**
+     * Shopware's setCountry() is not nullable, so a missing country is modelled by never assigning
+     * one - not by assigning null.
+     */
+    private function makeCustomerAddress(bool $withCountry = true): CustomerAddressEntity
+    {
+        $customerAddress = new CustomerAddressEntity();
+        $customerAddress->setFirstName('Tester');
+        $customerAddress->setLastName('Test');
+        $customerAddress->setStreet('Main Street 1');
+        $customerAddress->setZipcode('12345');
+        $customerAddress->setCity('Berlin');
+
+        if ($withCountry) {
+            $country = new CountryEntity();
+            $country->setIso('DE');
+            $customerAddress->setCountry($country);
+        }
+
+        return $customerAddress;
     }
 }

@@ -37,9 +37,9 @@ final class DevWebHookSubscriberTest extends TestCase
     {
         $events = DevWebHookSubscriber::getSubscribedEvents();
 
-        static::assertArrayHasKey(PaymentFinalizeEvent::class, $events);
-        static::assertArrayHasKey(OrderShippedEvent::class, $events);
-        static::assertArrayHasKey(CancelItemEvent::class, $events);
+        self::assertArrayHasKey(PaymentFinalizeEvent::class, $events);
+        self::assertArrayHasKey(OrderShippedEvent::class, $events);
+        self::assertArrayHasKey(CancelItemEvent::class, $events);
     }
 
     #[DataProvider('developmentEnvironments')]
@@ -50,8 +50,8 @@ final class DevWebHookSubscriberTest extends TestCase
 
         $subscriber->handleFinalizeEvent($this->finalizeEvent('transaction-id'));
 
-        static::assertSame(['transaction-id'], $this->webhookRoute->getNotifiedTransactionIds());
-        static::assertTrue($this->logger->hasRecordThatContains('warning', 'Executing Webhook in Dev mode'));
+        self::assertSame(['transaction-id'], $this->webhookRoute->getNotifiedTransactionIds());
+        self::assertTrue($this->logger->hasRecordThatContains('warning', 'Executing Webhook in Dev mode'));
     }
 
     /**
@@ -73,7 +73,7 @@ final class DevWebHookSubscriberTest extends TestCase
 
         $subscriber->handleFinalizeEvent($this->finalizeEvent('transaction-id'));
 
-        static::assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
+        self::assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
     }
 
     public function testAProductionShopDoesNotRetriggerTheWebhookAfterAShipment(): void
@@ -82,7 +82,7 @@ final class DevWebHookSubscriberTest extends TestCase
 
         $subscriber->onOrderShipped(new OrderShippedEvent('transaction-id', Context::createDefaultContext()));
 
-        static::assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
+        self::assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
     }
 
     public function testAProductionShopDoesNotRetriggerTheWebhookAfterACancellation(): void
@@ -91,7 +91,7 @@ final class DevWebHookSubscriberTest extends TestCase
 
         $subscriber->onCancelItem(new CancelItemEvent('transaction-id', Context::createDefaultContext()));
 
-        static::assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
+        self::assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
     }
 
     private function buildSubscriber(EnvironmentSettings $environment): DevWebHookSubscriber

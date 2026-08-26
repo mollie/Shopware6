@@ -50,12 +50,12 @@ final class ChangeStateRouteTest extends TestCase
         try {
             $route->changeState(self::SUBSCRIPTION_ID, $this->actionRequest('pause'), new FakeSalesChannelContext());
         } catch (ChangeStateException $exception) {
-            static::assertSame(ChangeStateException::NOT_AUTHENTICATED, $exception->getErrorCode());
+            self::assertSame(ChangeStateException::NOT_AUTHENTICATED, $exception->getErrorCode());
 
             return;
         }
 
-        static::fail('Expected the state change to be rejected without a customer');
+        self::fail('Expected the state change to be rejected without a customer');
     }
 
     public function testTheChangeIsRejectedForAnotherCustomersSubscription(): void
@@ -65,12 +65,12 @@ final class ChangeStateRouteTest extends TestCase
         try {
             $route->changeState(self::SUBSCRIPTION_ID, $this->actionRequest('cancel'), $this->authenticatedContext());
         } catch (ChangeStateException $exception) {
-            static::assertSame(ChangeStateException::SUBSCRIPTION_NOT_OWNED, $exception->getErrorCode());
+            self::assertSame(ChangeStateException::SUBSCRIPTION_NOT_OWNED, $exception->getErrorCode());
 
             return;
         }
 
-        static::fail('Expected the state change to be rejected for a foreign subscription');
+        self::fail('Expected the state change to be rejected for a foreign subscription');
     }
 
     public function testNoActionIsRunForAnotherCustomersSubscription(): void
@@ -83,7 +83,7 @@ final class ChangeStateRouteTest extends TestCase
             // asserted in its own test
         }
 
-        static::assertSame(0, $this->actionHandler->getCallCount());
+        self::assertSame(0, $this->actionHandler->getCallCount());
     }
 
     #[DataProvider('storefrontActions')]
@@ -93,7 +93,7 @@ final class ChangeStateRouteTest extends TestCase
 
         $route->changeState(self::SUBSCRIPTION_ID, $this->actionRequest($action), $this->authenticatedContext());
 
-        static::assertSame([['action' => $action, 'subscriptionId' => self::SUBSCRIPTION_ID]], $this->actionHandler->getCalls());
+        self::assertSame([['action' => $action, 'subscriptionId' => self::SUBSCRIPTION_ID]], $this->actionHandler->getCalls());
     }
 
     #[DataProvider('storefrontActions')]
@@ -103,7 +103,7 @@ final class ChangeStateRouteTest extends TestCase
 
         $response = $route->changeState(self::SUBSCRIPTION_ID, $this->actionRequest($action), $this->authenticatedContext());
 
-        static::assertSame([
+        self::assertSame([
             'success' => true,
             'subscriptionId' => self::SUBSCRIPTION_ID,
             'action' => $action,
@@ -130,7 +130,7 @@ final class ChangeStateRouteTest extends TestCase
 
         $route->changeState('SUBSCRIPTION-ID', $this->actionRequest('pause'), $this->authenticatedContext());
 
-        static::assertSame([['subscriptionId' => self::SUBSCRIPTION_ID]], $dataService->getCalls());
+        self::assertSame([['subscriptionId' => self::SUBSCRIPTION_ID]], $dataService->getCalls());
     }
 
     private function buildRoute(
@@ -156,8 +156,8 @@ final class ChangeStateRouteTest extends TestCase
 
         $billingAddress = $subscription->getBillingAddress();
         $shippingAddress = $subscription->getShippingAddress();
-        static::assertNotNull($billingAddress);
-        static::assertNotNull($shippingAddress);
+        self::assertNotNull($billingAddress);
+        self::assertNotNull($shippingAddress);
 
         $order = new OrderEntity();
         $order->setId('order-id');

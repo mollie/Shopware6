@@ -53,9 +53,9 @@ final class MandateUpdateWebhookRouteTest extends TestCase
 
         $response = $route->update(self::SUBSCRIPTION_ID, Context::createDefaultContext());
 
-        static::assertSame(200, $response->getStatusCode());
-        static::assertSame(['success' => true], $this->decode($response));
-        static::assertSame('mdt_new', $this->subscriptionRepository->getLastUpsert()['mandateId']);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['success' => true], $this->decode($response));
+        self::assertSame('mdt_new', $this->subscriptionRepository->getLastUpsert()['mandateId']);
     }
 
     public function testTheSubscriptionIdFromTheUrlIsLoweredBeforeTheLookup(): void
@@ -65,7 +65,7 @@ final class MandateUpdateWebhookRouteTest extends TestCase
 
         $route->update('SUBSCRIPTION-ID', Context::createDefaultContext());
 
-        static::assertSame([['subscriptionId' => self::SUBSCRIPTION_ID]], $dataService->getCalls());
+        self::assertSame([['subscriptionId' => self::SUBSCRIPTION_ID]], $dataService->getCalls());
     }
 
     public function testAnUnknownSubscriptionIsAnsweredWithAnErrorInsteadOfAnException(): void
@@ -76,8 +76,8 @@ final class MandateUpdateWebhookRouteTest extends TestCase
 
         $response = $route->update(self::SUBSCRIPTION_ID, Context::createDefaultContext());
 
-        static::assertSame(422, $response->getStatusCode());
-        static::assertFalse($this->decode($response)['success']);
+        self::assertSame(422, $response->getStatusCode());
+        self::assertFalse($this->decode($response)['success']);
     }
 
     public function testAFailedConfirmationIsLogged(): void
@@ -87,7 +87,7 @@ final class MandateUpdateWebhookRouteTest extends TestCase
 
         $route->update(self::SUBSCRIPTION_ID, Context::createDefaultContext());
 
-        static::assertTrue($this->logger->hasRecordThatContains('error', 'Subscription mandate update webhook failed'));
+        self::assertTrue($this->logger->hasRecordThatContains('error', 'Subscription mandate update webhook failed'));
     }
 
     public function testAnUnapprovedPaymentDoesNotChangeTheMandate(): void
@@ -99,8 +99,8 @@ final class MandateUpdateWebhookRouteTest extends TestCase
 
         $response = $route->update(self::SUBSCRIPTION_ID, Context::createDefaultContext());
 
-        static::assertSame(422, $response->getStatusCode());
-        static::assertSame(0, $this->subscriptionRepository->getUpsertCount());
+        self::assertSame(422, $response->getStatusCode());
+        self::assertSame(0, $this->subscriptionRepository->getUpsertCount());
     }
 
     private function buildRoute(
@@ -135,8 +135,8 @@ final class MandateUpdateWebhookRouteTest extends TestCase
 
         $billingAddress = $subscription->getBillingAddress();
         $shippingAddress = $subscription->getShippingAddress();
-        static::assertNotNull($billingAddress);
-        static::assertNotNull($shippingAddress);
+        self::assertNotNull($billingAddress);
+        self::assertNotNull($shippingAddress);
 
         $order = new OrderEntity();
         $order->setId('order-id');

@@ -14,6 +14,12 @@ Run this **after** the tests are written.
 - **No PHPUnit mocks.** `createMock()`, `getMockBuilder()`, `prophesize()` are findings.
   Use a Fake from the neighbouring `Fake/` folder, or add one. When the assertion is about
   *what was sent*, use a Spy — a Fake that records its calls — not a mock.
+- **Every new Fake is a duplicate until proven otherwise.** For each added `Fake*` file, grep
+  the contract it satisfies (`implements <Interface>`, `extends <Class>`) across `tests/Unit`
+  before accepting it: a second Fake for a contract that already has one is a finding, and an
+  existing Fake that was *replaced* rather than extended is a worse one — check `git status`
+  for a `Fake*` file that shows as modified with methods removed. Existing callers break at
+  runtime, not at review time.
 - **`#[CoversClass(...)]`** declared on every unit test class.
 - **Builders** for complex fixtures instead of long inline object setup — reuse
   `tests/Unit/Builder/` and the per-component `Builder/` folders.

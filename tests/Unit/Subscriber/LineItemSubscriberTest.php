@@ -38,8 +38,8 @@ final class LineItemSubscriberTest extends TestCase
     {
         $events = LineItemSubscriber::getSubscribedEvents();
 
-        static::assertArrayHasKey(CartLoadedEvent::class, $events);
-        static::assertArrayHasKey(OrderEvents::ORDER_LINE_ITEM_LOADED_EVENT, $events);
+        self::assertArrayHasKey(CartLoadedEvent::class, $events);
+        self::assertArrayHasKey(OrderEvents::ORDER_LINE_ITEM_LOADED_EVENT, $events);
     }
 
     public function testACartLineItemLearnsItsSubscriptionSettingsFromTheProductCustomFields(): void
@@ -49,9 +49,9 @@ final class LineItemSubscriberTest extends TestCase
         $this->subscriber->onCartLoaded($this->cartLoadedEvent($lineItem));
 
         $extension = $lineItem->getExtension(Mollie::EXTENSION);
-        static::assertInstanceOf(Product::class, $extension);
-        static::assertTrue($extension->isSubscription());
-        static::assertSame('1 month', (string) $extension->getInterval());
+        self::assertInstanceOf(Product::class, $extension);
+        self::assertTrue($extension->isSubscription());
+        self::assertSame('1 month', (string) $extension->getInterval());
     }
 
     public function testACartLineItemWithoutProductCustomFieldsIsLeftAlone(): void
@@ -60,7 +60,7 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onCartLoaded($this->cartLoadedEvent($lineItem));
 
-        static::assertFalse($lineItem->hasExtension(Mollie::EXTENSION));
+        self::assertFalse($lineItem->hasExtension(Mollie::EXTENSION));
     }
 
     public function testAnAlreadyDecoratedCartLineItemIsNotDecoratedTwice(): void
@@ -71,7 +71,7 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onCartLoaded($this->cartLoadedEvent($lineItem));
 
-        static::assertSame($existing, $lineItem->getExtension(Mollie::EXTENSION));
+        self::assertSame($existing, $lineItem->getExtension(Mollie::EXTENSION));
     }
 
     public function testAProductThatCanAlsoBeBoughtOnceFollowsTheSubscribeButton(): void
@@ -85,8 +85,8 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onCartLoaded($this->cartLoadedEvent($withoutMarker, $withMarker));
 
-        static::assertFalse($this->extensionOf($withoutMarker)->isSubscription());
-        static::assertTrue($this->extensionOf($withMarker)->isSubscription());
+        self::assertFalse($this->extensionOf($withoutMarker)->isSubscription());
+        self::assertTrue($this->extensionOf($withMarker)->isSubscription());
     }
 
     public function testASubscriptionOnlyProductStaysASubscriptionWithoutTheMarker(): void
@@ -95,7 +95,7 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onCartLoaded($this->cartLoadedEvent($lineItem));
 
-        static::assertTrue($this->extensionOf($lineItem)->isSubscription());
+        self::assertTrue($this->extensionOf($lineItem)->isSubscription());
     }
 
     public function testAnOrderLineItemLearnsItsSubscriptionSettingsFromThePayload(): void
@@ -105,8 +105,8 @@ final class LineItemSubscriberTest extends TestCase
         $this->subscriber->onOrderLineItemLoaded($this->orderLineItemLoadedEvent($lineItem));
 
         $extension = $lineItem->getExtension(Mollie::EXTENSION);
-        static::assertInstanceOf(Product::class, $extension);
-        static::assertTrue($extension->isSubscription());
+        self::assertInstanceOf(Product::class, $extension);
+        self::assertTrue($extension->isSubscription());
     }
 
     public function testAnOrderLineItemWithoutProductCustomFieldsIsLeftAlone(): void
@@ -115,7 +115,7 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onOrderLineItemLoaded($this->orderLineItemLoadedEvent($lineItem));
 
-        static::assertFalse($lineItem->hasExtension(Mollie::EXTENSION));
+        self::assertFalse($lineItem->hasExtension(Mollie::EXTENSION));
     }
 
     public function testAnAlreadyDecoratedOrderLineItemIsNotDecoratedTwice(): void
@@ -126,7 +126,7 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onOrderLineItemLoaded($this->orderLineItemLoadedEvent($lineItem));
 
-        static::assertSame($existing, $lineItem->getExtension(Mollie::EXTENSION));
+        self::assertSame($existing, $lineItem->getExtension(Mollie::EXTENSION));
     }
 
     public function testAnOrderedProductThatCanAlsoBeBoughtOnceKeepsTheDecisionOfTheOrder(): void
@@ -138,8 +138,8 @@ final class LineItemSubscriberTest extends TestCase
 
         $this->subscriber->onOrderLineItemLoaded($this->orderLineItemLoadedEvent($oneOff, $subscribed));
 
-        static::assertFalse($this->extensionOf($oneOff)->isSubscription());
-        static::assertTrue($this->extensionOf($subscribed)->isSubscription());
+        self::assertFalse($this->extensionOf($oneOff)->isSubscription());
+        self::assertTrue($this->extensionOf($subscribed)->isSubscription());
     }
 
     /**
@@ -180,7 +180,7 @@ final class LineItemSubscriberTest extends TestCase
     private function extensionOf(LineItem|OrderLineItemEntity $lineItem): Product
     {
         $extension = $lineItem->getExtension(Mollie::EXTENSION);
-        static::assertInstanceOf(Product::class, $extension);
+        self::assertInstanceOf(Product::class, $extension);
 
         return $extension;
     }

@@ -35,6 +35,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?ApplePaySettings $applePaySettings = null,
         private ?ExpressComponentsSettings $expressComponentsSettings = null,
         private ?CreditCardSettings $creditCardSettings = null,
+        private ?RefundSettings $refundSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -139,6 +140,6 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getRefundSettings(?string $salesChannelId = null): RefundSettings
     {
-        return new RefundSettings();
+        return $this->refundSettings ?? new RefundSettings();
     }
 }

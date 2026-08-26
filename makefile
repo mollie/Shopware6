@@ -134,7 +134,7 @@ phpintegration: ##3 Starts all PHPUnit Tests [groups=core to limit to a group]
 report: ##3 Runs the unit tests with coverage and prints the line coverage of shopware/ and src/
 	# ----------------------------------------------------------------
 	# reset previous report output
-	rm -rf ./.reports/phpunit/coverage ./.reports/phpunit/clover.xml
+	rm -rf ./.reports/phpunit/coverage ./.reports/phpunit/clover.xml ../../../public/coverage
 	mkdir -p ./.reports/phpunit
 	# ----------------------------------------------------------------
 	# pcov records nothing outside pcov.directory, and the dockware image points that
@@ -152,7 +152,12 @@ report: ##3 Runs the unit tests with coverage and prints the line coverage of sh
 	# would leave the summary below reporting a truthful-looking 0.00%. Fail loudly instead.
 	@test -f ./.reports/phpunit/clover.xml || { echo ""; echo "  No coverage was recorded - is pcov or Xdebug available?"; exit 1; }
 	@php -r '$$m = simplexml_load_file("./.reports/phpunit/clover.xml")->project->metrics; $$s = (int) $$m["statements"]; $$c = (int) $$m["coveredstatements"]; printf("%s  Line coverage: %.2f%% (%d/%d statements)%s%s", PHP_EOL, $$s > 0 ? $$c / $$s * 100 : 0, $$c, $$s, PHP_EOL, PHP_EOL);'
+	# ----------------------------------------------------------------
+	# Publish the HTML report into the Shopware document root, so it can be opened
+	# in the browser at <shop-url>/coverage instead of only from the file system.
+	@cp -r ./.reports/phpunit/coverage ../../../public/coverage
 	@echo "  HTML report at .reports/phpunit/coverage/index.html"
+	@echo "  HTML report in the browser at <shop-url>/coverage"
 	@echo ""
 
 behat:

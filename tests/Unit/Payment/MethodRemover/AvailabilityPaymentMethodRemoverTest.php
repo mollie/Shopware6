@@ -14,8 +14,8 @@ use Mollie\Shopware\Component\Payment\MethodRemover\AvailabilityPaymentMethodRem
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Unit\Builder\CartBuilder;
-use Mollie\Shopware\Unit\Builder\PaymentMethodBuilder;
 use Mollie\Shopware\Unit\Builder\CustomerBuilder;
+use Mollie\Shopware\Unit\Builder\PaymentMethodBuilder;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -72,9 +72,6 @@ final class AvailabilityPaymentMethodRemoverTest extends TestCase
         $this->assertCount(3, $result);
     }
 
-    /**
-     * @param string[] $activeMethodIds
-     */
     public function testOnTheEditOrderPageTheOrderAmountDecidesInsteadOfTheCart(): void
     {
         // The cart is empty on the edit-order page, so the limits have to be checked against the order.

@@ -74,6 +74,12 @@ final class FakeGateway implements MollieGatewayInterface
     /** @var array<string, int> */
     private array $callCounts = [];
 
+    /** @var list<string> */
+    private array $requestedTransactionIds = [];
+
+    /** @var list<array{mollieCustomerId: string, mandateId: string}> */
+    private array $revokedMandates = [];
+
     private ?Payment $repairPayment = null;
     private bool $repairResultConfigured = false;
     private bool $throwOnRepair = false;
@@ -165,8 +171,28 @@ final class FakeGateway implements MollieGatewayInterface
     public function getPaymentByTransactionId(string $transactionId, Context $context): Payment
     {
         $this->countCall('getPaymentByTransactionId');
+        $this->requestedTransactionIds[] = $transactionId;
 
         return $this->payment;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getRequestedTransactionIds(): array
+    {
+        return $this->requestedTransactionIds;
+    }
+
+    public function getLastTransactionId(): string
+    {
+        $last = end($this->requestedTransactionIds);
+
+        if ($last === false) {
+            throw new \RuntimeException('No payment was looked up by transaction id.');
+        }
+
+        return $last;
     }
 
     public function withRepairResult(?Payment $payment): void
@@ -252,7 +278,17 @@ final class FakeGateway implements MollieGatewayInterface
 
     public function revokeMandate(string $mollieCustomerId, string $mandateId, string $salesChannelId): bool
     {
+        $this->revokedMandates[] = ['mollieCustomerId' => $mollieCustomerId, 'mandateId' => $mandateId];
+
         return true;
+    }
+
+    /**
+     * @return list<array{mollieCustomerId: string, mandateId: string}>
+     */
+    public function getRevokedMandates(): array
+    {
+        return $this->revokedMandates;
     }
 
     public function listTerminals(string $salesChannelId): TerminalCollection
