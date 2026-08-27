@@ -15,6 +15,14 @@
         </testsuite>
     </testsuites>
 
+    <!-- Writes Allure results for the CI report. The config path is resolved against the
+         working directory, which is the plugin root for this suite. -->
+    <extensions>
+        <bootstrap class="Qameta\Allure\PHPUnit\AllureExtension">
+            <parameter name="config" value="config/allure.config.php"/>
+        </bootstrap>
+    </extensions>
+
    <source>
        <include>
            <directory>./../src</directory>

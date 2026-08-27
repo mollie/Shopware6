@@ -9,6 +9,7 @@
     "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/preset-env": "^7.15.6",
     "@babel/runtime": "^7.15.4",
+    "allure-vitest": "^3.11.0",
     "babel-eslint": "10.0.2",
     "babel-preset-env": "^1.7.0",
     "deepmerge": "^4.3.1",

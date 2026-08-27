@@ -118,3 +118,16 @@ jobs:
             # maintainer's own PR) run all integration tests and Behat.
             PHPUNIT_GROUPS: ${{ secrets.MOLLIE_APIKEY_TEST == '' && 'core' || '' }}
             RUN_BEHAT: ${{ secrets.MOLLIE_APIKEY_TEST != '' }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  report:
+    name: Test Report
+    needs: [ review, e2e ]
+    # always(), because a red suite is exactly the report worth reading. A pull request
+    # does not publish, it attaches the report to the run as an artifact, so this also
+    # works for contributions from a fork.
+    if: ${{ always() }}
+    uses: ./.github/workflows/step_report.yml
+    permissions:
+      contents: read

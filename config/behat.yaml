@@ -1,4 +1,8 @@
 default:
+  # Registers the Cucumber JSON formatter without enabling it - `make behat allure=<dir>`
+  # selects it. Allure reads that format directly, including every Given/When/Then step.
+  extensions:
+    Vanare\BehatCucumberJsonFormatter\Extension: ~
   suites:
     default:
       paths:

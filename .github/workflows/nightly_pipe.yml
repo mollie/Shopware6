@@ -116,3 +116,24 @@ jobs:
           TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  report:
+    name: Test Report
+    needs: [ review, e2e ]
+    # always(), because a red suite is exactly the report worth reading. The nightly runs
+    # the full matrix against master, so it is the same state of the plugin the CI reports
+    # and it feeds the same trend.
+    if: ${{ always() }}
+    uses: ./.github/workflows/step_report.yml
+    # Deploying to Pages needs pages and id-token write, storing the trend needs contents
+    # write. It is granted here and not inside the reusable workflow: a pull request from a
+    # fork can never be given it, and a called workflow that asks for more than its caller
+    # has fails validation - for every job, including the ones it would skip.
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    with:
+      PUBLISH: true

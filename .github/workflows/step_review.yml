@@ -106,6 +106,15 @@ jobs:
       - name: Run Vitest
         run: make vitest -B
 
+      - name: Store Allure Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-Vitest
+          retention-days: 1
+          if-no-files-found: ignore
+          path: .reports/allure/results
+
   eslint:
     name: ESLint
     needs: install_dev
@@ -239,6 +248,19 @@ jobs:
 
       - name: Run PHPUnit
         run: make phpunit -B
+        env:
+          ALLURE_OUTPUT_DIRECTORY: .reports/allure/results
+          ALLURE_LAYER: Unit Tests
+
+      # Consumed by the report job. Uploaded even when the suite fails - a red report is
+      # the one worth looking at.
+      - name: Store Allure Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-Unit_Tests
+          retention-days: 1
+          path: .reports/allure/results
 
   phpcsfixer:
     name: PHP CS Fixer

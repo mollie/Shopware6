@@ -84,6 +84,10 @@ inputs:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/MolliePayments.zip'
     required: false
+  _ALLURE_DIR:
+    description: 'Where the PHP suites write their Allure results inside the container. Absolute, because the integration tests and Behat both run from the Shopware root.'
+    default: '/var/www/html/custom/plugins/MolliePayments/.reports/allure'
+    required: false
 
 
 
@@ -236,13 +240,16 @@ runs:
     - name: Integration tests
       shell: bash
       run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration groups="${{ inputs.PHPUNIT_GROUPS }}" -B'
+        docker exec \
+          -e ALLURE_OUTPUT_DIRECTORY=${{ inputs._ALLURE_DIR }}/results \
+          -e ALLURE_LAYER="Integration Tests" \
+          shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration groups="${{ inputs.PHPUNIT_GROUPS }}" -B'
 
     - name: Functional tests
       if: ${{ inputs.RUN_BEHAT == 'true' }}
       shell: bash
       run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat allure=${{ inputs._ALLURE_DIR }}/behat -B'
 
     # The PHP integration/behat tests create sales channel contexts that get persisted here.
     # Clear them so the Cypress store-api logins start from a clean state and bind the customer
@@ -288,6 +295,42 @@ runs:
         mkdir -p $(pwd)/tests/Cypress/cypress/logs/apache
         docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware || true
         docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache || true
+
+    # One artifact per Shopware version, holding nothing but Allure results. The report job
+    # turns each of them into its own environment, so the same test from four Shopware
+    # versions stays four results instead of collapsing into retries of a single one.
+    - name: Collect Allure Results
+      if: always()
+      shell: bash
+      run: |
+        mkdir -p allure-results
+        docker cp shop:${{ inputs._ALLURE_DIR }}/results/. allure-results/ || true
+        docker cp shop:${{ inputs._ALLURE_DIR }}/behat/. allure-results/ || true
+        cp -r tests/Cypress/allure-results/. allure-results/ || true
+
+        # Behat writes every feature into a single all.json, but Allure's Cucumber reader
+        # only ever reads the first entry of such an array - the other features would be
+        # dropped without a word. Give it one file per feature instead.
+        node -e '
+          const fs = require("fs");
+
+          if (fs.existsSync("allure-results/all.json")) {
+            JSON.parse(fs.readFileSync("allure-results/all.json")).forEach((feature, index) => {
+              fs.writeFileSync(`allure-results/behat-${index}.json`, JSON.stringify([feature]));
+            });
+
+            fs.unlinkSync("allure-results/all.json");
+          }
+        '
+
+    - name: Store Allure Results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: allure-results-Shopware_${{ inputs.SHOPWARE }}
+        retention-days: 1
+        if-no-files-found: ignore
+        path: allure-results
 
     - name: Store Cypress Results
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}

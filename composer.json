@@ -84,6 +84,8 @@
         "behat/behat": "^3",
         "behat/gherkin": "^4",
         "phpstan/phpstan-phpunit": "^2.0",
+        "allure-framework/allure-phpunit": "^3",
+        "cawolf/behat-cucumber-json-formatter": "^1.5",
         "ext-fileinfo": "*",
         "ext-dom": "*"
     },
