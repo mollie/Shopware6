@@ -21,4 +21,18 @@ export default {
     output: './.reports/allure/report',
     historyPath: './.reports/allure/history.jsonl',
     environments: Object.fromEntries(environments),
+    plugins: {
+        awesome: {
+            options: {
+                // Left alone, the tree groups by titlePath - whatever path the framework
+                // happens to report. That is a PHP namespace for PHPUnit, a spec file path
+                // for Cypress and Vitest, and nothing at all for Behat, which is why Behat
+                // had no category. Group by what a test means instead: the layer it
+                // exercises, then the category inside that layer. Both labels are set by
+                // the integrations themselves - see config/allure.config.php, the Cypress
+                // support file and dev/vitest.setup.js.
+                groupBy: ['layer', 'suite'],
+            },
+        },
+    },
 };
