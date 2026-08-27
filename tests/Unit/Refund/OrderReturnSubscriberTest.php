@@ -128,10 +128,10 @@ final class OrderReturnSubscriberTest extends TestCase
     }
 
     /**
-     * Opening an order in the admin replays the state change on a non-live order version; refunding
-     * from that clone would refund a second time (issue #1421).
+     * The Return Management completes a return inside the working version of the order the admin has
+     * open, so a live context never arrives here. Skipping those meant no return was ever refunded.
      */
-    public function testAStateChangeOnANonLiveVersionDoesNotRefund(): void
+    public function testAStateChangeOnANonLiveVersionRefunds(): void
     {
         $handler = new FakeOrderReturnHandler();
         $subscriber = new OrderReturnSubscriber($handler);
@@ -140,7 +140,7 @@ final class OrderReturnSubscriberTest extends TestCase
 
         $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done', context: $context));
 
-        $this->assertSame([], $handler->returnCalls);
+        $this->assertSame(['return-id'], $handler->returnCalls);
     }
 
     private function stateChangeEvent(
