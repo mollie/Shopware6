@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.5.0
 - Hinzugefügt: Plugins können eigene Positionen, etwa Container-Positionen von Set-Produkten, über das neue Event `FilterLineItemEvent` selbst vom Mollie-Payload ausschließen.
 - Hinzugefügt: Mollie Express Components (Beta) im Warenkorb, Off-Canvas und Checkout.
 - Hinzugefügt: Die Mollie Erstattungs-, Erfassungs- und Versand-IDs stehen für Buchhaltungsexporte an der Bestellung bereit, im DATEV-tauglichen Format mit Bindestrich.

@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.5.0
 - Added: Plugins can keep their own line items, such as set product containers, out of the Mollie payload themselves, using the new `FilterLineItemEvent`.
 - Added: Mollie express components (beta) in the cart, off-canvas and checkout.
 - Added: The Mollie refund, capture and shipment ids are available on the order for accounting exports, in the DATEV-compatible format with a hyphen.
