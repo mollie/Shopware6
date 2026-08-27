@@ -21,6 +21,7 @@ import 'cypress-axe'
 
 // Reports every test, command and screenshot to the Allure results of this run.
 import 'allure-cypress'
+import * as allure from 'allure-js-commons'
 
 const CypressFilters = require('cypress-filters');
 new CypressFilters().register();
@@ -31,6 +32,21 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     // failing the test because some third party apps
     // cause an error in the console which stops the test
     return false
+})
+
+
+// The report groups by layer and suite. Without both labels a spec falls back to its file
+// path, and every branch of the tree then starts with the same cypress > e2e prefix instead
+// of the area the spec covers.
+beforeEach(() => {
+    allure.layer('E2E')
+
+    // cypress/e2e/<area>/... - admin, api, store-api or storefront
+    const area = Cypress.spec.relative.split('/')[2]
+
+    if (area !== undefined) {
+        allure.suite(area)
+    }
 })
 
 

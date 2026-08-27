@@ -12,7 +12,12 @@ export default defineConfig({
         include: ['./src/Resources/app/**/*.spec.js'],
         watch: false,
         // Writes Allure results for the CI report, next to the PHP suites and Cypress.
-        setupFiles: [requireFromDev.resolve('allure-vitest/setup')],
+        setupFiles: [
+            requireFromDev.resolve('allure-vitest/setup'),
+            // Tags every test with the layer and the bundle, which is what the report tree
+            // groups by. Resolved from dev/ for the same reason as the reporter above.
+            requireFromDev.resolve('./vitest.setup.js'),
+        ],
         reporters: [
             'default',
             [requireFromDev.resolve('allure-vitest/reporter'), {resultsDir: './.reports/allure/results'}],
