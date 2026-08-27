@@ -133,7 +133,11 @@ jobs:
     needs: [ review, e2e ]
     if: ${{ always() }}
     uses: ./.github/workflows/step_report.yml
+    # Pushing to gh-pages is the only reason any pipeline needs write access to the repo,
+    # so it is granted here and not inside the reusable workflow - a pull request from a
+    # fork can never be given it, and asking for it there would fail the whole job.
+    permissions:
+      contents: write
     with:
-      DESTINATION: run-${{ github.run_number }}
-      # Only master decides what the README badge and reports/latest show.
-      PUBLISH_LATEST: true
+      # Master is the state of the plugin, so this is the run that GitHub Pages shows.
+      PUBLISH: true

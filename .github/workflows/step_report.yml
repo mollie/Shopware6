@@ -3,12 +3,8 @@ name: Step Report
 on:
   workflow_call:
     inputs:
-      DESTINATION:
-        description: "Folder below reports/ on the gh-pages branch that receives this report."
-        required: true
-        type: string
-      PUBLISH_LATEST:
-        description: "Also update reports/latest, the trend history and the README badge. Only the master pipeline may do this - a pull request is not the state of the plugin."
+      PUBLISH:
+        description: "Push the report to the gh-pages branch, which is what GitHub Pages serves. Only the master pipeline may do this - a pull request is not the state of the plugin, so it gets the report as a downloadable artifact instead."
         required: false
         default: false
         type: boolean
@@ -18,8 +14,13 @@ jobs:
   report:
     name: Allure Report
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    # Master and the nightly both publish, and both force-push the same branch. The gate
+    # sits on the job, so a queued run does not even read the trend until the running one
+    # has pushed its own. A run that only builds an artifact is never held up: its group
+    # is unique.
+    concurrency:
+      group: ${{ inputs.PUBLISH && 'publish-gh-pages' || format('report-{0}', github.run_id) }}
+      cancel-in-progress: false
     steps:
 
       - name: Clone Code
@@ -33,7 +34,10 @@ jobs:
           pattern: allure-results-*
           path: .reports/allure/stages
 
+      # The report is rebuilt from scratch every run, so the only thing the branch has to
+      # carry between runs is the trend data.
       - name: Clone Report Branch
+        if: ${{ inputs.PUBLISH }}
         uses: actions/checkout@v6
         with:
           ref: gh-pages
@@ -47,7 +51,7 @@ jobs:
 
           # The trend chart is the reason to publish at all, so continue the history the
           # last master run left behind instead of starting over.
-          cp gh-pages/reports/history.jsonl .reports/allure/history.jsonl || true
+          cp gh-pages/history.jsonl .reports/allure/history.jsonl || true
 
           environments=""
 
@@ -74,57 +78,65 @@ jobs:
             --dump '.reports/allure/dumps/*.zip' \
             --history-limit 30
 
+      # A pull request stays off gh-pages, so the published page always shows master. The
+      # finished report is attached to the run instead, for whoever reviews the PR.
+      - name: Upload Report
+        if: ${{ !inputs.PUBLISH }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: .reports/allure/report
+          retention-days: 14
+
       - name: Publish Report
+        if: ${{ inputs.PUBLISH }}
         run: |
-          destination="gh-pages/reports/${{ inputs.DESTINATION }}"
-          rm -rf "$destination"
-          mkdir -p "$destination"
-          cp -r .reports/allure/report/. "$destination/"
+          # Shields.io has no idea what Allure is, so hand it a finished endpoint.
+          node -e '
+            const {stats = {}} = require("./.reports/allure/report/summary.json");
+            const passed = stats.passed ?? 0;
+            const failed = (stats.failed ?? 0) + (stats.broken ?? 0);
 
-          if [ "${{ inputs.PUBLISH_LATEST }}" = "true" ]; then
-            rm -rf gh-pages/reports/latest
-            cp -r .reports/allure/report gh-pages/reports/latest
-            cp .reports/allure/history.jsonl gh-pages/reports/history.jsonl
-
-            # Shields.io has no idea what Allure is, so hand it a finished endpoint.
-            node -e '
-              const {stats = {}} = require("./.reports/allure/report/summary.json");
-              const passed = stats.passed ?? 0;
-              const failed = (stats.failed ?? 0) + (stats.broken ?? 0);
-
-              require("fs").writeFileSync("gh-pages/reports/badge.json", JSON.stringify({
-                schemaVersion: 1,
-                label: "tests",
-                message: failed > 0 ? passed + " passed, " + failed + " failed" : passed + " passed",
-                color: failed > 0 ? "critical" : "success",
-              }));
-            '
-          fi
-
-          # A report is a few MB, so without a cap the branch grows out of hand.
-          ls -1d gh-pages/reports/run-* 2>/dev/null | sort -V | head -n -20 | xargs -r rm -rf
+            require("fs").writeFileSync(".reports/allure/badge.json", JSON.stringify({
+              schemaVersion: 1,
+              label: "tests",
+              message: failed > 0 ? passed + " passed, " + failed + " failed" : passed + " passed",
+              color: failed > 0 ? "critical" : "success",
+            }));
+          '
 
           cd gh-pages
+
+          # The state the trend was read from. The push may overwrite that and nothing
+          # else - if another pipeline got there first, its history entries would be
+          # dropped without a word, and a red job is the only way anyone would notice.
+          base=$(git rev-parse HEAD)
+
+          # Nothing on this branch is a source of truth - the report is derived from the
+          # test results, the trend from the previous run - so the whole tree is replaced.
+          # The report sits at the root, so the Pages base URL IS the report.
+          find . -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
+
+          cp -r "$GITHUB_WORKSPACE/.reports/allure/report/." .
+          cp "$GITHUB_WORKSPACE/.reports/allure/history.jsonl" history.jsonl
+          cp "$GITHUB_WORKSPACE/.reports/allure/badge.json" badge.json
+
+          # Pages runs the tree through Jekyll otherwise, which drops every file Allure
+          # writes into an underscore-prefixed path.
+          touch .nojekyll
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports
 
-          if git diff --quiet --cached; then
-            echo "Nothing to publish."
-            exit 0
-          fi
-
+          # One root commit per publish. Without it the branch would keep every report it
+          # ever served in its object database, and deleting the files would not help.
+          git checkout --orphan publish
+          git add -A
           git commit -m "Test report for ${{ github.sha }}"
-
-          # Two pipelines can finish at the same moment and both push to this branch.
-          for attempt in 1 2 3; do
-            git push && exit 0
-            git pull --rebase
-          done
-
-          exit 1
+          git push --force-with-lease=gh-pages:"$base" origin publish:gh-pages
 
       - name: Link Report
+        if: ${{ inputs.PUBLISH }}
         run: |
-          url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ inputs.DESTINATION }}/"
-          echo "[Test report for this run]($url)" >> "$GITHUB_STEP_SUMMARY"
+          url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "[Test report]($url)" >> "$GITHUB_STEP_SUMMARY"

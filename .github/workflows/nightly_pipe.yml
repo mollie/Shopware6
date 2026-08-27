@@ -116,3 +116,18 @@ jobs:
           TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  report:
+    name: Test Report
+    needs: [ review, e2e ]
+    # always(), because a red suite is exactly the report worth reading. The nightly runs
+    # the full matrix against master, so it is the same state of the plugin the CI reports
+    # and it feeds the same trend.
+    if: ${{ always() }}
+    uses: ./.github/workflows/step_report.yml
+    permissions:
+      contents: write
+    with:
+      PUBLISH: true
