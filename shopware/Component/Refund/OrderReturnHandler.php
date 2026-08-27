@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -142,7 +143,7 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
                 'refundId' => $refund->getId(),
             ]);
 
-            $this->refundController->cancel($request, $context);
+            $this->refundController->cancel($request, $this->liveContext($context));
 
             $this->logger->info('OrderReturn - Refund cancelled successfully', $logData);
         } catch (\Throwable $e) {
@@ -200,13 +201,20 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
     {
         $items = $this->buildItemsFromReturn($orderReturn, $order);
         $description = (string) $orderReturn->getInternalComment();
+        // the total is only written when the return was recalculated, so fall back to its positions
+        $amount = $orderReturn->getAmountTotal() ?? (float) array_sum(array_column($items, 'amount'));
 
         $logData['itemCount'] = count($items);
+        $logData['amount'] = $amount;
         $logData['description'] = $description;
         $this->logger->info('OrderReturn - Sending refund request', $logData);
 
+        // the same request the Refund Manager sends: the amount decides what is refunded, the items
+        // only carry the composition and the stock. Without it Mollie recalculates the refund from
+        // the lines of the order and ignores what the return asks for.
         $request = new Request([], [
             'orderId' => $order->getId(),
+            'amount' => $amount,
             'description' => '',
             'internalDescription' => $description,
             'returnId' => $returnId,
@@ -214,12 +222,27 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
         ]);
 
         try {
-            $this->refundController->create($request, $context);
+            $this->refundController->create($request, $this->liveContext($context));
             $this->logger->info('OrderReturn - Refund created successfully', $logData);
         } catch (\Throwable $e) {
             $logData['error'] = $e->getMessage();
             $this->logger->error('OrderReturn - Refund creation failed', $logData);
         }
+    }
+
+    /**
+     * The return is read in the context the transition happened in, so the amounts the merchant just
+     * edited are used. Everything that persists has to run against the live version though: the
+     * working version of an order is deleted when the merchant saves it, and mollie_refund has an
+     * ON DELETE CASCADE on the order version - the refund record would be dropped with it.
+     */
+    private function liveContext(Context $context): Context
+    {
+        if ($context->getVersionId() === Defaults::LIVE_VERSION) {
+            return $context;
+        }
+
+        return $context->createWithVersionId(Defaults::LIVE_VERSION);
     }
 
     /**
@@ -255,7 +278,9 @@ final class OrderReturnHandler implements OrderReturnHandlerInterface
                 'id' => $lineItemId,
                 'quantity' => $lineItem->getQuantity(),
                 'amount' => $lineItem->getRefundAmount(),
-                'resetStock' => 0,
+                // neither the Return Management nor the core puts the returned goods back into
+                // stock, so the quantity the return asks for is ours to restock
+                'resetStock' => $lineItem->getRestockQuantity(),
                 'label' => $label,
             ];
         }

@@ -9,15 +9,19 @@ build:
       npm_strict: true
     pack:
       excludes:
+        # Paths are matched literally - "config-*" style patterns are silently
+        # ignored, so every entry has to be a real path.
         paths:
+          - .agents
           - .ai
-          - .agent
           - .claude
           - .phpunuhi
           - .prettierignore
           - .reports
-          # NOT excluded: the store's plugin check reads validation.ignore from
-          # this file inside the ZIP. Excluding it means the check runs unfiltered.
+          # NOT excluded, and deliberately so: .shopware-extension.yml itself has
+          # to stay in the ZIP because the store's plugin check reads
+          # validation.ignore from it. Excluding it runs the check unfiltered.
+          - .tmp
           - AGENTS.md
           - config
           - docs
@@ -30,7 +34,7 @@ build:
           - .git
           - .gitignore
           - src/Resources/app/storefront/tests
-          - src/Resources/app/administrator/tests
+          - src/Resources/app/administration/tests
 
 # The store's plugin check analyses the ZIP with its own PHPStan config, so
 # neither config/.phpstan.neon nor inline @phpstan-ignore comments apply here:

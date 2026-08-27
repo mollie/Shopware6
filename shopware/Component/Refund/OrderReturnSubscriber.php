@@ -59,10 +59,9 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (! $this->isLiveVersion($event->getContext())) {
-            return;
-        }
-
+        // No live version check here: the Return Management always transitions the return inside the
+        // working version of the order the admin opened, so a live context never arrives. Refunding
+        // twice is prevented by the returnId Mollie stores on the refund instead.
         $returnId = $event->getTransition()->getEntityId();
         $context = $event->getContext();
 

@@ -204,6 +204,59 @@ final class RefundBuilderTest extends TestCase
         $this->assertSame('10.00', $createRefund->toArray()['amount']['value']);
     }
 
+    /**
+     * A return of an order with a 25 % discount. The discount sits in its own Mollie line that a
+     * return never contains, so refunding the returned positions by line refunded the undiscounted
+     * 69.98 EUR instead of the 52.49 EUR the return asks for.
+     */
+    public function testAReturnOfADiscountedOrderRefundsTheAmountTheReturnAsksFor(): void
+    {
+        $currency = new CurrencyEntity();
+        $currency->setIsoCode('EUR');
+
+        $promotion = $this->buildLineItem('promo-1', -17.49, 1, 19.0, -2.79);
+        $promotion->setType('promotion');
+
+        $order = new OrderEntity();
+        $order->setId('order-id');
+        $order->setOrderNumber('M10424635');
+        $order->setSalesChannelId('sales-channel-id');
+        $order->setCurrency($currency);
+        $order->setAmountTotal(52.49);
+        $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
+        $order->setLineItems(new OrderLineItemCollection([
+            $this->buildLineItem('line-1', 29.99, 1, 19.0, 4.79),
+            $this->buildLineItem('line-2', 39.99, 1, 19.0, 6.38),
+            $promotion,
+        ]));
+
+        $mollieLines = [];
+        foreach (['line-1' => 29.99, 'line-2' => 39.99] as $shopwareId => $price) {
+            $mollieLine = new LineItem('Line ' . $shopwareId, 1, new Money($price, 'EUR'), new Money($price, 'EUR'));
+            $mollieLine->setId('odl_' . $shopwareId);
+            $mollieLine->setShopwareLineItemId($shopwareId);
+            $mollieLine->setRefundableQuantity(1);
+            $mollieLines[] = $mollieLine;
+        }
+
+        $payment = new Payment('tr_test');
+        $payment->setOrderId('ord_test');
+
+        $gateway = new FakeGateway('', $payment);
+        $gateway->withOrder(new Order('ord_test', '', null, $mollieLines));
+
+        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), new FakeLogger());
+
+        // the request the OrderReturnHandler builds: the positions plus the total of the return
+        $createRefund = $builder->build($payment, $order, [
+            ['id' => 'line-1', 'quantity' => 1, 'amount' => 22.4925, 'resetStock' => 1],
+            ['id' => 'line-2', 'quantity' => 1, 'amount' => 29.9925, 'resetStock' => 1],
+        ], '', 52.49);
+
+        $this->assertInstanceOf(CreatePaymentRefund::class, $createRefund);
+        $this->assertSame('52.49', $createRefund->toArray()['amount']['value']);
+    }
+
     public function testRefundingTheShippingCostsAloneUsesTheDeliveryAmount(): void
     {
         $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());

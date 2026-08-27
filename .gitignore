@@ -19,8 +19,10 @@ config-*
 composer.lock
 package-lock.json
 .tmp
-.shopware-extension.yml
-
+# only the plugin root one: it is the mount target the release target binds
+# config/.shopware-extension.yml to, and that file has to stay committed
+/.shopware-extension.yml
 .php-cs-fixer.cache
 /.ai/
 /.zed
+/.phpactor.json
