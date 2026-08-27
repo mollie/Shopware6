@@ -114,7 +114,8 @@ single source of truth for every skill in this repository — reviewers included
 A pointer never carries content. When a rule changes, it changes in `.agents/` only.
 
 Recurring tasks live here too — adding or removing a Mollie payment method is
-`.agents/skills/payment-methods/`.
+`.agents/skills/payment-methods/`, and setting the release version before internal QA is
+`.agents/skills/increase-version/`.
 
 ## 5. Do not run the suites — hand over instead
 
