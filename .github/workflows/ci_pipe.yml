@@ -133,11 +133,14 @@ jobs:
     needs: [ review, e2e ]
     if: ${{ always() }}
     uses: ./.github/workflows/step_report.yml
-    # Pushing to gh-pages is the only reason any pipeline needs write access to the repo,
-    # so it is granted here and not inside the reusable workflow - a pull request from a
-    # fork can never be given it, and asking for it there would fail the whole job.
+    # Deploying to Pages needs pages and id-token write, storing the trend needs contents
+    # write. It is granted here and not inside the reusable workflow: a pull request from a
+    # fork can never be given it, and a called workflow that asks for more than its caller
+    # has fails validation - for every job, including the ones it would skip.
     permissions:
       contents: write
+      pages: write
+      id-token: write
     with:
       # Master is the state of the plugin, so this is the run that GitHub Pages shows.
       PUBLISH: true

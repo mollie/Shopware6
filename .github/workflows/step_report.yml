@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       PUBLISH:
-        description: "Push the report to the gh-pages branch, which is what GitHub Pages serves. Only the master pipeline may do this - a pull request is not the state of the plugin, so it gets the report as a downloadable artifact instead."
+        description: "Deploy the report to GitHub Pages and write the trend back to the gh-pages branch. Only master and the nightly may do this - a pull request is not the state of the plugin, so it gets the report as a downloadable artifact instead."
         required: false
         default: false
         type: boolean
@@ -14,10 +14,10 @@ jobs:
   report:
     name: Allure Report
     runs-on: ubuntu-latest
-    # Master and the nightly both publish, and both force-push the same branch. The gate
-    # sits on the job, so a queued run does not even read the trend until the running one
-    # has pushed its own. A run that only builds an artifact is never held up: its group
-    # is unique.
+    # Pages deploys one site at a time, and the trend is read from gh-pages before it is
+    # written back - so master and the nightly must not publish at once. The gate sits on
+    # the job, ahead of the checkout, so a queued run reads the trend the previous one
+    # wrote. A run that only builds an artifact is never held up: its group is unique.
     concurrency:
       group: ${{ inputs.PUBLISH && 'publish-gh-pages' || format('report-{0}', github.run_id) }}
       cancel-in-progress: false
@@ -34,9 +34,9 @@ jobs:
           pattern: allure-results-*
           path: .reports/allure/stages
 
-      # The report is rebuilt from scratch every run, so the only thing the branch has to
-      # carry between runs is the trend data.
-      - name: Clone Report Branch
+      # The site is deployed straight out of this run, so the branch is nothing but the
+      # store for the one piece of state that has to survive between runs: the trend.
+      - name: Clone Trend Branch
         if: ${{ inputs.PUBLISH }}
         uses: actions/checkout@v6
         with:
@@ -50,7 +50,7 @@ jobs:
           mkdir -p .reports/allure/dumps
 
           # The trend chart is the reason to publish at all, so continue the history the
-          # last master run left behind instead of starting over.
+          # last publishing run left behind instead of starting over.
           cp gh-pages/history.jsonl .reports/allure/history.jsonl || true
 
           environments=""
@@ -78,8 +78,26 @@ jobs:
             --dump '.reports/allure/dumps/*.zip' \
             --history-limit 30
 
-      # A pull request stays off gh-pages, so the published page always shows master. The
-      # finished report is attached to the run instead, for whoever reviews the PR.
+      - name: Add Badge
+        if: ${{ inputs.PUBLISH }}
+        run: |
+          # Shields.io has no idea what Allure is, so hand it a finished endpoint. It ships
+          # inside the site, which is the only thing this run publishes.
+          node -e '
+            const {stats = {}} = require("./.reports/allure/report/summary.json");
+            const passed = stats.passed ?? 0;
+            const failed = (stats.failed ?? 0) + (stats.broken ?? 0);
+
+            require("fs").writeFileSync(".reports/allure/report/badge.json", JSON.stringify({
+              schemaVersion: 1,
+              label: "tests",
+              message: failed > 0 ? passed + " passed, " + failed + " failed" : passed + " passed",
+              color: failed > 0 ? "critical" : "success",
+            }));
+          '
+
+      # A pull request does not deploy, so the report has to be downloadable for whoever
+      # reviews it.
       - name: Upload Report
         if: ${{ !inputs.PUBLISH }}
         uses: actions/upload-artifact@v4
@@ -88,55 +106,53 @@ jobs:
           path: .reports/allure/report
           retention-days: 14
 
-      - name: Publish Report
+      - name: Upload Pages Artifact
+        if: ${{ inputs.PUBLISH }}
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: .reports/allure/report
+
+      - name: Store Trend
         if: ${{ inputs.PUBLISH }}
         run: |
-          # Shields.io has no idea what Allure is, so hand it a finished endpoint.
-          node -e '
-            const {stats = {}} = require("./.reports/allure/report/summary.json");
-            const passed = stats.passed ?? 0;
-            const failed = (stats.failed ?? 0) + (stats.broken ?? 0);
-
-            require("fs").writeFileSync(".reports/allure/badge.json", JSON.stringify({
-              schemaVersion: 1,
-              label: "tests",
-              message: failed > 0 ? passed + " passed, " + failed + " failed" : passed + " passed",
-              color: failed > 0 ? "critical" : "success",
-            }));
-          '
-
           cd gh-pages
 
           # The state the trend was read from. The push may overwrite that and nothing
-          # else - if another pipeline got there first, its history entries would be
-          # dropped without a word, and a red job is the only way anyone would notice.
+          # else - if another pipeline got there first, its entries would be dropped
+          # without a word, and a red job is the only way anyone would notice.
           base=$(git rev-parse HEAD)
 
-          # Nothing on this branch is a source of truth - the report is derived from the
-          # test results, the trend from the previous run - so the whole tree is replaced.
-          # The report sits at the root, so the Pages base URL IS the report.
+          # This branch does not serve anything any more, Pages is deployed from the run
+          # itself. Everything except the trend is derived, so none of it is kept.
           find . -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
-
-          cp -r "$GITHUB_WORKSPACE/.reports/allure/report/." .
           cp "$GITHUB_WORKSPACE/.reports/allure/history.jsonl" history.jsonl
-          cp "$GITHUB_WORKSPACE/.reports/allure/badge.json" badge.json
-
-          # Pages runs the tree through Jekyll otherwise, which drops every file Allure
-          # writes into an underscore-prefixed path.
-          touch .nojekyll
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # One root commit per publish. Without it the branch would keep every report it
-          # ever served in its object database, and deleting the files would not help.
-          git checkout --orphan publish
+          # One root commit per run. Without it the branch would keep every trend it ever
+          # stored in its object database, and deleting the files would not help.
+          git checkout --orphan trend
           git add -A
-          git commit -m "Test report for ${{ github.sha }}"
-          git push --force-with-lease=gh-pages:"$base" origin publish:gh-pages
+          git commit -m "Test trend for ${{ github.sha }}"
+          git push --force-with-lease=gh-pages:"$base" origin trend:gh-pages
+
+  # Deploying is its own job because that is the only way to hang the github-pages
+  # environment - and the URL it reports back - off it. It needs pages and id-token write,
+  # which the calling pipeline grants; a pull request never reaches this job.
+  publish:
+    name: Publish Report
+    needs: report
+    if: ${{ inputs.PUBLISH }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
 
       - name: Link Report
-        if: ${{ inputs.PUBLISH }}
-        run: |
-          url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          echo "[Test report]($url)" >> "$GITHUB_STEP_SUMMARY"
+        run: echo "[Test report](${{ steps.deployment.outputs.page_url }})" >> "$GITHUB_STEP_SUMMARY"
