@@ -114,8 +114,10 @@ single source of truth for every skill in this repository — reviewers included
 A pointer never carries content. When a rule changes, it changes in `.agents/` only.
 
 Recurring tasks live here too — adding or removing a Mollie payment method is
-`.agents/skills/payment-methods/`, and setting the release version before internal QA is
-`.agents/skills/increase-version/`.
+`.agents/skills/payment-methods/`, setting the release version before internal QA is
+`.agents/skills/increase-version/`, and bringing the Shopware version matrix of the pipelines
+up to date with the released versions and the available dockware images is
+`.agents/skills/update-shopware-versions/`.
 
 ## 5. Do not run the suites — hand over instead
 

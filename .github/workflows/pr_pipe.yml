@@ -80,9 +80,6 @@ jobs:
       matrix:
         include:
           - shopware: '6.7.13.1'
-            php: '8.4'
-            image: 'dockware/shopware'
-          - shopware: '6.7.12.2'
             php: '8.2'
             image: 'dockware/shopware'
           - shopware: '6.6.10.23'
