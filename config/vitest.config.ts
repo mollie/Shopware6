@@ -14,13 +14,22 @@ export default defineConfig({
         // Writes Allure results for the CI report, next to the PHP suites and Cypress.
         setupFiles: [
             requireFromDev.resolve('allure-vitest/setup'),
-            // Tags every test with the layer and the bundle, which is what the report tree
+            // Tags every test with the bundle it belongs to, which is what the report tree
             // groups by. Resolved from dev/ for the same reason as the reporter above.
             requireFromDev.resolve('./vitest.setup.js'),
         ],
         reporters: [
             'default',
-            [requireFromDev.resolve('allure-vitest/reporter'), {resultsDir: './.reports/allure/results'}],
+            [
+                requireFromDev.resolve('allure-vitest/reporter'),
+                {
+                    resultsDir: './.reports/allure/results',
+                    // The layer of the testing pyramid these tests belong to. Set on the
+                    // reporter rather than in a hook so that a spec which dies in beforeAll
+                    // is still counted - see config/allurerc.mjs for the other three.
+                    globalLabels: {layer: 'Unit'},
+                },
+            ],
         ],
     },
 })

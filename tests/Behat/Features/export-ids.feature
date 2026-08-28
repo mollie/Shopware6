@@ -1,5 +1,6 @@
 @core @export-ids
-Feature: Mollie ids for an accounting export
+Feature: Export IDs
+  Mollie ids for an accounting export
   In order to reconcile the Shopware export with the Mollie report
   As an Admin
 

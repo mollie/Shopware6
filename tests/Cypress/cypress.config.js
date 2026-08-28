@@ -81,7 +81,10 @@ module.exports = defineConfig({
 
             allureCypress(register, config, {
                 resultsDir: 'allure-results',
-                globalLabels: [{name: 'parentSuite', value: 'Cypress E2E'}],
+                // The layer of the testing pyramid these tests belong to. Set here rather
+                // than in a hook so that a spec which dies in before() is still counted -
+                // see config/allurerc.mjs for the other three.
+                globalLabels: [{name: 'layer', value: 'E2E'}],
             })
 
             const result = require('./cypress/plugins/index.js')(register, config)

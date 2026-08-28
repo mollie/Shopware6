@@ -45,7 +45,10 @@ jobs:
 
       - name: Build Report
         run: |
-          npm install -g allure@^3
+          # Installed into the checkout, not globally: config/allurerc.mjs imports Allure's
+          # own default chart list, and a global install is not resolvable from there.
+          npm install --no-save --no-package-lock allure@^3 @allurereport/charts-api@^3
+          export PATH="$PWD/node_modules/.bin:$PATH"
 
           mkdir -p .reports/allure/dumps
 

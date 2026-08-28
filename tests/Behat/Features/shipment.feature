@@ -1,5 +1,5 @@
 @core @shipping
-Feature: Basic Shipment Feature
+Feature: Shipment
   In order to ship authorized order
   As an Admin
 
