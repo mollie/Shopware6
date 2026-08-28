@@ -50,8 +50,9 @@ Do not skip ahead. Each step ends with something reviewable.
 
 0. **Ask** — before you read anything. See the rules below.
 1. **Understand** — read the code that is actually involved. Report which files you read.
-   For subscriptions or vouchers, read `.agents/guidelines/domain.md` first: it holds the
-   Mollie behaviour the code depends on but cannot state itself.
+   For payment status, webhooks, captures, subscriptions or vouchers, read
+   `.agents/guidelines/domain.md` first: it holds the Mollie behaviour the code depends on
+   but cannot state itself.
 2. **Implement** — production code only, following section 2. **No tests yet.**
 3. **Review** — run the reviewers from `.agents/skills/review-*/` (see section 4) and report
    the findings.
@@ -59,7 +60,9 @@ Do not skip ahead. Each step ends with something reviewable.
    approach if it is rejected, then review again.
 5. **Tests** — only now. See `.agents/guidelines/testing.md`.
 6. **Changelog** — see section 6, then review it with `.agents/skills/review-changelog/`.
-7. **Hand over** — a human runs the checks (section 5) and reports the result back.
+7. **Record** — write what you learned about Mollie or Shopware into
+   `.agents/guidelines/domain.md`. See the rules below.
+8. **Hand over** — a human runs the checks (section 5) and reports the result back.
 
 ### Step 0 — ask before you search
 
@@ -83,6 +86,37 @@ The counter-rule, so this does not turn into an interrogation: **no question who
 in a file you have to read anyway**, and no question you can answer by reading the
 neighbouring component for the pattern. If the developer answers *"find it yourself"*, do
 that and do not ask again for that thing.
+
+### Step 7 — record what only a human could have told you
+
+Domain knowledge is worth exactly as much as the next person's ability to find it. Anything this
+task taught you about how Mollie or Shopware really behaves goes into
+`.agents/guidelines/domain.md` before hand-over. If nothing did, say so in one line and move on.
+
+**This is not tied to a code change.** When a maintainer explains a behaviour in passing — in a
+review comment, in an answer to one of your step 0 questions, in a chat message — that is the
+trigger. Write it down in the same turn, while the wording is still theirs.
+
+Write it down when:
+
+- Mollie behaves differently than its API reads — a field that decides more than its name says, a
+  status that is not final, a retry, endpoints that differ per API version.
+- Shopware forces a workaround, and the workaround looks wrong without the reason.
+- Something in the code that looks redundant, duplicated or over-careful is deliberate, and only a
+  maintainer could tell you why.
+- A value comes from outside the code: a law, a market convention, an approval Mollie has not
+  given yet.
+- There is a usual suspect — the cause that is behind nearly every report of a given symptom.
+
+Do **not** write down: anything derivable by reading the code, a coding or test rule (those are
+`php.md` and `testing.md`), a decision that only concerns the current ticket, or anything a
+maintainer has not confirmed. **A guess must never enter this file** — ask, and write the answer.
+
+Form: one `##` section, a handful of sentences, the fact first and what follows for the code
+after it. Extend the existing section when the topic is already there instead of adding a second
+one beside it. No running log, no dated entries, no new file.
+
+Then name in your answer, in one line, which section you added or extended.
 
 ## 4. Review before tests
 
@@ -189,7 +223,8 @@ question the human must answer — never to explain, summarise or reassure.
 - **No caveats.** Only a blocker the human must act on. Never a closing reservation.
 - **No structure under ten lines.** No headers, no tables, no bold labels.
 - Name the files you changed. Say what you deliberately left out.
-- Do not write documentation or "learning" notes.
+- Do not write documentation or "learning" notes. The one exception is step 7:
+  maintainer-confirmed Mollie or Shopware behaviour, in `.agents/guidelines/domain.md`.
 
 Do not commit, push or open a pull request unless asked.
 
@@ -221,8 +256,8 @@ that should change and leave it to the developer.
 - **No new file for a single correction.** No running log of learnings, no `corrections.md`.
   The five homes above are enough; if a correction fits none of them, say so and ask.
 - **A fact is not a rule.** An undocumented Mollie or Shopware behaviour is not process
-  feedback. It belongs in `.agents/guidelines/domain.md`, not in the rule files above — ask
-  before writing it there, and only write what a maintainer confirmed.
+  feedback. It goes to `.agents/guidelines/domain.md` under the rules of step 7, not into the
+  rule files above.
 - **State what you changed.** One line: which file, which rule now reads differently.
 - **The test:** would this correction now be caught without the human saying anything? If
   not, it went in the wrong place.
