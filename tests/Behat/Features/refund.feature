@@ -1,5 +1,5 @@
 @core @refund
-Feature: Refund Management
+Feature: Refund
   In order to refund paid orders
   As an Admin
 

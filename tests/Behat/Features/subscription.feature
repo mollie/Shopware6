@@ -1,5 +1,5 @@
 @core @subscription
-Feature: Subscription checkout
+Feature: Subscription
   In order to use subscription payment methods
   As a customer
 

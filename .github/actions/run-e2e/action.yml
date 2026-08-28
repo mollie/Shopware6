@@ -242,7 +242,7 @@ runs:
       run: |
         docker exec \
           -e ALLURE_OUTPUT_DIRECTORY=${{ inputs._ALLURE_DIR }}/results \
-          -e ALLURE_LAYER="Integration Tests" \
+          -e ALLURE_LAYER="Integration" \
           shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration groups="${{ inputs.PHPUNIT_GROUPS }}" -B'
 
     - name: Functional tests

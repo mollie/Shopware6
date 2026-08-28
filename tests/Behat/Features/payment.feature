@@ -1,5 +1,5 @@
 @core @payment
-Feature: Basic payment checkout
+Feature: Payment
   In order to use payment methods
   As a customer
 
