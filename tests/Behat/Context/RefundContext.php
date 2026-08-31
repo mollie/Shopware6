@@ -12,8 +12,9 @@ use Mollie\Shopware\Component\Mollie\Gateway\RefundGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\RefundGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\RefundStatus;
-use Mollie\Shopware\Component\Refund\Controller\RefundController;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
+use Mollie\Shopware\Component\Refund\Route\CancelRefundRoute;
+use Mollie\Shopware\Component\Refund\Route\CreateRefundRoute;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
@@ -208,13 +209,13 @@ final class RefundContext extends ShopwareContext
     {
         $context = $this->getCurrentSalesChannelContext()->getContext();
 
-        /** @var RefundController $controller */
-        $controller = $this->getContainer()->get(RefundController::class);
+        /** @var CancelRefundRoute $route */
+        $route = $this->getContainer()->get(CancelRefundRoute::class);
 
         $request = new Request();
         $request->request->replace(['orderId' => $orderId, 'refundId' => $refundId]);
 
-        $controller->cancel($request, $context);
+        $route->cancel($request, $context);
     }
 
     private function findDalRefundByMollieId(string $mollieRefundId): RefundEntity
@@ -285,8 +286,8 @@ final class RefundContext extends ShopwareContext
     {
         $context = $this->getCurrentSalesChannelContext()->getContext();
 
-        /** @var RefundController $controller */
-        $controller = $this->getContainer()->get(RefundController::class);
+        /** @var CreateRefundRoute $route */
+        $route = $this->getContainer()->get(CreateRefundRoute::class);
 
         $request = new Request();
         $request->request->replace($params);
@@ -299,7 +300,7 @@ final class RefundContext extends ShopwareContext
         Storage::set(self::STORAGE_REFUND_EXCEPTION, null);
 
         try {
-            $response = $controller->create($request, $context);
+            $response = $route->create($request, $context);
             $data = json_decode((string) $response->getContent(), true);
             $refund = $data['refund'];
             Storage::set(self::STORAGE_LAST_REFUND_RESPONSE, $refund);

@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Unit\Refund;
+namespace Mollie\Shopware\Unit\Refund\Return;
 
-use Mollie\Shopware\Component\Refund\OrderReturnSubscriber;
-use Mollie\Shopware\Unit\Refund\Fake\FakeOrderReturnHandler;
+use Mollie\Shopware\Component\Refund\Return\OrderReturnSubscriber;
+use Mollie\Shopware\Unit\Refund\Return\Fake\FakeCancelAction;
+use Mollie\Shopware\Unit\Refund\Return\Fake\FakeRefundAction;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Context;
@@ -40,27 +41,29 @@ final class OrderReturnSubscriberTest extends TestCase
         $this->assertArrayNotHasKey('state_enter.order_return.state.cancelled', $events);
     }
 
-    public function testWrittenOnLiveVersionTriggersHandler(): void
+    public function testWrittenOnLiveVersionTriggersTheRefundAction(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $subscriber->onOrderReturnWritten($this->insertEvent('return-id', Context::createDefaultContext()));
 
-        $this->assertSame(['return-id'], $handler->returnOnCreatedAsDoneCalls);
+        $this->assertSame(['return-id'], $refundAction->executeOnCreateCalls);
     }
 
-    public function testWrittenOnNonLiveVersionDoesNotTriggerHandler(): void
+    public function testWrittenOnNonLiveVersionDoesNotTriggerTheRefundAction(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         // Opening an order in the admin clones its returns into a non-live version (issue #1421).
         $context = Context::createDefaultContext()->createWithVersionId('0198a1b2c3d4e5f60718293a4b5c6d7e');
 
         $subscriber->onOrderReturnWritten($this->insertEvent('return-id', $context));
 
-        $this->assertSame([], $handler->returnOnCreatedAsDoneCalls);
+        $this->assertSame([], $refundAction->executeOnCreateCalls);
     }
 
     /**
@@ -69,34 +72,37 @@ final class OrderReturnSubscriberTest extends TestCase
      */
     public function testAnUpdatedReturnDoesNotTriggerAnotherRefund(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $writeResult = new EntityWriteResult('return-id', [], 'order_return', EntityWriteResult::OPERATION_UPDATE);
 
         $subscriber->onOrderReturnWritten(new EntityWrittenEvent('order_return', [$writeResult], Context::createDefaultContext()));
 
-        $this->assertSame([], $handler->returnOnCreatedAsDoneCalls);
+        $this->assertSame([], $refundAction->executeOnCreateCalls);
     }
 
     public function testAReturnSetToDoneIsRefunded(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done'));
 
-        $this->assertSame(['return-id'], $handler->returnCalls);
+        $this->assertSame(['return-id'], $refundAction->executeCalls);
     }
 
     public function testACancelledReturnIsCancelled(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('cancelled'));
 
-        $this->assertSame(['return-id'], $handler->cancelCalls);
+        $this->assertSame(['return-id'], $cancelAction->executeCalls);
     }
 
     /**
@@ -104,13 +110,14 @@ final class OrderReturnSubscriberTest extends TestCase
      */
     public function testAnyOtherReturnStateIsIgnored(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('in_progress'));
 
-        $this->assertSame([], $handler->returnCalls);
-        $this->assertSame([], $handler->cancelCalls);
+        $this->assertSame([], $refundAction->executeCalls);
+        $this->assertSame([], $cancelAction->executeCalls);
     }
 
     /**
@@ -119,12 +126,13 @@ final class OrderReturnSubscriberTest extends TestCase
      */
     public function testLeavingAStateDoesNotRefund(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done', StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_LEAVE));
 
-        $this->assertSame([], $handler->returnCalls);
+        $this->assertSame([], $refundAction->executeCalls);
     }
 
     /**
@@ -133,14 +141,15 @@ final class OrderReturnSubscriberTest extends TestCase
      */
     public function testAStateChangeOnANonLiveVersionRefunds(): void
     {
-        $handler = new FakeOrderReturnHandler();
-        $subscriber = new OrderReturnSubscriber($handler);
+        $refundAction = new FakeRefundAction();
+        $cancelAction = new FakeCancelAction();
+        $subscriber = new OrderReturnSubscriber($refundAction, $cancelAction);
 
         $context = Context::createDefaultContext()->createWithVersionId('0198a1b2c3d4e5f60718293a4b5c6d7e');
 
         $subscriber->onOrderReturnStateChanged($this->stateChangeEvent('done', context: $context));
 
-        $this->assertSame(['return-id'], $handler->returnCalls);
+        $this->assertSame(['return-id'], $refundAction->executeCalls);
     }
 
     private function stateChangeEvent(

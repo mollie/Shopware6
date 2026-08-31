@@ -5,15 +5,18 @@ namespace Mollie\Shopware\Unit\FlowBuilder\Action;
 
 use Mollie\Shopware\Component\FlowBuilder\Action\RefundOrderAction;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Refund\Controller\RefundController;
 use Mollie\Shopware\Component\Refund\CreditNoteService;
 use Mollie\Shopware\Component\Refund\DAL\Order\OrderExtension;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundCollection;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundDefinition;
 use Mollie\Shopware\Component\Refund\DAL\Refund\RefundEntity;
 use Mollie\Shopware\Component\Refund\RefundableTotalCalculator;
+use Mollie\Shopware\Component\Refund\RefundCompositionBuilder;
 use Mollie\Shopware\Component\Refund\RefundItemSplitter;
+use Mollie\Shopware\Component\Refund\RefundOrderLoader;
 use Mollie\Shopware\Component\Refund\RefundPersister;
+use Mollie\Shopware\Component\Refund\RefundTotalsBuilder;
+use Mollie\Shopware\Component\Refund\Route\CreateRefundRoute;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
@@ -206,20 +209,24 @@ final class RefundOrderActionTest extends TestCase
 
     private function action(): RefundOrderAction
     {
-        return new RefundOrderAction($this->controller(), new NullLogger());
+        return new RefundOrderAction($this->createRefundRoute(), new NullLogger());
     }
 
-    private function controller(): RefundController
+    private function createRefundRoute(): CreateRefundRoute
     {
         $logger = new NullLogger();
 
-        $controller = new RefundController(
-            $this->orderRepository,
+        $route = new CreateRefundRoute(
+            new RefundOrderLoader(
+                $this->orderRepository,
+                new FakeGateway('', new Payment('tr_1')),
+                new EventSpy()
+            ),
+            new RefundCompositionBuilder(),
+            new RefundTotalsBuilder(new RefundableTotalCalculator(), $logger),
             $this->refundGateway,
-            new FakeGateway('', new Payment('tr_1')),
             $this->refundBuilder,
             new RefundPersister($this->refundRepository, new FakeStockStorage(), new RefundItemSplitter()),
-            new RefundableTotalCalculator(),
             new EventSpy(),
             new FakeSettingsService(),
             new CreditNoteService(
@@ -234,8 +241,8 @@ final class RefundOrderActionTest extends TestCase
 
         // AbstractController::json() asks the container for a serializer; an empty container makes
         // it fall back to json_encode.
-        $controller->setContainer(new Container());
+        $route->setContainer(new Container());
 
-        return $controller;
+        return $route;
     }
 }
