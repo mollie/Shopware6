@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-.PHONY: help prod dev clean build fixtures pr release validate report build-js
+.PHONY: help prod dev clean build fixtures pr release validate report phpmetrics build-js
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
@@ -158,6 +158,45 @@ report: ##3 Runs the unit tests with coverage and prints the line coverage of sh
 	@cp -r ./.reports/phpunit/coverage ../../../public/coverage
 	@echo "  HTML report at .reports/phpunit/coverage/index.html"
 	@echo "  HTML report in the browser at <shop-url>/coverage"
+	@echo ""
+
+# PHPMetrics is deliberately not part of composer.json: its dependencies clash with the
+# other dev tools on the pipeline. It gets its own composer project under dev/tools
+# instead, so the plugin's dependency tree stays untouched.
+# Version 2.x and not the 3.0 release candidates: only 2.x still has --junit, which is
+# what pairs the metrics with the test results.
+PHPMETRICS_DIR := ./dev/tools/phpmetrics
+PHPMETRICS_BIN := $(PHPMETRICS_DIR)/vendor/bin/phpmetrics
+
+phpmetrics: ##3 Installs PHPMetrics and generates the metrics report from the unit test run
+	# ----------------------------------------------------------------
+	@test -f $(PHPMETRICS_BIN) || ( mkdir -p $(PHPMETRICS_DIR) \
+		&& composer require --working-dir=$(PHPMETRICS_DIR) --no-interaction phpmetrics/phpmetrics:^2.11 )
+	# ----------------------------------------------------------------
+	# reset previous report output
+	rm -rf ./.reports/phpmetrics ../../../public/phpmetrics
+	mkdir -p ./.reports/phpmetrics
+	# ----------------------------------------------------------------
+	# PHPMetrics reads the JUnit log to tell which classes the tests actually reach, so the
+	# unit tests have to run first. No coverage driver is involved: PHPMetrics cannot read
+	# Clover, use "make report" for line coverage.
+	# A non-zero exit code must not stop the report here: PHPUnit already returns 1 for the
+	# deprecations the Shopware core triggers, and the JUnit log is written either way.
+	@php vendor/bin/phpunit --configuration=./config/phpunit.xml --log-junit ./.reports/phpmetrics/junit.xml \
+		|| echo "  The test run reported problems - see the JUnit page of the report."
+	# ----------------------------------------------------------------
+	# Analysed directories, exclusions and output paths live in config/.phpmetrics.json,
+	# so they stay in sync with the exclusions of config/phpunit.xml.
+	# PHPMetrics 2.x still writes dynamic properties, which buries the summary under
+	# deprecations on PHP 8.4+. They come from the tool, not from this plugin.
+	@php -d error_reporting="E_ALL & ~E_DEPRECATED" $(PHPMETRICS_BIN) --config=./config/.phpmetrics.json
+	# ----------------------------------------------------------------
+	# Publish the HTML report into the Shopware document root, so it can be opened
+	# in the browser at <shop-url>/phpmetrics instead of only from the file system.
+	@cp -r ./.reports/phpmetrics/html ../../../public/phpmetrics
+	@echo ""
+	@echo "  HTML report at .reports/phpmetrics/html/index.html"
+	@echo "  HTML report in the browser at <shop-url>/phpmetrics"
 	@echo ""
 
 # Behat prints progress to stdout. CI passes allure=<dir> to additionally write Cucumber

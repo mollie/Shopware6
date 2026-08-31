@@ -226,6 +226,19 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
     private function loadOrder(string $orderId, string $orderNumber, Context $context): OrderEntity
     {
+        $criteria = $this->buildOrderCriteria($orderId, $orderNumber);
+
+        $order = $this->orderRepository->search($criteria, $context)->first();
+
+        if (! $order instanceof OrderEntity) {
+            throw $orderNumber !== '' ? ShippingException::orderNumberNotFound($orderNumber) : ShippingException::orderNotFound($orderId);
+        }
+
+        return $order;
+    }
+
+    private function buildOrderCriteria(string $orderId, string $orderNumber): Criteria
+    {
         $criteria = new Criteria();
         $criteria->addAssociation('lineItems.product');
         $criteria->addAssociation('transactions.stateMachineState');
@@ -235,17 +248,13 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         if ($orderNumber !== '') {
             $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
-        } else {
-            $criteria->setIds([$orderId]);
+
+            return $criteria;
         }
 
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $criteria->setIds([$orderId]);
 
-        if (! $order instanceof OrderEntity) {
-            throw $orderNumber !== '' ? ShippingException::orderNumberNotFound($orderNumber) : ShippingException::orderNotFound($orderId);
-        }
-
-        return $order;
+        return $criteria;
     }
 
     /**

@@ -16,7 +16,10 @@ Invert the condition and return. The happy path stays at the lowest indentation 
 **No nested conditionals.**
 Use guard clauses, `continue` inside loops, or extract a private method.
 
-The codebase has ~16 `else` branches across 568 files — do not add to that number.
+The codebase has ~11 `else` branches across 568 files — do not add to that number.
+The one legitimate exception is a compatibility switch that declares one of two class
+bodies depending on the Shopware version (`AbstractMolliePaymentHandler`): there is no
+early return at file level. Do not report that one.
 
 **No computed list in a loop header.** A call that *builds* the list — `explode()`,
 `array_merge()`, `array_filter()`, `json_decode()` — is assigned to a named variable first:

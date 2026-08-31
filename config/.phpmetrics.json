@@ -1,0 +1,18 @@
+{
+    "includes": [
+        "../src",
+        "../shopware"
+    ],
+    "excludes": [
+        "Migration/",
+        "Component/Fixture/"
+    ],
+    "report": {
+        "html": "../.reports/phpmetrics/html"
+    },
+    "plugins": {
+        "junit": {
+            "report": ".reports/phpmetrics/junit.xml"
+        }
+    }
+}
