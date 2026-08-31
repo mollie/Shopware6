@@ -17,6 +17,9 @@ final class CustomerBuilder
     private bool $guest = false;
     private ?SalutationEntity $salutation = null;
     private ?CustomerAddressEntity $defaultBillingAddress = null;
+    private ?CustomerAddressEntity $defaultShippingAddress = null;
+    private ?CustomerAddressEntity $activeBillingAddress = null;
+    private ?CustomerAddressEntity $activeShippingAddress = null;
 
     public static function create(): self
     {
@@ -79,6 +82,31 @@ final class CustomerBuilder
         return $this;
     }
 
+    public function withDefaultShippingAddress(CustomerAddressEntity $address): self
+    {
+        $this->defaultShippingAddress = $address;
+
+        return $this;
+    }
+
+    /**
+     * The address the current checkout uses. Shopware falls back to the default address when none
+     * is set, so a test that cares about the fallback leaves this out.
+     */
+    public function withActiveBillingAddress(CustomerAddressEntity $address): self
+    {
+        $this->activeBillingAddress = $address;
+
+        return $this;
+    }
+
+    public function withActiveShippingAddress(CustomerAddressEntity $address): self
+    {
+        $this->activeShippingAddress = $address;
+
+        return $this;
+    }
+
     public function build(): CustomerEntity
     {
         $customer = new CustomerEntity();
@@ -95,6 +123,18 @@ final class CustomerBuilder
 
         if ($this->defaultBillingAddress instanceof CustomerAddressEntity) {
             $customer->setDefaultBillingAddress($this->defaultBillingAddress);
+        }
+
+        if ($this->defaultShippingAddress instanceof CustomerAddressEntity) {
+            $customer->setDefaultShippingAddress($this->defaultShippingAddress);
+        }
+
+        if ($this->activeBillingAddress instanceof CustomerAddressEntity) {
+            $customer->setActiveBillingAddress($this->activeBillingAddress);
+        }
+
+        if ($this->activeShippingAddress instanceof CustomerAddressEntity) {
+            $customer->setActiveShippingAddress($this->activeShippingAddress);
         }
 
         return $customer;
